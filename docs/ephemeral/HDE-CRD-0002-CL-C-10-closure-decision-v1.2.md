@@ -40,7 +40,7 @@ next: CL-20 — Prepare Closure Memo and Post-Closure Record — 100926.1, Isis;
 | :- | :- |
 | Decision | **`CLOSE`** |
 | State | **`CHANGE_CLOSED`** |
-| Why | The one element v1.1 found missing, B-6, is now met. A hosted closeout run validated HDE-CRD-0002's committed close pack, and it started by itself: run 40353776342 on #755's head `a90029c3`, with bytes identical to #751's head `2ae4fd5e` (§2, §3). Nothing else was open: v1.0 §2 to §5 and v1.1 §2 to §6 stand. The closure trace now holds on every row (§4), and no acceptance-critical blocker remains (§5). |
+| Why | The one element v1.1 found missing, B-6, is now met. A hosted closeout run validated HDE-CRD-0002's committed close pack, and it started by itself: run 40353776342 on #755's head `a90029c3`, with bytes identical to #751's head `2ae4fd5e` (§2, §3). Nothing else was open: v1.0 §2 to §5 and v1.1 §2 to §6 stand. The closure trace now holds on every row (§4), and no acceptance-critical blocker remains (§5). The `main` push run after #755 failed one test, a known intermittent failure that predates this change (OBS-17). It is classified in §2 and does not bear on the close. |
 | Close Gate | Ordinary Close Gate complete. The close mutation set is #751. Its exact bytes were validated hosted by the `test` job (run 40271349767) and the closeout workflow (run 40353776342). No exceptional closure applies. |
 | Not established | Board state, PF09 or PF30 movement, canon drainage, deployment or release activation (§14). |
 | Next | CL-20, after the Product Owner merges #756 and this record's pull request. Post-closure work is in §9, separate from acceptance. |
@@ -53,7 +53,7 @@ next: CL-20 — Prepare Closure Memo and Post-Closure Record — 100926.1, Isis;
 | #755 | Merged as `1fb4731b` (single parent `f1cdc88d`). `1fb4731b^{tree}` equals `a90029c3^{tree}`, which is `59f41516809058b63f435ebd1509e4f9ffedb515`. Three files: the closeout workflow, its owner test and `AGENTS.md` (+181, −18). Codex code review of `a90029c` found nothing; 0 review threads. |
 | Closeout run 40353776342, job 121680627274 | Log downloaded and read whole: 483 lines, 38,587 bytes, SHA-256 `f97591749aaa7d462be4d744cd7c9cfd6bfb517500273cc5202f7c8e0fc5dd2b` |
 | `ci` run 40353776329, job 121680627088 (`test` on `a90029c3`) | Log downloaded whole: 928 lines, 75,532 bytes, SHA-256 `a85b7d7a8eea3a5f2dae3e0363f49e44b22e0a9b97a42f624814a19d8193ee03`, equal to CL-05's record. Markers and counts read. |
-| `ci` push run 40359063642 on `1fb4731b` | In progress when this record was written; its result is not part of this decision (§2) |
+| `ci` push run 40359063642, job 121699262919 (`test` on `main` `1fb4731b`) | **Failed**: one test failed. Log downloaded and read whole: 627 lines, 52,777 bytes, SHA-256 `c203351ee12a9acb77520151b7aa8d1e6506964a67c29663e57d353fcc1eb22a`. Classified in §2 and §5 |
 | v1.0 and v1.1 of this decision | v1.0 read in full here (420 lines); v1.1 is this session's own record |
 | CL-20 — 100926.1 | Read in full (page state 2026-10-12T02:29:16.766Z), as the receiver of `CLOSE` |
 | PF06 §1.0.6 and §3.5.1 | Re-read in full here |
@@ -115,7 +115,18 @@ next: CL-20 — Prepare Closure Memo and Post-Closure Record — 100926.1, Isis;
   - release 79.
 - `CI_APPLICABILITY_AND_EXACT_HEAD_OK`; 0 `##[error]` lines.
 
-**Push run on `main`.** Run 40359063642 on `1fb4731b` was at its changed-test step when this record was written. Its tree is `a90029c3`'s, which the run above already passed. Its result does not bear on this decision.
+**Push run on `main`: failed, a known intermittent failure (OBS-17).** Run 40359063642, job 121699262919, `test` on `1fb4731b`, event `push`, `reason=selected_lanes;paths=3`. Its log was read whole.
+- **What failed.** The changed-test step: 1 failed, 4,528 passed, 2 skipped. The failing test is `tests/qa/test_generate_epic_close_pack.py::test_manifest_reader_rejects_new_report_with_old_manifest`, at line 2891 (`assert _run(... "--check") == 0`, got 1). Its stderr: `EPIC_CLOSE_PACK_ERROR:MANIFEST_BINDING_MISMATCH` (the test's expected first refusal), then `EPIC_CLOSE_PACK_ERROR:CHECK_MODE_MUTATION` (the unexpected one).
+- **The other steps.** Every later lane was skipped, and the final step reported `APPLICABLE_CI_LANE_NOT_SUCCESSFUL`. `main` is red at `1fb4731b`.
+- **Classification.** This is OBS-17 recurring. It is not a new defect of this change.
+  - The test came from HDE-EPIC039 (#396, `a74558c4`, 2026-08-21), before this change.
+  - The same failure was recorded at WU-PR-01 (run 38344773095 on `496e2c7`; OBS-17) and at WU-PR-06 (`7a3b7b2`).
+  - The Live QA Guide carried it into QA as IR-7: "Intermittent hosted test failures: `tests/tools/test_prepush_check.py` (git auto-maintenance race) and `test_manifest_reader_rejects_new_report_with_old_manifest` (mechanism unknown)".
+  - The WU-PR-07 lineage review left it open as LR7-O13, owner "QA tool and test owner, through this IA (as LR6-O8)".
+  - The same tree passed this test on #755's `pull_request` run (40353776329).
+- **Local reproduction, not achieved.** The test passed 8 of 8 runs on this container's relatime `/tmp` and 20 of 20 on a strictatime tmpfs, with git 2.43.0. The hosted runner has git 2.55.0.
+- **Mechanism, not established here.** The writer's check refuses any worktree metadata change, or any change to the Git control files (`HEAD`, `index`, `logs/HEAD`, `config`, `packed-refs`), during `--check`. The test runs `git commit` immediately before that `--check`. One hypothesis fits: a background `git maintenance` run started by that commit touches a control file. The Guide records the same race for `tests/tools/test_prepush_check.py` (IR-7; FND-024). It is a hypothesis for the owner, not a finding.
+- **Bearing on closure.** None on the close pack. The hosted closeout run and every local check passed on the same bytes. The test is not a bound input of the close pack, and it exercises a synthetic repository, not HDE-CRD-0002's close pack. The open item is recorded with its owner in §8.
 
 These local runs are this decision's verification. They are not CI's result.
 
@@ -168,6 +179,7 @@ No acceptance-critical blocker remains.
 | B-3 (v1.0): CR-9 | Decided at v1.0 §6.1 |
 | B-4, B-5 | Close-tooling defects, repaired by CL-05 in #750 and #752 |
 | B-6 (v1.1) | Met (§3) |
+| OBS-17 recurrence on `main` push run 40359063642 (§2) | Not acceptance-critical. It is a known intermittent test failure that predates this change. QA carried it as IR-7, and LR7-O13 gives it an owner. It does not touch the close pack, its hosted validation or any approved objective's evidence. It stays open with its owner (§8) |
 | Every other item (v1.0 §4 last row; v1.1 §8; §8 here) | Not a failed approved objective. Each is an owned later-change candidate, a pending drainage or an accepted risk (PF19 §3.1.3) |
 
 ## 6. Retrospective additions since v1.1
@@ -219,6 +231,7 @@ v1.0 §7 and v1.1 §8 stand, with these changes:
 | CL-05 O-5: HDE Build Notes 2.13's kept-property text, now also narrowed by #755's trigger addition | Product Owner: canon drainage or a later addendum | Open |
 | CL-05 O-6 and O-7; CL-L7 to CL-L9; §11 | GCFPE-MGMT-10 maintenance owner (MB-030) | Reported |
 | CL-05 O-8: an invalid tracked `audit/*_MANIFEST.json` would fail a close-tooling pull request's closeout run | Whoever adds such a file | No action now |
+| OBS-17 / LR6-O8 / LR7-O13: `test_manifest_reader_rejects_new_report_with_old_manifest` fails intermittently on hosted runners with `CHECK_MODE_MUTATION`. It recurred on `main` push run 40359063642 at `1fb4731b`, so `main` is red there until the next passing push run (§2). Mechanism not established; the hypothesis in §2 is for the owner | QA tool and test owner, through the IA (LR7-O13); the Product Owner for scheduling | **Open**; a later-change candidate |
 | Every v1.0 §7 row other than the close mutation set (PO-2, PO-5, the RCA's D-1, undrained HDE Build Notes, FND-028, FND-029, FND-012, LR7-O1/FND-020, documentation candidates, later-change candidates, FND-004, O-1, O-A, OBS-1, OBS-2, OBS-12, I-1, residual workstation state, MB-021, addendum numbering) | As v1.0 §7 names them | As v1.0 §7 records |
 
 ## 9. Post-closure administrative work (not acceptance blockers)
@@ -321,6 +334,7 @@ Read on `main` at `1fb4731b`. No `docs/pfcanon/` file changed since v1.1.
 | Return work | This decision's v1.1 §3 and §7 | §3 |
 | Measures | WU-PR-07 business-case disposition v1.0; HDE Build Notes 2.24 | §7 |
 | PF30 | CR-1, as carried in v1.0 §13 | §4 |
+| The known intermittent test failure (OBS-17) | Live QA Guide v1.0 IR-7; WU-PR-07 lineage review v1.0, LR7-O13; WU-PR-01 lineage review v1.0 (run 38344773095); WU-PR-06 result v1.20 (`7a3b7b2`); `tools/qa/generate_epic_close_pack.py` `main` and `_run_check` (the check-mode comparison) | §2, §5, §8 |
 | Repository rules | `AGENTS.md`: "Evidence attribution, currentness and distinct decisions", closed rails, "Pre-push check", "Truncation/retrieval-failure guardrail" (logs read whole, with byte counts and hashes) | §1, §2 |
 
 v1.0's and v1.1's blocks stand for every topic they cover.
