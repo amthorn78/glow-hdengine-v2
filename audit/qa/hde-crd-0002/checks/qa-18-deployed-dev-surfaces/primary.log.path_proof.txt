@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-18-deployed-dev-surfaces/primary.log
+size_bytes: 19984
+sha256: 63fe7da715fc16c6f0e9d9246d56cfcda4581565d3cbddaecf2056f67a48856b
+mtime_utc: 2026-10-25T23:24:46Z
+produced_at_utc: 2026-09-22T14:25:29Z
