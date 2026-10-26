@@ -7,13 +7,14 @@ Preparation outcome: **READY**. Save completeness and validation are recorded in
 | Field | Value |
 | :---- | :---- |
 | Prompt | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1, https://app.notion.com/p/3f44590a05eb8172a314fe6b958bb9ff (fetched live 2026-10-26) |
-| Run identity | `gtwpe-20261026-pf10-v13-8-8 / T-PF05 / TW-DRAIN-10 / run 1` |
+| Run identity | `gtwpe-20261026-pf10-v13-8-8 / T-PF05 / TW-DRAIN-10 / run 1`, package revision 2 |
+| Revision | Revision 2 replaces revision 1 (commit `431661b`, RL-01 to RL-05) in place, at Nathan's direction in this session (2026-10-26) to fix the stale §4.1.6, §5.1.0 and §5.1.7 sentences in this run rather than in a new drain. It adds RL-06 to RL-08 and widens RL-05's entry; RL-01 to RL-04 are unchanged. The baseline is unchanged |
 | Preparer | Claude Code cloud session https://claude.ai/code/session_01D49VTgmgq8kpkcN9WLDdAW, started by Nathan for T-PF05 |
 | Target | `PF05-Canon-HDE-CLI-API-Vendor-Ref` v2.5.3, `docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.3.md` |
 | Baseline bytes | blob `8b136def4c22f8308169a1b0315086b3e90ead1d`; 323,966 bytes; 4,439 LF-terminated lines; no CR; SHA-256 `65a9ad6e9d4e75cf50c4e0ae5ac6b3cbabce35bea759de9a6ef4c77549dd6352` |
 | Baseline commit | read at `origin/main` `0838ba08254eaefc888019df49a06aa2ae99cc6c`; the same blob as at the ledger baseline `9dda63dd3f05f496c3ff67e95da78550d3950c5a` |
 | Ledger | `docs/ephemeral/gtwpe/gtwpe-20261026-pf10-v13-8-8/LEDGER.md`, task T-PF05; rows A07, A08, A09 (with X05), S-APR |
-| Change sources | PF10 `docs/pfcanon/PF10-HDE-Build-Notes-v13.8.8.md` v13.8.8 (addenda 2.7 lines 688–889, 2.8 lines 890–1002, 2.9 lines 1003–1101; front matter lines 1–223); `docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md` lines 147–193 (S-APR), overlaid by `docs/ephemeral/HDE-CRD-0002-specification-delta-v1.0.md` C-8 to C-12; `audit/HDE-CRD-0002_close_report.md` (the recorded limits in RL-03) |
+| Change sources | PF10 `docs/pfcanon/PF10-HDE-Build-Notes-v13.8.8.md` v13.8.8 (addenda 2.7 lines 688–889, 2.8 lines 890–1002, 2.9 lines 1003–1101; front matter lines 1–223); `docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md` lines 147–193 (S-APR), overlaid by `docs/ephemeral/HDE-CRD-0002-specification-delta-v1.0.md` C-8 to C-12; `audit/HDE-CRD-0002_close_report.md` (the recorded limits in RL-03). Supporting for RL-06 and RL-08: PF10 addenda 2.2 and 2.4 (S03) and `tests/retired_tests.md` |
 | Held, not drafted | H-03 (LR5-O1, §5.11.2 and §5.12); H-04 (OBS-W4-4, §7.1.11f "governed clock boundary") |
 
 ## Payload convention
@@ -142,12 +143,12 @@ The contract in this section is Required-Now. Static inspection at `main@0838ba0
 - Redline ID: RL-05
 - Operation: `INSERT`
 - Change type: CONSISTENCY (change-history entry the target's own rules require)
-- Source items: PF05 §0.4 "Editorial vs. normative" and §11.1 "Policy" and "Entry style"; the changes of RL-01 to RL-04
+- Source items: PF05 §0.4 "Editorial vs. normative" and §11.1 "Policy" and "Entry style"; the changes of RL-01 to RL-04 and RL-06 to RL-08
 - Target document: `PF05-Canon-HDE-CLI-API-Vendor-Ref`
 - Section path: line 4113: `# **11\. Change Log & Doc-Delta Hooks \[Required-Now\]**` > line 4115: `## **11.1 Change Log (concise, normative)**`
 - Location: original line 4127; the gap between the `v2.5.3` Change Log entry and the "Where to put links." bullet
 - Scope and expected count: whole PF; expected 1; observed 1
-- Rationale: RL-03 lifts the canon directive "do not invoke or describe the flag as operational", a normative delta that §0.4 and §11.1 require to be logged. The entry uses the target's one-line format and names the version TW-APPLY-10 derives (v2.5.3 bumped once, v2.5.4). The format records no date.
+- Rationale: RL-03 lifts the canon directive "do not invoke or describe the flag as operational", a normative delta that §0.4 and §11.1 require to be logged. The entry uses the target's one-line format, covers every section the batch changes and names the version TW-APPLY-10 derives (v2.5.3 bumped once, v2.5.4). The format records no date.
 - BEFORE anchor (445 bytes; SHA-256 `e5c18567bd896f69d90742aad08e8dcd1c764f7cb2923053da7ce0729979f302`; ends with LF: yes; occurs once):
 
 ````text
@@ -160,10 +161,79 @@ The contract in this section is Required-Now. Static inspection at `main@0838ba0
 * **Where to put links.** Governed artifact identities and paths are indexed through the Evidence Catalog in **HDE-Schemas & Artifacts**; do not paste payload or transport bytes here. If the Human Evidence Index changes, record “Sentinel updated: YES” only after recomputing `docs/evidence/INDEX.sha256`; the sentinel is the SHA-256 digest of the canonical bytes of `docs/evidence/INDEX.json` and is not mirrored.
 ````
 
-- INSERTED TEXT (252 bytes; SHA-256 `a68f4e6f41c980a21969654ba944a4fc91e67c0a182206f17de8e0a31edd15ad`; ends with LF: yes), placed at the gap between the two anchors:
+- INSERTED TEXT (363 bytes; SHA-256 `b04f1143914eb9d36d3a85d85a088c246c4f6edc6f1202397c9fe1e80e7abf23`; ends with LF: yes), placed at the gap between the two anchors:
 
 ````text
-* v2.5.4 — Record the delivered production vendor override and its limits in §7.1.11, remove it from the gap statements in §§1 and 7.2.0, and record the Endpoint Catalog state with the canon-retired route exclusion in §5.6. Sentinel updated: NO.
+* v2.5.4 — Record the delivered production vendor override and its limits in §7.1.11, remove it from the gap statements in §§1 and 7.2.0, record the Endpoint Catalog state with the canon-retired route exclusion in §5.6, and record the resolved not-found, showcompat-help and legacy CLI proof limitations in §§4.1.6, 5.1.0 and 5.1.7. Sentinel updated: NO.
+````
+
+## RL-06
+
+- Redline ID: RL-06
+- Operation: `REPLACE`
+- Change type: CANON_UPDATE
+- Source items: Nathan's direction of 2026-10-26 in this session to fix the stale sentences in this run; A08 (S07 met: `hdctl --help` names `magic10_compat_result.v1`); supporting PF10 2.2 and 2.4 (S03 met) and `tests/retired_tests.md`
+- Target document: `PF05-Canon-HDE-CLI-API-Vendor-Ref`
+- Section path: line 512: `# 4\. Commands (by status)` > line 516: `## 4.1 hdctl showcompat \[Partially Implemented; Required‑Now\]` > line 833: `### 4.1.6 Implementation status (bounded repository inspection)`
+- Location: original line 837; the "Remaining CLI limitations:" bullet of §4.1.6
+- Scope and expected count: whole PF; expected 1; observed 1
+- Rationale: The bullet says the parser still describes Reader v1 bytes and that the legacy `scripts/hd_cli.py` / `tests/reader_v1/test_cli_proof.py` failure stands. S07 changed the help text, and S03 retired the test with a recorded reason. Both facts were verified at `main@0838ba08254eaefc888019df49a06aa2ae99cc6c`. The bullet's other limitations stay.
+- OLD (482 bytes; SHA-256 `96920064dba80c2f2e2534c5266d38117024520edba0f78427fbddf3694b02d3`; ends with LF: no):
+
+````text
+* **Remaining CLI limitations:** the adopted explicit stdin/user flag spellings and file canonical-byte/schema gates are not established by this inspection; the parser still describes Reader v1 bytes rather than compat stdout. `--dump-reader` does not emit Reader v2. The separate stateless run-bundle capability in §4.1.7 remains a gap. The legacy `scripts/hd_cli.py` / `tests/reader_v1/test_cli_proof.py` failure is recorded in HDE Build Notes and is not corrected or rerun here.
+````
+
+- NEW (728 bytes; SHA-256 `367e316da87bb797b311fe8fdefa8cb01f97cd28a71a0b4bcba7a6d757838e5e`; ends with LF: no):
+
+````text
+* **Remaining CLI limitations:** the adopted explicit stdin/user flag spellings and file canonical-byte/schema gates are not established by this inspection. `--dump-reader` does not emit Reader v2. The separate stateless run-bundle capability in §4.1.7 remains a gap. HDE-CRD-0002 resolved two earlier limitations, as bounded static inspection at `main@0838ba08254eaefc888019df49a06aa2ae99cc6c` confirms: the parser's `showcompat` help names `magic10_compat_result.v1` and says Reader v1 bytes come only through `--dump-reader` (S07), and `tests/reader_v1/test_cli_proof.py`, which failed against the legacy `scripts/hd_cli.py` stub, is retired with its recorded reason and replacing coverage in `tests/retired_tests.md` (S03).
+````
+
+## RL-07
+
+- Redline ID: RL-07
+- Operation: `REPLACE`
+- Change type: CANON_UPDATE
+- Source items: Nathan's direction of 2026-10-26 in this session; A08 (S02 met: unknown paths answer the governed envelope)
+- Target document: `PF05-Canon-HDE-CLI-API-Vendor-Ref`
+- Section path: line 2042: `# 5\. Reader Transport (public bytes) \[Required‑Now\]` > line 2044: `## 5.1 Success envelope \[Required‑Now\]` > line 2061: `### **5.1.0 Production POST request and resolution (normative)**`
+- Location: original line 2071; the last sentence of the method-contract paragraph of §5.1.0
+- Scope and expected count: whole PF; expected 1; observed 1
+- Rationale: The sentence keeps a factory HTML 404 limitation that S02 removed. Unknown descendant paths now take the governed §5.2 error, and §5.1.7 records the implementation.
+- OLD (141 bytes; SHA-256 `54f8c25aeae7dc316e3fc80c00ae5fde84641e6a354d31d215b5962a3eca8875`; ends with LF: no):
+
+````text
+Unknown descendant paths are distinct from this exact-route method contract; the factory-specific HTML 404 limitation is retained in §5.1.7.
+````
+
+- NEW (178 bytes; SHA-256 `93ff3dea56972a8bf8fa3b7f945c4b3e560a6c6bb79e752353af6c657a6f40de`; ends with LF: no):
+
+````text
+Unknown descendant paths are distinct from this exact-route method contract; they receive the governed `404 ERR_NOT_FOUND` error of §5.2, and §5.1.7 records the implementation.
+````
+
+## RL-08
+
+- Redline ID: RL-08
+- Operation: `REPLACE`
+- Change type: CANON_UPDATE
+- Source items: Nathan's direction of 2026-10-26 in this session; A08 (S02 and S07 met); supporting PF10 2.2 and 2.4 (S03 met)
+- Target document: `PF05-Canon-HDE-CLI-API-Vendor-Ref`
+- Section path: line 2042: `# 5\. Reader Transport (public bytes) \[Required‑Now\]` > line 2044: `## 5.1 Success envelope \[Required‑Now\]` > line 2245: `### 5.1.7 Delivered scope and proof limits (informative)`
+- Location: original line 2253; the "Known limits remain:" paragraph of §5.1.7
+- Scope and expected count: whole PF; expected 1; observed 1
+- Rationale: The paragraph says two factories answer unknown paths with framework HTML 404, and it lists the legacy CLI proof failure and stale showcompat help as open limitations. S02, S07 and S03 resolved all three, verified at `main@0838ba08254eaefc888019df49a06aa2ae99cc6c`. The wheel-install limitation and the carried findings stay, and so does the closing nonclaim sentence.
+- OLD (641 bytes; SHA-256 `4ba93d030fa547df15b03a0fa43d1bb4a4955faaea01270a43c15808ccaf6d9c`; ends with LF: no):
+
+````text
+Known limits remain: unknown non-compat paths, including Reader descendant paths, receive framework HTML 404 from `adapter/factory.py` and `adapter/http_reader.py`; `adapter/wsgi.py` supplies JSON `ERR_NOT_FOUND`. This does not weaken the normative error contract, and the transport owner retains the gap. Other recorded limitations, including the legacy CLI proof failure, wheel-install admission limitation, stale showcompat help and carried implementation/evidence findings, retain their owners; their historical outcomes are not rerun here. This documentation revision runs no product QA, deploys nothing and proves no live availability.
+````
+
+- NEW (797 bytes; SHA-256 `fadf0f1ca9c989edc6df8cc12dfb5b67358fed98ce7b499972fb3dd0c4a33d93`; ends with LF: no):
+
+````text
+HDE-CRD-0002 resolved three earlier limits, as bounded static inspection at `main@0838ba08254eaefc888019df49a06aa2ae99cc6c` confirms: a 404 handler in each of `adapter/factory.py`, `adapter/http_reader.py` and `adapter/wsgi.py` answers an unknown path, including a Reader descendant path, with the governed JSON `ERR_NOT_FOUND` error rather than framework HTML (S02); `showcompat` help describes its compat stdout (S07); and the failing legacy CLI proof test is retired with its recorded reason (S03; §4.1.6). Other recorded limitations, including the wheel-install admission limitation and carried implementation/evidence findings, retain their owners; their historical outcomes are not rerun here. This documentation revision runs no product QA, deploys nothing and proves no live availability.
 ````
 
 END OF REDLINES

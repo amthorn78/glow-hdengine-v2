@@ -6,13 +6,14 @@ This is the processing report for the redlines file `redlines-PF05-from-v2.5.3.m
 
 | Field | Value |
 | :---- | :---- |
-| Artifact | `docs/ephemeral/gtwpe/gtwpe-20261026-pf10-v13-8-8/pf05/redlines-PF05-from-v2.5.3.md`; 16,530 bytes; 169 lines; SHA-256 `bcc4c6061c07a292c777016f6a4a659c9f4824d03d04d28f42e8a1db2d853c15` |
+| Artifact | `docs/ephemeral/gtwpe/gtwpe-20261026-pf10-v13-8-8/pf05/redlines-PF05-from-v2.5.3.md`, package revision 2; 23,808 bytes; SHA-256 `f5224bb704bd94bdf7df496a6ee35df3e31d8f6bc13acd1cac6ffc354ae24b9e` |
 | Preparation outcome | `READY` |
 | Save completeness | `COMPLETE_PACKAGE` (receipt in §12) |
-| Operations | 5: RL-01 to RL-04 `REPLACE`, RL-05 `INSERT`; terminated by `END OF REDLINES` |
+| Operations | 8: RL-01 to RL-04 and RL-06 to RL-08 `REPLACE`, RL-05 `INSERT`; terminated by `END OF REDLINES` |
 | Prompt | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1, https://app.notion.com/p/3f44590a05eb8172a314fe6b958bb9ff; body fetched live on 2026-10-26 (page last edited 2026-10-09T11:05:22.094Z); version line `Prompt Version: 100926.1` |
-| Authorization | Nathan's handoff "GTWPE 100926.1 T-PF05 document session (TW-DRAIN-10 then TW-APPLY-10)", sent 2026-10-26T21:08:28Z, which authorizes this preparation and then TW-APPLY-10 in this session |
-| Run identity | `gtwpe-20261026-pf10-v13-8-8 / T-PF05 / TW-DRAIN-10 / run 1` (first run; no earlier T-PF05 output existed) |
+| Authorization | Nathan's handoff "GTWPE 100926.1 T-PF05 document session (TW-DRAIN-10 then TW-APPLY-10)", sent 2026-10-26T21:08:28Z, which authorizes this preparation and then TW-APPLY-10 in this session. For revision 2: Nathan's direction in this session on 2026-10-26, "Don't run a whole new drain, just fix them in the current one", referring to the stale sentences in §4.1.6, §5.1.0 and §5.1.7 |
+| Run identity | `gtwpe-20261026-pf10-v13-8-8 / T-PF05 / TW-DRAIN-10 / run 1`, package revision 2 (first run; no earlier T-PF05 output existed) |
+| Revision history | Revision 1: 5 operations, redlines SHA-256 `bcc4c6061c07a292c777016f6a4a659c9f4824d03d04d28f42e8a1db2d853c15`, committed at `431661b` and applied at `e24e05f`. Revision 2 replaces it in place against the same baseline: RL-01 to RL-04 are unchanged byte for byte, RL-05's entry is widened, and RL-06 to RL-08 are added. Git history keeps revision 1 |
 | Originating preparer | Claude Code cloud session https://claude.ai/code/session_01D49VTgmgq8kpkcN9WLDdAW; one session, no subagents and no reviewers, as the handoff directs |
 | Ledger | `docs/ephemeral/gtwpe/gtwpe-20261026-pf10-v13-8-8/LEDGER.md`, task T-PF05, rows A07, A08, A09 (with X05) and S-APR |
 | Preparation date | 2026-10-26 |
@@ -26,6 +27,7 @@ This is the processing report for the redlines file `redlines-PF05-from-v2.5.3.m
 5. **Baseline currency.** At the start, `origin/main` was `0838ba08254eaefc888019df49a06aa2ae99cc6c`, the merge of #760 at 2026-10-26T21:18:51Z. `git diff --name-status 9dda63d 0838ba0` lists one added path, the ledger. PF05 and PF10 have the same blobs at both commits, so `main` carries no newer target version and the ledger baseline holds.
 6. **Destination.** #760 had merged, so the handoff's continuation applies: `docs/20261026-gtwpe-pf10-v13-8-8-documents`. It did not exist at this session's first check. The T-PF07 document session then created it at `28184eab1a8ba36e6c4cec5d073acbb9d3db6e38` and opened shared draft PR #761 (2026-10-26T21:39:03Z). This session reuses that branch and PR and does not open another. That session has since recorded #761 on the ledger's continuation line; this session writes only the T-PF05 Completion cell.
 7. **Posture.** Closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`). No vendor, production, database, Railway, TypeSafe or Drive access. No write to `docs/pfcanon/`.
+8. **Revision 2.** Nathan directed the stale sentences reported as O-1 to be fixed in this run. While verifying them, the preparer found that the same sentences also carry a third stale claim: the legacy CLI proof failure, which S03 resolved by retiring the test. The editable scope therefore grows by three passages: §4.1.6 line 837, §5.1.0 line 2071 and §5.1.7 line 2253. The baseline, the target identity, the ledger rows and the held items are unchanged. `origin/main` was re-checked at `0838ba08254eaefc888019df49a06aa2ae99cc6c`.
 
 ## 3. Sources and inputs
 
@@ -34,7 +36,8 @@ Every repository file was read at `origin/main` `0838ba08254eaefc888019df49a06aa
 | Ref | Role | Path | Blob | Bytes | SHA-256 | Read |
 | :-- | :-- | :-- | :-- | --: | :-- | :-- |
 | Target | PF05 v2.5.3, the original | `docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.3.md` | `8b136def4c22f8308169a1b0315086b3e90ead1d` | 323,966 | `65a9ad6e9d4e75cf50c4e0ae5ac6b3cbabce35bea759de9a6ef4c77549dd6352` | lines 1–4439, in full |
-| SR1 | Change source: PF10 v13.8.8, effective 2026.10.26 | `docs/pfcanon/PF10-HDE-Build-Notes-v13.8.8.md` | `680b0accb0bdf260b0489d1a7385f90bb120cd99` | 729,539 | `f5e13efb5ab1354bda2f578ca69f41bed773160784602a896927bc091a254c2f` | 1–223 (front matter, precedence §1–§9, index); 688–889 (2.7); 890–1002 (2.8); 1003–1101 (2.9) |
+| SR1 | Change source: PF10 v13.8.8, effective 2026.10.26 | `docs/pfcanon/PF10-HDE-Build-Notes-v13.8.8.md` | `680b0accb0bdf260b0489d1a7385f90bb120cd99` | 729,539 | `f5e13efb5ab1354bda2f578ca69f41bed773160784602a896927bc091a254c2f` | 1–223 (front matter, precedence §1–§9, index); 688–889 (2.7); 890–1002 (2.8, including S02 met at line 933 and S07 met at line 937); 1003–1101 (2.9). Supporting for revision 2: 2.2 lines 266–272, 295 and 309–311 (the S03 base and its retirements) and 2.4 line 423 (S03 met) |
+| RTL | Supporting for revision 2: the retired-test ledger | `tests/retired_tests.md` | `ea44b46262168fd5240451fe1e9da069c76e6a5e` | 19,110 | (repository evidence) | lines 1–12 (header: "HDE-CRD-0002 WU-PR-01 (S03)") and 60–66, including line 65 (`tests/reader_v1/test_cli_proof.py`, reason O-P06a-03, retired 2026-10-13, with replacing coverage) |
 | SR2 | Change source: Specification v1.1, approved base | `docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md` | `c4802a5a7fa33db38d42d8a7f64679cd18b50480` | 43,151 | `fb412f178fa0ecae527704b16ced4be2c28e42a84e663ccbebdbdb669b7382df` | 140–200, covering S-APR (147–193) |
 | SR3 | Overlay: Specification delta 01 | `docs/ephemeral/HDE-CRD-0002-specification-delta-v1.0.md` | `9408d6ed091bcba3d751fcb17ae392a1ceca8bbb` | 21,046 | `59ef9a776c6b5615333cfe68ba4d8145a3d1fe1fdd194b12bb24cf71a233b636` | 1–162, in full |
 | SR4 | Delta approval | `docs/ephemeral/HDE-CRD-0002-specification-delta-review-v1.0.md` | `5a6cecc86f604a17aaa3e6c89b17183d2d0f9ffa` | 14,586 | `ee5b07d2fe1ee69e23fb0b78b489fde4885696eb7c1135e80a5a887e207ac169` | decision lines 8, 20, 32 (`DELTA_APPROVE`, 2026-10-21T18:36:00Z) |
@@ -62,7 +65,7 @@ Every repository file was read at `origin/main` `0838ba08254eaefc888019df49a06aa
 
 - **Target.** PF05 was read in seven contiguous ranges: 1–468, 469–1310, 1311–2132, 2133–2736, 2737–3524, 3525–4221, 4222–4439. Every range returned complete text, the last ending at the final rule and blank line. No truncation occurred.
 - **Selected sources.** Each unit in §3 marked "in full" or by a boundary was read to that boundary, including its tables.
-- **Canon-first search.** `git grep` on `origin/main` across `docs/pfcanon/` for `DD-04`, `allow-prod-vendor`, `HDE_VENDOR_OVERRIDE_AUDIT_PATH`, `canon-retired`, `PROVIDER_PROD_OVERRIDE`, `vendor_prod_override` and `governed clock boundary` found, outside PF05 and PF10, only HDE Users Guide line 979 (the stale §16 bullet; T-PF29's task), HDE Phased Epics line 11430 (the historical DD-04 row; X05 keeps it as history) and two unrelated live-deferral lines in the Separation checklist and the Glow QA Guide. A search of PF05 itself located every statement of the DD-04 status and the Catalog state: lines 125, 2577, 3500, 3605 and the historical v2.5.3 Change Log entry at line 4126.
+- **Canon-first search.** `git grep` on `origin/main` across `docs/pfcanon/` for `DD-04`, `allow-prod-vendor`, `HDE_VENDOR_OVERRIDE_AUDIT_PATH`, `canon-retired`, `PROVIDER_PROD_OVERRIDE`, `vendor_prod_override` and `governed clock boundary` found, outside PF05 and PF10, only HDE Users Guide line 979 (the stale §16 bullet; T-PF29's task), HDE Phased Epics line 11430 (the historical DD-04 row; X05 keeps it as history) and two unrelated live-deferral lines in the Separation checklist and the Glow QA Guide. A search of PF05 itself located every statement of the DD-04 status and the Catalog state: lines 125, 2577, 3500, 3605 and the historical v2.5.3 Change Log entry at line 4126. For revision 2, a search of PF05 for `HTML 404`, `stale showcompat help`, `describes Reader v1 bytes` and `test_cli_proof` found lines 837, 2071 and 2253 only.
 
 ## 5. Repository inspection (read-only, at `main@0838ba08254eaefc888019df49a06aa2ae99cc6c`)
 
@@ -84,6 +87,12 @@ Every repository file was read at `origin/main` `0838ba08254eaefc888019df49a06aa
 - `engine/bodygraph/vendor_client.py` lines 90–96 hold the five route contracts, and `build_contract_route_request` (lines 396–473) builds any of them.
 - `classify_bg_resolve_route_policy` (lines 124–153) sends every non-`v2` base, including an unversioned one, to legacy `bodygraphs`, against §7.1.10's `PROVIDER_ROUTE_UNSUPPORTED`.
 - `PINNED_MAX_ATTEMPTS` is `{0, 1, 2, 3}` (line 49), against §7.3.3's `{1,2,3}`, and the backoff profiles are checked apart from `max_attempts` (lines 57–65 and 162–175), against §7.3.4's complete tuples.
+
+**Resolved limits (RL-06 to RL-08, revision 2).**
+- **S02.** `adapter/factory.py` (blob `618a624dc4d4`) line 30, `adapter/http_reader.py` (blob `ffba6c4e1794`) line 1287 and `adapter/wsgi.py` (blob `52fd4aedf1a9`) line 53 each register a 404 handler that emits `error_envelope("ERR_NOT_FOUND")`. The `http_reader` handler says "never framework HTML"; under `/api/compat/v1` it uses the compat envelope of §5.5.
+- **S07.** `engine/cli/main.py` (blob `77b886026c10`) line 94 gives the `showcompat` help: "Emit the canonical magic10_compat_result.v1 document for a pair (stdin or files); Reader v1 bytes only via --dump-reader".
+- **S03.** `tests/reader_v1/test_cli_proof.py` is absent, and `tests/retired_tests.md` line 65 records its retirement on 2026-10-13. The reason is O-P06a-03: the legacy `scripts/hd_cli.py` stub refuses `--admin-out` without `--admin`, and the stub is no Reader surface and no proof. The replacing coverage is `tests/reader_v1/test_emitter.py` and `tests/cli/test_cli_canonical_bytes.py::test_reader_dump_and_admin_sidecars_are_canonical`. `scripts/hd_cli.py` stays as the retained legacy stub that §5.1.6 names.
+- **Probe (a local check, not CI and not QA).** With the same scratch install, closed rails and `APP_ENV=dev`, a Flask test client on each of the three factories requested `GET`, `POST`, `HEAD` and `OPTIONS` on `/nope`, and `GET` and `POST` on `/api/reader/x`. All 18 requests returned `404` with `application/json; charset=utf-8`. The 15 body-bearing ones carried `code` `ERR_NOT_FOUND` in 70 bytes, and `HEAD` returned no body. The worktree was clean afterwards. The PF05 text states only the checked-in handlers.
 
 **Tests run (implementation checks, not CI and not QA).** In a detached scratch worktree of `0838ba0`, with CI's install (`setuptools>=68`, `wheel`, `requirements.txt`, `requirements-dev.txt`, `-e .`) in a scratch virtual environment:
 - **Environment.** pytest 8.4.2; `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1`; vendor, database and override keys unset; `XDG_STATE_HOME` pointed at an empty scratch directory.
@@ -127,7 +136,10 @@ Dispositions: **RL** an actionable redline; **EQ** already represented, with its
 | S-APR | S14: the HDE Users Guide §16 bullet | OUT: T-PF29 |
 | S-APR | S21 close-pack targets; operative `AGENTS.md` passages | OUT: T-PF06, T-PF12, T-PF19; the Product Owner |
 | S-APR | Approval block, phase blocks, QA posture and Live QA table, overlaid by delta C-8 to C-12 | NC: record history and QA posture; no PF05 content. C-8 to C-12 reword the release re-cut and delete the S01 row; neither touches PF05 |
-| PF05 rule | §0.4 and §11.1: log a normative delta | RL-05 (Change Log entry for v2.5.4) |
+| A08 | Requirement coverage: S02 met (unknown paths answer the governed envelope, line 933) | Revision 2, at Nathan's direction: RL-07 (§5.1.0) and RL-08 (§5.1.7). Revision 1 had reported it as O-1 |
+| A08 | Requirement coverage: S07 met (`hdctl --help` names `magic10_compat_result.v1`, line 937) | Revision 2, at Nathan's direction: RL-06 (§4.1.6) and RL-08 (§5.1.7). Revision 1 had reported it as O-1 |
+| 2.2 and 2.4 (supporting) | S03 met; `tests/reader_v1/test_cli_proof.py` retired with its recorded reason | Revision 2, at Nathan's direction: RL-06 and RL-08. Found while verifying O-1; revision 1 had not identified it |
+| PF05 rule | §0.4 and §11.1: log a normative delta | RL-05 (Change Log entry for v2.5.4, widened in revision 2 to name §§4.1.6, 5.1.0 and 5.1.7) |
 
 **Classification of RL-05.** §11.1 logs "normative deltas only" and lets editorial moves go unlogged. RL-03 removes the directive "do not invoke or describe the flag as operational", which governs how canon readers treat the flag, so this revision is a normative delta and the entry is required. The v2.5.3 entry logged the same DD-04 status ("retain held DD-04").
 
@@ -139,7 +151,10 @@ Dispositions: **RL** an actionable redline; **EQ** already represented, with its
 | RL-02 | REPLACE | §5.6, line 2577 | A07 (AD-1, CR-7); A08 drainage; X04 §18 | The paragraph describes the Catalog at `aa58e93` before S15 and CR-7. The new state is verified at `0838ba0` (§5) |
 | RL-03 | REPLACE | §7.1.11, line 3500 | S-APR; A09 with X05; LR4-O2; OBS-W4-1 with X14 `FND-012`; X14 line 37 | S14 delivered the flag and gate (#651, squash `5892538`, accepted by 2.9), so the held-gap paragraph is stale. The contract is unchanged; the new text gives the bounded implementation state and its recorded limits |
 | RL-04 | REPLACE | §7.2.0, line 3605 | A09 with X05 | The delivered gap leaves the list; the other two gaps are re-verified and the inspection is pinned |
-| RL-05 | INSERT | §11.1, between lines 4126 and 4127 | PF05 §0.4 and §11.1 | Required change-history entry; version v2.5.4, no date in the format |
+| RL-05 | INSERT | §11.1, between lines 4126 and 4127 | PF05 §0.4 and §11.1 | Required change-history entry naming every changed section; version v2.5.4, no date in the format |
+| RL-06 | REPLACE | §4.1.6, line 837, the "Remaining CLI limitations:" bullet | Nathan's direction; A08 S07; supporting 2.2, 2.4 and `tests/retired_tests.md` for S03 | The bullet says the parser still describes Reader v1 bytes and the legacy CLI proof failure stands; both are resolved. Its other limitations stay |
+| RL-07 | REPLACE | §5.1.0, line 2071, the last sentence of the method-contract paragraph | Nathan's direction; A08 S02 | The sentence retains an HTML 404 limitation that S02 removed; unknown descendant paths take the governed §5.2 error |
+| RL-08 | REPLACE | §5.1.7, line 2253, the "Known limits remain:" paragraph | Nathan's direction; A08 S02 and S07; supporting S03 | The HTML 404, stale showcompat help and legacy CLI proof limits are resolved. The wheel-install limit, the carried findings and the nonclaim sentence stay |
 
 **Editorial standard applied (PF03).**
 - §3 "Truth and source fidelity" and "Claim-state separation": static inspection proves checked-in bytes only, and a negative statement names its snapshot and search scope.
@@ -162,7 +177,7 @@ Dispositions: **RL** an actionable redline; **EQ** already represented, with its
   - The date is `YYYY-MM-DD`.
   - The gate lists sources separated by `; `, writing PF10 as `BN <version>` and any other source as its filename.
 - **Sources that justified this update, in recorded order:**
-  1. PF10 file `PF10-HDE-Build-Notes-v13.8.8.md`, v13.8.8 (RL-01 to RL-04), giving `BN 13.8.8`;
+  1. PF10 file `PF10-HDE-Build-Notes-v13.8.8.md`, v13.8.8 (RL-01 to RL-04 and RL-06 to RL-08), giving `BN 13.8.8`;
   2. `HDE-CRD-0002-specification-v1.1-approved.md` (S-APR; RL-01, RL-03);
   3. `HDE-CRD-0002_close_report.md` (the RL-03 limits).
 - **Not gate sources.** No PF document other than PF10 is a source. The delta (SR3) justifies no change. X01, X04, X05, WI4 and GS are supporting reading.
@@ -182,24 +197,25 @@ The batch was validated twice:
 | RL-02 | `REPLACE` | whole PF | 1 | 1 | [199202, 199654) | OLD 452 bytes `244434aa139c28e77d2de6febbe27701f677427bb8599405abae1621e95e609c`; NEW 1,669 bytes `3d7e22165edf2a9d6e3be073ea082d513425527917598f09fcc512d029cfb3ff` |
 | RL-03 | `REPLACE` | whole PF | 1 | 1 | [259142, 259836) | OLD 694 bytes `f1561d111595e852fcb8bc72398995432c164c1c647b138372ce7ca5cbcd4a46`; NEW 1,986 bytes `140bb0df3b787874be8c4f94d577b6621f5f8ad3e57f64a48706cbec8fa9a42a` |
 | RL-04 | `REPLACE` | whole PF | 1 | 1 | [267539, 268073) | OLD 534 bytes `c92c423362b1ccd682cd6df639ce709862c86c5e291e58b9f302fc1770222ead`; NEW 631 bytes `4827e9ec774c76b70c23301588df2b258f75055d09a9f4c7376ffa5ef7b9f7ec` |
-| RL-05 | `INSERT` | whole PF | 1 | 1 | gap at 307197 | BEFORE 445 bytes `e5c18567bd896f69d90742aad08e8dcd1c764f7cb2923053da7ce0729979f302` (count 1); AFTER 417 bytes `adafe4dbe84db32b463a0a5826518a11e8d7954a9ebc1f86d2c196215b139f73` (count 1); TEXT 252 bytes `a68f4e6f41c980a21969654ba944a4fc91e67c0a182206f17de8e0a31edd15ad` |
+| RL-05 | `INSERT` | whole PF | 1 | 1 | gap at 307197 | BEFORE 445 bytes `e5c18567bd896f69d90742aad08e8dcd1c764f7cb2923053da7ce0729979f302` (count 1); AFTER 417 bytes `adafe4dbe84db32b463a0a5826518a11e8d7954a9ebc1f86d2c196215b139f73` (count 1); TEXT 363 bytes `b04f1143914eb9d36d3a85d85a088c246c4f6edc6f1202397c9fe1e80e7abf23` (revision 1: 252 bytes) |
+| RL-06 | `REPLACE` | whole PF | 1 | 1 | [76816, 77298) | OLD 482 bytes `96920064dba80c2f2e2534c5266d38117024520edba0f78427fbddf3694b02d3`; NEW 728 bytes `367e316da87bb797b311fe8fdefa8cb01f97cd28a71a0b4bcba7a6d757838e5e` |
+| RL-07 | `REPLACE` | whole PF | 1 | 1 | [153354, 153495) | OLD 141 bytes `54f8c25aeae7dc316e3fc80c00ae5fde84641e6a354d31d215b5962a3eca8875`; NEW 178 bytes `93ff3dea56972a8bf8fa3b7f945c4b3e560a6c6bb79e752353af6c657a6f40de` |
+| RL-08 | `REPLACE` | whole PF | 1 | 1 | [166307, 166948) | OLD 641 bytes `4ba93d030fa547df15b03a0fa43d1bb4a4955faaea01270a43c15808ccaf6d9c`; NEW 797 bytes `fadf0f1ca9c989edc6df8cc12dfb5b67358fed98ce7b499972fb3dd0c4a33d93` |
 
-- **Conflicts.** None. The spans are disjoint and in order, and the RL-05 gap lies outside every replaced span.
+- **Conflicts.** None. The eight spans are disjoint and in order, and the RL-05 gap lies outside every replaced span.
 - **RL-045.** No `FIND AND REPLACE` or `FIND_AND_REPLACE` operation is used; every single-occurrence edit is `REPLACE`.
 - **Payload hygiene.** No payload contains a CR, a trailing space, a fence or an ellipsis. Every OLD block is absent after simulated application and every NEW block and the inserted text are present.
-- **Simulation.** One pass in descending offset order from the original (323,966 bytes) gives 326,805 bytes, 4,461 lines, SHA-256 `13cb56bca5913c0599261fd2a2992d77f031ee78fb233381f83e2892f749bad2`, content operations only, before the header plan. A stream rebuilt from the six untouched intervals and the payloads equals it, and the in-memory plan gives the same bytes. `diff` shows exactly the five intended changes.
+- **Simulation (revision 2).** One pass in descending offset order from the original (323,966 bytes) gives 327,355 bytes, 4,461 lines, SHA-256 `c157925a8cb796023ca2ac07dc19bedb0e518f6b6c1bb7c5e8d8b1cacc7c1915`, content operations only, before the header plan. A stream rebuilt from the nine untouched intervals and the payloads equals it, and the in-memory plan gives the same bytes. `diff` shows exactly the eight intended changes. (Revision 1's simulation was 326,805 bytes, SHA-256 `13cb56bca5913c0599261fd2a2992d77f031ee78fb233381f83e2892f749bad2`.)
 - **Hygiene scan (TW-DRAIN-10).** No `Draft` status language about the document, TODO, TBD, FIXME or drafting note is present. The `[OPEN]` markers (lines 251, 255, 866, 1031) record open contract decisions. "JSON Schema Draft 2020-12" names a specification. Line 1738's "the draft's" is rationale history. The angle-bracket placeholders, such as `<path>`, sit in examples and templates. None needs a hygiene redline.
 
 ## 10. Held items, observations and limits
 
 **Held, not drafted.** H-03 (LR5-O1: §5.12 and §5.11.2) and H-04 (OBS-W4-4: §7.1.11f "governed clock boundary"). No redline touches either section.
 
-**O-1. Stale statements outside T-PF05's named sections (for Nathan to route).** 2.8 records S02 (the governed not-found envelope) and S07 (showcompat help) as delivered, but names no PF05 drain target for them, and the ledger routes neither to T-PF05. At `0838ba0`, `adapter/factory.py` line 30 and `adapter/http_reader.py` line 1287 register 404 handlers that emit the governed `ERR_NOT_FOUND` envelope, and `engine/cli/main.py` line 94 describes showcompat's stdout as `magic10_compat_result.v1`. These PF05 sentences are therefore stale:
-- §4.1.6 line 837: "the parser still describes Reader v1 bytes rather than compat stdout";
-- §5.1.0 line 2071: "the factory-specific HTML 404 limitation is retained in §5.1.7";
-- §5.1.7 line 2253: "unknown non-compat paths, including Reader descendant paths, receive framework HTML 404 from `adapter/factory.py` and `adapter/http_reader.py`", and "stale showcompat help".
-
-They are not drafted here because the handoff limits this task to the sections the sources name. A follow-up drainage needs Nathan's routing.
+**O-1. Resolved in revision 2.**
+- **Revision 1.** It reported the stale S02 and S07 sentences at §4.1.6 line 837, §5.1.0 line 2071 and §5.1.7 line 2253 as out of scope for routing.
+- **Revision 2.** Nathan directed them to be fixed in this run, and RL-06 to RL-08 do so. They also fix a third stale claim in the same sentences that revision 1 had not identified: the legacy `scripts/hd_cli.py` / `tests/reader_v1/test_cli_proof.py` failure, resolved by S03's retirement of the test.
+- **What stays.** In those sentences, the stdin/user flag spellings and file gates, `--dump-reader` without Reader v2, the §4.1.7 gap, the wheel-install limitation and the carried findings stay. No source shows them resolved.
 
 **O-2.** §3.7 and §4.6 list `bg:resolve --source=vendor --dry-run` under open rails as allowed in pre-Glow production. In a production-like environment that call now also needs the §7.1.11 flag (§7.1.11d: "A production dry run that contacts the vendor still requires the flag"). §7.1.11 already governs, no source names these passages, and they stay unchanged.
 
@@ -211,7 +227,7 @@ They are not drafted here because the handoff limits this task to the sections t
 
 ## 11. Next step
 
-READY with `COMPLETE_PACKAGE`. Nathan's handoff authorizes TW-APPLY-10 — Apply Validated Redlines — 100926.1 (https://app.notion.com/p/3f44590a05eb81eebff6e3afa3d9aa5b) in this session. Its inputs are:
+READY with `COMPLETE_PACKAGE` (revision 2). Nathan's handoff authorizes TW-APPLY-10 — Apply Validated Redlines — 100926.1 (https://app.notion.com/p/3f44590a05eb81eebff6e3afa3d9aa5b) in this session, and the revision 2 direction asks for the revised PF to be remade from this package. Its inputs are:
 - the original `docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.3.md` at blob `8b136def4c22f8308169a1b0315086b3e90ead1d`;
 - this redlines file and this proof log;
 - ledger rows A07, A08, A09 (with X05) and S-APR, with the source boundaries in §3;
@@ -220,4 +236,4 @@ READY with `COMPLETE_PACKAGE`. Nathan's handoff authorizes TW-APPLY-10 — Apply
 
 ## 12. Save verification receipt
 
-Both files of this package were read back in full from the working tree after saving. The redlines file matched its recorded size and SHA-256 (§1). Re-parsing the saved redlines file with `check_package.py` returned no failure and exit 0. This receipt is written after those checks; this proof log does not carry its own hash.
+Both files of this package (revision 2) were read back from the working tree after saving. The redlines file matched its recorded size and SHA-256 (§1). Re-parsing the saved redlines file with `check_package.py` returned no failure and exit 0. This receipt is written after those checks; this proof log does not carry its own hash.
