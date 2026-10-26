@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/close/evidence-paths/primary.log
+size_bytes: 599
+sha256: 9f1ba692aff47c869117fd48845d679cdf3c261ee746900dd194fbcaaed6afab
+mtime_utc: 2026-10-26T04:37:35Z
+produced_at_utc: 2026-09-22T14:25:29Z
