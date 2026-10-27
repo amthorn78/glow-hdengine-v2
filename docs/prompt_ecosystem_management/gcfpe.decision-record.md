@@ -2011,3 +2011,24 @@ The Modification's §P lists five guards, each with synthetic pass and fail fixt
   external system) and `G-W2-F5` (a fidelity target).
 Each is fired by an injected regression at the successor release's qualification (PART-24). **Until those land,
 `D30` is ruled but not applied.**
+
+## Note, 2026-10-27 — the Codex security review rests on Nathan's direction of 2026-10-13
+
+Recorded by `MODIFICATION-20261027-gcfpe-backlog-open-items` (PART-02, ITEM-24, CD-4), whose
+analysis Nathan approved on 2026-10-27. It applies a direction already given and rules nothing new,
+so it takes no D-number.
+
+- **The direction.** Nathan, 2026-10-13, in the HDE-CRD-0002 WU-PR-01 PR-35 session: *"This
+  feature (security review) is no longer available. We will need to deprecate it."* It is recorded
+  in `docs/ephemeral/HDE-CRD-0002-PF10-build-notes-addendum-codex-security-review-deprecation-v1.0.md`.
+- **Why it is recorded here.** The addendum that carried it drained with no permanent home (the
+  drainage ledger records it as "N for PF canon"), and permanent canon names no Codex security
+  review. Without this note the direction is findable only through a closed change's record.
+- **What follows for GCFPE.** No prompt or skill names a Codex security review as part of a pull
+  request's review chain. `glow-hde-pr-development` reads the Codex code review and any security
+  review that the approved work unit and the repository's instructions require. PR-35's generic
+  security-review wording is unchanged, and so is the Codex code review.
+- **Guard (`D14`).** The registry forbids, on every member row, a sentence naming both Codex and a
+  security review, and `glow-hde-pr-development`'s validator forbids "Codex code and security
+  reviews" and "Codex security review". Each is fired by an injected regression in the
+  Modification's EXECUTE.
