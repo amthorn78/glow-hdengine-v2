@@ -1,0 +1,102 @@
+{
+ "mode": "check",
+ "stand_in": false,
+ "conditional_sets": [
+  "R-P1",
+  "R-P2"
+ ],
+ "pages": [
+  {
+   "prompt": "PR-50",
+   "fetch_captured": "2026-10-27T13:02:03.936Z",
+   "as_of": "2026-10-27T13:01:37.364Z",
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 0,
+   "binding_stale_lines": 0,
+   "binding_skipped_covered": 0,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "binding_unresolved_lines": [],
+   "worker_replacements_binding_rewritten": 0,
+   "ops_by_source": {
+    "A1": 2
+   },
+   "revision_moved": true,
+   "ops": {
+    "HEAD-PR-50-T": {
+     "start": true,
+     "new": true,
+     "landed": true
+    },
+    "HEAD-PR-50-U": {
+     "start": true,
+     "new": true,
+     "landed": true
+    }
+   },
+   "binding_current": true,
+   "guards": {
+    "G-W1-F5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-2": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-3": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-4": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-6": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W7-BIND-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W7-REL-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W8-NAME-1": {
+     "count": 0,
+     "pass": true
+    }
+   },
+   "ok": true
+  }
+ ],
+ "pages_ok": 1,
+ "pages_total": 1,
+ "ok": true,
+ "d22": "transient reads of this session's harness records; no body text in this report",
+ "successor_map_checks": {
+  "members_56": true,
+  "members_cover_tsv_plus_cl05": true,
+  "only_added_is_cl05": true,
+  "kept_ids_equal_tsv": true,
+  "successor_predecessors_equal_tsv": true,
+  "pe_predecessor": true,
+  "page_ids_32_hex": true,
+  "successor_titles_102726": true,
+  "distinct_successor_ids": true,
+  "revision_pins_present": true,
+  "ok": true,
+  "stand_in": false,
+  "successor_map_102726_errors": []
+ }
+}

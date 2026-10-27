@@ -1,0 +1,6841 @@
+{
+ "record_type": "X7_LANDING_CHECK_102726.1",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "fetched_after": "2026-10-27T13:24:41.758Z",
+ "check": {
+  "mode": "check",
+  "stand_in": false,
+  "conditional_sets": [
+   "R-P1",
+   "R-P2"
+  ],
+  "pages": [
+   {
+    "prompt": "CF-C-10",
+    "fetch_captured": "2026-10-27T13:25:15.092Z",
+    "as_of": "2026-10-27T13:17:07.203Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-CF-C-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-C-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CF-C-20",
+    "fetch_captured": "2026-10-27T13:25:14.040Z",
+    "as_of": "2026-10-27T13:11:25.235Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "C16": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "C16-CF-C-20-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-C-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-C-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CF-C-30",
+    "fetch_captured": "2026-10-27T13:25:35.225Z",
+    "as_of": "2026-10-27T13:03:01.779Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W2": 2,
+     "C16": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W2-CF-C-30-BC-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W2-CF-C-30-BC-2": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "C16-CF-C-30-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-C-30-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-C-30-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-BC-2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CF-C-40",
+    "fetch_captured": "2026-10-27T13:26:09.924Z",
+    "as_of": "2026-10-27T13:11:03.196Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W2": 2,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W2-CF-C-40-BC-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W2-CF-C-40-BC-2": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-C-40-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-C-40-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-9": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-BC-10": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CF-E-10",
+    "fetch_captured": "2026-10-27T13:26:23.181Z",
+    "as_of": "2026-10-27T13:22:24.392Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-CF-E-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-E-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CF-E-20",
+    "fetch_captured": "2026-10-27T13:26:58.511Z",
+    "as_of": "2026-10-27T13:16:44.645Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "C16": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "C16-CF-E-20-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-E-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-E-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CF-E-30",
+    "fetch_captured": "2026-10-27T13:27:16.209Z",
+    "as_of": "2026-10-27T13:21:53.464Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W2": 2,
+     "C16": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W2-CF-E-30-BC-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W2-CF-E-30-BC-2": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "C16-CF-E-30-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-E-30-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-E-30-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-BC-2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CF-E-40",
+    "fetch_captured": "2026-10-27T13:25:18.510Z",
+    "as_of": "2026-10-27T13:17:15.163Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W2": 2,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W2-CF-E-40-BC-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W2-CF-E-40-BC-2": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-E-40-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-E-40-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-9": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-BC-10": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CF-PO-10",
+    "fetch_captured": "2026-10-27T13:25:14.361Z",
+    "as_of": "2026-10-27T13:22:27.779Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-CF-PO-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CF-PO-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CL-05",
+    "fetch_captured": "2026-10-27T13:25:39.210Z",
+    "as_of": "2026-10-27T13:19:06.175Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W5": 26,
+     "A1": 1
+    },
+    "revision_moved": true,
+    "ops": {
+     "CL05-01": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "CL05-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-03": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-05": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-06": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-07": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "CL05-08": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-09": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "CL05-10": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-11": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-12": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "CL05-13": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-14": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-15": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "CL05-16": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "CL05-17": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "CL05-18": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-19": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-20": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "CL05-21": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-22": {
+      "start": true,
+      "landed": true
+     },
+     "CL05-23": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-24": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-25": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CL05-26": {
+      "start": true,
+      "end": true,
+      "landed": true
+     },
+     "HEAD-CL-05": {
+      "start": true,
+      "new": true,
+      "inserted_before": true,
+      "inserted_after": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-CL05-07": {
+      "count": 0,
+      "pass": true
+     },
+     "G-CL05-08": {
+      "count": 1,
+      "pass": true
+     },
+     "G-CL05-09": {
+      "count": 0,
+      "pass": true
+     },
+     "G-CL05-10": {
+      "count": 0,
+      "pass": true
+     },
+     "G-CL05-11": {
+      "count": 1,
+      "pass": true
+     },
+     "G-CL05-12": {
+      "count": 1,
+      "pass": true
+     },
+     "G-CL05-13": {
+      "count": 1,
+      "pass": true
+     },
+     "G-CL05-14": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CL-20",
+    "fetch_captured": "2026-10-27T13:26:13.467Z",
+    "as_of": "2026-10-27T13:15:06.100Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 2,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-CL-20-01": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-CL-20-02": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HEAD-CL-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CL-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CL-30",
+    "fetch_captured": "2026-10-27T13:26:35.250Z",
+    "as_of": "2026-10-27T13:20:49.487Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 3,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-CL-30-01": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-CL-30-02": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-CL-30-03": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HEAD-CL-30-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CL-30-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CL-40",
+    "fetch_captured": "2026-10-27T13:27:02.234Z",
+    "as_of": "2026-10-27T13:13:23.717Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 8,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-CL-40-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-CL-40-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-CL-40-03": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-CL-40-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-CL-40-05": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-CL-40-06": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-CL-40-07": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-CL-40-08": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CL-40-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CL-40-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CL-C-10",
+    "fetch_captured": "2026-10-27T13:27:19.575Z",
+    "as_of": "2026-10-27T13:14:18.752Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W5": 5,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "CLC-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CLC-02": {
+      "start": true,
+      "new": true,
+      "inserted_before": true,
+      "landed": true
+     },
+     "CLC-03": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "CLC-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CLC-05": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HEAD-CL-C-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CL-C-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-CL05-04": {
+      "count": 1,
+      "pass": true
+     },
+     "G-CL05-05": {
+      "count": 1,
+      "pass": true
+     },
+     "G-CL05-06": {
+      "count": 2,
+      "pass": true
+     },
+     "G-CL05-07": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CL-E-10",
+    "fetch_captured": "2026-10-27T13:25:23.172Z",
+    "as_of": "2026-10-27T13:14:18.647Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W5": 5,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "CLE-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CLE-02": {
+      "start": true,
+      "new": true,
+      "inserted_before": true,
+      "landed": true
+     },
+     "CLE-03": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "CLE-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "CLE-05": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HEAD-CL-E-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CL-E-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-CL05-04": {
+      "count": 1,
+      "pass": true
+     },
+     "G-CL05-05": {
+      "count": 1,
+      "pass": true
+     },
+     "G-CL05-06": {
+      "count": 2,
+      "pass": true
+     },
+     "G-CL05-07": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CL-E-20",
+    "fetch_captured": "2026-10-27T13:25:14.887Z",
+    "as_of": "2026-10-27T13:21:34.064Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-CL-E-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CL-E-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CL-E-30",
+    "fetch_captured": "2026-10-27T13:25:42.810Z",
+    "as_of": "2026-10-27T13:16:18.362Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-CL-E-30-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CL-E-30-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "CL-E-40",
+    "fetch_captured": "2026-10-27T13:26:17.537Z",
+    "as_of": "2026-10-27T13:10:18.917Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-CL-E-40-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-CL-E-40-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "DOC-10",
+    "fetch_captured": "2026-10-27T13:26:40.902Z",
+    "as_of": "2026-10-27T13:19:44.974Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "C16": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "C16-DOC-10-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-DOC-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-DOC-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "DOC-20",
+    "fetch_captured": "2026-10-27T13:27:06.452Z",
+    "as_of": "2026-10-27T13:08:47.827Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W1": 1,
+     "W3b": 2,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W1-DOC20-01": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-DOC-20-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-DOC-20-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-DOC-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-DOC-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-R15": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "ESC-10",
+    "fetch_captured": "2026-10-27T13:27:29.079Z",
+    "as_of": "2026-10-27T13:11:05.410Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-ESC-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-ESC-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "ESC-25",
+    "fetch_captured": "2026-10-27T13:25:28.600Z",
+    "as_of": "2026-10-27T13:09:50.459Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "C16": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "C16-ESC-25-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-ESC-25-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-ESC-25-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "ESC-30",
+    "fetch_captured": "2026-10-27T13:25:15.400Z",
+    "as_of": "2026-10-27T13:10:40.161Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-ESC-30-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-ESC-30-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "ESC-40",
+    "fetch_captured": "2026-10-27T13:25:47.037Z",
+    "as_of": "2026-10-27T13:10:06.373Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W4": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W4-P10-ESC40-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HEAD-ESC-40-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-ESC-40-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "IA-10",
+    "fetch_captured": "2026-10-27T13:26:45.052Z",
+    "as_of": "2026-10-27T13:16:07.631Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W2": 1,
+     "W3b": 4,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W2-IA-10-BC-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-IA-10-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-IA-10-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-IA-10-03": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-IA-10-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-IA-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-IA-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-11": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "IA-20",
+    "fetch_captured": "2026-10-27T13:27:10.395Z",
+    "as_of": "2026-10-27T13:22:04.218Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W2": 1,
+     "W3b": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W2-IA-20-BC-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-IA-20-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-IA-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-IA-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-11": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "IA-30",
+    "fetch_captured": "2026-10-27T13:27:33.034Z",
+    "as_of": "2026-10-27T13:21:07.780Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W2": 4,
+     "W3b": 1,
+     "W4": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W2-IA-30-BC-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W2-IA-30-EM-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W2-IA-30-BC-2": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W2-IA-30-EM-2": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HP-IA-30-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P09-IA30-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HEAD-IA-30-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-IA-30-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-BC-4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-EM-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-EM-2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-09-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-09-2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-09-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "IA-40",
+    "fetch_captured": "2026-10-27T13:25:33.788Z",
+    "as_of": "2026-10-27T13:16:58.421Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W2": 1,
+     "W4": 3,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W2-IA-40-BC-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P09-IA40-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P09-IA40-2": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W4-P09-IA40-3": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-IA-40-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-IA-40-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-12": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-09-3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-09-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "IA-50",
+    "fetch_captured": "2026-10-27T13:25:15.591Z",
+    "as_of": "2026-10-27T13:16:39.527Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-IA-50-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-IA-50-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "IA-60",
+    "fetch_captured": "2026-10-27T13:25:50.910Z",
+    "as_of": "2026-10-27T13:22:09.622Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-IA-60-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-IA-60-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "MGR-10",
+    "fetch_captured": "2026-10-27T13:26:27.674Z",
+    "as_of": "2026-10-27T13:15:48.337Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 2,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-MGR-10-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-MGR-10-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-MGR-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-MGR-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "OPS-10",
+    "fetch_captured": "2026-10-27T13:26:49.276Z",
+    "as_of": "2026-10-27T13:12:27.044Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 21,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-OPS-10-01": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-10-03": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-04": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-05": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-06": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-10-07": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-08": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-09": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-10": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-11": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-10-12": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-13": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-14": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-15": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-16": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-17": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-18": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-19": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-20": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-10-21": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HEAD-OPS-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-OPS-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-R3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "OPS-20",
+    "fetch_captured": "2026-10-27T13:27:14.045Z",
+    "as_of": "2026-10-27T13:12:54.383Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 21,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-OPS-20-01": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-20-03": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-04": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-05": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-06": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-20-07": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-08": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-09": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-10": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-20-11": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-20-12": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-13": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-14": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-15": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-16": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-17": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-18": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-19": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-20": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-20-21": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HEAD-OPS-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-OPS-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-R3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "OPS-30",
+    "fetch_captured": "2026-10-27T13:27:37.492Z",
+    "as_of": "2026-10-27T13:07:41.085Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3a": 29,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-OPS-30-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-30-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-30-03": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-30-05": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-06": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-07": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-08": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-30-09": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-30-10": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-11": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-12": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-13": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-30-14": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-15": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-16": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-17": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-18": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-19": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-30-20": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-21": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-22": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-23": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-30-24": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-OPS-30-25": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-26": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-27": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-28": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-OPS-30-29": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-OPS-30-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-OPS-30-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-R1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-R2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-R3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "PE",
+    "fetch_captured": "2026-10-27T13:25:52.456Z",
+    "as_of": "2026-10-27T13:09:24.084Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W6": 14,
+     "A1": 1,
+     "W6 (Q-W6-4) / C-13": 1
+    },
+    "revision_moved": true,
+    "ops": {
+     "W6-PE-27a": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-27b": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-26": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-14a": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "W6-PE-14b": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-14c": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "W6-PE-14d": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-14e": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-14f": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-14g": {
+      "start": true,
+      "end": true,
+      "landed": true
+     },
+     "W6-PE-14h": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-13a": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-13b": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W6-PE-13c": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-PE": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "RP2-PE": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W6-PE-14F": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W6-PE-14L": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W6-PE-14R": {
+      "count": 4,
+      "pass": true
+     },
+     "G-W6-PE-27F": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W6-PE-27R": {
+      "count": 2,
+      "pass": true
+     },
+     "G-W6-PE-26F": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W6-PE-26R": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W6-PE-TS1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W6-PE-TS2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W6-PE-TS3": {
+      "count": 2,
+      "pass": true
+     },
+     "G-W6-PE-13F": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W6-PE-13R": {
+      "count": 2,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "PR-10",
+    "fetch_captured": "2026-10-27T13:25:37.876Z",
+    "as_of": "2026-10-27T13:19:04.774Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W2": 2,
+     "W3b": 15,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W2-PR-10-BC-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W2-PR-10-PIN-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HP-PR-10-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-10-02": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-10-03": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-10-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-10-05": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-10-06": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-10-07": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-10-08": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-10-09": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-10-10": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-10-11": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-10-12": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-10-13": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-10-14": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-10-15": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HEAD-PR-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-PR-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-5": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-BC-6": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-PIN-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-R1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-R2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "PR-20",
+    "fetch_captured": "2026-10-27T13:25:16.361Z",
+    "as_of": "2026-10-27T13:18:23.839Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W1": 2,
+     "W2": 5,
+     "W3a": 24,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W1-PR20-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W1-PR20-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W2-PR-20-RI-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W2-PR-20-RI-2": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W2-PR-20-RI-3": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W2-PR-20-BC-1": {
+      "start": true,
+      "new": true,
+      "inserted_before": true,
+      "landed": true
+     },
+     "W2-PR-20-BC-2": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-03": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HP-PR-20-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-05": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-06": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HP-PR-20-07": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-20-08": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-09": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-10": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-11": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-20-12": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-13": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-20-14": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-20-15": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-16": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-20-17": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-20-18": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-20-19": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-20": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-21": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-20-22": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-20-23": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-20-24": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HEAD-PR-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-PR-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-R13": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R14": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BC-7": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-BC-8": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-RI-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-RI-2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-RI-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-R1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-R2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "PR-30",
+    "fetch_captured": "2026-10-27T13:25:57.072Z",
+    "as_of": "2026-10-27T13:15:20.197Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 5,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-PR-30-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-30-02": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-30-03": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-30-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-30-05": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-PR-30-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-PR-30-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-R1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "PR-35",
+    "fetch_captured": "2026-10-27T13:26:32.283Z",
+    "as_of": "2026-10-27T13:13:39.046Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W1": 5,
+     "W3b": 4,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W1-PR35-01": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W1-PR35-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W1-PR35-03": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W1-PR35-04": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W1-PR35-05": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-35-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-35-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-35-03": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-35-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-PR-35-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-PR-35-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-R1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R5": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R6": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R7": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R8": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R9": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R10": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R11": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "PR-40",
+    "fetch_captured": "2026-10-27T13:26:53.032Z",
+    "as_of": "2026-10-27T13:18:21.343Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W1": 1,
+     "W2": 2,
+     "W3a": 18,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W1-PR40-01": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W2-PR-40-BM-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W2-PR-40-BM-2": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HP-PR-40-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-03": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-05": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-06": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-07": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-08": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-09": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-40-10": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-40-11": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-40-12": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HP-PR-40-13": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-40-14": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-40-15": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-PR-40-16": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-17": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-PR-40-18": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HEAD-PR-40-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-PR-40-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-R12": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-BM-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W2-BM-2": {
+      "count": 2,
+      "pass": true
+     },
+     "G-W2-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W2-F3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-R1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-R2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "PR-50",
+    "fetch_captured": "2026-10-27T13:27:23.136Z",
+    "as_of": "2026-10-27T13:01:37.364Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-PR-50-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-PR-50-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-10",
+    "fetch_captured": "2026-10-27T13:27:41.568Z",
+    "as_of": "2026-10-27T13:07:31.843Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3a": 38,
+     "W4": 2,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-QA-10-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-03": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-04": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-05": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-06": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-07": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-08": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-09": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-10": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-11": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-12": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-13": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-14": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-15": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-16": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-17": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-18": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-19": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-20": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-21": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-22": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-23": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-24": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-25": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-26": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-27": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-28": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-29": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-30": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-31": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-32": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-33": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-10-34": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-35": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-36": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-37": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "HP-QA-10-38": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-EH-QA10-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-EH-QA10-2": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HEAD-QA-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-R1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-R2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-4-QA10": {
+      "count": 2,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-100",
+    "fetch_captured": "2026-10-27T13:25:41.806Z",
+    "as_of": "2026-10-27T13:21:17.380Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W4": 4,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W4-P12-QA100-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P12-QA100-2": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W4-P12-QA100-3": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P12-QA100-4": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-100-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-100-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-12-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-12-3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-12-4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-110",
+    "fetch_captured": "2026-10-27T13:25:16.470Z",
+    "as_of": "2026-10-27T13:09:31.094Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W4": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W4-P10-QA110-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HEAD-QA-110-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-110-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-120",
+    "fetch_captured": "2026-10-27T13:26:01.719Z",
+    "as_of": "2026-10-27T13:20:19.853Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 1,
+     "W5": 5,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-QA-120-01": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "QA120-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "QA120-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "QA120-03": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "QA120-04": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "QA120-05": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-120-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-120-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-CL05-01": {
+      "count": 1,
+      "pass": true
+     },
+     "G-CL05-02": {
+      "count": 2,
+      "pass": true
+     },
+     "G-CL05-03": {
+      "count": 0,
+      "pass": true
+     },
+     "G-CL05-07": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-20",
+    "fetch_captured": "2026-10-27T13:26:37.269Z",
+    "as_of": "2026-10-27T13:14:52.288Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 3,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-QA-20-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-20-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-QA-20-03": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-50",
+    "fetch_captured": "2026-10-27T13:26:56.362Z",
+    "as_of": "2026-10-27T13:08:15.848Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 1,
+     "W4": 3,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-QA-50-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P10-QA50-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P11-QA50-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W4-P12-QA50-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-50-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-50-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-11-7": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-12-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-60",
+    "fetch_captured": "2026-10-27T13:27:27.019Z",
+    "as_of": "2026-10-27T13:20:05.824Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 1,
+     "W4": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-QA-60-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P10-QA60-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-60-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-60-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-70",
+    "fetch_captured": "2026-10-27T13:27:46.084Z",
+    "as_of": "2026-10-27T13:19:35.915Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W4": 7,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W4-P10-QA70-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P10-QA70-2": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P10-QA70-3": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P10-QA70-4": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W4-P10-QA70-5": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P11-QA70-1": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W4-P11-QA70-2": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HEAD-QA-70-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-70-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-10-2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-11-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-11-2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-11-3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-11-4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-80",
+    "fetch_captured": "2026-10-27T13:25:45.473Z",
+    "as_of": "2026-10-27T13:09:00.512Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 1,
+     "W4": 6,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-QA-80-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P10-QA80-1": {
+      "start": true,
+      "new": true,
+      "end": true,
+      "landed": true
+     },
+     "W4-P10-QA80-2": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P10-QA80-3": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P10-QA80-4": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W4-P11-QA80-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P11-QA80-2": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "HEAD-QA-80-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-80-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-11-5": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-11-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "QA-90",
+    "fetch_captured": "2026-10-27T13:25:16.865Z",
+    "as_of": "2026-10-27T13:15:43.099Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W4": 2,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W4-P10-QA90-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W4-P12-QA90-1": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-90-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-QA-90-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-10-4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-10-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W4-12-1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-12-2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W4-12-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "RS-10",
+    "fetch_captured": "2026-10-27T13:26:06.753Z",
+    "as_of": "2026-10-27T13:21:43.767Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W3b": 2,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HP-RS-10-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HP-RS-10-02": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-RS-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-RS-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "RS-20",
+    "fetch_captured": "2026-10-27T13:26:42.786Z",
+    "as_of": "2026-10-27T13:20:37.196Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-RS-20-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-RS-20-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "RS-30",
+    "fetch_captured": "2026-10-27T13:27:00.835Z",
+    "as_of": "2026-10-27T13:10:44.942Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "C16": 1,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "C16-RS-30-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-RS-30-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-RS-30-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "RS-40",
+    "fetch_captured": "2026-10-27T13:27:30.801Z",
+    "as_of": "2026-10-27T13:08:26.035Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "W1": 3,
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "W1-RS40-01": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "W1-RS40-02": {
+      "start": true,
+      "new": true,
+      "inserted_after": true,
+      "landed": true
+     },
+     "W1-RS40-03": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-RS-40-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-RS-40-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-R1": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R2": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R3": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R4": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R5": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R6": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R7": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R8": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R9": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R10": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-R11": {
+      "count": 1,
+      "pass": true
+     },
+     "G-W1-F1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "UTIL-10",
+    "fetch_captured": "2026-10-27T13:27:50.012Z",
+    "as_of": "2026-10-27T13:11:38.789Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {
+     "A1": 2
+    },
+    "revision_moved": true,
+    "ops": {
+     "HEAD-UTIL-10-T": {
+      "start": true,
+      "new": true,
+      "landed": true
+     },
+     "HEAD-UTIL-10-U": {
+      "start": true,
+      "new": true,
+      "landed": true
+     }
+    },
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": true
+   },
+   {
+    "prompt": "GCFPE-MGMT-10",
+    "fetch_captured": "2026-10-27T13:26:23.429Z",
+    "as_of": "2026-10-12T02:30:05.584Z",
+    "binding_ops": 0,
+    "binding_identity_under_stand_in": 0,
+    "binding_stale_lines": 0,
+    "binding_skipped_covered": 0,
+    "binding_partial_line_ops": 0,
+    "binding_unresolved": 0,
+    "binding_unresolved_lines": [],
+    "worker_replacements_binding_rewritten": 0,
+    "ops_by_source": {},
+    "revision_moved": false,
+    "ops": {},
+    "binding_current": true,
+    "guards": {
+     "G-W1-F5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-2": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-3": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-4": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-5": {
+      "count": 0,
+      "pass": true
+     },
+     "G-HP-6": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-BIND-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W7-REL-1": {
+      "count": 0,
+      "pass": true
+     },
+     "G-W8-NAME-1": {
+      "count": 0,
+      "pass": true
+     }
+    },
+    "ok": false
+   }
+  ],
+  "pages_ok": 56,
+  "pages_total": 57,
+  "ok": false,
+  "d22": "transient reads of this session's harness records; no body text in this report",
+  "successor_map_checks": {
+   "members_56": true,
+   "members_cover_tsv_plus_cl05": true,
+   "only_added_is_cl05": true,
+   "kept_ids_equal_tsv": true,
+   "successor_predecessors_equal_tsv": true,
+   "pe_predecessor": true,
+   "page_ids_32_hex": true,
+   "successor_titles_102726": true,
+   "distinct_successor_ids": true,
+   "revision_pins_present": true,
+   "ok": true,
+   "stand_in": false,
+   "successor_map_102726_errors": []
+  }
+ },
+ "registry": {
+  "mode": "registry",
+  "stand_in": false,
+  "fixture_rows": 329,
+  "fixtures_disagreeing": [],
+  "page_rows": 756,
+  "pages_disagreeing": [],
+  "ok": true,
+  "d22": "transient reads of this session's harness records; no body text in this report"
+ },
+ "note": "GCFPE-MGMT-10 is KEPT (no operations; the plan does not change it), so its revision does not move; it is the only row with ok false, and only on revision_moved"
+}

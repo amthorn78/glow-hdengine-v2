@@ -9,7 +9,9 @@ It runs plan/body_check.py plan --successor-map execute/successor-pages-102726.1
 to stdout only, {"prompt", "page_id", "ok", "ops", "chunks", "chunk", "content_updates": [{"old_str", "new_str"}]}
 in the order body_check.py applied them. It refuses (exit 1, no payload) unless that page's plan row is `ok`.
 The Notion tool takes at most 100 operations per call, so a page with more is split into chunks of 100 (--chunk 1,
-2, ...), sent in order. The payload is never written to a file (D22: body fragments travel only on stdout). Run with
+2, ...), sent in order. --max-chars N also starts a new chunk before the printed operations pass N characters (a
+fallback for a payload too large for a worker's tool output to show in full); chunks are sent in order, one call
+each, and each operation still names its span alone in the unedited page (body_check.py's batch-safety check). The payload is never written to a file (D22: body fragments travel only on stdout). Run with
 PYTHONDONTWRITEBYTECODE=1 and CLAUDE_CODE_SESSION_ID set.
 """
 from __future__ import annotations
@@ -34,6 +36,7 @@ def main() -> int:
     ap.add_argument("--fetched-after", required=True)
     ap.add_argument("--chunk", type=int, default=1)
     ap.add_argument("--since-minutes", type=int, default=600)
+    ap.add_argument("--max-chars", type=int, default=0)
     a = ap.parse_args()
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
     p = subprocess.run([sys.executable, str(PLAN / "body_check.py"), "plan", "--successor-map", str(MAP),
@@ -53,11 +56,20 @@ def main() -> int:
                                            "guards_failing_after", "check_would_pass", "binding_current_after")}}))
         return 1
     ops = [o for o in res.get("ops_payload_for_execute", [])]
-    chunks = max(1, -(-len(ops) // MAX_OPS))
+    groups, cur, size = [], [], 0
+    for o in ops:
+        n = len(json.dumps({"old_str": o["old_str"], "new_str": o["new_str"]}, ensure_ascii=False)) + 4
+        if cur and (len(cur) >= MAX_OPS or (a.max_chars and size + n > a.max_chars)):
+            groups.append(cur)
+            cur, size = [], 0
+        cur.append(o)
+        size += n
+    groups.append(cur)
+    chunks = len(groups)
     if not 1 <= a.chunk <= chunks:
         print(json.dumps({"prompt": a.prompt, "ok": False, "error": f"CHUNK_RANGE 1..{chunks}"}))
         return 1
-    part = ops[(a.chunk - 1) * MAX_OPS:a.chunk * MAX_OPS]
+    part = groups[a.chunk - 1]
     print(json.dumps({"prompt": a.prompt, "page_id": part[0]["page_id"] if part else None, "ok": True,
                       "ops": len(ops), "chunks": chunks, "chunk": a.chunk,
                       "content_updates": [{"old_str": o["old_str"], "new_str": o["new_str"]} for o in part]},

@@ -8,6 +8,10 @@ title @SUCC_TITLE_<ID>, which body_check.py fills from the map. PE counts as a s
 is `pe`). A line that a worker or head operation already replaces is skipped (no double edit): instead the same
 rewrite is applied to that operation's replacement text, so the one edit carries current bindings. A line that
 already carries 102726.1 is skipped (C-9). A KEPT member (GCFPE-MGMT-10) is never rewritten: it is not a successor.
+AM-2 (Nathan, 2026-10-27, after EXECUTE's X4 stop): on a real duplicate Notion remaps the page's own self-mention to
+the duplicate, which then renders the successor's "— 102726.1" title. C-9's test ignores that one mention, the page's
+own successor self-mention, so a line whose only 102726.1 is that self-mention still has its stale citations
+rewritten; a line carrying any other 102726.1 is skipped as before.
 
 The map (W7 "successor_page_map", written once by EXECUTE at
 execute/successor-pages-102726.1.json) is the only source of dispositions, successor ids and titles. A STAND-IN map
@@ -241,6 +245,10 @@ def generate(text: str, prompt: str, smap: dict, covered: list, tsv: dict | None
     rw = Rewriter(smap, tsv)
     spans = line_spans(text)
     lines = text.split("\n")
+    # AM-2: the page's own successor self-mention does not count as "already carrying 102726.1" for C-9
+    own = (smap.get("pe") if prompt == "PE" else (smap.get("members") or {}).get(prompt)) or {}
+    own_mention = (re.compile(r'<mention url="' + re.escape(URL_BASE + str(own["page_id"])) + r'[^"]*"[^>]*>[^<]*</mention>')
+                   if own.get("page_id") else None)
 
     def cover_of(k):
         a, b = spans[k]
@@ -254,7 +262,7 @@ def generate(text: str, prompt: str, smap: dict, covered: list, tsv: dict | None
     for k in stale:
         a0, b0 = spans[k]
         cov = cover_of(k)
-        if NEW_VERSION in lines[k]:
+        if NEW_VERSION in (own_mention.sub("", lines[k]) if own_mention else lines[k]):
             counts["skipped_already_102726"] += 1
             continue
         if cov:
@@ -440,6 +448,21 @@ def selftest() -> dict:
     checks["injected_bad_predecessor_refused"] = validate(bad)["successor_predecessors_equal_tsv"] is False
     bad2 = json.loads(json.dumps(sm)); bad2["members"]["PR-50"]["disposition"] = "ADDED"
     checks["injected_second_added_refused"] = validate(bad2)["only_added_is_cl05"] is False
+    # AM-2: a duplicate's own remapped self-mention renders 102726.1; a stale own title on its line is still rewritten
+    own_url = f"https://app.notion.com/p/{'1' * 32}"
+    am2_line = (f"- Its own record: <code>AA-10 — Alpha Stage — 100926.1</code> at <mention url=\"{own_url}\">"
+                f"AA-10 — Alpha Stage — 102726.1</mention>.")
+    am2_text = "Head.\n" + am2_line + "\nTail."
+    a2 = generate(am2_text, "AA-10", real, [], tsv)
+    a2_out = _apply(am2_text, a2["ops"], shared)
+    checks["am2_own_remapped_line_rewritten"] = (len(a2["ops"]) == 1 and a2["skipped_already_102726"] == 0
+                                                 and _count(a2_out, name) == 0 and own_url in a2_out)
+    other_line = (f"- Already at <mention url=\"https://app.notion.com/p/{'2' * 32}\">BB-20 — Beta Stage — 102726.1"
+                  f"</mention> and <code>AA-10 — Alpha Stage — 100926.1</code>.")
+    o2 = generate("Head.\n" + other_line + "\nTail.", "AA-10", real, [], tsv)
+    checks["am2_other_102726_still_skipped"] = len(o2["ops"]) == 0 and o2["skipped_already_102726"] == 1
+    a2_again = generate(a2_out, "AA-10", real, [], tsv)
+    checks["am2_current_after"] = len(a2_again["ops"]) == 0 and a2_again["unresolved"] == 0
     return {"mode": "selftest", "checks": checks, "ok": all(checks.values())}
 
 
