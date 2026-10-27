@@ -1,0 +1,70 @@
+{
+ "chain_ok": true,
+ "chain_totals": {
+  "listed": 79,
+  "generated": 179,
+  "applied": 258,
+  "refused": 0
+ },
+ "ops_seen": 258,
+ "single_break_joins": [],
+ "references_written": {
+  "markdown_link:link:other": 44,
+  "markdown_link:link:child": 4,
+  "mention:inner_text:child": 1
+ },
+ "ops_with_markdown_links": [
+  "C-FI",
+  "C-HUB-CF",
+  "C-HUB-ESC",
+  "C-HUB-IA",
+  "C-HUB-QA",
+  "C-HUB-TW",
+  "C-REG",
+  "P1d-FI-B-CAT",
+  "P1d-FI-B-CHK",
+  "P1d-FI-B-ENTRY",
+  "P1d-FI-B-HUB-CF",
+  "P1d-FI-B-HUB-ESC",
+  "P1d-FI-B-HUB-IA",
+  "P1d-FI-B-HUB-QA",
+  "P1d-FI-B-HUB-TW",
+  "P1d-FI-B-PE",
+  "P2-REG-CHG",
+  "P2-REG-MEM",
+  "P2-REG-PROC",
+  "P2-REG-SEL",
+  "P6-HUB-FIND",
+  "P6-HUB-SEL",
+  "P6-OV-FIND",
+  "P6-OV-SEL"
+ ],
+ "ops_with_mentions": [
+  "P1e-HUB-TW-PE"
+ ],
+ "stored_mentions_by_relation": {
+  "pages_read": 69,
+  "child:inner_text": 9,
+  "other:self_closing": 859,
+  "self:inner_text": 61
+ },
+ "stored_markdown_links": {
+  "Flow Index": {
+   "markdown_links": 12,
+   "to_child_pages": 3
+  },
+  "register": {
+   "markdown_links": 65,
+   "to_child_pages": 8
+  },
+  "hub HDE Change Flow": {
+   "markdown_links": 0,
+   "to_child_pages": 0
+  },
+  "Glow Operations Hub": {
+   "markdown_links": 63,
+   "to_child_pages": 4
+  }
+ },
+ "d22": "transient reads of this session's harness records; counts, ids and forms only"
+}

@@ -17,7 +17,11 @@ entry's `validation\\_status: VALIDATED` line replaced by P1c-PE-5's replacement
 lines, each its own paragraph, in the escaped fetch form), resolved by activation_render's apply.
 
 `check` compares the newest fetch of the draft after T with the plan's model: for `created`, as_fetched(entry_text);
-for `inserted`, that model with the insert applied in memory. It prints counts, booleans and line indexes only, and
+for `inserted`, that model with the insert applied in memory.
+
+--base-as-of TS (for `insert` and `check --stage inserted`) takes as the insert's base the draft's own fetch whose
+revision is TS, instead of the created model: the insert form is then rehearsed on its own when the created form
+already differs from the model (the receipt says which base was used). It prints counts, booleans and line indexes only, and
 exits 0 only when the read equals the model exactly. Nothing is written by this helper. Run with
 PYTHONDONTWRITEBYTECODE=1 and CLAUDE_CODE_SESSION_ID set.
 """
@@ -68,6 +72,7 @@ def main() -> int:
     ap.add_argument("--fetched-after", default="")
     ap.add_argument("--since-minutes", type=int, default=600)
     ap.add_argument("--stage", choices=("created", "inserted"))
+    ap.add_argument("--base-as-of", default="")
     a = ap.parse_args()
     ar = load()
     ctx = ar.Ctx(str(HERE / "successor-pages-102726.1.json"), a.parts, {}, True, read_only=True)
@@ -84,6 +89,19 @@ def main() -> int:
         print(json.dumps({"ok": False, "error": "NO_FETCH_FOUND"}))
         return 1
     real = got[3]
+    base_name = "model"
+    if a.base_as_of:
+        import body_check as bc
+        reads = [r for r in bc.all_fetches(a.page, os.path.expanduser("~/.claude/projects"),
+                                           os.environ["CLAUDE_CODE_SESSION_ID"], a.since_minutes) if r[1] == a.base_as_of]
+        if not reads:
+            print(json.dumps({"ok": False, "error": "BASE_READ_NOT_FOUND"}))
+            return 1
+        created, base_name = reads[-1][2], f"read as of {a.base_as_of}"
+        inserted, rows = ar.apply(created, [op], ctx)
+        if not rows[0]["applied"]:
+            print(json.dumps({"ok": False, "error": rows[0]["refusal"]}))
+            return 1
     if a.mode == "insert":
         if real != created:
             print(json.dumps({"ok": False, "error": "DRAFT_NOT_AT_CREATED_MODEL", **diff_report(real, created)}))
@@ -93,12 +111,13 @@ def main() -> int:
         if not r["applied"]:
             print(json.dumps({"ok": False, "error": r["refusal"]}))
             return 1
-        print(json.dumps({"ok": True, "page_id": a.page, "op": op["id"], "form": r["form"],
+        print(json.dumps({"ok": True, "page_id": a.page, "op": op["id"], "form": r["form"], "base": base_name,
                           "content_updates": [{"old_str": r["old_str"], "new_str": r["new_str"]}]},
                          ensure_ascii=False, indent=1))
         return 0
     want = created if a.stage == "created" else inserted
-    out = {"page": a.page, "stage": a.stage, "as_of": got[1], "title": got[2], **diff_report(real, want)}
+    out = {"page": a.page, "stage": a.stage, "base": base_name if a.stage == "inserted" else "model", "as_of": got[1],
+           "title": got[2], **diff_report(real, want)}
     fm = [x for x in ar.C.frontmatter_lines(real) if x and x != "---"]
     out["frontmatter_lines"] = len(fm)
     out["frontmatter_joined_by_br"] = sum("<br />" in x for x in fm)
