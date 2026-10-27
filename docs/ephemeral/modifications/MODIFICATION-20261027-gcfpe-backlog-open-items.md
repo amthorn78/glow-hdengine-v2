@@ -824,7 +824,7 @@ Because R-P1 and R-P2 are taken, neither goes on the backlog (C-14).
 | X11 | PART-24, 08–10, 13 | VERIFIED | `execute/x11_graphs_102726.py`, the plan's commands on the real successor map in scratch ([execute/x11-graphs-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x11-graphs-102726.1.json)). `graph_assemble_102726.py apply` (with `plan/graph-edits.json` and `plan/members-100926.1.tsv`): `apply_ok`; the installed `graph_parts.py reindex`; `check` against `docs/graph/parts`: `check_ok`. **Candidate** build: 56 nodes · 240 edges · 56 state_routes · 608,051 bytes · sha256 `e17d4e6ad78f7c92…`, validation PASS. `routes`: `routes_ok`, every flag true: no QA-120 edge to CL-C-10 or CL-E-10, QA-120 `PASS` to CL-05, no DOC-20 edge to PR-40, IA-40 `REDLINE_INCOMPLETE` to IA-30 only, both `DO_NOT_CLOSE` routes reach CL-05, `sole_added_node` CL-05, no unresolved edge. `flip`, then `check --flipped`: `check_ok`, no error, so production differs only in the lifecycle literals and the prologue. **Production** build: 56 · 240 · 56 · 607,994 bytes · sha256 `2342744dc1d9de9d…`, validation PASS; `routes_ok`. `selftest`: `selftest_ok`. These candidate parts are byte-identical to the scratch parts the renderer used from X4b on |
 | X12 | PART-24 | VERIFIED | `contracts_102726.py values <repo-root> --check`: the release-values file is current. `fill` with X11's production graph, PLAN-20261027.md and the map: `fill_ok`, no marker left, [execute/contracts/release-values-102726.1.filled.json](evidence/20261027-gcfpe-backlog-open-items/execute/contracts/release-values-102726.1.filled.json) (its PLAN pin is PLAN-20261027.md's sha256 `a3b11f4668b166c4…`, 84,106 B). `run` on the build root, X11's candidate and production graphs and Q2's oracle `f1b221e9…`, with the map ([execute/x12-contracts-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x12-contracts-102726.1.json)): `ok`. Q1 again PASS (`cd291f17…`, EQUAL ×2). Every Q5 check true: both written, neither with `promoted_at`, 56 `candidate_prompt_ids`, heads, R1 pins, 240 route edges, QA closure through CL-05, the real-input P1 condition (C-7), the 2026-09-23 references historical (C-11), the member rule from the graph, lifecycle, release-semantic equality outside the lifecycle keys and the graph digest, CL-05's parent from the map (C-19), and the 55 carried parents' template values. All 13 injected refusals fire, among them the 100926.1 release-values file. Candidate contract 649,674 B `3527775d675733ff…`; production 646,249 B `f5dfa63f3f0b1c0d…` (measured here; the dry run's stand-in values differ, as the plan says they would) |
 | X13 | PART-24, 01, 02, 07, 10, 13, 26 | VERIFIED | `execute/x13_packages_102726.py` on the installed skills, X11's production graph, X12's production contract and filled release values, and the R1 files (`--out-dir`, identical to Q2's), with `--with-conditional R-P1` (Nathan's opt-in) ([execute/x13-packages-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x13-packages-102726.1.json)). **G1:** the redlines file reproduces; 105 operations apply once, every one `LANDED`, a second application refused; R-P1's 4 land once, a second refused, and refused on an unredlined base. **G2:** `execute/package_build_102726.py` (a byte-identical copy of the plan's) `build`, exit 0, no stand-in, R-P1 applied; `check` byte-identical; `selftest` true on every case but `stops_on_stand_in_map_without_flag`, which needs a stand-in map by construction (X4b) and is true on the stand-in map in A3's PLAN receipt: `NOT_APPLICABLE_REAL_MAP`. **Packages:** quick_validate and package_skill for each, extracted, each extracted tree's freeze digest equal to the built one: change-flow `98ba87979cdc2911…` 538,904 B, tree `29 672f3cbb133092bee896d157c62deff8bb559dae446687ae1fd15ebbb07f74e0`; flowmaster-validate `60b8889ae79cfea3…` 721,255 B, tree `45 39762ccab52e4fb7cb5c4e792aea2a5245fa23e0edd9273b47880954a696668d`; glow-hde-pr-development `dd6fd4234dedd6fa…` 26,085 B, tree `4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee`; glow-graph-contract `683ea1039538ee76…` 58,987 B, tree `9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1`. **Two roots** (every name line quoted in one, plain in the other, D28), each with the four extracted packages: in both, the suite has no finding from this change and exactly the three named pre-existing ones (C-21), FLOWMASTER R1 coverage 47 of 47 (26 core), the change-flow fixtures ok; flowmaster-validate's `validate_gcfpe_20261027.py` ok and `run_gcfpe_20261027_fixtures.py` ok (297 cases, none failed); change-flow's `validate_gcfpe_20261027.py` PASS; glow-hde-pr-development's validator PASS; quick_validate ×4; `contract_recipe.py --check` EQUAL ×2 for 102726.1 (`f5dfa63f…`) and for 100926.1 (`cd291f17…`). The two roots give identical gate results and identical freeze digests for every skill. **G6:** each new check fires on its injected regression (FMV-ORACLE-019, FMV-ORACLE-020, the superseded-contract link, the close-stage negative fixture, the runner's close-set case) |
-| X14 | — | NOT_RUN | not yet reached |
+| X14 | PART-24 | FAILED | Fresh reads of the 56 members by seven read-only workers after 15:45:58.638Z: 56 fetched, no error, and no member revision moved since X7's landing check. `plan/x12_qualify_102726.py run` on both X13 roots, with `--candidate-contract` naming X12's candidate contract (`3527775d…`, disclosed below) ([execute/x14-bodies-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x14-bodies-102726.1.json), `execute/x14_diagnose_102726.py`). Passed: `prompt_bodies_validated` 56; `prompt_body_checks_not_evaluated` empty; the profile `ok`, contract `SELECTED_PRODUCTION`, 240 frozen edges; no `PROMPT_BINDING_SUPERSEDED`; the payload normalized (C-15); the fixtures without bodies `ok` (297 cases); the suite with no finding from this change and only C-21's three named ones; the candidate and production contracts equal outside the lifecycle keys and the graph digest; the two roots' results identical. **But `ok` is false. The fixtures runner, given the bodies, stops before its QA-closure cases** with `ValueError: Mutation anchor absent: reject-source-missing-rca`. The cause is in *Failure record — 2026-10-27, X14* |
 | X15 | — | NOT_RUN | not yet reached |
 | X16 | — | NOT_RUN | not yet reached |
 | X17 | — | NOT_RUN | not yet reached |
@@ -877,6 +877,8 @@ EXECUTE stops at X2. The plan's normal path cannot be executed mechanically on a
 - **X9b, stages 7 and 8 read together.** The banner insert (7) and the retitle (8) were sent one after the other, and then read together, rather than reading the page between them. The joint read equals the model after both.
 - **X9b, the draft's catalog table.** The draft carried the catalog's first three member rows, not 56; the forms are the same. Its text, and both pages' reads, were seen in the terminal. These were rehearsal pages holding the plan's control-page text with stand-in values, not member bodies. Nothing was written to disk.
 - **X13, one self-test case classified, not passed.** `package_build_102726.py selftest`'s `stops_on_stand_in_map_without_flag` drops `--stand-in-ok` and expects the build to stop, which only a stand-in map can cause; with the real map it cannot fire. X4b recorded this; the case is true on the stand-in map in A3's PLAN receipt. The X13 driver counts it `NOT_APPLICABLE_REAL_MAP` and no other case.
+- **X14, the candidate contract named.** The plan's X14 command names no candidate contract. `x12_qualify_102726.py`'s default path, `execute/contracts/gcfpe-20261027.1-102726.1-candidate-contract.json`, does not exist: X12 wrote both contracts to scratch, and only the filled release values were committed. The first run therefore reported `candidate_contract_present` false. The runs recorded pass `--candidate-contract` with X12's candidate contract, whose sha256 `3527775d…` equals X12's receipt. The bundled production contract in both roots is `f5dfa63f…`, X12's production contract.
+- **X14, terminal views and diagnostic runs.** To find the failure, QA-120's PASS routing section (about 1,900 characters of the live read) and eight short windows around "RCA" were printed once in the terminal. Scratch probes printed anchor counts and the runner's stderr tail. Nothing from a body was written to disk. `execute/x14_diagnose_102726.py` and `execute/x14_sweep_102726.py` reproduce every measurement the record uses, and print counts, ids, revisions, the runner's own anchor strings and error codes only. One scratch probe, run with `python3 -I` (which ignores `PYTHONDONTWRITEBYTECODE`), wrote a bytecode cache of `plan/x12_qualify_102726.py` under `plan/__pycache__/`. It is ignored by Git, held no body text, and was deleted at once.
 
 ### Return to Nathan — 2026-10-27, after X2
 
@@ -1341,3 +1343,79 @@ Nathan's words:
 - **Observed and recorded, not differences.**
   - A parent's revision did not move when its child page moved out or in; its content did.
   - A page moved in is appended at the end of its new parent.
+
+### Failure record — 2026-10-27, X14 (D26-B)
+
+EXECUTE stops at X14. The 56 written bodies pass the shipped 102726.1 validator, but the shipped fixtures runner cannot run its body cases on them: three of its QA-120 mutation anchors name text the page does not hold. X14's failure path is "none; stop". The fix changes a shipped package file beyond the approved build step, so Nathan's rule 3 sends it back: "content or meaning would differ from the approved plan". It is not a storage-form fix under rule 2, and neither of rule 4's two amendments is used.
+
+- **What was run.**
+  - 15:45Z: fresh reads of the 56 members, seven read-only workers, 56 fetched, no error.
+  - `plan/x12_qualify_102726.py run` on X13's two roots (D28), with X12's candidate contract named ([execute/x14-bodies-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x14-bodies-102726.1.json), `execute/x14_diagnose_102726.py`).
+  - Every component passed but one: the fixtures runner with bodies exited 1 and printed no report. Both roots gave identical results.
+- **What failed.** The built `flowmaster-validate/scripts/run_gcfpe_20261027_fixtures.py` (package `60b8889a…`) was given the 56 bodies on stdin. It raised `Mutation anchor absent: reject-source-missing-rca` before any QA-closure source case ran.
+  - *Where the runner comes from.* It is the 100926.1 runner, rebuilt by the plan's build step R (`plan/package_build_102726.py`). R moves the release literals and retargets the QA-closure *contract* cases to CL-05. It carries the nine QA-closure *source* cases, which mutate the QA-120, CL-E-10 and CL-C-10 bodies, unchanged: that block is byte-identical to the 100926.1 runner's.
+  - *The three anchors that find nothing.* The receipt counts each anchor in every QA-120 read this session holds.
+    - `reject-source-missing-rca` anchors on `` `QA_RCA_ID` ``. The plan's own HP-QA-120-01 (PART-07, coordinator C-9) replaced the paragraph that held it. The PASS handoff now names "the separate `QA_REPORT` and `QA_RCA` with their IDs", which is the validator's own intake marker (`QA_PASS_INTAKE_MARKERS`). The successor held the anchor once before its X6 write (revision 12:09:36Z) and holds it 0 times now (13:20:19Z). The body is the approved plan's text; the runner's anchor was not moved with it.
+    - `reject-source-absent-crd-class-branch` and `reject-source-duplicate-crd-class-branch` anchor on the HTML cell `` <td>`CRD`</td> ``. Today's fetch renders QA-120's class map as a Markdown pipe table. The cell occurs 0 times on the unedited 100926.1 page (revision 2026-10-12T02:29:51Z) and on the successor, and the pipe row `` | `PASS` | `CRD` | `` once on each.
+    - The validator reads either rendering (`qa_pass_class_rows`); these two cases read only HTML. The 100926.1 runner's own comment records the reverse flip in the precedent: its anchors had assumed the pipe rendering, and the live body then rendered as an HTML table. The installed 100926.1 runner's same case would also find nothing today.
+- **Why PLAN did not catch it.** A3 ran the runner without bodies and deferred every body-level case to EXECUTE, saying so: "QA-closure body cases need QA-120, CL-E-10 and CL-C-10 bodies): A5 and x12 in EXECUTE" ([plan/receipts-A3/A3-packages-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/plan/receipts-A3/A3-packages-102726.1.json)). X14 is the first run against the written bodies.
+- **Measured, not applied.** A scratch copy of the built flowmaster-validate was made, deleted after the run, with three substitutions:
+  - the RCA case anchored on "`QA_RCA` with their IDs";
+  - the absent-branch case deleting the CRD cell of the pipe row;
+  - the duplicate case finding the CRD row by line scan in the pipe rendering.
+
+  With the same 56 bodies, the copy passes:
+  - 323 cases, none failed;
+  - the 9 QA-closure source cases and 17 artifact-timing cases;
+  - section 13 at 54 of 54, its variants at 55 of 55.
+
+  The validator, the contracts, the bodies and the other three packages need no change.
+- **Read-only sweep.** Fresh reads after 16:00:09.298Z of 11 pages, 11 fetched with no error ([execute/x14-sweep-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x14-sweep-102726.1.json), `execute/x14_sweep_102726.py`): the register, the Flow Index, the five hubs, the HDE Change Flow Overview, the catalog, PE and the Glow Operations Hub.
+  - `control_check_102726.py --phase candidate` is `ok`, with 0 findings.
+  - The register's Current selection still names GCFPE-20261009.1 / 100926.1 / 55, and the catalog's staging frontmatter holds.
+  - Each control page is at its X9 revision; PE is at its X7 revision.
+  - The Glow Operations Hub's revision moved twice since X8, at 13:46:03Z (already seen at X8b) and 14:22:01Z, while its content stayed byte-equal to the X8 read. This run did not write it.
+  - The 56 members: X14's reads, with no revision moved since X7.
+- **What is live.**
+  - Notion: X9's state, unchanged. That is the 56 successors, PART-17's edits, the catalog (repaired, still staged), and the candidate sections and record. No selection change; 100926.1 is selected.
+  - Repository: this branch, in draft [amthorn78/glow-hdengine-v2#775](https://github.com/amthorn78/glow-hdengine-v2/pull/775).
+  - Skills: the four packages exist only in scratch; nothing is installed.
+- **Rules 3 and 4.** Rule 3's first condition holds. No live page is wrong, and P2 is not affected. Rule 4: 0 of the 2 storage-form amendments after the rehearsal are used, and about 4 h 50 min of the 30 h.
+- **The freeze is kept.** No Notion write follows until Nathan decides.
+- **The record reaches `main`** when #775 merges (D21-C).
+
+### Return to Nathan — 2026-10-27, after X14
+
+**EXECUTE stopped at X14. The 56 written bodies pass the shipped 102726.1 validator (56 validated, none unevaluated), but the shipped fixtures runner stops before its QA-closure body cases. Three of its mutation anchors name QA-120 text that is not on the page. With the three anchors moved on a scratch copy, all 323 cases pass. No live page is wrong, and 100926.1 is still selected. `DECISION NEEDED`.**
+
+| # | Question | Recommendation |
+|---|---|---|
+| 1 | How the runner is repaired | amendment AM-8, option A |
+| 2 | The record pull request | mark #775 ready and merge it as the record pull request |
+
+**1. The repair.** The runner carries three QA-120 anchors over from the 100926.1 runner.
+- `` `QA_RCA_ID` `` was removed by the plan's own HP-QA-120-01.
+- `` <td>`CRD`</td> `` assumes an HTML table, but Notion now fetches that table as a pipe table, on the old page too.
+
+The options:
+- **Option A, AM-8 (recommended).** Three named substitutions on the 100926.1 runner's QA-120 source cases, in `package_build_102726.py`'s step R. Each case keeps its expected error.
+  - The RCA case anchors on "`QA_RCA` with their IDs", the sentence HP-QA-120-01 wrote and the validator reads.
+  - The absent-branch case deletes the CRD class cell in whichever rendering the read carries, pipe or HTML.
+  - The duplicate case finds the CRD row by line scan, in either rendering.
+  - The step-R description and the runner's comments say what moved and why.
+  - *Then:* X13 again (build, check, package, two roots, every gate). Only flowmaster-validate's bytes and digest change. Then X14 again on a fresh read of the 56, and on to X18.
+  - *Coverage:* X17's reviewers and X23's `x18_validate_102726.py` run the same runner with bodies, so the fix covers them too.
+  - *Cost:* about 1 hour, plus about 1M tokens for the fresh read. No Notion write.
+- **Option B: the pipe rendering only.** The same, but the two table cases read only the pipe form, as measured. It is simpler, but if Notion renders the table as HTML again, as it has once before, the runner stops again.
+- **Option C: end the run here.** 100926.1 stays selected, the candidate stays staged in Notion, and the remaining work moves to MB-052. Not recommended: the defect is three anchors in one generated file.
+- **Counting.** AM-8 is a plan amendment for you to approve, not a rule-2 fix. I propose it does not count toward rule 4's two storage-form amendments.
+
+**2. Record pull request.** Draft #775 carries AM-5 to AM-7, X9b to X13, this record and its receipts.
+- **Mark it ready and merge it now (recommended).** The run continues on this branch, restarted from `main`, in a new pull request.
+- **Keep it open.** The X14 record stays off `main` until it merges.
+
+**Spend in EXECUTE so far.**
+- **Time:** about 4 h 50 min, 11:20Z to 16:10Z, of rule 4's 30 h.
+- **Tokens:** 8.7M of subagent tokens, measured from this session's workflow records, plus the coordinator's.
+
+**In one line, if you take the recommendations:** "AM-8 as described (option A), outside rule 4's count; I merge #775 as the record pull request."
