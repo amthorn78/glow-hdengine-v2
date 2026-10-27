@@ -1,0 +1,33 @@
+{
+ "wrong_pin_refused": {
+  "exit": 1,
+  "ok": false,
+  "revision_matches_plan": false
+ },
+ "wrong_predecessor_refused": {
+  "exit": 2,
+  "error": "SUCCESSOR_MAP_INVALID"
+ },
+ "check_refuses_stand_in": {
+  "exit": 2,
+  "error": "STAND_IN_MAP_REFUSED: check runs only on EXECUTE's real map"
+ },
+ "real_map_without_pins_refused": {
+  "exit": 2,
+  "error": "SUCCESSOR_MAP_INVALID",
+  "revision_pins_present": false
+ },
+ "no_map_refused": {
+  "exit": 2,
+  "error": "SUCCESSOR_MAP_REQUIRED: pass --successor-map (a stand-in map for PLAN)"
+ },
+ "markup_without_flag_refused_on_real_read": {
+  "ok": false,
+  "batch_safe": false,
+  "markup_spans_refused": [
+   "HEAD-PR-50-U"
+  ]
+ },
+ "ok": true,
+ "note": "each injected failure must be reported as a failure; inputs are scratch copies of the stand-in map, never written to the repository"
+}

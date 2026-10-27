@@ -1,0 +1,1307 @@
+{
+ "record_type": "A1_OP_COUNTS",
+ "source": "edits.json and receipts-A1/A1-plan-standin.json (stand-in map)",
+ "static_ops_total": 439,
+ "static_ops_by_part": {
+  "PART-01": 10,
+  "PART-03": 16,
+  "PART-04": 6,
+  "PART-05": 2,
+  "PART-06": 1,
+  "PART-07": 207,
+  "PART-08": 1,
+  "PART-09": 4,
+  "PART-10": 16,
+  "PART-11": 5,
+  "PART-12": 6,
+  "PART-13": 44,
+  "PART-14": 8,
+  "PART-24": 110,
+  "PART-26": 1,
+  "PART-27": 2
+ },
+ "static_ops_by_source": {
+  "W1": 12,
+  "W2": 24,
+  "W3a": 109,
+  "W3b": 98,
+  "W4": 31,
+  "W5": 41,
+  "W6": 14,
+  "A1": 110
+ },
+ "conditional_ops": {
+  "R-P1": 0,
+  "R-P2": 1
+ },
+ "static_ops_by_page": {
+  "CF-C-10": {
+   "PART-24": 2
+  },
+  "CF-C-20": {
+   "PART-24": 2
+  },
+  "CF-C-30": {
+   "PART-03": 2,
+   "PART-24": 2
+  },
+  "CF-C-40": {
+   "PART-03": 2,
+   "PART-24": 2
+  },
+  "CF-E-10": {
+   "PART-24": 2
+  },
+  "CF-E-20": {
+   "PART-24": 2
+  },
+  "CF-E-30": {
+   "PART-03": 2,
+   "PART-24": 2
+  },
+  "CF-E-40": {
+   "PART-03": 2,
+   "PART-24": 2
+  },
+  "CF-PO-10": {
+   "PART-24": 2
+  },
+  "CL-05": {
+   "PART-13": 26,
+   "PART-24": 1
+  },
+  "CL-20": {
+   "PART-07": 2,
+   "PART-24": 2
+  },
+  "CL-30": {
+   "PART-07": 3,
+   "PART-24": 2
+  },
+  "CL-40": {
+   "PART-07": 8,
+   "PART-24": 2
+  },
+  "CL-C-10": {
+   "PART-13": 5,
+   "PART-24": 2
+  },
+  "CL-E-10": {
+   "PART-13": 5,
+   "PART-24": 2
+  },
+  "CL-E-20": {
+   "PART-24": 2
+  },
+  "CL-E-30": {
+   "PART-24": 2
+  },
+  "CL-E-40": {
+   "PART-24": 2
+  },
+  "DOC-10": {
+   "PART-24": 2
+  },
+  "DOC-20": {
+   "PART-08": 1,
+   "PART-07": 2,
+   "PART-24": 2
+  },
+  "ESC-10": {
+   "PART-24": 2
+  },
+  "ESC-25": {
+   "PART-24": 2
+  },
+  "ESC-30": {
+   "PART-24": 2
+  },
+  "ESC-40": {
+   "PART-10": 1,
+   "PART-24": 2
+  },
+  "IA-10": {
+   "PART-03": 1,
+   "PART-07": 4,
+   "PART-24": 2
+  },
+  "IA-20": {
+   "PART-03": 1,
+   "PART-07": 1,
+   "PART-24": 2
+  },
+  "IA-30": {
+   "PART-03": 2,
+   "PART-04": 2,
+   "PART-07": 1,
+   "PART-09": 1,
+   "PART-24": 2
+  },
+  "IA-40": {
+   "PART-03": 1,
+   "PART-09": 3,
+   "PART-24": 2
+  },
+  "IA-50": {
+   "PART-24": 2
+  },
+  "IA-60": {
+   "PART-24": 2
+  },
+  "MGR-10": {
+   "PART-07": 2,
+   "PART-24": 2
+  },
+  "OPS-10": {
+   "PART-07": 21,
+   "PART-24": 2
+  },
+  "OPS-20": {
+   "PART-07": 21,
+   "PART-24": 2
+  },
+  "OPS-30": {
+   "PART-07": 29,
+   "PART-24": 2
+  },
+  "PE": {
+   "PART-27": 2,
+   "PART-26": 1,
+   "PART-14": 8,
+   "PART-13": 3,
+   "PART-24": 1
+  },
+  "PR-10": {
+   "PART-03": 1,
+   "PART-04": 1,
+   "PART-07": 15,
+   "PART-24": 2
+  },
+  "PR-20": {
+   "PART-01": 1,
+   "PART-06": 1,
+   "PART-04": 3,
+   "PART-03": 2,
+   "PART-07": 24,
+   "PART-24": 2
+  },
+  "PR-30": {
+   "PART-07": 5,
+   "PART-24": 2
+  },
+  "PR-35": {
+   "PART-01": 5,
+   "PART-07": 4,
+   "PART-24": 2
+  },
+  "PR-40": {
+   "PART-01": 1,
+   "PART-05": 2,
+   "PART-07": 18,
+   "PART-24": 2
+  },
+  "PR-50": {
+   "PART-24": 2
+  },
+  "QA-10": {
+   "PART-07": 38,
+   "PART-10": 2,
+   "PART-24": 2
+  },
+  "QA-100": {
+   "PART-12": 4,
+   "PART-24": 2
+  },
+  "QA-110": {
+   "PART-10": 1,
+   "PART-24": 2
+  },
+  "QA-120": {
+   "PART-07": 1,
+   "PART-13": 5,
+   "PART-24": 2
+  },
+  "QA-20": {
+   "PART-07": 3,
+   "PART-24": 2
+  },
+  "QA-50": {
+   "PART-07": 1,
+   "PART-10": 1,
+   "PART-11": 1,
+   "PART-12": 1,
+   "PART-24": 2
+  },
+  "QA-60": {
+   "PART-07": 1,
+   "PART-10": 1,
+   "PART-24": 2
+  },
+  "QA-70": {
+   "PART-10": 5,
+   "PART-11": 2,
+   "PART-24": 2
+  },
+  "QA-80": {
+   "PART-07": 1,
+   "PART-10": 4,
+   "PART-11": 2,
+   "PART-24": 2
+  },
+  "QA-90": {
+   "PART-10": 1,
+   "PART-12": 1,
+   "PART-24": 2
+  },
+  "RS-10": {
+   "PART-07": 2,
+   "PART-24": 2
+  },
+  "RS-20": {
+   "PART-24": 2
+  },
+  "RS-30": {
+   "PART-24": 2
+  },
+  "RS-40": {
+   "PART-01": 3,
+   "PART-24": 2
+  },
+  "UTIL-10": {
+   "PART-24": 2
+  }
+ },
+ "binding_by_page_stand_in": {
+  "CF-C-10": {
+   "binding_ops": 4,
+   "binding_identity_under_stand_in": 5,
+   "binding_stale_lines": 11,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CF-C-20": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 5,
+   "binding_stale_lines": 9,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CF-C-30": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 4,
+   "binding_stale_lines": 8,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CF-C-40": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 3,
+   "binding_stale_lines": 6,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CF-E-10": {
+   "binding_ops": 4,
+   "binding_identity_under_stand_in": 5,
+   "binding_stale_lines": 11,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CF-E-20": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 5,
+   "binding_stale_lines": 9,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CF-E-30": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 4,
+   "binding_stale_lines": 8,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CF-E-40": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 3,
+   "binding_stale_lines": 6,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CF-PO-10": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 4,
+   "binding_stale_lines": 8,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CL-05": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 0,
+   "binding_stale_lines": 2,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CL-20": {
+   "binding_ops": 5,
+   "binding_identity_under_stand_in": 18,
+   "binding_stale_lines": 25,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CL-30": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 16,
+   "binding_stale_lines": 19,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CL-40": {
+   "binding_ops": 12,
+   "binding_identity_under_stand_in": 11,
+   "binding_stale_lines": 25,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CL-C-10": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 22,
+   "binding_stale_lines": 26,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CL-E-10": {
+   "binding_ops": 4,
+   "binding_identity_under_stand_in": 21,
+   "binding_stale_lines": 27,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CL-E-20": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 13,
+   "binding_stale_lines": 17,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CL-E-30": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 13,
+   "binding_stale_lines": 17,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "CL-E-40": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 14,
+   "binding_stale_lines": 18,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "DOC-10": {
+   "binding_ops": 3,
+   "binding_identity_under_stand_in": 19,
+   "binding_stale_lines": 24,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "DOC-20": {
+   "binding_ops": 3,
+   "binding_identity_under_stand_in": 17,
+   "binding_stale_lines": 23,
+   "binding_skipped_covered": 3,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "ESC-10": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 15,
+   "binding_stale_lines": 18,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "ESC-25": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 14,
+   "binding_stale_lines": 17,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "ESC-30": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 14,
+   "binding_stale_lines": 18,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "ESC-40": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 11,
+   "binding_stale_lines": 15,
+   "binding_skipped_covered": 3,
+   "binding_partial_line_ops": 1,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "IA-10": {
+   "binding_ops": 4,
+   "binding_identity_under_stand_in": 4,
+   "binding_stale_lines": 10,
+   "binding_skipped_covered": 3,
+   "binding_partial_line_ops": 1,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "IA-20": {
+   "binding_ops": 3,
+   "binding_identity_under_stand_in": 3,
+   "binding_stale_lines": 8,
+   "binding_skipped_covered": 3,
+   "binding_partial_line_ops": 1,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "IA-30": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 2,
+   "binding_stale_lines": 6,
+   "binding_skipped_covered": 3,
+   "binding_partial_line_ops": 1,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "IA-40": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 2,
+   "binding_stale_lines": 5,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "IA-50": {
+   "binding_ops": 4,
+   "binding_identity_under_stand_in": 4,
+   "binding_stale_lines": 10,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "IA-60": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 3,
+   "binding_stale_lines": 6,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "MGR-10": {
+   "binding_ops": 4,
+   "binding_identity_under_stand_in": 8,
+   "binding_stale_lines": 14,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "OPS-10": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 22,
+   "binding_stale_lines": 24,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "OPS-20": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 16,
+   "binding_stale_lines": 18,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "OPS-30": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 25,
+   "binding_stale_lines": 27,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "PE": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 0,
+   "binding_stale_lines": 2,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "PR-10": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 21,
+   "binding_stale_lines": 23,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "PR-20": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 17,
+   "binding_stale_lines": 19,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "PR-30": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 16,
+   "binding_stale_lines": 18,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "PR-35": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 10,
+   "binding_stale_lines": 14,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "PR-40": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 21,
+   "binding_stale_lines": 23,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "PR-50": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 8,
+   "binding_stale_lines": 10,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-10": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 22,
+   "binding_stale_lines": 24,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-100": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 11,
+   "binding_stale_lines": 14,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-110": {
+   "binding_ops": 4,
+   "binding_identity_under_stand_in": 11,
+   "binding_stale_lines": 17,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-120": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 13,
+   "binding_stale_lines": 19,
+   "binding_skipped_covered": 4,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-20": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 17,
+   "binding_stale_lines": 21,
+   "binding_skipped_covered": 3,
+   "binding_partial_line_ops": 1,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-50": {
+   "binding_ops": 4,
+   "binding_identity_under_stand_in": 17,
+   "binding_stale_lines": 23,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-60": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 15,
+   "binding_stale_lines": 19,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-70": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 15,
+   "binding_stale_lines": 19,
+   "binding_skipped_covered": 3,
+   "binding_partial_line_ops": 1,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-80": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 13,
+   "binding_stale_lines": 17,
+   "binding_skipped_covered": 4,
+   "binding_partial_line_ops": 2,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "QA-90": {
+   "binding_ops": 3,
+   "binding_identity_under_stand_in": 13,
+   "binding_stale_lines": 18,
+   "binding_skipped_covered": 3,
+   "binding_partial_line_ops": 1,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "RS-10": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 13,
+   "binding_stale_lines": 16,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "RS-20": {
+   "binding_ops": 2,
+   "binding_identity_under_stand_in": 12,
+   "binding_stale_lines": 16,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "RS-30": {
+   "binding_ops": 1,
+   "binding_identity_under_stand_in": 13,
+   "binding_stale_lines": 16,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "RS-40": {
+   "binding_ops": 4,
+   "binding_identity_under_stand_in": 7,
+   "binding_stale_lines": 13,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "UTIL-10": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 2,
+   "binding_stale_lines": 4,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  },
+  "GCFPE-MGMT-10": {
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 0,
+   "binding_stale_lines": 0,
+   "binding_skipped_covered": 0,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "worker_replacements_binding_rewritten": 0
+  }
+ },
+ "binding_totals_stand_in": {
+  "binding_ops": 113,
+  "binding_identity_under_stand_in": 632,
+  "binding_stale_lines": 860,
+  "binding_skipped_covered": 124,
+  "binding_partial_line_ops": 9,
+  "binding_unresolved": 0,
+  "worker_replacements_binding_rewritten": 0
+ },
+ "probe_by_page": {
+  "CF-C-10": {
+   "ops": 11,
+   "ops_applied": 11,
+   "bind_before": 7,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "CF-C-20": {
+   "ops": 9,
+   "ops_applied": 9,
+   "bind_before": 6,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "CF-C-30": {
+   "ops": 10,
+   "ops_applied": 10,
+   "bind_before": 5,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "CF-C-40": {
+   "ops": 8,
+   "ops_applied": 8,
+   "bind_before": 4,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "CF-E-10": {
+   "ops": 11,
+   "ops_applied": 11,
+   "bind_before": 7,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "CF-E-20": {
+   "ops": 9,
+   "ops_applied": 9,
+   "bind_before": 6,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "CF-E-30": {
+   "ops": 10,
+   "ops_applied": 10,
+   "bind_before": 5,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "CF-E-40": {
+   "ops": 8,
+   "ops_applied": 8,
+   "bind_before": 4,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "CF-PO-10": {
+   "ops": 8,
+   "ops_applied": 8,
+   "bind_before": 5,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "CL-05": {
+   "ops": 27,
+   "ops_applied": 27,
+   "bind_before": 2,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "CL-20": {
+   "ops": 27,
+   "ops_applied": 27,
+   "bind_before": 24,
+   "bind_after": 0,
+   "name_before": 7,
+   "name_after": 0
+  },
+  "CL-30": {
+   "ops": 22,
+   "ops_applied": 22,
+   "bind_before": 18,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "CL-40": {
+   "ops": 33,
+   "ops_applied": 33,
+   "bind_before": 24,
+   "bind_after": 0,
+   "name_before": 14,
+   "name_after": 0
+  },
+  "CL-C-10": {
+   "ops": 31,
+   "ops_applied": 31,
+   "bind_before": 25,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "CL-E-10": {
+   "ops": 32,
+   "ops_applied": 32,
+   "bind_before": 26,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "CL-E-20": {
+   "ops": 17,
+   "ops_applied": 17,
+   "bind_before": 16,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "CL-E-30": {
+   "ops": 17,
+   "ops_applied": 17,
+   "bind_before": 16,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "CL-E-40": {
+   "ops": 18,
+   "ops_applied": 18,
+   "bind_before": 17,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "DOC-10": {
+   "ops": 24,
+   "ops_applied": 24,
+   "bind_before": 23,
+   "bind_after": 0,
+   "name_before": 5,
+   "name_after": 0
+  },
+  "DOC-20": {
+   "ops": 25,
+   "ops_applied": 25,
+   "bind_before": 22,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "ESC-10": {
+   "ops": 18,
+   "ops_applied": 18,
+   "bind_before": 17,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "ESC-25": {
+   "ops": 17,
+   "ops_applied": 17,
+   "bind_before": 16,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "ESC-30": {
+   "ops": 18,
+   "ops_applied": 18,
+   "bind_before": 17,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "ESC-40": {
+   "ops": 16,
+   "ops_applied": 16,
+   "bind_before": 14,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "IA-10": {
+   "ops": 15,
+   "ops_applied": 15,
+   "bind_before": 9,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "IA-20": {
+   "ops": 10,
+   "ops_applied": 10,
+   "bind_before": 7,
+   "bind_after": 0,
+   "name_before": 5,
+   "name_after": 0
+  },
+  "IA-30": {
+   "ops": 12,
+   "ops_applied": 12,
+   "bind_before": 5,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "IA-40": {
+   "ops": 9,
+   "ops_applied": 9,
+   "bind_before": 4,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "IA-50": {
+   "ops": 10,
+   "ops_applied": 10,
+   "bind_before": 9,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "IA-60": {
+   "ops": 6,
+   "ops_applied": 6,
+   "bind_before": 5,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "MGR-10": {
+   "ops": 16,
+   "ops_applied": 16,
+   "bind_before": 13,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "OPS-10": {
+   "ops": 45,
+   "ops_applied": 45,
+   "bind_before": 23,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "OPS-20": {
+   "ops": 39,
+   "ops_applied": 39,
+   "bind_before": 17,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "OPS-30": {
+   "ops": 56,
+   "ops_applied": 56,
+   "bind_before": 26,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "PE": {
+   "ops": 15,
+   "ops_applied": 15,
+   "bind_before": 0,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "PR-10": {
+   "ops": 40,
+   "ops_applied": 40,
+   "bind_before": 22,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "PR-20": {
+   "ops": 50,
+   "ops_applied": 50,
+   "bind_before": 18,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "PR-30": {
+   "ops": 23,
+   "ops_applied": 23,
+   "bind_before": 17,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "PR-35": {
+   "ops": 23,
+   "ops_applied": 23,
+   "bind_before": 11,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "PR-40": {
+   "ops": 44,
+   "ops_applied": 44,
+   "bind_before": 22,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "PR-50": {
+   "ops": 10,
+   "ops_applied": 10,
+   "bind_before": 9,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "QA-10": {
+   "ops": 64,
+   "ops_applied": 64,
+   "bind_before": 23,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "QA-100": {
+   "ops": 18,
+   "ops_applied": 18,
+   "bind_before": 13,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "QA-110": {
+   "ops": 18,
+   "ops_applied": 18,
+   "bind_before": 16,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "QA-120": {
+   "ops": 23,
+   "ops_applied": 23,
+   "bind_before": 18,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "QA-20": {
+   "ops": 24,
+   "ops_applied": 24,
+   "bind_before": 20,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "QA-50": {
+   "ops": 27,
+   "ops_applied": 27,
+   "bind_before": 22,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "QA-60": {
+   "ops": 21,
+   "ops_applied": 21,
+   "bind_before": 18,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "QA-70": {
+   "ops": 26,
+   "ops_applied": 26,
+   "bind_before": 18,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "QA-80": {
+   "ops": 24,
+   "ops_applied": 24,
+   "bind_before": 16,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "QA-90": {
+   "ops": 20,
+   "ops_applied": 20,
+   "bind_before": 17,
+   "bind_after": 0,
+   "name_before": 5,
+   "name_after": 0
+  },
+  "RS-10": {
+   "ops": 18,
+   "ops_applied": 18,
+   "bind_before": 15,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "RS-20": {
+   "ops": 16,
+   "ops_applied": 16,
+   "bind_before": 15,
+   "bind_after": 0,
+   "name_before": 4,
+   "name_after": 0
+  },
+  "RS-30": {
+   "ops": 16,
+   "ops_applied": 16,
+   "bind_before": 15,
+   "bind_after": 0,
+   "name_before": 3,
+   "name_after": 0
+  },
+  "RS-40": {
+   "ops": 16,
+   "ops_applied": 16,
+   "bind_before": 12,
+   "bind_after": 0,
+   "name_before": 6,
+   "name_after": 0
+  },
+  "UTIL-10": {
+   "ops": 4,
+   "ops_applied": 4,
+   "bind_before": 3,
+   "bind_after": 0,
+   "name_before": 2,
+   "name_after": 0
+  },
+  "GCFPE-MGMT-10": {
+   "ops": 0,
+   "ops_applied": 0,
+   "bind_before": 0,
+   "bind_after": 0,
+   "name_before": 0,
+   "name_after": 0
+  }
+ },
+ "probe_totals": {
+  "ops": 1184,
+  "ops_applied": 1184,
+  "bind_before": 784,
+  "bind_after": 0,
+  "name_before": 228,
+  "name_after": 0
+ },
+ "allow_markup_ops": 163,
+ "decisions_applied": [
+  "C-5 Q-2 W1-DOC20-01",
+  "C-6 W2-PR-10-BC-1 verbatim",
+  "C-9 HP-QA-120-01 names CL-05",
+  "A1 allow_markup HP-OPS-10-04",
+  "C-8 W4-EH-QA10-1",
+  "C-8 W4-EH-QA10-2",
+  "C-2 W3a 109, W3b 98 kept"
+ ],
+ "pin_flags": [],
+ "overlaps": {
+  "overlapping_spans_between_ops": 0,
+  "same_line_cross_worker_pairs": [
+   [
+    "PR-20",
+    "W2-PR-20-RI-2",
+    "HP-PR-20-02",
+    "different sentences of step 7; not merged"
+   ],
+   [
+    "QA-120",
+    "HP-QA-120-01",
+    "QA120-04",
+    "W5 Q-7 / C-9: checked together on the dry run"
+   ],
+   [
+    "QA-120",
+    "HP-QA-120-01",
+    "QA120-05",
+    "W5 Q-7 / C-9: checked together on the dry run"
+   ]
+  ],
+  "same_text_two_ops": [
+   [
+    "DOC-20",
+    "W1-DOC20-01",
+    "HP-DOC-20-02",
+    "C-5 Q-2: identical wording in two bullets; state() rule adjusted"
+   ]
+  ],
+  "binding_partial_line_ops_on_worker_lines": 9
+ }
+}

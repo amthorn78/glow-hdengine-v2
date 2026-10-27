@@ -1,0 +1,451 @@
+{
+ "mode": "plan",
+ "stand_in": true,
+ "conditional_sets": [
+  "R-P2"
+ ],
+ "pages": [
+  {
+   "prompt": "PE",
+   "fetch_captured": "2026-10-27T06:14:48.780Z",
+   "as_of": "2026-10-12T13:32:38.514Z",
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 0,
+   "binding_stale_lines": 2,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "binding_unresolved_lines": [],
+   "worker_replacements_binding_rewritten": 0,
+   "ops_by_source": {
+    "W6": 14,
+    "A1": 1,
+    "W6 (Q-W6-4) / C-13": 1
+   },
+   "revision_matches_plan": true,
+   "guards_before": {
+    "G-HP-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-2": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-3": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-4": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-6": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-14F": {
+     "count": 8,
+     "pass": false
+    },
+    "G-W6-PE-14L": {
+     "count": 3,
+     "pass": false
+    },
+    "G-W6-PE-14R": {
+     "count": 0,
+     "pass": false
+    },
+    "G-W6-PE-27F": {
+     "count": 2,
+     "pass": false
+    },
+    "G-W6-PE-27R": {
+     "count": 0,
+     "pass": false
+    },
+    "G-W6-PE-26F": {
+     "count": 1,
+     "pass": false
+    },
+    "G-W6-PE-26R": {
+     "count": 0,
+     "pass": false
+    },
+    "G-W6-PE-TS1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-TS2": {
+     "count": 1,
+     "pass": true
+    },
+    "G-W6-PE-TS3": {
+     "count": 2,
+     "pass": true
+    },
+    "G-W6-PE-13F": {
+     "count": 3,
+     "pass": false
+    },
+    "G-W6-PE-13R": {
+     "count": 0,
+     "pass": false
+    },
+    "G-W7-BIND-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W8-NAME-1": {
+     "count": 2,
+     "pass": false
+    }
+   },
+   "batch_safe": true,
+   "ops": [
+    {
+     "id": "W6-PE-27a",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-27b",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-26",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14a",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-14b",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-14c",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-14d",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14e",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14f",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14g",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14h",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-13a",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-13b",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-13c",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "HEAD-PE",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "RP2-PE",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    }
+   ],
+   "ops_not_applied": [],
+   "markup_spans_allowed": 7,
+   "markup_spans_refused": [],
+   "refs_dropped": [],
+   "guards_after": {
+    "G-HP-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-2": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-3": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-4": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-6": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-14F": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-14L": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-14R": {
+     "count": 4,
+     "pass": true
+    },
+    "G-W6-PE-27F": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-27R": {
+     "count": 2,
+     "pass": true
+    },
+    "G-W6-PE-26F": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-26R": {
+     "count": 1,
+     "pass": true
+    },
+    "G-W6-PE-TS1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-TS2": {
+     "count": 1,
+     "pass": true
+    },
+    "G-W6-PE-TS3": {
+     "count": 2,
+     "pass": true
+    },
+    "G-W6-PE-13F": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-13R": {
+     "count": 2,
+     "pass": true
+    },
+    "G-W7-BIND-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W8-NAME-1": {
+     "count": 0,
+     "pass": true
+    }
+   },
+   "guards_failing_after": [],
+   "landed_state_after": {
+    "W6-PE-27a": "LANDED",
+    "W6-PE-27b": "LANDED",
+    "W6-PE-26": "LANDED",
+    "W6-PE-14a": "LANDED",
+    "W6-PE-14b": "LANDED",
+    "W6-PE-14c": "LANDED",
+    "W6-PE-14d": "LANDED",
+    "W6-PE-14e": "LANDED",
+    "W6-PE-14f": "LANDED",
+    "W6-PE-14g": "LANDED",
+    "W6-PE-14h": "LANDED",
+    "W6-PE-13a": "LANDED",
+    "W6-PE-13b": "LANDED",
+    "W6-PE-13c": "LANDED",
+    "HEAD-PE": "LANDED",
+    "RP2-PE": "LANDED"
+   },
+   "end_anchor_not_unique": [],
+   "check_would_pass": true,
+   "binding_current_after": true,
+   "ok": true,
+   "probe": {
+    "ops_applied": 16,
+    "ops": 16,
+    "batch_safe": true,
+    "bind_after": 0,
+    "bind_before": 0,
+    "name_after": 0,
+    "name_before": 2,
+    "unresolved": 0,
+    "ok": true
+   }
+  }
+ ],
+ "pages_ok": 1,
+ "pages_total": 1,
+ "ok": true,
+ "d22": "transient reads of this session's harness records; no body text in this report",
+ "stand_in_note": "stand-in successor map: each successor page = its predecessor, CL-05 = the candidate; URL-only binding rewrites are identities (counted per page), and the probe pass with synthetic successor ids carries the URL half of the binding check",
+ "successor_map_checks": {
+  "members_56": true,
+  "members_cover_tsv_plus_cl05": true,
+  "only_added_is_cl05": true,
+  "kept_ids_equal_tsv": true,
+  "successor_predecessors_equal_tsv": true,
+  "pe_predecessor": true,
+  "page_ids_32_hex": true,
+  "successor_titles_102726": true,
+  "distinct_successor_ids": "NOT_APPLICABLE_STAND_IN",
+  "ok": true,
+  "stand_in": true,
+  "successor_map_102726_errors": []
+ }
+}

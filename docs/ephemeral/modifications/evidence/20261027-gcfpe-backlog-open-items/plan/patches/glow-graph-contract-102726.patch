@@ -1,0 +1,29 @@
+diff -ruN base/glow-graph-contract/scripts/regenerate_contract.py work/glow-graph-contract/scripts/regenerate_contract.py
+--- base/glow-graph-contract/scripts/regenerate_contract.py	2026-10-27 04:43:07.582171039 +0000
++++ work/glow-graph-contract/scripts/regenerate_contract.py	2026-10-27 07:19:39.597807998 +0000
+@@ -228,6 +228,9 @@
+ # (§5.11 step 2); `generate` re-checks it against the oracle file's bytes.
+ # ---------------------------------------------------------------------------------------------
+ SUCCESSOR_ORACLE_SHA256 = "ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52"
++# MODIFICATION-20261027-gcfpe-backlog-open-items PART-13: generate() accepts the oracle the graph pins when it is one of
++# these. The 091426.1 and 100926.1 contracts keep ede635b1...; GCFPE-20261027.1 pins the 2026-10-27 successor.
++KNOWN_R1_ORACLE_SHA256 = (SUCCESSOR_ORACLE_SHA256, "f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d")
+ W4 = ("PR-40 is entered on the observed merge event for the identified PR, delivered to the subscribed PR-35 session "
+       "as MERGE_OBSERVED, or, only where no MERGE_OBSERVED result was returned for this merge, on Nathan's assertion "
+       "that he manually merged it.")
+@@ -507,10 +510,12 @@
+              contract_revision: str, primary_skill_revision: str, release_values: str | None = None) -> int:
+     gb = graph_block(graph_path)
+     g = json.loads(gb)
+-    assert hashlib.sha256(open(oracle_path, "rb").read()).hexdigest() == SUCCESSOR_ORACLE_SHA256, "oracle digest"
+-    assert g["protected_identities"]["r1_oracle_sha256"] == SUCCESSOR_ORACLE_SHA256, "graph G16 not applied"
++    pinned = g["protected_identities"]["r1_oracle_sha256"]
++    assert pinned in KNOWN_R1_ORACLE_SHA256, "graph G16 not applied"
++    assert hashlib.sha256(open(oracle_path, "rb").read()).hexdigest() == pinned, "oracle digest"
+     t = json.loads(open(template_path, "rb").read())
+-    ops = VALUE_TABLE + revision_ops(contract_revision, primary_skill_revision) + release_value_ops(release_values, g)
++    ops = (VALUE_TABLE + [("set", ("protected_identities", "r1_oracle_sha256"), pinned)]
++           + revision_ops(contract_revision, primary_skill_revision) + release_value_ops(release_values, g))
+     out = serialise(regenerate(t, g, gb, ops))
+     for p in outs:
+         open(p, "wb").write(out)

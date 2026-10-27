@@ -1,0 +1,1259 @@
+{
+ "record_type": "BACKLOG_OPEN_ITEMS_PACKAGE_REDLINES",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "date": "2026-10-27",
+ "scope": "Text redlines for the four packages that change in GCFPE-20261027.1 / 102726.1 (W7-D2): change-flow, flowmaster-validate, glow-hde-pr-development, glow-graph-contract. Each `old` must occur exactly `count` times when its turn comes (ops apply in list order, W7's last); plan/package_apply.py refuses otherwise and refuses a second application. Generated files (bundled 102726.1 contract and graph, R1 oracle, map and matrix, profile, fixtures, derived validators, SKILL_TREE_SHA256) are package_build_102726.py's, listed under new_files and in its specification, not here.",
+ "generated_by": "docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/plan/make_package_redlines_102726.py",
+ "base_digests": {
+  "change-flow": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+  "flowmaster-validate": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+  "glow-hde-pr-development": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+  "glow-graph-contract": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9"
+ },
+ "decisions_applied": [
+  "C-3: W3a's change-flow :436 and :453 in; governance-audit lines out",
+  "C-13: R-P1 conditional, EXCLUDED by default",
+  "W7-D2: four packages",
+  "W7-D3: change-flow 3.5.0, flowmaster-validate 3.5.0, glow-hde-pr-development 1.5.0",
+  "W7-D4: W4 SR-3/SR-4 merged into EXPECTED_POLICY_20261027",
+  "W7: SR-W7-FV-11 replaces SR-FV-29; SR-W7-* after every worker op",
+  "A3-C1 (SR-W7-FV-11 corrected in place) and A3-C2..C4 (last): found by the scratch suite run; each needs the coordinator's acceptance"
+ ],
+ "sources": {
+  "plan/work/W1.json": "4c9bc11f0d736c8768904016032b35671be66fa91659742273cbe5831519cd50",
+  "plan/work/W3a.json": "a151ac04e4e26ff1adb40bbf8a93aeeb89667973d985a6d916069c0e4649f728",
+  "plan/work/W4.json": "d554135b9af08e7254c804d8b6c4ed2984c1c12fd5f3a6fc7e888211ff7d5326",
+  "plan/work/W5.json": "cf60de858765178b8d3e1c23d249c21de8ffbcef7d59266bce67df457427119a",
+  "plan/work/W7.json": "dfa4e7d0a428b533570117acdb48334b2c8c31fcff269aaf543dfb0d7378c4dc"
+ },
+ "op_counts": {
+  "total": 102,
+  "change-flow": 18,
+  "flowmaster-validate": 64,
+  "glow-hde-pr-development": 16,
+  "glow-graph-contract": 4
+ },
+ "ops": [
+  {
+   "id": "W1-SR-01",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[0]",
+   "skill": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "`GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.4.0`",
+   "new": "`GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0`",
+   "count": 1,
+   "why": "Changed content carries an unspent revision (skill-identity-and-freeze.md). The coordinator confirms 1.5.0 is unspent and owns the number."
+  },
+  {
+   "id": "W1-SR-02",
+   "part": "PART-02",
+   "source": "W1.json skill_redlines[1]",
+   "skill": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "- Read all applicable Codex code and security reviews, inline threads, summary comments, and current check state after publication and after material updates.",
+   "new": "- Read all applicable Codex code reviews, any security review that the approved work unit and the actual repository instructions require, inline threads, summary comments, and current check state after publication and after material updates.",
+   "count": 1,
+   "why": "ITEM-24, CD-4: Nathan's direction of 2026-10-13 deprecates the Codex security review; canon names none. Converges on PR-35's own wording ('code/security reviews remain required under the approved work unit and actual repository instructions'). The Codex code review is unchanged (line 86)."
+  },
+  {
+   "id": "W1-SR-03",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[2]",
+   "skill": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "- Before another push, resolve every known substantive in-scope review issue locally and verify the affected behavior.",
+   "new": "- Before another push, fix each known finding that shows a wrong result, a crash or a guarantee breach on a real input, verify the affected behavior locally, and answer every other finding on its thread with the traced path and the stated limit, as *Review findings on real inputs* below states.",
+   "count": 1,
+   "why": "ITEM-12: the skill states PR-35's finding rule (PF06 v2.5.5 §1.1.4; PF27 v2.0.6)."
+  },
+  {
+   "id": "W1-SR-04",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[3]",
+   "skill": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "- If CI starts automatically and later becomes stale because a substantive finding requires another candidate revision, stop treating that run as a gate. Cancel it only when a supported authorized interface permits cancellation.",
+   "new": "- If CI starts automatically and later becomes stale because a finding that must be fixed on a real input requires another candidate revision, stop treating that run as a gate. Cancel it only when a supported authorized interface permits cancellation.\n\n### Review findings on real inputs\n\nThese rules govern every review finding on the pull request, from the automated code review or from a person.\n\n- Real input. A finding's triggering input is real when it exists on `main` or in an approved work unit's planned deliverable; occurs in the product's real operating environment, such as the deployed services, the hosted CI runner, the operator's shell or the vendor's responses; or can be supplied by a user, a vendor or an attacker through an interface the product exposes. An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding; an input outside the real set receives one refusal or a stated limit, never a model of it.\n- Findings below P1. A finding is fixed when it shows a wrong result, a crash or a guarantee breach on a real input. Otherwise, the reply on the thread gives the traced path and the stated limit, and the thread is resolved. Declining a security finding goes to the Product Owner first. A blanket instruction to fix every finding on a pull request is read under this rule. The standing default is to fix only a wrong result on a real input, or a breach of a read-only or no-secrets guarantee; a snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself, or code it runs in the checkout, can make.\n- P1 findings. A P1 finding is a review finding labelled P1 or any higher priority, such as P0; the priority is the label the reviewer gives. A P1 finding whose triggering input is real is fixed. It is not declined, deferred to a later change, recorded as a stated limit, or resolved on cost, effort, design preference, a plan's earlier choice, an ADR's stated limit or a \"not worth its code\" judgement. Fixed means that the wrong result, crash or guarantee breach the finding reports no longer occurs on that real input, shown by a test that fails without the fix; a typed refusal of the input is a fix when refusing it is correct behavior for the product. The thread stays open until the fix is pushed and the finding's own check of it is answered. A pull request with an open P1 thread on a real input is not merge-ready.\n- The one P1 exception. A P1 finding may be declined only when its triggering input is not real, so that the input is one constructed only to exercise the code. The reply on the thread gives the traced path and shows why the input can never occur in the product. Declining a P1 goes to the Product Owner first, and the thread is resolved only after that.\n- Repeated finding class. When two consecutive review rounds on one pull request raise findings of the same class, meaning the same component or contract, stop fixing instances and ask the Product Owner one design question: narrow the design, accept a stated limit, or rescope. For a P1 on a real input, accepting a stated limit is not an option: the answer is a fix, a narrowed design that removes the wrong result (a typed refusal included), or a rescope through the native route, and the P1 is resolved before the pull request merges. This is a design trigger by finding class. It is not a push count, a pause threshold or a CI-budget control. Ask the question in the PR-35 session and continue there on the answer: work a narrowed design or a stated limit in that session, and take a rescope through the formal rescope route.\n- Unchanged duty. Nothing in these rules weakens the existing duty to fix a real defect at any priority.",
+   "count": 1,
+   "why": "Line 96 tied stale CI to an undefined 'substantive finding'; it now names the real-input test. The new subsection, closing §4, carries PF06 §1.1.4's rules in canon's sentences (L-A06), with CD-2's in-session design question. CD-15: no ceiling and no round-count escalation; the repeated-class trigger is by finding class, 'not a push count'."
+  },
+  {
+   "id": "W1-SR-05",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[4]",
+   "skill": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "Continue in this phase's own dedicated session until all applicable predicates are true:",
+   "new": "Continue in this phase's own dedicated session until all applicable predicates are true. A work unit whose business case is met stops; further work on it needs a new business case: record such work as a candidate for its owner, and do not do it in this session. The predicates:",
+   "count": 1,
+   "why": "CD-14: PF04 v2.8.8 §9.7.7's stop rule on the same PR-35 correction loop the prompt carries it on; the validator's 'merge-ready ownership' marker (this exact opening) is preserved."
+  },
+  {
+   "id": "W1-SR-06",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[5]",
+   "skill": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "- applicable code and security review findings and required threads are resolved on the current remote head, or a truthful clean current-head review is evidenced;",
+   "new": "- every applicable review finding is fixed or answered under *Review findings on real inputs*, no P1 thread on a real input is open, and required threads are resolved on the current remote head, or a truthful clean current-head review is evidenced;",
+   "count": 1,
+   "why": "PF06 §1.1.4: 'A pull request with an open P1 thread on a real input is not merge-ready.' Keeps the validator's 'current-head reviews' marker ('required threads are resolved on the current remote head')."
+  },
+  {
+   "id": "W1-SR-07",
+   "part": "PART-26",
+   "source": "W1.json skill_redlines[6]",
+   "skill": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "(HDE Build Notes; PF04 §9.1.3)",
+   "new": "(PF04 §9.1.3, *GCFPE model and reasoning-level guidance*)",
+   "count": 1,
+   "why": "ITEM-33 (DN-12 rider 1): the TypeSafe rule drained from PF10 addendum 2.1 into PF04 v2.8.8 §9.1.3 (ledger A01). PF10 v13.9 restarted its numbering, and its addendum 2.1 is now unrelated S19 vendor and security policy, so 'HDE Build Notes' names a home that does not carry the rule."
+  },
+  {
+   "id": "W1-SR-08",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[7]",
+   "skill": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "PR-35 processes reviews, corrects all known findings locally, verifies the current remote head and current-head CI, and stops only at genuine merge readiness.",
+   "new": "PR-35 processes reviews, fixes each known finding that shows a wrong result, a crash or a guarantee breach on a real input, answers every other finding on its thread with the traced path and the stated limit, verifies the current remote head and current-head CI, and stops only at genuine merge readiness.",
+   "count": 1,
+   "why": "Line 7: the same rule."
+  },
+  {
+   "id": "W1-SR-09",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[8]",
+   "skill": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "Resolve known substantive findings before treating CI as a gate, retest locally,",
+   "new": "Fix the known findings that show a wrong result, a crash or a guarantee breach on a real input before treating CI as a gate, answer every other finding on its thread with the traced path and the stated limit, retest locally,",
+   "count": 1,
+   "why": "Line 17: the same rule."
+  },
+  {
+   "id": "W1-SR-10",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[9]",
+   "skill": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "Given substantive open review issues on a pushed revision, address the issues locally immediately.",
+   "new": "Given open review findings on a pushed revision that show a wrong result, a crash or a guarantee breach on a real input, fix them locally immediately, and answer every other open finding on its thread with the traced path and the stated limit.",
+   "count": 1,
+   "why": "Line 41: the same rule."
+  },
+  {
+   "id": "W1-SR-11",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[10]",
+   "skill": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "Given an open substantive review, failing or stale CI, or unpushed intended commit,",
+   "new": "Given an open finding that must be fixed on a real input, an open P1 thread on a real input, failing or stale CI, or unpushed intended commit,",
+   "count": 1,
+   "why": "Line 91: the same rule, and PF06's 'not merge-ready'."
+  },
+  {
+   "id": "W1-SR-12",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[11]",
+   "skill": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "## Pull request subscription\n",
+   "new": "## Finding on a constructed input\n\nGiven a review finding below P1 whose triggering input exists nowhere on `main`, in an approved deliverable, in the product's real operating environment or behind an interface the product exposes, PR-35 replies on the thread with the traced path and the stated limit and resolves the thread. It writes no fix, test or model of that input. A security finding declined this way goes to the Product Owner first.\n\n## Real-input P1\n\nGiven a P1 finding whose triggering input is real, PR-35 fixes it, with a test that fails without the fix, and keeps the thread open until the fix is pushed and the finding's own check of it is answered. It never records a stated limit for it or declines it on cost, effort or design preference, and it does not return `MERGE_PENDING` while that thread is open. Only a P1 whose input is not real may be declined, Product Owner first.\n\n## Repeated finding class\n\nGiven two consecutive review rounds on one pull request that raise findings of the same component or contract, PR-35 stops fixing instances and asks the Product Owner one design question in its own session: narrow the design, accept a stated limit, or rescope. It continues on the answer. For a P1 on a real input the answer is a fix, a narrowed design or a rescope, never a stated limit. Push count, review-round count and CI spend are not triggers.\n\n## Pull request subscription\n",
+   "count": 1,
+   "why": "Behavior cases for the three new rules; the validator's case_headings gains the three headings."
+  },
+  {
+   "id": "W1-SR-13",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[12]",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "Resolve all then-known findings and retest locally before the next coherent corrective push.",
+   "new": "Fix each then-known finding that shows a wrong result, a crash or a guarantee breach on a real input, answer every other finding on its thread with the traced path and the stated limit, and retest locally before the next coherent corrective push. A P1 finding whose triggering input is real is fixed and never declined; declining a security finding or a P1 goes to the Product Owner first. When two consecutive review rounds on one pull request raise findings of the same class, PR-35 asks the Product Owner one design question in its own session and continues on the answer.",
+   "count": 1,
+   "why": "change-flow SKILL.md:317 restated PR-35's fix-every-finding rule (verifier V1). Restated to PF06 §1.1.4 in the prompt's wording."
+  },
+  {
+   "id": "W1-SR-14",
+   "part": "PART-01",
+   "source": "W1.json skill_redlines[13]",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "PR-35 reaches `MERGE_PENDING` only with resolved current-head reviews and required threads, passing required current-head CI",
+   "new": "PR-35 reaches `MERGE_PENDING` only with resolved current-head reviews and required threads, no open P1 thread on a real input, passing required current-head CI",
+   "count": 1,
+   "why": "PF06 §1.1.4: 'A pull request with an open P1 thread on a real input is not merge-ready.'"
+  },
+  {
+   "id": "W1-VR-01",
+   "part": "PART-01",
+   "source": "W1.json validator_redlines[0]",
+   "skill": "glow-hde-pr-development",
+   "file": "scripts/validate_glow_hde_pr_development.py",
+   "old": "\"revision\": \"GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.4.0\",",
+   "new": "\"revision\": \"GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0\",",
+   "count": 1,
+   "why": "Revision pin follows the SKILL.md revision."
+  },
+  {
+   "id": "W1-VR-02",
+   "part": "PART-01",
+   "source": "W1.json validator_redlines[1]",
+   "skill": "glow-hde-pr-development",
+   "file": "scripts/validate_glow_hde_pr_development.py",
+   "old": "        \"specification change terminal\":",
+   "new": "        # MODIFICATION-20261027 PART-01 (PF06 §1.1.4; PF27): review findings on real inputs; CD-2; CD-14 (PF04 §9.7.7).\n        \"real input\": \"A finding's triggering input is real when it exists on `main` or in an approved work unit's planned deliverable\",\n        \"constructed input\": \"An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding\",\n        \"below-P1 reply\": \"the reply on the thread gives the traced path and the stated limit\",\n        \"security decline\": \"Declining a security finding goes to the Product Owner first.\",\n        \"real-input P1 fixed\": \"A P1 finding whose triggering input is real is fixed.\",\n        \"P1 merge readiness\": \"A pull request with an open P1 thread on a real input is not merge-ready.\",\n        \"P1 exception\": \"Declining a P1 goes to the Product Owner first, and the thread is resolved only after that.\",\n        \"repeated finding class\": \"stop fixing instances and ask the Product Owner one design question\",\n        \"in-session design question\": \"Ask the question in the PR-35 session and continue there on the answer\",\n        \"unchanged duty\": \"Nothing in these rules weakens the existing duty to fix a real defect at any priority.\",\n        \"business case stop\": \"A work unit whose business case is met stops; further work on it needs a new business case\",\n        \"specification change terminal\":",
+   "count": 1,
+   "why": "Required markers for every rule the redline adds (GUARD-001); the existing markers are kept."
+  },
+  {
+   "id": "W1-VR-03",
+   "part": "PART-01",
+   "source": "W1.json validator_redlines[2]",
+   "skill": "glow-hde-pr-development",
+   "file": "scripts/validate_glow_hde_pr_development.py",
+   "old": "        \"select final PF10 numbering\",\n",
+   "new": "        \"select final PF10 numbering\",\n        # MODIFICATION-20261027 PART-01, PART-02, PART-26: retired finding, Codex security review and drained-citation text.\n        \"resolve every known substantive in-scope review issue\",\n        \"corrects all known findings locally\",\n        \"Resolve known substantive findings before treating CI\",\n        \"address the issues locally immediately\",\n        \"explicitly lawfully waived\",\n        \"Codex code and security reviews\",\n        \"Codex security review\",\n        \"spend against a ceiling\",\n        \"growing number of review rounds\",\n        \"HDE Build Notes; PF04\",\n        \"because a substantive finding requires another candidate revision\",\n        \"applicable code and security review findings and required threads are resolved\",\n",
+   "count": 1,
+   "why": "Forbidden markers for every retired phrase (GUARD-001, D26-E), each fired by its injected regression; matching is case-insensitive over SKILL.md and behavior-cases.md."
+  },
+  {
+   "id": "W1-VR-04",
+   "part": "PART-01",
+   "source": "W1.json validator_redlines[3]",
+   "skill": "glow-hde-pr-development",
+   "file": "scripts/validate_glow_hde_pr_development.py",
+   "old": "        \"## Pull request subscription\",",
+   "new": "        \"## Finding on a constructed input\",\n        \"## Real-input P1\",\n        \"## Repeated finding class\",\n        \"## Pull request subscription\",",
+   "count": 1,
+   "why": "The three new behavior cases are required."
+  },
+  {
+   "id": "W3a-SR-01",
+   "part": "PART-07",
+   "source": "W3a.json skill_redlines[0]; C-3",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "continue directly to the exact selected IA-10 destination with the complete native package when the required IA session is available",
+   "new": "continue directly to the exact selected IA-10 destination, naming its input artifacts by repository path, when the required IA session is available",
+   "count": 1,
+   "why": "ITEM-08 (C-3: change-flow :436 and :453 ride PART-07)"
+  },
+  {
+   "id": "W3a-SR-02",
+   "part": "PART-07",
+   "source": "W3a.json skill_redlines[1]; C-3",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "Success hands the complete native package directly to the exact selected IA-30 or QA-70 prompt.",
+   "new": "Success hands off directly to the exact selected IA-30 or QA-70 prompt, naming its input artifacts by repository path.",
+   "count": 1,
+   "why": "ITEM-08 (C-3: change-flow :436 and :453 ride PART-07)"
+  },
+  {
+   "id": "W4-SR-1",
+   "part": "PART-10",
+   "source": "W4.json SR-1",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "A material delta to an approved QA Plan is reviewed by QA-70 as an overlay; QA-80 revises only pending preapproval QA Plans.",
+   "new": "An approved QA Plan that a delivered change may have made stale is reviewed by QA-70 against that change; a DENY sends exact redlines to QA-80, which revises it into a pending successor that QA-70 reviews, and no PF10 addendum results.",
+   "count": 1,
+   "why": "PART-10 (DN-5 (a))"
+  },
+  {
+   "id": "W4-SR-2",
+   "part": "PART-10",
+   "source": "W4.json SR-2",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "The same rule governs material Implementation Plan and QA Plan deltas.",
+   "new": "The same rule governs material Implementation Plan deltas; an approved QA Plan follows the QA-70 review route above.",
+   "count": 1,
+   "why": "PART-10 (DN-5 (a))"
+  },
+  {
+   "id": "SR-CF-1",
+   "part": "PART-13",
+   "source": "W5.json SR-CF-1",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "R1_CONTRACT_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1",
+   "new": "R1_CONTRACT_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1",
+   "count": 1,
+   "why": "PART-13 (W5 SR-CF-1)"
+  },
+  {
+   "id": "SR-CF-2",
+   "part": "PART-13",
+   "source": "W5.json SR-CF-2",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "R1_ROW_COVERAGE: 46/46",
+   "new": "R1_ROW_COVERAGE: 47/47",
+   "count": 1,
+   "why": "PART-13 (W5 SR-CF-2)"
+  },
+  {
+   "id": "SR-CF-3",
+   "part": "PART-13",
+   "source": "W5.json SR-CF-3",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "[bundled 46-row runtime map](references/glow-hde-canonical-change-flow-r1-runtime-map-20260923.json), SHA-256 `aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4`",
+   "new": "[bundled 47-row runtime map](references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json), SHA-256 `4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add`",
+   "count": 1,
+   "why": "PART-13 (W5 SR-CF-3)"
+  },
+  {
+   "id": "SR-CF-4",
+   "part": "PART-13",
+   "source": "W5.json SR-CF-4",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "remains immutable historical provenance, checked by its historical pins.",
+   "new": "remains immutable historical provenance, checked by its historical pins. The 2026-09-23 successor map `glow-hde-canonical-change-flow-r1-runtime-map-20260923.json` (SHA-256 `aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4`) is kept on the same terms.",
+   "count": 1,
+   "why": "PART-13 (W5 SR-CF-4)"
+  },
+  {
+   "id": "SR-CF-5",
+   "part": "PART-13",
+   "source": "W5.json SR-CF-5",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "- GCF-24 — After the complete approved QA Plan reaches truthful terminal state, the same Kronos session creates both the final QA Report and an RCA, including for a clean pass.",
+   "new": "- GCF-24 — After the complete approved QA Plan reaches truthful terminal state, the same Kronos session creates both the final QA Report and an RCA, including for a clean pass.\n- GCF-24.CLOSE — After a final QA Report with verdict PASS, or a closure DO_NOT_CLOSE whose return work is a missing, incomplete or defective close mutation set, the Close Implementer (CL-05) prepares and publishes the close mutation set, and repairs any close tooling the close needs, in a standalone session the Product Owner starts. His invocation is the Proceed and he alone merges. It exits to GCF-25 after the merge and never reopens implementation, QA or the closure decision. An Epic stops after rehearsal until canon admits an Epic close-run family.",
+   "count": 1,
+   "why": "PART-13 (W5 SR-CF-5)"
+  },
+  {
+   "id": "SR-CF-6",
+   "part": "PART-13",
+   "source": "W5.json SR-CF-6",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "A QA PASS, Product Owner action, IA receipt, Kronos report, or memo cannot substitute.",
+   "new": "A QA PASS, Product Owner action, IA receipt, Kronos report, or memo cannot substitute. A DO_NOT_CLOSE whose return work is the close mutation set returns to GCF-24.CLOSE.",
+   "count": 1,
+   "why": "PART-13 (W5 SR-CF-6)"
+  },
+  {
+   "id": "SR-CF-7",
+   "part": "PART-13",
+   "source": "W5.json SR-CF-7",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "final QA Report and RCA; Isis closure;",
+   "new": "final QA Report and RCA; the close mutation set and its close pull request; Isis closure;",
+   "count": 1,
+   "why": "PART-13 (W5 SR-CF-7)"
+  },
+  {
+   "id": "SR-CF-9",
+   "part": "PART-13",
+   "source": "W5.json SR-CF-9",
+   "skill": "change-flow",
+   "file": "scripts/validate_gcfpe_artifact_timing.py",
+   "old": "def validate_artifact_timing_contract(contract):\n    return [] if contract.get('artifact_availability_contract') == EXPECTED_POLICY else ['ARTIFACT_AVAILABILITY_CONTRACT']",
+   "new": "# GCFPE-20261027.1 / 102726.1 (MODIFICATION-20261027-gcfpe-backlog-open-items, PART-13): CL-05 joins the stage categories.\n# EXPECTED_POLICY stays the 091426.1 and 100926.1 value, which their bundled contracts still carry.\nEXPECTED_POLICY_20261027 = {**EXPECTED_POLICY, 'qa_artifact_births': {**EXPECTED_POLICY['qa_artifact_births'], 'QA_PLAN_REVIEW': {'after': 'COMPLETE_PENDING_QA_PLAN_OR_APPROVED_QA_PLAN_WITH_DELIVERED_CHANGE_OR_EXPLICIT_APPROVED_BASE_DELTA', 'producer': 'QA-70'}}, 'stage_categories': dict(sorted({**EXPECTED_POLICY['stage_categories'], 'CL-05': 'CLOSE_MUTATION_SET'}.items()))}\n\ndef validate_artifact_timing_contract(contract, policy=None):\n    expected = EXPECTED_POLICY if policy is None else policy\n    return [] if contract.get('artifact_availability_contract') == expected else ['ARTIFACT_AVAILABILITY_CONTRACT']",
+   "count": 1,
+   "why": "The 102726.1 release validator (PART-24's validate_gcfpe_20261027.py) calls it with policy=EXPECTED_POLICY_20261027; the 20260914 and 20261009 validators keep the default. W7-D4: W4's SR-3/SR-4 QA_PLAN_REVIEW birth value is carried in EXPECTED_POLICY_20261027."
+  },
+  {
+   "id": "SR-FV-1",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-1",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "all 46 Change rows",
+   "new": "all 47 Change rows",
+   "count": 1,
+   "why": "frontmatter description"
+  },
+  {
+   "id": "SR-FV-2",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-2",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "R1_ORACLE_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1",
+   "new": "R1_ORACLE_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-2)"
+  },
+  {
+   "id": "SR-FV-3",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-3",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "R1_ORACLE_SHA256: ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52",
+   "new": "R1_ORACLE_SHA256: f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-3)"
+  },
+  {
+   "id": "SR-FV-4",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-4",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "The Change oracle is the bundled file references/glow-hde-canonical-change-flow-r1-20260923.json. It pins:",
+   "new": "The Change oracle is the bundled file references/glow-hde-canonical-change-flow-r1-20261027.json. It pins:",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-4)"
+  },
+  {
+   "id": "SR-FV-5",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-5",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "- projection SHA-256 ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52;",
+   "new": "- projection SHA-256 f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d;",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-5)"
+  },
+  {
+   "id": "SR-FV-6",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-6",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "- the successor source matrix references/r1-successor-source-20260923.md, SHA-256 8b443eb17180f85e8d615ba56ed6e1d1d78802fcd1a49aa3be3b5dd638bc4d04, which records the three successor rows GCF-14, GCF-17 and GCF-17.LINEAGE;",
+   "new": "- the successor source matrix references/r1-successor-source-20261027.md, SHA-256 088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a, which records the six successor rows GCF-14, GCF-17, GCF-17.LINEAGE, GCF-24, GCF-24.CLOSE (inserted after GCF-24) and GCF-25;\n- the 2026-09-23 successor oracle references/glow-hde-canonical-change-flow-r1-20260923.json (SHA-256 ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52) and its matrix references/r1-successor-source-20260923.md (SHA-256 8b443eb17180f85e8d615ba56ed6e1d1d78802fcd1a49aa3be3b5dd638bc4d04), kept as history;",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-6)"
+  },
+  {
+   "id": "SR-FV-7",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-7",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "whose 43 rows outside the successor set the successor keeps unchanged;",
+   "new": "whose 41 rows outside the successor set the successor keeps unchanged, in order;",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-7)"
+  },
+  {
+   "id": "SR-FV-8",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-8",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "- 26 core rows plus 20 material branch, loop, and utility rows;",
+   "new": "- 26 core rows plus 21 material branch, loop, and utility rows;",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-8)"
+  },
+  {
+   "id": "SR-FV-9",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-9",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "The Change validator must emit 46/46 only when all of these pass:",
+   "new": "The Change validator must emit 47/47 only when all of these pass:",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-9)"
+  },
+  {
+   "id": "SR-FV-10",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-10",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "2. All 46 row IDs occur exactly once in oracle order: 26 core and 20 material rows.",
+   "new": "2. All 47 row IDs occur exactly once in oracle order: 26 core and 21 material rows.",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-10)"
+  },
+  {
+   "id": "SR-FV-11",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-11",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "46/46 Change rows",
+   "new": "47/47 Change rows",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-11)"
+  },
+  {
+   "id": "SR-FV-12",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-12",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "ORACLE_RELATIVE = Path(\"references/glow-hde-canonical-change-flow-r1-20260923.json\")",
+   "new": "ORACLE_RELATIVE = Path(\"references/glow-hde-canonical-change-flow-r1-20261027.json\")",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-12)"
+  },
+  {
+   "id": "SR-FV-13",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-13",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "CHANGE_RUNTIME_MAP_RELATIVE = Path(\n    \"references/glow-hde-canonical-change-flow-r1-runtime-map-20260923.json\"\n)",
+   "new": "CHANGE_RUNTIME_MAP_RELATIVE = Path(\n    \"references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json\"\n)",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-13)"
+  },
+  {
+   "id": "SR-FV-14",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-14",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "EXPECTED_ORACLE_PROFILE = \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1\"",
+   "new": "EXPECTED_ORACLE_PROFILE = \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1\"",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-14)"
+  },
+  {
+   "id": "SR-FV-15",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-15",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "EXPECTED_ORACLE_SHA256 = (\n    \"ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52\"\n)",
+   "new": "EXPECTED_ORACLE_SHA256 = (\n    \"f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d\"\n)",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-15)"
+  },
+  {
+   "id": "SR-FV-16",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-16",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "EXPECTED_CHANGE_RUNTIME_MAP_SHA256 = (\n    \"aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4\"\n)",
+   "new": "EXPECTED_CHANGE_RUNTIME_MAP_SHA256 = (\n    \"4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add\"\n)",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-16)"
+  },
+  {
+   "id": "SR-FV-17",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-17",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1\",\n        \"R1_ROW_COVERAGE: 46/46\",",
+   "new": "        \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1\",\n        \"R1_ROW_COVERAGE: 47/47\",",
+   "count": 1,
+   "why": "CONTRACT_REQUIRED['change-flow']"
+  },
+  {
+   "id": "SR-FV-18",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-18",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"rows\": 46,\n        \"core_rows\": 26,\n        \"material_rows\": 20,",
+   "new": "        \"rows\": 47,\n        \"core_rows\": 26,\n        \"material_rows\": 21,",
+   "count": 1,
+   "why": "FMV-ORACLE-004"
+  },
+  {
+   "id": "SR-FV-19",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-19",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "if len(ids) != 46 or len(set(ids)) != 46 or core != 26 or material != 20:",
+   "new": "if len(ids) != 47 or len(set(ids)) != 47 or core != 26 or material != 21:",
+   "count": 1,
+   "why": "FMV-ORACLE-005"
+  },
+  {
+   "id": "SR-FV-20",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-20",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_gcfpe_artifact_timing.py",
+   "old": "def validate_artifact_timing_contract(contract):\n    return [] if contract.get('artifact_availability_contract') == EXPECTED_POLICY else ['ARTIFACT_AVAILABILITY_CONTRACT']",
+   "new": "# GCFPE-20261027.1 / 102726.1 (MODIFICATION-20261027-gcfpe-backlog-open-items, PART-13): CL-05 joins the stage categories.\n# EXPECTED_POLICY stays the 091426.1 and 100926.1 value, which their bundled contracts still carry.\nEXPECTED_POLICY_20261027 = {**EXPECTED_POLICY, 'qa_artifact_births': {**EXPECTED_POLICY['qa_artifact_births'], 'QA_PLAN_REVIEW': {'after': 'COMPLETE_PENDING_QA_PLAN_OR_APPROVED_QA_PLAN_WITH_DELIVERED_CHANGE_OR_EXPLICIT_APPROVED_BASE_DELTA', 'producer': 'QA-70'}}, 'stage_categories': dict(sorted({**EXPECTED_POLICY['stage_categories'], 'CL-05': 'CLOSE_MUTATION_SET'}.items()))}\n\ndef validate_artifact_timing_contract(contract, policy=None):\n    expected = EXPECTED_POLICY if policy is None else policy\n    return [] if contract.get('artifact_availability_contract') == expected else ['ARTIFACT_AVAILABILITY_CONTRACT']",
+   "count": 1,
+   "why": "Same as SR-CF-9; the two files must stay identical in this function and constant. W7-D4: W4's SR-3/SR-4 QA_PLAN_REVIEW birth value is carried in EXPECTED_POLICY_20261027."
+  },
+  {
+   "id": "SR-FV-21",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-21",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "\"expected_rows\": 46,",
+   "new": "\"expected_rows\": 47,",
+   "count": 2,
+   "why": "change_contract_coverage report, both sites"
+  },
+  {
+   "id": "SR-FV-22",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-22",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "SUCCESSOR_MATRIX_RELATIVE = Path(\"references/r1-successor-source-20260923.md\")",
+   "new": "SUCCESSOR_MATRIX_RELATIVE = Path(\"references/r1-successor-source-20261027.md\")",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-22)"
+  },
+  {
+   "id": "SR-FV-23",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-23",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "SUCCESSOR_ROWS = (\"GCF-14\", \"GCF-17\", \"GCF-17.LINEAGE\")",
+   "new": "SUCCESSOR_ROWS = (\"GCF-14\", \"GCF-17\", \"GCF-17.LINEAGE\", \"GCF-24\", \"GCF-24.CLOSE\", \"GCF-25\")\n# PART-13 (MODIFICATION-20261027-gcfpe-backlog-open-items): a successor row with no historical row, and the row it follows.\nSUCCESSOR_ADDED_ROWS = {\"GCF-24.CLOSE\": \"GCF-24\"}",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-23)"
+  },
+  {
+   "id": "SR-FV-24",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-24",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "    \"GCF-17.LINEAGE\": (\"next\", \"failure_stop_condition\", \"source_row_sha256\"),\n}",
+   "new": "    \"GCF-17.LINEAGE\": (\"next\", \"failure_stop_condition\", \"source_row_sha256\"),\n    \"GCF-24\": (\"next\", \"source_row_sha256\"),\n    \"GCF-25\": (\"consumes\", \"next\", \"failure_stop_condition\", \"source_row_sha256\"),\n}",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-24)"
+  },
+  {
+   "id": "SR-FV-25",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-25",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "SUCCESSOR_CHANGED_TOP_LEVEL = (\"profile_id\", \"required_global_tokens\", \"authority\")",
+   "new": "SUCCESSOR_CHANGED_TOP_LEVEL = (\"profile_id\", \"required_global_tokens\", \"authority\", \"coverage\")",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-25)"
+  },
+  {
+   "id": "SR-FV-26",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-26",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "SUCCESSOR_AUTHORITY = \"D23-D, D23-F; Product Owner 2026-09-23\"",
+   "new": "SUCCESSOR_AUTHORITY = (\n    \"D23-D, D23-F; Product Owner 2026-09-23. D23 successor of 2026-10-27, the close-mutation-set \"\n    \"stage (PF06 §3.5.1; DN-2 of MODIFICATION-20261027-gcfpe-backlog-open-items); Product Owner \"\n    \"2026-10-27\"\n)",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-26)"
+  },
+  {
+   "id": "SR-FV-27",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-27",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "    \"GCF-17.LINEAGE\": \"73a133c18b13682cbc57d813b37caacda7ed15b183437515867166bcda70e83e\",\n}",
+   "new": "    \"GCF-17.LINEAGE\": \"73a133c18b13682cbc57d813b37caacda7ed15b183437515867166bcda70e83e\",\n    \"GCF-24\": \"66d4c41e3992a28f5550e1fd12865ac7a127de291d34f6dd676acc07a9ad2215\",\n    \"GCF-24.CLOSE\": \"9c0f70693dc21f0cbaef27c7804e645f33858d30fc52b89ae57854f7e2177453\",\n    \"GCF-25\": \"1b2ab0339aed2a04aff404864a1699605eb3904780c7e3b3ca25881c74ed5ee3\",\n}",
+   "count": 1,
+   "why": "FMV-ORACLE-021 approved row digests; they move only with Nathan's approval of the rows"
+  },
+  {
+   "id": "SR-FV-28",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-28",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"references/r1-successor-source-20260923.md\",\n    ),",
+   "new": "        \"references/r1-successor-source-20260923.md\",\n        \"references/glow-hde-canonical-change-flow-r1-20261027.json\",\n        \"references/r1-successor-source-20261027.md\",\n    ),",
+   "count": 1,
+   "why": "REQUIRED_SCRIPTS['flowmaster-validate']"
+  },
+  {
+   "id": "SR-FV-30",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-30",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "CANDIDATE_VALIDATOR_RELATIVE = Path(\"scripts/validate_gcfpe_20261009.py\")",
+   "new": "CANDIDATE_VALIDATOR_RELATIVE = Path(\"scripts/validate_gcfpe_20261027.py\")",
+   "count": 1,
+   "why": "FMV-ORACLE-017 ties this file's 3 r1_oracle_sha256 literals and 1 r1_runtime_map_sha256 literal to the current oracle and map; the file is PART-24's 102726.1 release validator, whose literals are f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d and 4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add"
+  },
+  {
+   "id": "SR-FV-31",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-31",
+   "skill": "flowmaster-validate",
+   "file": "scripts/run_change_flow_fixtures.py",
+   "old": "ORACLE_PATH = SKILL_DIR / \"references\" / \"glow-hde-canonical-change-flow-r1-20260923.json\"",
+   "new": "ORACLE_PATH = SKILL_DIR / \"references\" / \"glow-hde-canonical-change-flow-r1-20261027.json\"",
+   "count": 1,
+   "why": "PART-13 (W5 SR-FV-31)"
+  },
+  {
+   "id": "SR-FV-32",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-32",
+   "skill": "flowmaster-validate",
+   "file": "fixtures/change-flow/scenarios.json",
+   "old": "{\"row\": \"GCF-24\"}, {\"row\": \"GCF-25\"},",
+   "new": "{\"row\": \"GCF-24\"}, {\"row\": \"GCF-24.CLOSE\"}, {\"row\": \"GCF-25\"},",
+   "count": 1,
+   "why": "positive Epic happy path (line 25)"
+  },
+  {
+   "id": "SR-FV-33",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-33",
+   "skill": "flowmaster-validate",
+   "file": "fixtures/change-flow/scenarios.json",
+   "old": "{\"row\": \"GCF-24\"},\n        {\"row\": \"GCF-25\"}",
+   "new": "{\"row\": \"GCF-24\"}, {\"row\": \"GCF-24.CLOSE\"},\n        {\"row\": \"GCF-25\"}",
+   "count": 2,
+   "why": "positive CRD happy path (lines 44-45) and the specification-denial path (lines 124-125)"
+  },
+  {
+   "id": "SR-FV-34",
+   "part": "PART-13",
+   "source": "W5.json SR-FV-34",
+   "skill": "flowmaster-validate",
+   "file": "fixtures/change-flow/scenarios.json",
+   "old": "    {\n      \"id\": \"positive_post_closure_pf09_drainage\",",
+   "new": "    {\n      \"id\": \"positive_close_stage_do_not_close_return\",\n      \"expected_pass\": true,\n      \"expected_rule_ids\": [],\n      \"coverage_mode\": \"COMPLETE\",\n      \"events\": [\n        {\"row\": \"GCF-24\"}, {\"row\": \"GCF-24.CLOSE\"}, {\"row\": \"GCF-25\"},\n        {\"row\": \"GCF-24.CLOSE\"}, {\"row\": \"GCF-25\"}, {\"row\": \"GCF-26\"}\n      ]\n    },\n    {\n      \"id\": \"negative_qa_report_skips_close_stage\",\n      \"expected_pass\": false,\n      \"expected_rule_ids\": [\"FMV-GCF-EDGE-003\"],\n      \"coverage_mode\": \"COMPLETE\",\n      \"events\": [{\"row\": \"GCF-23\"}, {\"row\": \"GCF-24\"}, {\"row\": \"GCF-25\"}]\n    },\n    {\n      \"id\": \"positive_post_closure_pf09_drainage\",",
+   "count": 1,
+   "why": "W5 SR-FV-34 made concrete by A3: the two scenarios inserted after positive_post_closure_adr_drainage; the negative is the R1 successor's injected regression (D14)"
+  },
+  {
+   "id": "SR-GG-1",
+   "part": "PART-13",
+   "source": "W5.json SR-GG-1",
+   "skill": "glow-graph-contract",
+   "file": "scripts/regenerate_contract.py",
+   "old": "SUCCESSOR_ORACLE_SHA256 = \"ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52\"",
+   "new": "SUCCESSOR_ORACLE_SHA256 = \"ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52\"\n# MODIFICATION-20261027-gcfpe-backlog-open-items PART-13: generate() accepts the oracle the graph pins when it is one of\n# these. The 091426.1 and 100926.1 contracts keep ede635b1...; GCFPE-20261027.1 pins the 2026-10-27 successor.\nKNOWN_R1_ORACLE_SHA256 = (SUCCESSOR_ORACLE_SHA256, \"f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d\")",
+   "count": 1,
+   "why": "Confirms §A.4's 'probable' glow-graph-contract package: qa_closure_contract is mirrored (no pin), but the R1 oracle digest is pinned here and asserted by generate()."
+  },
+  {
+   "id": "SR-GG-2",
+   "part": "PART-13",
+   "source": "W5.json SR-GG-2",
+   "skill": "glow-graph-contract",
+   "file": "scripts/regenerate_contract.py",
+   "old": "    assert hashlib.sha256(open(oracle_path, \"rb\").read()).hexdigest() == SUCCESSOR_ORACLE_SHA256, \"oracle digest\"\n    assert g[\"protected_identities\"][\"r1_oracle_sha256\"] == SUCCESSOR_ORACLE_SHA256, \"graph G16 not applied\"",
+   "new": "    pinned = g[\"protected_identities\"][\"r1_oracle_sha256\"]\n    assert pinned in KNOWN_R1_ORACLE_SHA256, \"graph G16 not applied\"\n    assert hashlib.sha256(open(oracle_path, \"rb\").read()).hexdigest() == pinned, \"oracle digest\"",
+   "count": 1,
+   "why": "PART-13 (W5 SR-GG-2)"
+  },
+  {
+   "id": "SR-GG-3",
+   "part": "PART-13",
+   "source": "W5.json SR-GG-3",
+   "skill": "glow-graph-contract",
+   "file": "scripts/regenerate_contract.py",
+   "old": "    ops = VALUE_TABLE + revision_ops(contract_revision, primary_skill_revision) + release_value_ops(release_values, g)",
+   "new": "    ops = (VALUE_TABLE + [(\"set\", (\"protected_identities\", \"r1_oracle_sha256\"), pinned)]\n           + revision_ops(contract_revision, primary_skill_revision) + release_value_ops(release_values, g))",
+   "count": 1,
+   "why": "For a 100926.1 build pinned equals SUCCESSOR_ORACLE_SHA256, so the extra set rewrites the same value and the shipped contracts still regenerate byte for byte (check with contract_recipe.py --check)."
+  },
+  {
+   "id": "SR-GG-4",
+   "part": "PART-13",
+   "source": "W5.json SR-GG-4",
+   "skill": "glow-graph-contract",
+   "file": "SKILL.md",
+   "old": "      <flowmaster-validate>/references/glow-hde-canonical-change-flow-r1-20260923.json \\",
+   "new": "      <flowmaster-validate>/references/glow-hde-canonical-change-flow-r1-<the graph's oracle>.json \\",
+   "count": 1,
+   "why": "Optional documentation line; the 091426.1 command still names the 2026-09-23 oracle. Leave unchanged if the package review prefers."
+  },
+  {
+   "id": "SR-W7-FV-01",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-01",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        if explicit_release == \"GCFPE-20260914.1\":\n            from validate_gcfpe_20260914 import validate_package as validate_candidate\n            from run_gcfpe_20260914_fixtures import run as run_candidate_fixtures\n        else:\n            from validate_gcfpe_20261009 import validate_package as validate_candidate\n            from run_gcfpe_20261009_fixtures import run as run_candidate_fixtures\n",
+   "new": "        if explicit_release == \"GCFPE-20260914.1\":\n            from validate_gcfpe_20260914 import validate_package as validate_candidate\n            from run_gcfpe_20260914_fixtures import run as run_candidate_fixtures\n        elif explicit_release == \"GCFPE-20261009.1\":\n            from validate_gcfpe_20261009 import validate_package as validate_candidate\n            from run_gcfpe_20261009_fixtures import run as run_candidate_fixtures\n        else:\n            from validate_gcfpe_20261027 import validate_package as validate_candidate\n            from run_gcfpe_20261027_fixtures import run as run_candidate_fixtures\n",
+   "count": 1,
+   "why": "Three schema-4 releases: each explicit contract runs its own release's profile; 102726.1 is the default branch (A-6, PAIR-001)."
+  },
+  {
+   "id": "SR-W7-FV-02",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-02",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "    # The current overlay (the 100926.1 contract, MB-008 V5) is always regression-tested\n",
+   "new": "    # The current overlay (the 102726.1 contract, MODIFICATION-20261027-gcfpe-backlog-open-items PART-24) is always regression-tested\n",
+   "count": 1,
+   "why": "Comment follows the current overlay."
+  },
+  {
+   "id": "SR-W7-FV-03",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-03",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "                str(change_dir / \"references\" / \"gcfpe-20261009.1-100926.1-direct-handoff-contract.json\"),\n",
+   "new": "                str(change_dir / \"references\" / \"gcfpe-20261027.1-102726.1-direct-handoff-contract.json\"),\n",
+   "count": 1,
+   "why": "FMV-GCF-CURRENT-001 names the contract the current overlay actually validates."
+  },
+  {
+   "id": "SR-W7-FV-04",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-04",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "    import validate_gcfpe_20260914 as v0914\n    import validate_gcfpe_20261009 as v1009\n    import validate_gcfpe_current as vcur\n",
+   "new": "    import validate_gcfpe_20260914 as v0914\n    import validate_gcfpe_20261009 as v1009\n    import validate_gcfpe_20261027 as v1027\n    import validate_gcfpe_current as vcur\n",
+   "count": 1,
+   "why": "D28's name_line_forms covers every name reader, the new profile's included."
+  },
+  {
+   "id": "SR-W7-FV-05",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-05",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        for module in (v0914, v1009, vcur):\n",
+   "new": "        for module in (v0914, v1009, v1027, vcur):\n",
+   "count": 1,
+   "why": "D28 (name line read plain in every reader)."
+  },
+  {
+   "id": "SR-W7-FV-06",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-06",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        for module in (v0914, v1009):\n",
+   "new": "        for module in (v0914, v1009, v1027):\n",
+   "count": 1,
+   "why": "D28 (skill_identity_bytes in every profile)."
+  },
+  {
+   "id": "SR-W7-FV-07",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-07",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.4.0",
+   "new": "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.5.0",
+   "count": 2,
+   "why": "CONTRACT_REQUIRED['change-flow'] and maintenance_metadata follow change-flow's new revision (skill-identity-and-freeze.md, Advertised identity must be unspent)."
+  },
+  {
+   "id": "SR-W7-FV-08",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-08",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "            \"validator_revision\": \"3.4.1\",\n",
+   "new": "            \"validator_revision\": \"3.5.0\",\n",
+   "count": 1,
+   "why": "The suite report advertises the new revision."
+  },
+  {
+   "id": "SR-W7-FV-09",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-09",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"scripts/run_gcfpe_current_fixtures.py\",\n        \"scripts/validate_gcfpe_20261009.py\",\n",
+   "new": "        \"scripts/run_gcfpe_current_fixtures.py\",\n        \"scripts/validate_gcfpe_20261027.py\",\n        \"scripts/run_gcfpe_20261027_fixtures.py\",\n        \"fixtures/gcfpe-20261027.1-102726.1/scenarios.json\",\n        \"references/gcfpe-20261027.1-102726.1-validation-profile.json\",\n        \"references/gcfpe-20261027.1-102726.1-direct-handoff-contract.json\",\n        \"references/gcfpe-20261027.1-102726.1-candidate-graph-contract.json\",\n        # History (MODIFICATION-20261027-gcfpe-backlog-open-items): the 100926.1 profile, its validator,\n        # fixtures, contract and graph stay bundled, superseded; they run only when passed explicitly.\n        \"scripts/validate_gcfpe_20261009.py\",\n",
+   "count": 1,
+   "why": "REQUIRED_SCRIPTS['flowmaster-validate']: the 102726.1 files are required; the 100926.1 files stay required as history. Does not overlap W5 SR-FV-28 (end of the same tuple)."
+  },
+  {
+   "id": "SR-W7-FV-10",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-10",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"scripts/pf_header_parity.py\",\n        \"scripts/validate_gcfpe_20261009.py\",\n",
+   "new": "        \"scripts/pf_header_parity.py\",\n        \"scripts/validate_gcfpe_20261027.py\",\n        \"references/gcfpe-20261027.1-102726.1-direct-handoff-contract.json\",\n        \"references/gcfpe-20261027.1-102726.1-candidate-graph-contract.json\",\n        \"references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json\",\n        # History (MODIFICATION-20261027-gcfpe-backlog-open-items): the 100926.1 checks and contract stay bundled.\n        \"scripts/validate_gcfpe_20261009.py\",\n",
+   "count": 1,
+   "why": "REQUIRED_SCRIPTS['change-flow']."
+  },
+  {
+   "id": "SR-W7-FV-11",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-11; corrected by A3-C1",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"references/glow-hde-canonical-change-flow-r1-runtime-map-20260923.json\",\n        \"references/gcfpe-20261009.1-100926.1-direct-handoff-contract.json\",\n    },",
+   "new": "        \"references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json\",\n        \"references/gcfpe-20261027.1-102726.1-direct-handoff-contract.json\",\n    },",
+   "count": 1,
+   "why": "OPTIONAL_REFERENCES['change-flow']: the 102726.1 contract is linked from change-flow SKILL.md. A3-C1: OPTIONAL_REFERENCES is the exact set of references change-flow SKILL.md links (validate_flowmaster.py: 'optional bundled reference is not linked'). SR-CF-* and SR-W7-CF-02 move both links to the 2026-10-27 map and the 102726.1 contract, so the two superseded entries must leave the set, as MB-008 replaced its predecessor's; the files stay bundled as history, unlinked, like the 091426.1 contract. W7's text kept both."
+  },
+  {
+   "id": "SR-W7-FV-12",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-12",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "    \"references/gcfpe-20261009.1-100926.1-validation-profile.json\": (\n        \"complete 55-member prompt corpus\",\n    ),\n",
+   "new": "    \"references/gcfpe-20261009.1-100926.1-validation-profile.json\": (\n        \"complete 55-member prompt corpus\",\n    ),\n    \"references/gcfpe-20261027.1-102726.1-validation-profile.json\": (\n        \"complete 55-member prompt corpus\",\n        \"complete 56-member prompt corpus\",\n    ),\n",
+   "count": 1,
+   "why": "D22 SELF_FORBIDDEN: the new profile never presumes a local corpus (GUARD-001)."
+  },
+  {
+   "id": "SR-W7-FV-13",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-13",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_gcfpe_current.py",
+   "old": "        if contract.get(\"target_release\") == \"GCFPE-20260914.1\":\n            from validate_gcfpe_20260914 import validate_contract as validate_contract_v4\n        else:\n            from validate_gcfpe_20261009 import validate_contract as validate_contract_v4\n",
+   "new": "        if contract.get(\"target_release\") == \"GCFPE-20260914.1\":\n            from validate_gcfpe_20260914 import validate_contract as validate_contract_v4\n        elif contract.get(\"target_release\") == \"GCFPE-20261009.1\":\n            from validate_gcfpe_20261009 import validate_contract as validate_contract_v4\n        else:\n            from validate_gcfpe_20261027 import validate_contract as validate_contract_v4\n",
+   "count": 1,
+   "why": "Each schema-4 contract runs its own release's profile."
+  },
+  {
+   "id": "SR-W7-FV-14",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-14",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_gcfpe_current.py",
+   "old": "        if contract.get(\"target_release\") == \"GCFPE-20260914.1\":\n            from validate_gcfpe_20260914 import validate_package as validate_package_v4\n        else:\n            from validate_gcfpe_20261009 import validate_package as validate_package_v4\n",
+   "new": "        if contract.get(\"target_release\") == \"GCFPE-20260914.1\":\n            from validate_gcfpe_20260914 import validate_package as validate_package_v4\n        elif contract.get(\"target_release\") == \"GCFPE-20261009.1\":\n            from validate_gcfpe_20261009 import validate_package as validate_package_v4\n        else:\n            from validate_gcfpe_20261027 import validate_package as validate_package_v4\n",
+   "count": 1,
+   "why": "As SR-W7-FV-13."
+  },
+  {
+   "id": "SR-W7-FV-15",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-15",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_gcfpe_current.py",
+   "old": "contract_path = contract_path or change_skill_dir / \"references\" / \"gcfpe-20261009.1-100926.1-direct-handoff-contract.json\"",
+   "new": "contract_path = contract_path or change_skill_dir / \"references\" / \"gcfpe-20261027.1-102726.1-direct-handoff-contract.json\"",
+   "count": 1,
+   "why": "The default current overlay is the 102726.1 contract (installed only at promotion: W5 Q-4 (a))."
+  },
+  {
+   "id": "SR-W7-FV-16",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-16",
+   "skill": "flowmaster-validate",
+   "file": "scripts/run_gcfpe_current_fixtures.py",
+   "old": "        if source.get(\"target_release\") == \"GCFPE-20260914.1\":\n            from run_gcfpe_20260914_fixtures import run as run_v4\n        else:\n            from run_gcfpe_20261009_fixtures import run as run_v4\n",
+   "new": "        if source.get(\"target_release\") == \"GCFPE-20260914.1\":\n            from run_gcfpe_20260914_fixtures import run as run_v4\n        elif source.get(\"target_release\") == \"GCFPE-20261009.1\":\n            from run_gcfpe_20261009_fixtures import run as run_v4\n        else:\n            from run_gcfpe_20261027_fixtures import run as run_v4\n",
+   "count": 1,
+   "why": "Each schema-4 contract runs its own release's fixtures."
+  },
+  {
+   "id": "SR-W7-FV-17",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-17",
+   "skill": "flowmaster-validate",
+   "file": "scripts/run_gcfpe_current_fixtures.py",
+   "old": "contract_path = contract_path or change_skill_dir / \"references\" / \"gcfpe-20261009.1-100926.1-direct-handoff-contract.json\"",
+   "new": "contract_path = contract_path or change_skill_dir / \"references\" / \"gcfpe-20261027.1-102726.1-direct-handoff-contract.json\"",
+   "count": 1,
+   "why": "As SR-W7-FV-15."
+  },
+  {
+   "id": "SR-W7-FV-18",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-18",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "FLOWMASTER_VALIDATE_REVISION: 3.4.1",
+   "new": "FLOWMASTER_VALIDATE_REVISION: 3.5.0",
+   "count": 1,
+   "why": "Validation behaviour changes; the identity moves (skill-identity-and-freeze.md). SKILL_TREE_SHA256 is recomputed last by the package build."
+  },
+  {
+   "id": "SR-W7-FV-19",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-19",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "The current overlay `references/gcfpe-20261009.1-100926.1-direct-handoff-contract.json` must match that live binding;",
+   "new": "The current overlay `references/gcfpe-20261027.1-102726.1-direct-handoff-contract.json` must match that live binding;",
+   "count": 1,
+   "why": "Current overlay pointer."
+  },
+  {
+   "id": "SR-W7-FV-20",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-20",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "The `GCFPE-20261009.1 / 100926.1` profile pins and re-reads the bundled production contract and its 55-member frozen graph, which add no member. The `GCFPE-20260914.1 / 091426.1` profile, validator, fixtures, contract and graph stay bundled as history and run only when that contract is passed explicitly.",
+   "new": "The `GCFPE-20261027.1 / 102726.1` profile pins and re-reads the bundled production contract and its 56-member frozen graph, which add one member, CL-05. The `GCFPE-20261009.1 / 100926.1` and `GCFPE-20260914.1 / 091426.1` profiles, validators, fixtures, contracts and graphs stay bundled as history and each runs only when its contract is passed explicitly.",
+   "count": 1,
+   "why": "Profile boundary for the new release."
+  },
+  {
+   "id": "SR-W7-FV-21",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-21",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "--contract /exact/change-flow-skill/references/gcfpe-20261009.1-100926.1-direct-handoff-contract.json",
+   "new": "--contract /exact/change-flow-skill/references/gcfpe-20261027.1-102726.1-direct-handoff-contract.json",
+   "count": 3,
+   "why": "Command examples name the current release's files."
+  },
+  {
+   "id": "SR-W7-FV-22",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-22",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "--gcfpe-contract /exact/change-flow-skill/references/gcfpe-20261009.1-100926.1-direct-handoff-contract.json",
+   "new": "--gcfpe-contract /exact/change-flow-skill/references/gcfpe-20261027.1-102726.1-direct-handoff-contract.json",
+   "count": 1,
+   "why": "As SR-W7-FV-21."
+  },
+  {
+   "id": "SR-W7-FV-23",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-23",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "/exact/GCFPE-20261009.1-candidate-root",
+   "new": "/exact/GCFPE-20261027.1-candidate-root",
+   "count": 2,
+   "why": "As SR-W7-FV-21."
+  },
+  {
+   "id": "SR-W7-FV-24",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-24",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "python3 scripts/validate_gcfpe_20261009.py /exact/change-flow-skill",
+   "new": "python3 scripts/validate_gcfpe_20261027.py /exact/change-flow-skill",
+   "count": 2,
+   "why": "As SR-W7-FV-21."
+  },
+  {
+   "id": "SR-W7-FV-25",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-25",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "python3 scripts/run_gcfpe_20261009_fixtures.py /exact/change-flow-skill",
+   "new": "python3 scripts/run_gcfpe_20261027_fixtures.py /exact/change-flow-skill",
+   "count": 1,
+   "why": "As SR-W7-FV-21."
+  },
+  {
+   "id": "SR-W7-FV-26",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-26",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "By default the suite validates the 100926.1 current overlay and its schema-4 fixtures; the 091426.1 contract and the 54-member",
+   "new": "By default the suite validates the 102726.1 current overlay and its schema-4 fixtures; the 100926.1 contract, the 091426.1 contract and the 54-member",
+   "count": 1,
+   "why": "Default overlay statement."
+  },
+  {
+   "id": "SR-W7-FV-27",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-27",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "which always runs the 100926.1 contract and its fixtures first. After promotion, the selected alias must resolve as the 55-member schema-4 production contract;",
+   "new": "which always runs the 102726.1 contract and its fixtures first. After promotion, the selected alias must resolve as the 56-member schema-4 production contract;",
+   "count": 1,
+   "why": "Default overlay statement; 56 members."
+  },
+  {
+   "id": "SR-W7-FV-28",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-FV-28",
+   "skill": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "The 100926.1 contract revision 4.2.0 is regenerated from the final candidate graph. It binds its governing plan as a repository file on `main`, names the selected 091426.1 contract as its predecessor, and carries forward, as repair-baseline evidence, the raw-byte PF10 pin and corrected source manifest that the 20260914 contract revision 4.1.1 bound. It checks QA-120 PASS by verified change class: Epic to CL-E-10 and CRD to CL-C-10, with separate Report/RCA and complete matching intake to continuing Isis.",
+   "new": "The 102726.1 contract revision 4.3.0 is regenerated from the final candidate graph. It binds its governing plan as a repository file on `main`, names the selected 100926.1 contract as its predecessor, and carries forward, as repair-baseline evidence, the raw-byte PF10 pin and corrected source manifest that the 20260914 contract revision 4.1.1 bound. It checks that QA-120 PASS for a verified Epic or CRD goes to the close-mutation-set stage CL-05, with separate Report/RCA, and that CL-05's close-PR-ready result goes to the class-matching closure decision: CL-E-10 for an Epic and CL-C-10 for a CRD. It checks each member's version against the release's successor set: a member whose body changed carries 102726.1 and every other member 100926.1, and no member body names a superseded page of a changed member.",
+   "count": 1,
+   "why": "Covers W5's escape-hatch line (flowmaster-validate SKILL.md 'GCFPE release-profile validation boundary') and the two new 102726.1 checks."
+  },
+  {
+   "id": "SR-W7-CF-01",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-CF-01",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.4.0",
+   "new": "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.5.0",
+   "count": 1,
+   "why": "Change-specific behaviour and the bundled contract change (SKILL.md line 590's own rule)."
+  },
+  {
+   "id": "SR-W7-CF-02",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-CF-02",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "Load [GCFPE current direct-handoff contract](references/gcfpe-20261009.1-100926.1-direct-handoff-contract.json) as the current specialization overlay.",
+   "new": "Load [GCFPE current direct-handoff contract](references/gcfpe-20261027.1-102726.1-direct-handoff-contract.json) as the current specialization overlay.",
+   "count": 1,
+   "why": "Current overlay pointer."
+  },
+  {
+   "id": "SR-W7-CF-03",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-CF-03",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "The current overlay is the 100926.1 contract above, `contract_id` `GCFPE-20261009.1-100926.1-DIRECT-HANDOFF-SELECTED`, which carries `status: SELECTED_PRODUCTION`. The 091426.1 contract",
+   "new": "The current overlay is the 102726.1 contract above, `contract_id` `GCFPE-20261027.1-102726.1-DIRECT-HANDOFF-SELECTED`, which carries `status: SELECTED_PRODUCTION`. The 100926.1 contract (`GCFPE-20261009.1-100926.1-DIRECT-HANDOFF-SELECTED`) and its frozen graph are superseded records and remain immutable historical provenance on the same terms. The 091426.1 contract",
+   "count": 1,
+   "why": "Resolution rule for the shared contract_id names the new current overlay and the superseded 100926.1 contract (STALE-001)."
+  },
+  {
+   "id": "SR-W7-CF-04",
+   "part": "PART-24",
+   "source": "W7.json SR-W7-CF-04",
+   "skill": "change-flow",
+   "file": "SKILL.md",
+   "old": "Change-specific behaviour changes, so the revision moves to 3.4.0.",
+   "new": "Change-specific behaviour changes, so the revision moves to 3.4.0.\n\nBacklog maintenance (`MODIFICATION-20261027-gcfpe-backlog-open-items`): the current overlay is the 102726.1 contract, regenerated from the candidate graph with the 2026-10-27 R1 successor oracle; a verified QA-120 PASS goes to the close-mutation-set stage CL-05, and CL-05's result goes to the class-matching closure decision. Change-specific behaviour changes, so the revision moves to 3.5.0.",
+   "count": 1,
+   "why": "The dated MB-008 note stays as written (AUTH-001); a successor note follows it, as MB-008 added its own."
+  },
+  {
+   "id": "A3-C2",
+   "part": "PART-13",
+   "source": "W5.json validator_changes_needed FMV-ORACLE-019 (prose; no redline in W5 skill_redlines)",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        ids = [row.get(\"id\") for row in rows]\n        history_ids = [row.get(\"id\") for row in history_rows]\n        position_findings = 0\n",
+   "new": "        # PART-13 (MODIFICATION-20261027-gcfpe-backlog-open-items): an added successor row has no historical row;\n        # it must sit immediately after its anchor row, and every other row keeps its historical neighbours.\n        all_ids = [row.get(\"id\") for row in rows]\n        ids = [row_id for row_id in all_ids if row_id not in SUCCESSOR_ADDED_ROWS]\n        history_ids = [row.get(\"id\") for row in history_rows]\n        position_findings = 0\n        for added, anchor in SUCCESSOR_ADDED_ROWS.items():\n            if (added in history_ids or all_ids.count(added) != 1 or anchor not in all_ids\n                    or all_ids.index(added) != all_ids.index(anchor) + 1):\n                position_findings += 1\n                results.append(finding(\n                    \"FMV-ORACLE-019\", str(oracle_path),\n                    f\"row={added}; an added successor row must occur once, immediately after {anchor}, \"\n                    f\"and have no historical row\",\n                ))\n",
+   "count": 1,
+   "why": "W5: 'Remove SUCCESSOR_ADDED_ROWS ids before comparing ids with history_ids and before computing neighbours; require each added row to sit immediately after its anchor row'. Without it the suite reports GCF-24 and GCF-25 as moved (A3 scratch run)."
+  },
+  {
+   "id": "A3-C3",
+   "part": "PART-13",
+   "source": "W5.json validator_changes_needed FMV-ORACLE-020 (prose; no redline in W5 skill_redlines)",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "            [EXPECTED_ORACLE_PROFILE if token == history_profile else token for token in history_tokens]\n",
+   "new": "            [EXPECTED_ORACLE_PROFILE if token == history_profile\n             else \"R1_ROW_COVERAGE: 47/47\" if token == \"R1_ROW_COVERAGE: 46/46\" else token\n             for token in history_tokens]\n",
+   "count": 1,
+   "why": "W5: \"required_global_tokens: the historical list with the profile_id replaced in place and 'R1_ROW_COVERAGE: 46/46' replaced in place by 'R1_ROW_COVERAGE: 47/47'\". Without it the suite refuses the 2026-10-27 oracle (A3 scratch run)."
+  },
+  {
+   "id": "A3-C4",
+   "part": "PART-13",
+   "source": "message for A3-C3",
+   "skill": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "f\"required_global_tokens must be the historical list with only the historical profile_id {history_profile} \"\n                f\"replaced in place by {EXPECTED_ORACLE_PROFILE}\",\n",
+   "new": "f\"required_global_tokens must be the historical list with only the historical profile_id {history_profile} \"\n                f\"replaced in place by {EXPECTED_ORACLE_PROFILE} and the row coverage token by R1_ROW_COVERAGE: 47/47\",\n",
+   "count": 1,
+   "why": "the finding names what the check now requires"
+  }
+ ],
+ "conditional_sets": [
+  {
+   "set": "R-P1",
+   "default": "EXCLUDED",
+   "authority": "C-13 (Nathan, scope freeze); W1-Q3",
+   "applies_after": "every op in `ops`",
+   "ops": [
+    {
+     "id": "RP1-FV-01",
+     "skill": "flowmaster-validate",
+     "file": "SKILL.md",
+     "old": "(HDE Build Notes; PF04 §9.1.3)",
+     "new": "(PF04 §9.1.3, *GCFPE model and reasoning-level guidance*)",
+     "count": 1,
+     "why": "flowmaster-validate SKILL.md:168 (W1-Q3); ITEM-33's wording"
+    },
+    {
+     "id": "RP1-FV-02",
+     "skill": "flowmaster-validate",
+     "file": "scripts/run_gcfpe_20261009_fixtures.py",
+     "old": "# F07 (HDE Build Notes; PF04 §9.1.3)",
+     "new": "# F07 (PF04 §9.1.3)",
+     "count": 1,
+     "why": "fixture comment run_gcfpe_20261009_fixtures.py:320 (W1-Q3); the derived 102726.1 runner inherits it"
+    },
+    {
+     "id": "RP1-CF-01",
+     "skill": "change-flow",
+     "file": "SKILL.md",
+     "old": "Under current HDE Build Notes, the model and reasoning-level guidance for each GCFPE downstream session",
+     "new": "Under PF04 §9.1.3, the model and reasoning-level guidance for each GCFPE downstream session",
+     "count": 1,
+     "why": "change-flow SKILL.md:305 (W1-Q3): states as current a home that no longer holds the rule"
+    },
+    {
+     "id": "RP1-CF-02",
+     "skill": "change-flow",
+     "file": "SKILL.md",
+     "old": "and CL-05's result goes to the class-matching closure decision. Change-specific behaviour changes, so the revision moves to 3.5.0.",
+     "new": "and CL-05's result goes to the class-matching closure decision. The TypeSafe rule that the MB-008 note places under HDE Build Notes is PF04 §9.1.3's since its drain. Change-specific behaviour changes, so the revision moves to 3.5.0.",
+     "count": 1,
+     "requires": [
+      "SR-W7-CF-04"
+     ],
+     "why": "change-flow line 10 (W1-Q3), placed in the successor note because the dated MB-008 note stays as written (AUTH-001)"
+    }
+   ]
+  }
+ ],
+ "new_files": [
+  {
+   "id": "SR-CF-8",
+   "skill": "change-flow",
+   "file": "references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json",
+   "spec": "NEW FILE written by build_r1_successor_20261027.py (repo_edits RE-1): 48,515 bytes, sha256 4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add",
+   "built_by": "build_r1_successor_20261027.py; bundled by package_build_102726.py step N"
+  },
+  {
+   "id": "SR-FV-35",
+   "skill": "flowmaster-validate",
+   "file": "references/glow-hde-canonical-change-flow-r1-20261027.json",
+   "spec": "NEW FILE written by build_r1_successor_20261027.py (repo_edits RE-1): 55,591 bytes, sha256 f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d",
+   "built_by": "build_r1_successor_20261027.py; bundled by package_build_102726.py step N"
+  },
+  {
+   "id": "SR-FV-36",
+   "skill": "flowmaster-validate",
+   "file": "references/r1-successor-source-20261027.md",
+   "spec": "NEW FILE written by build_r1_successor_20261027.py, byte-identical to the repository copy (repo_edits RE-2): 7,705 bytes, sha256 088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a",
+   "built_by": "build_r1_successor_20261027.py; bundled by package_build_102726.py step N"
+  }
+ ],
+ "not_applied": [
+  {
+   "source": "W3a Q-2 amthor-workspace-governance-audit SKILL.md:61, references/interoperability-contracts.md:62",
+   "disposition": "OUT (C-3)",
+   "reason": "that package is otherwise unchanged; backlog (C-14); Nathan may opt in"
+  },
+  {
+   "source": "W4.json SR-3",
+   "disposition": "MERGED (W7-D4)",
+   "reason": "its QA_PLAN_REVIEW value goes into EXPECTED_POLICY_20261027 (SR-CF-9, SR-FV-20); EXPECTED_POLICY is not edited, so the 091426.1 and 100926.1 contracts still validate"
+  },
+  {
+   "source": "W4.json SR-4",
+   "disposition": "MERGED (W7-D4)",
+   "reason": "its QA_PLAN_REVIEW value goes into EXPECTED_POLICY_20261027 (SR-CF-9, SR-FV-20); EXPECTED_POLICY is not edited, so the 091426.1 and 100926.1 contracts still validate"
+  },
+  {
+   "source": "W5.json SR-FV-29",
+   "disposition": "REPLACED by SR-W7-FV-11",
+   "reason": "same old text; W7's new text is SR-FV-29's plus one line"
+  },
+  {
+   "source": "W7.json SR-W7-FV-11 new text",
+   "disposition": "CORRECTED (A3-C1)",
+   "reason": "A3-C1: OPTIONAL_REFERENCES is the exact set of references change-flow SKILL.md links (validate_flowmaster.py: 'optional bundled reference is not linked'). SR-CF-* and SR-W7-CF-02 move both links to the 2026-10-27 map and the 102726.1 contract, so the two superseded entries must leave the set, as MB-008 replaced its predecessor's; the files stay bundled as history, unlinked, like the 091426.1 contract. W7's text kept both."
+  }
+ ]
+}
