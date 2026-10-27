@@ -148,6 +148,20 @@ def unescape(s: str) -> str:
     return s.replace("\\_", "_")
 
 
+# AM-3 (Nathan, 2026-10-27, after EXECUTE's X8 stop): Notion stores an inline code span inside a bold run by closing
+# and reopening the bold around it (`<b>A </b><b><code>B</code></b><b> C</b>`). Every readback check folds that split
+# back before it reads; nothing else changes. activation_render_102726.py imports this for its landing check.
+SPLIT_BOLD = (("</b><b><code>", "<code>"), ("</code></b><b>", "</code>"))
+
+
+def fold(text):
+    if text is None:
+        return None
+    for split, joined in SPLIT_BOLD:
+        text = text.replace(split, joined)
+    return text
+
+
 # --- transient read (the precedent's reader, keeping the title) --------------------------------------------------
 def latest(page_id: str, root: str, session: str, since: int, fetched_after: str):
     """(captured, as_of, title, content) of the newest fetch at or after the cutoff, or None."""
@@ -330,6 +344,7 @@ RETAINED_RECORDS = {"3f74590a05eb81b8b7bbcbfe0dcacea9": "GCFPE Membership and Re
 
 
 def findings(text: str, ctx: dict, phase: str, sweep_page: bool = False) -> list:
+    text = fold(text)  # AM-3
     ids = set(ctx["archive_102726"]) if sweep_page else set(ctx["archive"])
     lits = LITERALS_SWEEP if sweep_page else LITERALS_ALL
     out = []
@@ -401,6 +416,7 @@ def linked(text: str) -> set:
 
 def check_text(page: str, title: str, text: str, ctx: dict, phase: str, register_pending: bool = False) -> dict:
     """page: a real page id, or 'CATALOG', 'PE', 'ENTRY' for the pages this Modification creates."""
+    text = fold(text)  # AM-3
     is_catalog = page in ("CATALOG", ctx.get("catalog") or "<none>")
     is_pe = page in ("PE", ctx["pe"])
     is_entry = page in ("ENTRY", ctx.get("entry") or "<none>")
@@ -609,6 +625,16 @@ def selftest(map_path: str) -> dict:
         got = check_text(page, title, text, ctx, phase, pending)["ok"]
         rows[name] = got == want
         ok &= got == want
+    # AM-3: Notion's split bold folds back to the written form, idempotently, and a check reads the folded form
+    split = "<b>Bound to </b><b><code>v5.1.0</code></b><b> here</b>"
+    joined = "<b>Bound to <code>v5.1.0</code> here</b>"
+    fi_text = "## Selected topology\n" + split + "\n" + all_links
+    rows["am3_fold_reverses_split_bold"] = fold(split) == joined and fold(fold(split)) == joined and fold(joined) == joined
+    a3s = check_text(FLOW_INDEX, T[FLOW_INDEX], fi_text, ctx, "activation", False)
+    a3j = check_text(FLOW_INDEX, T[FLOW_INDEX], fi_text.replace(split, joined), ctx, "activation", False)
+    rows["am3_split_and_written_forms_read_alike"] = ({k: a3s[k] for k in ("ok", "findings", "failed_checks")}
+                                                     == {k: a3j[k] for k in ("ok", "findings", "failed_checks")})
+    ok &= rows["am3_fold_reverses_split_bold"] and rows["am3_split_and_written_forms_read_alike"]
     sizes = {"archive_set_102726": len(ctx["archive_102726"]), "archive_set_091426": len(ctx["archive_091426"])}
     ok &= sizes["archive_set_102726"] == 57 and sizes["archive_set_091426"] == 57
     return {"mode": "selftest", "stand_in": ctx["stand_in"], **sizes, "cases": rows,
