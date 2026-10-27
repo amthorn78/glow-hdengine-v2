@@ -1,0 +1,61 @@
+{
+ "catalog": "4064590a05eb8113ae7de73041631c00",
+ "as_of": "2026-10-27T15:33:12.290Z",
+ "real_lines": 115,
+ "model_lines": 115,
+ "real_equals_model": true,
+ "frontmatter_lines_real": 37,
+ "frontmatter_lines_model": 37,
+ "real_frontmatter_paragraphs_joined_by_br": 0,
+ "real_br_segments": 0,
+ "segments_equal_model_lines": false,
+ "body_after_frontmatter_equal": true,
+ "control_candidate_real": {
+  "ok": true,
+  "judged": true,
+  "findings": 0,
+  "failed_checks": [],
+  "finding_sections": []
+ },
+ "activation_ops_real": {
+  "listed": 8,
+  "generated": 0,
+  "applied": 8,
+  "refused": []
+ },
+ "control_activation_real": {
+  "ok": true,
+  "judged": true,
+  "findings": 0,
+  "failed_checks": [],
+  "finding_sections": []
+ },
+ "control_candidate_model": {
+  "ok": true,
+  "judged": true,
+  "findings": 0,
+  "failed_checks": [],
+  "finding_sections": []
+ },
+ "activation_ops_model": {
+  "listed": 8,
+  "generated": 0,
+  "applied": 8,
+  "refused": []
+ },
+ "control_activation_model": {
+  "ok": true,
+  "judged": true,
+  "findings": 0,
+  "failed_checks": [],
+  "finding_sections": []
+ },
+ "old_catalog": {
+  "id": "3f74590a05eb812db385c2544d7570f7",
+  "as_of": "2026-10-12T13:28:07.573Z",
+  "frontmatter_lines": 43,
+  "joined_by_br": 0
+ },
+ "ok": true,
+ "d22": "transient read of this session's harness records; counts, booleans and check names only"
+}

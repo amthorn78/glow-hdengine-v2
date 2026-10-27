@@ -817,27 +817,28 @@ Because R-P1 and R-P2 are taken, neither goes on the backlog (C-14).
 | X7 | all body parts | VERIFIED | Fresh reads of the 56 successors and GCFPE-MGMT-10 by seven read-only workers after 13:24:41.758Z. `body_check.py check --successor-map <map> --with-conditional R-P1 R-P2` ([execute/landing-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/landing-check-102726.1.json), counts, ids and revisions only): on all 56 written pages `ok`, each revision moved from its map pin; 447 checked operations, every one `LANDED`; bindings current on all 57; 756 of 756 guard rows pass, so every forbidden guard finds no surviving old text (template rule 4, D26-E); `G-W7-BIND-1` and `G-W8-NAME-1` 0 on all 57 bodies and `G-W7-REL-1` 0 on its 56. GCFPE-MGMT-10 is the only row with `ok` false, and only on `revision_moved`: it is the KEPT member, with no operations, and the plan does not change it (PLAN §2), so its revision stays at its pin as it must. `body_check.py registry --audit-root <installed amthor-workspace-governance-audit>`: `ok`; 329 fixture rows and 756 page rows, the registry form agreeing on every row |
 | X8 | PART-17, 21 | VERIFIED after AM-3 | Fresh reads of the Hub and the register after 13:29:44.374Z: the Hub at `2026-10-27T03:02:37.191Z`, pinned at that read (`--pin`), and the register at its pin `2026-10-12T17:17:45.991Z`. `activation_render_102726.py plan --phase part17`: `ok`. On the Hub, 21 operations apply and none is refused, with its notion-control guards at W6's before-counts (`G-W6-HUB-F` 13, RH 0, RN 0, RP 0); on the register, 3 apply, with `G-W6-REG-F` 4 and RN 0. 13:30–13:31Z: one update_content per page, the register's 3 then the Hub's 21, each returning success with no warning. Fresh reads after 13:31:46.801Z: `activation_render_102726.py check --phase part17` `ok` false ([execute/x8-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8-check-102726.1.json)). Both revisions moved, and every guard is at W6's after-count (`G-W6-HUB-F` 0, RH 4, RN 2, RP 2; `G-W6-REG-F` 2, RN 2), with control `ok` and 0 findings on both. But only 22 of 24 operations read `LANDED`: `W6-REG-3` and `W6-HUB-10` hold their text in Notion's split-bold form (*Failure record — 2026-10-27, X8*). The register's *Current selection* is unchanged. First check: BLOCKED, as above; D26-B record and Nathan's decisions below. **After AM-3, VERIFIED** on the same reads ([execute/x8-check-am3-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8-check-am3-102726.1.json)): `ok`; the register 3 of 3 and the Hub 21 of 21 `LANDED`, both revisions moved, every guard at W6's after-count, control `ok` on both |
 | X8b | PART-24, 25 (Nathan's addition after X8) | VERIFIED | `activation_render_102726.py plan --chain --standin-values --from-phase candidate --phase register` (after AM-3), read-only, on the real successor map, the candidate parts in scratch, and fresh reads of the 11 control pages after 13:49:58.426Z, each pinned at the revision just read ([execute/x8b-chain-through-p2-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8b-chain-through-p2-102726.1.json)). Real values: `@CONTROLS_PR` 770 and `@PUBLICATION_DATE` 2026-10-27. The 15 values that exist only later (activation, promotion and archival dates, review verdicts, receipts, the production token) took the named stand-ins, as the report lists. `ok` true: 10 of 10 pages at their pins, and the 100926.1 catalog at its read-only pin. Earlier phases: PART-17's 3 register and 21 Hub operations read `LANDED` and were not applied again. Then each phase applied in memory, in order: C3 (`candidate`) 7 pages (the register, the Flow Index, the five hubs); C4 (`review`) the Flow Index; P1 (`activation`) the Flow Index 92, Change Flow 32, IA 33, QA 24, Escalation 16, TW 14, the Alpha checklist 10, the new catalog 8 and PE 5; P1's entry step (`activation-done`) the new register entry 1; P2 (`register`) the register 6. In all 249 operations (70 listed, 179 generated), 0 refused. After every phase, every judged page passed its control rules with 0 findings (9, 9, 11, 11, 11 pages judged). The new catalog renders 56 rows with no marker left; the register entry has no marker left; the 57 P5 moves equal the archive set. Limit: an in-memory chain cannot reproduce Notion's storage forms, such as AM-3's split bold, so each write's own readback check still decides |
-| X9 | PART-24 | BLOCKED | 13:54Z: the catalog (C-CAT), one `notion-create-pages` call under the Flow Index, sent once, from `activation_render_102726.py plan --phase candidate --emit`'s catalog text (56 rows, 0 markers left): `4064590a05eb8113ae7de73041631c00`, titled "Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1", recorded once in [execute/notion-controls-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/notion-controls-102726.1.json). Fresh reads of the catalog, the Flow Index, the register and the five hubs after 13:56:52.690Z. `plan --phase candidate` with `@CATALOG_PAGE_ID` filled and each page pinned at that read (the Flow Index at `2026-10-27T13:54:13.135Z`, moved by the catalog's child-page block): `ok`, 7 of 7 pages, one operation each, none refused ([execute/x9-plan-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-plan-102726.1.json)); nothing was emitted or sent. `control_check_102726.py check --phase candidate --catalog <id>`, run before the control writes ([execute/x9-precheck-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-precheck-102726.1.json)): the catalog's title is right and it links all 56 members at the map's ids, but `catalog_staging_ok` is false, because Notion stored the catalog's 17 frontmatter lines as one paragraph (*Failure record — 2026-10-27, X9*). C-FI, the five C-HUB notes and C-REG were not sent |
+| X9 | PART-24 | VERIFIED after AM-4 to AM-7 | 13:54Z: the catalog (C-CAT), one `notion-create-pages` call under the Flow Index, sent once, from `activation_render_102726.py plan --phase candidate --emit`'s catalog text (56 rows, 0 markers left): `4064590a05eb8113ae7de73041631c00`, titled "Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1", recorded once in [execute/notion-controls-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/notion-controls-102726.1.json). Fresh reads of the catalog, the Flow Index, the register and the five hubs after 13:56:52.690Z. `plan --phase candidate` with `@CATALOG_PAGE_ID` filled and each page pinned at that read (the Flow Index at `2026-10-27T13:54:13.135Z`, moved by the catalog's child-page block): `ok`, 7 of 7 pages, one operation each, none refused ([execute/x9-plan-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-plan-102726.1.json)); nothing was emitted or sent. `control_check_102726.py check --phase candidate --catalog <id>`, run before the control writes ([execute/x9-precheck-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-precheck-102726.1.json)): the catalog's title is right and it links all 56 members at the map's ids, but `catalog_staging_ok` is false, because Notion stored the catalog's 17 frontmatter lines as one paragraph (*Failure record — 2026-10-27, X9*). C-FI, the five C-HUB notes and C-REG were not sent First run: BLOCKED, as above (*Failure record — 2026-10-27, X9*). **Resumed after X9b.** 15:32Z: the catalog repair (AM-7), one replace_content with the catalog's AM-4 template, planned by `execute/catalog_repair_102726.py` on the read as of 13:54:13.282Z (exactly the page C-CAT created). Read back as of 15:33:12.290Z: it equals the plan's model exactly (115 lines, frontmatter one line per paragraph); the candidate and P1 catalog checks pass ([execute/x9c-catalog-repair-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9c-catalog-repair-check-102726.1.json)). Fresh reads of the seven control pages after 15:34:04.878Z, each pinned at that read (the Flow Index at 15:33:12.290Z, moved by the repair under it): `plan --phase candidate` `ok`, one operation each, none refused. 15:35Z: one write per page, each sent once and returning success with no warning: C-FI, C-HUB-CF, C-HUB-IA, C-HUB-QA, C-HUB-ESC, C-HUB-TW (update_content), then C-REG (insert_content at the end). Fresh reads after 15:35:41.750Z: `activation_render_102726.py check --phase candidate --set @CONTROLS_PR=770` `ok`; on all seven pages the operation is `LANDED` and the revision moved; C-REG carries pull request #770's link ([execute/x9-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-check-102726.1.json)). `control_check_102726.py check --phase candidate --catalog 4064590a05eb8113ae7de73041631c00`: `ok`, 0 findings, 0 failed checks; the catalog links all 56 at the map's ids and keeps its staging; each candidate section and the candidate record occur once; *Current selection* still names GCFPE-20261009.1 / 100926.1 / 55; no control asserts the candidate ([execute/x9-control-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-control-check-102726.1.json)). Ids and revisions are recorded once in [execute/notion-controls-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/notion-controls-102726.1.json) |
 | X9a | PART-24 (Nathan's addition after X9) | FAILED | AM-4 committed at `f5629c8` before any write. One private draft page `4064590a05eb810c9bafced522a9c7fe` was created with the register entry's rendered text, given one P1c-style multi-line insert, read back after each write, and deleted ([execute/x9a-rehearsal-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9a-rehearsal-102726.1.json)). Created form: the 17 frontmatter lines are separate paragraphs, none joined, but the page differs from the model at one line: Notion stored the entry's register mention self-closing, without its inner text. Insert form, on the draft's own read: equals the model exactly; both lines read as frontmatter lines; `LANDED`. Nathan's rule: stop and return before C-FI (*Failure record — 2026-10-27, X9a*). C-FI, the hub notes, C-REG and the catalog repair were not sent |
-| X10 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X11 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X12 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X13 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X14 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X15 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X16 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X17 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X18 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X19 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X20 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X21 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X22 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X23 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X24 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X25 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X26 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X27 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
-| X28 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X9b | PART-24 (Nathan's decisions after X9a) | VERIFIED after one repeat | The AM-5 inventory ([execute/am5-inventory-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/am5-inventory-102726.1.json)), then one pass on one private draft page with one child page: 13 writes, each read back and compared with the plan's model. The first pass showed two form-only differences: the catalog repair's update_content did not match a `<br />`-joined paragraph, and the move model kept an extra blank line. Both were fixed under rule 2 (AM-6, AM-7), and each was repeated once on the same pages; every read then equalled the model. Both pages deleted ([execute/x9b-rehearsal-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9b-rehearsal-102726.1.json); *X9b — the write-form rehearsal, and AM-6 and AM-7*) |
+| X10 | PART-24, 13 | VERIFIED | `execute/x10_q0_q2_102726.py` on the installed skills and a scratch build root copied from them ([execute/x10-q0-q2-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x10-q0-q2-102726.1.json)). **Q0:** the nine installed skills and their copies equal W7's freeze digests; `docs/graph/parts` builds D29's token (55 nodes · 235 edges · 55 state_routes · 593,569 bytes · `43f84f29…`, validation PASS); the register's *Current selection* is still GCFPE-20261009.1 / 100926.1 / 55 (X9's control check, read 15:35Z). **Q1:** the installed glow-graph-contract, copied and patched by `contracts_102726.py patch-ggc`, regenerates the shipped 100926.1 contract: `cd291f17…`, 631,061 B, EQUAL on both bundled copies (W7 `graph_measurement`'s predecessor command). **Q2:** `build_r1_successor_20261027.py <build-root> <repo-root> --expect-decision-record docs/prompt_ecosystem_management/gcfpe.decision-record.md`: `build_ok`; 47 rows, 26 core and 21 material; matrix `088b1c67…` (7,705 B), oracle `f1b221e9…` (55,591 B), runtime map `47855256…` (48,515 B); `decision_record_match` true. It wrote the three skill files into the build root and `docs/prompt_ecosystem_management/r1-successor-source-20261027.md` into the repository, byte-identical to flowmaster-validate's copy. Committed |
+| X11 | PART-24, 08–10, 13 | VERIFIED | `execute/x11_graphs_102726.py`, the plan's commands on the real successor map in scratch ([execute/x11-graphs-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x11-graphs-102726.1.json)). `graph_assemble_102726.py apply` (with `plan/graph-edits.json` and `plan/members-100926.1.tsv`): `apply_ok`; the installed `graph_parts.py reindex`; `check` against `docs/graph/parts`: `check_ok`. **Candidate** build: 56 nodes · 240 edges · 56 state_routes · 608,051 bytes · sha256 `e17d4e6ad78f7c92…`, validation PASS. `routes`: `routes_ok`, every flag true: no QA-120 edge to CL-C-10 or CL-E-10, QA-120 `PASS` to CL-05, no DOC-20 edge to PR-40, IA-40 `REDLINE_INCOMPLETE` to IA-30 only, both `DO_NOT_CLOSE` routes reach CL-05, `sole_added_node` CL-05, no unresolved edge. `flip`, then `check --flipped`: `check_ok`, no error, so production differs only in the lifecycle literals and the prologue. **Production** build: 56 · 240 · 56 · 607,994 bytes · sha256 `2342744dc1d9de9d…`, validation PASS; `routes_ok`. `selftest`: `selftest_ok`. These candidate parts are byte-identical to the scratch parts the renderer used from X4b on |
+| X12 | PART-24 | VERIFIED | `contracts_102726.py values <repo-root> --check`: the release-values file is current. `fill` with X11's production graph, PLAN-20261027.md and the map: `fill_ok`, no marker left, [execute/contracts/release-values-102726.1.filled.json](evidence/20261027-gcfpe-backlog-open-items/execute/contracts/release-values-102726.1.filled.json) (its PLAN pin is PLAN-20261027.md's sha256 `a3b11f4668b166c4…`, 84,106 B). `run` on the build root, X11's candidate and production graphs and Q2's oracle `f1b221e9…`, with the map ([execute/x12-contracts-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x12-contracts-102726.1.json)): `ok`. Q1 again PASS (`cd291f17…`, EQUAL ×2). Every Q5 check true: both written, neither with `promoted_at`, 56 `candidate_prompt_ids`, heads, R1 pins, 240 route edges, QA closure through CL-05, the real-input P1 condition (C-7), the 2026-09-23 references historical (C-11), the member rule from the graph, lifecycle, release-semantic equality outside the lifecycle keys and the graph digest, CL-05's parent from the map (C-19), and the 55 carried parents' template values. All 13 injected refusals fire, among them the 100926.1 release-values file. Candidate contract 649,674 B `3527775d675733ff…`; production 646,249 B `f5dfa63f3f0b1c0d…` (measured here; the dry run's stand-in values differ, as the plan says they would) |
+| X13 | PART-24, 01, 02, 07, 10, 13, 26 | VERIFIED | `execute/x13_packages_102726.py` on the installed skills, X11's production graph, X12's production contract and filled release values, and the R1 files (`--out-dir`, identical to Q2's), with `--with-conditional R-P1` (Nathan's opt-in) ([execute/x13-packages-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x13-packages-102726.1.json)). **G1:** the redlines file reproduces; 105 operations apply once, every one `LANDED`, a second application refused; R-P1's 4 land once, a second refused, and refused on an unredlined base. **G2:** `execute/package_build_102726.py` (a byte-identical copy of the plan's) `build`, exit 0, no stand-in, R-P1 applied; `check` byte-identical; `selftest` true on every case but `stops_on_stand_in_map_without_flag`, which needs a stand-in map by construction (X4b) and is true on the stand-in map in A3's PLAN receipt: `NOT_APPLICABLE_REAL_MAP`. **Packages:** quick_validate and package_skill for each, extracted, each extracted tree's freeze digest equal to the built one: change-flow `98ba87979cdc2911…` 538,904 B, tree `29 672f3cbb133092bee896d157c62deff8bb559dae446687ae1fd15ebbb07f74e0`; flowmaster-validate `60b8889ae79cfea3…` 721,255 B, tree `45 39762ccab52e4fb7cb5c4e792aea2a5245fa23e0edd9273b47880954a696668d`; glow-hde-pr-development `dd6fd4234dedd6fa…` 26,085 B, tree `4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee`; glow-graph-contract `683ea1039538ee76…` 58,987 B, tree `9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1`. **Two roots** (every name line quoted in one, plain in the other, D28), each with the four extracted packages: in both, the suite has no finding from this change and exactly the three named pre-existing ones (C-21), FLOWMASTER R1 coverage 47 of 47 (26 core), the change-flow fixtures ok; flowmaster-validate's `validate_gcfpe_20261027.py` ok and `run_gcfpe_20261027_fixtures.py` ok (297 cases, none failed); change-flow's `validate_gcfpe_20261027.py` PASS; glow-hde-pr-development's validator PASS; quick_validate ×4; `contract_recipe.py --check` EQUAL ×2 for 102726.1 (`f5dfa63f…`) and for 100926.1 (`cd291f17…`). The two roots give identical gate results and identical freeze digests for every skill. **G6:** each new check fires on its injected regression (FMV-ORACLE-019, FMV-ORACLE-020, the superseded-contract link, the close-stage negative fixture, the runner's close-set case) |
+| X14 | PART-24 | FAILED | Fresh reads of the 56 members by seven read-only workers after 15:45:58.638Z: 56 fetched, no error, and no member revision moved since X7's landing check. `plan/x12_qualify_102726.py run` on both X13 roots, with `--candidate-contract` naming X12's candidate contract (`3527775d…`, disclosed below) ([execute/x14-bodies-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x14-bodies-102726.1.json), `execute/x14_diagnose_102726.py`). Passed: `prompt_bodies_validated` 56; `prompt_body_checks_not_evaluated` empty; the profile `ok`, contract `SELECTED_PRODUCTION`, 240 frozen edges; no `PROMPT_BINDING_SUPERSEDED`; the payload normalized (C-15); the fixtures without bodies `ok` (297 cases); the suite with no finding from this change and only C-21's three named ones; the candidate and production contracts equal outside the lifecycle keys and the graph digest; the two roots' results identical. **But `ok` is false. The fixtures runner, given the bodies, stops before its QA-closure cases** with `ValueError: Mutation anchor absent: reject-source-missing-rca`. The cause is in *Failure record — 2026-10-27, X14* |
+| X15 | — | NOT_RUN | not yet reached |
+| X16 | — | NOT_RUN | not yet reached |
+| X17 | — | NOT_RUN | not yet reached |
+| X18 | — | NOT_RUN | not yet reached |
+| X19 | — | NOT_RUN | not yet reached |
+| X20 | — | NOT_RUN | not yet reached |
+| X21 | — | NOT_RUN | not yet reached |
+| X22 | — | NOT_RUN | not yet reached |
+| X23 | — | NOT_RUN | not yet reached |
+| X24 | — | NOT_RUN | not yet reached |
+| X25 | — | NOT_RUN | not yet reached |
+| X26 | — | NOT_RUN | not yet reached |
+| X27 | — | NOT_RUN | not yet reached |
+| X28 | — | NOT_RUN | not yet reached |
 
 ### Failure record — 2026-10-27, X2 (D26-B)
 
@@ -872,6 +873,12 @@ EXECUTE stops at X2. The plan's normal path cannot be executed mechanically on a
 - **X9, a diagnostic helper and one terminal view.** `execute/x9_catalog_probe_102726.py` compares the real catalog read with the page the plan models for it and runs the candidate and P1 catalog checks on both, in memory; it prints counts, booleans and check names only. Before it existed, the catalog's first 16 lines were printed once in the terminal, cut at 160 characters, to see the stored form. The catalog is a control page this Modification created, not a member body, and nothing was written to disk.
 - **X9a, the insert rehearsed on the draft's own read.** The created form already differed from the model, so the insert was planned and checked against the draft's own read (`am4_rehearsal_102726.py --base-as-of`), not the created model. Each receipt names its base. The insert sent was the one P1c-style insert Nathan named.
 - **X9a, two helpers and terminal views.** `execute/am4_rehearsal_102726.py` renders, plans and checks the rehearsal. `execute/write_forms_inventory_102726.py` records the reference and line-break forms every remaining write carries, and the mention forms stored on the pages read; it prints counts, ids and forms only. The draft's rendered text and its two reads were seen in the terminal. It held the register entry's template with two stand-in dates, not a member body, and nothing was written to disk.
+- **X9b, how the repeat was read.** Nathan: "repeat the rehearsal once, on the same two pages before deleting them". The repeat re-ran each stage that showed a difference (the catalog repair, the move) and the stages that depended on it (P1b-CAT-1 to 8), on the same two pages. Stages 1 and 2 created the two pages and passed; repeating them would have needed more pages. The other stages had passed on the same pages.
+- **X9b, stages 7 and 8 read together.** The banner insert (7) and the retitle (8) were sent one after the other, and then read together, rather than reading the page between them. The joint read equals the model after both.
+- **X9b, the draft's catalog table.** The draft carried the catalog's first three member rows, not 56; the forms are the same. Its text, and both pages' reads, were seen in the terminal. These were rehearsal pages holding the plan's control-page text with stand-in values, not member bodies. Nothing was written to disk.
+- **X13, one self-test case classified, not passed.** `package_build_102726.py selftest`'s `stops_on_stand_in_map_without_flag` drops `--stand-in-ok` and expects the build to stop, which only a stand-in map can cause; with the real map it cannot fire. X4b recorded this; the case is true on the stand-in map in A3's PLAN receipt. The X13 driver counts it `NOT_APPLICABLE_REAL_MAP` and no other case.
+- **X14, the candidate contract named.** The plan's X14 command names no candidate contract. `x12_qualify_102726.py`'s default path, `execute/contracts/gcfpe-20261027.1-102726.1-candidate-contract.json`, does not exist: X12 wrote both contracts to scratch, and only the filled release values were committed. The first run therefore reported `candidate_contract_present` false. The runs recorded pass `--candidate-contract` with X12's candidate contract, whose sha256 `3527775d…` equals X12's receipt. The bundled production contract in both roots is `f5dfa63f…`, X12's production contract.
+- **X14, terminal views and diagnostic runs.** To find the failure, QA-120's PASS routing section (about 1,900 characters of the live read) and eight short windows around "RCA" were printed once in the terminal. Scratch probes printed anchor counts and the runner's stderr tail. Nothing from a body was written to disk. `execute/x14_diagnose_102726.py` and `execute/x14_sweep_102726.py` reproduce every measurement the record uses, and print counts, ids, revisions, the runner's own anchor strings and error codes only. One scratch probe, run with `python3 -I` (which ignores `PYTHONDONTWRITEBYTECODE`), wrote a bytecode cache of `plan/x12_qualify_102726.py` under `plan/__pycache__/`. It is ignored by Git, held no body text, and was deleted at once.
 
 ### Return to Nathan — 2026-10-27, after X2
 
@@ -1237,3 +1244,178 @@ EXECUTE stops before C-FI. Nathan's rehearsal failed on the created form. The re
 - That is inside the 18–30 h and 16–26M re-price.
 
 **In one line, if you take the recommendations:** "AM-5 as described (option A); I merge #774 as the record pull request."
+
+### Nathan's decisions after X9a — 2026-10-27
+
+Nathan's words:
+
+> "I have merged #774 as the record pull request. Continue on a branch restarted from main, in a new pull request.
+>
+> 1. AM-5 as described (option A), widened.
+> - Before C-FI, inventory every distinct write form in every remaining Notion step, X9 to X28: code, bold, code inside bold, separate-line paragraphs, mentions of the page itself, of a child page and of any other page, Markdown links to a child page and to any other page, page creation, and any other form the inventory finds.
+> - Rehearse all of them in one pass on one private draft page with one child page, no more. Read each write back and compare it with the plan's model.
+> - Then delete both pages, and record the inventory and the results in §E.
+> - If the rehearsal shows a difference, you may fix it under rule 2 and repeat the rehearsal once, on the same two pages before deleting them. If it still fails, stop and return before C-FI.
+>
+> 2. Standing authority for the rest of this run.
+> - When a fresh read shows Notion stored a write in a different form, but its normalized text equals the plan's model, you may fix the plan's model, renderer or check. Never change the content.
+> - Add a self-test case each way, record the fix in §E as the next AM number quoting these words, and continue without returning to me.
+> - For a write form not covered by the rehearsal, rehearse it first on a private draft page and delete the draft.
+>
+> 3. Stop and return to me when any of these holds:
+> - content or meaning would differ from the approved plan;
+> - a live page would be left wrong;
+> - the register's selection write (P2) is affected;
+> - the rehearsal fails after its one repeat.
+>
+> 4. Exit rule, set by me.
+> - After the rehearsal in rule 1, at most two more storage-form amendments are allowed. Fixes made inside the rehearsal do not count.
+> - The run also ends if it reaches 30 hours of session time in total, counted from EXECUTE's start at 2026-10-27 11:20Z.
+> - If either limit is reached, stop at the next safe point before any promotion write, record the state in §E, and return. 100926.1 stays selected, and the remaining work moves to MB-052 on the backlog."
+
+**Applied.**
+
+- **The record pull request.** #774 merged as `e6aebea`, detected by files on `main` (D26-C): the X9a record and its receipts are on `main`, and `main`'s tree equals the branch's (`09eff226…`). The remote branch had been deleted at the merge; the branch was restarted from `main` at `e6aebea` and pushed fresh. The run continues in a new pull request.
+- **AM-5**, committed before any Notion write.
+  - *[plan/make_activation_ops_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/make_activation_ops_102726.py).* A repair after AM-4: the register entry's one inner-text mention, of the register, is written self-closing. The entry sits under the register, so under Notion's rule the register is neither the page nor a child. [plan/activation-ops.json](evidence/20261027-gcfpe-backlog-open-items/plan/activation-ops.json) was rebuilt by the generator; only `new_pages.REGISTER_ENTRY` changed.
+  - *[plan/activation_render_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/activation_render_102726.py).*
+    - `apply` refuses a replacement whose mention would not be stored as written on its page (`MENTION_FORM`). A mention of the page itself must carry inner text. A mention of a child must carry inner text equal to the child-page block's title. Any other mention must be self-closing.
+    - The chain and `plan` pass the page's id.
+    - `frontmatter_paragraph_repair()` builds X9's catalog repair from the read: the joined paragraph, unique, becomes one paragraph per line.
+  - *Self-tests, a case each way.*
+    - `make_activation_ops_102726.py selftest`: `ok`, 15 rows. The entry's mention is self-closing; a second repair is refused.
+    - `activation_render_102726.py selftest`: `ok`, 43 of 43, on the real map and on the PLAN stand-in map. The seven AM-5 cases:
+      - another page's mention applies self-closing and is refused with inner text;
+      - a child's mention applies with its title, and is refused self-closing or with a stale title;
+      - the page's own mention applies with inner text and is refused self-closing;
+      - the entry's mentions take the stored form;
+      - the catalog repair gives paragraphs once, and finds nothing to repair on the AM-4 template.
+    - `control_check_102726.py selftest`: `ok`, 42 of 42. `make_activation_ops_102726.py check`: current.
+  - *The chain after AM-5* ([execute/am5-chain-through-sweep-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/am5-chain-through-sweep-102726.1.json)): from the candidate phase through `sweep`, read-only, on the real map and the newest reads, each page pinned at that read. `ok`; 258 operations, 0 refused; after every phase every judged page passes with 0 findings. P1e-HUB-TW-PE passes the mention rule: PE is a child of the TW hub, titled "PE Metaprompt 102726.1".
+- **The inventory, rule 1** ([execute/am5-inventory-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/am5-inventory-102726.1.json), `execute/am5_rehearsal_102726.py inventory`). It classifies every write of X9 to X28.
+  - It runs the chain (258 operations).
+  - It adds the writes the chain does not render: X9's catalog repair, P1a's page creation, the nine P1 titles, the 57 P5 moves, X25's banners and navigation corrections, and X28's backlog dispositions. X28's are read from the backlog itself: 52 entries, each a `## MB-0xx — title — STATUS` heading, a field table and bold-led paragraphs.
+  - *Write tools:* update_content (one or many operations per call); insert_content at the end (C-REG, P2-REG-EXEC); insert_content at the start (X25's banners); page creation under a parent (P1a); update_properties for a title (P1); move pages (P5).
+  - *Content forms:*
+    - inline code, bold, code inside bold, italic (`<i>`), plain-text underscores (stored `\_`);
+    - separate-line paragraphs, headings, bulleted and numbered list items;
+    - table rows, and a table row inserted before another (CL-05 before CL-20);
+    - a span within a line (`end`), a span over lines (`lines`), a whole line (`whole_line`);
+    - Markdown links to a child page and to another page; external links;
+    - mentions of a child page (P1e) and of another page (the created entry);
+    - typographic characters and double quotes;
+    - on created pages, the frontmatter divider;
+    - X9's joined frontmatter paragraph replaced by paragraphs.
+  - No remaining write mentions the page itself; the rehearsal covers that form anyway, as Nathan listed it.
+  - Every form maps to a rehearsal stage; none is uncovered.
+- **The rehearsal** in one pass: recorded below as X9b.
+
+### X9b — the write-form rehearsal, and AM-6 and AM-7 — 2026-10-27
+
+**The rehearsal passed after its one repeat.** In one pass on one private draft page (`4064590a05eb813caaa3efa8c9235761`) with one child page (`4064590a05eb8131bbc8d7b371302d84`), every write form the inventory found was written once and read back. Each read was compared with the plan's model after AM-3's fold ([execute/x9b-rehearsal-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9b-rehearsal-102726.1.json), `execute/am5_rehearsal_102726.py`). The first pass showed two differences, both in form only; each was fixed under rule 2 and repeated once on the same two pages. Both pages were then deleted (in Trash).
+
+- **First pass.**
+  - *1, create the draft:* the catalog's text with X9's single-break frontmatter. It equals the model (57 lines), the frontmatter joined as AM-4 models it.
+  - *2, create the child under the draft:* the register entry under AM-5. Both pages equal the model: the entry's register mention is self-closing, and the child-page block sits at the end of the draft.
+  - *3, one update_content on the draft, 10 operations:* the catalog repair, C-FI, P2-REG-SEL, P6-OV-FIND (a span over lines), P1d-FI-ACT (a span within a line), P5-FI-DISP (a whole line), the two generated member rows (one replaced, CL-05 inserted before CL-20), P1e-HUB-TW-PE's child mention, and a self-mention.
+    - Nine landed exactly as modeled. Markdown links to the child and to other pages stayed Markdown links. Mentions of the child and of the page itself kept their inner text. Code inside bold, `<i>`, headings, bulleted and numbered lists, and table rows all matched.
+    - **The catalog repair did not land.** update_content answered `no_match`: it does not match a `<br />`-joined paragraph in the form fetch renders it. With the repair held out, both pages equal the model.
+  - *4, one update_content on the child:* P1-ENTRY-DONE (a table row) and P1c-PE-5's two-paragraph insert. Equal.
+  - *5, C-FI-REV* (a list item after a list item). P1b-CAT-1 to 8 were held, because their anchors need the repair. Equal.
+  - *6, insert_content at the end:* C-REG, with its external link. Equal.
+  - *7 and 8:* insert_content at the start (a dated banner), then update_properties retitling the child. Read together, both equal the model: the new title shows in the draft's child-page block and in its inner-text mention.
+  - *9, move the child to the workspace level:* the child-page block is gone, and the child's mention is now self-closing. **But the model kept one extra blank line** where the block had been.
+- **The two fixes (inside the rehearsal; they do not count toward rule 4's limit).** Nathan's rule 2: "When a fresh read shows Notion stored a write in a different form, but its normalized text equals the plan's model, you may fix the plan's model, renderer or check. Never change the content. Add a self-test case each way, record the fix in §E as the next AM number quoting these words, and continue without returning to me." No content changes under either.
+  - **AM-6, the move model.** When a child page moves out, Notion leaves one blank line between the blocks around its child-page block, and none after the page's last block. A mention of a page that is no longer a child is self-closing. `remove_children()` in [plan/activation_render_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/activation_render_102726.py) does this, and the chain's `archived` phase uses it. Self-test cases:
+    - a middle child leaves one blank line;
+    - an end child leaves one newline;
+    - the old rule's extra blank line is detected;
+    - other children are kept.
+  - **AM-7, the catalog repair's form.** X9's repair becomes one `replace_content` whose new_str is the catalog's AM-4 template (`catalog_text`), the plan's own text for that page. It goes through the same path as page creation, which stores frontmatter one line per paragraph. `catalog_repair_payload()` refuses unless the read is exactly the page C-CAT created and has no child page, so nothing else on the page is replaced. Self-test cases: the repair is the AM-4 template on the created page; it is refused on any other read, including an already-repaired one.
+  - `activation_render_102726.py selftest`: `ok`, 49 of 49, on both maps. The chain through `sweep` ([execute/am7-chain-through-sweep-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/am7-chain-through-sweep-102726.1.json)): `ok`; 258 operations, 0 refused; every judged page passes after every phase.
+  - The real catalog's latest read (13:54:13.282Z, read 14:53Z) is exactly the page C-CAT created, so `catalog_repair_payload` accepts it.
+- **The repeat** (once, on the same two pages).
+  - *9:* the stage-9 read rechecked under AM-6 equals the model.
+  - *10, replace_content of the draft:* its text with the frontmatter as one paragraph per line, sent in its written form (AM-7). Equal, 142 lines.
+  - *11, P1b-CAT-1 to 8 on the repaired frontmatter*, both paragraph inserts included. Equal.
+  - *12, the child moved under the draft* (a page parent, as at P5). Equal: the block is appended at the end, and the mention takes the child's title.
+  - *13, the child moved out again* (AM-6 at the page's end). Equal.
+- **Observed and recorded, not differences.**
+  - A parent's revision did not move when its child page moved out or in; its content did.
+  - A page moved in is appended at the end of its new parent.
+
+### Failure record — 2026-10-27, X14 (D26-B)
+
+EXECUTE stops at X14. The 56 written bodies pass the shipped 102726.1 validator, but the shipped fixtures runner cannot run its body cases on them: three of its QA-120 mutation anchors name text the page does not hold. X14's failure path is "none; stop". The fix changes a shipped package file beyond the approved build step, so Nathan's rule 3 sends it back: "content or meaning would differ from the approved plan". It is not a storage-form fix under rule 2, and neither of rule 4's two amendments is used.
+
+- **What was run.**
+  - 15:45Z: fresh reads of the 56 members, seven read-only workers, 56 fetched, no error.
+  - `plan/x12_qualify_102726.py run` on X13's two roots (D28), with X12's candidate contract named ([execute/x14-bodies-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x14-bodies-102726.1.json), `execute/x14_diagnose_102726.py`).
+  - Every component passed but one: the fixtures runner with bodies exited 1 and printed no report. Both roots gave identical results.
+- **What failed.** The built `flowmaster-validate/scripts/run_gcfpe_20261027_fixtures.py` (package `60b8889a…`) was given the 56 bodies on stdin. It raised `Mutation anchor absent: reject-source-missing-rca` before any QA-closure source case ran.
+  - *Where the runner comes from.* It is the 100926.1 runner, rebuilt by the plan's build step R (`plan/package_build_102726.py`). R moves the release literals and retargets the QA-closure *contract* cases to CL-05. It carries the nine QA-closure *source* cases, which mutate the QA-120, CL-E-10 and CL-C-10 bodies, unchanged: that block is byte-identical to the 100926.1 runner's.
+  - *The three anchors that find nothing.* The receipt counts each anchor in every QA-120 read this session holds.
+    - `reject-source-missing-rca` anchors on `` `QA_RCA_ID` ``. The plan's own HP-QA-120-01 (PART-07, coordinator C-9) replaced the paragraph that held it. The PASS handoff now names "the separate `QA_REPORT` and `QA_RCA` with their IDs", which is the validator's own intake marker (`QA_PASS_INTAKE_MARKERS`). The successor held the anchor once before its X6 write (revision 12:09:36Z) and holds it 0 times now (13:20:19Z). The body is the approved plan's text; the runner's anchor was not moved with it.
+    - `reject-source-absent-crd-class-branch` and `reject-source-duplicate-crd-class-branch` anchor on the HTML cell `` <td>`CRD`</td> ``. Today's fetch renders QA-120's class map as a Markdown pipe table. The cell occurs 0 times on the unedited 100926.1 page (revision 2026-10-12T02:29:51Z) and on the successor, and the pipe row `` | `PASS` | `CRD` | `` once on each.
+    - The validator reads either rendering (`qa_pass_class_rows`); these two cases read only HTML. The 100926.1 runner's own comment records the reverse flip in the precedent: its anchors had assumed the pipe rendering, and the live body then rendered as an HTML table. The installed 100926.1 runner's same case would also find nothing today.
+- **Why PLAN did not catch it.** A3 ran the runner without bodies and deferred every body-level case to EXECUTE, saying so: "QA-closure body cases need QA-120, CL-E-10 and CL-C-10 bodies): A5 and x12 in EXECUTE" ([plan/receipts-A3/A3-packages-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/plan/receipts-A3/A3-packages-102726.1.json)). X14 is the first run against the written bodies.
+- **Measured, not applied.** A scratch copy of the built flowmaster-validate was made, deleted after the run, with three substitutions:
+  - the RCA case anchored on "`QA_RCA` with their IDs";
+  - the absent-branch case deleting the CRD cell of the pipe row;
+  - the duplicate case finding the CRD row by line scan in the pipe rendering.
+
+  With the same 56 bodies, the copy passes:
+  - 323 cases, none failed;
+  - the 9 QA-closure source cases and 17 artifact-timing cases;
+  - section 13 at 54 of 54, its variants at 55 of 55.
+
+  The validator, the contracts, the bodies and the other three packages need no change.
+- **Read-only sweep.** Fresh reads after 16:00:09.298Z of 11 pages, 11 fetched with no error ([execute/x14-sweep-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x14-sweep-102726.1.json), `execute/x14_sweep_102726.py`): the register, the Flow Index, the five hubs, the HDE Change Flow Overview, the catalog, PE and the Glow Operations Hub.
+  - `control_check_102726.py --phase candidate` is `ok`, with 0 findings.
+  - The register's Current selection still names GCFPE-20261009.1 / 100926.1 / 55, and the catalog's staging frontmatter holds.
+  - Each control page is at its X9 revision; PE is at its X7 revision.
+  - The Glow Operations Hub's revision moved twice since X8, at 13:46:03Z (already seen at X8b) and 14:22:01Z, while its content stayed byte-equal to the X8 read. This run did not write it.
+  - The 56 members: X14's reads, with no revision moved since X7.
+- **What is live.**
+  - Notion: X9's state, unchanged. That is the 56 successors, PART-17's edits, the catalog (repaired, still staged), and the candidate sections and record. No selection change; 100926.1 is selected.
+  - Repository: this branch, in draft [amthorn78/glow-hdengine-v2#775](https://github.com/amthorn78/glow-hdengine-v2/pull/775).
+  - Skills: the four packages exist only in scratch; nothing is installed.
+- **Rules 3 and 4.** Rule 3's first condition holds. No live page is wrong, and P2 is not affected. Rule 4: 0 of the 2 storage-form amendments after the rehearsal are used, and about 4 h 50 min of the 30 h.
+- **The freeze is kept.** No Notion write follows until Nathan decides.
+- **The record reaches `main`** when #775 merges (D21-C).
+
+### Return to Nathan — 2026-10-27, after X14
+
+**EXECUTE stopped at X14. The 56 written bodies pass the shipped 102726.1 validator (56 validated, none unevaluated), but the shipped fixtures runner stops before its QA-closure body cases. Three of its mutation anchors name QA-120 text that is not on the page. With the three anchors moved on a scratch copy, all 323 cases pass. No live page is wrong, and 100926.1 is still selected. `DECISION NEEDED`.**
+
+| # | Question | Recommendation |
+|---|---|---|
+| 1 | How the runner is repaired | amendment AM-8, option A |
+| 2 | The record pull request | mark #775 ready and merge it as the record pull request |
+
+**1. The repair.** The runner carries three QA-120 anchors over from the 100926.1 runner.
+- `` `QA_RCA_ID` `` was removed by the plan's own HP-QA-120-01.
+- `` <td>`CRD`</td> `` assumes an HTML table, but Notion now fetches that table as a pipe table, on the old page too.
+
+The options:
+- **Option A, AM-8 (recommended).** Three named substitutions on the 100926.1 runner's QA-120 source cases, in `package_build_102726.py`'s step R. Each case keeps its expected error.
+  - The RCA case anchors on "`QA_RCA` with their IDs", the sentence HP-QA-120-01 wrote and the validator reads.
+  - The absent-branch case deletes the CRD class cell in whichever rendering the read carries, pipe or HTML.
+  - The duplicate case finds the CRD row by line scan, in either rendering.
+  - The step-R description and the runner's comments say what moved and why.
+  - *Then:* X13 again (build, check, package, two roots, every gate). Only flowmaster-validate's bytes and digest change. Then X14 again on a fresh read of the 56, and on to X18.
+  - *Coverage:* X17's reviewers and X23's `x18_validate_102726.py` run the same runner with bodies, so the fix covers them too.
+  - *Cost:* about 1 hour, plus about 1M tokens for the fresh read. No Notion write.
+- **Option B: the pipe rendering only.** The same, but the two table cases read only the pipe form, as measured. It is simpler, but if Notion renders the table as HTML again, as it has once before, the runner stops again.
+- **Option C: end the run here.** 100926.1 stays selected, the candidate stays staged in Notion, and the remaining work moves to MB-052. Not recommended: the defect is three anchors in one generated file.
+- **Counting.** AM-8 is a plan amendment for you to approve, not a rule-2 fix. I propose it does not count toward rule 4's two storage-form amendments.
+
+**2. Record pull request.** Draft #775 carries AM-5 to AM-7, X9b to X13, this record and its receipts.
+- **Mark it ready and merge it now (recommended).** The run continues on this branch, restarted from `main`, in a new pull request.
+- **Keep it open.** The X14 record stays off `main` until it merges.
+
+**Spend in EXECUTE so far.**
+- **Time:** about 4 h 50 min, 11:20Z to 16:10Z, of rule 4's 30 h.
+- **Tokens:** 8.7M of subagent tokens, measured from this session's workflow records, plus the coordinator's.
+
+**In one line, if you take the recommendations:** "AM-8 as described (option A), outside rule 4's count; I merge #775 as the record pull request."

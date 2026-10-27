@@ -1,0 +1,520 @@
+{
+ "mode": "plan-chain",
+ "phase": "sweep",
+ "stand_in": false,
+ "stand_in_ids": null,
+ "stand_in_marker_values": [
+  "@ACTIVATION_DATE",
+  "@ARCHIVAL_DATE",
+  "@PRODUCTION_TOKEN",
+  "@POSTFLIGHT_VERDICT",
+  "@D24_RECORDS",
+  "@PROMOTION_APPROVED_AT",
+  "@PROMOTION_D",
+  "@PROCEDURE_PR",
+  "@REGISTER_SELECTED_AT",
+  "@QUAL_VALIDATORS_PATH",
+  "@QUAL_FIXTURES_PATH",
+  "@QUAL_RECEIPT_PATHS",
+  "@INSTALL_RECEIPT",
+  "@PRODVAL_RECEIPT",
+  "@ARCHIVAL_RECEIPT"
+ ],
+ "map_parts_errors": [],
+ "pages": {
+  "3d24590a05eb81ce942ad994cfca9fa1": {
+   "name": "register",
+   "as_of": "2026-10-27T13:31:04.126Z",
+   "pin": "2026-10-27T13:31:04.126Z",
+   "revision_matches_pin": true,
+   "part17_guards_before": {
+    "G-W6-REG-F": {
+     "kind": "required",
+     "count": 2,
+     "pass": true,
+     "w6": 4,
+     "equals_w6": false
+    },
+    "G-W6-REG-RN": {
+     "kind": "required",
+     "count": 2,
+     "pass": true,
+     "w6": 0,
+     "equals_w6": false
+    }
+   },
+   "part17_before_equals_w6": false
+  },
+  "3db4590a05eb81de9736ea69bac61016": {
+   "name": "Flow Index",
+   "as_of": "2026-10-27T13:54:13.135Z",
+   "pin": "2026-10-27T13:54:13.135Z",
+   "revision_matches_pin": true
+  },
+  "3db4590a05eb81d59059eb6b95ed5fcf": {
+   "name": "hub HDE Change Flow",
+   "as_of": "2026-10-27T13:22:27.779Z",
+   "pin": "2026-10-27T13:22:27.779Z",
+   "revision_matches_pin": true
+  },
+  "3db4590a05eb8195a2ccf7c0959a8b6e": {
+   "name": "hub HDE IA",
+   "as_of": "2026-10-27T13:22:09.622Z",
+   "pin": "2026-10-27T13:22:09.622Z",
+   "revision_matches_pin": true
+  },
+  "3db4590a05eb814d96d3dcfa8835f96d": {
+   "name": "hub HDE QA",
+   "as_of": "2026-10-27T13:21:17.380Z",
+   "pin": "2026-10-27T13:21:17.380Z",
+   "revision_matches_pin": true
+  },
+  "3db4590a05eb81cd938de84cfffead9c": {
+   "name": "hub Escalation",
+   "as_of": "2026-10-27T13:11:05.410Z",
+   "pin": "2026-10-27T13:11:05.410Z",
+   "revision_matches_pin": true
+  },
+  "3db4590a05eb811b9c14f2ae89c28df7": {
+   "name": "hub HDE TW",
+   "as_of": "2026-10-27T13:11:38.789Z",
+   "pin": "2026-10-27T13:11:38.789Z",
+   "revision_matches_pin": true
+  },
+  "3db4590a05eb812f87caed515836687f": {
+   "name": "Alpha checklist",
+   "as_of": "2026-10-12T13:37:58.821Z",
+   "pin": "2026-10-12T13:37:58.821Z",
+   "revision_matches_pin": true
+  },
+  "3ce4590a05eb814f8892f88ff8539308": {
+   "name": "Glow Operations Hub",
+   "as_of": "2026-10-27T13:46:03.649Z",
+   "pin": "2026-10-27T13:46:03.649Z",
+   "revision_matches_pin": true,
+   "part17_guards_before": {
+    "G-W6-HUB-F": {
+     "kind": "forbidden",
+     "count": 0,
+     "pass": true,
+     "w6": 13,
+     "equals_w6": false
+    },
+    "G-W6-HUB-RH": {
+     "kind": "required",
+     "count": 4,
+     "pass": true,
+     "w6": 0,
+     "equals_w6": false
+    },
+    "G-W6-HUB-RN": {
+     "kind": "required",
+     "count": 2,
+     "pass": true,
+     "w6": 0,
+     "equals_w6": false
+    },
+    "G-W6-HUB-RP": {
+     "kind": "required",
+     "count": 2,
+     "pass": true,
+     "w6": 0,
+     "equals_w6": false
+    }
+   },
+   "part17_before_equals_w6": false
+  },
+  "3c74590a05eb811d8433e7022629e213": {
+   "name": "HDE Change Flow Overview",
+   "as_of": "2026-10-12T17:34:33.909Z",
+   "pin": "2026-10-12T17:34:33.909Z",
+   "revision_matches_pin": true
+  }
+ },
+ "phases": [
+  {
+   "phase": "candidate",
+   "pages": {
+    "3d24590a05eb81ce942ad994cfca9fa1": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    },
+    "3db4590a05eb81de9736ea69bac61016": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    },
+    "3db4590a05eb81d59059eb6b95ed5fcf": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    },
+    "3db4590a05eb8195a2ccf7c0959a8b6e": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    },
+    "3db4590a05eb814d96d3dcfa8835f96d": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    },
+    "3db4590a05eb81cd938de84cfffead9c": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    },
+    "3db4590a05eb811b9c14f2ae89c28df7": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "candidate",
+    "register_pending": false,
+    "pages_judged": 9,
+    "pages_ok": 9,
+    "findings": 0,
+    "failing": {}
+   }
+  },
+  {
+   "phase": "review",
+   "pages": {
+    "3db4590a05eb81de9736ea69bac61016": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "candidate",
+    "register_pending": false,
+    "pages_judged": 9,
+    "pages_ok": 9,
+    "findings": 0,
+    "failing": {}
+   }
+  },
+  {
+   "phase": "activation",
+   "pages": {
+    "3db4590a05eb81de9736ea69bac61016": {
+     "listed": 27,
+     "generated": 65,
+     "applied": 92,
+     "escaped_form": 9,
+     "refused": []
+    },
+    "3db4590a05eb81d59059eb6b95ed5fcf": {
+     "listed": 4,
+     "generated": 28,
+     "applied": 32,
+     "escaped_form": 8,
+     "refused": []
+    },
+    "3db4590a05eb8195a2ccf7c0959a8b6e": {
+     "listed": 2,
+     "generated": 31,
+     "applied": 33,
+     "escaped_form": 8,
+     "refused": []
+    },
+    "3db4590a05eb814d96d3dcfa8835f96d": {
+     "listed": 4,
+     "generated": 20,
+     "applied": 24,
+     "escaped_form": 8,
+     "refused": []
+    },
+    "3db4590a05eb81cd938de84cfffead9c": {
+     "listed": 2,
+     "generated": 14,
+     "applied": 16,
+     "escaped_form": 8,
+     "refused": []
+    },
+    "3db4590a05eb811b9c14f2ae89c28df7": {
+     "listed": 3,
+     "generated": 11,
+     "applied": 14,
+     "escaped_form": 8,
+     "refused": []
+    },
+    "3db4590a05eb812f87caed515836687f": {
+     "listed": 0,
+     "generated": 10,
+     "applied": 10,
+     "escaped_form": 8,
+     "refused": []
+    },
+    "@CATALOG_PAGE_ID": {
+     "listed": 8,
+     "generated": 0,
+     "applied": 8,
+     "escaped_form": 7,
+     "refused": []
+    },
+    "@PE_PAGE_ID": {
+     "listed": 5,
+     "generated": 0,
+     "applied": 5,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "activation",
+    "register_pending": true,
+    "pages_judged": 11,
+    "pages_ok": 11,
+    "findings": 0,
+    "failing": {}
+   }
+  },
+  {
+   "phase": "activation-done",
+   "pages": {
+    "@REGISTER_ENTRY_PAGE_ID": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "activation",
+    "register_pending": true,
+    "pages_judged": 11,
+    "pages_ok": 11,
+    "findings": 0,
+    "failing": {}
+   }
+  },
+  {
+   "phase": "register",
+   "pages": {
+    "3d24590a05eb81ce942ad994cfca9fa1": {
+     "listed": 6,
+     "generated": 0,
+     "applied": 6,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "activation",
+    "register_pending": false,
+    "pages_judged": 11,
+    "pages_ok": 11,
+    "findings": 0,
+    "failing": {}
+   }
+  },
+  {
+   "phase": "register-done",
+   "pages": {
+    "@REGISTER_ENTRY_PAGE_ID": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "activation",
+    "register_pending": false,
+    "pages_judged": 11,
+    "pages_ok": 11,
+    "findings": 0,
+    "failing": {}
+   }
+  },
+  {
+   "phase": "install-done",
+   "pages": {
+    "@REGISTER_ENTRY_PAGE_ID": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "activation",
+    "register_pending": false,
+    "pages_judged": 11,
+    "pages_ok": 11,
+    "findings": 0,
+    "failing": {}
+   }
+  },
+  {
+   "phase": "prodval-done",
+   "pages": {
+    "@REGISTER_ENTRY_PAGE_ID": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "activation",
+    "register_pending": false,
+    "pages_judged": 11,
+    "pages_ok": 11,
+    "findings": 0,
+    "failing": {}
+   }
+  },
+  {
+   "phase": "archived",
+   "pages": {
+    "3db4590a05eb81de9736ea69bac61016": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 1,
+     "refused": []
+    },
+    "@REGISTER_ENTRY_PAGE_ID": {
+     "listed": 1,
+     "generated": 0,
+     "applied": 1,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "archived",
+    "register_pending": false,
+    "pages_judged": 11,
+    "pages_ok": 11,
+    "findings": 0,
+    "failing": {}
+   }
+  },
+  {
+   "phase": "sweep",
+   "pages": {
+    "3ce4590a05eb814f8892f88ff8539308": {
+     "listed": 2,
+     "generated": 0,
+     "applied": 2,
+     "escaped_form": 0,
+     "refused": []
+    },
+    "3c74590a05eb811d8433e7022629e213": {
+     "listed": 2,
+     "generated": 0,
+     "applied": 2,
+     "escaped_form": 0,
+     "refused": []
+    }
+   },
+   "control": {
+    "phase_rules": "sweep",
+    "register_pending": false,
+    "pages_judged": 13,
+    "pages_ok": 13,
+    "findings": 0,
+    "failing": {}
+   }
+  }
+ ],
+ "from_phase": "candidate",
+ "read_only_pins": {
+  "3f74590a05eb812db385c2544d7570f7": {
+   "as_of": "2026-10-12T13:28:07.573Z",
+   "pin": "2026-10-12T13:28:07.573Z",
+   "revision_matches_pin": true
+  }
+ },
+ "prior_phases_landed": {
+  "3d24590a05eb81ce942ad994cfca9fa1": {
+   "listed": 3,
+   "not_landed": []
+  },
+  "3db4590a05eb81de9736ea69bac61016": {
+   "listed": 0,
+   "not_landed": []
+  },
+  "3db4590a05eb81d59059eb6b95ed5fcf": {
+   "listed": 0,
+   "not_landed": []
+  },
+  "3db4590a05eb8195a2ccf7c0959a8b6e": {
+   "listed": 0,
+   "not_landed": []
+  },
+  "3db4590a05eb814d96d3dcfa8835f96d": {
+   "listed": 0,
+   "not_landed": []
+  },
+  "3db4590a05eb81cd938de84cfffead9c": {
+   "listed": 0,
+   "not_landed": []
+  },
+  "3db4590a05eb811b9c14f2ae89c28df7": {
+   "listed": 0,
+   "not_landed": []
+  },
+  "3db4590a05eb812f87caed515836687f": {
+   "listed": 0,
+   "not_landed": []
+  },
+  "3ce4590a05eb814f8892f88ff8539308": {
+   "listed": 21,
+   "not_landed": []
+  },
+  "3c74590a05eb811d8433e7022629e213": {
+   "listed": 0,
+   "not_landed": []
+  }
+ },
+ "new_pages": {
+  "CATALOG": {
+   "markers_left": 0,
+   "rows": 56,
+   "chars": 13503
+  },
+  "REGISTER_ENTRY": {
+   "markers_left": 0
+  }
+ },
+ "moves": {
+  "P5": 57,
+  "distinct": 57,
+  "equal_to_control_archive_set": true
+ },
+ "totals": {
+  "listed": 79,
+  "generated": 179,
+  "applied": 258,
+  "refused": 0
+ },
+ "ok": true
+}
