@@ -987,3 +987,28 @@ EXECUTE stops at X4, before X5's first body write. X4's verification is not met 
 - That is inside the 18–30 h and 16–26M re-price.
 
 **In one line, if you take the recommendations:** "AM-2 as described (option A); I merge #771 as the record pull request."
+
+### Nathan's decisions after X4 — 2026-10-27
+
+Nathan's words:
+
+> "AM-2 as described (option A), with one addition: before X5, run the plan's dry run (plan/dry_run_102726.py) once, read-only, on the real successor map and the X4 reads with AM-1 and AM-2 applied, and record its gates in §E. If it fails, stop and return before any body write. If the tool cannot take the real map without a code change, record that and continue to X5. I have merged #771 as the record pull request; continue on a branch restarted from main, in a new pull request."
+
+**Applied.**
+
+- **The record pull request.** #771 merged as `f480456`, detected by files on `main` (D26-C): the X4 failure record, the successor map and AM-1 are on `main`, and `main`'s tree equals the branch's (`ddcfffbb…`). The branch was restarted from `main` at `f480456` and pushed fresh. The run continues in a new pull request.
+- **AM-2**, in [plan/binding_pass.py](evidence/20261027-gcfpe-backlog-open-items/plan/binding_pass.py), committed before any body write.
+  - *The rule.* `generate`'s C-9 test ("a line already carrying 102726.1 is skipped") ignores the page's own successor self-mention. A line whose only "102726.1" is that self-mention, remapped by Notion, still has its stale citations rewritten. A line carrying any other "102726.1" is skipped exactly as before, so the self-test's existing C-9 case is unchanged.
+  - *Self-test.* `binding_pass.py selftest`: `ok`, 32 checks. Three AM-2 cases are added, each true:
+    - a remapped own self-mention line with a stale own `<code>` title gets one operation and is clean after;
+    - a line with another member's "102726.1" is still skipped;
+    - after the operation, the line is current.
+  - `body_check.py selftest`: `ok`; 118 guards; 377 fixture rows, none failing.
+- **X4 rerun** on the same reads (after 12:23:13.860Z; nothing was written since), `body_check.py plan --no-ops --successor-map <map> --with-conditional R-P1 R-P2`: `ok`, 57 of 57 pages ([execute/x4-plan-am2-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x4-plan-am2-102726.1.json)).
+  - Revisions: 57 at their map pins.
+  - Operations: 1,190, of which 1,136 apply once and 54 are `SATISFIED_BY_DUPLICATION`; none is left unapplied.
+  - Pages: 57 batches safe, 57 landing checks would pass, 57 bindings current, 0 unresolved.
+  - Markup and references: 0 markup spans refused, 0 references dropped.
+  - Guard rows: 756, of which 295 fail before and 0 after.
+  - Only CL-E-20 and DOC-10 changed against the first X4 run, each gaining one binding operation.
+- **The dry run before X5, Nathan's addition.** Its result is recorded below as X4b, before any body write.
