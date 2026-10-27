@@ -163,6 +163,18 @@ QA_PASS_ROW_HTML_RE = re.compile(
     re.S,
 )
 CLOSE_SET_REPAIR_SENTENCE_RE = re.compile(r"(?i)close-tooling defect is CL-05's to repair, not ESC-30 work")
+# QA-120's PASS handoff goes to CL-05 and names what PF06 §3.5.1 makes the close-mutation-set stage's input: the
+# final QA Report with verdict PASS (with its separate RCA) and the change ID; the stage resolves the rest from the
+# change's records (MODIFICATION-20261027 C-18, D13: the validator follows the body, the body follows canon). The body
+# is checked in its Markdown form (C-15: callers supply normalize_fetch.normalize(read)).
+QA_PASS_INTAKE_MARKERS = (
+    "CL-05's Close Implementer",
+    "the change ID",
+    "by repository path, the separate `QA_REPORT` and `QA_RCA` with their IDs",
+    "the PF10 and addendum lineage, the Product Owner publication state and the rescope, remediation and "
+    "unresolved-finding lineage",
+    "Read CL-05's complete intake before emitting its one handoff.",
+)
 
 
 def qa_pass_class_rows(producer: str) -> list[tuple[str, str, str, str]]:
@@ -194,12 +206,7 @@ def validate_qa_closure_bodies(bodies: dict[str, str], contract: dict[str, Any])
             or "without a closure handoff" not in producer
             or "Do not infer a class" not in producer):
         errors.append("QA_CLASS_UNRESOLVED_HANDOFF")
-    if any(marker not in producer for marker in (
-        "`QA_REPORT_ID`", "`QA_RCA_ID`", "Implementation Plan/review",
-        "Ops receipts/documentation completion", "QA-10 Reality Audit",
-        "Change Audit Triage", "continuing Isis", "existing Strategy Card",
-        "A CRD has no Strategy Card requirement.",
-    )):
+    if any(marker not in producer for marker in QA_PASS_INTAKE_MARKERS):
         errors.append("QA_PASS_BODY_INTAKE")
     for cls, destination in exits.items():
         receiver = bodies.get(destination, "")
@@ -547,24 +554,25 @@ def _graph_block(md: Path) -> str:
 
 
 def timing_standin(fv_scripts: Path) -> dict:
-    """Scratch stand-in for the merged package redline W7-D4 describes: W5's SR-FV-20 (EXPECTED_POLICY_20261027 with
-    CL-05's stage category and a policy argument) with W4's SR-4 QA_PLAN_REVIEW value moved into the 20261027 policy
-    rather than into EXPECTED_POLICY. EXECUTE's package build owns the real text."""
-    w5 = json.loads((HERE / "work/W5.json").read_text(encoding="utf-8"))
+    """Scratch stand-in for flowmaster-validate's timing module in EXECUTE's package build: the assembled SR-FV-20 op
+    from plan/package-redlines.json (C-20: EXPECTED_POLICY_20261027 with W4's QA_PLAN_REVIEW value and W5's CL-05
+    category, the same text the package build applies), applied with its count. W4 SR-3/SR-4 are not applied as
+    written, so EXPECTED_POLICY is unchanged."""
+    reds = json.loads((HERE / "package-redlines.json").read_text(encoding="utf-8"))
+    op = next(o for o in reds["ops"] if o["id"] == "SR-FV-20")
     w4 = json.loads((HERE / "work/W4.json").read_text(encoding="utf-8"))
-    sr20 = next(r for r in w5["skill_redlines"] if r["id"] == "SR-FV-20")
     sr4 = next(r for r in w4["skill_redlines"] if r["id"] == "SR-4")
-    p = fv_scripts / "validate_gcfpe_artifact_timing.py"
+    p = fv_scripts / op["file"].split("/", 1)[1]
     text = p.read_text(encoding="utf-8")
-    assert text.count(sr20["old"]) == 1 and text.count(sr4["old"]) == 1
-    text = text.replace(sr20["old"], sr20["new"])
-    new_birth = re.search(r"'QA_PLAN_REVIEW': (\{.*\})$", sr4["new"]).group(1)
-    anchor = "EXPECTED_POLICY_20261027 = {**EXPECTED_POLICY, "
-    assert text.count(anchor) == 1
-    text = text.replace(anchor, anchor + "'qa_artifact_births': {**EXPECTED_POLICY['qa_artifact_births'], "
-                        "'QA_PLAN_REVIEW': " + new_birth + "}, ")
+    assert op["skill"] == "flowmaster-validate" and text.count(op["old"]) == op["count"] == 1
+    text = text.replace(op["old"], op["new"])
     p.write_text(text, encoding="utf-8")
-    return {"sr_fv_20_applied": True, "w4_sr4_value_in_20261027_policy": True, "expected_policy_unchanged": True}
+    line = next(l for l in op["new"].splitlines() if l.startswith("EXPECTED_POLICY_20261027 = "))
+    new_birth = re.search(r"'QA_PLAN_REVIEW': (\{.*\})$", sr4["new"]).group(1)
+    return {"sr_fv_20_from_package_redlines": True,
+            "w4_value_in_20261027_policy": ("'QA_PLAN_REVIEW': " + new_birth) in line,
+            "cl05_category_in_20261027_policy": "'CL-05': 'CLOSE_MUTATION_SET'" in line,
+            "expected_policy_unchanged": text.count(sr4["old"]) == 1 and text.count(sr4["new"]) == 1}
 
 
 def cmd_dryrun(argv: list[str]) -> int:
@@ -588,7 +596,7 @@ def cmd_dryrun(argv: list[str]) -> int:
         shutil.copytree(S / k, W / k, ignore=shutil.ignore_patterns("__pycache__"))
     rec = {"stand_in_used": smap.get("stand_in") is True,
            "stand_ins": ["successor map" if smap.get("stand_in") else None,
-                         "plan file " + a.plan, "EXPECTED_POLICY_20261027 (timing_standin)",
+                         "plan file " + a.plan, "EXPECTED_POLICY_20261027 (timing_standin: package-redlines.json SR-FV-20, C-20)",
                          "fixtures: the 100926.1 scenarios with release fields moved (package build adds cases)",
                          "change-flow SKILL.md and glow-hde-pr-development as installed (revisions move in EXECUTE)"]}
     rec["timing_standin"] = timing_standin(fv / "scripts")
@@ -648,7 +656,7 @@ def cmd_dryrun(argv: list[str]) -> int:
                                                "redlines in EXECUTE's package build; SKILL_TREE_SHA256 is recomputed last "
                                                "(I step), so the scratch tree's self-identity differs"}
     rec["regressions"] = regressions(fv, cf, names, smap)
-    rec["ok"] = (not unexpected and all(rec["regressions"].values()))
+    rec["ok"] = (not unexpected and all(rec["regressions"].values()) and all(rec["timing_standin"].values()))
     print(json.dumps(rec, indent=1))
     return 0 if rec["ok"] else 1
 
@@ -743,6 +751,19 @@ def regressions(fv: Path, cf: Path, names: dict, smap: dict) -> dict:
     rows["close_set_repair_sentence_present_passes"] = "QA_CLOSE_SET_REPAIR_ROUTE_BODY:CL-C-10" not in rec
     rows["close_set_repair_sentence_removed_fails"] = "QA_CLOSE_SET_REPAIR_ROUTE_BODY:CL-C-10" in V.validate_qa_closure_bodies(
         {"QA-120": good, "CL-C-10": "nothing"}, base)
+    # C-18: the PASS intake markers are the CL-05 handoff wording (PF06 §3.5.1), in the Markdown form (C-15)
+    intake = ("For either PASS branch, the handoff names CL-05's Close Implementer and the inputs CL-05's intake reads: "
+              "the change ID and, by repository path, the separate `QA_REPORT` and `QA_RCA` with their IDs; the artifacts "
+              "hold the PF10 and addendum lineage, the Product Owner publication state and the rescope, remediation and "
+              "unresolved-finding lineage. Read CL-05's complete intake before emitting its one handoff.\n")
+    rows["qa_pass_intake_cl05_wording_passes"] = "QA_PASS_BODY_INTAKE" not in V.validate_qa_closure_bodies(
+        {"QA-120": good + intake}, base)
+    rows["qa_pass_intake_rejects_dropped_change_id"] = "QA_PASS_BODY_INTAKE" in V.validate_qa_closure_bodies(
+        {"QA-120": good + intake.replace("the change ID and, ", "")}, base)
+    rows["qa_pass_intake_rejects_fetch_form_unnormalized"] = "QA_PASS_BODY_INTAKE" in V.validate_qa_closure_bodies(
+        {"QA-120": good + intake.replace("`QA_REPORT`", "<code>QA\\_REPORT</code>")}, base)
+    rows["qa_pass_intake_rejects_old_isis_wording"] = "QA_PASS_BODY_INTAKE" in V.validate_qa_closure_bodies(
+        {"QA-120": good + "address the actual continuing Isis session; `QA_REPORT_ID`, `QA_RCA_ID`.\n"}, base)
     return rows
 
 

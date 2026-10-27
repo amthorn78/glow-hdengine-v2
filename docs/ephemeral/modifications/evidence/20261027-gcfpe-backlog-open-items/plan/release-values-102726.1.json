@@ -272,6 +272,24 @@
     "rs20_returns_only_from_recorded_pr20_planning_origin_before_proceed"
    ],
    true
+  ],
+  [
+   "set",
+   [
+    "member_registry",
+    "CL-05",
+    "staged_parent_id"
+   ],
+   "@CL05_PARENT_ID"
+  ],
+  [
+   "set",
+   [
+    "notion_page_manifest",
+    "CL-05",
+    "parent_id"
+   ],
+   "@CL05_PARENT_ID"
   ]
  ],
  "sources": {
@@ -284,6 +302,7 @@
   "merge_pending_requirements": "W1-Q1: PR-35's readiness gains 'no open P1 thread on a real input' (PF06 §1.1.4); the release-values file, not the regenerator's value table, carries it (W7-D5).",
   "historical_non_executable_references": "W5 Q-4: the 2026-10-27 oracle and map become current; the 2026-09-23 pair joins the historical list (Q-W7-5).",
   "receiver_compatibility.PR-20": "Carried from release-values-100926.1 (F09); the 4.0.6 template lacks it, so each release's file repeats it.",
-  "record": "Written by contracts_102726.py values from W7.json repo_edits RE-W7-01; coordinator decisions C-7 (merge_pending_requirements) and C-11 (historical references) checked."
+  "member_registry.CL-05.staged_parent_id, notion_page_manifest.CL-05.parent_id": "C-19: the sole added member has no template-carried parent; @CL05_PARENT_ID is the successor map's CL-05 parent_id (the HDE Change Flow hub it is moved under, C-9), filled by contracts_102726.py fill. The 55 carried members keep their template-carried staged_parent_id and parent_id, as 100926.1 did.",
+  "record": "Written by contracts_102726.py values from W7.json repo_edits RE-W7-01; coordinator decisions C-7 (merge_pending_requirements) and C-11 (historical references) checked; C-19's two CL-05 parent ops added (repair R2)."
  }
 }

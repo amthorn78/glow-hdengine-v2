@@ -16,6 +16,12 @@ the coordinator's decisions (plan/coordinator-decisions.md) mechanically:
   W5     count-0 entries are new files (SR-CF-8, SR-FV-35, SR-FV-36: written by build_r1_successor_20261027.py and
          bundled by the package build); SR-FV-34's prose is made a concrete count-checked insertion here.
 
+  C-19   (repair R2) the bounded regenerator exception for CL-05's staged parent: contracts_102726.py's
+         C19_GG_REDLINES, typed once there and appended here after A3-C2..C4, so the glow-graph-contract package
+         carries the same patch the contracts dry run applies.
+  C-20   (repair R2) W4's QA_PLAN_REVIEW value and W5's CL-05 category in EXPECTED_POLICY_20261027, identical in the
+         change-flow (SR-CF-9) and flowmaster-validate (SR-FV-20) timing modules: refused otherwise.
+
   make_package_redlines_102726.py            write plan/package-redlines.json
   make_package_redlines_102726.py --check    rebuild in memory; exit 1 unless the file on disk is byte-identical
   make_package_redlines_102726.py --selftest each injected defect in a worker input must be refused
@@ -144,6 +150,18 @@ A3_CORRECTIONS = [
 ]
 
 
+def c19_redlines() -> list:
+    """C-19's regenerator redlines, from contracts_102726.py (the one place they are typed)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("contracts_102726", HERE / "contracts_102726.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.C19_GG_REDLINES
+
+
+C20_CATEGORY = "'CL-05': 'CLOSE_MUTATION_SET'"
+
+
 def sha256_file(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
@@ -245,6 +263,22 @@ def merge(W: dict) -> dict:
         ops.append(op(r["id"], r["part"], source, r["package"], r["file"], r["old"], new, r["count"], why))
     for r in A3_CORRECTIONS:
         ops.append(op(r["id"], r["part"], r["source"], r["skill"], r["file"], r["old"], r["new"], r["count"], r["why"]))
+    # C-20: one EXPECTED_POLICY_20261027 in both packages, carrying W4's QA_PLAN_REVIEW value and W5's CL-05 category
+    timing = {o["id"]: o for o in ops if o["id"] in ("SR-CF-9", "SR-FV-20")}
+    lines = {k: [l for l in o["new"].splitlines() if l.startswith("EXPECTED_POLICY_20261027 = ")] for k, o in timing.items()}
+    if (set(timing) != {"SR-CF-9", "SR-FV-20"} or timing["SR-CF-9"]["new"] != timing["SR-FV-20"]["new"]
+            or any(len(v) != 1 for v in lines.values())
+            or any(("'QA_PLAN_REVIEW': " + birth) not in v[0] or C20_CATEGORY not in v[0] for v in lines.values())
+            or (timing["SR-CF-9"]["skill"], timing["SR-FV-20"]["skill"]) != ("change-flow", "flowmaster-validate")):
+        raise SystemExit("C-20: EXPECTED_POLICY_20261027 must carry W4's QA_PLAN_REVIEW value and W5's CL-05 category, "
+                         "identically in change-flow and flowmaster-validate")
+    # C-19: the bounded regenerator exception (repair R2), last
+    for r in c19_redlines():
+        ops.append(op(r["id"], "PART-13", "C-19 (repair R2); contracts_102726.py C19_GG_REDLINES", "glow-graph-contract",
+                      r["file"], r["old"], r["new"], r["count"],
+                      "C-19: CL-05, the sole added member, has no template-carried staged parent; the regenerator admits "
+                      "exactly its member_registry staged_parent_id and notion_page_manifest parent_id from the "
+                      "release-values file (filled from the successor map) and requires them"))
     ids = [o["id"] for o in ops]
     if len(ids) != len(set(ids)):
         raise SystemExit("duplicate op id")
@@ -268,7 +302,9 @@ def merge(W: dict) -> dict:
                               "W7-D2: four packages", "W7-D3: change-flow 3.5.0, flowmaster-validate 3.5.0, glow-hde-pr-development 1.5.0",
                               "W7-D4: W4 SR-3/SR-4 merged into EXPECTED_POLICY_20261027",
                               "W7: SR-W7-FV-11 replaces SR-FV-29; SR-W7-* after every worker op",
-                              "A3-C1 (SR-W7-FV-11 corrected in place) and A3-C2..C4 (last): found by the scratch suite run; each needs the coordinator's acceptance"],
+                              "A3-C1 (SR-W7-FV-11 corrected in place) and A3-C2..C4: found by the scratch suite run; accepted (C-22)",
+                              "C-19 (repair R2): the bounded regenerator exception for CL-05's staged parent, last",
+                              "C-20 (repair R2): EXPECTED_POLICY_20261027 checked identical in both packages with W4's value and W5's CL-05 category"],
         "sources": {f"plan/work/{w}.json": sha256_file(WORK / f"{w}.json") for w in ("W1", "W3a", "W4", "W5", "W7")},
         "op_counts": {"total": len(ops), **{p: sum(o["skill"] == p for o in ops) for p in PACKAGES}},
         "ops": ops,
@@ -312,9 +348,20 @@ def selftest() -> dict:
     rows["timing_ops_carry_w4_value"] = all("APPROVED_QA_PLAN_WITH_DELIVERED_CHANGE" in o["new"] and "'QA_PLAN_REVIEW': {'after': 'COMPLETE_PENDING_QA_PLAN_OR_EXPLICIT" not in o["new"]
                                             for o in doc["ops"] if o["id"] in ("SR-CF-9", "SR-FV-20"))
     rows["r_p1_not_in_ops"] = not any(i.startswith("RP1-") for i in ids)
-    n = len(A3_CORRECTIONS)
-    rows["w7_then_a3_corrections_last"] = (ids[-32 - n:-n] == [r["id"] for r in base["W7"]["skill_redlines"]]
-                                           and ids[-n:] == [r["id"] for r in A3_CORRECTIONS])
+    n, k = len(A3_CORRECTIONS), len(c19_redlines())
+    rows["w7_then_a3_corrections_last"] = (ids[-32 - n - k:-n - k] == [r["id"] for r in base["W7"]["skill_redlines"]]
+                                           and ids[-n - k:-k] == [r["id"] for r in A3_CORRECTIONS])
+    rows["c19_ops_last_in_glow_graph_contract"] = (ids[-k:] == [r["id"] for r in c19_redlines()] and k == 3
+                                                   and all(o["skill"] == "glow-graph-contract" for o in doc["ops"][-k:]))
+    rows["timing_ops_identical_with_cl05_category"] = len({o["new"] for o in doc["ops"] if o["id"] in ("SR-CF-9", "SR-FV-20")}) == 1 \
+        and all(C20_CATEGORY in o["new"] for o in doc["ops"] if o["id"] in ("SR-CF-9", "SR-FV-20"))
+
+    def drop_category(W):
+        r = next(r for r in W["W5"]["skill_redlines"] if r["id"] == "SR-FV-20")
+        r["new"] = r["new"].replace(", 'CL-05': 'CLOSE_MUTATION_SET'", "")
+    rows["rejects_timing_policy_without_cl05_category"] = refused(drop_category)
+    rows["rejects_timing_ops_that_differ"] = refused(lambda W: next(r for r in W["W5"]["skill_redlines"] if r["id"] == "SR-CF-9").__setitem__(
+        "new", next(r for r in W["W5"]["skill_redlines"] if r["id"] == "SR-CF-9")["new"] + "\n"))
     return {"mode": "selftest", "rows": rows, "selftest_ok": all(rows.values())}
 
 

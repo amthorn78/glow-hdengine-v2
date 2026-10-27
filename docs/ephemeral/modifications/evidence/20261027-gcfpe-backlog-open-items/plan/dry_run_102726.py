@@ -10,6 +10,7 @@ booleans only.
 
     PYTHONDONTWRITEBYTECODE=1 CLAUDE_CODE_SESSION_ID=<session> python3 dry_run_102726.py run \\
         <installed-skills-root> <scratch> <fetched-after> [--map <successor map>] [--receipt <dry-run.json>]
+        [--worker <id>] [--previous-receipt <earlier dry-run receipt>]
     PYTHONDONTWRITEBYTECODE=1 python3 dry_run_102726.py selftest <scratch>
 
 <fetched-after> is an ISO UTC time (with milliseconds) taken just before this session fetched every page in
@@ -23,6 +24,14 @@ N8 the four packages and their own gates (run before N7, which needs the built t
 built 102726.1 profile with the edits applied in memory, N9 the registry with every row's assertions run on the
 edited bodies, N10 activation render and control check. `selftest` shows that each check this file adds (beyond the
 tools it calls) fails on an injected defect.
+
+C-15 (repair R2): N7 and N9 give the 102726.1 profile and every registry assertion normalize_fetch.normalize(body) (the
+Markdown form), never the raw fetch form; operations are still applied to the raw read, because update_content
+matches the fetch's own form. The raw form is kept only as a named diagnostic row. C-19: N5 passes the successor map
+to contracts_102726.py run, which fills CL-05's staged parent from it.
+
+R3: N8 also runs the self-tests of the two EXECUTE qualification scripts R2 added (x12_qualify_102726.py with the
+built root, x18_validate_102726.py) and counts them in N8's flag (qualify_selftests; self-tested here).
 """
 from __future__ import annotations
 
@@ -39,6 +48,8 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[5]
+sys.path.insert(0, str(HERE))
+import normalize_fetch as nf  # noqa: E402
 EVID = HERE.parent
 SESSION = os.environ.get("CLAUDE_CODE_SESSION_ID", "")
 PY = sys.executable
@@ -127,14 +138,14 @@ def body_classes(errors: list) -> list:
     return sorted({e.split(":")[0] for e in errors if e.startswith("PROMPT")})
 
 
-def markdown_form(text: str) -> str:
-    """DIAGNOSTIC ONLY, never a gate input: the fetched text with Notion's inline markup (<code>, <b>/<strong>,
-    <i>/<em>, the escaped underscore) rewritten as Markdown, the rendering the 100926.1 registry's inherited
-    assertions and the profile's backtick-only checks were written for."""
-    text = re.sub(r"</?code>", "`", text)
-    text = re.sub(r"</?(?:b|strong)>", "**", text)
-    text = re.sub(r"</?(?:i|em)>", "*", text)
-    return text.replace("\\_", "_")
+def check_text(text: str) -> str:
+    """C-15: the one text form every profile body check and registry assertion sees (normalize_fetch.normalize)."""
+    return nf.normalize(text)
+
+
+def profile_payload(bodies: dict) -> str:
+    """The --bodies-stdin payload for the 102726.1 profile: every body in its normalized form (C-15)."""
+    return json.dumps({k: check_text(v) for k, v in bodies.items()})
 
 
 def probe_contract(src: Path, dst: Path, standin_map: dict, probe_map: dict) -> int:
@@ -211,6 +222,20 @@ def row_assertions(A, row: dict, after: str) -> dict:
                                                             "forbidden_regex")),
             "findings_after": len(findings), "finding_ids": failing_ids[:12], "injected_fired": fired,
             "injected_missed": missed, "ok": not findings and not missed}
+
+
+def qualify_gate(x12: tuple, x18: tuple) -> dict:
+    """R3: the EXECUTE qualification scripts R2 added (x12 with the built root, x18) must pass their own self-tests on
+    the built packages; each argument is (exit, parsed result)."""
+    rows = {}
+    for name, (c, res) in (("x12_qualify_102726.selftest", x12), ("x18_validate_102726.selftest", x18)):
+        rows[name] = {"exit": c, "ok": res.get("ok"), "rows_false": [k for k, v in (res.get("rows") or {}).items() if v is not True],
+                      "rows": len(res.get("rows") or {})}
+    rows["x12_built_intake_rows_present"] = {"built_intake_passes_normalized", "built_intake_injected_raw_fails"} <= \
+        set((x12[1].get("rows") or {}))
+    rows["ok"] = all(r["exit"] == 0 and r["ok"] is True and not r["rows_false"] and r["rows"] > 0
+                     for k, r in rows.items() if k.endswith(".selftest")) and rows["x12_built_intake_rows_present"]
+    return rows
 
 
 def load_engine(audit_root: Path):
@@ -382,7 +407,8 @@ def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) 
     c_v, vv = jrun([PY, HERE / "contracts_102726.py", "values", REPO, "--check"])
     oracle = r1 / "oracle-glow-hde-canonical-change-flow-r1-20261027.json"
     c_cr, cr = jrun([PY, HERE / "contracts_102726.py", "run", REPO, base, a2, a2 / "candidate-102726.1.md",
-                     a2 / "production-102726.1.md", oracle, plan_file, *(["--stand-in"] if stand_in else [])])
+                     a2 / "production-102726.1.md", oracle, plan_file, "--map", map_path,
+                     *(["--stand-in"] if stand_in else [])])
     if (a2 / "contracts/graph-100926.1.md").exists():
         shutil.copyfile(a2 / "contracts/graph-100926.1.md", a2 / "graph-100926.1.md")
     gates["N5_contracts_regenerator"] = {
@@ -394,6 +420,7 @@ def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) 
         "contracts.run.ok": cr.get("ok"), "Q1_PASS": (cr.get("Q1") or {}).get("Q1_PASS"),
         "Q5_checks_false": [k for k, v in (cr.get("Q5_checks") or {}).items() if not v],
         "injected_refusals_false": [k for k, v in (cr.get("injected_refusals") or {}).items() if not v],
+        "c19_listed": cr.get("c19_listed"),
         "contract_digests": {k: {x: v.get(x) for x in ("exit", "bytes", "sha256")} for k, v in (cr.get("contracts") or {}).items()},
         "ok": c_r1b == 0 and c_r1s == 0 and c_v == 0 and c_cr == 0 and cr.get("ok") is True}
 
@@ -414,6 +441,8 @@ def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) 
     c8, _, e8 = run([PY, HERE / "a3_package_dryrun_102726.py", base, a3, "--a2", a2, "--map", map_path,
                      "--receipt", scratch / "a3-packages.json"], timeout=7200)
     p8 = json.loads((scratch / "a3-packages.json").read_text(encoding="utf-8")) if (scratch / "a3-packages.json").exists() else {}
+    q8 = qualify_gate(jrun([PY, HERE / "x12_qualify_102726.py", "selftest", a3 / "suite"]),
+                      jrun([PY, HERE / "x18_validate_102726.py", "selftest"]))
     gates["N8_packages"] = {
         "a3_package_dryrun.exit": c8, "stderr_tail": e8.strip()[-300:] or None,
         **{f"{g}.ok": (p8.get(g) or {}).get("ok") for g in ("G1_redlines", "G2_build", "G3_suite", "G4_release_validators",
@@ -424,9 +453,13 @@ def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) 
         "G4.cf_validate_gcfpe_20261027": (p8.get("G4_release_validators") or {}).get("cf_validate_gcfpe_20261027"),
         "G4.cf_validate_diagnostic_with_cl05_parent": (p8.get("G4_release_validators") or {}).get("cf_validate_gcfpe_20261027_diagnostic_with_cl05_parent"),
         "real_errors": p8.get("real_errors"), "built_digests": (p8.get("G2_build") or {}).get("built_digests"),
-        "ok": bool(p8) and all((p8.get(g) or {}).get("ok") is True for g in
-                                ("G1_redlines", "G2_build", "G4_release_validators", "G5_contracts", "G6_injections"))
-        and (p8.get("G3_suite") or {}).get("ok_except_preexisting") is True and not p8.get("real_errors")}
+        "G3_suite.c21_unchanged_suite_findings_are_the_named_three": (p8.get("G3_suite") or {}).get("c21_unchanged_suite_findings_are_the_named_three"),
+        "G3_suite.c21_built_suite_findings_are_the_named_three": (p8.get("G3_suite") or {}).get("c21_built_suite_findings_are_the_named_three"),
+        "qualify_selftests": q8,
+        # C-21: G3's ok is its stated condition (no finding from this change; the three named pre-existing ones only)
+        "ok": bool(p8) and q8["ok"] and all((p8.get(g) or {}).get("ok") is True for g in
+                                ("G1_redlines", "G2_build", "G3_suite", "G4_release_validators", "G5_contracts", "G6_injections"))
+        and not p8.get("real_errors")}
 
     # N7 all 56 bodies through the built 102726.1 profile, unedited and edited ----------------------------------
     sys.path.insert(0, str(HERE))
@@ -461,15 +494,17 @@ def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) 
             if name == "after_probe_ids":
                 contract = scratch / "probe-contract-102726.1.json"
                 n7["probe_contract_members_rebound"] = probe_contract(cf / CF_REL, contract, B.STATE["map"], m)
-            forms = {"fetched": bodies}
-            if name == (("after_probe_ids" if probe_map is not None else "after_stand_in_map")):
-                forms["markdown_form_diagnostic"] = {k: markdown_form(v) for k, v in bodies.items()}
-            for form, payload in forms.items():
+            forms = {"normalized": profile_payload(bodies)}
+            if name in ("before", ("after_probe_ids" if probe_map is not None else "after_stand_in_map")):
+                forms["raw_fetch_form_diagnostic"] = json.dumps(bodies)
+            for form, payload_text in list(forms.items()):
+                payload = json.loads(payload_text)
                 c7, res = jrun([PY, "scripts/validate_gcfpe_20261027.py", cf, "--contract", contract, "--bodies-stdin"],
-                               cwd=fv, inp=json.dumps(payload))
+                               cwd=fv, inp=payload_text)
+                del payload_text
                 errs = res.get("errors", []) or []
                 berrs = [e for e in errs if e.startswith("PROMPT")]
-                key = name if form == "fetched" else name + "__markdown_form_diagnostic"
+                key = name if form == "normalized" else name + "__raw_fetch_form_diagnostic"
                 scoped = [e for e in errs if e.startswith(BODY_SCOPED_PREFIXES)]
                 contract_errs = [e for e in errs if not e.startswith(BODY_SCOPED_PREFIXES)]
                 n7[key] = {"exit": c7, "bodies_supplied": len(payload), "unfetched": unfetched,
@@ -487,7 +522,9 @@ def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) 
                                "PROMPT_BINDING_SUPERSEDED fires on every surviving binding by construction; after_probe_ids "
                                "applies them with binding_pass.probe() synthetic successor ids against a scratch copy of the "
                                "built contract whose member_registry page identities are the same probe ids, and is the gating "
-                               "variant; the __markdown_form_diagnostic row is diagnostic only") if probe_map else None
+                               "variant. Every variant gives the profile normalize_fetch.normalize(body) (C-15); the "
+                               "__raw_fetch_form_diagnostic rows (the unnormalized fetch form) are diagnostic only") if probe_map else None
+        n7["text_form"] = "normalize_fetch.normalize (C-15)"
         n7["probe_rebind_contract_classes_expected"] = sorted(PROBE_REBIND_CLASSES)
         n7["ok"] = (after["bodies_validated"] == 56 and after["body_scoped_errors"] == 0 and not after["not_evaluated"]
                     and n7["after_stand_in_map"]["contract_level_errors"] == 0
@@ -522,28 +559,28 @@ def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) 
                 continue
             ops, _ = B.page_ops(key, got[2], m, [], shared)
             edited, _ = B.apply_all(got[2], ops, shared)
-            r = row_assertions(A, row, edited)
-            before_fail += bool(A._evaluate_assertions(row, got[2], "transient"))
+            r = row_assertions(A, row, check_text(edited))
+            before_fail += bool(A._evaluate_assertions(row, check_text(got[2]), "transient"))
             # each finding classified: INHERITED when the selected 100926.1 registry carries the same assertion on
             # the same row and the installed engine reports it on today's unedited body; NEW otherwise
             srow = sel_rows.get(key)
             sel_vals = {(x.get("value") if isinstance(x, dict) else x) for kind in ASSERT_KINDS
                         for x in ((srow or {}).get("audit_assertions") or {}).get(kind) or []}
             sel_fail = {str((f.get("observed") or {}).get("summary")) for f in
-                        (A_sel._evaluate_assertions(srow, got[2], "transient") if srow else [])}
+                        (A_sel._evaluate_assertions(srow, check_text(got[2]), "transient") if srow else [])}
             guard_of = {(x.get("value") if isinstance(x, dict) else x): (x.get("guard") if isinstance(x, dict) else None)
                         for kind in ASSERT_KINDS for x in (row.get("audit_assertions") or {}).get(kind) or []}
             inh, new_ids = 0, []
-            for f in A._evaluate_assertions(row, edited, "transient"):
+            for f in A._evaluate_assertions(row, check_text(edited), "transient"):
                 summ = str((f.get("observed") or {}).get("summary"))
                 val = summ.split(": ", 1)[1] if ": " in summ else summ
                 if val in sel_vals and summ in sel_fail:
                     inh += 1
                 else:
                     new_ids.append(f"{f.get('rule_id')}:{guard_of.get(val) or 'unguarded'}")
-            md_findings = len(A._evaluate_assertions(row, markdown_form(edited), "transient"))
+            raw_findings = len(A._evaluate_assertions(row, edited, "transient"))
             rows9.append({"prompt": key, **r, "findings_inherited": inh, "findings_new": len(new_ids),
-                          "new_finding_ids": sorted(new_ids), "findings_markdown_form_diagnostic": md_findings})
+                          "new_finding_ids": sorted(new_ids), "findings_raw_fetch_form_diagnostic": raw_findings})
         n9.update({"body_rows": len(rows9), "body_rows_ok": sum(r["ok"] for r in rows9),
                    "assertions_evaluated": sum(r.get("assertions", 0) for r in rows9),
                    "findings_after_total": sum(r.get("findings_after", 0) for r in rows9),
@@ -554,10 +591,11 @@ def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) 
                    "rows_with_inherited": sum(1 for r in rows9 if r.get("findings_inherited")),
                    "findings_new_total": sum(r.get("findings_new", 0) for r in rows9),
                    "rows_with_new": sorted(r["prompt"] for r in rows9 if r.get("findings_new")),
-                   "markdown_form_diagnostic": {
-                       "note": "diagnostic only, not a gate: the edited bodies with Notion inline markup rewritten as Markdown",
-                       "findings_total": sum(r.get("findings_markdown_form_diagnostic", 0) for r in rows9),
-                       "rows_with_findings": sum(1 for r in rows9 if r.get("findings_markdown_form_diagnostic"))},
+                   "text_form": "normalize_fetch.normalize (C-15)",
+                   "raw_fetch_form_diagnostic": {
+                       "note": "diagnostic only, not a gate: the edited bodies in the unnormalized fetch form",
+                       "findings_total": sum(r.get("findings_raw_fetch_form_diagnostic", 0) for r in rows9),
+                       "rows_with_findings": sum(1 for r in rows9 if r.get("findings_raw_fetch_form_diagnostic"))},
                    "failing_rows": [{k: r.get(k) for k in ("prompt", "findings_after", "findings_inherited", "findings_new",
                                                            "new_finding_ids", "injected_missed", "error")}
                                     for r in rows9 if not r["ok"]],
@@ -675,7 +713,16 @@ def selftest(scratch: Path) -> dict:
                                                        "forbidden_regex": row["audit_assertions"]["forbidden_regex"]}}
     rows["row_assertions_vacuous_required_fails"] = not row_assertions(Eng, vacuous, ok_text)["ok"]
     rows["body_classes_parse"] = body_classes(["PROMPT_BINDING_SUPERSEDED:PR-10:CF-C-10", "OTHER:x"]) == ["PROMPT_BINDING_SUPERSEDED"]
-    rows["markdown_form_rewrites_markup"] = markdown_form("a <code>X</code> <b>B</b> <i>c</i> d\\_e") == "a `X` **B** *c* d_e"
+    # C-15: the profile payload and the registry text are the normalized form; a payload of the raw fetch form (the
+    # injected defect) keeps the markup a Markdown-form check misreads
+    fetch_body = "a <code>X</code> <b>B</b> <i>c</i> d\\_e"
+    rows["check_text_is_normalize"] = check_text(fetch_body) == "a `X` **B** *c* d_e" == nf.normalize(fetch_body)
+    rows["profile_payload_normalized"] = json.loads(profile_payload({"K": fetch_body}))["K"] == "a `X` **B** *c* d_e"
+    rows["injected_raw_payload_differs"] = json.loads(json.dumps({"K": fetch_body}))["K"] != json.loads(profile_payload({"K": fetch_body}))["K"]
+    md_row = {"prompt_key": "X", "audit_assertions": {"required_regex": [{"rule_id": "CTR-002", "value": "(?m)`X`"}],
+                                                      "forbidden_regex": row["audit_assertions"]["forbidden_regex"]}}
+    rows["row_assertions_on_check_text_pass_markdown_assertion"] = row_assertions(Eng, md_row, check_text(fetch_body))["ok"]
+    rows["injected_row_assertions_on_raw_text_fail"] = not row_assertions(Eng, md_row, fetch_body)["ok"]
     old_id, new_id = "a" * 32, "b" * 32
     src = scratch / "c.json"
     src.write_text(json.dumps({"member_registry": {"K": {"notion_url": f"https://app.notion.com/p/{old_id}?pvs=204"},
@@ -685,6 +732,16 @@ def selftest(scratch: Path) -> dict:
     pc = json.loads((scratch / "p.json").read_text(encoding="utf-8"))["member_registry"]
     rows["probe_contract_rebinds_only_changed_members"] = (n == 1 and new_id in pc["K"]["notion_url"]
                                                           and pc["S"]["notion_url"] == "u")
+    good12 = (0, {"ok": True, "rows": {"payload_normalized": True, "built_intake_passes_normalized": True,
+                                       "built_intake_injected_raw_fails": True}})
+    good18 = (0, {"ok": True, "rows": {"payload_normalized": True}})
+    rows["qualify_gate_clean_passes"] = qualify_gate(good12, good18)["ok"] is True
+    rows["qualify_gate_injected_x12_row_false_fails"] = not qualify_gate(
+        (0, {"ok": True, "rows": dict(good12[1]["rows"], built_intake_injected_raw_fails=False)}), good18)["ok"]
+    rows["qualify_gate_injected_x18_exit_fails"] = not qualify_gate(good12, (1, good18[1]))["ok"]
+    rows["qualify_gate_injected_unbuilt_root_fails"] = not qualify_gate((0, {"ok": True, "rows": {"payload_normalized": True}}),
+                                                                        good18)["ok"]
+    rows["qualify_gate_injected_unparsed_fails"] = not qualify_gate(good12, (0, {"_unparsed_tail": "x"}))["ok"]
     ok = all(rows.values())
     shutil.rmtree(scratch)
     return {"mode": "selftest", "rows": rows, "selftest_ok": ok}
@@ -703,6 +760,14 @@ def main() -> int:
     installed, scratch, fetched_after = Path(a[1]), Path(a[2]), a[3]
     map_path = Path(a[a.index("--map") + 1]) if "--map" in a else HERE / "successor-map-standin.json"
     rec = run_all(installed, scratch, fetched_after, map_path.resolve())
+    if "--worker" in a:
+        rec["worker"] = a[a.index("--worker") + 1]
+    if "--previous-receipt" in a:
+        prev = Path(a[a.index("--previous-receipt") + 1])
+        pj = json.loads(prev.read_text(encoding="utf-8"))
+        rec["previous_receipt"] = {"path": str(prev.resolve().relative_to(REPO)) if prev.resolve().is_relative_to(REPO) else str(prev),
+                                   "date_utc": pj.get("date_utc"), "fetched_after": pj.get("fetched_after"),
+                                   "gate_ok": pj.get("gate_ok"), "ok": pj.get("ok")}
     rec["dry_run_selftest"] = selftest(scratch.parent / (scratch.name + "-selftest"))
     rec["gate_ok"]["dry_run_selftest"] = rec["dry_run_selftest"]["selftest_ok"]
     rec["ok"] = rec["ok"] and rec["dry_run_selftest"]["selftest_ok"]

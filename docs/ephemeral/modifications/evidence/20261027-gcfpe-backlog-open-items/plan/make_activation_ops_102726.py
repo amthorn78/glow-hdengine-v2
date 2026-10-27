@@ -19,20 +19,30 @@ Generated families (catalog rows, Flow Index topology rows, hub member rows, fro
 list) are NOT written here: activation_render_102726.py generates them from the successor map and the candidate
 graph parts at render time.
 
-  make_activation_ops_102726.py build    write plan/activation-ops.json
-  make_activation_ops_102726.py check    rebuild in memory and compare with the file on disk (exit 1 on drift)
+  C-22      (repair R2) W8's P1c-PE-* anchors (and their replacements) take the escaped fetch form: PE's candidate
+            frontmatter is written by the coordinator's HEAD-PE operation (edits.json) in the fetch's own form, where a
+            plain-text underscore reads `\\_`, and update_content matches that form (C-15). Markers and <code> spans are
+            left as they are; each escaped anchor must normalize back to W8's text (normalize_fetch.normalize) and
+            occur exactly once in HEAD-PE's replacement.
 
-Reads only the W files and coordinator-decisions.md beside it; writes only activation-ops.json. Run with
-PYTHONDONTWRITEBYTECODE=1.
+  make_activation_ops_102726.py build     write plan/activation-ops.json
+  make_activation_ops_102726.py check     rebuild in memory and compare with the file on disk (exit 1 on drift)
+  make_activation_ops_102726.py selftest  each C-22 check refuses its injected defect
+
+Reads the W files and coordinator-decisions.md beside it, and edits.json's HEAD-PE replacement (C-22); writes only
+activation-ops.json. Run with PYTHONDONTWRITEBYTECODE=1.
 """
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import normalize_fetch as nf  # noqa: E402
 OUT = HERE / "activation-ops.json"
 W = {k: json.loads((HERE / "work" / f"{k}.json").read_text(encoding="utf-8")) for k in ("W5", "W6", "W8")}
 
@@ -82,6 +92,40 @@ PHASES = [
 ]
 
 
+MARKER = re.compile(r"@[A-Z][A-Z0-9_]+(?::[A-Z0-9-]+)?")  # activation_render_102726.py's marker form
+ESC_KEEP = re.compile(r"(<code>.*?</code>|@[A-Z][A-Z0-9_]+(?::[A-Z0-9-]+)?)")
+
+
+def esc_fetch(s):
+    """C-22: a string in Notion's fetch form: each plain-text underscore escaped (`\\_`); <code> spans and @MARKERs
+    (activation_render_102726.py fills them before writing) are left as they are."""
+    if s is None:
+        return None
+    return "".join(p if ESC_KEEP.fullmatch(p) else p.replace("\\_", "_").replace("_", "\\_") for p in ESC_KEEP.split(s))
+
+
+def pe_fetch_form(ops: list, head_pe: str) -> list:
+    """C-22: W8's P1c-PE-* ops in the escaped fetch form, checked against the PE head the coordinator writes."""
+    out = []
+    for o in ops:
+        e = {**o, "start": esc_fetch(o["start"]), "end": esc_fetch(o.get("end")), "new": esc_fetch(o["new"])}
+        for k in ("start", "end", "new"):
+            if o.get(k) is not None and nf.normalize(e[k]) != o[k]:
+                raise SystemExit(f"C-22: {o['id']} {k}: the escaped form does not normalize back to W8's text")
+            if o.get(k) is not None and MARKER.findall(e[k]) != MARKER.findall(o[k]):
+                raise SystemExit(f"C-22: {o['id']} {k}: escaping changed a marker")
+        if head_pe.count(e["start"]) != 1:
+            raise SystemExit(f"C-22: {o['id']}: the escaped anchor does not occur exactly once in HEAD-PE's replacement")
+        e["why"] = (o.get("why") or "") + " C-22: anchor and replacement in the escaped fetch form."
+        out.append(e)
+    return out
+
+
+def head_pe_text() -> str:
+    edits = json.loads((HERE / "edits.json").read_text(encoding="utf-8"))
+    return next(o for o in edits["ops"] if o["id"] == "HEAD-PE")["new"]
+
+
 def phase_of(op_id: str) -> str:
     for pre, ph in (("C-FI-REV", "review"), ("C-", "candidate"), ("P1-ENTRY-DONE", "activation-done"),
                     ("P1", "activation"), ("P2-ENTRY-DONE", "register-done"), ("P2", "register"),
@@ -106,8 +150,9 @@ def norm(o: dict, source: str) -> dict:
     return out
 
 
-def build() -> dict:
+def build(head_pe: str | None = None) -> dict:
     w8 = {o["id"]: o for o in W["W8"]["notion_control_ops"]}
+    head_pe = head_pe_text() if head_pe is None else head_pe
     w6 = {o["id"]: o for o in W["W6"]["notion_control_ops"]}
     tx = W["W8"]["transaction"]
     pages: dict = {}
@@ -160,6 +205,13 @@ def build() -> dict:
             continue
         key = o["page_id"]
         page(key)["ops"].append(norm(o, "W8"))
+    # C-22: PE's P1c ops in the escaped fetch form
+    pe_ops = page("@PE_PAGE_ID")["ops"]
+    p1c = [o for o in pe_ops if o["id"].startswith("P1c-PE-")]
+    if len(p1c) != 5:
+        raise SystemExit(f"C-22: expected W8's five P1c-PE ops, found {len(p1c)}")
+    escaped = {o["id"]: o for o in pe_fetch_form(p1c, head_pe)}
+    page("@PE_PAGE_ID")["ops"] = [escaped.get(o["id"], o) for o in pe_ops]
 
     # D-W8-7 / CD-9: W6-BIND-1..3 carried verbatim in P2-REG-*; W6-BIND-4 folded into P1d-FI-BIND-P
     carried = []
@@ -282,8 +334,43 @@ def build() -> dict:
     }
 
 
+def selftest() -> dict:
+    head = head_pe_text()
+    rows = {"clean_build_passes": bool(build(head)["pages"]["@PE_PAGE_ID"]["ops"])}
+    ops = build(head)["pages"]["@PE_PAGE_ID"]["ops"]
+    rows["p1c_anchors_escaped"] = all("\\_" in o["start"] for o in ops if o["id"].startswith("P1c-PE-"))
+    rows["p1c_marker_kept"] = any("@ACTIVATION_DATE" in o["new"] for o in ops if o["id"] == "P1c-PE-3")
+
+    def refused(fn) -> bool:
+        try:
+            fn()
+        except SystemExit:
+            return True
+        return False
+    # the head written unescaped (an anchor that only the raw form would match) is refused
+    rows["rejects_head_without_escaped_anchor"] = refused(lambda: build(head.replace("candidate\\_release", "candidate_release")))
+    # an anchor occurring twice in the head is refused
+    rows["rejects_anchor_twice_in_head"] = refused(lambda: build(head + "\npromotion\\_authorized: false\n"))
+    # escaping a marker would break its fill: the round trip through the normalizer refuses it
+    bad = [{"id": "P1c-PE-X", "start": "promotion_authorized: false", "end": None, "new": "activated_at: @ACTIVATION_DATE"}]
+    global esc_fetch
+    keep = esc_fetch
+    try:
+        esc_fetch = lambda s: None if s is None else s.replace("_", "\\_")  # noqa: E731  (escapes inside markers)
+        rows["rejects_escaped_marker"] = refused(lambda: pe_fetch_form(bad, head))
+    finally:
+        esc_fetch = keep
+    rows["esc_fetch_keeps_markers_and_code"] = esc_fetch("a_b <code>c_d</code> @SUCC_URL:QA-10 @ACTIVATION_DATE") == \
+        "a\\_b <code>c_d</code> @SUCC_URL:QA-10 @ACTIVATION_DATE"
+    return {"mode": "selftest", "rows": rows, "ok": all(rows.values())}
+
+
 def main() -> int:
     mode = sys.argv[1] if len(sys.argv) > 1 else "build"
+    if mode == "selftest":
+        res = selftest()
+        print(json.dumps(res, indent=1))
+        return 0 if res["ok"] else 1
     data = build()
     text = json.dumps(data, indent=1, ensure_ascii=False) + "\n"
     carried_ok = all(c["text_in_host"] for c in data["folded_and_dropped"]["carried_check"])

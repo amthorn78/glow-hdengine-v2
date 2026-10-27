@@ -1,10 +1,10 @@
 {
  "record_type": "GCFPE_102726_PLAN_DRY_RUN",
  "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
- "worker": "A5",
- "date_utc": "2026-10-27T08:43:06+00:00",
- "repository_head": "41aaabaa63f2dd75f372c09c09f04064e4973eca",
- "fetched_after": "2026-10-27T08:16:14.442Z",
+ "worker": "R3",
+ "date_utc": "2026-10-27T09:47:29+00:00",
+ "repository_head": "acc39b04ce73d7d212953e066e1d401f95be0150",
+ "fetched_after": "2026-10-27T09:38:45.177Z",
  "successor_map": "docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/plan/successor-map-standin.json",
  "stand_in_used": true,
  "stand_ins": [
@@ -106,7 +106,7 @@
     "exit": 0,
     "ok": true,
     "guards": 118,
-    "fixture_rows": 367,
+    "fixture_rows": 375,
     "fixture_rows_failing": [],
     "span_resolver_false": []
    },
@@ -141,16 +141,16 @@
    "ok": true
   },
   "N2_body_rehearsal": {
-   "body_check.plan.exit": 1,
-   "body_check.plan.ok": false,
+   "body_check.plan.exit": 0,
+   "body_check.plan.ok": true,
    "stand_in": true,
    "pages_read": 57,
    "pages_total": 57,
    "pages_in_edits_json": 57,
    "no_fetch_found": [],
-   "pages_ok": 46,
-   "ops": 552,
-   "ops_applied": 552,
+   "pages_ok": 57,
+   "ops": 559,
+   "ops_applied": 559,
    "binding_ops": 113,
    "binding_identity_under_stand_in": 632,
    "revisions_match_pins": 57,
@@ -160,103 +160,12 @@
    "check_would_pass": 57,
    "binding_current_after": 57,
    "probe_ok": 57,
-   "guard_rows": 751,
-   "guard_rows_failing_before": 245,
-   "guard_rows_failing_after": 13,
-   "guard_rows_failing_after_detail": [
-    {
-     "prompt": "CF-C-20",
-     "guard": "G-HP-1",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "CF-C-30",
-     "guard": "G-HP-1",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "CF-E-20",
-     "guard": "G-HP-1",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "CF-E-30",
-     "guard": "G-HP-1",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "CL-C-10",
-     "guard": "G-HP-1",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "CL-C-10",
-     "guard": "G-HP-4",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "CL-E-10",
-     "guard": "G-HP-4",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "DOC-10",
-     "guard": "G-HP-1",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "DOC-10",
-     "guard": "G-HP-5",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "ESC-25",
-     "guard": "G-HP-1",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "PR-20",
-     "guard": "G-HP-5",
-     "count_before": 3,
-     "count_after": 1
-    },
-    {
-     "prompt": "QA-110",
-     "guard": "G-HP-2",
-     "count_before": 1,
-     "count_after": 1
-    },
-    {
-     "prompt": "RS-30",
-     "guard": "G-HP-2",
-     "count_before": 1,
-     "count_after": 1
-    }
-   ],
+   "guard_rows": 756,
+   "guard_rows_failing_before": 240,
+   "guard_rows_failing_after": 0,
+   "guard_rows_failing_after_detail": [],
    "failing_rows_all_preexisting_text": true,
-   "failing_pages": [
-    "CF-C-20",
-    "CF-C-30",
-    "CF-E-20",
-    "CF-E-30",
-    "CL-C-10",
-    "CL-E-10",
-    "DOC-10",
-    "ESC-25",
-    "PR-20",
-    "QA-110",
-    "RS-30"
-   ],
+   "failing_pages": [],
    "gcfpe_mgmt10": {
     "ops": 0,
     "binding_ops": 0,
@@ -266,25 +175,25 @@
     "needs_no_edit": true
    },
    "with_R-P2": {
-    "exit": 1,
-    "ok": false,
+    "exit": 0,
+    "ok": true,
     "pe_ok": true,
     "pe_ops": 16,
     "pe_guards_failing_after": []
    },
-   "ok": false
+   "ok": true
   },
   "N3_registry_form": {
-   "body_check.registry.exit": 1,
-   "body_check.registry.ok": false,
-   "fixture_rows": 319,
+   "body_check.registry.exit": 0,
+   "body_check.registry.ok": true,
+   "fixture_rows": 327,
    "fixtures_disagreeing": 0,
-   "page_rows": 751,
-   "page_rows_not_ok": 13,
+   "page_rows": 756,
+   "page_rows_not_ok": 0,
    "page_rows_where_registry_form_and_guard_disagree": 0,
-   "page_rows_not_ok_only_because_guard_fails_after": 13,
+   "page_rows_not_ok_only_because_guard_fails_after": 0,
    "registry_form_agrees_everywhere": true,
-   "ok": false
+   "ok": true
   },
   "N4_graph": {
    "apply.apply_ok": true,
@@ -331,16 +240,26 @@
    "Q1_PASS": true,
    "Q5_checks_false": [],
    "injected_refusals_false": [],
+   "c19_listed": {
+    "added_member_parent": {
+     "member": "CL-05",
+     "source": "successor map CL-05.parent_id",
+     "value": "3db4590a05eb81d59059eb6b95ed5fcf",
+     "stand_in": true
+    },
+    "carried_members_template_values": 55,
+    "note": "the 55 carried members keep their template-carried staged_parent_id and notion_page_manifest parent_id, as 100926.1 did (C-19)"
+   },
    "contract_digests": {
     "candidate": {
      "exit": 0,
-     "bytes": 649555,
-     "sha256": "81f60fb9e5c88d7a789a75fa95ef9ef2d64ac72c74163f6674056397ca050ae5"
+     "bytes": 649672,
+     "sha256": "6994f51afdefb94423777e2b74e3daab91f98a39b06c330d9fbc0b2e45fa91ed"
     },
     "production": {
      "exit": 0,
-     "bytes": 646130,
-     "sha256": "16e527f1fbd5d15102feea83c67fbd6a0d251e15e806b72eec199e2735ecc3ef"
+     "bytes": 646247,
+     "sha256": "cd58119960a2424a4e5940e317e8ccbc67503d114ef293357fb7b471b9351490"
     }
    },
    "ok": true
@@ -352,13 +271,13 @@
    "profile_errors": [
     "CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.5.0",
     "SKILL_CONTRACT:glow-hde-pr-development:GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0",
-    "SKILL_SELF_IDENTITY:DECLARED_b1f00f3ae3b7_MEASURED_568281014476"
+    "SKILL_SELF_IDENTITY:DECLARED_b1f00f3ae3b7_MEASURED_3803014f6ff0"
    ],
    "unexpected_errors": [],
    "expected_pending": [
     "CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.5.0",
     "SKILL_CONTRACT:glow-hde-pr-development:GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0",
-    "SKILL_SELF_IDENTITY:DECLARED_b1f00f3ae3b7_MEASURED_568281014476"
+    "SKILL_SELF_IDENTITY:DECLARED_b1f00f3ae3b7_MEASURED_3803014f6ff0"
    ],
    "regressions_false": [],
    "ok": true
@@ -366,6 +285,115 @@
   "N7_bodies_through_profile": {
    "members": 56,
    "before": {
+    "exit": 1,
+    "bodies_supplied": 56,
+    "unfetched": [],
+    "bodies_validated": 56,
+    "not_evaluated": [],
+    "errors_total": 845,
+    "body_scoped_errors": 845,
+    "body_scoped_error_classes": [
+     "PROMPT_BINDING_SUPERSEDED",
+     "PROMPT_BODY_IDENTITY",
+     "PROMPT_HANDOFF_RECEIVER",
+     "PROMPT_TYPESAFE_READING",
+     "QA_CLOSE_SET_REPAIR_ROUTE_BODY",
+     "QA_PASS_BODY_CLASS_MAP",
+     "QA_PASS_BODY_INTAKE"
+    ],
+    "body_scoped_error_ids": [
+     "PROMPT_BINDING_SUPERSEDED:CF-C-10",
+     "PROMPT_BINDING_SUPERSEDED:CF-C-20",
+     "PROMPT_BINDING_SUPERSEDED:CF-C-30",
+     "PROMPT_BINDING_SUPERSEDED:CF-C-40",
+     "PROMPT_BINDING_SUPERSEDED:CF-E-10",
+     "PROMPT_BINDING_SUPERSEDED:CF-E-20",
+     "PROMPT_BINDING_SUPERSEDED:CF-E-30",
+     "PROMPT_BINDING_SUPERSEDED:CF-E-40",
+     "PROMPT_BINDING_SUPERSEDED:CF-PO-10",
+     "PROMPT_BINDING_SUPERSEDED:CL-05",
+     "PROMPT_BINDING_SUPERSEDED:CL-20",
+     "PROMPT_BINDING_SUPERSEDED:CL-30",
+     "PROMPT_BINDING_SUPERSEDED:CL-40",
+     "PROMPT_BINDING_SUPERSEDED:CL-C-10",
+     "PROMPT_BINDING_SUPERSEDED:CL-E-10",
+     "PROMPT_BINDING_SUPERSEDED:CL-E-20",
+     "PROMPT_BINDING_SUPERSEDED:CL-E-30",
+     "PROMPT_BINDING_SUPERSEDED:CL-E-40",
+     "PROMPT_BINDING_SUPERSEDED:DOC-10",
+     "PROMPT_BINDING_SUPERSEDED:DOC-20",
+     "PROMPT_BINDING_SUPERSEDED:ESC-10",
+     "PROMPT_BINDING_SUPERSEDED:ESC-25",
+     "PROMPT_BINDING_SUPERSEDED:ESC-30",
+     "PROMPT_BINDING_SUPERSEDED:ESC-40",
+     "PROMPT_BINDING_SUPERSEDED:IA-10",
+     "PROMPT_BINDING_SUPERSEDED:IA-20",
+     "PROMPT_BINDING_SUPERSEDED:IA-30",
+     "PROMPT_BINDING_SUPERSEDED:IA-40",
+     "PROMPT_BINDING_SUPERSEDED:IA-50",
+     "PROMPT_BINDING_SUPERSEDED:IA-60",
+     "PROMPT_BINDING_SUPERSEDED:MGR-10",
+     "PROMPT_BINDING_SUPERSEDED:OPS-10",
+     "PROMPT_BINDING_SUPERSEDED:OPS-20",
+     "PROMPT_BINDING_SUPERSEDED:OPS-30",
+     "PROMPT_BINDING_SUPERSEDED:PR-10",
+     "PROMPT_BINDING_SUPERSEDED:PR-20",
+     "PROMPT_BINDING_SUPERSEDED:PR-30",
+     "PROMPT_BINDING_SUPERSEDED:PR-35",
+     "PROMPT_BINDING_SUPERSEDED:PR-40",
+     "PROMPT_BINDING_SUPERSEDED:PR-50",
+     "PROMPT_BINDING_SUPERSEDED:QA-10",
+     "PROMPT_BINDING_SUPERSEDED:QA-100",
+     "PROMPT_BINDING_SUPERSEDED:QA-110",
+     "PROMPT_BINDING_SUPERSEDED:QA-120",
+     "PROMPT_BINDING_SUPERSEDED:QA-20",
+     "PROMPT_BINDING_SUPERSEDED:QA-50",
+     "PROMPT_BINDING_SUPERSEDED:QA-60",
+     "PROMPT_BINDING_SUPERSEDED:QA-70",
+     "PROMPT_BINDING_SUPERSEDED:QA-80",
+     "PROMPT_BINDING_SUPERSEDED:QA-90",
+     "PROMPT_BINDING_SUPERSEDED:RS-10",
+     "PROMPT_BINDING_SUPERSEDED:RS-20",
+     "PROMPT_BINDING_SUPERSEDED:RS-30",
+     "PROMPT_BINDING_SUPERSEDED:RS-40",
+     "PROMPT_BINDING_SUPERSEDED:UTIL-10",
+     "PROMPT_BODY_IDENTITY:CF-C-10",
+     "PROMPT_BODY_IDENTITY:CF-C-20",
+     "PROMPT_BODY_IDENTITY:CF-C-30",
+     "PROMPT_BODY_IDENTITY:CF-C-40",
+     "PROMPT_BODY_IDENTITY:CF-E-10",
+     "PROMPT_BODY_IDENTITY:CF-E-20",
+     "PROMPT_BODY_IDENTITY:CF-E-30",
+     "PROMPT_BODY_IDENTITY:CF-E-40",
+     "PROMPT_BODY_IDENTITY:CF-PO-10",
+     "PROMPT_BODY_IDENTITY:CL-05",
+     "PROMPT_BODY_IDENTITY:CL-20",
+     "PROMPT_BODY_IDENTITY:CL-30",
+     "PROMPT_BODY_IDENTITY:CL-40",
+     "PROMPT_BODY_IDENTITY:CL-C-10",
+     "PROMPT_BODY_IDENTITY:CL-E-10",
+     "PROMPT_BODY_IDENTITY:CL-E-20",
+     "PROMPT_BODY_IDENTITY:CL-E-30",
+     "PROMPT_BODY_IDENTITY:CL-E-40",
+     "PROMPT_BODY_IDENTITY:DOC-10",
+     "PROMPT_BODY_IDENTITY:DOC-20",
+     "PROMPT_BODY_IDENTITY:ESC-10",
+     "PROMPT_BODY_IDENTITY:ESC-25",
+     "PROMPT_BODY_IDENTITY:ESC-30",
+     "PROMPT_BODY_IDENTITY:ESC-40",
+     "PROMPT_BODY_IDENTITY:IA-10"
+    ],
+    "contract_level_errors": 0,
+    "contract_level_error_classes": [],
+    "body_error_classes": [
+     "PROMPT_BINDING_SUPERSEDED",
+     "PROMPT_BODY_IDENTITY",
+     "PROMPT_HANDOFF_RECEIVER",
+     "PROMPT_TYPESAFE_READING"
+    ],
+    "body_errors": 841
+   },
+   "before__raw_fetch_form_diagnostic": {
     "exit": 1,
     "bodies_supplied": 56,
     "unfetched": [],
@@ -481,17 +509,23 @@
     "exit": 1,
     "bodies_supplied": 56,
     "unfetched": [],
-    "bodies_validated": 46,
+    "bodies_validated": 56,
     "not_evaluated": [],
-    "errors_total": 731,
-    "body_scoped_errors": 731,
+    "errors_total": 779,
+    "body_scoped_errors": 779,
     "body_scoped_error_classes": [
-     "PROMPT_BINDING_SUPERSEDED",
-     "PROMPT_BODY_ID_MISMATCH",
-     "QA_PASS_BODY_INTAKE",
-     "QA_PASS_RECEIVER_BODY"
+     "PROMPT_BINDING_SUPERSEDED"
     ],
     "body_scoped_error_ids": [
+     "PROMPT_BINDING_SUPERSEDED:CF-C-10",
+     "PROMPT_BINDING_SUPERSEDED:CF-C-20",
+     "PROMPT_BINDING_SUPERSEDED:CF-C-30",
+     "PROMPT_BINDING_SUPERSEDED:CF-C-40",
+     "PROMPT_BINDING_SUPERSEDED:CF-E-10",
+     "PROMPT_BINDING_SUPERSEDED:CF-E-20",
+     "PROMPT_BINDING_SUPERSEDED:CF-E-30",
+     "PROMPT_BINDING_SUPERSEDED:CF-E-40",
+     "PROMPT_BINDING_SUPERSEDED:CF-PO-10",
      "PROMPT_BINDING_SUPERSEDED:CL-05",
      "PROMPT_BINDING_SUPERSEDED:CL-20",
      "PROMPT_BINDING_SUPERSEDED:CL-30",
@@ -513,6 +547,7 @@
      "PROMPT_BINDING_SUPERSEDED:IA-40",
      "PROMPT_BINDING_SUPERSEDED:IA-50",
      "PROMPT_BINDING_SUPERSEDED:IA-60",
+     "PROMPT_BINDING_SUPERSEDED:MGR-10",
      "PROMPT_BINDING_SUPERSEDED:OPS-10",
      "PROMPT_BINDING_SUPERSEDED:OPS-20",
      "PROMPT_BINDING_SUPERSEDED:OPS-30",
@@ -536,31 +571,36 @@
      "PROMPT_BINDING_SUPERSEDED:RS-20",
      "PROMPT_BINDING_SUPERSEDED:RS-30",
      "PROMPT_BINDING_SUPERSEDED:RS-40",
-     "PROMPT_BINDING_SUPERSEDED:UTIL-10",
-     "PROMPT_BODY_ID_MISMATCH:CF-C-10",
-     "PROMPT_BODY_ID_MISMATCH:CF-C-20",
-     "PROMPT_BODY_ID_MISMATCH:CF-C-30",
-     "PROMPT_BODY_ID_MISMATCH:CF-C-40",
-     "PROMPT_BODY_ID_MISMATCH:CF-E-10",
-     "PROMPT_BODY_ID_MISMATCH:CF-E-20",
-     "PROMPT_BODY_ID_MISMATCH:CF-E-30",
-     "PROMPT_BODY_ID_MISMATCH:CF-E-40",
-     "PROMPT_BODY_ID_MISMATCH:CF-PO-10",
-     "PROMPT_BODY_ID_MISMATCH:MGR-10",
-     "QA_PASS_BODY_INTAKE",
-     "QA_PASS_RECEIVER_BODY:CL-C-10",
-     "QA_PASS_RECEIVER_BODY:CL-E-10"
+     "PROMPT_BINDING_SUPERSEDED:UTIL-10"
     ],
     "contract_level_errors": 0,
     "contract_level_error_classes": [],
     "body_error_classes": [
-     "PROMPT_BINDING_SUPERSEDED",
-     "PROMPT_BODY_ID_MISMATCH"
+     "PROMPT_BINDING_SUPERSEDED"
     ],
-    "body_errors": 728
+    "body_errors": 779
    },
    "probe_contract_members_rebound": 55,
    "after_probe_ids": {
+    "exit": 1,
+    "bodies_supplied": 56,
+    "unfetched": [],
+    "bodies_validated": 56,
+    "not_evaluated": [],
+    "errors_total": 111,
+    "body_scoped_errors": 0,
+    "body_scoped_error_classes": [],
+    "body_scoped_error_ids": [],
+    "contract_level_errors": 111,
+    "contract_level_error_classes": [
+     "GRAPH_NODE_CONTRACT",
+     "MEMBER_BINDING",
+     "PRODUCTION_CONTRACT_SEMANTIC_BUNDLE_MISMATCH"
+    ],
+    "body_error_classes": [],
+    "body_errors": 0
+   },
+   "after_probe_ids__raw_fetch_form_diagnostic": {
     "exit": 1,
     "bodies_supplied": 56,
     "unfetched": [],
@@ -599,70 +639,64 @@
     ],
     "body_errors": 10
    },
-   "after_probe_ids__markdown_form_diagnostic": {
-    "exit": 1,
-    "bodies_supplied": 56,
-    "unfetched": [],
-    "bodies_validated": 56,
-    "not_evaluated": [],
-    "errors_total": 112,
-    "body_scoped_errors": 1,
-    "body_scoped_error_classes": [
-     "QA_PASS_BODY_INTAKE"
-    ],
-    "body_scoped_error_ids": [
-     "QA_PASS_BODY_INTAKE"
-    ],
-    "contract_level_errors": 111,
-    "contract_level_error_classes": [
-     "GRAPH_NODE_CONTRACT",
-     "MEMBER_BINDING",
-     "PRODUCTION_CONTRACT_SEMANTIC_BUNDLE_MISMATCH"
-    ],
-    "body_error_classes": [],
-    "body_errors": 0
-   },
-   "stand_in_note": "after_stand_in_map applies every operation with the stand-in map (successor = predecessor), so PROMPT_BINDING_SUPERSEDED fires on every surviving binding by construction; after_probe_ids applies them with binding_pass.probe() synthetic successor ids against a scratch copy of the built contract whose member_registry page identities are the same probe ids, and is the gating variant; the __markdown_form_diagnostic row is diagnostic only",
+   "stand_in_note": "after_stand_in_map applies every operation with the stand-in map (successor = predecessor), so PROMPT_BINDING_SUPERSEDED fires on every surviving binding by construction; after_probe_ids applies them with binding_pass.probe() synthetic successor ids against a scratch copy of the built contract whose member_registry page identities are the same probe ids, and is the gating variant. Every variant gives the profile normalize_fetch.normalize(body) (C-15); the __raw_fetch_form_diagnostic rows (the unnormalized fetch form) are diagnostic only",
+   "text_form": "normalize_fetch.normalize (C-15)",
    "probe_rebind_contract_classes_expected": [
     "GRAPH_NODE_CONTRACT",
     "MEMBER_BINDING",
     "PRODUCTION_CONTRACT_SEMANTIC_BUNDLE_MISMATCH"
    ],
-   "ok": false
+   "ok": true
   },
   "N8_packages": {
    "a3_package_dryrun.exit": 0,
    "stderr_tail": null,
    "G1_redlines.ok": true,
    "G2_build.ok": true,
-   "G3_suite.ok": false,
-   "G4_release_validators.ok": false,
+   "G3_suite.ok": true,
+   "G4_release_validators.ok": true,
    "G5_contracts.ok": true,
    "G6_injections.ok": true,
    "G3_suite.ok_except_preexisting": true,
    "G3_suite.findings_preexisting_in_installed_suite": 3,
    "G3_suite.findings_from_this_change": [],
    "G4.cf_validate_gcfpe_20261027": {
-    "exit": 1,
-    "pass_line": false,
-    "error_tail": "KeyError: 'staged_parent_id'",
-    "classification": "REAL: the 102726.1 contract carries no member_registry.CL-05.staged_parent_id (A2's contract build)"
+    "exit": 0,
+    "pass_line": true,
+    "error_tail": "",
+    "classification": null
    },
    "G4.cf_validate_diagnostic_with_cl05_parent": {
     "note": "diagnostic only, not a gate: the same run on a scratch contract copy with only CL-05's two parent fields added",
     "exit": 0,
     "pass_line": true
    },
-   "real_errors": [
-    "REAL: the 102726.1 contract carries no member_registry.CL-05.staged_parent_id (A2's contract build)"
-   ],
+   "real_errors": [],
    "built_digests": {
-    "change-flow": "29 b007e75d5c57f6967f511245ae2c3b6b00dd8c94aca59e21756dead127f85182",
-    "flowmaster-validate": "45 61c23419a53a8913b5f18501ee5df943d1cd2fab6ab17ec59e79f422b6308b7f",
+    "change-flow": "29 95b9ef0caf1d1bde6c6ca419324f56daeb62c5b6f825c0d008b1671f1420114a",
+    "flowmaster-validate": "45 424b76c02a4ad0586c3d2ab637ac7479bf0c2ace153ed07ffbf14a7c03b4b218",
     "glow-hde-pr-development": "4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee",
-    "glow-graph-contract": "9 08d3db4b3c60df514724c2fbee0af11932a1136234c0fdbcb181c397414111c5"
+    "glow-graph-contract": "9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1"
    },
-   "ok": false
+   "G3_suite.c21_unchanged_suite_findings_are_the_named_three": true,
+   "G3_suite.c21_built_suite_findings_are_the_named_three": true,
+   "qualify_selftests": {
+    "x12_qualify_102726.selftest": {
+     "exit": 0,
+     "ok": true,
+     "rows_false": [],
+     "rows": 8
+    },
+    "x18_validate_102726.selftest": {
+     "exit": 0,
+     "ok": true,
+     "rows_false": [],
+     "rows": 5
+    },
+    "x12_built_intake_rows_present": true,
+    "ok": true
+   },
+   "ok": true
   },
   "N9_registry": {
    "a3_registry_dryrun.exit": 0,
@@ -676,560 +710,25 @@
    "rebuild_byte_identical": true,
    "selftest.selftest_ok": true,
    "body_rows": 56,
-   "body_rows_ok": 1,
-   "assertions_evaluated": 3172,
-   "findings_after_total": 182,
+   "body_rows_ok": 56,
+   "assertions_evaluated": 3177,
+   "findings_after_total": 0,
    "injected_fired": 972,
    "injected_missed": 0,
-   "rows_failing_before_edits": 56,
-   "findings_inherited_total": 167,
-   "rows_with_inherited": 54,
-   "findings_new_total": 15,
-   "rows_with_new": [
-    "CF-C-20",
-    "CF-C-30",
-    "CF-E-20",
-    "CF-E-30",
-    "CL-05",
-    "CL-C-10",
-    "CL-E-10",
-    "DOC-10",
-    "ESC-25",
-    "PR-20",
-    "QA-110",
-    "RS-30"
-   ],
-   "markdown_form_diagnostic": {
-    "note": "diagnostic only, not a gate: the edited bodies with Notion inline markup rewritten as Markdown",
-    "findings_total": 16,
-    "rows_with_findings": 14
+   "rows_failing_before_edits": 55,
+   "findings_inherited_total": 0,
+   "rows_with_inherited": 0,
+   "findings_new_total": 0,
+   "rows_with_new": [],
+   "text_form": "normalize_fetch.normalize (C-15)",
+   "raw_fetch_form_diagnostic": {
+    "note": "diagnostic only, not a gate: the edited bodies in the unnormalized fetch form",
+    "findings_total": 176,
+    "rows_with_findings": 55
    },
-   "failing_rows": [
-    {
-     "prompt": "CF-C-10",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CF-C-20",
-     "findings_after": 3,
-     "findings_inherited": 2,
-     "findings_new": 1,
-     "new_finding_ids": [
-      "CTR-001:G-HP-1"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CF-C-30",
-     "findings_after": 4,
-     "findings_inherited": 3,
-     "findings_new": 1,
-     "new_finding_ids": [
-      "CTR-001:G-HP-1"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CF-C-40",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CF-E-10",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CF-E-20",
-     "findings_after": 3,
-     "findings_inherited": 2,
-     "findings_new": 1,
-     "new_finding_ids": [
-      "CTR-001:G-HP-1"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CF-E-30",
-     "findings_after": 4,
-     "findings_inherited": 3,
-     "findings_new": 1,
-     "new_finding_ids": [
-      "CTR-001:G-HP-1"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CF-E-40",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CF-PO-10",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CL-05",
-     "findings_after": 2,
-     "findings_inherited": 0,
-     "findings_new": 2,
-     "new_finding_ids": [
-      "CTR-002:G-TS-2",
-      "TOP-001:unguarded"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CL-20",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CL-30",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CL-40",
-     "findings_after": 4,
-     "findings_inherited": 4,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CL-C-10",
-     "findings_after": 5,
-     "findings_inherited": 3,
-     "findings_new": 2,
-     "new_finding_ids": [
-      "CTR-001:G-HP-1",
-      "CTR-001:G-HP-4"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CL-E-10",
-     "findings_after": 4,
-     "findings_inherited": 3,
-     "findings_new": 1,
-     "new_finding_ids": [
-      "CTR-001:G-HP-4"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CL-E-20",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CL-E-30",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "CL-E-40",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "DOC-10",
-     "findings_after": 7,
-     "findings_inherited": 5,
-     "findings_new": 2,
-     "new_finding_ids": [
-      "CTR-001:G-HP-1",
-      "CTR-001:G-HP-5"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "DOC-20",
-     "findings_after": 4,
-     "findings_inherited": 4,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "ESC-10",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "ESC-25",
-     "findings_after": 4,
-     "findings_inherited": 3,
-     "findings_new": 1,
-     "new_finding_ids": [
-      "CTR-001:G-HP-1"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "ESC-30",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "ESC-40",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "GCFPE-MGMT-10",
-     "findings_after": 6,
-     "findings_inherited": 6,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "IA-10",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "IA-20",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "IA-30",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "IA-40",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "IA-50",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "IA-60",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "MGR-10",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "OPS-10",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "OPS-20",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "OPS-30",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "PR-10",
-     "findings_after": 5,
-     "findings_inherited": 5,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "PR-20",
-     "findings_after": 7,
-     "findings_inherited": 6,
-     "findings_new": 1,
-     "new_finding_ids": [
-      "CTR-001:G-HP-5"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "PR-30",
-     "findings_after": 6,
-     "findings_inherited": 6,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "PR-35",
-     "findings_after": 8,
-     "findings_inherited": 8,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "PR-40",
-     "findings_after": 6,
-     "findings_inherited": 6,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-10",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-100",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-110",
-     "findings_after": 4,
-     "findings_inherited": 3,
-     "findings_new": 1,
-     "new_finding_ids": [
-      "CTR-001:G-HP-2"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-120",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-20",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-50",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-60",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-70",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-80",
-     "findings_after": 4,
-     "findings_inherited": 4,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "QA-90",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "RS-10",
-     "findings_after": 4,
-     "findings_inherited": 4,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "RS-20",
-     "findings_after": 3,
-     "findings_inherited": 3,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "RS-30",
-     "findings_after": 4,
-     "findings_inherited": 3,
-     "findings_new": 1,
-     "new_finding_ids": [
-      "CTR-001:G-HP-2"
-     ],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "RS-40",
-     "findings_after": 4,
-     "findings_inherited": 4,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    },
-    {
-     "prompt": "UTIL-10",
-     "findings_after": 2,
-     "findings_inherited": 2,
-     "findings_new": 0,
-     "new_finding_ids": [],
-     "injected_missed": [],
-     "error": null
-    }
-   ],
+   "failing_rows": [],
    "bodies_edited_with": "probe ids",
-   "ok": false
+   "ok": true
   },
   "N10_activation": {
    "make_activation_ops.check": {
@@ -1402,19 +901,39 @@
  "gate_ok": {
   "N0_identities": true,
   "N1_selftests": true,
-  "N2_body_rehearsal": false,
-  "N3_registry_form": false,
+  "N2_body_rehearsal": true,
+  "N3_registry_form": true,
   "N4_graph": true,
   "N5_contracts_regenerator": true,
   "N6_profile_102726": true,
-  "N7_bodies_through_profile": false,
-  "N8_packages": false,
-  "N9_registry": false,
+  "N7_bodies_through_profile": true,
+  "N8_packages": true,
+  "N9_registry": true,
   "N10_activation": true,
   "dry_run_selftest": true
  },
- "ok": false,
+ "ok": true,
  "d22": "transient reads of this session's harness records; bodies passed on pipes only; no body text in this receipt",
+ "previous_receipt": {
+  "path": "docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/plan/dry-run-1.json",
+  "date_utc": "2026-10-27T08:43:06+00:00",
+  "fetched_after": "2026-10-27T08:16:14.442Z",
+  "gate_ok": {
+   "N0_identities": true,
+   "N1_selftests": true,
+   "N2_body_rehearsal": false,
+   "N3_registry_form": false,
+   "N4_graph": true,
+   "N5_contracts_regenerator": true,
+   "N6_profile_102726": true,
+   "N7_bodies_through_profile": false,
+   "N8_packages": false,
+   "N9_registry": false,
+   "N10_activation": true,
+   "dry_run_selftest": true
+  },
+  "ok": false
+ },
  "dry_run_selftest": {
   "mode": "selftest",
   "rows": {
@@ -1431,8 +950,17 @@
    "row_assertions_uncarried_forbidden_fails": true,
    "row_assertions_vacuous_required_fails": true,
    "body_classes_parse": true,
-   "markdown_form_rewrites_markup": true,
-   "probe_contract_rebinds_only_changed_members": true
+   "check_text_is_normalize": true,
+   "profile_payload_normalized": true,
+   "injected_raw_payload_differs": true,
+   "row_assertions_on_check_text_pass_markdown_assertion": true,
+   "injected_row_assertions_on_raw_text_fail": true,
+   "probe_contract_rebinds_only_changed_members": true,
+   "qualify_gate_clean_passes": true,
+   "qualify_gate_injected_x12_row_false_fails": true,
+   "qualify_gate_injected_x18_exit_fails": true,
+   "qualify_gate_injected_unbuilt_root_fails": true,
+   "qualify_gate_injected_unparsed_fails": true
   },
   "selftest_ok": true
  }

@@ -36,6 +36,7 @@ PE_PRED = "3f44590a05eb81f98b76c83465dc1960"
 PE_PRED_TITLE = "PE Metaprompt 100926.1"
 CL05_CANDIDATE = "4054590a05eb8155b301e2cb6dec31d5"
 CL05_NAME = "CL-05 — Prepare and Publish the Close Mutation Set"
+CL05_PARENT_STAND_IN = "3db4590a05eb81d59059eb6b95ed5fcf"  # the HDE Change Flow hub (C-9, C-19; stand-in only)
 NEW_VERSION = "102726.1"
 OLD_VERSION = "100926.1"
 URL_BASE = "https://app.notion.com/p/"
@@ -72,10 +73,12 @@ def standin(tsv: dict | None = None) -> dict:
                                    "page_id": row["page_id"], "title": row["title"][:-len(OLD_VERSION)] + NEW_VERSION,
                                    "predecessor_page_id": row["page_id"], "duplicated_from": row["page_id"],
                                    "parent_id": None, "created_last_edited_at": None}
+    # C-19: CL-05's parent_id feeds the 102726.1 contract's staged_parent_id; the stand-in is the HDE Change Flow hub
+    # CL-05 is moved under before its operations (C-9; W5 RE-4 expected_parent_id). EXECUTE's map records the real one.
     out["members"]["CL-05"] = {"disposition": "ADDED", "reason": "ITEM-30, PART-13 (stand-in)",
                                "page_id": CL05_CANDIDATE, "title": f"{CL05_NAME} — {NEW_VERSION}",
-                               "predecessor_page_id": None, "duplicated_from": CL05_CANDIDATE, "parent_id": None,
-                               "created_last_edited_at": None}
+                               "predecessor_page_id": None, "duplicated_from": CL05_CANDIDATE,
+                               "parent_id": CL05_PARENT_STAND_IN, "created_last_edited_at": None}
     return out
 
 
@@ -153,13 +156,24 @@ def shared_from_map(smap: dict) -> dict:
 
 
 # --- regenerated guards -----------------------------------------------------------------------------------------
+def title_order(t: str) -> tuple:
+    """Longest first (a longer title must be tried before a title it contains), then by text (C-22)."""
+    return (-len(t), t)
+
+
+def alternation_sorted(parts: list) -> bool:
+    return parts == sorted(parts, key=title_order)
+
+
 def regenerated_guards(smap: dict, prompts: list, tsv: dict | None = None) -> tuple[dict, dict]:
     """G-W7-BIND-1 (URL half) and G-W8-NAME-1 (title half) from the map: forbidden on every page, line units. The URL
     half names only predecessor ids whose successor differs, so under a stand-in map it is empty (vacuous) and the
     probe pass carries it."""
     rows = successors(smap, tsv)
     ids = sorted({p for _, p, _, s, _ in rows if p != s})
-    titles = sorted({t for _, _, t, _, _ in rows}, key=len, reverse=True)
+    # C-22: the alternation is sorted, longest first and then by text, so equal-length titles do not follow set order
+    # (string hashing differs per process) and the regenerated pattern is the same on every run
+    titles = sorted({t for _, _, t, _, _ in rows}, key=title_order)
     bind = {"id": "G-W7-BIND-1", "source": "W7 (regenerated from the successor map)", "kind": "forbidden",
             "unit": "line", "prompts": prompts, "except": [],
             "all": ["app\\.notion\\.com/p/(?:" + "|".join(ids) + ")" if ids else "(?!)"],
@@ -402,6 +416,20 @@ def selftest() -> dict:
     ics = itext.find(inside)
     ig = generate(itext, "XX-20", real, [(ics, ics + len(inside))], tsv)
     checks["citation_inside_span_left_to_replacement"] = len(ig["ops"]) == 0 and ig["skipped_covered"] == 1
+    # C-22: G-W8-NAME-1's alternation is sorted (longest first, then by text) and so identical across processes; the
+    # injected failure is a tie between equal-length titles left in reverse order, which the order check refuses
+    alts = [re.sub(r"\\(.)", r"\1", t) for t in name["all"][0][3:-len(")(?![0-9])")].split("|")]
+    sm_titles = [t for _, _, t, _, _ in successors(standin())]
+    full = regenerated_guards(standin(), ["X"])[1]
+    full_alts = [re.sub(r"\\(.)", r"\1", t) for t in full["all"][0][3:-len(")(?![0-9])")].split("|")]
+    ties = sorted(full_alts, key=title_order)
+    tie_pair = next(((i, i + 1) for i in range(len(ties) - 1) if len(ties[i]) == len(ties[i + 1])), None)
+    injected = list(ties)
+    if tie_pair:
+        injected[tie_pair[0]], injected[tie_pair[1]] = injected[tie_pair[1]], injected[tie_pair[0]]
+    checks["name_alternation_sorted"] = alternation_sorted(alts) and alternation_sorted(full_alts) \
+        and sorted(full_alts) == sorted(set(sm_titles))
+    checks["injected_unsorted_tie_refused"] = tie_pair is not None and not alternation_sorted(injected)
     # stand-in map: URL-only rewrites are identities, the URL guard is vacuous, the probe map is not
     sm = standin(); pm = probe(sm)
     checks["standin_validates"] = validate(sm)["ok"] and validate(sm)["distinct_successor_ids"] == "NOT_APPLICABLE_STAND_IN"

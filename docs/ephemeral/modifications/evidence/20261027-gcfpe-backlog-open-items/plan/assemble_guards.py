@@ -15,6 +15,18 @@ guards.json format, with the coordinator's amendments (plan/coordinator-decision
   C-8 Q1   QA-10's two EH-1 sentences join PART-10: QA-10 is in G-W4-10-5 already; the presence half is a QA-10
            entry of the same rule (G-W4-10-4-QA10), expecting the two sentences W4's ops write there.
 
+Repair R1 (coordinator decisions C-15, C-16, C-17, C-22):
+
+  C-15     one text form for every check: body_check.py runs every guard on normalize_fetch.normalize(read), so every
+           pattern is re-expressed for the Markdown form by translation, never retyped (markdown_form below):
+           `<code>` and `</code>` become a backtick, `<b>` and `</b>` become `\\*\\*`, `<i>` and `</i>` become
+           `\\*`. The worker's own pattern stays in `source_all` / `source_except`. The C-5 Q-6 escape-tolerance rewrite
+           is kept: it is unnecessary once `\\_` is normalized, and harmless (`\\\\?_` still matches `_`).
+  C-16     the A5 failing rows judged by PART-07's test: a conforming line gets a named exception, with its reason, from
+           C16_EXCEPTIONS below; a contradicting line gets a PART-07 operation in assemble_edits.py (set "C16").
+  C-17     G-W2-BC-7 follows PR-20's reworded W2-PR-20-BC-1 ("as the PR Instruction states it").
+  C-22     CL-05 joins G-HP-1 to G-HP-5.
+
 G-W7-BIND-1 and G-W8-NAME-1 are kept as the workers wrote them and marked `regenerate`: body_check.py replaces their
 patterns with the ones binding_pass.py derives from the successor map (W7-D8). Guards on surfaces that are not
 prompt bodies (the Hub, the register, repository files) are merged with `surface` set; body_check runs a guard only
@@ -31,6 +43,9 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(HERE))
+from normalize_fetch import normalize  # noqa: E402
 WORK = HERE / "work"
 WORKERS = ["W1", "W2", "W3a", "W3b", "W4", "W5", "W6", "W7", "W8"]
 CORE = ("id", "part", "rule", "kind", "expect", "unit", "prompts", "all", "except", "fixtures")
@@ -99,12 +114,84 @@ def escape_tolerant(p: str) -> str:
     return "".join(out)
 
 
+# C-16 (repair R1): the conforming A5 failing rows, judged by PART-07's stated test (scope-measurement.md section 2;
+# D23-B; D27): a line that names artifacts by path, or speaks of something other than a handoff, gets a named exception
+# with its reason. Each literal is the start of the line's sentence in the normalized (Markdown) form, so the exception
+# is anchored and narrow; each carries a pass fixture (the excepted form) and a fail fixture (a contradicting sentence
+# of the same opening that the exception must not mask), the injected-failure self-test of the exception.
+C16_EXCEPTIONS = [
+    {"guard": "G-HP-1", "prompts_seen": ["CL-C-10"],
+     "literal": "Each runnable direct-native package names its destination, receiving role/name and exact "
+                "task/artifact binding, and input artifacts by repository path; the artifacts hold the rest.",
+     "why": "C-16, conforming: CL-C-10's package sentence names the destination, receiving role and input artifacts "
+            "by repository path and leaves the rest to the artifacts, which is W3a's HP_PACKAGE form; 'direct-native' "
+            "names the route, not a complete input package",
+     "fail": "Each runnable direct-native package carries the complete native input package and its lineage."},
+    {"guard": "G-HP-4", "prompts_seen": ["CL-C-10", "CL-E-10"],
+     "literal": "Required tools, stores, environment and access limitations: Use only approved evidence stores, "
+                "permitted read-only repository/environment evidence access and supplied manual permissions.",
+     "why": "C-16, conforming: the field is in the prompt's own Inputs section and limits the closure prompt's own "
+            "access; it is not a per-branch handoff field restating a destination prompt's tools (G-HP-4's rule, "
+            "findings.md V2 second layer)",
+     "fail": "Required tools, stores, environment and access limitations: preserve the destination's tools, recovery "
+             "and terminal behavior."},
+    {"guard": "G-HP-5", "prompts_seen": ["DOC-10"],
+     "literal": "Preserve exact `CHANGE_CLASS`, `CHANGE_ID`, `DOCUMENTATION_UNIT_ID`, actual PR/Ops "
+                "task/result/receipt lineage, repository baseline, producer/acceptance/operator/session identities,",
+     "why": "C-16, conforming: DOC-10's own Required inputs; the documentation record keeps the actual producer, "
+            "acceptance, operator and session identities as recorded facts (D23-A artifact content), and no handoff "
+            "is told to carry them",
+     "fail": "Preserve exact session identity and session continuity in the DOC-20 handoff."},
+    {"guard": "G-HP-2", "prompts_seen": ["QA-110"],
+     "literal": "Markdown at paths under `docs/ephemeral/` in the repository, commit and push them on the working "
+                "branch,",
+     "why": "C-16, conforming: storage rule (PF04 section 9.1.3; D23-A): the handoff is one of the artifacts written "
+            "and committed on the working branch; it names the artifact store, not handoff content (as the existing "
+            "'committed and pushed on the working branch' exception)",
+     "pass": "Write the checkpoint and handoff as Markdown at paths under `docs/ephemeral/` in the repository, commit "
+             "and push them on the working branch, preserve versions, and return their repository paths.",
+     "fail": "Write the handoff so that it carries the working branch and head commit to QA-120."},
+]
+
+
+def _c16_exceptions(merged: dict, notes: list) -> None:
+    for e in C16_EXCEPTIONS:
+        g = merged[e["guard"]]
+        lit = e["literal"]
+        pat = ("^" if e["guard"] != "G-HP-2" else "") + re.escape(lit)
+        g["except"] = list(g.get("except", [])) + [pat]
+        g["except_why"] = list(g.get("except_why", [])) + [e["why"]]
+        pass_fx = e.get("pass") or (lit if lit.endswith(".") else lit + " and the rest.")
+        g["fixtures"] = dict(g["fixtures"], **{"pass": list(g["fixtures"]["pass"]) + [pass_fx],
+                                               "fail": list(g["fixtures"]["fail"]) + [e["fail"]]})
+        # body_check selftest removes this exception and requires the pass fixture to fail then (the exception is
+        # what admits the line), and requires the fail fixture to fail with it (the exception is narrow)
+        g["c16_exceptions"] = list(g.get("c16_exceptions", [])) + [
+            {"except_index": len(g["except"]) - 1, "pass_fixture": pass_fx, "fail_fixture": e["fail"],
+             "prompts_seen": e["prompts_seen"]}]
+        notes.append(f"C-16: {e['guard']} named exception ({', '.join(e['prompts_seen'])})")
+
+
+MARKUP_TO_MARKDOWN = (("</code>", "`"), ("<code>", "`"), ("</b>", "\\*\\*"), ("<b>", "\\*\\*"),
+                      ("</i>", "\\*"), ("<i>", "\\*"))
+
+
+def markdown_form(p: str) -> str:
+    """C-15: a pattern written for the fetch's inline markup, translated to the normalized (Markdown) form. Only the
+    four tag literals are mapped; every other character of the pattern is kept."""
+    for old, new in MARKUP_TO_MARKDOWN:
+        p = p.replace(old, new)
+    return p
+
+
 def _count(text: str, g: dict) -> int:
-    """body_check.py's unit count, on the worker's own (pre-rewrite) patterns."""
+    """body_check.py's unit count on the normalized text (C-15), with the patterns in their Markdown form."""
+    text = normalize(text)
+    pats = [markdown_form(p) for p in g["all"]]
+    exc = [markdown_form(p) for p in g.get("except", [])]
     units = text.split("\n") if g["unit"] == "line" else [s for ln in text.split("\n")
                                                           for s in re.split(r"(?<=[.!?])\s+", ln) if s]
-    return sum(1 for u in units if all(re.search(p, u) for p in g["all"])
-               and not any(re.search(p, u) for p in g.get("except", [])))
+    return sum(1 for u in units if all(re.search(p, u) for p in pats) and not any(re.search(p, u) for p in exc))
 
 
 def surface(prompts: list) -> str:
@@ -139,6 +226,20 @@ def build() -> dict:
     # C-5 Q-5: OPS-30 joins G-HP-R3
     merged["G-HP-R3"]["prompts"] = sorted(set(merged["G-HP-R3"]["prompts"]) | {"OPS-30"})
     notes.append("C-5 Q-5: G-HP-R3 gains OPS-30")
+    # C-22: CL-05 joins G-HP-1 to G-HP-5 (W3b's prompt lists predate the CL-05 successor)
+    for gid in ("G-HP-1", "G-HP-2", "G-HP-3", "G-HP-4", "G-HP-5"):
+        merged[gid]["prompts"] = sorted(set(merged[gid]["prompts"]) | {"CL-05"})
+    notes.append("C-22: CL-05 joins G-HP-1 to G-HP-5")
+    # C-17: PR-20's W2-PR-20-BC-1 is reworded to "as the PR Instruction states it" (assemble_edits.py), and G-W2-BC-7
+    # moves to match: the same substitution on its pattern and fixtures, so the guard still pins the operation's text
+    g7 = merged["G-W2-BC-7"]
+    old7, new7 = "as the instruction carries it", "as the PR Instruction states it"
+    assert sum(p.count(old7) for p in g7["all"]) == 1, "C-17 guard anchor"
+    g7["all"] = [p.replace(old7, new7) for p in g7["all"]]
+    g7["fixtures"] = {k: [f.replace(old7, new7) for f in v] for k, v in g7["fixtures"].items()}
+    g7["note"] = "C-17: pattern and fixtures follow W2-PR-20-BC-1's rewording ('as the PR Instruction states it')"
+    notes.append("C-17: G-W2-BC-7 follows W2-PR-20-BC-1 ('as the PR Instruction states it')")
+    _c16_exceptions(merged, notes)
     # C-8 Q1: the presence half on QA-10 (W4's option (a): 'G-W4-10-4 extended to QA-10'); QA-10 carries both EH-1
     # sentences, each matching the rule's pattern, so its entry expects 2, and G-W4-10-4 itself keeps expect 1
     base = merged["G-W4-10-4"]
@@ -192,15 +293,19 @@ def build() -> dict:
         out.setdefault("except", [])
         out["source"] = g["source"]
         out["surface"] = surface(out["prompts"])
-        for k in ("regenerate", "except_why", "note"):
+        for k in ("regenerate", "except_why", "note", "c16_exceptions"):
             if k in g:
                 out[k] = g[k]
-        tol_all = [escape_tolerant(p) for p in out["all"]]
-        tol_exc = [escape_tolerant(p) for p in out["except"]]
+        md_all = [markdown_form(p) for p in out["all"]]
+        md_exc = [markdown_form(p) for p in out["except"]]
+        tol_all = [escape_tolerant(p) for p in md_all]
+        tol_exc = [escape_tolerant(p) for p in md_exc]
         if tol_all != out["all"] or tol_exc != out["except"]:
             out["source_all"], out["source_except"] = out["all"], out["except"]
             out["all"], out["except"] = tol_all, tol_exc
-            out["escape_tolerant_rewrite"] = True
+            out["escape_tolerant_rewrite"] = tol_all != md_all or tol_exc != md_exc
+            if md_all != out["source_all"] or md_exc != out["source_except"]:
+                out["markdown_form_translated"] = True  # C-15
         guards.append(out)
     return {
         "record_type": "GCFPE_102726_PLAN_BODY_GUARDS",
@@ -213,13 +318,18 @@ def build() -> dict:
         "semantics": ("A unit is a line, or a sentence within a line (split after . ! or ? followed by whitespace). A "
                       "unit matches when every `all` pattern matches it and no `except` pattern does. A forbidden "
                       "guard passes at 0 matching units; a required guard passes at exactly `expect` matching units "
-                      "per prompt. Every pattern is escape-tolerant (C-5 Q-6). Fixtures expand every @KEY shared "
-                      "text. Only counts are reported (D22)."),
+                      "per prompt. Every guard runs on the normalized (Markdown) form of the text, "
+                      "normalize_fetch.normalize (C-15): <code>/<b>/<i> become backticks, ** and *, an escaped "
+                      "underscore becomes _, mentions are unchanged; patterns are written for that form (translated "
+                      "from the workers' fetch-form tags, never retyped). Every pattern is also escape-tolerant "
+                      "(C-5 Q-6), which normalization makes unnecessary and harmless. Fixtures expand every @KEY shared "
+                      "text and are normalized too. Only counts are reported (D22)."),
         "fixture_rule": ("Fixtures are synthetic text, not prompt bodies. Each `pass` fixture must satisfy the guard "
                          "and each `fail` fixture must violate it; `fail_count_only` is a required guard's text present "
                          "at a count other than `expect` (the guard fails it, its registry form, which proves presence "
                          "only, passes it). body_check.py selftest also runs each fixture with its underscores escaped as "
-                         "Notion renders them, and it must give the same verdict."),
+                         "Notion renders them, and in the fetch's own form (inline markup as tags), and each must give "
+                         "the same verdict."),
         "amendments": notes,
         "guards": guards,
     }

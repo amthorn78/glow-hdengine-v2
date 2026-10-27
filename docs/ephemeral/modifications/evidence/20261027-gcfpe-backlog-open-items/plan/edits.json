@@ -735,8 +735,9 @@
    "section": "Required result",
    "start": "acceptance/evidence obligations; security and migration constraints; risks; recovery;",
    "end": null,
-   "new": "the work unit's business case, as the instruction carries it, against which the Product Owner gives Proceed; acceptance/evidence obligations; security and migration constraints; risks; recovery;",
-   "source": "W2"
+   "new": "the work unit's business case, as the PR Instruction states it, against which the Product Owner gives Proceed; acceptance/evidence obligations; security and migration constraints; risks; recovery;",
+   "source": "W2",
+   "coordinator": "C-17: reworded to 'as the PR Instruction states it' (G-HP-5 collision)"
   },
   {
    "id": "W2-PR-20-BC-2",
@@ -4201,6 +4202,97 @@
    "source": "W6"
   },
   {
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "id": "C16-CF-C-20-01",
+   "prompt": "CF-C-20",
+   "section": "Required result and routing",
+   "start": "A source, authority, or Product Owner decision stop without a complete receiver package remains terminal to its actual owner.",
+   "end": null,
+   "new": "A source, authority, or Product Owner decision stop that cannot hand off to a receiver, naming its input artifacts by repository path, remains terminal to its actual owner.",
+   "source": "C16",
+   "why": "G-HP-1: routing is made to depend on a 'complete receiver package', so the handoff is told to carry a complete package (ITEM-08; D23-B). Rewritten to the canonical form: a handoff names its input artifacts by repository path.",
+   "coordinator": "C-16: PART-07's test applied to an A5 failing row; contradicting"
+  },
+  {
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "id": "C16-CF-E-20-01",
+   "prompt": "CF-E-20",
+   "section": "Required result and routing",
+   "start": "A source, authority, or Product Owner decision stop without a complete receiver package remains terminal to its actual owner.",
+   "end": null,
+   "new": "A source, authority, or Product Owner decision stop that cannot hand off to a receiver, naming its input artifacts by repository path, remains terminal to its actual owner.",
+   "source": "C16",
+   "why": "G-HP-1: routing is made to depend on a 'complete receiver package', so the handoff is told to carry a complete package (ITEM-08; D23-B). Rewritten to the canonical form: a handoff names its input artifacts by repository path.",
+   "coordinator": "C-16: PART-07's test applied to an A5 failing row; contradicting"
+  },
+  {
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "id": "C16-CF-C-30-01",
+   "prompt": "CF-C-30",
+   "section": "Required result and routing",
+   "start": "The complete package names the exact approved Specification and Thoth decision by repository path, and the required IA/session binding or its truthful unassigned state; the artifacts hold the rest.",
+   "end": null,
+   "new": "The handoff names the exact approved Specification and Thoth decision by repository path; the artifacts hold the rest. The receiving side chooses or recovers the session.",
+   "source": "C16",
+   "why": "G-HP-1: a 'complete package' label, and the handoff is told to carry the IA/session binding (session identity), which D27 Continuity reverses. Rewritten with the canonical lead's naming form and HP_SESSION ('The receiving side chooses or recovers the session').",
+   "coordinator": "C-16: PART-07's test applied to an A5 failing row; contradicting"
+  },
+  {
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "id": "C16-CF-E-30-01",
+   "prompt": "CF-E-30",
+   "section": "Required result and routing",
+   "start": "The complete package names the exact approved Specification and Thoth decision by repository path, and the required IA/session binding or its truthful unassigned state; the artifacts hold the rest.",
+   "end": null,
+   "new": "The handoff names the exact approved Specification and Thoth decision by repository path; the artifacts hold the rest. The receiving side chooses or recovers the session.",
+   "source": "C16",
+   "why": "G-HP-1: a 'complete package' label, and the handoff is told to carry the IA/session binding (session identity), which D27 Continuity reverses. Rewritten with the canonical lead's naming form and HP_SESSION ('The receiving side chooses or recovers the session').",
+   "coordinator": "C-16: PART-07's test applied to an A5 failing row; contradicting"
+  },
+  {
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "id": "C16-DOC-10-01",
+   "prompt": "DOC-10",
+   "section": "Execute, step 6",
+   "start": "create one complete evidence package and RS-10 intake with the exact native return phase;",
+   "end": null,
+   "new": "record the evidence in one artifact and hand off to RS-10, naming that artifact by repository path; the artifact records the exact native return phase;",
+   "source": "C16",
+   "why": "G-HP-1: the RS-10 handoff is told to be built as 'one complete evidence package' (ITEM-08; D23-B), as DOC-20's 'one complete package' was (W3b HP-DOC-20-01). Rewritten: the evidence is an artifact the handoff names by repository path, and the artifact records the return phase (D23-A).",
+   "coordinator": "C-16: PART-07's test applied to an A5 failing row; contradicting"
+  },
+  {
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "id": "C16-ESC-25-01",
+   "prompt": "ESC-25",
+   "section": "Result routing",
+   "start": "or producing a complete lawful return package is terminal to Nathan",
+   "end": null,
+   "new": "or a lawful return that names its input artifacts by repository path is terminal to Nathan",
+   "source": "C16",
+   "why": "G-HP-1: the terminal condition is the absence of a 'complete lawful return package', so the return handoff is told to carry a complete package (ITEM-08; D23-B). Rewritten to the canonical naming form.",
+   "coordinator": "C-16: PART-07's test applied to an A5 failing row; contradicting"
+  },
+  {
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "id": "C16-RS-30-01",
+   "prompt": "RS-30",
+   "section": "Controlled sources and boundaries",
+   "start": "preserve the bases unchanged, and carry exact lineage into the revised request/proposal and handoff.",
+   "end": null,
+   "new": "preserve the bases unchanged, and record exact lineage in the revised request/proposal. The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest.",
+   "source": "C16",
+   "why": "G-HP-2: the handoff is told to carry exact lineage (ITEM-08; D23-B). The lineage goes into the artifact (D23-A), and the handoff sentence is W3a's HP_HOLD verbatim.",
+   "coordinator": "C-16: PART-07's test applied to an A5 failing row; contradicting"
+  },
+  {
    "id": "HEAD-CF-C-10-T",
    "part": "PART-24",
    "item": "ITEM-31",
@@ -5604,7 +5696,7 @@
    "guard_amendments": {
     "G-W6-PE-14L": {
      "except_add": [
-      "\\(C-VERSION, <code>D23-G</code>, from the release after 091426\\.1\\)"
+      "\\(C-VERSION, `D23-G`, from the release after 091426\\.1\\)"
      ]
     }
    }
@@ -5613,10 +5705,12 @@
  "decisions_applied": [
   "C-5 Q-2 W1-DOC20-01",
   "C-6 W2-PR-10-BC-1 verbatim",
+  "C-17 W2-PR-20-BC-1",
   "C-9 HP-QA-120-01 names CL-05",
   "A1 allow_markup HP-OPS-10-04",
   "C-8 W4-EH-QA10-1",
   "C-8 W4-EH-QA10-2",
+  "C-16 7 PART-07 operations (set C16)",
   "C-2 W3a 109, W3b 98 kept"
  ],
  "pin_flags": []

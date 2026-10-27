@@ -39,6 +39,8 @@ KEPT = {"GCFPE-MGMT-10"}
 ADDED = "CL-05"
 CL05_CANDIDATE = "4054590a05eb8155b301e2cb6dec31d5"
 CL05_TITLE = "CL-05 — Prepare and Publish the Close Mutation Set — 102726.1"
+CL05_PARENT_STAND_IN = "3db4590a05eb81d59059eb6b95ed5fcf"  # the HDE Change Flow hub (C-9, C-19; stand-in only)
+PE_TITLE = "PE Metaprompt 102726.1"
 PE_PREDECESSOR = "3f44590a05eb81f98b76c83465dc1960"
 DASH = " — "
 HEX32 = re.compile(r"^[0-9a-f]{32}$")
@@ -46,6 +48,8 @@ REAL_MAP_PATH = ("docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-o
                  "successor-pages-102726.1.json")
 MEMBER_KEYS = {"disposition", "reason", "page_id", "title", "predecessor_page_id", "duplicated_from", "parent_id",
                "created_last_edited_at"}
+# C-22: the map's PE row carries its title and its revision pin as well as its ids
+PE_KEYS = {"page_id", "predecessor_page_id", "title", "created_last_edited_at"}
 
 
 def members_tsv(path: str) -> dict:
@@ -84,13 +88,14 @@ def standin(tsv: str, out: str) -> int:
                             "created_last_edited_at": None}
     members[ADDED] = {"disposition": "ADDED", "reason": "STAND-IN: DN-2 (b), PART-13", "page_id": CL05_CANDIDATE,
                       "title": CL05_TITLE, "predecessor_page_id": None, "duplicated_from": CL05_CANDIDATE,
-                      "parent_id": None, "created_last_edited_at": None}
+                      "parent_id": CL05_PARENT_STAND_IN, "created_last_edited_at": None}
     doc = {"stand_in": True,
            "stand_in_note": "PLAN dry run only: each successor page id is its predecessor's; CL-05's is the candidate "
                             "page. EXECUTE writes the real map at " + REAL_MAP_PATH,
            "release": RELEASE, "version_family": VERSION, "baseline": BASELINE,
            "members": dict(sorted(members.items())),
-           "pe": {"page_id": PE_PREDECESSOR, "predecessor_page_id": PE_PREDECESSOR}}
+           "pe": {"page_id": PE_PREDECESSOR, "predecessor_page_id": PE_PREDECESSOR, "title": PE_TITLE,
+                  "created_last_edited_at": None}}
     Path(out).write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps({"written": out, "stand_in": True, "members": len(members)}))
     return 0
@@ -144,8 +149,17 @@ def errors(doc: dict, base: dict, stand_in_ok: bool) -> list[str]:
     pe = doc.get("pe") or {}
     if pe.get("predecessor_page_id") != PE_PREDECESSOR or not HEX32.match(str(pe.get("page_id"))):
         errs.append("PE")
+    if set(pe) != PE_KEYS:
+        errs.append("PE_KEYS")
+    elif pe["title"] != PE_TITLE:
+        errs.append("PE_TITLE")
     if not si and pe.get("page_id") == PE_PREDECESSOR:
         errs.append("PE_NOT_NEW")
+    if not si and not pe.get("created_last_edited_at"):
+        errs.append("PE_NO_REVISION_PIN")
+    # C-19: the sole added member's parent fills the contract's staged_parent_id, so even a stand-in map carries one
+    if ADDED in m and set(m[ADDED]) == MEMBER_KEYS and not HEX32.match(str(m[ADDED]["parent_id"])):
+        errs.append(f"PARENT_ID_FORM:{ADDED}")
     return errs
 
 
@@ -191,8 +205,14 @@ def selftest(tsv: str, scratch: str) -> int:
     rows["rejects_duplicate_page_id"] = bool(inj(lambda o: o["members"]["PR-20"].__setitem__(
         "page_id", o["members"]["PR-10"]["page_id"])))
     rows["rejects_typed_page_id_form"] = bool(inj(lambda o: o["members"]["PR-10"].__setitem__("page_id", "PR-10")))
+    rows["rejects_pe_without_title"] = "PE_KEYS" in inj(lambda o: o["pe"].pop("title"))
+    rows["rejects_pe_wrong_title"] = "PE_TITLE" in inj(lambda o: o["pe"].__setitem__("title", "PE Metaprompt 100926.1"))
+    rows["rejects_pe_without_revision_key"] = "PE_KEYS" in inj(lambda o: o["pe"].pop("created_last_edited_at"))
+    rows["rejects_cl05_without_parent"] = f"PARENT_ID_FORM:{ADDED}" in inj(lambda o: o["members"][ADDED].__setitem__(
+        "parent_id", None))
     real = copy.deepcopy(good)
     real.pop("stand_in")
+    rows["real_map_rejects_pe_without_revision_pin"] = "PE_NO_REVISION_PIN" in errors(real, base, False)
     rows["real_map_rejects_reused_predecessor_ids"] = any(e.startswith("SUCCESSOR_NOT_NEW") for e in
                                                           errors(real, base, False))
     ok = all(rows.values())

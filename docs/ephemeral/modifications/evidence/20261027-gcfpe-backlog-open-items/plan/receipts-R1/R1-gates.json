@@ -1,0 +1,111 @@
+{
+ "record_type": "GCFPE_102726_PLAN_R1_GATES",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "repair": "R1 (bodies and guards; coordinator decisions C-15, C-16, C-17, C-22 body items)",
+ "date_utc": "2026-10-27T09:03:48+00:00",
+ "repository_head": "acc39b04ce73d7d212953e066e1d401f95be0150",
+ "working_tree": "uncommitted (no commit or push, per task)",
+ "fetched_after": "2026-10-27T08:59:59.000Z",
+ "reads": {
+  "pages": 57,
+  "captured_first": "2026-10-27T09:00:07.526Z",
+  "captured_last": "2026-10-27T09:02:22.600Z",
+  "d22": "transient reads of this session's harness records; no body text in this receipt"
+ },
+ "successor_map": "plan/successor-map-standin.json",
+ "stand_in": true,
+ "gates": {
+  "normalize_fetch.selftest": {
+   "ok": true,
+   "cases": 15,
+   "cases_failing": [],
+   "injected": {
+    "drop_code_caught": true,
+    "drop_bold_caught": true,
+    "drop_italic_caught": true,
+    "drop_underscore_caught": true,
+    "mention_rewrite_caught": true,
+    "naive_underscore_not_idempotent_caught": true
+   }
+  },
+  "body_check.selftest": {
+   "ok": true,
+   "guards": 118,
+   "fixture_rows": 375,
+   "fixture_rows_failing": 0,
+   "escaped_fixture_rows": 41,
+   "fetch_form_fixture_rows": 40,
+   "checks_false": [],
+   "c15_c16_checks": {
+    "escape_rewritten_guards": 56,
+    "escape_tolerant_fires_on_escaped": true,
+    "normalized_source_pattern_fires_on_escaped": true,
+    "injected_raw_source_pattern_misses_escaped": true,
+    "escape_example_guard_present": true,
+    "c16_exceptions": 4,
+    "c16_exceptions_needed_and_narrow": true,
+    "markdown_translated_guards": 13,
+    "translated_pattern_fires_on_fetch_markup": true,
+    "injected_untranslated_pattern_misses_normalized": true,
+    "code_span_found_through_normalizer": true,
+    "injected_code_span_raw_misses": true,
+    "normalizer_selftest": true
+   }
+  },
+  "binding_pass.selftest": {
+   "ok": true,
+   "checks_false": [],
+   "c22_checks": {
+    "name_alternation_sorted": true,
+    "injected_unsorted_tie_refused": true
+   }
+  },
+  "body_check.plan": {
+   "ok": true,
+   "pages_ok": 57,
+   "pages_total": 57,
+   "ops": 559,
+   "ops_applied": 559,
+   "ops_by_source": {
+    "A1": 110,
+    "C16": 7,
+    "W1": 12,
+    "W2": 24,
+    "W3a": 109,
+    "W3b": 98,
+    "W4": 31,
+    "W5": 41,
+    "W6": 14,
+    "binding_pass": 113
+   },
+   "binding_ops": 113,
+   "binding_identity_under_stand_in": 632,
+   "revisions_match_pins": 57,
+   "batch_safe": 57,
+   "check_would_pass": 57,
+   "binding_current_after": 57,
+   "probe_ok": 57,
+   "guard_rows": 756,
+   "guard_rows_failing_before": 240,
+   "guard_rows_failing_after": 0,
+   "pages_not_ok": [],
+   "rerun_after_rp2_fix_pages_ok": 57
+  },
+  "body_check.registry": {
+   "ok": true,
+   "fixture_rows": 327,
+   "fixtures_disagreeing": 0,
+   "page_rows": 756,
+   "page_rows_disagreeing": 0,
+   "note": "registry form evaluated by the installed amthor-workspace-governance-audit engine on normalize(read), as the guard is"
+  },
+  "body_check.plan.with_R-P2": {
+   "ok": true,
+   "pages_ok": 57,
+   "pe_ok": true,
+   "pe_ops": 16,
+   "pe_guards_failing_after": [],
+   "note": "R-P2's guard amendment (named exception in G-W6-PE-14L) is translated to the Markdown form by assemble_guards.markdown_form (C-15)"
+  }
+ }
+}

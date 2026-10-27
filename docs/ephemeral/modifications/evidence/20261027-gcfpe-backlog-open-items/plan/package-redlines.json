@@ -17,7 +17,9 @@
   "W7-D3: change-flow 3.5.0, flowmaster-validate 3.5.0, glow-hde-pr-development 1.5.0",
   "W7-D4: W4 SR-3/SR-4 merged into EXPECTED_POLICY_20261027",
   "W7: SR-W7-FV-11 replaces SR-FV-29; SR-W7-* after every worker op",
-  "A3-C1 (SR-W7-FV-11 corrected in place) and A3-C2..C4 (last): found by the scratch suite run; each needs the coordinator's acceptance"
+  "A3-C1 (SR-W7-FV-11 corrected in place) and A3-C2..C4: found by the scratch suite run; accepted (C-22)",
+  "C-19 (repair R2): the bounded regenerator exception for CL-05's staged parent, last",
+  "C-20 (repair R2): EXPECTED_POLICY_20261027 checked identical in both packages with W4's value and W5's CL-05 category"
  ],
  "sources": {
   "plan/work/W1.json": "4c9bc11f0d736c8768904016032b35671be66fa91659742273cbe5831519cd50",
@@ -27,11 +29,11 @@
   "plan/work/W7.json": "dfa4e7d0a428b533570117acdb48334b2c8c31fcff269aaf543dfb0d7378c4dc"
  },
  "op_counts": {
-  "total": 102,
+  "total": 105,
   "change-flow": 18,
   "flowmaster-validate": 64,
   "glow-hde-pr-development": 16,
-  "glow-graph-contract": 4
+  "glow-graph-contract": 7
  },
  "ops": [
   {
@@ -1155,6 +1157,39 @@
    "new": "f\"required_global_tokens must be the historical list with only the historical profile_id {history_profile} \"\n                f\"replaced in place by {EXPECTED_ORACLE_PROFILE} and the row coverage token by R1_ROW_COVERAGE: 47/47\",\n",
    "count": 1,
    "why": "the finding names what the check now requires"
+  },
+  {
+   "id": "R2-C19-GG-1",
+   "part": "PART-13",
+   "source": "C-19 (repair R2); contracts_102726.py C19_GG_REDLINES",
+   "skill": "glow-graph-contract",
+   "file": "scripts/regenerate_contract.py",
+   "old": "def regenerate(template: dict, graph: dict, graph_bytes: bytes, value_table=()) -> dict:\n    out = copy.deepcopy(template)\n",
+   "new": "def added_member_parent_paths(template: dict, graph: dict) -> set:\n    \"\"\"MODIFICATION-20261027-gcfpe-backlog-open-items C-19: the one bounded exception to the rule that no value-table\n    entry targets member_registry. A sole added node the template does not carry has no template-carried staged\n    parent, so a release-values file may set exactly its member_registry staged_parent_id and notion_page_manifest\n    parent_id, and regenerate() then requires both. Every carried member keeps its template-carried values.\"\"\"\n    added = [m for m in (graph.get(\"proofs\") or {}).get(\"sole_added_node\") or []\n             if m not in (template.get(\"member_registry\") or {})]\n    return {p for m in added for p in ((\"member_registry\", m, \"staged_parent_id\"),\n                                       (\"notion_page_manifest\", m, \"parent_id\"))}\n\n\ndef regenerate(template: dict, graph: dict, graph_bytes: bytes, value_table=()) -> dict:\n    out = copy.deepcopy(template)\n",
+   "count": 1,
+   "why": "C-19: CL-05, the sole added member, has no template-carried staged parent; the regenerator admits exactly its member_registry staged_parent_id and notion_page_manifest parent_id from the release-values file (filled from the successor map) and requires them"
+  },
+  {
+   "id": "R2-C19-GG-2",
+   "part": "PART-13",
+   "source": "C-19 (repair R2); contracts_102726.py C19_GG_REDLINES",
+   "skill": "glow-graph-contract",
+   "file": "scripts/regenerate_contract.py",
+   "old": "    mirrored = mirrored_paths(graph)\n    for op in value_table:\n        assert op[1][0] != \"member_registry\"",
+   "new": "    mirrored = mirrored_paths(graph)\n    added_parent = added_member_parent_paths(template, graph)\n    for op in value_table:\n        if op[0] == \"set\" and tuple(op[1]) in added_parent:\n            continue  # C-19: the sole added member's staged parent, and nothing else of it\n        assert op[1][0] != \"member_registry\"",
+   "count": 1,
+   "why": "C-19: CL-05, the sole added member, has no template-carried staged parent; the regenerator admits exactly its member_registry staged_parent_id and notion_page_manifest parent_id from the release-values file (filled from the successor map) and requires them"
+  },
+  {
+   "id": "R2-C19-GG-3",
+   "part": "PART-13",
+   "source": "C-19 (repair R2); contracts_102726.py C19_GG_REDLINES",
+   "skill": "glow-graph-contract",
+   "file": "scripts/regenerate_contract.py",
+   "old": "    assert set(out[\"member_registry\"]) == {n[\"id\"] for n in graph[\"nodes\"]}, \"member set != graph node set\"\n",
+   "new": "    for member in sorted({p[1] for p in added_parent}):\n        parent = out[\"member_registry\"][member].get(\"staged_parent_id\")\n        assert isinstance(parent, str) and re.fullmatch(r\"[0-9a-f]{32}\", parent), \\\n            f\"added member {member} has no staged parent\"\n        assert out[\"notion_page_manifest\"][member].get(\"parent_id\") == parent, \\\n            f\"added member {member}: manifest parent differs from its staged parent\"\n    assert set(out[\"member_registry\"]) == {n[\"id\"] for n in graph[\"nodes\"]}, \"member set != graph node set\"\n",
+   "count": 1,
+   "why": "C-19: CL-05, the sole added member, has no template-carried staged parent; the regenerator admits exactly its member_registry staged_parent_id and notion_page_manifest parent_id from the release-values file (filled from the successor map) and requires them"
   }
  ],
  "conditional_sets": [

@@ -1299,10 +1299,10 @@
      "source": "W8",
      "part": "PART-25",
      "item": "ITEM-32",
-     "start": "candidate_release: GCFPE-20261027.1",
+     "start": "candidate\\_release: GCFPE-20261027.1",
      "end": null,
-     "new": "selected_release: GCFPE-20261027.1",
-     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it."
+     "new": "selected\\_release: GCFPE-20261027.1",
+     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it. C-22: anchor and replacement in the escaped fetch form."
     },
     {
      "id": "P1c-PE-2",
@@ -1310,10 +1310,10 @@
      "source": "W8",
      "part": "PART-25",
      "item": "ITEM-32",
-     "start": "status: UNSELECTED_CANDIDATE",
+     "start": "status: UNSELECTED\\_CANDIDATE",
      "end": null,
-     "new": "status: REGISTER_CONTROLLED",
-     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it."
+     "new": "status: REGISTER\\_CONTROLLED",
+     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it. C-22: anchor and replacement in the escaped fetch form."
     },
     {
      "id": "P1c-PE-3",
@@ -1321,10 +1321,10 @@
      "source": "W8",
      "part": "PART-25",
      "item": "ITEM-32",
-     "start": "selection_rule: \"This version is operative while the register binds it as the prompt-authoring control of GCFPE-20261027.1 / 102726.1 / 56, once selected. It does not assert its own selection.\"",
+     "start": "selection\\_rule: \"This version is operative while the register binds it as the prompt-authoring control of GCFPE-20261027.1 / 102726.1 / 56, once selected. It does not assert its own selection.\"",
      "end": null,
-     "new": "selection_rule: \"This version is operative while the register binds it as the prompt-authoring control of GCFPE-20261027.1 / 102726.1 / 56. It does not assert its own selection.\"\nactivated_at: @ACTIVATION_DATE",
-     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it."
+     "new": "selection\\_rule: \"This version is operative while the register binds it as the prompt-authoring control of GCFPE-20261027.1 / 102726.1 / 56. It does not assert its own selection.\"\nactivated\\_at: @ACTIVATION_DATE",
+     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it. C-22: anchor and replacement in the escaped fetch form."
     },
     {
      "id": "P1c-PE-4",
@@ -1332,10 +1332,10 @@
      "source": "W8",
      "part": "PART-25",
      "item": "ITEM-32",
-     "start": "promotion_authorized: false",
+     "start": "promotion\\_authorized: false",
      "end": null,
-     "new": "promotion_authorized: true",
-     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it."
+     "new": "promotion\\_authorized: true",
+     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it. C-22: anchor and replacement in the escaped fetch form."
     },
     {
      "id": "P1c-PE-5",
@@ -1343,10 +1343,10 @@
      "source": "W8",
      "part": "PART-25",
      "item": "ITEM-32",
-     "start": "validation_status: QUALIFICATION_PENDING",
+     "start": "validation\\_status: QUALIFICATION\\_PENDING",
      "end": null,
-     "new": "validation_status: VALIDATED\nvalidation_scope: \"the guards at the landing check and the independent post-flight, MODIFICATION-20261027-gcfpe-backlog-open-items\"",
-     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it."
+     "new": "validation\\_status: VALIDATED\nvalidation\\_scope: \"the guards at the landing check and the independent post-flight, MODIFICATION-20261027-gcfpe-backlog-open-items\"",
+     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it. C-22: anchor and replacement in the escaped fetch form."
     }
    ],
    "name": "PE Metaprompt 102726.1 (successor; head written by the coordinator)",

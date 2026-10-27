@@ -11,7 +11,9 @@ reported by its own top-level flag (never inferred):
                      application refused, and it is refused on an unredlined base (it requires SR-W7-CF-04)
   G2 build           package_build_102726.py build on the stand-in inputs; --check byte-identical; --selftest
   G3 suite           validate_flowmaster.py --skills-root over all installed skills with the four built packages;
-                     findings split into this change's and those the unchanged installed suite already reports
+                     findings split into this change's and those the unchanged installed suite already reports. C-21:
+                     ok when findings_from_this_change is empty and the findings on the unchanged and the built suite
+                     alike are exactly the three named human-design-reading-flowmaster FMV-SKILL-STRUCTURE-001 ones
   G4 release         flowmaster-validate validate_gcfpe_20261027.py, run_gcfpe_20261027_fixtures.py; change-flow
                      validate_gcfpe_20261027.py; glow-hde-pr-development's validator; skill-creator quick_validate x4
   G5 contracts       contract_recipe.py --check on both bundled 102726.1 copies (Q5) and both bundled 100926.1 copies with
@@ -40,6 +42,14 @@ REPO = HERE.parents[5]
 PACKAGES = ("change-flow", "flowmaster-validate", "glow-hde-pr-development", "glow-graph-contract")
 ENV = {"PYTHONDONTWRITEBYTECODE": "1", "PATH": os.environ.get("PATH", "/usr/bin:/bin")}
 CL05_PARENT = "3db4590a05eb81d59059eb6b95ed5fcf"  # W5 expected_parent_id (the HDE Change Flow hub; C-9)
+# C-21: the three findings the unchanged installed suite already reports (pre-existing, outside every part)
+PREEXISTING_C21 = {
+    ("FMV-SKILL-STRUCTURE-001", "human-design-reading-flowmaster",
+     "missing specialization contract: HUMAN_DESIGN_READING_SPECIALIZATION_REVISION: 1.0.1"),
+    ("FMV-SKILL-STRUCTURE-001", "human-design-reading-flowmaster",
+     "missing specialization contract: AUTHOR_SKILL_TARGET_SURFACE_UNAVAILABLE"),
+    ("FMV-SKILL-STRUCTURE-001", "human-design-reading-flowmaster", "missing specialization contract: Original-session QA"),
+}
 
 
 def run(cmd, cwd=None, stdin=None) -> tuple[int, str, str]:
@@ -191,8 +201,19 @@ def main() -> int:
         "findings_preexisting_in_installed_suite": len(pre),
         "findings_from_this_change": [{"rule_id": f["rule_id"], "evidence": f["evidence"][:300]} for f in new],
         "ok_except_preexisting": rep is not None and not new and (rep.get("suite_ok") is True or bool(pre)),
-        "ok": (rep or {}).get("suite_ok") is True,
     }
+    # C-21: the suite gate passes when findings_from_this_change is empty and the only findings, on the unchanged and
+    # the built suite alike, are the three named pre-existing human-design-reading-flowmaster findings
+    named = lambda r: sorted((f["rule_id"], Path(f["subject"]).parent.name, f["evidence"]) for f in (r or {}).get("findings", []))
+    g3 = rec["G3_suite"]
+    g3["c21_preexisting_named"] = [list(x) for x in sorted(PREEXISTING_C21)]
+    g3["c21_unchanged_suite_findings_are_the_named_three"] = rep is not None and named(base_rep) == sorted(PREEXISTING_C21)
+    g3["c21_built_suite_findings_are_the_named_three"] = rep is not None and named(rep) == sorted(PREEXISTING_C21)
+    g3["suite_ok_flag"] = (rep or {}).get("suite_ok") is True
+    g3["ok"] = (rep is not None and not new and g3["c21_unchanged_suite_findings_are_the_named_three"]
+                and g3["c21_built_suite_findings_are_the_named_three"])
+    g3["invariants_not_claimed"] = ("PAIR-001 (C-21): the invariants FMV-SKILL-STRUCTURE-001 covers for "
+                                    "human-design-reading-flowmaster are not claimed")
     # ---------------------------------------------------------------------------------------------- G4
     cf, fv, pr = suite / "change-flow", suite / "flowmaster-validate", suite / "glow-hde-pr-development"
     cpath = cf / "references/gcfpe-20261027.1-102726.1-direct-handoff-contract.json"

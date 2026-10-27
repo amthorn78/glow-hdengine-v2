@@ -4,7 +4,8 @@ MODIFICATION-20261027-gcfpe-backlog-open-items (PLAN, PART-24; W7 tooling.preced
 W7-D9). Adapted from docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/plan/registry_assemble.py.
 
   registry_assemble_102726.py build --stage candidate|selected --base-registry B --audit-root A --graph-contract G
-                                    --parts P --map M --revisions R --out FILE [--stand-in-ok] [--set @MARKER=VALUE ...]
+                                    --parts P --map M --revisions R --catalog-record C --out FILE [--stand-in-ok]
+                                    [--set @MARKER=VALUE ...]
         Rows, in the base registry's order with CL-05 inserted before CL-20:
           1. B is the selected GCFPE-PCR-20261009.1 registry on `main` (W7-D9; no proposal file); the build refuses any
              other registry_id, status or row count;
@@ -23,6 +24,9 @@ W7-D9). Adapted from docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-
           7. source_snapshot.page_last_edited_at from R (EXECUTE: the landing-check report; PLAN: a stand-in);
           8. this plan's guards in registry form (body_check.py `registry --emit`, on the map) appended to
              audit_assertions, an identical assertion once.
+        @CATALOG_ID (C-22) is filled from C, the activation record of the catalog created at candidate publication
+        (C3's C-CAT; JSON whose "values" carry "@CATALOG_PAGE_ID", the value activation_render_102726.py is given),
+        never typed: --set @CATALOG_ID is refused, and a record marked stand_in needs --stand-in-ok.
         The header is B's with registry-header-102726.1.json's set applied and the stage's values filled. The YAML is
         written by yaml.safe_dump and read back by the audit's own load_data; refused unless equal; refused with any
         unfilled `@` marker.
@@ -32,9 +36,16 @@ W7-D9). Adapted from docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-
   registry_assemble_102726.py assertions --registry FILE --audit-root A --synthetic --inject
         PLAN form (no body is read): through the shipped engine, each row's required assertions are reported on a
         text that lacks them, and the two release-wide forbidden assertions (SRC-001 `Prompt version:` and CTR-001
-        CONTROL_NOTION) are not reported on that text and are reported when a violating line is added. Body-level
-        assertions (every page as read, every operation LANDED) are EXECUTE's and A5's: the precedent's body mode
-        is kept (--landed / --page / --shared) and is not run in PLAN.
+        CONTROL_NOTION) are not reported on that text and are reported when a violating line is added.
+  registry_assemble_102726.py assertions --registry FILE --audit-root A --successor-map M [--landed] [--inject]
+                                         [--fetched-after T] [--since-minutes N] [--page KEY=ID@REV ...]
+        BODY form (the precedent's body mode; EXECUTE's x18 and A5): each row's assertions through the shipped engine
+        on the page as read (--landed: every operation on it must be LANDED) or with every operation applied in
+        memory. C-15 (repair R2): the engine sees normalize_fetch.normalize(body), never the raw fetch form; the
+        landing check and the in-memory application stay on the raw read (update_content's form). --inject: each
+        required assertion is reported with its matches removed from the normalized text, and each release-wide
+        forbidden assertion on a violating line. Bodies are D22 transient reads (body_check.py's reader); the report
+        carries counts, ids and booleans only.
   registry_assemble_102726.py compare CANDIDATE SELECTED --audit-root A
         the stages differ only at status, approved_by and approved_at.
   registry_assemble_102726.py selftest --base-registry B --audit-root A --graph-contract G --parts P --map M
@@ -47,6 +58,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import importlib.util
 import json
 import os
@@ -57,6 +69,8 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import normalize_fetch as NF  # noqa: E402  (C-15: every registry assertion runs on the normalized text)
 HEADER = json.loads((HERE / "registry-header-102726.1.json").read_text(encoding="utf-8"))
 W4 = json.loads((HERE / "work/W4.json").read_text(encoding="utf-8"))
 W5 = json.loads((HERE / "work/W5.json").read_text(encoding="utf-8"))
@@ -67,6 +81,28 @@ BASE_REGISTRY_ID, BASE_ROWS = "GCFPE-PCR-20261009.1", 55
 OLD_REL, NEW_REL, OLD_VER, NEW_VER = "GCFPE-20261009.1", "GCFPE-20261027.1", "100926.1", "102726.1"
 ROWS = 56
 ADDED, INSERT_BEFORE = "CL-05", "CL-20"
+HEX32 = re.compile(r"^[0-9a-f]{32}$")
+
+
+def catalog_values(a) -> dict:
+    """C-22: @CATALOG_ID from the activation record of the catalog created at candidate publication, never typed."""
+    if any(item.split("=", 1)[0] == "@CATALOG_ID" for item in a.set):
+        sys.exit("registry_assemble: @CATALOG_ID is filled from --catalog-record (C-22), not typed with --set")
+    if not getattr(a, "catalog_record", None):
+        return {}
+    rec = json.loads(Path(a.catalog_record).read_text(encoding="utf-8"))
+    if rec.get("stand_in") is True and not a.stand_in_ok:
+        sys.exit("registry_assemble: a stand-in catalog record is refused without --stand-in-ok")
+    cat = (rec.get("values") or {}).get("@CATALOG_PAGE_ID")
+    if not isinstance(cat, str) or not HEX32.match(cat):
+        sys.exit("registry_assemble: the catalog record carries no 32-hex @CATALOG_PAGE_ID")
+    return {"@CATALOG_ID": cat}
+
+
+def extra_values(a) -> dict:
+    extra = dict(item.split("=", 1) for item in a.set)
+    extra.update(catalog_values(a))
+    return extra
 
 
 def _module(path: Path, name: str):
@@ -235,7 +271,7 @@ def assemble(a) -> tuple[dict, dict]:
     plan, plan_stand_in = plan_assertions(a.map)
     parts = D.load_parts(a.parts)
     revisions = load_revisions(a.revisions)
-    values = stage_values(a.stage, dict(item.split("=", 1) for item in a.set))
+    values = stage_values(a.stage, extra_values(a))
     base_rows = {r["prompt_key"]: r for r in base["prompts"]}
     order = [r["prompt_key"] for r in base["prompts"]]
     if set(smap["members"]) != set(order) | {ADDED}:
@@ -334,7 +370,7 @@ def load_revisions(path: str) -> dict:
 
 
 def build(a) -> dict:
-    extra = dict(item.split("=", 1) for item in a.set)
+    extra = extra_values(a)
     A = audit(a.audit_root)
     data, report = assemble(a)
     left = markers_left(data)
@@ -399,12 +435,123 @@ INJECT_FORBIDDEN = [("SRC-001", "Prompt version:", "\nPrompt version: 102726.1\n
                     ("CTR-001", "CONTROL_NOTION", "\nCONTROL_NOTION\n")]
 
 
+def body_module():
+    return _module(HERE / "body_check.py", "body_check")
+
+
+def without_matches(text: str, value: str) -> str:
+    """The text with every line the pattern matches removed (the precedent's helper)."""
+    for _ in range(400):
+        m = re.search(value, text, flags=re.MULTILINE)
+        if not m:
+            return text
+        s = text.rfind("\n", 0, m.start()) + 1
+        e = text.find("\n", max(m.end() - 1, m.start()))
+        e = len(text) if e < 0 else e + 1
+        text = text[:s] + text[max(e, s + 1):]
+    return text
+
+
+def assertion_text(raw: str) -> str:
+    """C-15: the one text form every registry assertion sees: the Markdown form of the read in hand."""
+    return NF.normalize(raw)
+
+
+def body_assertions(a) -> dict:
+    """The precedent's body mode, with C-15's normalization: the engine sees assertion_text(body) only."""
+    A, B = audit(a.audit_root), body_module()
+    B.use_map(a.successor_map)
+    for item in a.page:
+        key, rest = item.split("=", 1)
+        pid, ts = rest.split("@", 1)
+        B.EDITS["pages"][key] = {"page_id": pid, "expected_last_edited": ts}
+    smap = B.STATE["map"]
+    shared = dict(B.SHARED, **B.bp.shared_from_map(smap))
+    data = A.load_data(a.registry)
+    root, session = os.path.expanduser("~/.claude/projects"), os.environ.get("CLAUDE_CODE_SESSION_ID")
+    rows_out, ok = [], True
+    for row in data["prompts"]:
+        key = row["prompt_key"]
+        meta = B.EDITS["pages"].get(key)
+        got = B.latest_fetch(meta["page_id"], root, session, a.since_minutes, a.fetched_after) if meta else None
+        if got is None:
+            rows_out.append({"prompt": key, "error": "NO_FETCH_FOUND", "ok": False})
+            ok = False
+            continue
+        raw = got[2]
+        not_landed = []
+        if a.as_read:
+            body = raw
+        elif a.landed:
+            ops, _ = B.page_ops(key, raw, smap, [], shared)
+            not_landed = sorted(o["id"] for o in ops if not o.get("binding") and not B.landed(raw, o, ops, shared)["landed"])
+            regen = B.bp.generate(raw, key, smap, covered=[])
+            if regen["ops"] or regen["unresolved"]:
+                not_landed.append("BINDING_NOT_CURRENT")
+            body = raw
+        else:
+            ops, _ = B.page_ops(key, raw, smap, [], shared)
+            body, _ = B.apply_all(raw, ops, shared)
+        text = assertion_text(body)
+        findings = A._evaluate_assertions(row, text, "transient")
+        r = {"prompt": key, "as_of": got[1], "operations_not_landed": not_landed,
+             "assertions": sum(len(row["audit_assertions"].get(k) or []) for k in ASSERTION_KEYS),
+             "findings_after": len(findings),
+             "finding_rules": sorted({str(f.get("rule_id")) for f in findings})}
+        if a.compare_raw:  # diagnostic only: the same row on the unnormalized fetch form
+            r["findings_on_raw_fetch_form_diagnostic"] = len(A._evaluate_assertions(row, body, "transient"))
+        if a.inject:
+            fired, missed = 0, []
+            aa = row["audit_assertions"]
+            for raw_a in aa.get("required_regex") or []:
+                if A._evaluate_assertions({"prompt_key": key, "audit_assertions": {"required_regex": [raw_a]}},
+                                          without_matches(text, raw_a["value"]), "inject"):
+                    fired += 1
+                else:
+                    missed.append(str(raw_a.get("guard") or raw_a["value"][:60]))
+            for lit in aa.get("required_literals") or []:
+                value = lit if isinstance(lit, str) else lit.get("value", "")
+                broken = "\n".join(l for l in text.split("\n") if value not in l)
+                if A._evaluate_assertions({"prompt_key": key, "audit_assertions": {"required_literals": [lit]}},
+                                          broken, "inject"):
+                    fired += 1
+                else:
+                    missed.append("literal:" + value[:40])
+            for rule, needle, line in INJECT_FORBIDDEN:
+                carried = [x for x in aa.get("forbidden_regex") or []
+                           if x["rule_id"] == rule and re.search(x["value"], needle, flags=re.MULTILINE)]
+                if not carried:
+                    missed.append("NOT_CARRIED:" + needle)
+                    continue
+                if A._evaluate_assertions({"prompt_key": key, "audit_assertions": {"forbidden_regex": carried}},
+                                          text + line, "inject"):
+                    fired += 1
+                else:
+                    missed.append(needle)
+            r["injected_fired"], r["injected_missed"] = fired, missed
+        r["ok"] = not findings and not r.get("injected_missed") and not not_landed
+        ok &= r["ok"]
+        rows_out.append(r)
+    return {"mode": "assertions", "form": "BODY_AS_READ" if a.as_read else ("BODY_LANDED" if a.landed else "BODY_EDITED_IN_MEMORY"),
+            "text_form": "normalize_fetch.normalize (C-15)", "stand_in": B.STATE["stand_in"],
+            "engine": "amthor-workspace-governance-audit _evaluate_assertions", "rows": rows_out,
+            "rows_total": len(rows_out), "rows_ok": sum(1 for r in rows_out if r.get("ok")),
+            "findings_total": sum(r.get("findings_after", 0) for r in rows_out),
+            "rows_with_findings": sum(1 for r in rows_out if r.get("findings_after")),
+            "findings_on_raw_fetch_form_diagnostic_total": sum(r.get("findings_on_raw_fetch_form_diagnostic", 0)
+                                                               for r in rows_out) if a.compare_raw else None,
+            "rows_with_findings_on_raw_fetch_form_diagnostic": sum(1 for r in rows_out if r.get("findings_on_raw_fetch_form_diagnostic"))
+            if a.compare_raw else None,
+            "ok": ok, "d22": "transient reads of this session's harness records; no body text in this report"}
+
+
 def assertions(a) -> dict:
     A = audit(a.audit_root)
-    data = A.load_data(a.registry)
     if not a.synthetic:
-        return {"mode": "assertions", "ok": False,
-                "error": "PLAN runs the synthetic form only; body-level assertions are A5's and EXECUTE's (precedent body mode)"}
+        if not a.successor_map:
+            return {"mode": "assertions", "ok": False, "error": "the body form needs --successor-map"}
+        return body_assertions(a)
+    data = A.load_data(a.registry)
     base_text = "Synthetic text for the registry injection proof; no prompt body is read.\n"
     rows_out, ok = [], True
     for row in data["prompts"]:
@@ -505,8 +652,18 @@ def selftest(a) -> dict:
     rows["refuses_missing_revision"] = refused(missing_rev)
 
     def unfilled(ns):
-        ns.set = [s for s in ns.set if not s.startswith("@CATALOG_ID=")]
+        ns.catalog_record = None
     rows["refuses_unfilled_marker"] = refused(unfilled)
+
+    def typed_catalog(ns):
+        ns.set = list(ns.set) + ["@CATALOG_ID=" + "0" * 32]
+    rows["refuses_typed_catalog_id"] = refused(typed_catalog)
+
+    def bad_catalog(ns):
+        p = W / "catalog-record-bad.json"
+        p.write_text(json.dumps({"stand_in": True, "values": {"@CATALOG_PAGE_ID": "not-a-page"}}), encoding="utf-8")
+        ns.catalog_record = str(p)
+    rows["refuses_catalog_record_without_page_id"] = refused(bad_catalog)
 
     def map_missing_member(ns):
         m = json.loads(Path(a.map).read_text(encoding="utf-8"))
@@ -549,6 +706,15 @@ def selftest(a) -> dict:
         "forbidden_regex", [x for x in d["prompts"][0]["audit_assertions"]["forbidden_regex"] if x["rule_id"] != "SRC-001"]))["ok"] is False
     rows["assertions_report_vacuous_required"] = assert_on(lambda d: d["prompts"][1]["audit_assertions"]["required_regex"].append(
         {"rule_id": "CTR-002", "value": "(?s).*"}))["ok"] is False
+    # C-15: the body form's assertions see the normalized read; on the raw fetch form the same Markdown-form assertion
+    # misreads (the injected failure: an assertion text that skips the normalizer)
+    fetch_line = "Write <code>QA\\_REPORT\\_ID</code> and the <b>Handoff:</b> line.\n"
+    md_row = {"prompt_key": "SELFTEST", "audit_assertions": {
+        "required_regex": [{"rule_id": "CTR-002", "value": r"(?m)`QA_REPORT_ID`"}],
+        "forbidden_regex": [{"rule_id": "CTR-001", "value": r"(?m)<b>"}]}}
+    rows["c15_assertions_pass_on_normalized_text"] = not A._evaluate_assertions(md_row, assertion_text(fetch_line), "transient")
+    rows["c15_injected_raw_text_reported"] = len(A._evaluate_assertions(md_row, fetch_line, "transient")) == 2
+    rows["c15_assertion_text_idempotent"] = assertion_text(assertion_text(fetch_line)) == assertion_text(fetch_line)
     shutil.rmtree(W, ignore_errors=True)
     return {"mode": "selftest", "rows": rows, "selftest_ok": all(rows.values())}
 
@@ -562,6 +728,7 @@ def main() -> int:
             p.add_argument(k, required=True)
         p.add_argument("--stand-in-ok", action="store_true")
         p.add_argument("--set", action="append", default=[], help="@MARKER=VALUE")
+        p.add_argument("--catalog-record", default=None, help="C-22: the catalog's activation record (JSON)")
     b = sub.add_parser("build")
     b.add_argument("--stage", choices=["candidate", "selected"], required=True)
     b.add_argument("--out", required=True)
@@ -575,6 +742,13 @@ def main() -> int:
     s.add_argument("--audit-root", required=True)
     s.add_argument("--synthetic", action="store_true")
     s.add_argument("--inject", action="store_true")
+    s.add_argument("--successor-map", default=None)
+    s.add_argument("--landed", action="store_true")
+    s.add_argument("--as-read", action="store_true", help="evaluate each page as read (no operation applied or required)")
+    s.add_argument("--compare-raw", action="store_true", help="diagnostic: also count findings on the raw fetch form")
+    s.add_argument("--fetched-after", default="")
+    s.add_argument("--since-minutes", type=int, default=900)
+    s.add_argument("--page", action="append", default=[], help="KEY=PAGE_ID@REVISION")
     m = sub.add_parser("compare")
     m.add_argument("candidate"); m.add_argument("selected")
     m.add_argument("--audit-root", required=True)

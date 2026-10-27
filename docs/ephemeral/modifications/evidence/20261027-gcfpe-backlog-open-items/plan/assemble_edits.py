@@ -22,6 +22,9 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(HERE))
+from assemble_guards import markdown_form  # noqa: E402  (C-15)
 WORK = HERE / "work"
 WORKERS = ["W1", "W2", "W3a", "W3b", "W4", "W5", "W6"]
 PE_ID = "3f44590a05eb81f98b76c83465dc1960"
@@ -31,6 +34,55 @@ KEPT = {"GCFPE-MGMT-10"}  # C-1: the only member kept
 MIDSPAN_MARKUP = {"HP-OPS-10-04"}
 DROPS = {"W1-DOC20-01": ["PR-40"], "QA120-02": ["CL-E-10"], "QA120-03": ["CL-C-10"]}
 OP_KEYS = ("id", "part", "item", "prompt", "section", "start", "end", "lines", "new")
+
+# C-16 (repair R1): the A5 failing rows judged by PART-07's stated test (scope-measurement.md section 2; D23-B; D27).
+# A line that tells an agent a handoff or package carries lineage, session identity, manual prerequisites, recovery
+# context, branch or commit, or a complete native input package gets a PART-07 operation built from W3a's canonical
+# family (W3a canonical_texts: HP_HOLD, HP_SESSION, and the "naming its input artifacts by repository path" form of
+# W3a's change-flow redlines); the conforming rows get named exceptions in assemble_guards.py (C16_EXCEPTIONS).
+# Anchors were checked on the A5 reads: each start occurs once in its page and overlaps no other operation's span.
+_C16_STOP = ("A source, authority, or Product Owner decision stop without a complete receiver package remains terminal "
+             "to its actual owner.",
+             "A source, authority, or Product Owner decision stop that cannot hand off to a receiver, naming its input "
+             "artifacts by repository path, remains terminal to its actual owner.",
+             "G-HP-1: routing is made to depend on a 'complete receiver package', so the handoff is told to carry a "
+             "complete package (ITEM-08; D23-B). Rewritten to the canonical form: a handoff names its input artifacts "
+             "by repository path.")
+_C16_IA10 = ("The complete package names the exact approved Specification and Thoth decision by repository path, and the "
+             "required IA/session binding or its truthful unassigned state; the artifacts hold the rest.",
+             "The handoff names the exact approved Specification and Thoth decision by repository path; the artifacts "
+             "hold the rest. The receiving side chooses or recovers the session.",
+             "G-HP-1: a 'complete package' label, and the handoff is told to carry the IA/session binding (session "
+             "identity), which D27 Continuity reverses. Rewritten with the canonical lead's naming form and HP_SESSION "
+             "('The receiving side chooses or recovers the session').")
+C16_OPS = [
+    {"id": "C16-CF-C-20-01", "prompt": "CF-C-20", "section": "Required result and routing",
+     "start": _C16_STOP[0], "new": _C16_STOP[1], "why": _C16_STOP[2]},
+    {"id": "C16-CF-E-20-01", "prompt": "CF-E-20", "section": "Required result and routing",
+     "start": _C16_STOP[0], "new": _C16_STOP[1], "why": _C16_STOP[2]},
+    {"id": "C16-CF-C-30-01", "prompt": "CF-C-30", "section": "Required result and routing",
+     "start": _C16_IA10[0], "new": _C16_IA10[1], "why": _C16_IA10[2]},
+    {"id": "C16-CF-E-30-01", "prompt": "CF-E-30", "section": "Required result and routing",
+     "start": _C16_IA10[0], "new": _C16_IA10[1], "why": _C16_IA10[2]},
+    {"id": "C16-DOC-10-01", "prompt": "DOC-10", "section": "Execute, step 6",
+     "start": "create one complete evidence package and RS-10 intake with the exact native return phase;",
+     "new": "record the evidence in one artifact and hand off to RS-10, naming that artifact by repository path; the "
+            "artifact records the exact native return phase;",
+     "why": "G-HP-1: the RS-10 handoff is told to be built as 'one complete evidence package' (ITEM-08; D23-B), as "
+            "DOC-20's 'one complete package' was (W3b HP-DOC-20-01). Rewritten: the evidence is an artifact the "
+            "handoff names by repository path, and the artifact records the return phase (D23-A)."},
+    {"id": "C16-ESC-25-01", "prompt": "ESC-25", "section": "Result routing",
+     "start": "or producing a complete lawful return package is terminal to Nathan",
+     "new": "or a lawful return that names its input artifacts by repository path is terminal to Nathan",
+     "why": "G-HP-1: the terminal condition is the absence of a 'complete lawful return package', so the return "
+            "handoff is told to carry a complete package (ITEM-08; D23-B). Rewritten to the canonical naming form."},
+    {"id": "C16-RS-30-01", "prompt": "RS-30", "section": "Controlled sources and boundaries",
+     "start": "preserve the bases unchanged, and carry exact lineage into the revised request/proposal and handoff.",
+     "new": "preserve the bases unchanged, and record exact lineage in the revised request/proposal. The handoff names "
+            "its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest.",
+     "why": "G-HP-2: the handoff is told to carry exact lineage (ITEM-08; D23-B). The lineage goes into the artifact "
+            "(D23-A), and the handoff sentence is W3a's HP_HOLD verbatim."},
+]
 
 
 def members() -> dict:
@@ -164,6 +216,14 @@ def build() -> tuple[dict, dict]:
                             "lineage.")
                 o["coordinator"] = "C-9: names CL-05 and its intake (W5 Q-7 (a)); this wording is A1's, for review"
                 notes["applied"].append("C-9 HP-QA-120-01 names CL-05")
+            # C-17: "as the instruction carries it" collides with G-HP-5 (a carry verb in the Required result sentence
+            # that also names session identity); reworded, with G-W2-BC-7 moved to match in assemble_guards.py
+            if o["id"] == "W2-PR-20-BC-1":
+                old = "as the instruction carries it"
+                assert o["new"].count(old) == 1, "C-17 anchor"
+                o["new"] = o["new"].replace(old, "as the PR Instruction states it")
+                o["coordinator"] = "C-17: reworded to 'as the PR Instruction states it' (G-HP-5 collision)"
+                notes["applied"].append("C-17 W2-PR-20-BC-1")
             if o["id"] in MIDSPAN_MARKUP:
                 o["allow_markup"] = True
                 o["coordinator"] = "A1: allow_markup for mid-span <code> formatting markup (no page reference)"
@@ -179,6 +239,12 @@ def build() -> tuple[dict, dict]:
                     for op in eh["proposed_ops"]:
                         ops.append(norm(op, "W4", "C-8 Q1: W4 EH-1 joins PART-10"))
                         notes["applied"].append(f"C-8 {op['id']}")
+    # C-16: the coordinator's PART-07 operations for the contradicting A5 rows (set "C16")
+    for op in C16_OPS:
+        ops.append(dict({"part": "PART-07", "item": "ITEM-08"}, **{k: op[k] for k in ("id", "prompt", "section", "start")},
+                        end=None, new=op["new"], source="C16", why=op["why"],
+                        coordinator="C-16: PART-07's test applied to an A5 failing row; contradicting"))
+    notes["applied"].append(f"C-16 {len(C16_OPS)} PART-07 operations (set C16)")
     # C-2: all of W3a's 109 and W3b's 98 operations are kept
     n3a = sum(1 for o in ops if o["source"] == "W3a")
     n3b = sum(1 for o in ops if o["source"] == "W3b")
@@ -206,8 +272,10 @@ def build() -> tuple[dict, dict]:
          # C-13's wording names 091426.1, which W6's PART-14 guard G-W6-PE-14L forbids on PE; the set carries the
          # named exception its own sentence needs, so the guard holds everywhere else (W6-Q-4 (a), dropping the
          # clause, needs none)
-         "guard_amendments": {"G-W6-PE-14L": {"except_add": [
-             "\\(C-VERSION, <code>D23-G</code>, from the release after 091426\\.1\\)"]}}},
+         # C-15: guards run on the normalized read, so the amendment pattern is translated to the Markdown form by
+         # assemble_guards.markdown_form (the same translation every guard pattern gets), not retyped
+         "guard_amendments": {"G-W6-PE-14L": {"except_add": [markdown_form(
+             "\\(C-VERSION, <code>D23-G</code>, from the release after 091426\\.1\\)")]}}},
     ]
 
     # pages: every page an op touches, pinned to the as_of of the worker's fresh read (the later if two differ)

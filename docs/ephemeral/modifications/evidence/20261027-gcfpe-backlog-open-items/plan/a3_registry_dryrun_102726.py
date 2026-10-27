@@ -60,15 +60,21 @@ def main() -> int:
     rev = W / "revisions-standin.json"
     rev.write_text(json.dumps({"stand_in": True, "revisions": {k: edits["pages"][k]["expected_last_edited"] for k in smap["members"]}},
                               indent=1), encoding="utf-8")
+    # C-22: @CATALOG_ID comes from the activation record of the catalog created at candidate publication; in PLAN
+    # that record is a stand-in naming the 100926.1 catalog
+    catrec = W / "catalog-record-standin.json"
+    catrec.write_text(json.dumps({"record_type": "GCFPE_102726_CANDIDATE_CATALOG_RECORD_STAND_IN", "stand_in": True,
+                                  "step": "C3 C-CAT", "values": {"@CATALOG_PAGE_ID": CATALOG_STAND_IN}}, indent=1) + "\n",
+                      encoding="utf-8")
     common = ["--base-registry", base, "--audit-root", W / "amthor-workspace-governance-audit",
               "--graph-contract", W / "glow-graph-contract", "--parts", A2 / "candidate-parts", "--map", a.map,
-              "--revisions", rev, "--stand-in-ok", "--set", f"@CATALOG_ID={CATALOG_STAND_IN}"]
+              "--revisions", rev, "--stand-in-ok", "--catalog-record", catrec]
     ck = ["--audit-root", W / "amthor-workspace-governance-audit", "--graph-contract", W / "glow-graph-contract",
           "--parts", A2 / "candidate-parts"]
     rec = {"record_type": "A3_PLAN_REGISTRY_RECEIPT", "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
            "worker": "A3", "date": "2026-10-27", "stand_in_used": True,
            "stand_ins": ["successor map " + Path(a.map).name, "page revisions: edits.json pages[*].expected_last_edited",
-                         f"@CATALOG_ID {CATALOG_STAND_IN} (the 100926.1 catalog)", "@PROMOTION_APPROVAL_DATE 2026-10-27",
+                         f"@CATALOG_ID {CATALOG_STAND_IN} (the 100926.1 catalog), from a stand-in catalog record (C-22)", "@PROMOTION_APPROVAL_DATE 2026-10-27",
                          "derived fields from A2's stand-in candidate parts (counts do not depend on the map)"],
            "base": {"source": f"git show origin/main:{REG}", "origin_main": main_rev,
                     "sha256": hashlib.sha256(base.read_bytes()).hexdigest(), "bytes": base.stat().st_size}}

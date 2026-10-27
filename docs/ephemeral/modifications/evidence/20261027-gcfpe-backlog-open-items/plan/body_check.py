@@ -27,6 +27,11 @@ span, landing, guard and registry logic, with this Modification's edits.json and
   page is accepted when its count after the batch equals the count the page's replacements carry (the landing
   check's own end test); and a required guard's sentence-final `$` becomes "followed by whitespace or line end" in
   the registry form, which runs over whole lines.
+* C-15 (repair R1): one text form for every check. Every guard, and its registry form, runs on
+  normalize_fetch.normalize(read) (`<code>x</code>` -> `x` in backticks, `<b>x</b>` -> **x**, `<i>x</i>` -> *x*, `\\_` ->
+  `_`, mentions unchanged), and so does every fixture; every operation's anchors, its landing check and the batch-safety
+  check stay on the raw read, because update_content matches the fetch's own form. guard_count normalizes its input
+  itself (normalize is idempotent), so no caller can run a guard on the raw form by omission.
 
   body_check.py selftest
   body_check.py plan  --successor-map F [--no-ops] [--prompts P ...] [--fetched-after T] [--with-conditional S ...]
@@ -57,6 +62,7 @@ sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import binding_pass as bp  # noqa: E402
+import normalize_fetch as nf  # noqa: E402
 
 EDITS = json.loads((HERE / "edits.json").read_text(encoding="utf-8"))
 GUARDS = json.loads((HERE / "guards.json").read_text(encoding="utf-8"))
@@ -313,12 +319,19 @@ def units(text: str, unit: str):
             yield from (s for s in re.split(r"(?<=[.!?])\s+", line) if s)
 
 
-def guard_count(text: str, g: dict) -> int:
+def raw_guard_count(text: str, g: dict) -> int:
+    """The unit count on the text exactly as given; only the self-test calls it, to show that normalization is what
+    makes a pattern written for the Markdown form fire on a fetch-form read."""
     n = 0
     for u in units(text, g["unit"]):
         if all(re.search(p, u) for p in g["all"]) and not any(re.search(p, u) for p in g.get("except", [])):
             n += 1
     return n
+
+
+def guard_count(text: str, g: dict) -> int:
+    """C-15: every guard runs on the normalized (Markdown) form of the text it is given."""
+    return raw_guard_count(nf.normalize(text), g)
 
 
 def guard_pass(text: str, g: dict) -> tuple[int, bool]:
@@ -473,8 +486,9 @@ def _engine(audit_root: str):
 
 
 def _registry_pass(evaluate, g: dict, text: str) -> bool:
+    """C-15: the registry form runs on the normalized text, as the guard does."""
     (k, v), = to_registry(g).items()
-    return not evaluate({"prompt_key": g["id"], "audit_assertions": {k: [v]}}, text, "transient")
+    return not evaluate({"prompt_key": g["id"], "audit_assertions": {k: [v]}}, nf.normalize(text), "transient")
 
 
 def registry(audit_root: str, root: str, session: str, since: int, fetched_after: str, conditional: list) -> dict:
@@ -520,6 +534,14 @@ def registry(audit_root: str, root: str, session: str, since: int, fetched_after
 
 
 # --- self-test ----------------------------------------------------------------------------------------------
+def _fetch_form(s: str) -> str:
+    """A Markdown-form fixture as Notion's fetch renders it (C-15's mappings inverted): `x` in backticks -> <code>x</code>,
+    **x** -> <b>x</b>, and every underscore outside <code> escaped. normalize() maps it back."""
+    s = re.sub(r"`([^`\n]+)`", lambda m: "<code>" + m.group(1) + "</code>", s)
+    s = re.sub(r"\*\*([^*\n]+)\*\*", lambda m: "<b>" + m.group(1) + "</b>", s)
+    return _escaped(s)
+
+
 def _escaped(s: str) -> str:
     """A fixture as Notion renders plain text: every underscore outside <code> escaped."""
     parts = re.split(r"(<code>.*?</code>)", s)
@@ -535,6 +557,7 @@ def selftest() -> dict:
     fshared = dict(SHARED, **bp.shared_from_map(bp.probe(smap)))
     guards = active_guards(bp.probe(smap))
     escape_rows = 0
+    fetch_form_rows = 0
     for g in guards:
         for want, fixtures in (("pass", g["fixtures"]["pass"]), ("fail", g["fixtures"]["fail"]),
                                ("fail", g["fixtures"].get("fail_count_only", []))):
@@ -549,6 +572,13 @@ def selftest() -> dict:
                     row["escaped_same_verdict"] = pe == passed
                     good &= row["escaped_same_verdict"]
                     escape_rows += 1
+                # C-15: the fixture in the fetch's own form (inline markup as tags, underscores escaped) normalizes to
+                # the same verdict, so a guard does not depend on which form its fixture was written in
+                ff = _fetch_form(nf.normalize(text))
+                if ff != text:
+                    row["fetch_form_same_verdict"] = guard_pass(ff, g)[1] == passed
+                    good &= row["fetch_form_same_verdict"]
+                    fetch_form_rows += 1
                 row["as_expected"] = good
                 ok &= good
                 rows.append(row)
@@ -617,17 +647,41 @@ def selftest() -> dict:
         synth["unfilled_token_refused"] = False
     except Unfilled:
         synth["unfilled_token_refused"] = True
-    # escape tolerance: a guard pattern with an underscore matches the escaped rendering; the worker's own
-    # (pre-rewrite) pattern does not, so the rewrite is what makes the guard fire
+    # C-15 normalization: an escaped underscore is normalized before any guard runs, so the worker's own pattern fires
+    # on the escaped rendering (the C-5 Q-6 rewrite is no longer needed, and stays harmless); the injected miss is the
+    # same pattern on the raw, unnormalized text
     tol = next(g for g in GUARDS["guards"] if g.get("escape_tolerant_rewrite"))
     probe_line = "Preserve session\\_disposition and role\\_session\\_ref for the receiver."
     gx = next(g for g in GUARDS["guards"] if g["id"] == "G-HP-5")
+    gsrc = dict(gx, all=gx["source_all"], **{"except": gx["source_except"]}) if "source_all" in gx else None
     synth.update({"escape_rewritten_guards": sum(1 for g in GUARDS["guards"] if g.get("escape_tolerant_rewrite")),
                   "escape_tolerant_fires_on_escaped": guard_count(probe_line, gx) == 1,
-                  "escape_source_pattern_misses_escaped": guard_count(
-                      probe_line, dict(gx, all=gx["source_all"], **{"except": gx["source_except"]})) == 0
-                  if "source_all" in gx else False,
+                  "normalized_source_pattern_fires_on_escaped": gsrc is not None and guard_count(probe_line, gsrc) == 1,
+                  "injected_raw_source_pattern_misses_escaped": gsrc is not None and raw_guard_count(probe_line, gsrc) == 0,
                   "escape_example_guard_present": bool(tol)})
+    # C-16 named exceptions: each admits its conforming line (removing it makes the pass fixture fail) and masks no
+    # contradicting sentence of the same opening (its fail fixture fails with the exception in place)
+    c16 = []
+    for g in GUARDS["guards"]:
+        for e in g.get("c16_exceptions", []):
+            without = dict(g, **{"except": [x for i, x in enumerate(g["except"]) if i != e["except_index"]]})
+            c16.append(guard_pass(e["pass_fixture"], g)[1] and not guard_pass(e["pass_fixture"], without)[1]
+                       and not guard_pass(e["fail_fixture"], g)[1])
+    synth.update({"c16_exceptions": len(c16), "c16_exceptions_needed_and_narrow": bool(c16) and all(c16)})
+    # C-15 markup: a fetch-form line (<b> label, <code> value) is found by the translated pattern, and the worker's
+    # untranslated <b> pattern misses the normalized text, so the translation is what keeps the guard firing; the
+    # normalized read is what makes a Markdown-form pattern fire on a <code> span
+    g6 = next(g for g in GUARDS["guards"] if g["id"] == "G-HP-6")
+    g6_src = dict(g6, all=g6["source_all"], **{"except": g6["source_except"]})
+    fetch_line = "- <b>Native inputs:</b> <code>QA\\_REPORT</code> and its lineage."
+    gcl = next(g for g in GUARDS["guards"] if g["id"] == "G-CL05-08")
+    code_line = "Never state <code>CLOSE\\_PR\\_READY</code> while any part of its predicate is unmet."
+    synth.update({"markdown_translated_guards": sum(1 for g in GUARDS["guards"] if g.get("markdown_form_translated")),
+                  "translated_pattern_fires_on_fetch_markup": guard_count(fetch_line, g6) == 1,
+                  "injected_untranslated_pattern_misses_normalized": guard_count(fetch_line, g6_src) == 0,
+                  "code_span_found_through_normalizer": guard_count(code_line, gcl) == 1,
+                  "injected_code_span_raw_misses": raw_guard_count(code_line, gcl) == 0,
+                  "normalizer_selftest": nf.selftest()["ok"]})
     # the binding generator's own self-test, and its rows on a synthetic head through page_ops
     bsel = bp.selftest()
     synth["binding_pass_selftest"] = bsel["ok"]
@@ -659,9 +713,11 @@ def selftest() -> dict:
     finally:
         EDITS["ops"] = saved
     synth["standin_identity_counted"] = sinfo["binding_identity_under_stand_in"] == 1 and sinfo["binding_ops"] == 1
-    ok &= all(v for k, v in synth.items() if k != "escape_rewritten_guards")
+    ok &= all(v for k, v in synth.items() if k not in ("escape_rewritten_guards", "markdown_translated_guards",
+                                                         "c16_exceptions"))
     return {"mode": "selftest", "guards": len(GUARDS["guards"]), "fixture_rows": len(rows),
             "fixture_rows_failing": [r for r in rows if not r["as_expected"]], "escaped_fixture_rows": escape_rows,
+            "fetch_form_fixture_rows": fetch_form_rows,
             "span_resolver_and_additions": synth, "binding_pass": bsel["checks"], "ok": ok}
 
 

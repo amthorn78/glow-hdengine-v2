@@ -3,11 +3,17 @@
  "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
  "date": "2026-10-27",
  "purpose": "Behavior guards for the body operations in edits.json and the central head and binding operations (D14, GUARD-001), merged from the nine design workers; each carries its source worker. Forbidden guards are a broad match minus named exceptions (D26-E, SCOPE-001); required guards prove the repair text present. They become candidate registry assertions (PART-24).",
- "semantics": "A unit is a line, or a sentence within a line (split after . ! or ? followed by whitespace). A unit matches when every `all` pattern matches it and no `except` pattern does. A forbidden guard passes at 0 matching units; a required guard passes at exactly `expect` matching units per prompt. Every pattern is escape-tolerant (C-5 Q-6). Fixtures expand every @KEY shared text. Only counts are reported (D22).",
- "fixture_rule": "Fixtures are synthetic text, not prompt bodies. Each `pass` fixture must satisfy the guard and each `fail` fixture must violate it; `fail_count_only` is a required guard's text present at a count other than `expect` (the guard fails it, its registry form, which proves presence only, passes it). body_check.py selftest also runs each fixture with its underscores escaped as Notion renders them, and it must give the same verdict.",
+ "semantics": "A unit is a line, or a sentence within a line (split after . ! or ? followed by whitespace). A unit matches when every `all` pattern matches it and no `except` pattern does. A forbidden guard passes at 0 matching units; a required guard passes at exactly `expect` matching units per prompt. Every guard runs on the normalized (Markdown) form of the text, normalize_fetch.normalize (C-15): <code>/<b>/<i> become backticks, ** and *, an escaped underscore becomes _, mentions are unchanged; patterns are written for that form (translated from the workers' fetch-form tags, never retyped). Every pattern is also escape-tolerant (C-5 Q-6), which normalization makes unnecessary and harmless. Fixtures expand every @KEY shared text and are normalized too. Only counts are reported (D22).",
+ "fixture_rule": "Fixtures are synthetic text, not prompt bodies. Each `pass` fixture must satisfy the guard and each `fail` fixture must violate it; `fail_count_only` is a required guard's text present at a count other than `expect` (the guard fails it, its registry form, which proves presence only, passes it). body_check.py selftest also runs each fixture with its underscores escaped as Notion renders them, and in the fetch's own form (inline markup as tags), and each must give the same verdict.",
  "amendments": [
   "C-5 Q-3: G-HP-6 prompts = the 56 release members and PE",
   "C-5 Q-5: G-HP-R3 gains OPS-30",
+  "C-22: CL-05 joins G-HP-1 to G-HP-5",
+  "C-17: G-W2-BC-7 follows W2-PR-20-BC-1 ('as the PR Instruction states it')",
+  "C-16: G-HP-1 named exception (CL-C-10)",
+  "C-16: G-HP-4 named exception (CL-C-10, CL-E-10)",
+  "C-16: G-HP-5 named exception (DOC-10)",
+  "C-16: G-HP-2 named exception (QA-110)",
   "C-8 Q1: G-W4-10-4-QA10 (expect 2 on QA-10)",
   "G-W7-BIND-1: W7's PR-50 pass fixture moved to fail (C-1 gives PR-50 a successor)",
   "G-W7-BIND-1 and G-W8-NAME-1: PE added; patterns regenerated from the successor map by body_check",
@@ -854,11 +860,11 @@
     "PR-20"
    ],
    "all": [
-    "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))business case, as the instruction carries it, against which the Product Owner gives Proceed(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))"
+    "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))business case, as the PR Instruction states it, against which the Product Owner gives Proceed(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))"
    ],
    "fixtures": {
     "pass": [
-     "One complete plan with the work unit's business case, as the instruction carries it, against which the Product Owner gives Proceed; acceptance/evidence obligations."
+     "One complete plan with the work unit's business case, as the PR Instruction states it, against which the Product Owner gives Proceed; acceptance/evidence obligations."
     ],
     "fail": [
      "One complete plan with acceptance/evidence obligations; security and migration constraints."
@@ -867,8 +873,9 @@
    "except": [],
    "source": "W2",
    "surface": "prompt-body",
+   "note": "C-17: pattern and fixtures follow W2-PR-20-BC-1's rewording ('as the PR Instruction states it')",
    "source_all": [
-    "(?i)\\bbusiness case, as the instruction carries it, against which the Product Owner gives Proceed\\b"
+    "(?i)\\bbusiness case, as the PR Instruction states it, against which the Product Owner gives Proceed\\b"
    ],
    "source_except": [],
    "escape_tolerant_rewrite": true
@@ -1499,6 +1506,7 @@
     "CF-E-30",
     "CF-E-40",
     "CF-PO-10",
+    "CL-05",
     "CL-20",
     "CL-30",
     "CL-40",
@@ -1550,28 +1558,46 @@
    "all": [
     "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))complete(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))[^.;:\\n]{0,40}(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))packages?(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))|(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))native\\s+(?:input\\s+)?packages?(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))"
    ],
-   "except": [],
+   "except": [
+    "^Each\\ runnable\\ direct\\-native\\ package\\ names\\ its\\ destination,\\ receiving\\ role/name\\ and\\ exact\\ task/artifact\\ binding,\\ and\\ input\\ artifacts\\ by\\ repository\\ path;\\ the\\ artifacts\\ hold\\ the\\ rest\\."
+   ],
    "fixtures": {
     "pass": [
      "Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest.",
      "Handoff: the output artifact and its predecessor artifacts, each by repository path; the artifacts hold the decision state, the pending manual act or terminal state, the return point and the rest.",
      "Do not emit a runnable PR-30 package while a decisive prerequisite is missing.",
-     "Handoff: the output artifact, by repository path; the artifacts hold the rest."
+     "Handoff: the output artifact, by repository path; the artifacts hold the rest.",
+     "Each runnable direct-native package names its destination, receiving role/name and exact task/artifact binding, and input artifacts by repository path; the artifacts hold the rest."
     ],
     "fail": [
      "Each handoff carries the complete native input package.",
      "Complete RS-20 package:",
      "Return the complete recoverable package to the owner.",
-     "All results use direct native handoffs with complete native input packages."
+     "All results use direct native handoffs with complete native input packages.",
+     "Each runnable direct-native package carries the complete native input package and its lineage."
     ]
    },
    "source": "W3a+W3b (W3b's text, C-5 Q-1)",
    "surface": "prompt-body",
-   "except_why": [],
+   "except_why": [
+    "C-16, conforming: CL-C-10's package sentence names the destination, receiving role and input artifacts by repository path and leaves the rest to the artifacts, which is W3a's HP_PACKAGE form; 'direct-native' names the route, not a complete input package"
+   ],
+   "c16_exceptions": [
+    {
+     "except_index": 0,
+     "pass_fixture": "Each runnable direct-native package names its destination, receiving role/name and exact task/artifact binding, and input artifacts by repository path; the artifacts hold the rest.",
+     "fail_fixture": "Each runnable direct-native package carries the complete native input package and its lineage.",
+     "prompts_seen": [
+      "CL-C-10"
+     ]
+    }
+   ],
    "source_all": [
     "(?i)\\bcomplete\\b[^.;:\\n]{0,40}\\bpackages?\\b|\\bnative\\s+(?:input\\s+)?packages?\\b"
    ],
-   "source_except": [],
+   "source_except": [
+    "^Each\\ runnable\\ direct\\-native\\ package\\ names\\ its\\ destination,\\ receiving\\ role/name\\ and\\ exact\\ task/artifact\\ binding,\\ and\\ input\\ artifacts\\ by\\ repository\\ path;\\ the\\ artifacts\\ hold\\ the\\ rest\\."
+   ],
    "escape_tolerant_rewrite": true
   },
   {
@@ -1590,6 +1616,7 @@
     "CF-E-30",
     "CF-E-40",
     "CF-PO-10",
+    "CL-05",
     "CL-20",
     "CL-30",
     "CL-40",
@@ -1648,7 +1675,8 @@
     "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))artifacts?\\s+(?:hold|holds|record|records)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))|(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))they\\s+(?:hold|record)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
     "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))committed and pushed on the working branch(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
     "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))(?:into|in) its (?:result artifact|execution result|output artifact), which (?:the|its|each)(?: return| next)? handoff names(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
-    "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority\\."
+    "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority\\.",
+    "Markdown\\ at\\ paths\\ under\\ `docs/ephemeral/`\\ in\\ the\\ repository,\\ commit\\ and\\ push\\ them\\ on\\ the\\ working\\ branch,"
    ],
    "fixtures": {
     "pass": [
@@ -1658,14 +1686,16 @@
      "The branch, head and commits are verified at entry; the handoff does not carry them.",
      "A blocked or terminal branch must preserve its owner rather than a fabricated runnable package.",
      "Write the Plan, checkpoint, and handoff as complete machine-readable Markdown at a path under docs/ephemeral/ in the repository, committed and pushed on the working branch; preserve prior versions.",
-     "Every applicable writer carries the exact PF10/addendum lineage into its result artifact, which the handoff names."
+     "Every applicable writer carries the exact PF10/addendum lineage into its result artifact, which the handoff names.",
+     "Write the checkpoint and handoff as Markdown at paths under `docs/ephemeral/` in the repository, commit and push them on the working branch, preserve versions, and return their repository paths."
     ],
     "fail": [
      "Each handoff carries exact artifact lineage and session identity.",
      "The package preserves the recovery state and manual prerequisites.",
      "The handoff includes the working branch and head commit.",
      "Carry that lineage into the proposal and handoff.",
-     "The handoff carries the lineage and is committed on the working branch."
+     "The handoff carries the lineage and is committed on the working branch.",
+     "Write the handoff so that it carries the working branch and head commit to QA-120."
     ]
    },
    "source": "W3a+W3b (W3b's text, C-5 Q-1)",
@@ -1675,7 +1705,18 @@
     "conformant wording: lineage or state is said to be held by the artifacts, not carried by the handoff (C-PLACE; 'the artifacts hold their lineage' in Source discovery and reference discipline)",
     "storage rule (PF04 §9.1.3; D23-A): 'written at a path under docs/ephemeral/ ... committed and pushed on the working branch' names the artifact store, not handoff content; it is in every body's runtime-artifact paragraph and matched only on 'working branch' (QA-60, QA-80, RS-10 on W3b's reads)",
     "conformant D23-A wording: lineage is carried into the result artifact, which the handoff names (the PF10-overlay paragraph of CL-20, CL-30, CL-40; OPS-10's execution-result sentence)",
-    "PE Metaprompt 'Run state, recovery, and completion': PE's own general run rule, which also governs TW; DN-8 (c) (Nathan, 2026-10-27) keeps PE's general rules unchanged and the D23-G successor of 2026-09-23 keeps TW out of scope, so the line is not edited here (Q-W3b-4)"
+    "PE Metaprompt 'Run state, recovery, and completion': PE's own general run rule, which also governs TW; DN-8 (c) (Nathan, 2026-10-27) keeps PE's general rules unchanged and the D23-G successor of 2026-09-23 keeps TW out of scope, so the line is not edited here (Q-W3b-4)",
+    "C-16, conforming: storage rule (PF04 section 9.1.3; D23-A): the handoff is one of the artifacts written and committed on the working branch; it names the artifact store, not handoff content (as the existing 'committed and pushed on the working branch' exception)"
+   ],
+   "c16_exceptions": [
+    {
+     "except_index": 5,
+     "pass_fixture": "Write the checkpoint and handoff as Markdown at paths under `docs/ephemeral/` in the repository, commit and push them on the working branch, preserve versions, and return their repository paths.",
+     "fail_fixture": "Write the handoff so that it carries the working branch and head commit to QA-120.",
+     "prompts_seen": [
+      "QA-110"
+     ]
+    }
    ],
    "source_all": [
     "(?i)\\b(?:handoffs?|packages?)\\b",
@@ -1687,7 +1728,8 @@
     "(?i)\\bartifacts?\\s+(?:hold|holds|record|records)\\b|\\bthey\\s+(?:hold|record)\\b",
     "(?i)\\bcommitted and pushed on the working branch\\b",
     "(?i)\\b(?:into|in) its (?:result artifact|execution result|output artifact), which (?:the|its|each)(?: return| next)? handoff names\\b",
-    "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority\\."
+    "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority\\.",
+    "Markdown\\ at\\ paths\\ under\\ `docs/ephemeral/`\\ in\\ the\\ repository,\\ commit\\ and\\ push\\ them\\ on\\ the\\ working\\ branch,"
    ],
    "escape_tolerant_rewrite": true
   },
@@ -1707,6 +1749,7 @@
     "CF-E-30",
     "CF-E-40",
     "CF-PO-10",
+    "CL-05",
     "CL-20",
     "CL-30",
     "CL-40",
@@ -1805,6 +1848,7 @@
     "CF-E-30",
     "CF-E-40",
     "CF-PO-10",
+    "CL-05",
     "CL-20",
     "CL-30",
     "CL-40",
@@ -1857,31 +1901,47 @@
     "^(?:- )?(?:Required tools, stores, environment and access limitations:|Applicable gates and manual prerequisites:|(?:Exact )?[Nn]ative inputs and artifact lineage:)"
    ],
    "except": [
-    "(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))holds them; name only(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))"
+    "(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))holds them; name only(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
+    "^Required\\ tools,\\ stores,\\ environment\\ and\\ access\\ limitations:\\ Use\\ only\\ approved\\ evidence\\ stores,\\ permitted\\ read\\-only\\ repository/environment\\ evidence\\ access\\ and\\ supplied\\ manual\\ permissions\\."
    ],
    "fixtures": {
     "pass": [
      "Required tools, stores, environment and access limitations: QA-20 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
      "Applicable gates and manual prerequisites: RS-10 holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
-     "Required tools are named in the plan."
+     "Required tools are named in the plan.",
+     "Required tools, stores, environment and access limitations: Use only approved evidence stores, permitted read-only repository/environment evidence access and supplied manual permissions."
     ],
     "fail": [
      "Required tools, stores, environment and access limitations: preserve read-only access, recovery and terminal behavior.",
      "Applicable gates and manual prerequisites: exact owner and session.",
      "Exact native inputs and artifact lineage: complete readiness record.",
-     "- Required tools, stores, environment and access limitations: preserve the dedicated PR session."
+     "- Required tools, stores, environment and access limitations: preserve the dedicated PR session.",
+     "Required tools, stores, environment and access limitations: preserve the destination's tools, recovery and terminal behavior."
     ]
    },
    "source": "W3a+W3b (W3b's text, C-5 Q-1)",
    "surface": "prompt-body",
    "except_why": [
-    "the canonical replacement form of the tools and gates fields (HP_ACCESS_FORM, HP_GATES_FORM)"
+    "the canonical replacement form of the tools and gates fields (HP_ACCESS_FORM, HP_GATES_FORM)",
+    "C-16, conforming: the field is in the prompt's own Inputs section and limits the closure prompt's own access; it is not a per-branch handoff field restating a destination prompt's tools (G-HP-4's rule, findings.md V2 second layer)"
+   ],
+   "c16_exceptions": [
+    {
+     "except_index": 1,
+     "pass_fixture": "Required tools, stores, environment and access limitations: Use only approved evidence stores, permitted read-only repository/environment evidence access and supplied manual permissions.",
+     "fail_fixture": "Required tools, stores, environment and access limitations: preserve the destination's tools, recovery and terminal behavior.",
+     "prompts_seen": [
+      "CL-C-10",
+      "CL-E-10"
+     ]
+    }
    ],
    "source_all": [
     "^(?:- )?(?:Required tools, stores, environment and access limitations:|Applicable gates and manual prerequisites:|(?:Exact )?[Nn]ative inputs and artifact lineage:)"
    ],
    "source_except": [
-    "\\bholds them; name only\\b"
+    "\\bholds them; name only\\b",
+    "^Required\\ tools,\\ stores,\\ environment\\ and\\ access\\ limitations:\\ Use\\ only\\ approved\\ evidence\\ stores,\\ permitted\\ read\\-only\\ repository/environment\\ evidence\\ access\\ and\\ supplied\\ manual\\ permissions\\."
    ],
    "escape_tolerant_rewrite": true
   },
@@ -1901,6 +1961,7 @@
     "CF-E-30",
     "CF-E-40",
     "CF-PO-10",
+    "CL-05",
     "CL-20",
     "CL-30",
     "CL-40",
@@ -1957,7 +2018,8 @@
     "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))(?:no|not|never|nor|without|neither|nothing|none)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
     "while retaining the supplied PR reviewer/session identity for this review",
     "Carry the exact continuing Isis role and supplied session identity across",
-    "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority\\."
+    "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority\\.",
+    "^Preserve\\ exact\\ `CHANGE\\\\?_CLASS`,\\ `CHANGE\\\\?_ID`,\\ `DOCUMENTATION\\\\?_UNIT\\\\?_ID`,\\ actual\\ PR/Ops\\ task/result/receipt\\ lineage,\\ repository\\ baseline,\\ producer/acceptance/operator/session\\ identities,"
    ],
    "fixtures": {
     "pass": [
@@ -1965,12 +2027,14 @@
      "Do not preserve a platform session identity.",
      "Carry the exact continuing Isis role and supplied session identity across the audit.",
      "Preserve the same author and reviewer and the exact Product Owner return owner where applicable.",
-     "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority."
+     "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority.",
+     "Preserve exact `CHANGE_CLASS`, `CHANGE_ID`, `DOCUMENTATION_UNIT_ID`, actual PR/Ops task/result/receipt lineage, repository baseline, producer/acceptance/operator/session identities, and the rest."
     ],
     "fail": [
      "Preserve session_disposition, role_session_ref and invocation_binding.",
      "Retain the exact owner, role and session continuity.",
-     "Carry the supplied session identity to the receiver."
+     "Carry the supplied session identity to the receiver.",
+     "Preserve exact session identity and session continuity in the DOC-20 handoff."
     ]
    },
    "source": "W3a+W3b (W3b's text, C-5 Q-1)",
@@ -1979,7 +2043,18 @@
     "negation: a sentence that says a handoff does NOT carry these (C-HANDOFF 'It carries no branch and no commit'; 'the handoff does not carry them') is the rule itself",
     "PR-40's own reviewer posture (its 'continuing identity' section), not handoff content; outside the MB-010 test; D27 tension listed in escape_hatch",
     "QA-10's own-role continuity across its integrated operation, not handoff content; outside the MB-010 test; D27 tension listed in escape_hatch",
-    "PE Metaprompt 'Run state, recovery, and completion': PE's own general run rule, which also governs TW; DN-8 (c) (Nathan, 2026-10-27) keeps PE's general rules unchanged and the D23-G successor of 2026-09-23 keeps TW out of scope, so the line is not edited here (Q-W3b-4)"
+    "PE Metaprompt 'Run state, recovery, and completion': PE's own general run rule, which also governs TW; DN-8 (c) (Nathan, 2026-10-27) keeps PE's general rules unchanged and the D23-G successor of 2026-09-23 keeps TW out of scope, so the line is not edited here (Q-W3b-4)",
+    "C-16, conforming: DOC-10's own Required inputs; the documentation record keeps the actual producer, acceptance, operator and session identities as recorded facts (D23-A artifact content), and no handoff is told to carry them"
+   ],
+   "c16_exceptions": [
+    {
+     "except_index": 4,
+     "pass_fixture": "Preserve exact `CHANGE_CLASS`, `CHANGE_ID`, `DOCUMENTATION_UNIT_ID`, actual PR/Ops task/result/receipt lineage, repository baseline, producer/acceptance/operator/session identities, and the rest.",
+     "fail_fixture": "Preserve exact session identity and session continuity in the DOC-20 handoff.",
+     "prompts_seen": [
+      "DOC-10"
+     ]
+    }
    ],
    "source_all": [
     "(?i)\\b(?:preserv\\w*|retain\\w*|carr(?:y|ies|ied|ying))\\b",
@@ -1989,7 +2064,8 @@
     "(?i)\\b(?:no|not|never|nor|without|neither|nothing|none)\\b",
     "while retaining the supplied PR reviewer/session identity for this review",
     "Carry the exact continuing Isis role and supplied session identity across",
-    "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority\\."
+    "Provide a concise populated next invocation only when a handoff is actually needed; preserve its native inputs, actor, session continuity, exact runtime lineage, and authority\\.",
+    "^Preserve\\ exact\\ `CHANGE_CLASS`,\\ `CHANGE_ID`,\\ `DOCUMENTATION_UNIT_ID`,\\ actual\\ PR/Ops\\ task/result/receipt\\ lineage,\\ repository\\ baseline,\\ producer/acceptance/operator/session\\ identities,"
    ],
    "escape_tolerant_rewrite": true
   },
@@ -2124,10 +2200,10 @@
     "PE"
    ],
    "all": [
-    "^(?:- )?(?:<b>)?(?:(?:Exact |Complete )?[Nn]ative inputs(?: and (?:artifact )?lineage)?|Inputs and lineage|RS-\\d+ complete native inputs)(?::|</b>)"
+    "^(?:- )?(?:\\*\\*)?(?:(?:Exact |Complete )?[Nn]ative inputs(?: and (?:artifact )?lineage)?|Inputs and lineage|RS-\\d+ complete native inputs)(?::|\\*\\*)"
    ],
    "except": [
-    "^<b>Inputs and lineage:</b> <code>CHANGE\\\\?_CLOSURE\\\\?_DECISION\\\\?_ID</code>; exact change/class identity; delivered outcomes;"
+    "^\\*\\*Inputs and lineage:\\*\\* `CHANGE\\\\?_CLOSURE\\\\?_DECISION\\\\?_ID`; exact change/class identity; delivered outcomes;"
    ],
    "fixtures": {
     "pass": [
@@ -2155,7 +2231,8 @@
    "source_except": [
     "^<b>Inputs and lineage:</b> <code>CHANGE_CLOSURE_DECISION_ID</code>; exact change/class identity; delivered outcomes;"
    ],
-   "escape_tolerant_rewrite": true
+   "escape_tolerant_rewrite": true,
+   "markdown_form_translated": true
   },
   {
    "id": "G-HP-R3",
@@ -2198,7 +2275,7 @@
     "IA-30"
    ],
    "all": [
-    "(?i)returns as (?:<code>)?REDLINE\\\\?_INCOMPLETE(?:</code>)? is received in the review mode that issued it",
+    "(?i)returns as (?:`)?REDLINE\\\\?_INCOMPLETE(?:`)? is received in the review mode that issued it",
     "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))not a fourth mode(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))"
    ],
    "fixtures": {
@@ -2218,7 +2295,8 @@
     "(?i)\\bnot a fourth mode\\b"
    ],
    "source_except": [],
-   "escape_tolerant_rewrite": true
+   "escape_tolerant_rewrite": true,
+   "markdown_form_translated": true
   },
   {
    "id": "G-W4-09-2",
@@ -2256,7 +2334,7 @@
     "IA-40"
    ],
    "all": [
-    "^- (?:<code>)?REDLINE\\\\?_INCOMPLETE(?:</code>)?:",
+    "^- (?:`)?REDLINE\\\\?_INCOMPLETE(?:`)?:",
     "(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))to IA-30(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
     "(?i)review mode that issued the redlines"
    ],
@@ -2278,7 +2356,8 @@
     "(?i)review mode that issued the redlines"
    ],
    "source_except": [],
-   "escape_tolerant_rewrite": true
+   "escape_tolerant_rewrite": true,
+   "markdown_form_translated": true
   },
   {
    "id": "G-W4-09-4",
@@ -2597,7 +2676,7 @@
     "QA-70"
    ],
    "all": [
-    "(?i)Before issuing a (?:<code>)?DENY(?:</code>)?, state the check collection that results once every redline applies"
+    "(?i)Before issuing a (?:`)?DENY(?:`)?, state the check collection that results once every redline applies"
    ],
    "fixtures": {
     "pass": [
@@ -2609,7 +2688,13 @@
    },
    "except": [],
    "source": "W4",
-   "surface": "prompt-body"
+   "surface": "prompt-body",
+   "source_all": [
+    "(?i)Before issuing a (?:<code>)?DENY(?:</code>)?, state the check collection that results once every redline applies"
+   ],
+   "source_except": [],
+   "escape_tolerant_rewrite": false,
+   "markdown_form_translated": true
   },
   {
    "id": "G-W4-11-5",
@@ -2885,8 +2970,8 @@
     "QA-120"
    ],
    "all": [
-    "^\\|\\s*(?:`|<code>)PASS(?:`|</code>)\\s*\\|",
-    "(?:`|<code>)CL-05 — Prepare and Publish the Close Mutation Set"
+    "^\\|\\s*(?:`|`)PASS(?:`|`)\\s*\\|",
+    "(?:`|`)CL-05 — Prepare and Publish the Close Mutation Set"
    ],
    "fixtures": {
     "pass": [
@@ -2899,7 +2984,14 @@
    },
    "except": [],
    "source": "W5",
-   "surface": "prompt-body"
+   "surface": "prompt-body",
+   "source_all": [
+    "^\\|\\s*(?:`|<code>)PASS(?:`|</code>)\\s*\\|",
+    "(?:`|<code>)CL-05 — Prepare and Publish the Close Mutation Set"
+   ],
+   "source_except": [],
+   "escape_tolerant_rewrite": false,
+   "markdown_form_translated": true
   },
   {
    "id": "G-CL05-03",
@@ -2911,10 +3003,10 @@
     "QA-120"
    ],
    "all": [
-    "(?i)(?:\\|\\s*(?:`|<code>)PASS(?:`|</code>)\\s*\\|.*(?:`|<code>)CL-[CE]-10 — Perform|select exactly one closure receiver|(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))PASS(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))[^.\\n]{0,80}(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))routes? (?:directly )?to (?:`|<code>)?CL-[CE]-10)"
+    "(?i)(?:\\|\\s*(?:`|`)PASS(?:`|`)\\s*\\|.*(?:`|`)CL-[CE]-10 — Perform|select exactly one closure receiver|(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))PASS(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))[^.\\n]{0,80}(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))routes? (?:directly )?to (?:`|`)?CL-[CE]-10)"
    ],
    "except": [
-    "(?:`|<code>)CL-05 — Prepare and Publish the Close Mutation Set"
+    "(?:`|`)CL-05 — Prepare and Publish the Close Mutation Set"
    ],
    "fixtures": {
     "pass": [
@@ -2934,7 +3026,8 @@
    "source_except": [
     "(?:`|<code>)CL-05 — Prepare and Publish the Close Mutation Set"
    ],
-   "escape_tolerant_rewrite": true
+   "escape_tolerant_rewrite": true,
+   "markdown_form_translated": true
   },
   {
    "id": "G-CL05-04",
@@ -3092,7 +3185,7 @@
     "CL-05"
    ],
    "all": [
-    "(?i)Never state (?:`|<code>)?CLOSE\\\\?_PR\\\\?_READY(?:`|</code>)? while any part of its predicate is unmet"
+    "(?i)Never state (?:`|`)?CLOSE\\\\?_PR\\\\?_READY(?:`|`)? while any part of its predicate is unmet"
    ],
    "fixtures": {
     "pass": [
@@ -3109,7 +3202,8 @@
     "(?i)Never state (?:`|<code>)?CLOSE_PR_READY(?:`|</code>)? while any part of its predicate is unmet"
    ],
    "source_except": [],
-   "escape_tolerant_rewrite": true
+   "escape_tolerant_rewrite": true,
+   "markdown_form_translated": true
   },
   {
    "id": "G-CL05-09",
@@ -3346,7 +3440,7 @@
     "PE"
    ],
    "all": [
-    "Each change resolves its actual approved successor and membership from the register|^The exact semantic addendum-producer set is <code>|^Keep production selection on the selected release until the complete pinned successor candidate passes|^Read completely every predecessor and candidate body that the actual registered membership"
+    "Each change resolves its actual approved successor and membership from the register|^The exact semantic addendum-producer set is `|^Keep production selection on the selected release until the complete pinned successor candidate passes|^Read completely every predecessor and candidate body that the actual registered membership"
    ],
    "fixtures": {
     "pass": [
@@ -3358,7 +3452,13 @@
    },
    "except": [],
    "source": "W6",
-   "surface": "prompt-body"
+   "surface": "prompt-body",
+   "source_all": [
+    "Each change resolves its actual approved successor and membership from the register|^The exact semantic addendum-producer set is <code>|^Keep production selection on the selected release until the complete pinned successor candidate passes|^Read completely every predecessor and candidate body that the actual registered membership"
+   ],
+   "source_except": [],
+   "escape_tolerant_rewrite": false,
+   "markdown_form_translated": true
   },
   {
    "id": "G-W6-PE-27F",
@@ -3455,7 +3555,7 @@
     "PE"
    ],
    "all": [
-    "PF04-Canon-HDE-Governance</code> §9\\.1\\.3",
+    "PF04-Canon-HDE-Governance` §9\\.1\\.3",
     "the reading of the installed TypeSafe scoring skill is the model and reasoning-level guidance for every GCFPE downstream session"
    ],
    "fixtures": {
@@ -3468,7 +3568,14 @@
    },
    "except": [],
    "source": "W6",
-   "surface": "prompt-body"
+   "surface": "prompt-body",
+   "source_all": [
+    "PF04-Canon-HDE-Governance</code> §9\\.1\\.3",
+    "the reading of the installed TypeSafe scoring skill is the model and reasoning-level guidance for every GCFPE downstream session"
+   ],
+   "source_except": [],
+   "escape_tolerant_rewrite": false,
+   "markdown_form_translated": true
   },
   {
    "id": "G-W6-PE-TS1",
@@ -3554,7 +3661,7 @@
     "PE"
    ],
    "all": [
-    "QA-120 <code>PASS</code> routes verified <code>EPIC</code> to CL-E-10|live oracle is its 46-row successor"
+    "QA-120 `PASS` routes verified `EPIC` to CL-E-10|live oracle is its 46-row successor"
    ],
    "fixtures": {
     "pass": [
@@ -3568,7 +3675,13 @@
    },
    "except": [],
    "source": "W6",
-   "surface": "prompt-body"
+   "surface": "prompt-body",
+   "source_all": [
+    "QA-120 <code>PASS</code> routes verified <code>EPIC</code> to CL-E-10|live oracle is its 46-row successor"
+   ],
+   "source_except": [],
+   "escape_tolerant_rewrite": false,
+   "markdown_form_translated": true
   },
   {
    "id": "G-W6-PE-13R",
@@ -3581,7 +3694,7 @@
     "PE"
    ],
    "all": [
-    "QA-120 <code>PASS</code> continues to the close-mutation-set stage CL-05, which exits to CL-E-10 for a verified <code>EPIC</code> and to CL-C-10 for a verified <code>CRD</code>"
+    "QA-120 `PASS` continues to the close-mutation-set stage CL-05, which exits to CL-E-10 for a verified `EPIC` and to CL-C-10 for a verified `CRD`"
    ],
    "fixtures": {
     "pass": [
@@ -3593,7 +3706,13 @@
    },
    "except": [],
    "source": "W6",
-   "surface": "prompt-body"
+   "surface": "prompt-body",
+   "source_all": [
+    "QA-120 <code>PASS</code> continues to the close-mutation-set stage CL-05, which exits to CL-E-10 for a verified <code>EPIC</code> and to CL-C-10 for a verified <code>CRD</code>"
+   ],
+   "source_except": [],
+   "escape_tolerant_rewrite": false,
+   "markdown_form_translated": true
   },
   {
    "id": "G-W6-HUB-F",
@@ -3605,7 +3724,7 @@
     "HUB"
    ],
    "all": [
-    "(?i)allocates its number|for Product Owner numbering|No number — the paste assigns it|confirms the reference is there|retired in the candidate|in the candidate release|to match the candidate|the current <b>091426\\.1</b>|headed \"Current … — 091426\\.1\"|This canonical format governs|This format is canonical for every|^#{1,2} Current .*— 091426\\.1$|identical text is in the repository"
+    "(?i)allocates its number|for Product Owner numbering|No number — the paste assigns it|confirms the reference is there|retired in the candidate|in the candidate release|to match the candidate|the current \\*\\*091426\\.1\\*\\*|headed \"Current … — 091426\\.1\"|This canonical format governs|This format is canonical for every|^#{1,2} Current .*— 091426\\.1$|identical text is in the repository"
    ],
    "fixtures": {
     "pass": [
@@ -3622,7 +3741,13 @@
    },
    "except": [],
    "source": "W6",
-   "surface": "notion-control"
+   "surface": "notion-control",
+   "source_all": [
+    "(?i)allocates its number|for Product Owner numbering|No number — the paste assigns it|confirms the reference is there|retired in the candidate|in the candidate release|to match the candidate|the current <b>091426\\.1</b>|headed \"Current … — 091426\\.1\"|This canonical format governs|This format is canonical for every|^#{1,2} Current .*— 091426\\.1$|identical text is in the repository"
+   ],
+   "source_except": [],
+   "escape_tolerant_rewrite": false,
+   "markdown_form_translated": true
   },
   {
    "id": "G-W6-HUB-RH",
@@ -3685,7 +3810,7 @@
     "HUB"
    ],
    "all": [
-    "^Canon owns the format of every PF10 build-notes addendum an agent drafts|nothing confirms the paste \\(<code>D8</code>\\)"
+    "^Canon owns the format of every PF10 build-notes addendum an agent drafts|nothing confirms the paste \\(`D8`\\)"
    ],
    "fixtures": {
     "pass": [
@@ -3697,7 +3822,13 @@
    },
    "except": [],
    "source": "W6",
-   "surface": "notion-control"
+   "surface": "notion-control",
+   "source_all": [
+    "^Canon owns the format of every PF10 build-notes addendum an agent drafts|nothing confirms the paste \\(<code>D8</code>\\)"
+   ],
+   "source_except": [],
+   "escape_tolerant_rewrite": false,
+   "markdown_form_translated": true
   },
   {
    "id": "G-W6-REG-F",
