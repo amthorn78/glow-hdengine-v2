@@ -41,7 +41,9 @@
   "Stop rule: the first failed or ambiguous write stops the run and returns to you; no blind retry, no automatic rollback, no archival after a failed step. The 30-hour limit of your rule 4 still applies: the run ends at 2026-10-28T17:20Z, at the next safe point before a promotion write."
  ],
  "risks": [
-  "None of these stops the flow. Each stays listed (D26-A rule 4) and goes to the backlog at X28 unless you opt in to its correction. The four marked **opt-in** have a one-line correction ready; taking one changes approved text, so it needs your words, and it is then written with the transaction's operations and checked like them.",
+  "**First, a prerequisite of promotion: proposed amendment AM-9 (your decision).** `activation_render_102726.py`'s `landed()` counts a start anchor's expected occurrences over every replacement the page carries up to the phase. An operation anchored inside an earlier operation's text is then expected twice where the page holds it once, and reads not landed. It did so for C-FI-REV at X18 (the page is exactly the model, §4) and would for P1d-FI-CAND-H and the five P1e-*-CAND operations at P1, so P1(d) would stop on the Flow Index after P1(a) to (c) are written. AM-9 counts the anchor only inside the replacements still on the page whole, and in the operation's own; the content of every write is unchanged. Measured in memory, the plan file unchanged (`execute/am9-experiment-102726.1.json`): the self-test 49 of 49 on both maps, the review check `ok`, no false negative from review through sweep, and a missing replacement, a leftover anchor and an unapplied operation each still not landed. It is not a storage-form fix (rule 2 does not reach it), so it is put to you; it would count toward rule 4 only if you say so. On your word it is committed with a self-test case each way before P0, and C4's check is run again.",
+  "",
+  "**Then the listed findings.** None of them stops the flow. Each stays listed (D26-A rule 4) and goes to the backlog at X28 unless you opt in to its correction. The four marked **opt-in** have a one-line correction ready; taking one changes approved text, so it needs your words, and it is then written with the transaction's operations and checked like them.",
   "",
   "**From the D24 review (X16)**",
   "",
@@ -55,7 +57,7 @@
   "- **PF-A F-3 = PF-B W-2.** `activation_render_102726.py plan --chain` ignores `--emit`, so the post-flight brief's statement that the author ran its step (a) with `--emit` shows counts only (disclosed in §E). Both reviewers read all 238 operations another way. The transaction writes from the non-chain `plan --phase PH --emit`, which emits. A tool fix goes to the backlog.",
   "- **PF-A F-4, opt-in.** P6-HUB-SEL carries over \"Sections on this page headed \\\"Historical … — 091426.1\\\" were written for the predecessor\"; the predecessor is now 100926.1, and X25's literal sweep will not catch it. Correction: \"Sections on this page headed \\\"Historical …\\\" were written for earlier releases and are kept as written; where they differ from the selected 102726.1 prompts or the register, those govern.\"",
   "- **PF-B W-3.** PE Metaprompt's page carries release and selection state (`status`, `candidate_release`, `promotion_authorized`, `validation_status`, a `Prompt Version` line), as PE 100926.1 did; `prompt-body-content-policy.md` has no ruling on whether PE's head is a control head or a prompt body. To the backlog for a ruling.",
-  "- **PF-B W-4, opt-in.** C-FI-REV, written at X18 as approved, appends the review line but leaves the candidate record's \"<b>Recovery-stage status:</b> qualification pending: the graph build, the registry, the validators over every member, the D24 package review and the independent post-flight.\" standing until P1 retitles the section historical (indefinitely, if promotion is declined). Correction: one update on the Flow Index, \"qualification pending:\" to \"qualification complete:\" in that sentence.",
+  "- **PF-B W-4, opt-in.** C-FI-REV, written at X18 as approved, appends the review line but leaves the candidate record's \"<b>Recovery-stage status:</b> qualification pending: the graph build, the registry, the validators over every member, the D24 package review and the independent post-flight.\" standing. P1(d) retitles that section historical, so the clause would then stand in the historical record for good (and indefinitely as current text if promotion is declined). Correction: \"qualification pending:\" to \"qualification complete:\" in that sentence, written at P1(d) with the Flow Index's other operations.",
   "",
   "**Carried**",
   "",
@@ -73,8 +75,8 @@
  "approval": [
   "A suggested form, to change as you wish:",
   "",
-  "*\"Nathan approves promotion of GCFPE-20261027.1 / 102726.1 as the snapshot in execute/PROMOTION-PACKET.md at <commit>, accepting the listed risks in its §6, with the opt-in corrections <none / any of PF-A F-1, PF-A F-2, PF-A F-4, PF-B W-4>; D24-B LISTED-2 goes to the backlog. Go on to PART-25.\"*",
+  "*\"AM-9 as proposed, outside rule 4's count. Nathan approves promotion of GCFPE-20261027.1 / 102726.1 as the snapshot in execute/PROMOTION-PACKET.md at <commit>, accepting the listed risks in its §6, with the opt-in corrections <none / any of PF-A F-1, PF-A F-2, PF-A F-4, PF-B W-4>; D24-B LISTED-2 goes to the backlog. Go on to PART-25.\"*",
   "",
-  "An opt-in correction is written with the transaction's operations: PF-B W-4 on the Flow Index at P1(d), the others in the operations they amend, each rendered, written once and checked like them."
+  "An opt-in correction is written with the transaction's operations: PF-B W-4 on the Flow Index at P1(d), the others in the operations they amend, each rendered, written once and checked like them. Without AM-9, P1 cannot pass its own check."
  ]
 }

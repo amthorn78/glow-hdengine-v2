@@ -68,7 +68,7 @@ def build(delivery: Path) -> str:
     w("# Promotion packet — GCFPE-20261027.1 / 102726.1\n")
     w("`MODIFICATION-20261027-gcfpe-backlog-open-items`, X18 (PLAN §3 PART-24, §7; DN-1 D2). This is the exact snapshot "
       "Nathan is asked to approve for promotion. Approving it authorizes PART-25, X19 to X28, as PLAN §7 and §8 state, with "
-      "the amendments AM-1 to AM-8 recorded in §E, and nothing else. Until then nothing of PART-25 is done: no control "
+      "the amendments AM-1 to AM-8 recorded in §E and AM-9 if you approve it (§6), and nothing else. Until then nothing of PART-25 is done: no control "
       "binding, no new page, no register change, no install, no archive move. Written by `execute/x18_packet_102726.py` "
       "from the receipts it names; `--check` reproduces it.\n")
     # ---------------------------------------------------------------------------------------------- 1
@@ -162,10 +162,23 @@ def build(delivery: Path) -> str:
     w("| page | id | revision |\n|---|---|---|")
     for pid, p in x18["pins"].items():
         w(f"| {p['name']} | `{pid}` | `{p['revision']}` |")
-    w(f"\nC4: C-FI-REV landed on the Flow Index; `activation_render_102726.py check --phase review` "
-      f"{'ok' if x18['review_check'].get('ok') else 'NOT ok'}; `control_check_102726.py --phase candidate` on the controls, "
-      f"the catalog and PE {'ok' if x18['control_check_candidate'].get('ok') else 'NOT ok'}, "
-      f"{x18['control_check_candidate'].get('findings_total')} findings.\n")
+    probe, am9 = J("x18-landed-probe-102726.1.json"), J("am9-experiment-102726.1.json")
+    w(f"\n**C4.** C-FI-REV, sent once at X18, is on the Flow Index exactly as written: the page read after the write "
+      f"equals the plan's model, the read before it with C-FI-REV applied, line for line "
+      f"(`execute/x18-landed-probe-102726.1.json`: `after_equals_model` {str(probe['model']['after_equals_model']).lower()}, "
+      f"{probe['model']['lines_differing']} lines differing). `control_check_102726.py --phase candidate` on the controls, "
+      f"the catalog and PE: {'ok' if x18['control_check_candidate'].get('ok') else 'NOT ok'}, "
+      f"{x18['control_check_candidate'].get('findings_total')} findings. **But `activation_render_102726.py check --phase "
+      f"review` reports C-FI-REV not landed** (`execute/x18-check-102726.1.json`): a false negative of the plan's own "
+      f"counting rule, which expects an anchor once per replacement up to the phase, so an operation anchored inside an "
+      f"earlier one's text is expected twice. The same rule misjudges six P1 operations: "
+      + ", ".join(f"`{op}`" for ph, op in probe["rule_false_not_landed"] if ph == "activation")
+      + ". Uncorrected, P1(d) would stop on the Flow Index after P1(a) to (c) are written. The proposed **AM-9** (§6, "
+      f"first) counts the anchor only in the replacements still on the page whole; measured in memory "
+      f"(`execute/am9-experiment-102726.1.json`): the self-test {am9['selftest_real_map']['passed']} of "
+      f"{am9['selftest_real_map']['cases']} on the real map and {am9['selftest_standin_map']['passed']} of "
+      f"{am9['selftest_standin_map']['cases']} on the stand-in map; the review check `ok`; no false negative from review "
+      f"through sweep; a missing replacement, a leftover anchor and an unapplied operation still read not landed.\n")
     # ---------------------------------------------------------------------------------------------- 5..8
     for title, key in (("## 5. What approval authorizes, in order (PLAN §7, §8)", "authorizes"),
                        ("## 6. Accepted risks — every listed finding", "risks"),
