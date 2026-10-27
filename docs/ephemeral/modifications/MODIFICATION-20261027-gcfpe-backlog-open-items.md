@@ -818,25 +818,26 @@ Because R-P1 and R-P2 are taken, neither goes on the backlog (C-14).
 | X8 | PART-17, 21 | VERIFIED after AM-3 | Fresh reads of the Hub and the register after 13:29:44.374Z: the Hub at `2026-10-27T03:02:37.191Z`, pinned at that read (`--pin`), and the register at its pin `2026-10-12T17:17:45.991Z`. `activation_render_102726.py plan --phase part17`: `ok`. On the Hub, 21 operations apply and none is refused, with its notion-control guards at W6's before-counts (`G-W6-HUB-F` 13, RH 0, RN 0, RP 0); on the register, 3 apply, with `G-W6-REG-F` 4 and RN 0. 13:30–13:31Z: one update_content per page, the register's 3 then the Hub's 21, each returning success with no warning. Fresh reads after 13:31:46.801Z: `activation_render_102726.py check --phase part17` `ok` false ([execute/x8-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8-check-102726.1.json)). Both revisions moved, and every guard is at W6's after-count (`G-W6-HUB-F` 0, RH 4, RN 2, RP 2; `G-W6-REG-F` 2, RN 2), with control `ok` and 0 findings on both. But only 22 of 24 operations read `LANDED`: `W6-REG-3` and `W6-HUB-10` hold their text in Notion's split-bold form (*Failure record — 2026-10-27, X8*). The register's *Current selection* is unchanged. First check: BLOCKED, as above; D26-B record and Nathan's decisions below. **After AM-3, VERIFIED** on the same reads ([execute/x8-check-am3-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8-check-am3-102726.1.json)): `ok`; the register 3 of 3 and the Hub 21 of 21 `LANDED`, both revisions moved, every guard at W6's after-count, control `ok` on both |
 | X8b | PART-24, 25 (Nathan's addition after X8) | VERIFIED | `activation_render_102726.py plan --chain --standin-values --from-phase candidate --phase register` (after AM-3), read-only, on the real successor map, the candidate parts in scratch, and fresh reads of the 11 control pages after 13:49:58.426Z, each pinned at the revision just read ([execute/x8b-chain-through-p2-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8b-chain-through-p2-102726.1.json)). Real values: `@CONTROLS_PR` 770 and `@PUBLICATION_DATE` 2026-10-27. The 15 values that exist only later (activation, promotion and archival dates, review verdicts, receipts, the production token) took the named stand-ins, as the report lists. `ok` true: 10 of 10 pages at their pins, and the 100926.1 catalog at its read-only pin. Earlier phases: PART-17's 3 register and 21 Hub operations read `LANDED` and were not applied again. Then each phase applied in memory, in order: C3 (`candidate`) 7 pages (the register, the Flow Index, the five hubs); C4 (`review`) the Flow Index; P1 (`activation`) the Flow Index 92, Change Flow 32, IA 33, QA 24, Escalation 16, TW 14, the Alpha checklist 10, the new catalog 8 and PE 5; P1's entry step (`activation-done`) the new register entry 1; P2 (`register`) the register 6. In all 249 operations (70 listed, 179 generated), 0 refused. After every phase, every judged page passed its control rules with 0 findings (9, 9, 11, 11, 11 pages judged). The new catalog renders 56 rows with no marker left; the register entry has no marker left; the 57 P5 moves equal the archive set. Limit: an in-memory chain cannot reproduce Notion's storage forms, such as AM-3's split bold, so each write's own readback check still decides |
 | X9 | PART-24 | BLOCKED | 13:54Z: the catalog (C-CAT), one `notion-create-pages` call under the Flow Index, sent once, from `activation_render_102726.py plan --phase candidate --emit`'s catalog text (56 rows, 0 markers left): `4064590a05eb8113ae7de73041631c00`, titled "Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1", recorded once in [execute/notion-controls-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/notion-controls-102726.1.json). Fresh reads of the catalog, the Flow Index, the register and the five hubs after 13:56:52.690Z. `plan --phase candidate` with `@CATALOG_PAGE_ID` filled and each page pinned at that read (the Flow Index at `2026-10-27T13:54:13.135Z`, moved by the catalog's child-page block): `ok`, 7 of 7 pages, one operation each, none refused ([execute/x9-plan-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-plan-102726.1.json)); nothing was emitted or sent. `control_check_102726.py check --phase candidate --catalog <id>`, run before the control writes ([execute/x9-precheck-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-precheck-102726.1.json)): the catalog's title is right and it links all 56 members at the map's ids, but `catalog_staging_ok` is false, because Notion stored the catalog's 17 frontmatter lines as one paragraph (*Failure record — 2026-10-27, X9*). C-FI, the five C-HUB notes and C-REG were not sent |
-| X10 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X11 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X12 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X13 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X14 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X15 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X16 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X17 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X18 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X19 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X20 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X21 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X22 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X23 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X24 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X25 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X26 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X27 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
-| X28 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X9a | PART-24 (Nathan's addition after X9) | FAILED | AM-4 committed at `f5629c8` before any write. One private draft page `4064590a05eb810c9bafced522a9c7fe` was created with the register entry's rendered text, given one P1c-style multi-line insert, read back after each write, and deleted ([execute/x9a-rehearsal-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9a-rehearsal-102726.1.json)). Created form: the 17 frontmatter lines are separate paragraphs, none joined, but the page differs from the model at one line: Notion stored the entry's register mention self-closing, without its inner text. Insert form, on the draft's own read: equals the model exactly; both lines read as frontmatter lines; `LANDED`. Nathan's rule: stop and return before C-FI (*Failure record — 2026-10-27, X9a*). C-FI, the hub notes, C-REG and the catalog repair were not sent |
+| X10 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X11 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X12 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X13 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X14 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X15 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X16 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X17 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X18 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X19 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X20 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X21 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X22 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X23 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X24 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X25 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X26 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X27 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
+| X28 | — | NOT_RUN | the stop at X9a (*Failure record — 2026-10-27, X9a*) |
 
 ### Failure record — 2026-10-27, X2 (D26-B)
 
@@ -869,6 +870,8 @@ EXECUTE stops at X2. The plan's normal path cannot be executed mechanically on a
 - **X6a, a payload in a scratch file.** CF-C-30's payload was written once to a scratch temp file for one command, then deleted at once. The plan's rule is that payloads travel on stdout only (D22); nothing was committed, and later payloads are read from stdout. The batch helper `payload_102726.py` gained a `--max-chars` fallback, which sends a payload too large for a worker's tool output to show in full as ordered chunks, one call each.
 - **X9, the catalog check run before the control writes.** The plan runs `control_check_102726.py --phase candidate` after C-FI, the hub notes and C-REG. It was also run, read-only, on the catalog's first read, before them, so that no control page would link to a catalog failing its own check.
 - **X9, a diagnostic helper and one terminal view.** `execute/x9_catalog_probe_102726.py` compares the real catalog read with the page the plan models for it and runs the candidate and P1 catalog checks on both, in memory; it prints counts, booleans and check names only. Before it existed, the catalog's first 16 lines were printed once in the terminal, cut at 160 characters, to see the stored form. The catalog is a control page this Modification created, not a member body, and nothing was written to disk.
+- **X9a, the insert rehearsed on the draft's own read.** The created form already differed from the model, so the insert was planned and checked against the draft's own read (`am4_rehearsal_102726.py --base-as-of`), not the created model. Each receipt names its base. The insert sent was the one P1c-style insert Nathan named.
+- **X9a, two helpers and terminal views.** `execute/am4_rehearsal_102726.py` renders, plans and checks the rehearsal. `execute/write_forms_inventory_102726.py` records the reference and line-break forms every remaining write carries, and the mention forms stored on the pages read; it prints counts, ids and forms only. The draft's rendered text and its two reads were seen in the terminal. It held the register entry's template with two stand-in dates, not a member body, and nothing was written to disk.
 
 ### Return to Nathan — 2026-10-27, after X2
 
@@ -1149,3 +1152,88 @@ EXECUTE stops at X9, after the catalog's creation and before the six control wri
 - That is inside the 18–30 h and 16–26M re-price.
 
 **In one line, if you take the recommendations:** "AM-4 as described (option A); I merge #773 as the record pull request."
+
+### Nathan's decisions after X9 — 2026-10-27
+
+Nathan's words:
+
+> "AM-4 as described (option A), widened: write every remaining multi-line insert as the target page stores it, each line its own paragraph, in catalog_text, entry_text and the operations P1b-CAT-4, P1b-CAT-7, P1c-PE-3 and P1c-PE-5, with a self-test case each way. Then, before C-FI, rehearse both write forms on a real page: create one private draft page with the register entry's rendered text, apply one P1c-style multi-line insert to it, read it back, confirm it equals the plan's model, record the result in §E, and delete the draft page. If the rehearsal fails, stop and return before C-FI. I have merged #773 as the record pull request; continue on a branch restarted from main, in a new pull request."
+
+**Applied.**
+
+- **The record pull request.** #773 merged as `92956b7`, detected by files on `main` (D26-C): the X9 failure record and its receipts are on `main`, and `main`'s tree equals the branch's (`3103e376…`). The branch was restarted from `main` at `92956b7` and pushed. The run continues in a new pull request.
+- **Every remaining multi-line insert, inventoried first.** In memory, the chain from the candidate phase through the last (`sweep`) applies 258 operations, 79 listed and 179 generated. Only the four Nathan named join two plain lines with a single line break. The others that carry single breaks put them before table rows or list items, which Notion keeps as their own blocks: C-FI, C-FI-REV, P1d-FI-FLOW-ADD, P2-REG-SEL and the generated member rows.
+- **AM-4**, widened as directed, committed before any further Notion write.
+  - *[plan/make_activation_ops_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/make_activation_ops_102726.py).* A repair after C-22 and C-26: P1b-CAT-4, P1b-CAT-7, P1c-PE-3 and P1c-PE-5 carry each line as its own paragraph. Each must have single line breaks before the repair and none after. [plan/activation-ops.json](evidence/20261027-gcfpe-backlog-open-items/plan/activation-ops.json) was rebuilt by the generator; only those four operations' `new` and `why` changed. PE stores its frontmatter one line per paragraph (its read after X6), as does the 100926.1 catalog.
+  - *[plan/activation_render_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/activation_render_102726.py).*
+    - `catalog_text` and `entry_text` write each frontmatter line as its own paragraph.
+    - `as_fetched` models what X9 observed: frontmatter lines separated by blank lines stay paragraphs, and lines separated by single breaks are joined into one paragraph with `<br />`. On the X9 template it reproduces the real X9 read of the catalog exactly. On the AM-4 template its result is the old model, so X8b's chain still holds.
+    - `apply` refuses a replacement that joins two lines with a single break unless the second is a table row or a list item (`SINGLE_BREAK_JOIN`).
+  - *Self-tests, a case each way.*
+    - `make_activation_ops_102726.py selftest`: `ok`, 13 rows. `am4_inserts_in_paragraph_form`; a second repair, or a one-line operation, is refused.
+    - `activation_render_102726.py selftest`: `ok`, 36 of 36, on the real map and on the PLAN stand-in map. The seven AM-4 cases:
+      - the catalog's frontmatter is written as paragraphs and reads as 17 lines;
+      - written with single breaks, it is stored joined and fails `catalog_staging_ok`;
+      - the entry's frontmatter is written as paragraphs and reads back as its planned lines;
+      - written with single breaks, it reads as one line;
+      - the four inserts apply and each inserted line reads as its own frontmatter line, with P1's catalog check passing;
+      - a single-break insert is refused;
+      - table rows and list items may follow a single break.
+    - `control_check_102726.py selftest`: `ok`, 42 of 42, on both maps. `make_activation_ops_102726.py check`: current.
+  - *The chain after AM-4* ([execute/am4-chain-through-sweep-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/am4-chain-through-sweep-102726.1.json)): `plan --chain --standin-values --from-phase candidate --phase sweep`, read-only, on the real map and the newest reads of the 10 control pages, each pinned at that read. `ok`; 258 operations, 0 refused; PART-17's 24 read `LANDED`; after every phase every judged page passes with 0 findings (9, 9, 11, 11, 11, 11, 11, 11, 11 and 13 pages judged).
+- **The repair write, planned.** On the catalog's X9 read, the joined paragraph occurs once. Replacing it with its 17 segments separated by blank lines gives the modeled page exactly.
+- **The rehearsal before C-FI, Nathan's addition.** Recorded below as X9a. It failed, so the catalog repair and C-FI were not sent.
+
+### Failure record — 2026-10-27, X9a (D26-B)
+
+EXECUTE stops before C-FI. Nathan's rehearsal failed on the created form. The register entry's frontmatter landed as separate paragraphs, as AM-4 writes it, but Notion dropped the inner text of the entry's page mention, so the draft does not equal the plan's model. The insert form passed exactly. Nathan's rule: "If the rehearsal fails, stop and return before C-FI."
+
+- **What was done.**
+  - 14:48Z: one private draft page (`creation_mode: draft`), `4064590a05eb810c9bafced522a9c7fe`, titled "AM-4 write-form rehearsal — draft, to be deleted", with the register entry's rendered text (`execute/am4_rehearsal_102726.py render`). `@ACTIVATION_DATE` and `@PROMOTION_APPROVED_AT` took the named stand-in values.
+  - 14:50Z: one P1c-style update_content: the entry's `validation\_status: VALIDATED` line replaced by P1c-PE-5's AM-4 replacement, two frontmatter lines, each its own paragraph.
+  - 14:51Z: the draft deleted (`notion-delete-pages`). The next fetch shows it `deleted`, in Trash.
+  - Receipt: [execute/x9a-rehearsal-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9a-rehearsal-102726.1.json).
+- **What failed.** `am4_rehearsal_102726.py check --stage created` on the draft's read: 50 lines on the page and in the model, 17 frontmatter lines, none joined, but one line differs (index 18). The entry writes `selection_authority_url: "<mention url="…/3d24590a05eb81ce942ad994cfca9fa1">GCFPE Membership and Release Register</mention>"`, and Notion stored `<mention url="…/3d24590a05eb81ce942ad994cfca9fa1" />`.
+- **What passed.** The insert form, rehearsed on the draft's own read (`--base-as-of`): the read equals the model exactly (52 lines); both inserted lines read as frontmatter lines; the operation is `LANDED`. Against the full model the inserted page differs only at that one mention line.
+- **The cause: Notion's mention rule.** On the newest read of every page this session has read (69 pages: the control pages, both catalogs, PE and the 56 members), a page mention keeps its inner text, which is the target's title, only when the target is the page itself (61 of 61) or one of its child pages (9 of 9). Every mention of any other page is stored self-closing (859 of 859). The entry will sit under the register and mentions the register, so Notion stores that mention self-closing; the plan's model keeps the inner text ([execute/write-forms-inventory-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/write-forms-inventory-102726.1.json)).
+- **The other reference forms the remaining writes carry.** Inventoried in memory over the chain from the candidate phase through `sweep` (258 operations):
+  - *One mention:* P1e-HUB-TW-PE writes `<mention url="…@PE_PAGE_ID">PE Metaprompt 102726.1</mention>` on the TW hub. PE is a child of that hub and is titled "PE Metaprompt 102726.1", so under the rule its stored form is the one written. Not rehearsed.
+  - *Markdown links to Notion pages:* 48 links in 24 operations, 4 of them to a child of the written page. Seven are X9's own writes: C-REG, C-FI (its link to the catalog, a child of the Flow Index) and the five hub notes. The rest are P1d (Flow Index), P2 (register) and P6 (sweep). The control pages store such links as Markdown links (the Flow Index 12, 3 to children; the register 65, 8; the Glow Operations Hub 63, 4). But no write in this run has yet carried one, and the create tool converts internal Markdown links to mentions by default. So whether update_content keeps them is not observed.
+- **Why it stops here.** It is Nathan's rule. Also, every one of X9's remaining writes carries a Markdown link, a form no write in this run has tested.
+- **Read-only sweep.** Fresh reads after 14:53:46.956Z: the catalog, the Flow Index, the register and the five hubs are each at their X9 revision. The draft's mention did not move the register. Nothing has been written to the 56 successors or GCFPE-MGMT-10 since X7, or to the Glow Operations Hub since X8.
+- **What is live.**
+  - Notion: X9's state, unchanged: the 56 successors, PART-17's edits, and the catalog with its frontmatter still joined. No candidate section, record or selection change. The draft is in Trash.
+  - Repository: this branch, in draft [amthorn78/glow-hdengine-v2#774](https://github.com/amthorn78/glow-hdengine-v2/pull/774), with AM-4 at `f5629c8`.
+  - Skills: nothing built or installed.
+- **The freeze is kept.** No Notion write follows until Nathan decides.
+- **The record reaches `main`** when #774 merges (D21-C).
+
+### Return to Nathan — 2026-10-27, after X9a
+
+**EXECUTE stopped before C-FI: the rehearsal failed. The entry's frontmatter landed as separate paragraphs and the P1c-style insert matched the model exactly. But Notion dropped the inner text of the entry's mention of the register, so the created page is one line off the model. Separately, all seven of X9's remaining writes carry Markdown links to Notion pages, a form no write has tested yet. `DECISION NEEDED`.**
+
+| # | Question | Recommendation |
+|---|---|---|
+| 1 | How the reference forms are repaired and tested | amendment AM-5, below |
+| 2 | The record pull request | mark #774 ready and merge it as the record pull request |
+
+**1. The repair.** Notion keeps a mention's inner text only for the page itself or a child page; every other mention is stored self-closing (929 mentions on 69 pages, no exception). The entry mentions its parent, the register, with inner text, so its stored form differs from the model. The remaining writes also carry 48 Markdown links to Notion pages, and no write in this run has carried one.
+- **Option A, AM-5 (recommended).** Write every page reference in the form Notion stores, and rehearse the link form before C-FI.
+  - *The entry.* Its register mention becomes self-closing, the catalog's form. The change goes in through `make_activation_ops_102726.py`, since the entry's frontmatter comes from W8.
+  - *A guard.* `activation_render_102726.py` refuses a written mention whose form does not match its target: inner text with the target's title for the page itself or a child page, self-closing otherwise. A self-test case each way.
+  - *A second rehearsal.* One private draft with one child page, both deleted afterwards. Create the fixed entry, which must equal the model. Then one update carrying three references: a Markdown link to the draft's child (C-FI's form), a Markdown link to another page (C-REG's and the hubs' form), and an inner-text mention of the child (P1e-HUB-TW-PE's form). Read it back; it must equal the model. If either check fails, stop and return before C-FI.
+  - *Then* the catalog repair and C-FI, as AM-4 planned.
+  - Cost: about 45 minutes and under 0.5M tokens, with four Notion calls on the drafts (the draft, its child, the update, one delete).
+- **Option B: fix the entry only.** C-FI's own readback would then test the link form. If update_content converts the links, C-REG, C-FI and the five hub notes would read as not landed only after they are written, on live control pages.
+- **Option C: accept the entry's one-line difference and continue.** The entry's own check reads only its markers, so P1 would not stop on it. But the model stays wrong for the entry, and the link form stays untested.
+
+**2. Record pull request.** Draft #774 carries AM-4, the X9a rehearsal and this record.
+- **Mark it ready and merge it now (recommended).** The run continues on this branch, restarted from `main`, in a new pull request.
+- **Keep it open.** The X9a record stays off `main` until it merges.
+
+**Spend in EXECUTE so far.**
+- **Time:** about 3 h 40 min, 11:20Z to 15:00Z.
+- **Tokens:** about 8.5M of subagent tokens, plus the coordinator's. Since the X9 return, the reads added about 0.3M.
+- That is inside the 18–30 h and 16–26M re-price.
+
+**In one line, if you take the recommendations:** "AM-5 as described (option A); I merge #774 as the record pull request."

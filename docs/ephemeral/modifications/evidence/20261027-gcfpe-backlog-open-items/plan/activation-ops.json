@@ -1238,8 +1238,8 @@
      "item": "ITEM-32",
      "start": "predecessor_release: GCFPE-20261009.1",
      "end": null,
-     "new": "activation_authority: Nathan / Product Owner\nactivated_at: @ACTIVATION_DATE\npredecessor_release: GCFPE-20261009.1",
-     "why": "D17: candidate controls move to REGISTER_CONTROLLED, operative iff the register selects them."
+     "new": "activation_authority: Nathan / Product Owner\n\nactivated_at: @ACTIVATION_DATE\n\npredecessor_release: GCFPE-20261009.1",
+     "why": "D17: candidate controls move to REGISTER_CONTROLLED, operative iff the register selects them. AM-4: each inserted line its own paragraph, the target page's stored form."
     },
     {
      "id": "P1b-CAT-5",
@@ -1271,8 +1271,8 @@
      "item": "ITEM-32",
      "start": "validation_status: QUALIFICATION_PENDING",
      "end": null,
-     "new": "validation_status: VALIDATED\nvalidation_evidence: \"the D24 skill review and the independent post-flight recorded in MODIFICATION-20261027-gcfpe-backlog-open-items; the register states their verdicts and records\"",
-     "why": "D17: candidate controls move to REGISTER_CONTROLLED, operative iff the register selects them."
+     "new": "validation_status: VALIDATED\n\nvalidation_evidence: \"the D24 skill review and the independent post-flight recorded in MODIFICATION-20261027-gcfpe-backlog-open-items; the register states their verdicts and records\"",
+     "why": "D17: candidate controls move to REGISTER_CONTROLLED, operative iff the register selects them. AM-4: each inserted line its own paragraph, the target page's stored form."
     },
     {
      "id": "P1b-CAT-8",
@@ -1324,8 +1324,8 @@
      "item": "ITEM-32",
      "start": "selection\\_rule: \"This version is operative while the register binds it as the prompt-authoring control of GCFPE-20261027.1 / 102726.1 / 56, once selected. It does not assert its own selection.\"",
      "end": null,
-     "new": "selection\\_rule: \"This version is operative while the register binds it as the prompt-authoring control of GCFPE-20261027.1 / 102726.1 / 56. It does not assert its own selection.\"\nactivated\\_at: @ACTIVATION_DATE",
-     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it. C-22: anchor and replacement in the escaped fetch form."
+     "new": "selection\\_rule: \"This version is operative while the register binds it as the prompt-authoring control of GCFPE-20261027.1 / 102726.1 / 56. It does not assert its own selection.\"\n\nactivated\\_at: @ACTIVATION_DATE",
+     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it. C-22: anchor and replacement in the escaped fetch form. AM-4: each inserted line its own paragraph, the target page's stored form."
     },
     {
      "id": "P1c-PE-4",
@@ -1346,8 +1346,8 @@
      "item": "ITEM-32",
      "start": "validation\\_status: QUALIFICATION\\_PENDING",
      "end": null,
-     "new": "validation\\_status: VALIDATED\nvalidation\\_scope: \"the guards at the landing check and the independent post-flight, MODIFICATION-20261027-gcfpe-backlog-open-items\"",
-     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it. C-22: anchor and replacement in the escaped fetch form."
+     "new": "validation\\_status: VALIDATED\n\nvalidation\\_scope: \"the guards at the landing check and the independent post-flight, MODIFICATION-20261027-gcfpe-backlog-open-items\"",
+     "why": "W6 left PE's activation frontmatter to W8; precedent PE-FM-* (activation-ops.json X15(b)); authoritative-surfaces.md: PE is operative while the register binds it. C-22: anchor and replacement in the escaped fetch form. AM-4: each inserted line its own paragraph, the target page's stored form."
     }
    ],
    "name": "PE Metaprompt 102726.1 (successor; head written by the coordinator)",
