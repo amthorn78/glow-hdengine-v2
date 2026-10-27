@@ -1,8 +1,8 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CHANGE_MANAGEMENT_MODEL
-artifact_version: "1.2"
+artifact_version: "1.3"
 created_date: 2026-09-18
-revised_date: 2026-09-24 — DISP-001 and §5 item 6: what resolves a finding (D26)
+revised_date: 2026-10-27 — §3, the graph proof token points to the release baseline (J-12); 1.2, 2026-09-24: DISP-001 and §5 item 6, what resolves a finding (D26)
 status: BINDING
 authority: Product Owner approval, 2026-09-18 (strategic assessment of the repair process)
 applies_to: The prompt-management ecosystem generally, not one release
@@ -141,7 +141,7 @@ routine; keep them working rather than rebuilding them.
 |---|---|---|
 | **Contract registry with behavioural assertions** | `project-prompt-contract-registry.md` | `required_regex` binds the Canon source and the `D23` canonical wordings; `forbidden_regex` guards `D7`, the `D23` reversals and session creation. |
 | **Governance audit** | `amthor-workspace-governance-audit` skill | Executes the registry assertions on demand. Not on push — this material is outside application CI by design (see `README.md`). |
-| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the token `55 nodes · 229 edges · 55 state_routes · 575,074 bytes · sha256 ae2bd159…`, as measured after `D23`, proves a rebuild matched. |
+| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the current token, recorded in `authoritative-surfaces.md` (*Release baseline*), proves a rebuild matched; measured after `D29`, it was `55 nodes · 235 edges · 55 state_routes · 593,569 bytes · sha256 43f84f29…`. |
 | **Isolated-readback harness** | pattern, `execution-and-delegation-model.md` §7 | Proves an applied change landed, without the verifier knowing the expectation. |
 | **Regression-injection test** | pattern, D11 | Proves a guard actually catches what it claims. The D7 guard was tested against five injected regressions and a clean control. |
 | **Succession record** | `pe-succession/` | Lets a session be replaced without losing the inheritance. |

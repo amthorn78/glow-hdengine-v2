@@ -1,0 +1,805 @@
+{
+ "record_type": "X1_REPOSITORY_EDITS_RECEIPT",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "tool": "plan/repo_edits_102726.py",
+ "before": "check --set X1 --state before: ok (20 old strings at their counts; guards 19F 4, 19R 0, 20R 0, 21F 2, 21R 0, 28F 1, 28R 0)",
+ "apply": {
+  "mode": "apply",
+  "set": "X1",
+  "rows": [
+   {
+    "id": "W6-RE-19#1",
+    "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-19#2",
+    "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-19#3",
+    "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-19#4",
+    "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-19#5",
+    "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-19#6",
+    "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-19#7",
+    "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-20#1",
+    "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-20#2",
+    "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-20#3",
+    "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-21#1",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-21#2",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-21#3",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-21#4",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-21#5",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-21#6",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-28#1",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-28#2",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-28#3",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W1-PART-02-NOTE#1",
+    "path": "docs/prompt_ecosystem_management/gcfpe.decision-record.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   }
+  ],
+  "refusals": [],
+  "after": {
+   "edit_rows": [
+    {
+     "id": "W6-RE-19#1",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-19#2",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-19#3",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-19#4",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-19#5",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-19#6",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-19#7",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-20#1",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-20#2",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-20#3",
+     "new_count_after": 1,
+     "old_count_after": 1,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-21#1",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-21#2",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-21#3",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-21#4",
+     "new_count_after": 1,
+     "old_count_after": 1,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-21#5",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-21#6",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-28#1",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-28#2",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W6-RE-28#3",
+     "new_count_after": 1,
+     "old_count_after": 0,
+     "old_only_in_own_new": true,
+     "ok": true
+    },
+    {
+     "id": "W1-PART-02-NOTE#1",
+     "new_count_after": 1,
+     "old_count_after": 1,
+     "old_only_in_own_new": true,
+     "ok": true
+    }
+   ],
+   "edits_ok": true,
+   "guards": [
+    {
+     "guard": "G-W6-RE-19F",
+     "kind": "forbidden",
+     "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+     "count": 0,
+     "pass": true,
+     "raw_count_differs": false,
+     "w6_after": 0,
+     "ok": true
+    },
+    {
+     "guard": "G-W6-RE-19R",
+     "kind": "required",
+     "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+     "count": 2,
+     "pass": true,
+     "raw_count_differs": false,
+     "w6_after": 2,
+     "ok": true
+    },
+    {
+     "guard": "G-W6-RE-20R",
+     "kind": "required",
+     "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+     "count": 1,
+     "pass": true,
+     "raw_count_differs": false,
+     "w6_after": 1,
+     "ok": true
+    },
+    {
+     "guard": "G-W6-RE-21F",
+     "kind": "forbidden",
+     "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+     "count": 0,
+     "pass": true,
+     "raw_count_differs": false,
+     "w6_after": 0,
+     "ok": true
+    },
+    {
+     "guard": "G-W6-RE-21R",
+     "kind": "required",
+     "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+     "count": 4,
+     "pass": true,
+     "raw_count_differs": false,
+     "w6_after": 4,
+     "ok": true
+    },
+    {
+     "guard": "G-W6-RE-28F",
+     "kind": "forbidden",
+     "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+     "count": 0,
+     "pass": true,
+     "raw_count_differs": false,
+     "w6_after": 0,
+     "ok": true
+    },
+    {
+     "guard": "G-W6-RE-28R",
+     "kind": "required",
+     "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+     "count": 1,
+     "pass": true,
+     "raw_count_differs": false,
+     "w6_after": 1,
+     "ok": true
+    }
+   ],
+   "guards_ok": true,
+   "v500_equal_to_main": true,
+   "note_heading_count": 1,
+   "note_after_d30": true,
+   "d30_heading_count": 1,
+   "ok": true
+  },
+  "ok": true,
+  "written": 5,
+  "stand_in_values": false,
+  "d22": "repository files only; counts, ids and booleans"
+ },
+ "after": {
+  "mode": "check",
+  "set": "X1",
+  "state": "after",
+  "edit_rows": [
+   {
+    "id": "W6-RE-19#1",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-19#2",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-19#3",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-19#4",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-19#5",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-19#6",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-19#7",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-20#1",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-20#2",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-20#3",
+    "new_count_after": 1,
+    "old_count_after": 1,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-21#1",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-21#2",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-21#3",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-21#4",
+    "new_count_after": 1,
+    "old_count_after": 1,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-21#5",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-21#6",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-28#1",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-28#2",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W6-RE-28#3",
+    "new_count_after": 1,
+    "old_count_after": 0,
+    "old_only_in_own_new": true,
+    "ok": true
+   },
+   {
+    "id": "W1-PART-02-NOTE#1",
+    "new_count_after": 1,
+    "old_count_after": 1,
+    "old_only_in_own_new": true,
+    "ok": true
+   }
+  ],
+  "edits_ok": true,
+  "guards": [
+   {
+    "guard": "G-W6-RE-19F",
+    "kind": "forbidden",
+    "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+    "count": 0,
+    "pass": true,
+    "raw_count_differs": false,
+    "w6_after": 0,
+    "ok": true
+   },
+   {
+    "guard": "G-W6-RE-19R",
+    "kind": "required",
+    "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+    "count": 2,
+    "pass": true,
+    "raw_count_differs": false,
+    "w6_after": 2,
+    "ok": true
+   },
+   {
+    "guard": "G-W6-RE-20R",
+    "kind": "required",
+    "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+    "count": 1,
+    "pass": true,
+    "raw_count_differs": false,
+    "w6_after": 1,
+    "ok": true
+   },
+   {
+    "guard": "G-W6-RE-21F",
+    "kind": "forbidden",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "count": 0,
+    "pass": true,
+    "raw_count_differs": false,
+    "w6_after": 0,
+    "ok": true
+   },
+   {
+    "guard": "G-W6-RE-21R",
+    "kind": "required",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "count": 4,
+    "pass": true,
+    "raw_count_differs": false,
+    "w6_after": 4,
+    "ok": true
+   },
+   {
+    "guard": "G-W6-RE-28F",
+    "kind": "forbidden",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "count": 0,
+    "pass": true,
+    "raw_count_differs": false,
+    "w6_after": 0,
+    "ok": true
+   },
+   {
+    "guard": "G-W6-RE-28R",
+    "kind": "required",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "count": 1,
+    "pass": true,
+    "raw_count_differs": false,
+    "w6_after": 1,
+    "ok": true
+   }
+  ],
+  "guards_ok": true,
+  "v500_equal_to_main": true,
+  "note_heading_count": 1,
+  "note_after_d30": true,
+  "d30_heading_count": 1,
+  "ok": true,
+  "stand_in_values": false,
+  "d22": "repository files only; counts, ids and booleans"
+ },
+ "second_apply": {
+  "mode": "apply",
+  "set": "X1",
+  "rows": [
+   {
+    "id": "W6-RE-20#1",
+    "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-20#2",
+    "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-20#3",
+    "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-21#1",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-21#2",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-21#3",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-21#4",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   },
+   {
+    "id": "W6-RE-21#5",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-21#6",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-28#1",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-28#2",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-28#3",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W1-PART-02-NOTE#1",
+    "path": "docs/prompt_ecosystem_management/gcfpe.decision-record.md",
+    "old_count_before": 1,
+    "old_count_stated": 1,
+    "old_count_at_application": 1
+   }
+  ],
+  "refusals": [
+   {
+    "id": "W6-RE-19",
+    "refusal": "NEW_FILE_EXISTS"
+   },
+   {
+    "id": "W6-RE-20#1",
+    "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-20#2",
+    "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-21#1",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-21#2",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-21#3",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-21#5",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-21#6",
+    "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-28#1",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-28#2",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   },
+   {
+    "id": "W6-RE-28#3",
+    "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+    "old_count_before": 0,
+    "old_count_stated": 1,
+    "old_count_at_application": 0,
+    "refusal": "OLD_COUNT"
+   }
+  ],
+  "ok": false,
+  "written": 0,
+  "stand_in_values": false,
+  "d22": "repository files only; counts, ids and booleans"
+ }
+}
