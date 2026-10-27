@@ -807,3 +807,91 @@ Because R-P1 and R-P2 are taken, neither goes on the backlog (C-14).
 |---|---|---|---|
 | X0 | all | VERIFIED | Fresh reads of the 57 pages and the 11 control pages by seven read-only workers, captured 11:30:20–11:33:56Z after `fetched-after` 2026-10-27T11:29:52.469Z. (a), (b), (f): `plan/dry_run_102726.py run` on those reads ([execute/x0-dry-run.json](evidence/20261027-gcfpe-backlog-open-items/execute/x0-dry-run.json), `--previous-receipt plan/dry-run.json`): `ok` true, every gate N0 to N12 and the dry run's self-test true. N0: 9 of 9 installed skills and their copies equal W7's digests; `docs/graph/parts` builds `55 nodes · 235 edges · 55 state_routes · 593569 bytes · 43f84f29…`, D29's token. N2: 57 of 57 pages read, every revision at its pin, none moved; 559 of 559 operations apply once (113 binding under the stand-in map); 57 batches safe; 756 guard rows, 240 failing before and 0 after; with R-P2, PE 16 operations and no guard failing. N10: control pins 10 of 10 and the 100926.1 catalog's read-only pin match; the Glow Operations Hub also reads at its PLAN revision `2026-10-27T03:02:37.191Z`. N11 and N12 pass. (c) `main` `229a4291` carries only `PF10-HDE-Build-Notes-v13.9.md`; its §1.1 index lists one addendum, 2.1 (S19 vendor and security policy), and a search of 2.1's body for this plan's topics finds none, so PF10 has not moved past v13.9 and Nathan's condition 2 needs no further read. (d) the register's first current section is *Current selection — GCFPE-20261009.1 / 100926.1*, "exactly 55 members", at its pin `2026-10-12T17:17:45.991Z`. (e) a workspace search for `102726.1` finds no page titled "— 102726.1". (g) `grep -c '^## D30 — '` on the branch's decision record: 1 (also on `main`). (h) Nathan's words take R-P1 and R-P2 (§P, *Approval to enter EXECUTE*) |
 | X1 | PART-02, 19, 20, 21, 28 | VERIFIED | `plan/repo_edits_102726.py --set X1` ([execute/x1-repo-edits-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x1-repo-edits-102726.1.json)). Before: `ok`, the 20 `old` strings at their counts, v5.1.0 absent, the 7 repository guards at W6's counts (19F 4, 19R 0, 20R 0, 21F 2, 21R 0, 28F 1, 28R 0). Apply: 5 files written. After: `ok`, each `new` once and each `old` only inside its own replacement; G-W6-RE-19F 0, 19R 2, 20R 1, 21F 0, 21R 4, 28F 0, 28R 1; v5.0.0 byte-equal to `origin/main`; the PART-02 note heading once, after `## D30`; `reviewer-prompt-template.md` at 1.3. A second apply is refused (`NEW_FILE_EXISTS`, `OLD_COUNT`) and writes nothing. Committed at `ccb5de0`; `modification_validate.py` 17 of 17. The controls pull request is [amthorn78/glow-hdengine-v2#770](https://github.com/amthorn78/glow-hdengine-v2/pull/770), recorded once in [execute/controls-pr-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/controls-pr-102726.1.json) at `ff7039a`. Nathan merges it before X18 (C-12) |
+| X2 | PART-24 | BLOCKED | Started 11:40:48.720Z. One `notion-duplicate-page` call on W8's first row, CF-C-10 (`3f44590a05eb810f83d4d539e5b0e588`), at 11:40:51Z created `4064590a05eb811e821bc064f56de3a3` under the HDE Change Flow hub, its planned parent, so no move was needed. It was not retitled. Fresh read (as of 11:40:52.663Z): parent as planned; no child page; the body's first line equals the source's. **But Notion remapped both of the body's self-references**: the source's id (2 occurrences) became the duplicate's own id, and the self-mention's title reads "… — 100926.1 (1)". With those remapped back, the body equals the source's. So `HEAD-CF-C-10-U`, whose start anchor is the predecessor's own `Notion URL` mention, resolves 0 times. In memory, `body_check.py plan --no-ops --prompts CF-C-10` on the duplicate's read, with a scratch map naming the duplicate: `START_COUNT_0`, `ops_not_applied` `["HEAD-CF-C-10-U"]`, `ok` false. `edits.json` carries 54 such head self-mention operations on 54 pages, so X4's verification, "every operation applies once", cannot pass on any successor: the plan is wrong. The other 55 duplications and the title were not run |
+| X3 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X4 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X5 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X6a | PART-24 (Nathan's condition 1) | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X6 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X7 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X8 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X9 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X10 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X11 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X12 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X13 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X14 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X15 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X16 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X17 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X18 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X19 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X20 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X21 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X22 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X23 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X24 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X25 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X26 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X27 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X28 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+
+### Failure record — 2026-10-27, X2 (D26-B)
+
+EXECUTE stops at X2. The plan's normal path cannot be executed mechanically on a real duplicate. GCFPE-MGMT-10: "If the plan is wrong, stop and return; do not repair it in flight." This comes after the first external write, so D26-B applies: a failure record that reaches `main` in a record pull request, a read-only sweep, the freeze kept, and a return to Nathan.
+
+- **What is wrong.** Each runtime successor's head operation `HEAD-<ID>-U` (54 in `plan/edits.json`) rewrites the duplicate's `Notion URL` self-mention from the predecessor's URL to the successor's. On a real duplicate, Notion has already made that rewrite: it remaps the page's own references to the new page.
+  - So the operation's start anchor is absent, and X4's predicate cannot pass.
+  - In memory, with the retitle simulated, the duplicate's self-mention equals the operation's `new` text. `body_check.py`'s landing predicate already counts it `LANDED` (start absent, `new` present). Only X4's "applies once" cannot be met.
+- **Why the dry run missed it.** The PLAN dry run used the stand-in map, in which each successor is its own predecessor page and nothing is duplicated (PLAN §4, *Stand-ins*). No dry-run read was ever of a real duplicate.
+- **Read-only sweep, 11:43:12–11:43:39Z.** One read-only worker fetched four pages, one call each; header facts by `execute/page_facts_102726.py`:
+  - the duplicate `4064590a05eb811e821bc064f56de3a3`: under the HDE Change Flow hub, titled "CF-C-10 — Prepare CRD Specification Kickoff Handoff — 100926.1 (1)", 0 child pages, revision `2026-10-27T11:40:52.663Z`;
+  - its source CF-C-10 100926.1: at its pin `2026-10-12T02:29:03.544Z`, unchanged;
+  - the HDE Change Flow hub: its revision moved to `2026-10-27T11:40:52.663Z` because the duplicate is now its child page, and the hub lists it;
+  - the register: at its pin `2026-10-12T17:17:45.991Z`; its first current section is still *Current selection — GCFPE-20261009.1 / 100926.1*.
+- **What is live.**
+  - Notion: that one duplicate page. Nothing else was written: no title, move, body operation or control page.
+  - Repository: this branch, in the open pull request [amthorn78/glow-hdengine-v2#770](https://github.com/amthorn78/glow-hdengine-v2/pull/770), which carries X1's five controls and this record.
+  - Skills: nothing built or installed.
+- **The freeze is kept.** No Notion write, package build or install follows until Nathan decides.
+- **The record reaches `main`** when #770 merges. That merge is Nathan's, and it preserves the record and approves nothing (D21-C).
+
+### Disclosed deviations (EXECUTE)
+
+- **Branch.** This session runs on the harness's `claude/ecstatic-mccarthy-m9b2lz`. The PLAN branch `claude/ecosystem-change-mgmt-drvb4v` merged as #769 and no longer exists. `main` `229a4291` has the approved tree, so this branch began equal to it.
+- **X2, one in-memory comparison (D22).** To diagnose the failed anchor, the duplicate's body was compared once in memory with its source's X0 read: lengths, the positions of differing segments, counts of the two page ids, and equality after remapping the ids. D22 forbids comparing a body with another read. Nothing was written and no digest was taken. The result is used for the diagnosis above, not as X2's verification.
+- **An EXECUTE helper.** `execute/page_facts_102726.py` reports header facts (revision, title, parent, child-page count, body length) from this session's fetch records, using `body_check.py`'s reader. It was added for X0(d) and X2's checks. It prints no body text.
+- **Fetch results saved by the harness.** At X0 and in the sweep, the harness saved six large fetch results to its own tool-results folder. Workers did not open them, and the tools read them only as D22 transient reads. They stay there for the harness's cleanup.
+
+### Return to Nathan — 2026-10-27, after X2
+
+**EXECUTE stopped at X2 after one duplication: on a real duplicate, Notion has already rewritten the page's self-mention, so the plan's 54 `HEAD-<ID>-U` operations cannot apply, and X4 cannot pass. `DECISION NEEDED`.**
+
+| # | Question | Recommendation |
+|---|---|---|
+| 1 | How the plan defect is repaired | amendment AM-1, below |
+| 2 | What happens to the CF-C-10 duplicate | keep it as CF-C-10's successor |
+| 3 | The record pull request | merge #770 now |
+
+**1. The repair.** The head operation exists to point each successor's `Notion URL` line at the successor. Duplication already does that, so the end state is right; only the plan's tool refuses to count it. If nothing changes, X4 fails on all 56 pages, and EXECUTE can go no further.
+- **Option A, AM-1 (recommended).** In `plan/body_check.py`'s `plan` mode, a head self-mention operation counts as `SATISFIED_BY_DUPLICATION`, and is not sent, only when:
+  - its start is absent;
+  - its expanded `new` text occurs exactly once;
+  - the page's own id appears where the predecessor's did.
+  The change is recorded in §E as AM-1, as PIN-1-A and AM-2 were in the precedent. Three self-test cases go with it (satisfied; neither present; `new` twice), the self-test is rerun, and CF-C-10's duplicate is planned in memory after its retitle, all before any further write. X5's and X7's checks are unchanged, since their landing predicate already accepts this state. Cost: about 45 minutes and under 0.5M tokens.
+- **Option B: a PLAN successor section.** A full re-plan of the head operations, a dry run on a real duplicate, and one D26-A diff check. Cost: several hours, about 2–4M tokens, and another approval round trip.
+
+**2. The duplicate** `4064590a05eb811e821bc064f56de3a3`, titled "… — 100926.1 (1)", sits under the HDE Change Flow hub.
+- **Keep it (recommended).** X2 resumes by retitling it and continues from W8's second row. Its id goes into the successor map at X3.
+- **Archive it.** Move it to *04 Archived Prompt Versions* (X2's rollback) and duplicate CF-C-10 again.
+
+**3. Record pull request.** #770 now carries this failure record and X1's controls. C-12 needs those controls on `main` before X18 anyway.
+- **Merge #770 now (recommended).** The run then continues on this branch, restarted from `main`, in a new pull request.
+- **Keep it open.** The failure record stays off `main` until it merges, which D26-B step 1 does not intend.
+
+**Spend in EXECUTE so far.**
+- **Time:** about 25 minutes, 11:20Z to 11:46Z.
+- **Tokens:** about 1.4M of subagent tokens (the X0 reads 1.09M, the sweep 0.10M, two single-read probes 0.18M), plus the coordinator's.
+- That is well inside the 18–30 h and 16–26M re-price.
+
+**In one line, if you take the recommendations:** "AM-1 as described; keep the CF-C-10 duplicate; I merge #770 as the record pull request."
