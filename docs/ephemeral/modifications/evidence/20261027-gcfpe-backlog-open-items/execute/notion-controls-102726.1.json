@@ -15,17 +15,83 @@
   "created_at": "2026-10-27T13:54Z",
   "revision_at_first_read": "2026-10-27T13:54:13.282Z",
   "first_read_after": "2026-10-27T13:56:52.690Z",
-  "check": "catalog_staging_ok false: frontmatter stored as one <br />-joined paragraph (X9 failure record)"
+  "repair": {
+   "amendment": "AM-7",
+   "command": "replace_content, sent once, 2026-10-27T15:32Z",
+   "new_str": "catalog_text (the AM-4 template), from execute/catalog_repair_102726.py plan on the read as of 13:54:13.282Z",
+   "revision_after": "2026-10-27T15:33:12.290Z",
+   "check": "execute/x9c-catalog-repair-check-102726.1.json: the read equals as_fetched(catalog_text) exactly; candidate and P1 catalog checks ok"
+  }
  },
- "controls": {},
- "controls_note": "C-FI, C-HUB-CF, C-HUB-IA, C-HUB-QA, C-HUB-ESC, C-HUB-TW and C-REG not sent: the stop at X9",
+ "controls": {
+  "3d24590a05eb81ce942ad994cfca9fa1": {
+   "op": "C-REG (insert_content, end)",
+   "sent": "once, 2026-10-27T15:35Z",
+   "revision_before": "2026-10-27T13:31:04.126Z",
+   "revision_after": "2026-10-27T15:35:32.914Z",
+   "landed": 1,
+   "ok": true
+  },
+  "3db4590a05eb81de9736ea69bac61016": {
+   "op": "C-FI",
+   "sent": "once, 2026-10-27T15:35Z",
+   "revision_before": "2026-10-27T15:33:12.290Z",
+   "revision_after": "2026-10-27T15:35:09.250Z",
+   "landed": 1,
+   "ok": true
+  },
+  "3db4590a05eb81d59059eb6b95ed5fcf": {
+   "op": "C-HUB-CF",
+   "sent": "once, 2026-10-27T15:35Z",
+   "revision_before": "2026-10-27T13:22:27.779Z",
+   "revision_after": "2026-10-27T15:35:12.051Z",
+   "landed": 1,
+   "ok": true
+  },
+  "3db4590a05eb8195a2ccf7c0959a8b6e": {
+   "op": "C-HUB-IA",
+   "sent": "once, 2026-10-27T15:35Z",
+   "revision_before": "2026-10-27T13:22:09.622Z",
+   "revision_after": "2026-10-27T15:35:15.062Z",
+   "landed": 1,
+   "ok": true
+  },
+  "3db4590a05eb814d96d3dcfa8835f96d": {
+   "op": "C-HUB-QA",
+   "sent": "once, 2026-10-27T15:35Z",
+   "revision_before": "2026-10-27T13:21:17.380Z",
+   "revision_after": "2026-10-27T15:35:17.895Z",
+   "landed": 1,
+   "ok": true
+  },
+  "3db4590a05eb81cd938de84cfffead9c": {
+   "op": "C-HUB-ESC",
+   "sent": "once, 2026-10-27T15:35Z",
+   "revision_before": "2026-10-27T13:11:05.410Z",
+   "revision_after": "2026-10-27T15:35:20.690Z",
+   "landed": 1,
+   "ok": true
+  },
+  "3db4590a05eb811b9c14f2ae89c28df7": {
+   "op": "C-HUB-TW",
+   "sent": "once, 2026-10-27T15:35Z",
+   "revision_before": "2026-10-27T13:11:38.789Z",
+   "revision_after": "2026-10-27T15:35:23.456Z",
+   "landed": 1,
+   "ok": true
+  }
+ },
  "pins_at_x9_plan": {
+  "3db4590a05eb81de9736ea69bac61016": "2026-10-27T15:33:12.290Z",
   "3d24590a05eb81ce942ad994cfca9fa1": "2026-10-27T13:31:04.126Z",
-  "3db4590a05eb81de9736ea69bac61016": "2026-10-27T13:54:13.135Z",
   "3db4590a05eb81d59059eb6b95ed5fcf": "2026-10-27T13:22:27.779Z",
   "3db4590a05eb8195a2ccf7c0959a8b6e": "2026-10-27T13:22:09.622Z",
   "3db4590a05eb814d96d3dcfa8835f96d": "2026-10-27T13:21:17.380Z",
   "3db4590a05eb81cd938de84cfffead9c": "2026-10-27T13:11:05.410Z",
   "3db4590a05eb811b9c14f2ae89c28df7": "2026-10-27T13:11:38.789Z"
+ },
+ "verification": {
+  "activation_render check --phase candidate": "ok (execute/x9-check-102726.1.json)",
+  "control_check check --phase candidate --catalog": "ok, 0 findings (execute/x9-control-check-102726.1.json)"
  }
 }
