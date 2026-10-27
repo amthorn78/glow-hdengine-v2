@@ -1,0 +1,393 @@
+{
+ "G1_redlines": {
+  "every_op_landed": true,
+  "first_apply_ok": true,
+  "merge_selftest_ok": true,
+  "ok": true,
+  "ops": 105,
+  "r_p1_lands_once": true,
+  "r_p1_ops": 4,
+  "r_p1_refused_on_unredlined_base": true,
+  "redlines_file_reproduced": true,
+  "second_apply_refused": true
+ },
+ "G2_build": {
+  "build_error": null,
+  "build_exit": 0,
+  "built_digests": {
+   "change-flow": "29 672f3cbb133092bee896d157c62deff8bb559dae446687ae1fd15ebbb07f74e0",
+   "flowmaster-validate": "45 39762ccab52e4fb7cb5c4e792aea2a5245fa23e0edd9273b47880954a696668d",
+   "glow-graph-contract": "9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1",
+   "glow-hde-pr-development": "4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee"
+  },
+  "check_byte_identical": true,
+  "conditional_sets_applied": [
+   "R-P1"
+  ],
+  "ok": true,
+  "package_build_copy_byte_identical_to_plan": true,
+  "selftest_false": [
+   "stops_on_stand_in_map_without_flag"
+  ],
+  "selftest_not_applicable_real_map": {
+   "stops_on_stand_in_map_without_flag": "NOT_APPLICABLE_REAL_MAP (true on the stand-in map, plan/receipts-A3/A3-packages-102726.1.json)"
+  },
+  "selftest_ok": false,
+  "selftest_ok_on_real_map": true,
+  "stand_in_used": false,
+  "substitutions": 37
+ },
+ "G6_injections": {
+  "A3_C1_link_to_superseded_contract_fires": true,
+  "A3_C2_added_row_out_of_place_fires_FMV_ORACLE_019": true,
+  "A3_C3_coverage_token_fires_FMV_ORACLE_020": true,
+  "change_flow_close_stage_negative_is_a_real_failure": true,
+  "ok": true,
+  "runner_case_fails_on_defective_base": true
+ },
+ "base_digests": {
+  "change-flow": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+  "flowmaster-validate": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+  "glow-graph-contract": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+  "glow-hde-pr-development": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0"
+ },
+ "inputs": {
+  "plan_sha256": "a3b11f4668b166c462158bdca836a0856b87b7e09adff4380e3a9b46320023e2",
+  "production_contract_sha256": "f5dfa63f3f0b1c0dc3a55e647dffeee8da70f7500e46df40242b80c09c4c0b5d",
+  "production_graph_sha256": "2652b4e1139293988e8220266ea515adfb0f78e76ad9b21b71a7aa6699532da1",
+  "r1_decision_record_match": true,
+  "r1_files_equal_x10_q2": true,
+  "r1_out_dir_exit": 0
+ },
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "ok": true,
+ "packages": {
+  "change-flow": {
+   "archive": "change-flow.skill",
+   "built_freeze": "29 672f3cbb133092bee896d157c62deff8bb559dae446687ae1fd15ebbb07f74e0",
+   "extracted_equals_built": true,
+   "extracted_freeze": "29 672f3cbb133092bee896d157c62deff8bb559dae446687ae1fd15ebbb07f74e0",
+   "package_exit": 0,
+   "quick_validate_valid": true,
+   "skill_bytes": 538904,
+   "skill_sha256": "98ba87979cdc2911b2fa6cd83fb91ab6aeb02f70119ce6ca4bd0efb7d6c55c63"
+  },
+  "flowmaster-validate": {
+   "archive": "flowmaster-validate.skill",
+   "built_freeze": "45 39762ccab52e4fb7cb5c4e792aea2a5245fa23e0edd9273b47880954a696668d",
+   "extracted_equals_built": true,
+   "extracted_freeze": "45 39762ccab52e4fb7cb5c4e792aea2a5245fa23e0edd9273b47880954a696668d",
+   "package_exit": 0,
+   "quick_validate_valid": true,
+   "skill_bytes": 721255,
+   "skill_sha256": "60b8889ae79cfea33b006d1791ade4c1e821ce32b26198dfd3f7a443f82d00a8"
+  },
+  "glow-graph-contract": {
+   "archive": "glow-graph-contract.skill",
+   "built_freeze": "9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1",
+   "extracted_equals_built": true,
+   "extracted_freeze": "9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1",
+   "package_exit": 0,
+   "quick_validate_valid": true,
+   "skill_bytes": 58987,
+   "skill_sha256": "683ea1039538ee7620af63c4f56203c4b35ad1b46486b0f25cb5f5df8024282d"
+  },
+  "glow-hde-pr-development": {
+   "archive": "glow-hde-pr-development.skill",
+   "built_freeze": "4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee",
+   "extracted_equals_built": true,
+   "extracted_freeze": "4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee",
+   "package_exit": 0,
+   "quick_validate_valid": true,
+   "skill_bytes": 26085,
+   "skill_sha256": "dd6fd4234dedd6faa194cb01aeb242991d69dcae612a46b82732a59dfc73ea07"
+  }
+ },
+ "packages_ok": true,
+ "quoted_vs_plain": {
+  "freeze_differences": [],
+  "freeze_identical": true,
+  "gates_identical": {
+   "G3_suite": true,
+   "G4_release_validators": true,
+   "G5_contracts": true,
+   "ok": true
+  }
+ },
+ "record_type": "X13_PACKAGE_RECEIPT",
+ "roots": {
+  "plain": {
+   "G3_suite": {
+    "baseline_exit": 1,
+    "built_exit": 1,
+    "built_verdict": "FLOWMASTER_SUITE_FAIL",
+    "c21_built_suite_findings_are_the_named_three": true,
+    "c21_unchanged_suite_findings_are_the_named_three": true,
+    "change_flow_fixtures_ok": true,
+    "findings_from_this_change": [],
+    "ok": true,
+    "oracle_profile": "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1",
+    "r1_coverage": {
+     "core_rows": 26,
+     "declared_rows": 47,
+     "expected_rows": 47
+    },
+    "validator_revision": "3.5.0"
+   },
+   "G4_release_validators": {
+    "cf_validate_gcfpe_20261027": {
+     "error_tail": "",
+     "exit": 0,
+     "pass_line": true
+    },
+    "fv_run_gcfpe_20261027_fixtures": {
+     "case_count": 297,
+     "exit": 0,
+     "failed": [],
+     "fixture_suite_ok": true,
+     "section_13": [
+      54,
+      54
+     ]
+    },
+    "fv_validate_gcfpe_20261027": {
+     "errors": [],
+     "exit": 0,
+     "frozen_graph_edge_count": 240,
+     "frozen_graph_node_count": 56,
+     "ok": true,
+     "prompt_body_checks_not_evaluated": [
+      "ALL_BODY_LEVEL_CHECKS"
+     ]
+    },
+    "glow_hde_pr_development_validator": {
+     "exit": 0,
+     "pass_line": true
+    },
+    "ok": true,
+    "skill_creator_quick_validate": {
+     "change-flow": {
+      "exit": 0,
+      "valid": true
+     },
+     "flowmaster-validate": {
+      "exit": 0,
+      "valid": true
+     },
+     "glow-graph-contract": {
+      "exit": 0,
+      "valid": true
+     },
+     "glow-hde-pr-development": {
+      "exit": 0,
+      "valid": true
+     }
+    }
+   },
+   "G5_contracts": {
+    "Q1_100926_1": {
+     "different_lines": 0,
+     "equal_lines": 2,
+     "exit": 0,
+     "sha256": "cd291f17ac832cc0aad62b5cc7e554bd6d524e18de7aea7f2f4fec5a1651317f"
+    },
+    "Q5_102726_1": {
+     "different_lines": 0,
+     "equal_lines": 2,
+     "exit": 0,
+     "sha256": "f5dfa63f3f0b1c0dc3a55e647dffeee8da70f7500e46df40242b80c09c4c0b5d"
+    },
+    "ok": true
+   },
+   "freeze": {
+    "amthor-workspace-governance-audit": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+    "built-in-browser": "2 19055c4952ca5c2ef9fafde05b87b573c929d016c115d53304e6c13b7b6ee6b4",
+    "canva-drive-facebook-workflow": "1 23a54aaf41b8c2726b1136e82f992f855413d6b05bf153eb057a2f09f825e4cf",
+    "change-flow": "29 672f3cbb133092bee896d157c62deff8bb559dae446687ae1fd15ebbb07f74e0",
+    "chrome-browser": "2 445ef6649cc132ecd6b92b6db1c297024bbe6fb18da46bdb2d34f869e987f8dc",
+    "computer-use": "2 e4717f6cbdb1be926bcd9275d2eda93a72528ec47dcbd1404154bcb863671f9b",
+    "deep-research": "3 c140ef6f07ff2a8e1a2306902cd25a7909c85a3b1e981fd2498697f04542efc4",
+    "docs": "1 1dffc10fbedd22b5e806ad78e824741a604bf49ca6fc00b440405dc502057c39",
+    "docx": "61 b209c8df39061f1cebf76093712af7f4d25cad05998504e71d20de92d603421b",
+    "flowmaster-primary": "2 2d41da26a39de98af02ad65e0f2818732fc0930e87223cb90ef75a2dc9e977e6",
+    "flowmaster-validate": "45 39762ccab52e4fb7cb5c4e792aea2a5245fa23e0edd9273b47880954a696668d",
+    "glow-artifact-storage": "1 502b4ecf11cea156702207ddb829b2d51064fe9eaa8678ac5db05c04375cba1c",
+    "glow-graph-contract": "9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1",
+    "glow-hd-report-author": "1 2da719ecb2217c4c9272e40ba47602b3ebd6266ce0f1cd6990d0f6b433c706fa",
+    "glow-hde-pr-development": "4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee",
+    "glow-merged-change-attribution-lock": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+    "glow-po-reporting": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1",
+    "glow-workspace-currency": "3 5f2b4ae0d43f0609ae3c3b88409a2578791b008cf6908bd6516181688e06dd93",
+    "glow-write-boundary": "1 662f9647ccfd996aa72e3d80ac70edc3d06a4310805ef14207b1340c69e93fc4",
+    "google-workspace": "9 c05cc0e95135a5059bfa934c2ce7462a67d70804cfc3cc0700791792e4756c7b",
+    "hd-typesafe-scoring": "1 539460d3af1a18ac6925909c741f10f88fc598a295e323a609f0f68c9b707e39",
+    "human-design-reader": "1 1a781f865a873738cc8bab0be88d2ea301a326dcd5663984cadac4b56271f80d",
+    "human-design-reading-flowmaster": "1 0be52cdbfb8642717bda0a757966f51a333d5b31775b94aca3285bafc14bfe2f",
+    "import-memory": "1 77be9411dcd3209678825b17481202889508973fcff3c44a872f1478c3af03e0",
+    "morning": "3 b95d8ede815722fd56a9d6cc15498387d1bd8aa03be985815a9149980df5c349",
+    "pdf": "12 1ea202c04164cbd6f9a455714d9b0736faf17d054a1dd26b779306ece4b4bac3",
+    "pptx": "58 83fb0c648c004963662936fec0f8df8e8a291d351273794ce041d8e4ea9e2c4b",
+    "pre-handoff-records-check": "1 43f205ad4af563f81e03893b61380ac65f8c466c056a8f86784f0266e21f64ef",
+    "session-branch-flowmaster": "2 17b5800b35d352216eb6ea7708fa4058400f66dd7d908debbea16fa9154b3008",
+    "session-relay-flowmaster": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+    "skill-creator": "18 a0c4a4d08d78c740a4217e1e6b5f5fa46b918c8c3cd9a8c4defbf035e425b3e4",
+    "tw-flowmaster": "2 0581205ba29f195ce784ff585ca9019de5644750c9e357b06e377e91827a722c",
+    "typesafe-ai": "2 6c4a7eb044581746e20fa2f6e076905819c72d0c626d17035dd0003a9fc761cf",
+    "typesafe-scoring": "3 8e26b0554e3ff37c0ae6ae0fa4d5242d5823fc6fd1f7514ebe10137d27d25523",
+    "xlsx": "53 81af9c780cc737d5be221a488b4fb29937f34ec16bc29a37bdcc6ddf26a58fda"
+   },
+   "name_lines": {
+    "base": {
+     "all_in_form": true,
+     "changed": 13,
+     "skills": 35
+    },
+    "root": {
+     "all_in_form": true,
+     "changed": 13,
+     "skills": 35
+    }
+   },
+   "ok": true
+  },
+  "quoted": {
+   "G3_suite": {
+    "baseline_exit": 1,
+    "built_exit": 1,
+    "built_verdict": "FLOWMASTER_SUITE_FAIL",
+    "c21_built_suite_findings_are_the_named_three": true,
+    "c21_unchanged_suite_findings_are_the_named_three": true,
+    "change_flow_fixtures_ok": true,
+    "findings_from_this_change": [],
+    "ok": true,
+    "oracle_profile": "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1",
+    "r1_coverage": {
+     "core_rows": 26,
+     "declared_rows": 47,
+     "expected_rows": 47
+    },
+    "validator_revision": "3.5.0"
+   },
+   "G4_release_validators": {
+    "cf_validate_gcfpe_20261027": {
+     "error_tail": "",
+     "exit": 0,
+     "pass_line": true
+    },
+    "fv_run_gcfpe_20261027_fixtures": {
+     "case_count": 297,
+     "exit": 0,
+     "failed": [],
+     "fixture_suite_ok": true,
+     "section_13": [
+      54,
+      54
+     ]
+    },
+    "fv_validate_gcfpe_20261027": {
+     "errors": [],
+     "exit": 0,
+     "frozen_graph_edge_count": 240,
+     "frozen_graph_node_count": 56,
+     "ok": true,
+     "prompt_body_checks_not_evaluated": [
+      "ALL_BODY_LEVEL_CHECKS"
+     ]
+    },
+    "glow_hde_pr_development_validator": {
+     "exit": 0,
+     "pass_line": true
+    },
+    "ok": true,
+    "skill_creator_quick_validate": {
+     "change-flow": {
+      "exit": 0,
+      "valid": true
+     },
+     "flowmaster-validate": {
+      "exit": 0,
+      "valid": true
+     },
+     "glow-graph-contract": {
+      "exit": 0,
+      "valid": true
+     },
+     "glow-hde-pr-development": {
+      "exit": 0,
+      "valid": true
+     }
+    }
+   },
+   "G5_contracts": {
+    "Q1_100926_1": {
+     "different_lines": 0,
+     "equal_lines": 2,
+     "exit": 0,
+     "sha256": "cd291f17ac832cc0aad62b5cc7e554bd6d524e18de7aea7f2f4fec5a1651317f"
+    },
+    "Q5_102726_1": {
+     "different_lines": 0,
+     "equal_lines": 2,
+     "exit": 0,
+     "sha256": "f5dfa63f3f0b1c0dc3a55e647dffeee8da70f7500e46df40242b80c09c4c0b5d"
+    },
+    "ok": true
+   },
+   "freeze": {
+    "amthor-workspace-governance-audit": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+    "built-in-browser": "2 19055c4952ca5c2ef9fafde05b87b573c929d016c115d53304e6c13b7b6ee6b4",
+    "canva-drive-facebook-workflow": "1 23a54aaf41b8c2726b1136e82f992f855413d6b05bf153eb057a2f09f825e4cf",
+    "change-flow": "29 672f3cbb133092bee896d157c62deff8bb559dae446687ae1fd15ebbb07f74e0",
+    "chrome-browser": "2 445ef6649cc132ecd6b92b6db1c297024bbe6fb18da46bdb2d34f869e987f8dc",
+    "computer-use": "2 e4717f6cbdb1be926bcd9275d2eda93a72528ec47dcbd1404154bcb863671f9b",
+    "deep-research": "3 c140ef6f07ff2a8e1a2306902cd25a7909c85a3b1e981fd2498697f04542efc4",
+    "docs": "1 1dffc10fbedd22b5e806ad78e824741a604bf49ca6fc00b440405dc502057c39",
+    "docx": "61 b209c8df39061f1cebf76093712af7f4d25cad05998504e71d20de92d603421b",
+    "flowmaster-primary": "2 2d41da26a39de98af02ad65e0f2818732fc0930e87223cb90ef75a2dc9e977e6",
+    "flowmaster-validate": "45 39762ccab52e4fb7cb5c4e792aea2a5245fa23e0edd9273b47880954a696668d",
+    "glow-artifact-storage": "1 502b4ecf11cea156702207ddb829b2d51064fe9eaa8678ac5db05c04375cba1c",
+    "glow-graph-contract": "9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1",
+    "glow-hd-report-author": "1 2da719ecb2217c4c9272e40ba47602b3ebd6266ce0f1cd6990d0f6b433c706fa",
+    "glow-hde-pr-development": "4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee",
+    "glow-merged-change-attribution-lock": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+    "glow-po-reporting": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1",
+    "glow-workspace-currency": "3 5f2b4ae0d43f0609ae3c3b88409a2578791b008cf6908bd6516181688e06dd93",
+    "glow-write-boundary": "1 662f9647ccfd996aa72e3d80ac70edc3d06a4310805ef14207b1340c69e93fc4",
+    "google-workspace": "9 c05cc0e95135a5059bfa934c2ce7462a67d70804cfc3cc0700791792e4756c7b",
+    "hd-typesafe-scoring": "1 539460d3af1a18ac6925909c741f10f88fc598a295e323a609f0f68c9b707e39",
+    "human-design-reader": "1 1a781f865a873738cc8bab0be88d2ea301a326dcd5663984cadac4b56271f80d",
+    "human-design-reading-flowmaster": "1 0be52cdbfb8642717bda0a757966f51a333d5b31775b94aca3285bafc14bfe2f",
+    "import-memory": "1 77be9411dcd3209678825b17481202889508973fcff3c44a872f1478c3af03e0",
+    "morning": "3 b95d8ede815722fd56a9d6cc15498387d1bd8aa03be985815a9149980df5c349",
+    "pdf": "12 1ea202c04164cbd6f9a455714d9b0736faf17d054a1dd26b779306ece4b4bac3",
+    "pptx": "58 83fb0c648c004963662936fec0f8df8e8a291d351273794ce041d8e4ea9e2c4b",
+    "pre-handoff-records-check": "1 43f205ad4af563f81e03893b61380ac65f8c466c056a8f86784f0266e21f64ef",
+    "session-branch-flowmaster": "2 17b5800b35d352216eb6ea7708fa4058400f66dd7d908debbea16fa9154b3008",
+    "session-relay-flowmaster": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+    "skill-creator": "18 a0c4a4d08d78c740a4217e1e6b5f5fa46b918c8c3cd9a8c4defbf035e425b3e4",
+    "tw-flowmaster": "2 0581205ba29f195ce784ff585ca9019de5644750c9e357b06e377e91827a722c",
+    "typesafe-ai": "2 6c4a7eb044581746e20fa2f6e076905819c72d0c626d17035dd0003a9fc761cf",
+    "typesafe-scoring": "3 8e26b0554e3ff37c0ae6ae0fa4d5242d5823fc6fd1f7514ebe10137d27d25523",
+    "xlsx": "53 81af9c780cc737d5be221a488b4fb29937f34ec16bc29a37bdcc6ddf26a58fda"
+   },
+   "name_lines": {
+    "base": {
+     "all_in_form": true,
+     "changed": 22,
+     "skills": 35
+    },
+    "root": {
+     "all_in_form": true,
+     "changed": 22,
+     "skills": 35
+    }
+   },
+   "ok": true
+  }
+ },
+ "roots_ok": true,
+ "stand_in_used": false,
+ "with_conditional": [
+  "R-P1"
+ ]
+}
