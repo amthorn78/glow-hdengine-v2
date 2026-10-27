@@ -11,7 +11,7 @@ override: {"by": "", "overrides": [], "reason": ""}
 interaction_cost_predicted: 23
 interaction_cost_actual:
 estimate: {"plan": "10–16 h and 6–10M aggregate tokens: a fresh read of about 56 pages for the dry run; operations for about 35 bodies, the CL-05 member, PE and two control pages; graph-part edits for five parts and a new part; registry guards with injected regressions for about twelve rules; redlines for three to five skill packages; the R1 successor rows; the qualification and promotion plans; then one FULL round of two reviewers and at most one DIFF_CHECK", "execute": "24–40 h and 12–20M aggregate tokens, excluding Product Owner waiting time: about 40 Notion body operations with fresh-read checks, a new member page, three to five packages through one D24 cycle, the qualification gates and post-flight, and, under DN-1 option D2, the promotion transaction of about 80 Notion writes and moves plus the sweep by literal"}
-reviews: [{"mode": "ANALYZE", "kind": "DRY_RUN", "date": "2026-10-27", "required_open": 0, "outcome": "Author dry run, read-only, before any full review: 55 of 55 closure.py calls exit 0; the graph build reproduces D29's token (55 nodes, 235 edges, 593,569 bytes, sha256 43f84f29…); 8 of 9 installed skill digests equal their recorded values, and typesafe-scoring has no repository record; 240 of 240 repository and canon quotes match their sources; 52 Notion quotes are reproduced by an independent sweep and none conflicts; the decisive sentences of MB-001, MB-002, MB-012, MB-020, MB-021, MB-026 and MB-030 re-read on fresh fetches and in the graph parts; the record validator passes. No defect in the analysis is open from the dry run."}, {"mode": "ANALYZE", "kind": "FULL", "date": "2026-10-27", "required_open": 2, "outcome": "Round 1 at 4780f64a, two fresh reviewers, briefs at 8134979c. A: 2 required. R-A1 (R1): ITEM-14 confined PF04 §9.7.7's IA-30 business-case gate to the initial Plan review, so a material Plan delta adding or changing a work unit would pass unchecked. R-A2 (R3): DN-6 (a) recommended a commit route that the installed glow-write-boundary excludes, since an earlier task's instruction 'is not that instruction'. A also listed 24. B: 0 required, 19 listed. Both confirmed A-1's class reading, CD-1, CD-4, MB-010's test on the bodies they fetched, the derived items and tier 2. Distinct required count 2, none in repaired text. The author repairs R-A1 and R-A2 only (ITEM-14, ITEM-15, PART-03's targets, A-5, DN-6); the listed findings stay listed (D26-A rule 4); one DIFF_CHECK follows."}]
+reviews: [{"mode": "ANALYZE", "kind": "DRY_RUN", "date": "2026-10-27", "required_open": 0, "outcome": "Author dry run, read-only, before any full review: 55 of 55 closure.py calls exit 0; the graph build reproduces D29's token (55 nodes, 235 edges, 593,569 bytes, sha256 43f84f29…); 8 of 9 installed skill digests equal their recorded values, and typesafe-scoring has no repository record; 240 of 240 repository and canon quotes match their sources; 52 Notion quotes are reproduced by an independent sweep and none conflicts; the decisive sentences of MB-001, MB-002, MB-012, MB-020, MB-021, MB-026 and MB-030 re-read on fresh fetches and in the graph parts; the record validator passes. No defect in the analysis is open from the dry run."}, {"mode": "ANALYZE", "kind": "FULL", "date": "2026-10-27", "required_open": 2, "outcome": "Round 1 at 4780f64a, two fresh reviewers, briefs at 8134979c. A: 2 required. R-A1 (R1): ITEM-14 confined PF04 §9.7.7's IA-30 business-case gate to the initial Plan review, so a material Plan delta adding or changing a work unit would pass unchecked. R-A2 (R3): DN-6 (a) recommended a commit route that the installed glow-write-boundary excludes, since an earlier task's instruction 'is not that instruction'. A also listed 24. B: 0 required, 19 listed. Both confirmed A-1's class reading, CD-1, CD-4, MB-010's test on the bodies they fetched, the derived items and tier 2. Distinct required count 2, none in repaired text. The author repairs R-A1 and R-A2 only (ITEM-14, ITEM-15, PART-03's targets, A-5, DN-6); the listed findings stay listed (D26-A rule 4); one DIFF_CHECK follows."}, {"mode": "ANALYZE", "kind": "DIFF_CHECK", "date": "2026-10-27", "required_open": 0, "outcome": "Reviewer C, who was neither A nor B, checked 02ba1797..46160491 under BRIEF-ANALYZE-DIFF.md (43fe026b). R-A1 fixed: the two named IA-30 reviews are its only approving modes. R-A2 fixed: A-5's quotes match the installed skill, and DN-6 (a) now asks in the committing session; ITEM-22 and PF19 §3.4.3 hold under every option. No new required defect. 5 LISTED (L-C1 to L-C5). Required count 2 to 0. This is the last ANALYZE review D26-A allows; the analysis returns to Nathan with every open finding listed."}]
 items:
   - {"id": "ITEM-01", "statement": "DOC-20 no longer routes a second PR-40 entry for a merge whose lineage PR-40 has already accepted (D23-E, once per merge).", "source": "MB-001", "disposition": ""}
   - {"id": "ITEM-02", "statement": "PR-20's description of PR-40 says that a REJECT re-plans through PR-20 (D23-F), not that it returns findings to the PR owner.", "source": "MB-002", "disposition": ""}
@@ -449,7 +449,10 @@ These were found while measuring, are outside every entry's rule, and are not ta
     - R-A1 (R1): the IA-30 business-case gate was confined to the initial review. ITEM-14, ITEM-15 and PART-03's targets now name both IA-30 reviews, because PF04 §9.7.7 names no mode.
     - R-A2 (R3): DN-6 (a) relied on an instruction from an earlier task, which glow-write-boundary says "is not that instruction". A-5 now quotes both of its conditions, and DN-6 (a) has QA-100 ask in its own session.
   - **Listed: 24 from A and 19 from B, which overlap to 31 distinct.** They are not repaired (D26-A rule 4) and are listed in §A.13 for approval as accepted risks, unless you opt in.
-- **DIFF_CHECK:** one bounded check of the repair's diff by a third fresh reviewer, entered below when it returns.
+- **DIFF_CHECK, 2026-10-27,** by reviewer C, who was neither A nor B, on `02ba1797..46160491` under [BRIEF-ANALYZE-DIFF.md](evidence/20261027-gcfpe-backlog-open-items/BRIEF-ANALYZE-DIFF.md). The record is [REVIEW-ANALYZE-DIFF.md](evidence/20261027-gcfpe-backlog-open-items/REVIEW-ANALYZE-DIFF.md), committed unedited.
+  - R-A1 and R-A2 are fixed, and the repair adds no required defect.
+  - It lists 5 findings (L-C1 to L-C5).
+  - **Trend: 2 required, then 0.** This was the last ANALYZE review D26-A allows. Every open finding is listed in §A.13.
 
 ### 12. TypeSafe reading for the PLAN session, and surface advice
 
@@ -469,7 +472,69 @@ The reading below came from running the installed TypeSafe scoring skill's scrip
 
 ### 13. Return to Nathan — 2026-10-27
 
-Written after the review rounds; see the section below.
+**`PRODUCT_OWNER_ACTION_PENDING`: approve §A to enter PLAN, with your answers to DN-1 to DN-12.**
+
+- **The analysis is reviewed.** A dry run, one FULL round by two fresh reviewers and one check of the repair's diff. Required defects went from 2 to 0.
+- **36 distinct findings stay listed**, below. Approving the analysis accepts them as risks (`DISP-001`, D26-A rule 4), except those you opt in to repairing.
+- **Who set this stop.** D26-A: two full reviews at most, then one diff check. This mode has used one full review and the diff check.
+
+**Five listed findings change what you are asked.** Read them with the decisions they touch:
+
+| Finding | Decision it touches | What it changes |
+|---|---|---|
+| L-A02 / L-B7 | DN-3 | Option (a) carries ITEM-18, the plan-side real-input rules: the PF06 drain put 2.11 rules 4 and 5 into the *Real input* bullet. It does not carry ITEM-15 or ITEM-17, the no-emulation and pin rules, which the drain recorded as out of target. To keep those two items, they need (b), a D-number, or (c), dropping them. So read DN-3 as (a) for ITEM-18 and (b) or (c) for ITEM-15 and ITEM-17 |
+| L-B12 | CD-9 | Moving the register's operating-procedure binding touches the selected release's *Current selection*, which `ecosystem-change-management.md` §6 makes yours. Approving §A approves it; say if you would rather it wait for the promotion |
+| L-A22 | CD-6 | Request 4 is new QA-70 reviewer behaviour, not an extension of the mechanical one-pass apply simulation. Approving §A adopts it; say if you want it left out |
+| L-A23 | DN-12.1 | Recording J-1 to J-14 on the backlog is template rule 3's job once scope freezes, and the backlog's destination rule authorizes it. It needs no ruling: answer only if you object |
+| L-B13 | CD-11 | CD-11 edits the *fixed* §6 deliverable text of the ANALYZE and PLAN brief, and the first brief's §10, by adding a Canon relied on line. It does not touch the rubric, cap or exit that D26-A protects |
+
+**The approval, in one line if you agree with every recommendation:** "approve §A of MODIFICATION-20261027-gcfpe-backlog-open-items with the recommended options for DN-1 to DN-12". Name any decision where you choose differently, and any listed finding below you want repaired.
+
+**Open findings, accepted as risks on approval** (path; likelihood; consequence). Each is listed rather than repaired because none meets R1 to R4 (D26-A rule 3). The full text is in the three review records.
+
+| ID | Finding | Path | Likelihood | Consequence |
+|---|---|---|---|---|
+| L-A01 | MGMT-10's PLAN line "authored in Notion in place" is the only text that reads like in-place editing. A-1 cites neither D20-B nor mb008's precedent of B and C classes for candidate siblings | normal | certain | low: wording; the register's *Release rule* governs |
+| L-A02 / L-B7 | DN-3 (a) cannot carry ITEM-15 or ITEM-17 (above) | normal, if (a) | likely | a rule installed as B on a contested citation |
+| L-A03 | ITEM-18's "one refusal outside it" is narrower than PF06's "one refusal or a stated limit" | normal | possible | plans demand refusals where a stated limit suffices; PLAN converges on canon's wording |
+| L-A04 / L-B8 | PF04 §9.7.7's stop rule ("a work unit whose business case is met stops") has no item; PLAN places it | normal | plausible | a canon-silent placement, or a P1 conflict and a return to you |
+| L-A05 / L-B17 | PART-03's seven author prompts are unread, so their scope is unmeasured | normal | certain | PART-03 may grow by up to seven bodies at PLAN; readiness and estimate understated |
+| L-A06 | ITEM-11 omits PF06's "declining a security finding goes to the Product Owner first" and "unchanged duty" | normal | unlikely | PLAN carries canon's full wording |
+| L-A07 / L-B6 | CD-1's `ORIGINAL_NATIVE_STAGE` recovery applies to remediation only; ordinary documentation uses the terminal return | failure | low | a loud terminal return |
+| L-A08 / L-B14 | CD-4's direction (2026-10-13) is findable only through a closed change's addendum record | normal | low | record its GCFPE consequence in the decision record when PART-02 lands |
+| L-A09 | "168 lines on 55 pages" for the provenance clause has nothing subtracted (IA-30's and MGR-10's hits are other sentences) | normal | certain | DN-10's "54 pages" is overstated; under (a), PLAN re-measures by the clause's text |
+| L-A10 / L-B16 | "50 of 55 members" should read 53 of 55 (all but GCFPE-MGMT-10 and PR-50) | normal | certain | none; tier 2 stands |
+| L-A11 | PART-13 does not narrow CL-C-10's and CL-E-10's `do_not_close_new_remedy` → ESC-30 branch for close-tooling defects | normal | possible | two `DO_NOT_CLOSE` branches fit one result; PLAN applies CL-05's installation note ("not as ESC-30 work") |
+| L-A12 / L-B1 | `global.json` `member_count`, `member_rule`, `proofs`, `protected_identities`, `stage_categories`, and both packages' `EXPECTED_POLICY`, are not named in PART-13 | normal | likely | stale contract facts unless PART-24's profile catches them; flowmaster-validate's 55-node pin fails loudly |
+| L-A13 / L-B2 | PF04 §9.1.6's Living Prompt Flow Map and the Flow Index are named only at promotion, not at candidate publication | normal or failure | likely | a stale map, or a loud stop of the E-2 kind |
+| L-A14 / L-B4 | DN-2 (b) leaves the R1 successor rows recorded only in this Modification | normal | certain, if (b) | add a decision-record successor entry, as D23 Amendment 1 did, and name the exact rows at PLAN approval |
+| L-A15 | PART-09's "R1 pins nothing" should cite GCF-12's `STOP_REDLINE_APPLICATION_AMBIGUITY`; the conclusion holds | normal | certain | none |
+| L-A16 | Under DN-1 D1, the skill halves of PART-01 and PART-02 wait for the separate run | option D1 | certain | PLAN disposes of them; `COMPLETE` is not reachable inside this run |
+| L-A17 / L-B15 | The cost range's upper bound is 27, not 28, and the controls-only split row omits its own two review rounds | normal | certain | off by one; no conclusion changes |
+| L-A18 / L-B10 | J-2's CL-L2 half is already covered by PART-13 and CD-8; only CL-L8 is adjacent | normal | certain | a duplicate backlog row if recorded as written |
+| L-A19 / L-B9 | J-4 concerns D23-F, PART-06's rule, although PR-40's RS-10 package already routes correctly | normal | low | it could ride PR-40's successor page |
+| L-A20 | PART-06's corrected PR-20 sentence still omits `reject_instruction_owner` → PR-10 (J-3) | normal | certain | PR-20's description stays partial until J-3 is decided |
+| L-A21 | J-9's three stale TypeSafe citations are the same defect as DN-12's `SKILL.md:184` rider | normal | certain | offer all four together, or one defect is fixed on one of four surfaces |
+| L-A22 | CD-6 overstates its basis (above) | normal | certain | a new QA-70 duty on an overstated basis |
+| L-A23 | DN-12.1 is template rule 3's job, not a ruling (above) | normal | certain | one wasted round trip |
+| L-A24 | A fresh session cannot find this record until its pull request merges, or unless it is told this branch | failure | loud | a blocked resume; the pull request names the branch |
+| L-B3 | CL-05's "Removing stopgaps" note has no recorded disposition (F9: 0 hits in IA-10, IA-30, PR-10) | normal | low | PLAN records "no change" |
+| L-B5 | MB-010's 13 lines read in context are not named in a committed file, so the 95 cannot be reproduced exactly (CL-20 gives 3 or 4) | normal | certain | PLAN re-measures with the stated test, and may differ by a few lines |
+| L-B11 | Two verifier findings have no disposition: CL-05's PRs and PF06 §1.1.4 (covered in substance through glow-hde-pr-development), and MB-022's PF19 §3.5.7 scope | normal | certain | no prompt is affected |
+| L-B12 | CD-9 touches the selected release (above) | normal | certain | authorized by your approval of §A |
+| L-B13 | CD-11 edits fixed §6 text (above) | normal | certain | the rubric, cap and exit are unchanged |
+| L-B18 | DN-8 (c)'s premise, that no producer outside GCFPE authors an addendum, rests on GTWPE-D3, which is about drain targets, not authorship | normal | low | MB-007 could close while a TW producer still leaves the number to you |
+| L-B19 | Parts sharing a successor page: a D26-B restore of that page also reverts the other parts' edits | failure | low | PLAN orders the parts on each shared page |
+| L-C1 | ITEM-14 and ITEM-15 cut the delta check by work unit; a delta can change a criterion or the outcome without editing a unit | normal | low | one criterion or case escapes the delta review |
+| L-C2 | DN-6 (a) wording: "it opens" against the skill's "he is opening", and "its own session" against D27's venue latitude | normal | low | wording; PLAN converges on the skill's text |
+| L-C3 | DN-6 (c) also changes glow-write-boundary, but §A.4 and §A.8 say "only under DN-6 (b)" | option (c) | low | one package short in the count under (c); loud at PLAN |
+| L-C4 | §A.11 pointed here before this section was written | normal | certain | none now |
+| L-C5 | No item lands the QA evidence of record on `main` before closure; under DN-6 (a), it rests on your merge of the evidence pull request | normal | plausible | closure can proceed with QA evidence unmerged, which is the HDE-EPIC040 brief's case; PF19 §3.4.3 is met by a branch |
+
+**Then:**
+- **In this session.** On your approval, I record it in the frontmatter with your words quoted here, mark the taken backlog entries with this Modification's ID, record J-1 to J-14 on the backlog under template rule 3, and go on to PLAN (D21-D).
+- **In a fresh session.** Invoke GCFPE-MGMT-10 with `MODE = PLAN` and `MODIFICATION-20261027-gcfpe-backlog-open-items`, naming branch `claude/cool-bardeen-zwduzl` until the pull request merges (L-A24).
+- **The PLAN session's reading** is in §A.12: **TypeSafe v8.2: Opus 5.5 at high**, no flags. You pick the cell.
 
 ## §P — Plan
 
