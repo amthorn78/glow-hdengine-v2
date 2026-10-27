@@ -963,5 +963,451 @@
    "qualify_gate_injected_unparsed_fails": true
   },
   "selftest_ok": true
+ },
+ "review1_repair": {
+  "date_utc": "2026-10-27T10:53:14+00:00",
+  "repository_head": "f1680af609de75298b75a9d5757150fb24e3c127",
+  "working_tree_changes_under_test": "C-23 to C-26 repair, uncommitted at this run",
+  "fetched_after": "2026-10-27T10:39:24.452Z",
+  "successor_map": "docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/plan/successor-map-standin.json",
+  "gates_rerun": [
+   "N10_part17_guards",
+   "N11_repository_edits",
+   "N12_c24_per_work_unit"
+  ],
+  "gates_not_rerun": "N0 to N10's other rows: their results above are unchanged",
+  "gates": {
+   "N10_part17_guards": {
+    "activation_render.selftest": {
+     "exit": 0,
+     "ok": true,
+     "cases": "24/24",
+     "part17_cases": {
+      "part17_clean_hub_passes": true,
+      "part17_clean_register_passes": true,
+      "part17_surviving_forbidden_line_fails": true,
+      "part17_missing_historical_heading_fails": true,
+      "part17_register_third_drain_copy_fails": true,
+      "part17_before_counts_differ_from_w6": true,
+      "part17_other_page_not_judged": true
+     }
+    },
+    "plan_part17": {
+     "exit": 0,
+     "ok": true,
+     "stand_in": true,
+     "hub_unpinned_refused": true,
+     "hub_pinned_at_read": "2026-10-27T03:02:37.191Z",
+     "pages": {
+      "3d24590a05eb81ce942ad994cfca9fa1": {
+       "as_of": "2026-10-12T17:17:45.991Z",
+       "revision_matches_pin": true,
+       "ops_listed": 3,
+       "applied": 3,
+       "refused": 0,
+       "guards_before": {
+        "G-W6-REG-F": 4,
+        "G-W6-REG-RN": 0
+       },
+       "before_equals_w6": true,
+       "guards_after": {
+        "G-W6-REG-F": 2,
+        "G-W6-REG-RN": 2
+       },
+       "after_all_pass": true,
+       "ok": true
+      },
+      "3ce4590a05eb814f8892f88ff8539308": {
+       "as_of": "2026-10-27T03:02:37.191Z",
+       "revision_matches_pin": true,
+       "ops_listed": 21,
+       "applied": 21,
+       "refused": 0,
+       "guards_before": {
+        "G-W6-HUB-F": 13,
+        "G-W6-HUB-RH": 0,
+        "G-W6-HUB-RN": 0,
+        "G-W6-HUB-RP": 0
+       },
+       "before_equals_w6": true,
+       "guards_after": {
+        "G-W6-HUB-F": 0,
+        "G-W6-HUB-RH": 4,
+        "G-W6-HUB-RN": 2,
+        "G-W6-HUB-RP": 2
+       },
+       "after_all_pass": true,
+       "ok": true
+      }
+     }
+    },
+    "chain_part17": {
+     "exit": 0,
+     "ok": true,
+     "pages_judged": 2,
+     "pages_ok": 2,
+     "findings": 0
+    },
+    "ok": true,
+    "candidate_parts_built": true,
+    "c26": {
+     "make_activation_ops.check": {
+      "exit": 0,
+      "file_equals_rebuild": true
+     },
+     "make_activation_ops.selftest": {
+      "exit": 0,
+      "ok": true,
+      "c26_rows": {
+       "c26_creg_carries_controls_pr_marker": true,
+       "c26_rejects_text_without_pr768_link": true,
+       "c26_rejects_doubled_pr768_link": true
+      }
+     },
+     "creg_marker_count": 2,
+     "creg_names_768": false,
+     "chain_to_sweep": {
+      "exit": 0,
+      "ok": true,
+      "totals": {
+       "listed": 103,
+       "generated": 179,
+       "applied": 282,
+       "refused": 0
+      },
+      "moves": {
+       "P5": 57,
+       "distinct": 57,
+       "equal_to_control_archive_set": true
+      },
+      "pins_match": 10,
+      "pins_total": 10,
+      "read_only_pins_match": true,
+      "stand_in_marker_values": [
+       "@PUBLICATION_DATE",
+       "@ACTIVATION_DATE",
+       "@ARCHIVAL_DATE",
+       "@PRODUCTION_TOKEN",
+       "@POSTFLIGHT_VERDICT",
+       "@D24_RECORDS",
+       "@PROMOTION_APPROVED_AT",
+       "@PROMOTION_D",
+       "@PROCEDURE_PR",
+       "@CONTROLS_PR",
+       "@REGISTER_SELECTED_AT",
+       "@QUAL_VALIDATORS_PATH",
+       "@QUAL_FIXTURES_PATH",
+       "@QUAL_RECEIPT_PATHS",
+       "@INSTALL_RECEIPT",
+       "@PRODVAL_RECEIPT",
+       "@ARCHIVAL_RECEIPT"
+      ],
+      "phases": [
+       {
+        "phase": "part17",
+        "pages_judged": 2,
+        "pages_ok": 2,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "candidate",
+        "pages_judged": 9,
+        "pages_ok": 9,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "review",
+        "pages_judged": 9,
+        "pages_ok": 9,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "activation",
+        "pages_judged": 11,
+        "pages_ok": 11,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "activation-done",
+        "pages_judged": 11,
+        "pages_ok": 11,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "register",
+        "pages_judged": 11,
+        "pages_ok": 11,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "register-done",
+        "pages_judged": 11,
+        "pages_ok": 11,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "install-done",
+        "pages_judged": 11,
+        "pages_ok": 11,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "prodval-done",
+        "pages_judged": 11,
+        "pages_ok": 11,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "archived",
+        "pages_judged": 11,
+        "pages_ok": 11,
+        "findings": 0,
+        "refused": 0
+       },
+       {
+        "phase": "sweep",
+        "pages_judged": 13,
+        "pages_ok": 13,
+        "findings": 0,
+        "refused": 0
+       }
+      ]
+     }
+    }
+   },
+   "N11_repository_edits": {
+    "x1_old_counts_before": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "x1_guards_before": {
+     "G-W6-RE-19F": 4,
+     "G-W6-RE-19R": 0,
+     "G-W6-RE-20R": 0,
+     "G-W6-RE-21F": 2,
+     "G-W6-RE-21R": 0,
+     "G-W6-RE-28F": 1,
+     "G-W6-RE-28R": 0
+    },
+    "x1_guards_after": {
+     "G-W6-RE-19F": 0,
+     "G-W6-RE-19R": 2,
+     "G-W6-RE-20R": 1,
+     "G-W6-RE-21F": 0,
+     "G-W6-RE-21R": 4,
+     "G-W6-RE-28F": 0,
+     "G-W6-RE-28R": 1
+    },
+    "x1_new_once_after": true,
+    "x1_note_heading_count": 1,
+    "x1_note_after_d30": true,
+    "x1_v500_equal_to_main": true,
+    "v500_tree_equals_origin_main": true,
+    "x1_edits": 20,
+    "x1_files": 5,
+    "x26_old_counts_before": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "x26_edits": 18,
+    "x26_files": 3,
+    "x26_new_once_after": true,
+    "x26_promotion_heading_count": 1,
+    "x26_earlier_entries_unchanged": true,
+    "x26_stand_in_values": "repo_edits_102726.STANDIN_X26 (named stand-ins for the receipt values EXECUTE fills)",
+    "steps": {
+     "x1_check_before": {
+      "exit": 0,
+      "ok": true,
+      "expected_exit_zero": true,
+      "as_expected": true
+     },
+     "x1_apply": {
+      "exit": 0,
+      "ok": true,
+      "expected_exit_zero": true,
+      "as_expected": true
+     },
+     "x1_check_after": {
+      "exit": 0,
+      "ok": true,
+      "expected_exit_zero": true,
+      "as_expected": true
+     },
+     "x1_second_apply_refused": {
+      "exit": 1,
+      "ok": false,
+      "expected_exit_zero": false,
+      "as_expected": true
+     },
+     "x26_check_before": {
+      "exit": 0,
+      "ok": true,
+      "expected_exit_zero": true,
+      "as_expected": true
+     },
+     "x26_apply_unfilled_refused": {
+      "exit": 1,
+      "ok": false,
+      "expected_exit_zero": false,
+      "as_expected": true
+     },
+     "x26_apply_stand_in": {
+      "exit": 0,
+      "ok": true,
+      "expected_exit_zero": true,
+      "as_expected": true
+     },
+     "x26_check_after": {
+      "exit": 0,
+      "ok": true,
+      "expected_exit_zero": true,
+      "as_expected": true
+     }
+    },
+    "selftest": {
+     "exit": 0,
+     "ok": true,
+     "cases": "14/14"
+    },
+    "real_tree_written": false,
+    "ok": true
+   },
+   "N12_c24_per_work_unit": {
+    "state": {
+     "ops_present": true,
+     "guards_present": true,
+     "ops_by_work_unit": true,
+     "ops_no_widening": true,
+     "guards_no_widening": true,
+     "d30a_by_work_unit": true,
+     "d30_no_widening": true
+    },
+    "assemble_edits_check": {
+     "exit": 0,
+     "current": true
+    },
+    "assemble_guards_check": {
+     "exit": 0,
+     "current": true
+    },
+    "selftest": {
+     "injected_op_widening_fails": true,
+     "injected_guard_l_c1_fails": true,
+     "injected_d30_widening_fails": true
+    },
+    "ok": true,
+    "body_check_selftest": {
+     "exit": 0,
+     "ok": true,
+     "guards": 118,
+     "fixture_rows": 377,
+     "failing": 0
+    },
+    "body_check_plan_IA-30": {
+     "exit": 0,
+     "ok": true,
+     "as_of": "2026-10-12T02:29:54.641Z",
+     "revision_matches_plan": true,
+     "ops_applied": 10,
+     "ops": 10,
+     "guards_before": {
+      "G-W2-BC-4": 0,
+      "G-W2-EM-1": 0,
+      "G-W2-EM-2": 0
+     },
+     "guards_after": {
+      "G-W2-BC-4": 1,
+      "G-W2-EM-1": 1,
+      "G-W2-EM-2": 1
+     },
+     "guards_rows": 21,
+     "guards_failing_after": 0,
+     "probe_ok": true
+    }
+   }
+  },
+  "gate_ok": {
+   "N10_part17_guards": true,
+   "N11_repository_edits": true,
+   "N12_c24_per_work_unit": true,
+   "dry_run_selftest": true
+  },
+  "ok": true,
+  "d22": "transient reads of this session's harness records; counts, ids and booleans; no body text",
+  "dry_run_selftest": {
+   "mode": "selftest",
+   "rows": {
+    "freeze_detects_changed_byte": true,
+    "token_accepts_match": true,
+    "token_rejects_edge_count": true,
+    "token_rejects_sha": true,
+    "token_rejects_failed_validation": true,
+    "build_token_parses": true,
+    "nine_expected_digests_from_w7": true,
+    "row_assertions_clean_passes": true,
+    "row_assertions_missing_required_fails": true,
+    "row_assertions_forbidden_present_fails": true,
+    "row_assertions_uncarried_forbidden_fails": true,
+    "row_assertions_vacuous_required_fails": true,
+    "body_classes_parse": true,
+    "check_text_is_normalize": true,
+    "profile_payload_normalized": true,
+    "injected_raw_payload_differs": true,
+    "row_assertions_on_check_text_pass_markdown_assertion": true,
+    "injected_row_assertions_on_raw_text_fail": true,
+    "probe_contract_rebinds_only_changed_members": true,
+    "qualify_gate_clean_passes": true,
+    "qualify_gate_injected_x12_row_false_fails": true,
+    "qualify_gate_injected_x18_exit_fails": true,
+    "qualify_gate_injected_unbuilt_root_fails": true,
+    "qualify_gate_injected_unparsed_fails": true,
+    "c24_state_clean_passes": true,
+    "c24_state_injected_l_c1_guard_fails": true
+   },
+   "selftest_ok": true
+  }
  }
 }

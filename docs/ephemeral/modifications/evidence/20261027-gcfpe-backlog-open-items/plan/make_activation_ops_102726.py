@@ -25,6 +25,11 @@ graph parts at render time.
             left as they are; each escaped anchor must normalize back to W8's text (normalize_fetch.normalize) and
             occur exactly once in HEAD-PE's replacement.
 
+  C-26      (repair of PLAN review round 1, R-B2) C-REG's work-record link names pull request #768, which merged only
+            the ANALYZE record; the link becomes the marker @CONTROLS_PR, the controls pull request's number, which
+            X1 records once (execute/controls-pr-102726.1.json) when it opens that pull request and X9 fills with
+            --set @CONTROLS_PR=<number>. activation_render_102726.py refuses an unfilled marker (UNFILLED_MARKER).
+
   make_activation_ops_102726.py build     write plan/activation-ops.json
   make_activation_ops_102726.py check     rebuild in memory and compare with the file on disk (exit 1 on drift)
   make_activation_ops_102726.py selftest  each C-22 check refuses its injected defect
@@ -121,6 +126,20 @@ def pe_fetch_form(ops: list, head_pe: str) -> list:
     return out
 
 
+PR768 = "[pull request #768](https://github.com/amthorn78/glow-hdengine-v2/pull/768)"
+CONTROLS_PR = "[pull request #@CONTROLS_PR](https://github.com/amthorn78/glow-hdengine-v2/pull/@CONTROLS_PR)"
+CONTROLS_PR_MEANING = ("the number of the controls pull request (C-12), which X1 records once in "
+                       "execute/controls-pr-102726.1.json when it opens it; X9 passes it as --set @CONTROLS_PR=<number> "
+                       "(C-26)")
+
+
+def controls_pr_link(text: str) -> str:
+    """C-26: W8's #768 link replaced by the @CONTROLS_PR marker; refused unless the link occurs exactly once."""
+    if text.count(PR768) != 1:
+        raise SystemExit("C-26: C-REG does not carry W8's #768 work-record link exactly once")
+    return text.replace(PR768, CONTROLS_PR)
+
+
 def head_pe_text() -> str:
     edits = json.loads((HERE / "edits.json").read_text(encoding="utf-8"))
     return next(o for o in edits["ops"] if o["id"] == "HEAD-PE")["new"]
@@ -205,6 +224,12 @@ def build(head_pe: str | None = None) -> dict:
             continue
         key = o["page_id"]
         page(key)["ops"].append(norm(o, "W8"))
+    # C-26: C-REG's work-record pull request is the controls pull request, recorded once at X1 and filled at X9
+    creg = next(o for o in page(REGISTER)["ops"] if o["id"] == "C-REG")
+    creg["new"] = controls_pr_link(creg["new"])
+    creg["why"] = (creg.get("why") or "") + (" C-26: the work-record link names the controls pull request "
+                                             "(@CONTROLS_PR, recorded once at X1), not #768, which merged only the "
+                                             "ANALYZE record.")
     # C-22: PE's P1c ops in the escaped fetch form
     pe_ops = page("@PE_PAGE_ID")["ops"]
     p1c = [o for o in pe_ops if o["id"].startswith("P1c-PE-")]
@@ -253,7 +278,7 @@ def build(head_pe: str | None = None) -> dict:
                     "map (stand_in: true) is rendered with binding_pass.probe() synthetic ids so retired and "
                     "successor ids stay distinct, and every receipt says stand-ins were used."},
         "phases": PHASES,
-        "markers": tx["markers"],
+        "markers": {**tx["markers"], "@CONTROLS_PR": CONTROLS_PR_MEANING},
         "generated_markers": {
             "@SUCC_URL:<ID>": "https://app.notion.com/p/<map page_id>",
             "@PE_PAGE_ID": "map pe.page_id",
@@ -362,6 +387,11 @@ def selftest() -> dict:
         esc_fetch = keep
     rows["esc_fetch_keeps_markers_and_code"] = esc_fetch("a_b <code>c_d</code> @SUCC_URL:QA-10 @ACTIVATION_DATE") == \
         "a\\_b <code>c_d</code> @SUCC_URL:QA-10 @ACTIVATION_DATE"
+    # C-26: C-REG carries the marker, never #768, and a C-REG without W8's link is refused
+    creg = next(o for o in build(head)["pages"][REGISTER]["ops"] if o["id"] == "C-REG")
+    rows["c26_creg_carries_controls_pr_marker"] = creg["new"].count("@CONTROLS_PR") == 2 and "#768" not in creg["new"]
+    rows["c26_rejects_text_without_pr768_link"] = refused(lambda: controls_pr_link("Work record: x."))
+    rows["c26_rejects_doubled_pr768_link"] = refused(lambda: controls_pr_link(PR768 + " " + PR768))
     return {"mode": "selftest", "rows": rows, "ok": all(rows.values())}
 
 

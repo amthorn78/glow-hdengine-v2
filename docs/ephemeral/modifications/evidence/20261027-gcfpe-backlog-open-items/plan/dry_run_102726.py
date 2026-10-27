@@ -30,6 +30,15 @@ Markdown form), never the raw fetch form; operations are still applied to the ra
 matches the fetch's own form. The raw form is kept only as a named diagnostic row. C-19: N5 passes the successor map
 to contracts_102726.py run, which fills CL-05's staged parent from it.
 
+Repair of PLAN review round 1 (C-23, C-24): N10 also runs PART-17's notion-control guards (G-W6-HUB-*, G-W6-REG-*)
+through activation_render_102726.py plan --phase part17 on the fresh Hub and register reads: before the operations the
+guards must give W6's measured counts, and with the operations applied in memory every guard passes (gate
+N10.part17_guards). N11 rehearses X1's and X26's repository edits with plan/repo_edits_102726.py on a scratch copy of
+the target files (X1 applied, then X26 with named stand-in values), with its self-test. N12 checks C-24's per-work-unit
+reading of IA-30's delta review in edits.json, guards.json and D30-A, with an injected reversion that must fail.
+`review1 <installed-skills-root> <scratch> <fetched-after> --receipt plan/dry-run.json` runs only N10.part17_guards, N11
+and N12 and appends them to the existing receipt as its `review1_repair` block, keeping every other gate's result.
+
 R3: N8 also runs the self-tests of the two EXECUTE qualification scripts R2 added (x12_qualify_102726.py with the
 built root, x18_validate_102726.py) and counts them in N8's flag (qualify_selftests; self-tested here).
 """
@@ -248,6 +257,237 @@ def load_engine(audit_root: Path):
 
 
 # ------------------------------------------------------------------------------------------------- the run
+PART17_PAGES = ["3ce4590a05eb814f8892f88ff8539308", "3d24590a05eb81ce942ad994cfca9fa1"]
+REPO_EDITS = HERE / "repo_edits_102726.py"
+
+
+def candidate_parts(installed: Path, scratch: Path, map_path: Path) -> tuple:
+    """The candidate graph parts (N4's first half), for the activation render's member rows."""
+    sm = ["--stand-in-ok"] if json.loads(map_path.read_text(encoding="utf-8")).get("stand_in") is True else []
+    cand = scratch / "candidate-parts"
+    if cand.exists():
+        shutil.rmtree(cand)
+    shutil.copytree(REPO / "docs/graph/parts", cand)
+    c_ap, ap = jrun([PY, HERE / "graph_assemble_102726.py", "apply", cand, map_path, *sm])
+    c_ri, _, _ = run([PY, installed / "glow-graph-contract/scripts/graph_parts.py", "reindex", cand],
+                     env_extra={"TMPDIR": str(scratch)})
+    return cand, c_ap == 0 and c_ri == 0 and ap.get("apply_ok") is True
+
+
+def part17_gate(map_path: Path, cand: Path, fetched_after: str) -> dict:
+    """C-23: PART-17's notion-control guards on the fresh Hub and register reads, before and after the operations."""
+    ar = HERE / "activation_render_102726.py"
+    c_rs, ars = jrun([PY, ar, "selftest", "--successor-map", map_path, "--parts", cand])
+    common = ["--successor-map", map_path, "--parts", cand, "--phase", "part17", "--pages", *PART17_PAGES,
+              "--fetched-after", fetched_after, "--since-minutes", "900"]
+    # the Hub is volatile and is pinned at the revision read just before its write (X8; A4's pin policy): a first
+    # pass reads its revision (and must refuse it unpinned), the second pins it there
+    c_p0, p0 = jrun([PY, ar, "plan", *common])
+    hub_row = next((r for r in p0.get("pages", []) if r.get("page") == PART17_PAGES[0]), {})
+    unpinned_refused = hub_row.get("refusal") == "PIN_REQUIRED"
+    c_pl, pl = jrun([PY, ar, "plan", *common, "--pin", f"{PART17_PAGES[0]}={hub_row.get('as_of')}"])
+    c_ch, ch = jrun([PY, ar, "plan", "--chain", "--standin-values", "--successor-map", map_path, "--parts", cand,
+                     "--phase", "part17", "--fetched-after", fetched_after, "--since-minutes", "900", "--pages",
+                     *PART17_PAGES])
+    pages = {}
+    for r in pl.get("pages", []):
+        ctl = r.get("control") or {}
+        pages[r.get("page")] = {
+            "as_of": r.get("as_of"), "revision_matches_pin": r.get("revision_matches_pin"),
+            "ops_listed": r.get("ops_listed"), "applied": r.get("applied"), "refused": len(r.get("refused") or []),
+            "guards_before": {k: v["count"] for k, v in (r.get("part17_guards_before") or {}).items()},
+            "before_equals_w6": r.get("part17_before_equals_w6"),
+            "guards_after": {k: v["count"] for k, v in (ctl.get("part17_guards") or {}).items()},
+            "after_all_pass": ctl.get("ok") is True and ctl.get("judged") is True, "ok": r.get("ok")}
+    ph = (ch.get("phases") or [{}])[0]
+    selfcases = {k: v for k, v in (ars.get("cases") or {}).items() if k.startswith("part17_")}
+    return {
+        "activation_render.selftest": {"exit": c_rs, "ok": ars.get("ok"),
+                                       "cases": f"{ars.get('cases_passed')}/{ars.get('cases_total')}",
+                                       "part17_cases": selfcases},
+        "plan_part17": {"exit": c_pl, "ok": pl.get("ok"), "stand_in": pl.get("stand_in"),
+                        "hub_unpinned_refused": unpinned_refused, "hub_pinned_at_read": hub_row.get("as_of"), "pages": pages},
+        "chain_part17": {"exit": c_ch, "ok": ch.get("ok"), "pages_judged": (ph.get("control") or {}).get("pages_judged"),
+                         "pages_ok": (ph.get("control") or {}).get("pages_ok"),
+                         "findings": (ph.get("control") or {}).get("findings")},
+        "ok": c_rs == 0 and ars.get("ok") is True and len(selfcases) == 7 and all(selfcases.values())
+        and unpinned_refused and c_pl == 0 and pl.get("ok") is True and len(pages) == 2
+        and all(v["before_equals_w6"] and v["after_all_pass"] and v["refused"] == 0 for v in pages.values())
+        and c_ch == 0 and ch.get("ok") is True and (ph.get("control") or {}).get("pages_judged") == 2}
+
+
+def repo_edits_gate(scratch: Path) -> dict:
+    """C-23 (N11): X1's and X26's repository edits on a scratch copy of the target files and a scratch git
+    repository whose main holds them (v5.0.0 taken from origin/main); X1 first, then X26 with stand-in values."""
+    sys.path.insert(0, str(HERE))
+    import repo_edits_102726 as RE  # noqa: E402
+    root = scratch / "repo-edits"
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True)
+    RE._copy(REPO, root)
+    v500_main = run(["git", "-C", REPO, "show", f"origin/main:{RE.V500}"])[1]
+    v500_tree_equals_main = (REPO / RE.V500).read_text(encoding="utf-8") == v500_main
+    steps = {}
+
+    def step(name, args, want):
+        c, d = jrun([PY, REPO_EDITS, *args])
+        steps[name] = {"exit": c, "ok": d.get("ok"), "expected_exit_zero": want, "as_expected": (c == 0) == want}
+        return d
+    b1 = step("x1_check_before", ["check", "--set", "X1", "--root", root, "--state", "before", "--main-ref", "main"], True)
+    step("x1_apply", ["apply", "--set", "X1", "--root", root, "--main-ref", "main"], True)
+    a1 = step("x1_check_after", ["check", "--set", "X1", "--root", root, "--state", "after", "--main-ref", "main"], True)
+    step("x1_second_apply_refused", ["apply", "--set", "X1", "--root", root, "--main-ref", "main"], False)
+    before_r4 = scratch / "dr-before-r4.md"
+    shutil.copyfile(root / RE.DR, before_r4)
+    b26 = step("x26_check_before", ["check", "--set", "X26", "--root", root, "--state", "before", "--main-ref", "main"], True)
+    step("x26_apply_unfilled_refused", ["apply", "--set", "X26", "--root", root, "--main-ref", "main"], False)
+    step("x26_apply_stand_in", ["apply", "--set", "X26", "--root", root, "--stand-in-values", "--main-ref", "main"], True)
+    a26 = step("x26_check_after", ["check", "--set", "X26", "--root", root, "--state", "after", "--stand-in-values",
+                                   "--main-ref", "main", "--before-ref", f"file:{before_r4}"], True)
+    c_st, st = jrun([PY, REPO_EDITS, "selftest"])
+    before_r4.unlink()
+    res = {
+        "x1_old_counts_before": [r.get("old_count") for r in b1.get("rows", []) if "old_count" in r],
+        "x1_guards_before": {g["guard"]: g["count"] for g in b1.get("guards", [])},
+        "x1_guards_after": {g["guard"]: g["count"] for g in a1.get("guards", [])},
+        "x1_new_once_after": all(r.get("new_count_after") == 1 for r in a1.get("edit_rows", [])),
+        "x1_note_heading_count": a1.get("note_heading_count"), "x1_note_after_d30": a1.get("note_after_d30"),
+        "x1_v500_equal_to_main": a1.get("v500_equal_to_main"), "v500_tree_equals_origin_main": v500_tree_equals_main,
+        "x1_edits": b1.get("edits"), "x1_files": b1.get("files"),
+        "x26_old_counts_before": [r.get("old_count") for r in b26.get("rows", []) if "old_count" in r],
+        "x26_edits": b26.get("edits"), "x26_files": b26.get("files"),
+        "x26_new_once_after": all(r.get("new_count_after") == 1 for r in a26.get("edit_rows", [])),
+        "x26_promotion_heading_count": a26.get("promotion_heading_count"),
+        "x26_earlier_entries_unchanged": a26.get("earlier_entries_unchanged"),
+        "x26_stand_in_values": "repo_edits_102726.STANDIN_X26 (named stand-ins for the receipt values EXECUTE fills)",
+        "steps": steps,
+        "selftest": {"exit": c_st, "ok": st.get("ok"), "cases": f"{st.get('cases_passed')}/{st.get('cases_total')}"},
+        "real_tree_written": False}
+    res["ok"] = (all(v["as_expected"] for v in steps.values()) and c_st == 0 and st.get("ok") is True
+                 and v500_tree_equals_main and res["x1_note_after_d30"] is True and res["x1_new_once_after"]
+                 and res["x26_new_once_after"] and res["x26_promotion_heading_count"] == 1)
+    shutil.rmtree(root)
+    return res
+
+
+C24_WIDENING = ("acceptance criterion or outcome", "whether or not the delta edits a work unit",
+                "An acceptance criterion the delta adds or changes that depends", "(L-C1)", "by acceptance criterion")
+
+
+def c24_state(edits: dict, guards: dict, d30: str) -> dict:
+    ia = {o["id"]: o["new"] for o in edits["ops"] if o["id"] in ("W2-IA-30-BC-2", "W2-IA-30-EM-2")}
+    gd = {g["id"]: g for g in guards["guards"] if g["id"] in ("G-W2-BC-4", "G-W2-EM-2")}
+    gtext = json.dumps({k: {x: v.get(x) for x in ("rule", "all", "source_all")} for k, v in gd.items()}, ensure_ascii=False)
+    d30_flat = " ".join(d30.split())
+    rows = {
+        "ops_present": len(ia) == 2, "guards_present": len(gd) == 2,
+        "ops_by_work_unit": all("For every work unit the delta adds or changes" in t for t in ia.values()),
+        "ops_no_widening": not any(w in t for t in ia.values() for w in C24_WIDENING),
+        "guards_no_widening": not any(w in gtext for w in C24_WIDENING),
+        "d30a_by_work_unit": "In `MATERIAL_PLAN_DELTA_REVIEW`, for every work unit the delta adds or changes, such a "
+                             "criterion is a ground for `DELTA_DENY`." in d30_flat,
+        "d30_no_widening": not any(w in d30_flat for w in C24_WIDENING[1:2] + C24_WIDENING[4:5])}
+    return {"rows": rows, "ok": all(rows.values())}
+
+
+def c24_gate() -> dict:
+    """C-24 (N12): IA-30's delta review reads by work unit in edits.json, guards.json and D30-A; an injected
+    reversion of each fails."""
+    edits = json.loads((HERE / "edits.json").read_text(encoding="utf-8"))
+    guards = json.loads((HERE / "guards.json").read_text(encoding="utf-8"))
+    dr = DECISIONS.read_text(encoding="utf-8")
+    d30 = dr[dr.index("## D30 — "):]
+    d30 = d30[: d30.find("\n## ", 1)] if "\n## " in d30[1:] else d30
+    now = c24_state(edits, guards, d30)
+    inj_ops = json.loads(json.dumps(edits))
+    for o in inj_ops["ops"]:
+        if o["id"] == "W2-IA-30-BC-2":
+            o["new"] = o["new"].replace("adds or changes, check", "adds or changes, including a unit whose acceptance "
+                                        "criterion or outcome the delta changes without editing the unit, check")
+    inj_g = json.loads(json.dumps(guards))
+    for g in inj_g["guards"]:
+        if g["id"] == "G-W2-EM-2":
+            g["rule"] += " (L-C1)"
+    inj_d = d30.replace("for every work unit the delta adds or changes, such a criterion is a ground",
+                        "every acceptance criterion the delta adds or changes is checked, whether or not the delta "
+                        "edits a work unit, and such a criterion is a ground")
+    c_ae, ae = jrun([PY, HERE / "assemble_edits.py", "--check"])
+    c_ag, ag = jrun([PY, HERE / "assemble_guards.py", "--check"])
+    selftest_rows = {"injected_op_widening_fails": not c24_state(inj_ops, guards, d30)["ok"],
+                     "injected_guard_l_c1_fails": not c24_state(edits, inj_g, d30)["ok"],
+                     "injected_d30_widening_fails": not c24_state(edits, guards, inj_d)["ok"]}
+    return {"state": now["rows"], "assemble_edits_check": {"exit": c_ae, "current": ae.get("edits_json_current")},
+            "assemble_guards_check": {"exit": c_ag, "current": ag.get("guards_json_current")},
+            "selftest": selftest_rows,
+            "ok": now["ok"] and all(selftest_rows.values()) and c_ae == 0 and c_ag == 0}
+
+
+def run_review1(installed: Path, scratch: Path, fetched_after: str, map_path: Path) -> dict:
+    if "/skills/synced/" in str(scratch.resolve()):
+        raise SystemExit("refusing a scratch directory under the synced install directory")
+    if scratch.exists():
+        shutil.rmtree(scratch)
+    scratch.mkdir(parents=True)
+    cand, cand_ok = candidate_parts(installed, scratch, map_path)
+    g10 = part17_gate(map_path, cand, fetched_after)
+    g10["candidate_parts_built"] = cand_ok
+    g10["ok"] = g10["ok"] and cand_ok
+    # C-26 changes C-REG (candidate phase): the activation-ops rebuild, its self-test, and the whole chain to the sweep
+    # on today's control reads, as N10 ran it
+    c_ops, opsck = jrun([PY, HERE / "make_activation_ops_102726.py", "check"])
+    c_ost, ost = jrun([PY, HERE / "make_activation_ops_102726.py", "selftest"])
+    c_ch, ch = jrun([PY, HERE / "activation_render_102726.py", "plan", "--chain", "--standin-values", "--successor-map",
+                     map_path, "--parts", cand, "--phase", "sweep", "--fetched-after", fetched_after, "--since-minutes", "900"])
+    creg = next(o for o in json.loads((HERE / "activation-ops.json").read_text(encoding="utf-8"))["pages"]
+                ["3d24590a05eb81ce942ad994cfca9fa1"]["ops"] if o["id"] == "C-REG")
+    g10["c26"] = {
+        "make_activation_ops.check": {"exit": c_ops, "file_equals_rebuild": opsck.get("file_equals_rebuild")},
+        "make_activation_ops.selftest": {"exit": c_ost, "ok": ost.get("ok"),
+                                         "c26_rows": {k: v for k, v in (ost.get("rows") or {}).items() if k.startswith("c26_")}},
+        "creg_marker_count": creg["new"].count("@CONTROLS_PR"), "creg_names_768": "#768" in creg["new"],
+        "chain_to_sweep": {"exit": c_ch, "ok": ch.get("ok"), "totals": ch.get("totals"), "moves": ch.get("moves"),
+                           "pins_match": sum(bool(v.get("revision_matches_pin")) for v in (ch.get("pages") or {}).values()),
+                           "pins_total": len(ch.get("pages") or {}),
+                           "read_only_pins_match": all(v.get("revision_matches_pin") for v in (ch.get("read_only_pins") or {}).values()),
+                           "stand_in_marker_values": ch.get("stand_in_marker_values"),
+                           "phases": [{"phase": q["phase"], "pages_judged": q["control"].get("pages_judged"),
+                                       "pages_ok": q["control"].get("pages_ok"), "findings": q["control"].get("findings"),
+                                       "refused": sum(len(v["refused"]) for v in q["pages"].values())}
+                                      for q in ch.get("phases", [])]}}
+    g10["ok"] = (g10["ok"] and c_ops == 0 and c_ost == 0 and ost.get("ok") is True and c_ch == 0 and ch.get("ok") is True
+                 and g10["c26"]["creg_marker_count"] == 2 and not g10["c26"]["creg_names_768"])
+    g11 = repo_edits_gate(scratch)
+    g12 = c24_gate()
+    c_bc, bc = jrun([PY, HERE / "body_check.py", "selftest"])
+    c_ia, ia = jrun([PY, HERE / "body_check.py", "plan", "--successor-map", map_path, "--prompts", "IA-30", "--no-ops",
+                     "--fetched-after", fetched_after, "--since-minutes", "900"])
+    pg = (ia.get("pages") or [{}])[0]
+    g12["body_check_selftest"] = {"exit": c_bc, "ok": bc.get("ok"), "guards": bc.get("guards"),
+                                  "fixture_rows": bc.get("fixture_rows"), "failing": len(bc.get("fixture_rows_failing") or [])}
+    g12["body_check_plan_IA-30"] = {
+        "exit": c_ia, "ok": ia.get("ok"), "as_of": pg.get("as_of"), "revision_matches_plan": pg.get("revision_matches_plan"),
+        "ops_applied": sum(1 for o in pg.get("ops", []) if o.get("applied")), "ops": len(pg.get("ops", [])),
+        "guards_before": {k: pg["guards_before"][k]["count"] for k in ("G-W2-BC-4", "G-W2-EM-1", "G-W2-EM-2")
+                          if k in pg.get("guards_before", {})},
+        "guards_after": {k: pg["guards_after"][k]["count"] for k in ("G-W2-BC-4", "G-W2-EM-1", "G-W2-EM-2")
+                         if k in pg.get("guards_after", {})},
+        "guards_rows": len(pg.get("guards_after", {})), "guards_failing_after": len(pg.get("guards_failing_after") or []),
+        "probe_ok": (pg.get("probe") or {}).get("ok")}
+    g12["ok"] = (g12["ok"] and c_bc == 0 and bc.get("ok") is True and c_ia == 0 and ia.get("ok") is True
+                 and not pg.get("guards_failing_after"))
+    shutil.rmtree(scratch)
+    gates = {"N10_part17_guards": g10, "N11_repository_edits": g11, "N12_c24_per_work_unit": g12}
+    return {"date_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "repository_head": run(["git", "-C", REPO, "rev-parse", "HEAD"])[1].strip(),
+            "working_tree_changes_under_test": "C-23 to C-26 repair, uncommitted at this run",
+            "fetched_after": fetched_after,
+            "successor_map": str(map_path.relative_to(REPO)) if map_path.is_relative_to(REPO) else str(map_path),
+            "gates_rerun": list(gates), "gates_not_rerun": "N0 to N10's other rows: their results above are unchanged",
+            "gates": gates, "gate_ok": {k: v["ok"] for k, v in gates.items()}, "ok": all(v["ok"] for v in gates.values()),
+            "d22": "transient reads of this session's harness records; counts, ids and booleans; no body text"}
+
+
 def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) -> dict:
     if "/skills/synced/" in str(scratch.resolve()):
         raise SystemExit("refusing a scratch directory under the synced install directory")
@@ -644,11 +884,18 @@ def run_all(installed: Path, scratch: Path, fetched_after: str, map_path: Path) 
                                                 "refused": sum(len(v["refused"]) for v in p["pages"].values())} for p in phases]},
         "ok": c_ops == 0 and c_cs == 0 and ccs.get("ok") is True and all(v["exit"] != 0 for v in today.values())
         and c_rs == 0 and ars.get("ok") is True and c_ch == 0 and ch.get("ok") is True}
+    p17 = part17_gate(map_path, cand, fetched_after)
+    gates["N10_activation"]["part17_guards"] = p17
+    gates["N10_activation"]["ok"] = gates["N10_activation"]["ok"] and p17["ok"]
+    gates["N11_repository_edits"] = repo_edits_gate(scratch)
+    gates["N12_c24_per_work_unit"] = c24_gate()
     if stand_in:
         stand_ins.append("activation: binding_pass.probe() synthetic ids and the named stand-in marker values (A4)")
+        stand_ins.append("repository edits: X26's receipt markers take repo_edits_102726.STANDIN_X26 (C-23)")
 
     order = ["N0_identities", "N1_selftests", "N2_body_rehearsal", "N3_registry_form", "N4_graph", "N5_contracts_regenerator",
-             "N6_profile_102726", "N7_bodies_through_profile", "N8_packages", "N9_registry", "N10_activation"]
+             "N6_profile_102726", "N7_bodies_through_profile", "N8_packages", "N9_registry", "N10_activation",
+             "N11_repository_edits", "N12_c24_per_work_unit"]
     return {"record_type": "GCFPE_102726_PLAN_DRY_RUN", "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
             "worker": "A5", "date_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "repository_head": run(["git", "-C", REPO, "rev-parse", "HEAD"])[1].strip(), "fetched_after": fetched_after,
@@ -742,6 +989,13 @@ def selftest(scratch: Path) -> dict:
     rows["qualify_gate_injected_unbuilt_root_fails"] = not qualify_gate((0, {"ok": True, "rows": {"payload_normalized": True}}),
                                                                         good18)["ok"]
     rows["qualify_gate_injected_unparsed_fails"] = not qualify_gate(good12, (0, {"_unparsed_tail": "x"}))["ok"]
+    # C-24: the per-work-unit state check fails on an injected reversion (on synthetic records)
+    syn_e = {"ops": [{"id": "W2-IA-30-BC-2", "new": "x. For every work unit the delta adds or changes, check its business case."},
+                     {"id": "W2-IA-30-EM-2", "new": "y. For every work unit the delta adds or changes, an acceptance criterion that depends on emulating an external system is a ground for this decision."}]}
+    syn_g = {"guards": [{"id": "G-W2-BC-4", "rule": "per work unit", "all": ["a"]}, {"id": "G-W2-EM-2", "rule": "per work unit", "all": ["b"]}]}
+    syn_d = "- In `MATERIAL_PLAN_DELTA_REVIEW`, for every work unit the delta adds or changes, such a criterion is a ground\n    for `DELTA_DENY`.\n"
+    rows["c24_state_clean_passes"] = c24_state(syn_e, syn_g, syn_d)["ok"]
+    rows["c24_state_injected_l_c1_guard_fails"] = not c24_state(syn_e, {"guards": [dict(syn_g["guards"][0], rule="x (L-C1)"), syn_g["guards"][1]]}, syn_d)["ok"]
     ok = all(rows.values())
     shutil.rmtree(scratch)
     return {"mode": "selftest", "rows": rows, "selftest_ok": ok}
@@ -749,7 +1003,7 @@ def selftest(scratch: Path) -> dict:
 
 def main() -> int:
     a = sys.argv[1:]
-    if not a or a[0] not in ("run", "selftest"):
+    if not a or a[0] not in ("run", "selftest", "review1"):
         sys.exit(__doc__)
     if a[0] == "selftest":
         res = selftest(Path(a[1]))
@@ -759,6 +1013,18 @@ def main() -> int:
         sys.exit("set CLAUDE_CODE_SESSION_ID")
     installed, scratch, fetched_after = Path(a[1]), Path(a[2]), a[3]
     map_path = Path(a[a.index("--map") + 1]) if "--map" in a else HERE / "successor-map-standin.json"
+    if a[0] == "review1":   # C-23 / C-24 gates only, appended to an existing receipt as `review1_repair`
+        blk = run_review1(installed, scratch, fetched_after, map_path.resolve())
+        blk["dry_run_selftest"] = selftest(scratch.parent / (scratch.name + "-selftest"))
+        blk["gate_ok"]["dry_run_selftest"] = blk["dry_run_selftest"]["selftest_ok"]
+        blk["ok"] = blk["ok"] and blk["dry_run_selftest"]["selftest_ok"]
+        if "--receipt" in a:
+            rp = Path(a[a.index("--receipt") + 1])
+            rec = json.loads(rp.read_text(encoding="utf-8"))
+            rec["review1_repair"] = blk
+            rp.write_text(json.dumps(rec, indent=1, ensure_ascii=False, default=str) + "\n", encoding="utf-8")
+        print(json.dumps(blk["gate_ok"] | {"ok": blk["ok"]}, indent=1))
+        return 0 if blk["ok"] else 1
     rec = run_all(installed, scratch, fetched_after, map_path.resolve())
     if "--worker" in a:
         rec["worker"] = a[a.index("--worker") + 1]

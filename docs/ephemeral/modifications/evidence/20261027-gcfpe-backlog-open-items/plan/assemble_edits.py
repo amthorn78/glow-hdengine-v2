@@ -4,7 +4,8 @@
 Merges the body operations of the design returns W1, W2, W3a, W3b, W4, W5 and W6 (plan/work/W*.json) into the
 precedent's edits.json format (MODIFICATION-20261011-gcfpe-mb008-to-promotion plan/edits.json: record_type,
 modification, date, scope, d22, span_rule, shared_texts, pages, ops), applies the coordinator's decisions
-(plan/coordinator-decisions.md, C-2 to C-6, C-8, C-9, C-10, C-13) where they bear on body operations, and adds the
+(plan/coordinator-decisions.md, C-2 to C-6, C-8, C-9, C-10, C-13, and C-16, C-17 and C-24 of the repairs) where they
+bear on body operations, and adds the
 central head operations (one per successor: 54 runtime members, PE and CL-05). The binding currency edits (C-1) are
 not stored: binding_pass.py generates them from each fresh read and the successor map.
 
@@ -34,6 +35,28 @@ KEPT = {"GCFPE-MGMT-10"}  # C-1: the only member kept
 MIDSPAN_MARKUP = {"HP-OPS-10-04"}
 DROPS = {"W1-DOC20-01": ["PR-40"], "QA120-02": ["CL-E-10"], "QA120-03": ["CL-C-10"]}
 OP_KEYS = ("id", "part", "item", "prompt", "section", "start", "end", "lines", "new")
+
+# C-24 (repair of PLAN review round 1, R-2; coordinator-decisions.md): the coordinator's override set for IA-30's two
+# delta-review operations. Each pair is (the worker's widening text, the frozen per-work-unit text); the assertion in
+# build() refuses a pair whose old text is not in the worker's replacement exactly once.
+C24_OVERRIDES = {
+    "W2-IA-30-BC-2": (
+        "For every work unit the delta adds or changes, including a unit whose acceptance criterion or outcome the "
+        "delta changes without editing the unit, check its business case",
+        "For every work unit the delta adds or changes, check its business case"),
+    "W2-IA-30-EM-2": (
+        "An acceptance criterion the delta adds or changes that depends on emulating an external system is a ground "
+        "for this decision",
+        "For every work unit the delta adds or changes, an acceptance criterion that depends on emulating an external "
+        "system is a ground for this decision"),
+}
+C24_WHY = {
+    "W2-IA-30-BC-2": ("PF04 §9.7.7 names no review mode, so IA-30's business-case check applies to its material "
+                      "Plan-delta review too (R-A1), for every work unit the delta adds or changes (ITEM-14). C-24: "
+                      "L-C1 is an accepted risk, not repaired here."),
+    "W2-IA-30-EM-2": ("D30-A in the material Plan-delta review, for every work unit the delta adds or changes "
+                      "(ITEM-15). C-24: L-C1 is an accepted risk, not repaired here."),
+}
 
 # C-16 (repair R1): the A5 failing rows judged by PART-07's stated test (scope-measurement.md section 2; D23-B; D27).
 # A line that tells an agent a handoff or package carries lineage, session identity, manual prerequisites, recovery
@@ -224,6 +247,16 @@ def build() -> tuple[dict, dict]:
                 o["new"] = o["new"].replace(old, "as the PR Instruction states it")
                 o["coordinator"] = "C-17: reworded to 'as the PR Instruction states it' (G-HP-5 collision)"
                 notes["applied"].append("C-17 W2-PR-20-BC-1")
+            # C-24 (repair of PLAN review round 1, R-2): L-C1 is an accepted risk (§A.13, §A.14), so IA-30's
+            # delta-review texts return to the frozen cut of ITEM-14 and ITEM-15, "every work unit a material Plan
+            # delta adds or changes"; the widening clauses are gone and L-C1 stays listed (D26-A rule 4)
+            if o["id"] in C24_OVERRIDES:
+                old, new = C24_OVERRIDES[o["id"]]
+                assert o["new"].count(old) == 1, f"C-24 anchor {o['id']}"
+                o["new"] = o["new"].replace(old, new)
+                o["why"] = C24_WHY[o["id"]]
+                o["coordinator"] = "C-24: reverted to the frozen per-work-unit cut of ITEM-14 / ITEM-15 (L-C1 stays listed)"
+                notes["applied"].append(f"C-24 {o['id']}")
             if o["id"] in MIDSPAN_MARKUP:
                 o["allow_markup"] = True
                 o["coordinator"] = "A1: allow_markup for mid-span <code> formatting markup (no page reference)"

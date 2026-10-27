@@ -50,6 +50,7 @@ sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import control_check_102726 as C  # noqa: E402
+import body_check as BC  # noqa: E402  (C-23: guard_pass on normalize_fetch.normalize of the text; GUARDS)
 
 OPS = json.loads((HERE / "activation-ops.json").read_text(encoding="utf-8"))
 EDITS = HERE / "edits.json"
@@ -59,6 +60,11 @@ CONTROL_PHASE = {"part17": None, "candidate": "candidate", "review": "candidate"
                  "activation-done": "activation", "register": "activation", "register-done": "activation",
                  "install-done": "activation", "prodval-done": "activation", "archived": "archived", "sweep": "sweep"}
 REGISTER_PENDING = {"activation", "activation-done"}
+# C-23 (repair of PLAN review round 1, R-1): PART-17's phase has no control_check rules; its rules are the
+# `notion-control` guards of guards.json (G-W6-HUB-*, G-W6-REG-*), run with body_check.py's guard functions on the
+# normalized read. W6's measured counts on its fresh reads are the expected `before` (W6.json
+# guard_counts_on_fresh_reads.notion).
+PART17_PAGES = {"3ce4590a05eb814f8892f88ff8539308": "HUB", "3d24590a05eb81ce942ad994cfca9fa1": "REGISTER"}
 PACKET_PATH = "docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/PROMOTION-PACKET.md"
 URL = "https://app.notion.com/p/"
 VIRTUAL = {"@CATALOG_PAGE_ID": "CATALOG", "@PE_PAGE_ID": "PE", "@REGISTER_ENTRY_PAGE_ID": "ENTRY"}
@@ -68,7 +74,7 @@ STANDIN_VALUES = {
     "@PRODUCTION_TOKEN": "56 nodes · 240 edges · 56 state_routes · STANDIN bytes · sha256 STANDIN…",
     "@POSTFLIGHT_VERDICT": "<code>STANDIN-REVIEW-POSTFLIGHT-A.md</code> and <code>STANDIN-REVIEW-POSTFLIGHT-B.md</code>: STANDIN",
     "@D24_RECORDS": "<code>STANDIN-REVIEW-D24-A.md</code> and <code>STANDIN-REVIEW-D24-B.md</code>: STANDIN",
-    "@PROMOTION_APPROVED_AT": "2026-10-28", "@PROMOTION_D": "D31", "@PROCEDURE_PR": "0",
+    "@PROMOTION_APPROVED_AT": "2026-10-28", "@PROMOTION_D": "D31", "@PROCEDURE_PR": "0", "@CONTROLS_PR": "0",
     "@REGISTER_SELECTED_AT": "2026-10-28T00:00:00.000Z", "@QUAL_VALIDATORS_PATH": "STANDIN/qualification-validators.json",
     "@QUAL_FIXTURES_PATH": "STANDIN/qualification-fixtures.json",
     "@QUAL_RECEIPT_PATHS": "<code>STANDIN/validators.json</code>, <code>STANDIN/fixtures.json</code>, <code>STANDIN/registry.json</code>",
@@ -369,8 +375,42 @@ def page_ops(key: str, phase: str) -> list:
 REPORT_LINES = {"on": False}
 
 
+def part17_guards(key: str) -> list:
+    name = PART17_PAGES.get(key)
+    return [g for g in BC.GUARDS["guards"] if g.get("surface") == "notion-control" and name in g["prompts"]]
+
+
+def w6_part17() -> dict:
+    n = json.loads((HERE / "work/W6.json").read_text(encoding="utf-8"))["guard_counts_on_fresh_reads"]["notion"]
+    return {gid: ba for page in ("HUB", "REGISTER") for gid, ba in n[page]["guards"].items()}
+
+
+def part17_rows(key: str, text: str, state: str) -> dict:
+    """The notion-control guards of one PART-17 page on `text` (state before: W6's measured before counts; after:
+    every guard passes, at W6's measured after counts)."""
+    w6 = w6_part17()
+    rows = {}
+    for g in part17_guards(key):
+        c, ok = BC.guard_pass(text, g)
+        want = w6.get(g["id"], {})
+        rows[g["id"]] = {"kind": g["kind"], "count": c, "pass": ok,
+                         "w6": want.get(state), "equals_w6": c == want.get(state)}
+    if state == "before":
+        good = bool(rows) and all(r["equals_w6"] for r in rows.values())
+    else:
+        good = bool(rows) and all(r["pass"] and r["equals_w6"] for r in rows.values())
+    return {"guards": rows, "ok": good, "failing": sorted(k for k, r in rows.items()
+                                                       if not (r["equals_w6"] if state == "before" else r["pass"] and r["equals_w6"]))}
+
+
 def control(key: str, title: str, text: str, ctx: Ctx, phase: str) -> dict:
     cphase = CONTROL_PHASE[phase]
+    if phase == "part17":   # C-23: PART-17's own rules are its notion-control guards
+        if key not in PART17_PAGES:
+            return {"ok": True, "judged": False}
+        res = part17_rows(key, text, "after")
+        return {"ok": res["ok"], "judged": True, "findings": len(res["failing"]), "failed_checks": res["failing"],
+                "finding_sections": [], "part17_guards": res["guards"]}
     if cphase is None:
         return {"ok": True, "judged": False}
     name = VIRTUAL.get(key, key)
@@ -408,6 +448,10 @@ def chain(a, ctx: Ctx) -> dict:
         pin = dict(x.split("=", 1) for x in a.pin).get(key, page["pin"])
         state[key] = {"text": got[3], "title": got[2]}
         report["pages"][key] = {"name": page["name"], "as_of": got[1], "pin": pin, "revision_matches_pin": got[1] == pin}
+        if key in PART17_PAGES and upto >= PHASES.index("part17"):
+            b = part17_rows(key, got[3], "before")
+            report["pages"][key]["part17_guards_before"] = b["guards"]
+            report["pages"][key]["part17_before_equals_w6"] = b["ok"]
         ok &= got[1] == pin
     # pins of pages only read (not written) by the transaction: the 100926.1 catalog
     old_cat = C.latest(C.OLD_CATALOG, root, session, a.since_minutes, a.fetched_after)
@@ -483,6 +527,8 @@ def chain(a, ctx: Ctx) -> dict:
                            "findings": sum(r.get("findings", 0) for r in checks.values()),
                            "failing": {k: {x: r[x] for x in ("findings", "failed_checks", "finding_sections", "markers_left", "excerpts") if x in r}
                                        for k, r in checks.items() if not r["ok"]}}
+        if ph == "part17":
+            prow["control"]["part17_guards_after"] = {k: r.get("part17_guards") for k, r in checks.items()}
         report["phases"].append(prow)
     report["moves"] = {"P5": len(ctx.moves), "distinct": len(set(ctx.moves)),
                        "equal_to_control_archive_set": set(ctx.moves) == set(ctx.cc["archive_102726"])}
@@ -528,6 +574,10 @@ def run_plan(a) -> dict:
         row["revision_matches_pin"] = pin is None or got[1] == pin
         prior = [o for o in page["ops"] if PHASES.index(o["phase"]) < PHASES.index(a.phase)]
         row["prior_not_landed"] = [o["id"] for o in prior if not landed(got[3], o, prior, ctx)]
+        if a.phase == "part17" and key in PART17_PAGES:   # C-23: the guards fire on the read before the ops
+            b = part17_rows(key, got[3], "before")
+            row["part17_guards_before"] = b["guards"]
+            row["part17_before_equals_w6"] = b["ok"]
         gen = generated(key, page, got[3], a.phase, ctx)
         text, rows = apply(got[3], ops + gen, ctx)
         row.update({"ops_listed": len(ops), "ops_generated": len(gen), "applied": sum(r["applied"] for r in rows),
@@ -539,7 +589,7 @@ def run_plan(a) -> dict:
                                                "append": r.get("append", False)} for r in rows if r["applied"]]
             row["title_for_execute"] = page.get("titles", {}).get(a.phase)
         row["ok"] = (row["revision_matches_pin"] and not row["prior_not_landed"] and not row["refused"]
-                     and row["control"]["ok"])
+                     and row["control"]["ok"] and row.get("part17_before_equals_w6", True))
         ok &= row["ok"]
         out.append(row)
     res = {**base, "pages": out}
@@ -645,9 +695,47 @@ def selftest(a) -> dict:
                                          and not repin_required(C.CHECKLIST, "candidate"),
         "move_list_is_archive_set": set(ctx.moves) == set(ctx.cc["archive_102726"]) and len(ctx.moves) == 57,
         "standin_values_refused_with_real_map": _real_map_refuses(a),
+        **_part17_cases(ctx),
+        **_c26_cases(a),
     }
     return {"mode": "selftest", "stand_in": ctx.stand_in, "cases": cases, "cases_passed": sum(cases.values()),
             "cases_total": len(cases), "ok": all(cases.values())}
+
+
+def _part17_cases(ctx: Ctx) -> dict:
+    """C-23: PART-17's notion-control guards on synthetic pages in the fetch's own form (`<code>`, `\\_`)."""
+    hub, reg = "3ce4590a05eb814f8892f88ff8539308", "3d24590a05eb81ce942ad994cfca9fa1"
+    hub_after = "\n".join(
+        [f"## Historical GCFPE section {i} — 091426.1" for i in range(4)]
+        + ["The agent resolves its current continuous number and format before authoring it."] * 2
+        + ["Canon owns the format of every PF10 build-notes addendum an agent drafts.",
+           "Nathan pastes it; nothing confirms the paste (<code>D8</code>)."]) + "\n"
+    reg_after = "\n".join(["A historical row: the operator performs the manual drain."] * 2
+                          + ["The agent resolves its current continuous number and format before authoring it."] * 2) + "\n"
+    hub_before = "## Current GCFPE section — 091426.1\nThis canonical format governs every addendum.\n"
+    ok = lambda k, t: control(k, "T", t, ctx, "part17")
+    return {
+        "part17_clean_hub_passes": ok(hub, hub_after)["ok"],
+        "part17_clean_register_passes": ok(reg, reg_after)["ok"],
+        "part17_surviving_forbidden_line_fails": not ok(hub, hub_after + "This canonical format governs it.\n")["ok"],
+        "part17_missing_historical_heading_fails": not ok(hub, hub_after.replace("## Historical GCFPE section 0 — 091426.1\n", ""))["ok"],
+        "part17_register_third_drain_copy_fails": not ok(reg, reg_after + "It performs the manual drain.\n")["ok"],
+        "part17_before_counts_differ_from_w6": not part17_rows(hub, hub_before, "before")["ok"],
+        "part17_other_page_not_judged": not control("3db4590a05eb81de9736ea69bac61016", "T", hub_before, ctx, "part17")["judged"],
+    }
+
+
+def _c26_cases(a) -> dict:
+    """C-26: C-REG's @CONTROLS_PR is refused unfilled and lands filled (synthetic register text)."""
+    creg = next(o for o in OPS["pages"]["3d24590a05eb81ce942ad994cfca9fa1"]["ops"] if o["id"] == "C-REG")
+    base = "## Current selection\nGCFPE-20261009.1\n"
+    vals = {"@PUBLICATION_DATE": "2026-10-27", "@CATALOG_PAGE_ID": "c" * 32}
+    unfilled = Ctx(a.successor_map, a.parts, vals, False)
+    filled = Ctx(a.successor_map, a.parts, {**vals, "@CONTROLS_PR": "812"}, False)
+    r0 = apply(base, [creg], unfilled)[1][0]
+    t1, r1 = apply(base, [creg], filled)
+    return {"c26_unfilled_controls_pr_refused": r0["refusal"] == "UNFILLED_MARKER" and "@CONTROLS_PR" in r0.get("markers", []),
+            "c26_filled_controls_pr_lands": r1[0]["applied"] and "/pull/812)" in t1 and "#768" not in t1}
 
 
 def _real_map_refuses(a) -> bool:

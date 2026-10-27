@@ -90,7 +90,8 @@
   "@QUAL_RECEIPT_PATHS": "the three qualification receipts (validators, fixtures, registry assertions), each in <code>",
   "@INSTALL_RECEIPT": "the post-install digest receipt (W7 R0)",
   "@PRODVAL_RECEIPT": "the P4 receipt",
-  "@ARCHIVAL_RECEIPT": "the P5 receipt"
+  "@ARCHIVAL_RECEIPT": "the P5 receipt",
+  "@CONTROLS_PR": "the number of the controls pull request (C-12), which X1 records once in execute/controls-pr-102726.1.json when it opens it; X9 passes it as --set @CONTROLS_PR=<number> (C-26)"
  },
  "generated_markers": {
   "@SUCC_URL:<ID>": "https://app.notion.com/p/<map page_id>",
@@ -174,9 +175,9 @@
      "item": "ITEM-31",
      "start": null,
      "end": null,
-     "new": "## Unselected candidate record — GCFPE-20261027.1 — @PUBLICATION_DATE\n\n[Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1](https://app.notion.com/p/@CATALOG_PAGE_ID) lists the 56-member <code>GCFPE-20261027.1</code> candidate: @SUCCESSOR_COUNT successor pages at <code>102726.1</code>, the new member <code>CL-05</code>, and <code>GCFPE-MGMT-10</code> unchanged at <code>100926.1</code>. The successor authoring control is PE Metaprompt 102726.1.\n\nThe existing register selection remains <code>GCFPE-20261009.1</code> / <code>100926.1</code> / <code>55</code>. No promotion, archival or installation is performed by this record. Work record: <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>, [pull request #768](https://github.com/amthorn78/glow-hdengine-v2/pull/768).",
+     "new": "## Unselected candidate record — GCFPE-20261027.1 — @PUBLICATION_DATE\n\n[Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1](https://app.notion.com/p/@CATALOG_PAGE_ID) lists the 56-member <code>GCFPE-20261027.1</code> candidate: @SUCCESSOR_COUNT successor pages at <code>102726.1</code>, the new member <code>CL-05</code>, and <code>GCFPE-MGMT-10</code> unchanged at <code>100926.1</code>. The successor authoring control is PE Metaprompt 102726.1.\n\nThe existing register selection remains <code>GCFPE-20261009.1</code> / <code>100926.1</code> / <code>55</code>. No promotion, archival or installation is performed by this record. Work record: <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>, [pull request #@CONTROLS_PR](https://github.com/amthorn78/glow-hdengine-v2/pull/@CONTROLS_PR).",
      "append": true,
-     "why": "D27 publication precedent (the register's \"Unselected candidate record — GCFPE-20261009.1\"); it does not touch Current selection, so CD-9's condition (binding moves only in PART-25) holds."
+     "why": "D27 publication precedent (the register's \"Unselected candidate record — GCFPE-20261009.1\"); it does not touch Current selection, so CD-9's condition (binding moves only in PART-25) holds. C-26: the work-record link names the controls pull request (@CONTROLS_PR, recorded once at X1), not #768, which merged only the ANALYZE record."
     },
     {
      "id": "P2-REG-SEL",

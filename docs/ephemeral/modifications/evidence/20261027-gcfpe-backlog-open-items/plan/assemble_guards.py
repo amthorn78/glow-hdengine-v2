@@ -27,6 +27,13 @@ Repair R1 (coordinator decisions C-15, C-16, C-17, C-22):
   C-17     G-W2-BC-7 follows PR-20's reworded W2-PR-20-BC-1 ("as the PR Instruction states it").
   C-22     CL-05 joins G-HP-1 to G-HP-5.
 
+Repair of PLAN review round 1 (coordinator decision C-24):
+
+  C-24     L-C1 is an accepted risk (D26-A rule 4), so IA-30's delta-review guards return to the frozen cut of ITEM-14
+           and ITEM-15, "every work unit a material Plan delta adds or changes": G-W2-EM-2 is cut by work unit, and
+           G-W2-BC-4 follows W2-IA-30-BC-2, which loses its "including a unit whose acceptance criterion or outcome
+           ..." clause (C24_GUARDS below; the operations' texts are assemble_edits.py's C24_OVERRIDES).
+
 G-W7-BIND-1 and G-W8-NAME-1 are kept as the workers wrote them and marked `regenerate`: body_check.py replaces their
 patterns with the ones binding_pass.py derives from the successor map (W7-D8). Guards on surfaces that are not
 prompt bodies (the Hub, the register, repository files) are merged with `surface` set; body_check runs a guard only
@@ -172,6 +179,35 @@ def _c16_exceptions(merged: dict, notes: list) -> None:
         notes.append(f"C-16: {e['guard']} named exception ({', '.join(e['prompts_seen'])})")
 
 
+# C-24 (repair of PLAN review round 1, R-2): IA-30's delta-review guards, per work unit (ITEM-14, ITEM-15)
+C24_GUARDS = {
+    "G-W2-BC-4": {
+        "rule": "PF04 §9.7.7 Gates in IA-30's material Plan-delta review, for every work unit the delta adds or changes (R-A1; ITEM-14)",
+        "all": ["(?i)\\bfor every work unit the delta adds or changes, check its business case\\b"],
+        "except": [],
+        "fixtures": {"pass": ["For every work unit the delta adds or changes, check its business case as the initial Plan "
+                              "review does, and deny the delta for a unit without one."],
+                     "fail": ["Check the delta's affected dependencies, risks, exclusions, and conflicts.",
+                              "For every acceptance criterion the delta adds or changes, check the business case of its "
+                              "unit."]},
+        "note": "C-24: follows W2-IA-30-BC-2 without the L-C1 clause (L-C1 is an accepted risk)"},
+    "G-W2-EM-2": {
+        "rule": "D30-A in IA-30's material Plan-delta review, for every work unit the delta adds or changes (ITEM-15)",
+        "all": ["(?i)^For every work unit the delta adds or changes, an acceptance criterion that depends on emulating "
+                "an external system\\b", "(?i)\\bground for this decision\\b"],
+        "except": [],
+        "fixtures": {"pass": ["- DELTA_DENY: return exact delta redlines to the same IA author through IA-40. For every "
+                              "work unit the delta adds or changes, an acceptance criterion that depends on emulating an "
+                              "external system is a ground for this decision; its redline asks for a pin or a stated "
+                              "precondition instead."],
+                     "fail": ["- DELTA_DENY: return exact delta redlines to the same IA author through IA-40. No addendum.",
+                              "- DELTA_DENY: return exact delta redlines to the same IA author through IA-40. An "
+                              "acceptance criterion the delta adds or changes that depends on emulating an external "
+                              "system is a ground for this decision."]},
+        "note": "C-24: cut by work unit (the frozen ITEM-15 reading); the acceptance-criterion cut of L-C1 is reverted"},
+}
+
+
 MARKUP_TO_MARKDOWN = (("</code>", "`"), ("<code>", "`"), ("</b>", "\\*\\*"), ("<b>", "\\*\\*"),
                       ("</i>", "\\*"), ("<i>", "\\*"))
 
@@ -240,6 +276,12 @@ def build() -> dict:
     g7["note"] = "C-17: pattern and fixtures follow W2-PR-20-BC-1's rewording ('as the PR Instruction states it')"
     notes.append("C-17: G-W2-BC-7 follows W2-PR-20-BC-1 ('as the PR Instruction states it')")
     _c16_exceptions(merged, notes)
+    # C-24: the coordinator's override set for the two IA-30 delta-review guards (rule, pattern and fixtures replaced
+    # whole, so neither keeps a pattern for the reverted L-C1 clause); assemble_edits.py's C24_OVERRIDES write the text
+    for gid, over in C24_GUARDS.items():
+        assert merged[gid]["source"] == "W2" and merged[gid]["prompts"] == ["IA-30"], f"C-24 guard {gid}"
+        merged[gid] = dict(merged[gid], **over)
+        notes.append(f"C-24: {gid} cut by work unit (the frozen ITEM-14 / ITEM-15 reading; L-C1 stays listed)")
     # C-8 Q1: the presence half on QA-10 (W4's option (a): 'G-W4-10-4 extended to QA-10'); QA-10 carries both EH-1
     # sentences, each matching the rule's pattern, so its entry expects 2, and G-W4-10-4 itself keeps expect 1
     base = merged["G-W4-10-4"]

@@ -14,6 +14,8 @@
   "C-16: G-HP-4 named exception (CL-C-10, CL-E-10)",
   "C-16: G-HP-5 named exception (DOC-10)",
   "C-16: G-HP-2 named exception (QA-110)",
+  "C-24: G-W2-BC-4 cut by work unit (the frozen ITEM-14 / ITEM-15 reading; L-C1 stays listed)",
+  "C-24: G-W2-EM-2 cut by work unit (the frozen ITEM-14 / ITEM-15 reading; L-C1 stays listed)",
   "C-8 Q1: G-W4-10-4-QA10 (expect 2 on QA-10)",
   "G-W7-BIND-1: W7's PR-50 pass fixture moved to fail (C-1 gives PR-50 a successor)",
   "G-W7-BIND-1 and G-W8-NAME-1: PE added; patterns regenerated from the successor map by body_check",
@@ -756,7 +758,7 @@
   {
    "id": "G-W2-BC-4",
    "part": "PART-03",
-   "rule": "PF04 §9.7.7 Gates in IA-30's material Plan-delta review (R-A1, L-C1)",
+   "rule": "PF04 §9.7.7 Gates in IA-30's material Plan-delta review, for every work unit the delta adds or changes (R-A1; ITEM-14)",
    "kind": "required",
    "expect": 1,
    "unit": "sentence",
@@ -764,25 +766,23 @@
     "IA-30"
    ],
    "all": [
-    "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))for every work unit the delta adds or changes(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
-    "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))acceptance criterion or outcome(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
-    "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))business case(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))"
+    "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))for every work unit the delta adds or changes, check its business case(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))"
    ],
+   "except": [],
    "fixtures": {
     "pass": [
-     "For every work unit the delta adds or changes, including a unit whose acceptance criterion or outcome the delta changes without editing the unit, check its business case as the initial Plan review does."
+     "For every work unit the delta adds or changes, check its business case as the initial Plan review does, and deny the delta for a unit without one."
     ],
     "fail": [
-     "For every work unit the delta adds or changes, check its business case."
+     "Check the delta's affected dependencies, risks, exclusions, and conflicts.",
+     "For every acceptance criterion the delta adds or changes, check the business case of its unit."
     ]
    },
-   "except": [],
    "source": "W2",
    "surface": "prompt-body",
+   "note": "C-24: follows W2-IA-30-BC-2 without the L-C1 clause (L-C1 is an accepted risk)",
    "source_all": [
-    "(?i)\\bfor every work unit the delta adds or changes\\b",
-    "(?i)\\bacceptance criterion or outcome\\b",
-    "(?i)\\bbusiness case\\b"
+    "(?i)\\bfor every work unit the delta adds or changes, check its business case\\b"
    ],
    "source_except": [],
    "escape_tolerant_rewrite": true
@@ -1137,7 +1137,7 @@
   {
    "id": "G-W2-EM-2",
    "part": "PART-04",
-   "rule": "D30-A in IA-30's material Plan-delta review, cut by acceptance criterion (L-C1)",
+   "rule": "D30-A in IA-30's material Plan-delta review, for every work unit the delta adds or changes (ITEM-15)",
    "kind": "required",
    "expect": 1,
    "unit": "sentence",
@@ -1145,22 +1145,24 @@
     "IA-30"
    ],
    "all": [
-    "(?i)^An acceptance criterion the delta adds or changes that depends on emulating an external system(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
+    "(?i)^For every work unit the delta adds or changes, an acceptance criterion that depends on emulating an external system(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))",
     "(?i)(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))ground for this decision(?:(?:(?<=\\w)|(?<=\\\\)(?=_))(?!\\w|\\\\_)|(?<!\\w)(?:(?<!\\\\)|(?!_))(?=\\w|\\\\_))"
    ],
+   "except": [],
    "fixtures": {
     "pass": [
-     "- DELTA_DENY: return exact delta redlines to the same IA author through IA-40. An acceptance criterion the delta adds or changes that depends on emulating an external system is a ground for this decision; its redline asks for a pin or a stated precondition instead."
+     "- DELTA_DENY: return exact delta redlines to the same IA author through IA-40. For every work unit the delta adds or changes, an acceptance criterion that depends on emulating an external system is a ground for this decision; its redline asks for a pin or a stated precondition instead."
     ],
     "fail": [
-     "- DELTA_DENY: return exact delta redlines to the same IA author through IA-40. No addendum."
+     "- DELTA_DENY: return exact delta redlines to the same IA author through IA-40. No addendum.",
+     "- DELTA_DENY: return exact delta redlines to the same IA author through IA-40. An acceptance criterion the delta adds or changes that depends on emulating an external system is a ground for this decision."
     ]
    },
-   "except": [],
    "source": "W2",
    "surface": "prompt-body",
+   "note": "C-24: cut by work unit (the frozen ITEM-15 reading); the acceptance-criterion cut of L-C1 is reverted",
    "source_all": [
-    "(?i)^An acceptance criterion the delta adds or changes that depends on emulating an external system\\b",
+    "(?i)^For every work unit the delta adds or changes, an acceptance criterion that depends on emulating an external system\\b",
     "(?i)\\bground for this decision\\b"
    ],
    "source_except": [],

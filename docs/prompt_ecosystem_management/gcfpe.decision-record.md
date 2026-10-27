@@ -1976,8 +1976,8 @@ MB-016 and MB-017).
 - **D30-A — IA-30 rejects an acceptance criterion that depends on emulating an external system, in both of its
   reviews.**
   - In `INITIAL_PLAN_REVIEW`, such a criterion is a ground for `INITIAL_DENY`.
-  - In `MATERIAL_PLAN_DELTA_REVIEW`, every acceptance criterion the delta adds or changes is checked, whether or
-    not the delta edits a work unit, and such a criterion is a ground for `DELTA_DENY`.
+  - In `MATERIAL_PLAN_DELTA_REVIEW`, for every work unit the delta adds or changes, such a criterion is a ground
+    for `DELTA_DENY`.
   - The redline asks for a pin or a stated precondition instead.
 - **D30-B — PR-10 requires a pin or a stated precondition, never a fidelity target, for a unit that depends on an
   external system.** It is part of PR-10's semantic readiness: no `INSTRUCTION_READY` without it.
@@ -2005,7 +2005,7 @@ PF06 §1.1.4's *Real input* bullet by its words (DN-3 (a)) and is class B.
 ### The tested guard (`D14`)
 
 The Modification's §P lists five guards, each with synthetic pass and fail fixtures:
-- required: `G-W2-EM-1` (IA-30 initial review), `G-W2-EM-2` (IA-30 delta review, by acceptance criterion) and
+- required: `G-W2-EM-1` (IA-30 initial review), `G-W2-EM-2` (IA-30 delta review, by work unit) and
   `G-W2-PIN-1` (PR-10);
 - forbidden: `G-W2-F4` (an acceptance criterion or instruction resting on emulating, replaying or modelling an
   external system) and `G-W2-F5` (a fidelity target).

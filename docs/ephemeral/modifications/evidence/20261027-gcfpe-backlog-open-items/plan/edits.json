@@ -657,8 +657,10 @@
    "section": "Execute > Material Plan-delta review",
    "start": "affected dependencies/tests/Ops/documentation/downstream work, risks, exclusions, and conflicts.",
    "end": null,
-   "new": "affected dependencies/tests/Ops/documentation/downstream work, risks, exclusions, and conflicts. For every work unit the delta adds or changes, including a unit whose acceptance criterion or outcome the delta changes without editing the unit, check its business case as the initial Plan review does, and deny the delta for a unit without one.",
-   "source": "W2"
+   "new": "affected dependencies/tests/Ops/documentation/downstream work, risks, exclusions, and conflicts. For every work unit the delta adds or changes, check its business case as the initial Plan review does, and deny the delta for a unit without one.",
+   "source": "W2",
+   "why": "PF04 §9.7.7 names no review mode, so IA-30's business-case check applies to its material Plan-delta review too (R-A1), for every work unit the delta adds or changes (ITEM-14). C-24: L-C1 is an accepted risk, not repaired here.",
+   "coordinator": "C-24: reverted to the frozen per-work-unit cut of ITEM-14 / ITEM-15 (L-C1 stays listed)"
   },
   {
    "id": "W2-IA-30-EM-2",
@@ -668,8 +670,10 @@
    "section": "Execute > Material Plan-delta review, DELTA_DENY bullet",
    "start": "return exact delta redlines to the same IA author through IA-40.",
    "end": null,
-   "new": "return exact delta redlines to the same IA author through IA-40. An acceptance criterion the delta adds or changes that depends on emulating an external system is a ground for this decision; its redline asks for a pin or a stated precondition instead.",
-   "source": "W2"
+   "new": "return exact delta redlines to the same IA author through IA-40. For every work unit the delta adds or changes, an acceptance criterion that depends on emulating an external system is a ground for this decision; its redline asks for a pin or a stated precondition instead.",
+   "source": "W2",
+   "why": "D30-A in the material Plan-delta review, for every work unit the delta adds or changes (ITEM-15). C-24: L-C1 is an accepted risk, not repaired here.",
+   "coordinator": "C-24: reverted to the frozen per-work-unit cut of ITEM-14 / ITEM-15 (L-C1 stays listed)"
   },
   {
    "id": "W2-PR-10-BC-1",
@@ -5704,6 +5708,8 @@
  ],
  "decisions_applied": [
   "C-5 Q-2 W1-DOC20-01",
+  "C-24 W2-IA-30-BC-2",
+  "C-24 W2-IA-30-EM-2",
   "C-6 W2-PR-10-BC-1 verbatim",
   "C-17 W2-PR-20-BC-1",
   "C-9 HP-QA-120-01 names CL-05",
