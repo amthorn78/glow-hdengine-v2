@@ -1,0 +1,291 @@
+{
+ "receipt": "X9b: AM-5's one-pass write-form rehearsal on one private draft page with one child page (Nathan's decisions after X9a, rules 1 and 2)",
+ "pages": {
+  "draft": "4064590a05eb813caaa3efa8c9235761 (creation_mode draft, private)",
+  "child": "4064590a05eb8131bbc8d7b371302d84 (created under the draft)",
+  "deleted": "notion-delete-pages, both, 2026-10-27T15:31Z; the next fetches show both deleted (in Trash)"
+ },
+ "tool": "execute/am5_rehearsal_102726.py; each write sent once; each check compares control_check.fold of the read with the model",
+ "first_pass": {
+  "1 create draft": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:19:12.488Z",
+    "title_ok": true,
+    "real_lines": 57,
+    "model_lines": 57,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "2 create child under the draft": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:20:07.203Z",
+    "title_ok": true,
+    "real_lines": 61,
+    "model_lines": 61,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:20:07.237Z",
+    "title_ok": true,
+    "real_lines": 50,
+    "model_lines": 50,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "3 update_content draft (10 operations)": {
+   "notion": "9 applied; X9-CAT-REPAIR returned no_match (a <br />-joined paragraph as fetch renders it is not matched)",
+   "with the repair in the model": {
+    "ok": false,
+    "draft": {
+     "as_of": "2026-10-27T15:21:16.523Z",
+     "title_ok": true,
+     "real_lines": 105,
+     "model_lines": 137,
+     "equal": false,
+     "differing_line_indexes": [
+      2,
+      4,
+      6,
+      8,
+      10,
+      12
+     ]
+    }
+   },
+   "with the repair held out": {
+    "ok": true,
+    "draft": {
+     "as_of": "2026-10-27T15:21:16.523Z",
+     "title_ok": true,
+     "real_lines": 105,
+     "model_lines": 105,
+     "equal": true,
+     "differing_line_indexes": []
+    },
+    "child": {
+     "as_of": "2026-10-27T15:20:07.237Z",
+     "title_ok": true,
+     "real_lines": 50,
+     "model_lines": 50,
+     "equal": true,
+     "differing_line_indexes": []
+    }
+   }
+  },
+  "4 update_content child (2 operations)": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:21:16.523Z",
+    "title_ok": true,
+    "real_lines": 105,
+    "model_lines": 105,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:23:28.860Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "5 update_content draft (C-FI-REV; P1b-CAT-1..8 held, their anchors need the repair)": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:23:47.455Z",
+    "title_ok": true,
+    "real_lines": 106,
+    "model_lines": 106,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:23:28.860Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "6 insert_content end (C-REG)": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:24:05.146Z",
+    "title_ok": true,
+    "real_lines": 112,
+    "model_lines": 112,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:23:28.860Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "7 insert_content start (banner) and 8 update_properties title, read together": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:24:27.344Z",
+    "title_ok": true,
+    "real_lines": 114,
+    "model_lines": 114,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:24:27.344Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "9 move the child to the workspace, the chain's old move rule": {
+   "ok": false,
+   "draft": {
+    "as_of": "2026-10-27T15:24:26.468Z",
+    "title_ok": true,
+    "real_lines": 110,
+    "model_lines": 111,
+    "equal": false,
+    "differing_line_indexes": [
+     104,
+     105,
+     106,
+     107,
+     108,
+     109
+    ]
+   },
+   "child": {
+    "as_of": "2026-10-27T15:24:27.344Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  }
+ },
+ "fixes_inside_the_rehearsal": {
+  "AM-6": "move model: one blank line where a moved-out child-page block was (remove_children)",
+  "AM-7": "X9's catalog repair: one replace_content with the catalog's AM-4 template"
+ },
+ "repeat": {
+  "9 rechecked under AM-6": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:24:26.468Z",
+    "title_ok": true,
+    "real_lines": 110,
+    "model_lines": 110,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:24:27.344Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "10 replace_content draft (the repair in AM-7's form)": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:28:45.299Z",
+    "title_ok": true,
+    "real_lines": 142,
+    "model_lines": 142,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:24:27.344Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "11 update_content draft (P1b-CAT-1..8)": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:29:10.907Z",
+    "title_ok": true,
+    "real_lines": 148,
+    "model_lines": 148,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:24:27.344Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "12 move the child under the draft (a page parent)": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:29:10.907Z",
+    "title_ok": true,
+    "real_lines": 152,
+    "model_lines": 152,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:24:27.344Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  },
+  "13 move the child to the workspace again (AM-6)": {
+   "ok": true,
+   "draft": {
+    "as_of": "2026-10-27T15:29:10.907Z",
+    "title_ok": true,
+    "real_lines": 148,
+    "model_lines": 148,
+    "equal": true,
+    "differing_line_indexes": []
+   },
+   "child": {
+    "as_of": "2026-10-27T15:24:27.344Z",
+    "title_ok": true,
+    "real_lines": 52,
+    "model_lines": 52,
+    "equal": true,
+    "differing_line_indexes": []
+   }
+  }
+ },
+ "result": "PASS after the one repeat: every stage's read equals the model; the two first-pass differences were form-only and fixed under rule 2 (AM-6, AM-7)",
+ "observations": [
+  "a parent's revision did not move when its child page moved out or in (stages 9, 12, 13); its content did",
+  "a retitled child's title follows into its parent's child-page block and into its inner-text mentions (stage 8)",
+  "moving a page in appends its child-page block at the end of the parent (stage 12)"
+ ],
+ "d22": "transient reads of this session's harness records; counts, titles and line indexes only"
+}
