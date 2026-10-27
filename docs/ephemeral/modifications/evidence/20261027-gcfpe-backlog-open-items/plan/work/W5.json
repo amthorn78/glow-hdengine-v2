@@ -1,0 +1,3343 @@
+{
+ "worker": "W5",
+ "parts": [
+  "PART-13"
+ ],
+ "items": [
+  "ITEM-30",
+  "ITEM-27"
+ ],
+ "tier": 2,
+ "canon_read": [
+  {
+   "title": "PF06-Canon-Change-Process-Guide",
+   "version": "2.5.5",
+   "sections": [
+    "§0.1A Governing lanes, common lifecycle, and authority routing",
+    "§1.0.6 QA and closeout",
+    "§3.5.1 Requirement, with *Close-mutation-set stage* (Entries, Exit, What it owns, What it never does, Authority and actor, Close-tooling repair, Dev, not Ops), *Feedback-free terminal lifecycle* and *Exceptional closure record*",
+    "§3.5.2 Close PR contents",
+    "§3.5.2.1 Close-pack files",
+    "§3.5.2.2 Core determinism and parity evidence",
+    "§3.5.2.3 Index and mirror trio",
+    "§3.5.2.4 Repo-docs and evidence updates (same PR)"
+   ],
+   "path": "docs/pfcanon/PF06-Canon-Change-Process-Guide-v2.5.5.md (main, blob e9f4d7d6)"
+  },
+  {
+   "title": "PF27-Canon-Plan-Templates",
+   "version": "2.0.6",
+   "sections": [
+    "§3 Ops Task Record: *Definition* and *Not a PR (normative)*",
+    "§3B Close Mutation Set Task Record (Template): Definition, Entries and exit, Dev, not Ops, Authority and actor, Close-tooling repair, Record fields"
+   ],
+   "path": "docs/pfcanon/PF27-Canon-Plan-Templates-v2.0.6.md (main, blob c21096d7)"
+  },
+  {
+   "title": "PF19-Canon-Glow-QA-Guide",
+   "version": "3.0.7",
+   "sections": [
+    "§3.1.2 Independent QA, reporting and closure",
+    "§3.1.3 Permanent drainage and post-closure administration",
+    "*Close-pack truthfulness and same-run execution (normative)* (in §3.4.12), with *Close report requirements*"
+   ],
+   "path": "docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.7.md (main, blob 9af5e056)"
+  },
+  {
+   "title": "PF12-Canon-HDE-Schemas-and-Artifacts",
+   "version": "2.9.7",
+   "sections": [
+    "§1.2 *Close-pack artifacts (deterministic path-of-record; baseline artifacts)*, with *Change-container compatibility*, *Generic close-pack writer*, *Same-run close evidence for a CRD*, *Acceptance-binding family coherence*",
+    "§8.17 Live QA evidence layout, opening through *Close-run family exception (normative; admitted CRDs only)*"
+   ],
+   "path": "docs/pfcanon/PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.md (main, blob d5bc01f8)"
+  },
+  {
+   "title": "PF10-HDE-Build-Notes",
+   "version": "13.9",
+   "sections": [
+    "front matter index and headings; addendum 2.1 (S19 vendor and security policy) by heading and search for close/CL-05: silent on every topic of this part, so permanent canon governs"
+   ],
+   "path": "docs/pfcanon/PF10-HDE-Build-Notes-v13.9.md (main, blob cb61644d)"
+  }
+ ],
+ "records_read": [
+  "docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md (frontmatter, §A in full, §A.14)",
+  "docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/findings.md (MB-027, MB-030, adjacent and not-checked tables)",
+  "docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/scope-measurement.md (F9, MB-027/MB-030 rows)",
+  "docs/ephemeral/HDE-CRD-0002-CL-05-close-mutation-set-result-v1.0.md (§1, §8a–§13, §15) and -v1.1.md (§1, §3–§5, §11–§15)",
+  "docs/ephemeral/HDE-CRD-0002-CL-C-10-closure-decision-v1.0.md (§10 lessons, §10 report), -v1.1.md (§6, §7, §9), -v1.2.md (§6 lessons, §11)",
+  "docs/prompt_ecosystem_management/ecosystem-change-management.md §2, §4; prompt-body-content-policy.md; prompt-corpus-policy.md; gcfpe.decision-record.md D22, D23 with successors, D27–D29; authoritative-surfaces.md 'Restating is allowed; asserting is not'",
+  "docs/prompt_ecosystem_management/r1-successor-source-20260923.md; docs/ephemeral/modifications/evidence/build_r1_successor.py",
+  "docs/ephemeral/GCFPE-alpha-feedback-epic-closure-evidence-task-v1.0.md (MB-027 brief), in full",
+  "precedent docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/plan/edits.json and guards.json (format), body_check.py (docstring, resolve, state, landed, units, guard_count)",
+  "docs/graph/parts/global.json, prompts/QA-120.json, CL-C-10.json, CL-E-10.json, CF-C-10.json (BLOCKED form); registry rows CL-C-10, CL-E-10, QA-120 (by script)",
+  "installed skills (read-only): flowmaster-validate references/glow-hde-canonical-change-flow-r1*.json, SKILL.md, scripts/validate_flowmaster.py, validate_gcfpe_20261009.py, run_gcfpe_20261009_fixtures.py, validate_gcfpe_artifact_timing.py, fixtures/change-flow/scenarios.json; change-flow SKILL.md, scripts/validate_gcfpe_20261009.py, validate_gcfpe_artifact_timing.py; glow-graph-contract SKILL.md, scripts/graph_parts.py, regenerate_contract.py"
+ ],
+ "not_read": [
+  "docs/ephemeral/HDE-CRD-0002-PF10-build-notes-addendum-close-mutation-set-stage-v1.0.md (routing record only; its text is drained, PF06 §3.5.1 relied on, as the brief directs)"
+ ],
+ "fresh_reads": [
+  {
+   "prompt_or_page": "CL-05 — Prepare and Publish the Close Mutation Set — 102626.2 (candidate)",
+   "page_id": "4054590a05eb8155b301e2cb6dec31d5",
+   "as_of": "2026-10-26T11:45:19.630Z",
+   "body_chars": 23705
+  },
+  {
+   "prompt_or_page": "QA-120 — Create Final QA Report and RCA — 100926.1",
+   "page_id": "3f44590a05eb81a4a3fbc0fae65d153e",
+   "as_of": "2026-10-12T02:29:51.614Z",
+   "body_chars": 22284
+  },
+  {
+   "prompt_or_page": "CL-C-10 — Perform CRD Retrospective and Decide Closure — 100926.1",
+   "page_id": "3f44590a05eb819b8022f2a4cdd3b022",
+   "as_of": "2026-10-12T02:29:13.994Z",
+   "body_chars": 46731
+  },
+  {
+   "prompt_or_page": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 100926.1",
+   "page_id": "3f44590a05eb81248741f4679b050262",
+   "as_of": "2026-10-12T02:29:21.313Z",
+   "body_chars": 47584
+  },
+  {
+   "prompt_or_page": "Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1 (catalog)",
+   "page_id": "3f74590a05eb812db385c2544d7570f7",
+   "as_of": "2026-10-12T13:28:07.573Z",
+   "body_chars": 13433
+  }
+ ],
+ "installed_package_baselines": {
+  "change-flow": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+  "flowmaster-validate": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+  "glow-graph-contract": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+  "method": "docs/prompt_ecosystem_management/freeze.py on the installed tree, 2026-10-27"
+ },
+ "shared_texts": {
+  "CL05_URL": "https://app.notion.com/p/<CL-05 102726.1 page id>",
+  "CLC10_URL": "https://app.notion.com/p/<CL-C-10 102726.1 page id>",
+  "CLE10_URL": "https://app.notion.com/p/<CL-E-10 102726.1 page id>"
+ },
+ "op_order_per_page": {
+  "CL-05": "CL05-01..26 in id order; the page is created by duplication (NC-2) and moved before the ops",
+  "QA-120": "QA120-01..05, before W3b's sentence-1 op and before the central binding pass (Q-2, Q-7)",
+  "CL-C-10": "CLC-01..05",
+  "CL-E-10": "CLE-01..05"
+ },
+ "ops": [
+  {
+   "id": "CL05-01",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Head: status block",
+   "start": "<b>Status: candidate 102626.2, not a release member.</b>",
+   "end": "## Place in the change flow",
+   "new": "## Place in the change flow",
+   "why": "Remove the candidate-status block: selection state, release-phase language and provenance are not behaviour (prompt-body-content-policy.md; D23-G). The register and catalog hold membership (CD-7: installed text is the corrected text).",
+   "lines": 8,
+   "span_has_markup": true
+  },
+  {
+   "id": "CL05-02",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Place in the change flow: Dev, not Ops",
+   "start": "PF06 §3.5.2.1: \"The close PR MUST include the epic close-pack (canonical filenames)\"",
+   "end": null,
+   "new": "PF06 §3.5.2.1: \"The close PR MUST include the change's close-pack (canonical filenames)\"",
+   "why": "The quote no longer matches PF06 v2.5.5 §3.5.2.1, which now reads \"the change's close-pack\"."
+  },
+  {
+   "id": "CL05-03",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Place in the change flow: Dev, not Ops",
+   "start": "PF06 §3.5.2.3: the Index and Mirror trio \"in the same authorized mutation set\"",
+   "end": null,
+   "new": "PF06 §3.5.2.3: \"the same authorized mutation set MUST update and verify\" the Index and Mirror trio",
+   "why": "PF06 v2.5.5 §3.5.2.3 has no phrase \"in the same authorized mutation set\"; quote its sentence."
+  },
+  {
+   "id": "CL05-04",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Role and authority: Allowed changes 3",
+   "start": "that the close makes untrue",
+   "end": null,
+   "new": "that the close or a close-tooling repair under step 4 makes untrue",
+   "why": "CD-7: allowed change 3 (CL-C-10 v1.2 §11): a close-tooling repair also makes operative lines untrue."
+  },
+  {
+   "id": "CL05-05",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Canonical sources: PF10",
+   "start": "Read the current PF10 (HDE Build Notes) completely, and work under every addendum on the change.",
+   "end": null,
+   "new": "Read the current PF10 (HDE Build Notes) completely, and apply each addendum that governs the change. When PF10 is silent, authority returns to the relevant permanent PF-Canon document.",
+   "why": "CD-7: stale after PF10's drain (\"work under every addendum\"). PF10 front matter §8 Silence rule, in its words."
+  },
+  {
+   "id": "CL05-06",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Canonical sources: close-pack ADR",
+   "start": "<b>The close-pack ADR,</b> read with the HDE Build Notes addenda it defers to.",
+   "end": null,
+   "new": "<b>The close-pack ADR,</b> read with the HDE Build Notes it defers to.",
+   "why": "Same drain-stale class as CD-7's two passages (A-11, NAME-001); AGENTS.md: the ADR \"defers to HDE Build Notes and is read with it\".",
+   "span_has_markup": true
+  },
+  {
+   "id": "CL05-07",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Canonical sources: PF06 list",
+   "start": "    - §3.5.4.",
+   "end": null,
+   "new": "    - §3.5.4.\n  - <b>PF27-Canon-Plan-Templates:</b> §3B \"Close Mutation Set Task Record (Template)\", whose record fields the result record carries.",
+   "why": "PF27 §3B is the stage's task-record template (canon read for PART-13); step 7.1 now carries its fields.",
+   "span_has_markup": true
+  },
+  {
+   "id": "CL05-08",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "CL-05",
+   "section": "Canonical sources: PF19 list",
+   "start": "    - §3.4.3.",
+   "end": null,
+   "new": "    - §3.4.3;\n    - §3.1.3 (the close mutation set is a closure prerequisite and precedes the closure decision).",
+   "why": "PF19 §3.1.3 is the classification CD-8 applies; the stage reads it too."
+  },
+  {
+   "id": "CL05-09",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Inputs",
+   "start": "Read every input completely.",
+   "end": null,
+   "new": "Read every input completely. On entry (b), when the return work does not reproduce the close pack, read completely the inputs that return work rests on; the inputs the committed close pack binds are proved unchanged by the writer's check mode.",
+   "why": "CD-7: CL-05 result v1.1 §15 item 2 (reading scope on entry (b)), accepted at CL-C-10 v1.2 §6."
+  },
+  {
+   "id": "CL05-10",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Execute 1: Intake",
+   "start": "No close pack exists for the change, or the closure decision names the one that exists as defective.",
+   "end": null,
+   "new": "No close pack exists for the change, or the closure decision that sent the change here names the existing close mutation set as missing, incomplete or defective and states its return work.",
+   "why": "CD-7: intake 3 against entry (b) (CL-C-10 v1.1 §9): entry (b) admits a set that is missing, incomplete or defective; PF06 §3.5.1 Entries."
+  },
+  {
+   "id": "CL05-11",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Execute 1: Intake",
+   "start": "The change's QA root is admitted by the canonical updater. If it is not, admitting it is close-tooling repair (step 4).",
+   "end": null,
+   "new": "For a CRD, the change's QA root is admitted by the canonical updater. If it is not, admitting it is close-tooling repair (step 4).",
+   "why": "A-7 (listed limit): only a CRD's admission row is close tooling (PF12 §8.17 \"another CRD needs its own row\"); an Epic stops at rehearsal (CL05-12)."
+  },
+  {
+   "id": "CL05-12",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Execute 3c: classify every failure",
+   "start": "<b>Anything else</b> is a stop: approved QA evidence that is wrong, a product defect, or a canon conflict.",
+   "end": null,
+   "new": "<b>Anything else</b> is a stop: approved QA evidence that is wrong, a product defect, or a canon conflict. An Epic close stops here after its rehearsal: no Epic close-run family is admitted, and an Epic close run needs its own explicit admission (PF06 §3.5.2.1; PF12-Canon-HDE-Schemas-and-Artifacts §8.17).",
+   "why": "A-7, kept a listed limit: PF06 §3.5.2.1 and PF12 §8.17 admit no Epic close-run family, so CL-05 stops at rehearsal for an Epic.",
+   "span_has_markup": true
+  },
+  {
+   "id": "CL05-13",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Execute 4.5: Canon and Build Notes limits",
+   "start": "A fix may narrow a close-tooling rule that the close-pack ADR or an HDE Build Notes addendum records",
+   "end": null,
+   "new": "A fix may narrow a close-tooling rule that the close-pack ADR or HDE Build Notes records",
+   "why": "Converge on PF06 §3.5.1 Close-tooling repair (\"that the ADR or HDE Build Notes records\")."
+  },
+  {
+   "id": "CL05-14",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Execute 4.5: Canon and Build Notes limits",
+   "start": "its basis (HDE Build Notes addendum 2.31)",
+   "end": null,
+   "new": "its basis (PF06-Canon-Change-Process-Guide §3.5.1, \"Close-tooling repair\")",
+   "why": "CD-7: \"addendum 2.31\" is drained; its rule lives in PF06 §3.5.1 (A-11)."
+  },
+  {
+   "id": "CL05-15",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Execute 6.3: Closeout workflow",
+   "start": "Record its run.",
+   "end": null,
+   "new": "Record its run. If the close pull request merged before the closeout workflow passed on its exact head, the route is the workflow's tooling mode: on a pull request that changes the close tooling, it validates every committed close pack, and that run counts when the close pack and every input its manifest binds are byte-identical to the close head's. Every step that needs a hosted run names the repository event that starts it.",
+   "why": "CD-7: the route for a close PR merged before its closeout run (CL-05 result v1.1 §15 item 1; CL-C-10 v1.2 §11 \"Hosted runs\"; CL-L9). AGENTS.md: the workflow checks every committed candidate source when the close tooling changed."
+  },
+  {
+   "id": "CL05-16",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Required result",
+   "start": "and the closeout workflow have passed.",
+   "end": null,
+   "new": "and the closeout workflow have passed. The closeout workflow's run may instead be on a later head whose close pack and every input its manifest binds are byte-identical to the close head's (step 6.3).",
+   "why": "CD-7: the result predicate must admit the byte-identical later-head run that step 6.3 names (CL-C-10 v1.1 §3)."
+  },
+  {
+   "id": "CL05-17",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Required result",
+   "start": "- <b><code>BLOCKED</code></b><b>:</b> a stop.",
+   "end": null,
+   "new": "- <b><code>BLOCKED</code></b><b>:</b> a stop.\n\nNever state <code>CLOSE_PR_READY</code> while any part of its predicate is unmet. The state is then <code>BLOCKED</code>, unless step 4 first repairs the cause.",
+   "why": "CD-7: CL-L7 (CL-C-10 v1.1 §6): a stage result must not state a success state while its own predicate is unmet.",
+   "span_has_markup": true
+  },
+  {
+   "id": "CL05-18",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Execute 7.1: result record",
+   "start": "It holds:",
+   "end": null,
+   "new": "It carries the record fields of PF27-Canon-Plan-Templates §3B, and it holds:",
+   "why": "PF27 §3B \"Record fields (required)\": every close mutation set task record carries change identity, entry, authorization, the set, rehearsal, repair, close PR, exit and nonclaims."
+  },
+  {
+   "id": "CL05-19",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Execute 7.1: result record",
+   "start": "canon relied on;",
+   "end": null,
+   "new": "a substantive Canon relied on block: the PF titles, versions and sections actually read;",
+   "why": "D27 Canon relied on; converge on the corpus label (registry AF-024-CANON)."
+  },
+  {
+   "id": "CL05-20",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Mandatory single-block handoff: Before the block",
+   "start": "<b>Before the block:</b>",
+   "end": "write no Notion row.",
+   "new": "The final response ends with the <code>NEXT_PROMPT_HANDOFF</code> block. Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest. Among those lines, name the TypeSafe reading and the surface advice for the receiving session, with the output artifact's path. Before saving the artifact, run the installed TypeSafe scoring skill's script once, on an action text for the receiving session's work written as the skill directs; do not paste its line into the block or write its Notion row. The artifact holds the reading as the skill prints it, with its cell, every probability and its flags, or <code>TypeSafe: not read</code> with the reason, and task-specific advice on execution surface, with no model, reasoning-level or effort content. No agent gives its own recommendation, assessment or ranking of model, reasoning level or effort. When Nathan states the model and setting chosen for this session, record that pick in this session's output artifact with a reference to the reading, and never record a setting Nathan did not state. This prompt runs in a top-level session that Nathan creates, or re-enters by pasting a handoff, and never as a subagent of another session. It may use subagents as workers within its own task. It never creates, starts or schedules another session; it returns control, with the handoff where there is one.",
+   "why": "Converge on the corpus's canonical handoff passage (C-PLACE, the TypeSafe rule of PF04 §9.1.3 as G-TS-1 and G-TS-2 pin it, and C-TOP of D23), which every member carries; the candidate's own wording does not meet them.",
+   "lines": 3,
+   "span_has_markup": true
+  },
+  {
+   "id": "CL05-21",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "GCFPE identity and provenance: Identity",
+   "start": ", candidate version <code>102626.2</code>.",
+   "end": null,
+   "new": ". At each use, retain its stable ID, version and exact Notion page from the selected catalog.",
+   "why": "A release-bound version and release-phase label in a body (prompt-body-content-policy.md; D23-G); converge on the corpus's \"retain its stable ID, version and exact Notion page\".",
+   "span_has_markup": true
+  },
+  {
+   "id": "CL05-22",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "GCFPE identity and provenance: Prompt-use entry",
+   "start": " plus \"CL-05 candidate 102626.2\"",
+   "end": null,
+   "new": "",
+   "why": "Release-phase label in a body (D23-G); the release in force names the member's version."
+  },
+  {
+   "id": "CL05-23",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "GCFPE identity and provenance: Defects",
+   "start": "Report a defect in this candidate to GCFPE-MGMT-10 through the Modification Backlog, citing MB-030.",
+   "end": null,
+   "new": "Report a defect in this prompt, with its exact identity, expected and actual behaviour and evidence, to the GCFPE-MGMT-10 maintenance owner in the result record. Do not write the GCFPE Modification Backlog.",
+   "why": "CD-7: O-7 (CL-05 result v1.0 §11; v1.1 §15): flow sessions may not write the backlog; converge on QA-120's \"report a prompt defect with its exact identity, expected/actual behavior and evidence to the selected GCFPE-MGMT-10 maintenance owner\"."
+  },
+  {
+   "id": "CL05-24",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Destination bindings",
+   "start": "- CL-C-10 — Perform CRD Retrospective and Decide Closure — 100926.1: <mention url=\"https://app.notion.com/p/3f44590a05eb819b8022f2a4cdd3b022\" />",
+   "end": null,
+   "new": "- CL-C-10 — Perform CRD Retrospective and Decide Closure — 102726.1: <mention url=\"@CLC10_URL\" />",
+   "why": "CL-C-10 changes in this release (D23-G successor page). Skip if the coordinator's central destination-binding pass rewrites this line (question Q-2).",
+   "span_has_markup": true
+  },
+  {
+   "id": "CL05-25",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Destination bindings",
+   "start": "- CL-E-10 — Perform Epic Retrospective and Decide Closure — 100926.1: <mention url=\"https://app.notion.com/p/3f44590a05eb81248741f4679b050262\" />",
+   "end": null,
+   "new": "- CL-E-10 — Perform Epic Retrospective and Decide Closure — 102726.1: <mention url=\"@CLE10_URL\" />",
+   "why": "As CL05-24.",
+   "span_has_markup": true
+  },
+  {
+   "id": "CL05-26",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-05",
+   "section": "Installation notes (removed)",
+   "start": "## Installation notes for the GCFPE Modification (not instructions to the Close Implementer)",
+   "end": "<b>Tracking.</b> MB-030; MB-027 closes with it.",
+   "new": "",
+   "why": "The notes address the installing Modification, not the Close Implementer; this PLAN carries each one out (dispositions), and L-B3 records \"no change\" for the Removing-stopgaps note.",
+   "lines": 10,
+   "span_has_markup": true
+  },
+  {
+   "id": "QA120-01",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "QA-120",
+   "section": "Required result and routing: PASS",
+   "start": "select exactly one closure receiver from the verified existing change class:",
+   "end": null,
+   "new": "continue to the close-mutation-set stage CL-05, which produces the close mutation set before the closure decision and exits to the closure receiver for the verified existing change class:",
+   "why": "PF06 §3.5.1 Entries; PF19 §3.1.3; DN-2 (b): QA-120 PASS enters the stage, not the closure decision."
+  },
+  {
+   "id": "QA120-02",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "QA-120",
+   "section": "Required result and routing: PASS table, EPIC row",
+   "start": "<code>CL-E-10 — Perform Epic Retrospective and Decide Closure — 100926.1</code> at <mention url=\"https://app.notion.com/p/3f44590a05eb81248741f4679b050262\" />",
+   "end": null,
+   "new": "<code>CL-05 — Prepare and Publish the Close Mutation Set — 102726.1</code> at <mention url=\"@CL05_URL\" />, which exits to <code>CL-E-10 — Perform Epic Retrospective and Decide Closure</code>",
+   "why": "pass_epic → CL-05 (graph QA-120.json edges[1]).",
+   "span_has_markup": true
+  },
+  {
+   "id": "QA120-03",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "QA-120",
+   "section": "Required result and routing: PASS table, CRD row",
+   "start": "<code>CL-C-10 — Perform CRD Retrospective and Decide Closure — 100926.1</code> at <mention url=\"https://app.notion.com/p/3f44590a05eb819b8022f2a4cdd3b022\" />",
+   "end": null,
+   "new": "<code>CL-05 — Prepare and Publish the Close Mutation Set — 102726.1</code> at <mention url=\"@CL05_URL\" />, which exits to <code>CL-C-10 — Perform CRD Retrospective and Decide Closure</code>",
+   "why": "pass_crd → CL-05 (graph QA-120.json edges[0]).",
+   "span_has_markup": true
+  },
+  {
+   "id": "QA120-04",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "QA-120",
+   "section": "Required result and routing: PASS paragraph",
+   "start": "Read the matching receiver's complete intake before emitting its one handoff.",
+   "end": null,
+   "new": "Read CL-05's complete intake before emitting its one handoff.",
+   "why": "The PASS receiver is now CL-05; its intake (step 1) is what the handoff must satisfy."
+  },
+  {
+   "id": "QA120-05",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "QA-120",
+   "section": "Required result and routing: PASS paragraph",
+   "start": "decision through that receiver;",
+   "end": null,
+   "new": "decision at the closure receiver, after the Product Owner merges the close pull request;",
+   "why": "PF19 §3.1.3: the set lands through the Product Owner's merge before the closure decision is made."
+  },
+  {
+   "id": "CLC-01",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "CL-C-10",
+   "section": "Inputs",
+   "start": "and <code>QA_RCA_ID</code>, complete QA-10 Reality Audit",
+   "end": null,
+   "new": "and <code>QA_RCA_ID</code>, the change's close mutation set on <code>main</code> and CL-05's result record, complete QA-10 Reality Audit",
+   "why": "Installation note \"Read the close mutation set as an input\"; PF19 §3.1.3: a closure prerequisite.",
+   "span_has_markup": true
+  },
+  {
+   "id": "CLC-02",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "CL-C-10",
+   "section": "Execute 3",
+   "start": "Cosmetic preferences or optional post-closure maintenance do not invent a new closure prerequisite.",
+   "end": null,
+   "new": "A missing, incomplete or defective close mutation set also prevents closure: the close mutation set is a closure prerequisite and precedes the closure decision, and it is not post-closure administration. Cosmetic preferences or optional post-closure maintenance do not invent a new closure prerequisite.",
+   "why": "CD-8: PF19 §3.1.3's classification in Execute step 3 (MB-027 request 2)."
+  },
+  {
+   "id": "CLC-03",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "CL-C-10",
+   "section": "Execute 5",
+   "start": "These follow a positive closure; they are not prerequisites that keep a completed change artificially open.",
+   "end": null,
+   "new": "These follow a positive closure; they are not prerequisites that keep a completed change artificially open. The close mutation set is not among them: it lands through the Product Owner's merge of the close pull request before this decision is made (step 3).",
+   "why": "CD-8: PF19 §3.1.3 in Execute step 5; the set is outside the post-closure drainage rule."
+  },
+  {
+   "id": "CLC-04",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "CL-C-10",
+   "section": "Next step and recovery: DO_NOT_CLOSE",
+   "start": "For <code>decision: DO_NOT_CLOSE</code>, return the exact closure finding",
+   "end": null,
+   "new": "For <code>decision: DO_NOT_CLOSE</code> whose return work is the close mutation set, because it is missing, incomplete or defective, return the exact closure finding and return work to <code>CL-05 — Prepare and Publish the Close Mutation Set</code> in <code>AI Prompts / HDE Change Flow</code>, which the Product Owner starts as a standalone session. A close-tooling defect is CL-05's to repair, not ESC-30 work. For any other <code>decision: DO_NOT_CLOSE</code>, return the exact closure finding",
+   "why": "PF06 §3.5.1 Entries (b) and Close-tooling repair (\"uses no escalation stage\"); L-A11 narrows the ESC-30 branch to a remedy outside the close mutation set.",
+   "span_has_markup": true
+  },
+  {
+   "id": "CLC-05",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-C-10",
+   "section": "Candidate direct-destination bindings",
+   "start": "Use only the binding for the actual result branch.",
+   "end": null,
+   "new": "Use only the binding for the actual result branch.\n\n- <code>CL-05 — Prepare and Publish the Close Mutation Set — 102726.1</code>: <code>@CL05_URL?pvs=204</code>",
+   "why": "The new DO_NOT_CLOSE branch's destination (graph edge CL-C-10 → CL-05).",
+   "span_has_markup": true
+  },
+  {
+   "id": "CLE-01",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "CL-E-10",
+   "section": "Inputs",
+   "start": "and <code>QA_RCA_ID</code>, complete QA-10 Reality Audit",
+   "end": null,
+   "new": "and <code>QA_RCA_ID</code>, the change's close mutation set on <code>main</code> and CL-05's result record, complete QA-10 Reality Audit",
+   "why": "Installation note \"Read the close mutation set as an input\"; PF19 §3.1.3: a closure prerequisite.",
+   "span_has_markup": true
+  },
+  {
+   "id": "CLE-02",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "CL-E-10",
+   "section": "Execute 3",
+   "start": "Cosmetic preferences or optional post-closure maintenance do not invent a new closure prerequisite.",
+   "end": null,
+   "new": "A missing, incomplete or defective close mutation set also prevents closure: the close mutation set is a closure prerequisite and precedes the closure decision, and it is not post-closure administration. Cosmetic preferences or optional post-closure maintenance do not invent a new closure prerequisite.",
+   "why": "CD-8: PF19 §3.1.3's classification in Execute step 3 (MB-027 request 2)."
+  },
+  {
+   "id": "CLE-03",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "CL-E-10",
+   "section": "Execute 5",
+   "start": "These follow a positive closure; they are not prerequisites that keep a completed change artificially open.",
+   "end": null,
+   "new": "These follow a positive closure; they are not prerequisites that keep a completed change artificially open. The close mutation set is not among them: it lands through the Product Owner's merge of the close pull request before this decision is made (step 3).",
+   "why": "CD-8: PF19 §3.1.3 in Execute step 5; the set is outside the post-closure drainage rule."
+  },
+  {
+   "id": "CLE-04",
+   "part": "PART-13",
+   "item": "ITEM-27",
+   "prompt": "CL-E-10",
+   "section": "Next step and recovery: DO_NOT_CLOSE",
+   "start": "For <code>decision: DO_NOT_CLOSE</code>, return the exact closure finding",
+   "end": null,
+   "new": "For <code>decision: DO_NOT_CLOSE</code> whose return work is the close mutation set, because it is missing, incomplete or defective, return the exact closure finding and return work to <code>CL-05 — Prepare and Publish the Close Mutation Set</code> in <code>AI Prompts / HDE Change Flow</code>, which the Product Owner starts as a standalone session. A close-tooling defect is CL-05's to repair, not ESC-30 work. For any other <code>decision: DO_NOT_CLOSE</code>, return the exact closure finding",
+   "why": "PF06 §3.5.1 Entries (b) and Close-tooling repair (\"uses no escalation stage\"); L-A11 narrows the ESC-30 branch to a remedy outside the close mutation set.",
+   "span_has_markup": true
+  },
+  {
+   "id": "CLE-05",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "CL-E-10",
+   "section": "Candidate direct-destination bindings",
+   "start": "Use only the binding for the actual result branch.",
+   "end": null,
+   "new": "Use only the binding for the actual result branch.\n\n- <code>CL-05 — Prepare and Publish the Close Mutation Set — 102726.1</code>: <code>@CL05_URL?pvs=204</code>",
+   "why": "The new DO_NOT_CLOSE branch's destination (graph edge CL-E-10 → CL-05).",
+   "span_has_markup": true
+  }
+ ],
+ "guards": [
+  {
+   "id": "G-CL05-01",
+   "part": "PART-13",
+   "rule": "PF06 §3.5.1 Entries (a); PF19 §3.1.3; DN-2 (b)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "line",
+   "prompts": [
+    "QA-120"
+   ],
+   "all": [
+    "(?i)close-mutation-set stage CL-05",
+    "(?i)before the closure decision"
+   ],
+   "fixtures": {
+    "pass": [
+     "- <code>PASS</code>: complete read-back <code>QA_REPORT</code> and <code>QA_RCA</code>; continue to the close-mutation-set stage CL-05, which produces the close mutation set before the closure decision and exits to the closure receiver for the verified existing change class:"
+    ],
+    "fail": [
+     "- <code>PASS</code>: complete read-back <code>QA_REPORT</code> and <code>QA_RCA</code>; select exactly one closure receiver from the verified existing change class:"
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-02",
+   "part": "PART-13",
+   "rule": "PF06 §3.5.1 Entries (a); DN-2 (b)",
+   "kind": "required",
+   "expect": 2,
+   "unit": "line",
+   "prompts": [
+    "QA-120"
+   ],
+   "all": [
+    "^\\|\\s*(?:`|<code>)PASS(?:`|</code>)\\s*\\|",
+    "(?:`|<code>)CL-05 — Prepare and Publish the Close Mutation Set"
+   ],
+   "fixtures": {
+    "pass": [
+     "| <code>PASS</code> | <code>EPIC</code> | <code>CL-05 — Prepare and Publish the Close Mutation Set — 102726.1</code> at <mention url=\"https://app.notion.com/p/x\" />, which exits to <code>CL-E-10 — Perform Epic Retrospective and Decide Closure</code> |\n| <code>PASS</code> | <code>CRD</code> | <code>CL-05 — Prepare and Publish the Close Mutation Set — 102726.1</code> at <mention url=\"https://app.notion.com/p/x\" />, which exits to <code>CL-C-10 — Perform CRD Retrospective and Decide Closure</code> |"
+    ],
+    "fail": [
+     "| <code>PASS</code> | <code>EPIC</code> | <code>CL-05 — Prepare and Publish the Close Mutation Set — 102726.1</code> at <mention url=\"https://app.notion.com/p/x\" /> |\n| <code>PASS</code> | <code>CRD</code> | <code>CL-C-10 — Perform CRD Retrospective and Decide Closure — 102726.1</code> at <mention url=\"https://app.notion.com/p/y\" /> |"
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-03",
+   "part": "PART-13",
+   "rule": "PF06 §3.5.1 Entries (a); PF19 §3.1.3 (no PASS straight to the closure decision)",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "QA-120"
+   ],
+   "all": [
+    "(?i)(?:\\|\\s*(?:`|<code>)PASS(?:`|</code>)\\s*\\|.*(?:`|<code>)CL-[CE]-10 — Perform|select exactly one closure receiver|\\bPASS\\b[^.\\n]{0,80}\\broutes? (?:directly )?to (?:`|<code>)?CL-[CE]-10)"
+   ],
+   "except": [
+    "(?:`|<code>)CL-05 — Prepare and Publish the Close Mutation Set"
+   ],
+   "fixtures": {
+    "pass": [
+     "| <code>PASS</code> | <code>CRD</code> | <code>CL-05 — Prepare and Publish the Close Mutation Set — 102726.1</code> at <mention url=\"https://app.notion.com/p/x\" />, which exits to <code>CL-C-10 — Perform CRD Retrospective and Decide Closure</code> |"
+    ],
+    "fail": [
+     "| <code>PASS</code> | <code>CRD</code> | <code>CL-C-10 — Perform CRD Retrospective and Decide Closure — 100926.1</code> at <mention url=\"https://app.notion.com/p/x\" /> |",
+     "- PASS: select exactly one closure receiver from the verified existing change class:",
+     "A verified CRD PASS routes directly to CL-C-10."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-04",
+   "part": "PART-13",
+   "rule": "PF06 §3.5.1 Entries (b) and Close-tooling repair; L-A11",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "CL-C-10",
+    "CL-E-10"
+   ],
+   "all": [
+    "DO_NOT_CLOSE",
+    "(?i)\\bclose mutation set\\b",
+    "(?i)missing, incomplete or defective",
+    "CL-05 — Prepare and Publish the Close Mutation Set"
+   ],
+   "fixtures": {
+    "pass": [
+     "For <code>decision: DO_NOT_CLOSE</code> whose return work is the close mutation set, because it is missing, incomplete or defective, return the exact closure finding and return work to <code>CL-05 — Prepare and Publish the Close Mutation Set</code> in <code>AI Prompts / HDE Change Flow</code>, which the Product Owner starts as a standalone session."
+    ],
+    "fail": [
+     "For <code>decision: DO_NOT_CLOSE</code>, return the exact closure finding to the existing owner for already-authorized correction, or to continuing Thoth through ESC-30 for a substantive new remedy."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-05",
+   "part": "PART-13",
+   "rule": "PF06 §3.5.1 Close-tooling repair (no escalation stage); L-A11",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "CL-C-10",
+    "CL-E-10"
+   ],
+   "all": [
+    "(?i)close-tooling defect is CL-05's to repair, not ESC-30 work"
+   ],
+   "fixtures": {
+    "pass": [
+     "A close-tooling defect is CL-05's to repair, not ESC-30 work."
+    ],
+    "fail": [
+     "A close-tooling defect goes to continuing Thoth through ESC-30."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-06",
+   "part": "PART-13",
+   "rule": "PF19 §3.1.3; CD-8",
+   "kind": "required",
+   "expect": 2,
+   "unit": "sentence",
+   "prompts": [
+    "CL-C-10",
+    "CL-E-10"
+   ],
+   "all": [
+    "(?i)\\bclose mutation set\\b",
+    "(?i)\\b(?:precedes (?:the|this) closure decision|before this decision is made)\\b"
+   ],
+   "fixtures": {
+    "pass": [
+     "A missing, incomplete or defective close mutation set also prevents closure: the close mutation set is a closure prerequisite and precedes the closure decision, and it is not post-closure administration. The close mutation set is not among them: it lands through the Product Owner's merge of the close pull request before this decision is made (step 3)."
+    ],
+    "fail": [
+     "These follow a positive closure; they are not prerequisites that keep a completed change artificially open.",
+     "A missing, incomplete or defective close mutation set also prevents closure: the close mutation set is a closure prerequisite and precedes the closure decision."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-07",
+   "part": "PART-13",
+   "rule": "PF19 §3.1.3; CD-8 (no closure text treats the set as post-closure administration)",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "CL-C-10",
+    "CL-E-10",
+    "QA-120",
+    "CL-05"
+   ],
+   "all": [
+    "(?i)\\b(?:close mutation set|close pack|close-pack|close PR|close pull request)\\b",
+    "(?i)\\b(?:post-closure|after (?:a |the )?positive closure|follows? (?:a |the )?positive closure|after closure)\\b"
+   ],
+   "except": [
+    "(?i)\\bnot (?:post-closure|among them)\\b",
+    "(?i)\\bprecedes\\b",
+    "(?i)\\bbefore (?:this|the) (?:closure )?decision\\b",
+    "(?i)\\bnever reopens\\b"
+   ],
+   "fixtures": {
+    "pass": [
+     "The close mutation set is not among them: it lands through the Product Owner's merge of the close pull request before this decision is made (step 3).",
+     "It is not post-closure administration of the close mutation set."
+    ],
+    "fail": [
+     "Prepare the close pack as post-closure administration.",
+     "The close pull request follows a positive closure."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-08",
+   "part": "PART-13",
+   "rule": "PF06 §3.5.1 Exit and Authority; CL-L7",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "CL-05"
+   ],
+   "all": [
+    "(?i)Never state (?:`|<code>)?CLOSE_PR_READY(?:`|</code>)? while any part of its predicate is unmet"
+   ],
+   "fixtures": {
+    "pass": [
+     "Never state <code>CLOSE_PR_READY</code> while any part of its predicate is unmet."
+    ],
+    "fail": [
+     "State <code>CLOSE_PR_READY</code> when the close pull request is open."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-09",
+   "part": "PART-13",
+   "rule": "CD-7; PF10 front matter §8 (drained addenda cited by number)",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "CL-05"
+   ],
+   "all": [
+    "(?i)(?:\\baddendum 2\\.\\d+|\\bwork under every addendum\\b|\\bproposed addendum\\b|\\bBuild Notes addenda it defers to\\b)"
+   ],
+   "fixtures": {
+    "pass": [
+     "Read the current PF10 (HDE Build Notes) completely, and apply each addendum that governs the change.",
+     "It records the narrowing and its basis (PF06-Canon-Change-Process-Guide §3.5.1, \"Close-tooling repair\")."
+    ],
+    "fail": [
+     "It records the narrowing and its basis (HDE Build Notes addendum 2.31).",
+     "Read the current PF10 completely, and work under every addendum on the change."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-10",
+   "part": "PART-13",
+   "rule": "prompt-body-content-policy.md; D23-G (no release-phase state in a body)",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "CL-05"
+   ],
+   "all": [
+    "(?i)(?:\\bStatus:\\s*candidate\\b|\\bnot a release member\\b|\\bthis candidate\\b|\\bcandidate version\\b|\\bCL-05 candidate\\b|\\b\\d{6}\\.\\d \\(candidate\\)|\\bInstallation notes for the GCFPE Modification\\b|\\bciting MB-0\\d\\d\\b)"
+   ],
+   "fixtures": {
+    "pass": [
+     "- <b>Identity.</b> This page is <code>CL-05</code>. At each use, retain its stable ID, version and exact Notion page from the selected catalog.",
+     "- The candidate source <code>audit/<prefix>_close_candidate_source.json</code>."
+    ],
+    "fail": [
+     "<b>Status: candidate 102626.2, not a release member.</b>",
+     "- <b>Identity.</b> This page is <code>CL-05</code>, candidate version <code>102626.2</code>.",
+     "Report a defect in this candidate to GCFPE-MGMT-10 through the Modification Backlog, citing MB-030."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-11",
+   "part": "PART-13",
+   "rule": "CD-7: route for a close PR merged before its closeout run; CL-L9",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "CL-05"
+   ],
+   "all": [
+    "(?i)merged before the closeout workflow passed on its exact head",
+    "(?i)tooling mode"
+   ],
+   "fixtures": {
+    "pass": [
+     "If the close pull request merged before the closeout workflow passed on its exact head, the route is the workflow's tooling mode: on a pull request that changes the close tooling, it validates every committed close pack, and that run counts when the close pack and every input its manifest binds are byte-identical to the close head's."
+    ],
+    "fail": [
+     "If it did not run, or ran as not applicable, that is a close-tooling defect (step 4)."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-12",
+   "part": "PART-13",
+   "rule": "CD-7: intake 3 against entry (b)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "line",
+   "prompts": [
+    "CL-05"
+   ],
+   "all": [
+    "(?i)No close pack exists for the change, or the closure decision that sent the change here names the existing close mutation set as missing, incomplete or defective"
+   ],
+   "fixtures": {
+    "pass": [
+     "   - No close pack exists for the change, or the closure decision that sent the change here names the existing close mutation set as missing, incomplete or defective and states its return work."
+    ],
+    "fail": [
+     "   - No close pack exists for the change, or the closure decision names the one that exists as defective."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-13",
+   "part": "PART-13",
+   "rule": "CD-7: allowed change 3",
+   "kind": "required",
+   "expect": 1,
+   "unit": "line",
+   "prompts": [
+    "CL-05"
+   ],
+   "all": [
+    "(?i)that the close or a close-tooling repair under step 4 makes untrue"
+   ],
+   "fixtures": {
+    "pass": [
+     "  3. <b>Operative documentation.</b> The lines in <code>README.md</code> that the close or a close-tooling repair under step 4 makes untrue."
+    ],
+    "fail": [
+     "  3. <b>Operative documentation.</b> The lines in <code>README.md</code> that the close makes untrue."
+    ]
+   }
+  },
+  {
+   "id": "G-CL05-14",
+   "part": "PART-13",
+   "rule": "A-7 (Epic close-run family not admitted: CL-05 stops at rehearsal)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "CL-05"
+   ],
+   "all": [
+    "(?i)An Epic close stops here after its rehearsal"
+   ],
+   "fixtures": {
+    "pass": [
+     "An Epic close stops here after its rehearsal: no Epic close-run family is admitted."
+    ],
+    "fail": [
+     "For an Epic, admit its close-run family as close-tooling repair."
+    ]
+   }
+  }
+ ],
+ "guard_counts_on_fresh_reads": [
+  {
+   "id": "G-CL05-01",
+   "prompt": "QA-120",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-02",
+   "prompt": "QA-120",
+   "before": 0,
+   "after": 2,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-03",
+   "prompt": "QA-120",
+   "before": 3,
+   "after": 0,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-04",
+   "prompt": "CL-C-10",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-04",
+   "prompt": "CL-E-10",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-05",
+   "prompt": "CL-C-10",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-05",
+   "prompt": "CL-E-10",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-06",
+   "prompt": "CL-C-10",
+   "before": 0,
+   "after": 2,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-06",
+   "prompt": "CL-E-10",
+   "before": 0,
+   "after": 2,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-07",
+   "prompt": "CL-C-10",
+   "before": 0,
+   "after": 0,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-07",
+   "prompt": "CL-E-10",
+   "before": 0,
+   "after": 0,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-07",
+   "prompt": "QA-120",
+   "before": 0,
+   "after": 0,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-07",
+   "prompt": "CL-05",
+   "before": 0,
+   "after": 0,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-08",
+   "prompt": "CL-05",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-09",
+   "prompt": "CL-05",
+   "before": 4,
+   "after": 0,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-10",
+   "prompt": "CL-05",
+   "before": 5,
+   "after": 0,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-11",
+   "prompt": "CL-05",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-12",
+   "prompt": "CL-05",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-13",
+   "prompt": "CL-05",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  },
+  {
+   "id": "G-CL05-14",
+   "prompt": "CL-05",
+   "before": 0,
+   "after": 1,
+   "ok": true
+  }
+ ],
+ "guard_fixture_selftest": [
+  {
+   "id": "G-CL05-01",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-02",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-03",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-04",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-05",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-06",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-07",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-08",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-09",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-10",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-11",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-12",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-13",
+   "ok": true
+  },
+  {
+   "id": "G-CL05-14",
+   "ok": true
+  }
+ ],
+ "op_resolution_on_fresh_reads": [
+  {
+   "id": "CL05-01",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-02",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-03",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-04",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-05",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-06",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-07",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-08",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-09",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-10",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-11",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-12",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-13",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-14",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-15",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-16",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-17",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-18",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-19",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-20",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-21",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-22",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-23",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-24",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-25",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CL05-26",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "QA120-01",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "QA120-02",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "QA120-03",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "QA120-04",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "QA120-05",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLC-01",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLC-02",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLC-03",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLC-04",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLC-05",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLE-01",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLE-02",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLE-03",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLE-04",
+   "start_count": 1,
+   "resolve": "OK"
+  },
+  {
+   "id": "CLE-05",
+   "start_count": 1,
+   "resolve": "OK"
+  }
+ ],
+ "r1_successor": {
+  "authority": "DN-2 (b), Nathan 2026-10-27; L-A14",
+  "profile_id": "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1",
+  "shape": "cumulative over the historical oracle glow-hde-canonical-change-flow-r1.json (52807e58…); the 2026-09-23 successor (ede635b1…) is superseded and kept as history (Q-3)",
+  "neighbours_read": {
+   "GCF-23": {
+    "id": "GCF-23",
+    "partition": "CORE",
+    "name": "Authorized environment/DevOps operator executes a bounded QA Task",
+    "change_class": "QA",
+    "actor": "Kronos creates task; authorized DevOps/environment operator executes; Kronos reviews evidence",
+    "session": "Continuing Kronos QA session plus task-bounded environment operator session.",
+    "consumes": [
+     "approved_qa_plan",
+     "bounded_qa_task",
+     "qa_task_handoff",
+     "authorized_environment"
+    ],
+    "produces": [
+     "committed_qa_evidence",
+     "kronos_qa_acceptance_review",
+     "qa_task_completion_state"
+    ],
+    "next": [
+     "GCF-23",
+     "GCF-23.RERUN",
+     "GCF-23.ESC10",
+     "GCF-24"
+    ],
+    "approval_contract": "Isis Plan approval authorizes the QA task lane; execution and evidence review do not create Product Owner approval.",
+    "failure_stop_condition": "STOP_QA_TASK_OUTSIDE_PLAN, STOP_EVIDENCE_DIRECTORY_MISSING, or STOP_TASK_ACCEPTANCE_FAIL; recovery owner: Kronos/DevOps/escalation route.",
+    "source_row_sha256": "fd218903ce5c2cdb3bd16c376893706c53321bdd2f5e54b41602ba486cf4beef"
+   },
+   "GCF-24": {
+    "id": "GCF-24",
+    "partition": "CORE",
+    "name": "Kronos creates the final QA Report and RCA",
+    "change_class": "QA",
+    "actor": "Kronos",
+    "session": "Same continuing Kronos session that created the QA Audit/Plan and reviewed evidence.",
+    "consumes": [
+     "approved_qa_plan",
+     "qa_task_evidence_history",
+     "escalation_and_remediation_history_if_any"
+    ],
+    "produces": [
+     "final_qa_report",
+     "qa_rca"
+    ],
+    "next": [
+     "GCF-25"
+    ],
+    "approval_contract": "Kronos authors; these are closure inputs, not the closure decision and not Product Owner approval.",
+    "failure_stop_condition": "STOP_QA_PLAN_NOT_COMPLETE, STOP_REPORT_EVIDENCE_GAP, or STOP_RCA_MISSING; recovery owner: Kronos.",
+    "source_row_sha256": "271f99808be54154c12096d94532fc71b64bab586b545cdc6beb9934977e3bdc"
+   },
+   "GCF-25": {
+    "id": "GCF-25",
+    "partition": "CORE",
+    "name": "Isis performs terminal retrospective and decides closure",
+    "change_class": "Closure",
+    "actor": "Isis",
+    "session": "Continuing Isis Lead Developer session for the change.",
+    "consumes": [
+     "approved_specification_ia_intake",
+     "approved_change_wide_implementation_plan",
+     "complete_work_unit_results",
+     "final_qa_report",
+     "qa_rca",
+     "outstanding_blocker_ledger"
+    ],
+    "produces": [
+     "isis_closure_decision",
+     "terminal_retrospective"
+    ],
+    "next": [
+     "GCF-26",
+     "REENTER_EXACT_OWNER"
+    ],
+    "approval_contract": "Isis alone owns the terminal closure decision. Product Owner, IA, Kronos, QA PASS, or a memo does not substitute.",
+    "failure_stop_condition": "STOP_CLOSURE_EVIDENCE_INCOMPLETE or CLOSE_DENIED_WITH_EXACT_OWNER_AND_REENTRY; recovery owner: Isis/named stage owner.",
+    "source_row_sha256": "2a59e2a5e135f2e7ef8a47318b7abd42190c118fa43649fe9756b27346a1964a"
+   },
+   "GCF-26": {
+    "id": "GCF-26",
+    "partition": "CORE",
+    "name": "Manual PF10 addenda drainage, closure memo, and board update",
+    "change_class": "Post-closure",
+    "actor": "Product Owner/operator and Master Scrum",
+    "session": "Manual post-closure operator context; Master Scrum receives memo and updates the development board.",
+    "consumes": [
+     "isis_closure_decision",
+     "terminal_retrospective",
+     "final_qa_report",
+     "qa_rca",
+     "pf10_drainage_candidates",
+     "board_change_identity"
+    ],
+    "produces": [
+     "pf10_drainage_receipt",
+     "closure_memo_delivery",
+     "development_board_update"
+    ],
+    "next": [
+     "GCF-26.ADR",
+     "GCF-26.PF09",
+     "TERMINAL"
+    ],
+    "approval_contract": "No runtime approval occurs. The closure decision already happened at GCF-25; memo delivery and board update are ceremony/tracking.",
+    "failure_stop_condition": "STOP_CLOSURE_DECISION_MISSING, STOP_DRAINAGE_TARGET_AMBIGUOUS, or STOP_BOARD_IDENTITY_MISMATCH; recovery owner: Product Owner/Master Scrum.",
+    "source_row_sha256": "cf997d3cf4fd0438780f3e0b7956cdbba54566fdefbfcf21f392d9331cfd011c"
+   }
+  },
+  "successor_rows": [
+   {
+    "id": "GCF-24",
+    "partition": "CORE",
+    "name": "Kronos creates the final QA Report and RCA",
+    "change_class": "QA",
+    "actor": "Kronos",
+    "session": "Same continuing Kronos session that created the QA Audit/Plan and reviewed evidence.",
+    "consumes": [
+     "approved_qa_plan",
+     "qa_task_evidence_history",
+     "escalation_and_remediation_history_if_any"
+    ],
+    "produces": [
+     "final_qa_report",
+     "qa_rca"
+    ],
+    "next": [
+     "GCF-24.CLOSE"
+    ],
+    "approval_contract": "Kronos authors; these are closure inputs, not the closure decision and not Product Owner approval.",
+    "failure_stop_condition": "STOP_QA_PLAN_NOT_COMPLETE, STOP_REPORT_EVIDENCE_GAP, or STOP_RCA_MISSING; recovery owner: Kronos.",
+    "source_row_sha256": "66d4c41e3992a28f5550e1fd12865ac7a127de291d34f6dd676acc07a9ad2215"
+   },
+   {
+    "id": "GCF-24.CLOSE",
+    "partition": "MATERIAL_BRANCH_LOOP_OR_UTILITY",
+    "name": "Close-mutation-set stage prepares and publishes the close mutation set",
+    "change_class": "Closure prerequisite (PR work unit)",
+    "actor": "Close Implementer (CL-05); the Product Owner invokes the stage and alone merges the close pull request",
+    "session": "A standalone top-level session that the Product Owner starts with the stage prompt and the change ID; it needs no handoff to start, resolves its inputs from the change's records, and is never a subagent of another session.",
+    "consumes": [
+     "change_identity",
+     "final_qa_report",
+     "qa_rca",
+     "isis_closure_decision",
+     "current_repository",
+     "applicable_canon"
+    ],
+    "produces": [
+     "close_mutation_set",
+     "close_mutation_set_result"
+    ],
+    "next": [
+     "GCF-25"
+    ],
+    "approval_contract": "The Product Owner's invocation of the stage for a change authorizes that change's close mutation set and any close-tooling repair it needs, and is the Proceed for both. The closure authority judges its result at the closure decision; the Product Owner alone merges. It never reopens implementation, QA or the closure decision.",
+    "failure_stop_condition": "STOP_CLOSE_INTAKE_FAILED, STOP_APPROVED_QA_EVIDENCE_WOULD_CHANGE, STOP_DEFECT_OUTSIDE_CLOSE_TOOLING, STOP_CLOSE_RUN_FAMILY_NOT_ADMITTED or STOP_CANON_CONFLICT; recovery owner: the Close Implementer for close-tooling repair, with no escalation, rescope or PR-chain stage; otherwise the Product Owner.",
+    "source_row_sha256": "9c0f70693dc21f0cbaef27c7804e645f33858d30fc52b89ae57854f7e2177453"
+   },
+   {
+    "id": "GCF-25",
+    "partition": "CORE",
+    "name": "Isis performs terminal retrospective and decides closure",
+    "change_class": "Closure",
+    "actor": "Isis",
+    "session": "Continuing Isis Lead Developer session for the change.",
+    "consumes": [
+     "approved_specification_ia_intake",
+     "approved_change_wide_implementation_plan",
+     "complete_work_unit_results",
+     "final_qa_report",
+     "qa_rca",
+     "close_mutation_set",
+     "close_mutation_set_result",
+     "outstanding_blocker_ledger"
+    ],
+    "produces": [
+     "isis_closure_decision",
+     "terminal_retrospective"
+    ],
+    "next": [
+     "GCF-24.CLOSE",
+     "GCF-26",
+     "REENTER_EXACT_OWNER"
+    ],
+    "approval_contract": "Isis alone owns the terminal closure decision. Product Owner, IA, Kronos, QA PASS, or a memo does not substitute.",
+    "failure_stop_condition": "STOP_CLOSURE_EVIDENCE_INCOMPLETE or CLOSE_DENIED_WITH_EXACT_OWNER_AND_REENTRY; recovery owner: Isis/named stage owner, and the close-mutation-set stage (GCF-24.CLOSE) when the return work is a missing, incomplete or defective close mutation set, a close-tooling defect included.",
+    "source_row_sha256": "1b2ab0339aed2a04aff404864a1699605eb3904780c7e3b3ca25881c74ed5ee3"
+   }
+  ],
+  "carried_unchanged": [
+   "GCF-14",
+   "GCF-17",
+   "GCF-17.LINEAGE"
+  ],
+  "row_digests": {
+   "GCF-24": "66d4c41e3992a28f5550e1fd12865ac7a127de291d34f6dd676acc07a9ad2215",
+   "GCF-24.CLOSE": "9c0f70693dc21f0cbaef27c7804e645f33858d30fc52b89ae57854f7e2177453",
+   "GCF-25": "1b2ab0339aed2a04aff404864a1699605eb3904780c7e3b3ca25881c74ed5ee3",
+   "GCF-14": "42db7a9e614ecf943f042a9c012112fd3934f12e504cd4b980f404735b9cfe6b",
+   "GCF-17": "6774529046ba5050b2e62b8cf01b024766c5e99d343d0fcfdd32b0367fb99602",
+   "GCF-17.LINEAGE": "73a133c18b13682cbc57d813b37caacda7ed15b183437515867166bcda70e83e"
+  },
+  "top_level": {
+   "coverage": {
+    "rows": 47,
+    "core_rows": 26,
+    "material_rows": 21
+   },
+   "required_global_tokens_changed": {
+    "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1": "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1",
+    "R1_ROW_COVERAGE: 46/46": "R1_ROW_COVERAGE: 47/47"
+   },
+   "authority_appended": {
+    "successor_source_matrix_sha256": "088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a",
+    "successor_rows": [
+     "GCF-14",
+     "GCF-17",
+     "GCF-17.LINEAGE",
+     "GCF-24",
+     "GCF-24.CLOSE",
+     "GCF-25"
+    ],
+    "successor_authority": "D23-D, D23-F; Product Owner 2026-09-23. D23 successor of 2026-10-27, the close-mutation-set stage (PF06 §3.5.1; DN-2 of MODIFICATION-20261027-gcfpe-backlog-open-items); Product Owner 2026-10-27"
+   }
+  },
+  "files": {
+   "matrix": {
+    "bytes": 7705,
+    "sha256": "088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a"
+   },
+   "oracle": {
+    "bytes": 55591,
+    "sha256": "f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d"
+   },
+   "runtime_map": {
+    "bytes": 48515,
+    "sha256": "4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add"
+   }
+  },
+  "checks": "dry run of RE-1 into the scratchpad: historical and 2026-09-23 digests confirmed, 47 rows / 26 core, historical order with one insertion, changed fields vs 2026-09-23 = GCF-24 next and GCF-25 consumes/next/failure_stop_condition (plus digests), changed top-level keys = authority, coverage, profile_id, required_global_tokens, runtime_rows; validate_flowmaster.graph_findings on the result: no finding"
+ },
+ "graph_edits": [
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/CL-05.json",
+   "change": "NEW_FILE",
+   "object": {
+    "edge_indices": [
+     "<derived by graph_parts.py reindex; never typed>"
+    ],
+    "edges": [
+     {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-05",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+       {
+        "applicable_states": [
+         "CLOSE_PR_READY"
+        ],
+        "branch_id": "close_pr_ready_crd",
+        "change_class": "CRD",
+        "condition": "CLOSE_PR_READY for a verified CRD: the close pull request's exact head passed the hosted test job, the closeout workflow passed on that head or on a byte-identical later head, and the Product Owner has merged it; the handoff states that merge as its manual prerequisite",
+        "next_prompt_handoff_count": 1,
+        "public_result": true,
+        "required_artifacts": [
+         "CLOSE_MUTATION_SET_RESULT"
+        ],
+        "route_kind": "NATIVE_RESULT",
+        "route_steps": [],
+        "source_evidence": {
+         "path": "candidate/prompts/a/CL-05.md",
+         "section": "Mandatory single-block handoff"
+        },
+        "state": "CLOSE_PR_READY",
+        "terminal_for_invocation": false
+       }
+      ],
+      "state_predicates": [
+       "CLOSE_PR_READY"
+      ],
+      "to": "CL-C-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+     },
+     {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-05",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+       {
+        "applicable_states": [
+         "CLOSE_PR_READY"
+        ],
+        "branch_id": "close_pr_ready_epic",
+        "change_class": "EPIC",
+        "condition": "CLOSE_PR_READY for a verified Epic whose close-run family is admitted: the close pull request's exact head passed the hosted test job, the closeout workflow passed on that head or on a byte-identical later head, and the Product Owner has merged it; the handoff states that merge as its manual prerequisite",
+        "next_prompt_handoff_count": 1,
+        "public_result": true,
+        "required_artifacts": [
+         "CLOSE_MUTATION_SET_RESULT"
+        ],
+        "route_kind": "NATIVE_RESULT",
+        "route_steps": [],
+        "source_evidence": {
+         "path": "candidate/prompts/a/CL-05.md",
+         "section": "Mandatory single-block handoff"
+        },
+        "state": "CLOSE_PR_READY",
+        "terminal_for_invocation": false
+       }
+      ],
+      "state_predicates": [
+       "CLOSE_PR_READY"
+      ],
+      "to": "CL-E-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+     },
+     {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-05",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+       {
+        "applicable_states": [
+         "BLOCKED"
+        ],
+        "branch_id": "close_blocked",
+        "condition": "a stop: an intake condition fails; approved QA evidence would have to change; a defect lies outside the close-tooling surface; a repair would contradict PF-Canon or an HDE Build Notes rule it may not narrow; the schema cannot express a required close-report element; CI fails for a reason the allowed changes cannot fix; an Epic close, whose close-run family is not admitted, after its rehearsal; or a decision only the Product Owner can make. The result record holds the blocker, evidence, owner and resume point; no continuation block",
+        "next_prompt_handoff_count": 0,
+        "public_result": true,
+        "route_kind": "NATIVE_RESULT",
+        "route_steps": [],
+        "source_evidence": {
+         "path": "candidate/prompts/a/CL-05.md",
+         "section": "Stops (terminal return to Nathan, no continuation block)"
+        },
+        "state": "BLOCKED",
+        "terminal_for_invocation": true
+       }
+      ],
+      "state_predicates": [
+       "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+     },
+     {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-05",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+       {
+        "applicable_states": [],
+        "branch_id": "shared_source_authority_terminal",
+        "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+        "next_prompt_handoff_count": 0,
+        "public_result": true,
+        "route_kind": "TERMINAL_EXCEPTION",
+        "route_steps": [],
+        "source_evidence": {
+         "path": "candidate/prompts/a/CL-05.md",
+         "section": "Canonical sources"
+        },
+        "state": null,
+        "terminal_for_invocation": true
+       }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+     }
+    ],
+    "id": "CL-05",
+    "node": {
+     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+     "candidate_url": "https://app.notion.com/p/<CL-05 102726.1 page id>?pvs=204",
+     "candidate_version": "102726.1",
+     "id": "CL-05",
+     "lane": "CL",
+     "lifecycle": "SELECTED_PRODUCTION",
+     "native_function": "Execute Prepare and Publish the Close Mutation Set for the exact supplied change.",
+     "output_artifacts": [
+      "CLOSE_MUTATION_SET_RESULT"
+     ],
+     "predecessor": null,
+     "predecessor_union_destinations": [],
+     "r1_mapping": "GCF-24.CLOSE",
+     "receiving_role": "You are the Close Implementer for the exact supplied change.",
+     "result_states": [
+      "CLOSE_PR_READY",
+      "BLOCKED"
+     ],
+     "sequence": 5,
+     "session_class": "DEDICATED_ONE_OFF",
+     "title": "CL-05 — Prepare and Publish the Close Mutation Set — 102726.1"
+    },
+    "state_route_order": [
+     "close_pr_ready_epic",
+     "close_pr_ready_crd",
+     "close_blocked",
+     "shared_source_authority_terminal"
+    ],
+    "state_routes_extra": [],
+    "state_vocabularies": {}
+   },
+   "note": "Modelled on CL-C-10.json and QA-120.json (the 12-key branch form with change_class and required_artifacts). edge_indices is a placeholder: run graph_parts.py reindex after adding the file, then build; never type indices. candidate_url, lifecycle and candidate_page_binding take whatever values the coordinator's PART-24 head pass sets for every 102726.1 node; the page id is the CL-05 102726.1 member page created at EXECUTE. predecessor is null: CL-05 has no predecessor member (the 102626.2 candidate is not a member)."
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/QA-120.json",
+   "json_path": "edges[0].to",
+   "old": "CL-C-10",
+   "new": "CL-05",
+   "branch": "pass_crd"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/QA-120.json",
+   "json_path": "edges[0].route_branches[0].condition",
+   "old": "PASS with verified existing CRD class, complete QA Report/RCA and the matching continuing-Isis closure intake",
+   "new": "PASS with verified existing CRD class and complete QA Report/RCA; the close-mutation-set stage CL-05 produces the close mutation set before the CRD closure decision (CL-C-10)"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/QA-120.json",
+   "json_path": "edges[1].to",
+   "old": "CL-E-10",
+   "new": "CL-05",
+   "branch": "pass_epic"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/QA-120.json",
+   "json_path": "edges[1].route_branches[0].condition",
+   "old": "PASS with verified existing EPIC class, complete QA Report/RCA and the matching continuing-Isis closure intake",
+   "new": "PASS with verified existing EPIC class and complete QA Report/RCA; the close-mutation-set stage CL-05 produces the close mutation set before the Epic closure decision (CL-E-10)"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/QA-120.json",
+   "json_path": "node.predecessor_union_destinations",
+   "old": [
+    "CL-C-10",
+    "QA-110",
+    "QA-90",
+    "ESC-10"
+   ],
+   "new": "unchanged (predecessor history; the coordinator's PART-24 head pass sets it for every successor node, to the 100926.1 predecessor's own destinations)"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/CL-C-10.json",
+   "json_path": "edges[1].route_branches[0].condition",
+   "old": "substantive new bounded remedy requires Thoth remediation",
+   "new": "substantive new bounded remedy outside the close mutation set requires Thoth remediation",
+   "authority": "L-A11"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/CL-C-10.json",
+   "json_path": "edges[+] (append as edges[4])",
+   "old": null,
+   "new": {
+    "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+    "automatic": false,
+    "from": "CL-C-10",
+    "from_kind": "prompt",
+    "immediate": true,
+    "route_branches": [
+     {
+      "applicable_states": [
+       "DO_NOT_CLOSE"
+      ],
+      "branch_id": "do_not_close_close_mutation_set",
+      "condition": "the return work is the close mutation set, because it is missing, incomplete or defective, a close-tooling defect included; CL-05 entry (b), in a standalone session the Product Owner starts",
+      "next_prompt_handoff_count": 1,
+      "public_result": true,
+      "route_kind": "NATIVE_RESULT",
+      "route_steps": [],
+      "source_evidence": {
+       "path": "candidate/prompts/a/CL-C-10.md",
+       "section": "Next step and recovery"
+      },
+      "state": "DO_NOT_CLOSE",
+      "terminal_for_invocation": false
+     }
+    ],
+    "state_predicates": [
+     "DO_NOT_CLOSE"
+    ],
+    "to": "CL-05",
+    "to_kind": "prompt",
+    "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+   }
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/CL-C-10.json",
+   "json_path": "state_route_order",
+   "old": [
+    "change_closed",
+    "do_not_close_new_remedy",
+    "do_not_close_existing_owner",
+    "shared_source_authority_terminal"
+   ],
+   "new": [
+    "change_closed",
+    "do_not_close_close_mutation_set",
+    "do_not_close_new_remedy",
+    "do_not_close_existing_owner",
+    "shared_source_authority_terminal"
+   ]
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/CL-C-10.json",
+   "json_path": "edge_indices",
+   "old": [
+    46,
+    47,
+    48,
+    49
+   ],
+   "new": "derived by graph_parts.py reindex (one more index); never typed"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/CL-E-10.json",
+   "json_path": "edges[2].route_branches[0].condition",
+   "old": "substantive new bounded remedy requires Thoth remediation",
+   "new": "substantive new bounded remedy outside the close mutation set requires Thoth remediation",
+   "authority": "L-A11"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/CL-E-10.json",
+   "json_path": "edges[+] (append as edges[5])",
+   "old": null,
+   "new": {
+    "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+    "automatic": false,
+    "from": "CL-E-10",
+    "from_kind": "prompt",
+    "immediate": true,
+    "route_branches": [
+     {
+      "applicable_states": [
+       "DO_NOT_CLOSE"
+      ],
+      "branch_id": "do_not_close_close_mutation_set",
+      "condition": "the return work is the close mutation set, because it is missing, incomplete or defective, a close-tooling defect included; CL-05 entry (b), in a standalone session the Product Owner starts",
+      "next_prompt_handoff_count": 1,
+      "public_result": true,
+      "route_kind": "NATIVE_RESULT",
+      "route_steps": [],
+      "source_evidence": {
+       "path": "candidate/prompts/a/CL-E-10.md",
+       "section": "Next step and recovery"
+      },
+      "state": "DO_NOT_CLOSE",
+      "terminal_for_invocation": false
+     }
+    ],
+    "state_predicates": [
+     "DO_NOT_CLOSE"
+    ],
+    "to": "CL-05",
+    "to_kind": "prompt",
+    "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+   }
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/CL-E-10.json",
+   "json_path": "state_route_order",
+   "old": [
+    "change_closed_postclosure",
+    "change_closed_epic_pf09",
+    "do_not_close_new_remedy",
+    "do_not_close_existing_owner",
+    "shared_source_authority_terminal"
+   ],
+   "new": [
+    "change_closed_postclosure",
+    "change_closed_epic_pf09",
+    "do_not_close_close_mutation_set",
+    "do_not_close_new_remedy",
+    "do_not_close_existing_owner",
+    "shared_source_authority_terminal"
+   ]
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/prompts/CL-E-10.json",
+   "json_path": "edge_indices",
+   "old": [
+    50,
+    51,
+    52,
+    53,
+    54
+   ],
+   "new": "derived by graph_parts.py reindex (one more index); never typed"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "qa_closure_contract",
+   "old": {
+    "classification_source": "EXISTING_PRODUCT_OWNER_CLASSIFICATION_AND_APPROVED_SPECIFICATION",
+    "closure_actor": "Isis",
+    "closure_session": "RETAIN_EXISTING",
+    "crd_strategy_card_required": false,
+    "epic_strategy_card": "EXISTING_APPROVED_SPECIFICATION_STRATEGY_CARD",
+    "pass_receivers": {
+     "CRD": "CL-C-10",
+     "EPIC": "CL-E-10"
+    },
+    "qa_pass_closes_change": false,
+    "required_artifacts": [
+     "QA_REPORT",
+     "QA_RCA"
+    ],
+    "unresolved_class_effect": "NATHAN_TERMINAL_RETURN_NO_HANDOFF",
+    "unresolved_receiver_evidence_effect": "NATHAN_TERMINAL_RETURN_NO_HANDOFF",
+    "valid_result_reuse": true
+   },
+   "new": {
+    "classification_source": "EXISTING_PRODUCT_OWNER_CLASSIFICATION_AND_APPROVED_SPECIFICATION",
+    "close_mutation_set_is_post_closure": false,
+    "close_mutation_set_precedes_closure": true,
+    "close_stage": "CL-05",
+    "close_stage_exit_receivers": {
+     "CRD": "CL-C-10",
+     "EPIC": "CL-E-10"
+    },
+    "close_stage_result": "CLOSE_MUTATION_SET_RESULT",
+    "close_tooling_repair_route": "CL-05_NOT_ESC",
+    "closure_actor": "Isis",
+    "closure_session": "RETAIN_EXISTING",
+    "crd_strategy_card_required": false,
+    "do_not_close_close_mutation_set_route": "CL-05",
+    "epic_close_run_family_admitted": false,
+    "epic_strategy_card": "EXISTING_APPROVED_SPECIFICATION_STRATEGY_CARD",
+    "pass_receivers": {
+     "CRD": "CL-05",
+     "EPIC": "CL-05"
+    },
+    "qa_pass_closes_change": false,
+    "required_artifacts": [
+     "QA_REPORT",
+     "QA_RCA"
+    ],
+    "unresolved_class_effect": "NATHAN_TERMINAL_RETURN_NO_HANDOFF",
+    "unresolved_receiver_evidence_effect": "NATHAN_TERMINAL_RETURN_NO_HANDOFF",
+    "valid_result_reuse": true
+   },
+   "note": "pass_receivers keeps its meaning (where QA-120 PASS goes) and now names CL-05 for both classes; close_stage_exit_receivers carries the class-specific closure receivers. Mirrored into the direct-handoff contract by regenerate_contract.py (TOP_AND_NESTED), so no contract value table changes."
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "candidate.member_count",
+   "old": 55,
+   "new": 56,
+   "authority": "L-A12 / L-B1"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "candidate.member_rule",
+   "old": "54 successor runtime members + the GCFPE-MGMT-10 successor (D20 three-mode body); no additions or removals",
+   "new": "the 100926.1 members, each a 102726.1 successor page where its body changes and its 100926.1 page where it does not (D23-G), plus CL-05 — Prepare and Publish the Close Mutation Set, added (PF06 §3.5.1; DN-2); no removals",
+   "authority": "L-A12 / L-B1; the release and version_family values of candidate and baseline are the coordinator's PART-24 head values (GCFPE-20261027.1 / 102726.1; baseline GCFPE-20261009.1 / 100926.1 / 55)"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "proofs.candidate_node_count",
+   "old": 55,
+   "new": 56,
+   "authority": "L-A12 / L-B1"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "proofs.sole_added_node",
+   "old": [],
+   "new": [
+    "CL-05"
+   ],
+   "authority": "L-A12 / L-B1"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "proofs.baseline_ids_retained",
+   "old": true,
+   "new": true,
+   "note": "unchanged: no member is removed"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "protected_identities.r1_rows",
+   "old": 46,
+   "new": 47,
+   "authority": "L-A12 / L-B1; DN-2 (b)"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "protected_identities.r1_material_rows",
+   "old": 20,
+   "new": 21,
+   "authority": "L-A12 / L-B1 (GCF-24.CLOSE is a material row; Q-1)"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "protected_identities.r1_core_rows",
+   "old": 26,
+   "new": 26,
+   "note": "unchanged under Q-1's recommendation"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "protected_identities.r1_oracle_sha256",
+   "old": "ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52",
+   "new": "f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d",
+   "authority": "L-A12 / L-B1; the 2026-10-27 successor oracle (repo_edits RE-1)"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "protected_identities.flowmaster_primary_core_sha256",
+   "old": "4d8bb9bf1c9c85aeba8529995ee97b496d7938571d4b362f49c42aa9aa27d409",
+   "new": "4d8bb9bf1c9c85aeba8529995ee97b496d7938571d4b362f49c42aa9aa27d409",
+   "note": "unchanged: the Primary core does not change"
+  },
+  {
+   "part": "PART-13",
+   "file": "docs/graph/parts/global.json",
+   "json_path": "artifact_availability_contract.stage_categories",
+   "old": {
+    "CF-C-10": "FORMATION",
+    "CF-C-20": "FORMATION",
+    "CF-C-30": "FORMATION",
+    "CF-C-40": "FORMATION",
+    "CF-E-10": "FORMATION",
+    "CF-E-20": "FORMATION",
+    "CF-E-30": "FORMATION",
+    "CF-E-40": "FORMATION",
+    "CF-PO-10": "FORMATION",
+    "CL-20": "POST_CLOSURE",
+    "CL-30": "POST_CLOSURE",
+    "CL-40": "POST_CLOSURE",
+    "CL-C-10": "CLOSURE",
+    "CL-E-10": "CLOSURE",
+    "CL-E-20": "POST_CLOSURE",
+    "CL-E-30": "POST_CLOSURE",
+    "CL-E-40": "POST_CLOSURE",
+    "DOC-10": "ORIGIN_SCOPED_DELIVERY",
+    "DOC-20": "ORIGIN_SCOPED_DELIVERY",
+    "ESC-10": "QA_EXECUTION_EVIDENCE",
+    "ESC-25": "ORIGIN_SCOPED_REMEDIATION",
+    "ESC-30": "ORIGIN_SCOPED_REMEDIATION",
+    "ESC-40": "ORIGIN_SCOPED_REMEDIATION",
+    "GCFPE-MGMT-10": "CONTEXT_SCOPED",
+    "IA-10": "IMPLEMENTATION_PLANNING",
+    "IA-20": "IMPLEMENTATION_PLANNING",
+    "IA-30": "IMPLEMENTATION_PLANNING",
+    "IA-40": "IMPLEMENTATION_PLANNING",
+    "IA-50": "IMPLEMENTATION_PLANNING",
+    "IA-60": "IMPLEMENTATION_PLANNING",
+    "MGR-10": "CONTEXT_SCOPED",
+    "OPS-10": "ORIGIN_SCOPED_DELIVERY",
+    "OPS-20": "ORIGIN_SCOPED_DELIVERY",
+    "OPS-30": "ORIGIN_SCOPED_DELIVERY",
+    "PR-10": "PR_DELIVERY",
+    "PR-20": "PR_DELIVERY",
+    "PR-30": "PR_DELIVERY",
+    "PR-35": "PR_DELIVERY",
+    "PR-40": "PR_DELIVERY",
+    "PR-50": "PR_DELIVERY",
+    "QA-10": "READINESS",
+    "QA-100": "QA_EXECUTION_EVIDENCE",
+    "QA-110": "QA_EXECUTION_EVIDENCE",
+    "QA-120": "QA_EXECUTION_EVIDENCE",
+    "QA-20": "GUIDE_AUTHORING",
+    "QA-50": "QA_PLANNING",
+    "QA-60": "QA_PLANNING",
+    "QA-70": "QA_REVIEW",
+    "QA-80": "QA_REVIEW",
+    "QA-90": "QA_EXECUTION_EVIDENCE",
+    "RS-10": "ORIGIN_SCOPED_DELIVERY",
+    "RS-20": "ORIGIN_SCOPED_DELIVERY",
+    "RS-30": "ORIGIN_SCOPED_DELIVERY",
+    "RS-40": "ORIGIN_SCOPED_DELIVERY",
+    "UTIL-10": "CONTEXT_SCOPED"
+   },
+   "new": {
+    "CF-C-10": "FORMATION",
+    "CF-C-20": "FORMATION",
+    "CF-C-30": "FORMATION",
+    "CF-C-40": "FORMATION",
+    "CF-E-10": "FORMATION",
+    "CF-E-20": "FORMATION",
+    "CF-E-30": "FORMATION",
+    "CF-E-40": "FORMATION",
+    "CF-PO-10": "FORMATION",
+    "CL-05": "CLOSE_MUTATION_SET",
+    "CL-20": "POST_CLOSURE",
+    "CL-30": "POST_CLOSURE",
+    "CL-40": "POST_CLOSURE",
+    "CL-C-10": "CLOSURE",
+    "CL-E-10": "CLOSURE",
+    "CL-E-20": "POST_CLOSURE",
+    "CL-E-30": "POST_CLOSURE",
+    "CL-E-40": "POST_CLOSURE",
+    "DOC-10": "ORIGIN_SCOPED_DELIVERY",
+    "DOC-20": "ORIGIN_SCOPED_DELIVERY",
+    "ESC-10": "QA_EXECUTION_EVIDENCE",
+    "ESC-25": "ORIGIN_SCOPED_REMEDIATION",
+    "ESC-30": "ORIGIN_SCOPED_REMEDIATION",
+    "ESC-40": "ORIGIN_SCOPED_REMEDIATION",
+    "GCFPE-MGMT-10": "CONTEXT_SCOPED",
+    "IA-10": "IMPLEMENTATION_PLANNING",
+    "IA-20": "IMPLEMENTATION_PLANNING",
+    "IA-30": "IMPLEMENTATION_PLANNING",
+    "IA-40": "IMPLEMENTATION_PLANNING",
+    "IA-50": "IMPLEMENTATION_PLANNING",
+    "IA-60": "IMPLEMENTATION_PLANNING",
+    "MGR-10": "CONTEXT_SCOPED",
+    "OPS-10": "ORIGIN_SCOPED_DELIVERY",
+    "OPS-20": "ORIGIN_SCOPED_DELIVERY",
+    "OPS-30": "ORIGIN_SCOPED_DELIVERY",
+    "PR-10": "PR_DELIVERY",
+    "PR-20": "PR_DELIVERY",
+    "PR-30": "PR_DELIVERY",
+    "PR-35": "PR_DELIVERY",
+    "PR-40": "PR_DELIVERY",
+    "PR-50": "PR_DELIVERY",
+    "QA-10": "READINESS",
+    "QA-100": "QA_EXECUTION_EVIDENCE",
+    "QA-110": "QA_EXECUTION_EVIDENCE",
+    "QA-120": "QA_EXECUTION_EVIDENCE",
+    "QA-20": "GUIDE_AUTHORING",
+    "QA-50": "QA_PLANNING",
+    "QA-60": "QA_PLANNING",
+    "QA-70": "QA_REVIEW",
+    "QA-80": "QA_REVIEW",
+    "QA-90": "QA_EXECUTION_EVIDENCE",
+    "RS-10": "ORIGIN_SCOPED_DELIVERY",
+    "RS-20": "ORIGIN_SCOPED_DELIVERY",
+    "RS-30": "ORIGIN_SCOPED_DELIVERY",
+    "RS-40": "ORIGIN_SCOPED_DELIVERY",
+    "UTIL-10": "CONTEXT_SCOPED"
+   },
+   "note": "One key added: \"CL-05\": \"CLOSE_MUTATION_SET\" (Q-8). Not PR_DELIVERY, whose body checks would refuse CL-05's required QA Report input; not CLOSURE or POST_CLOSURE (PF19 §3.1.3). Must equal EXPECTED_POLICY_20261027 in both packages' validate_gcfpe_artifact_timing.py (skill_redlines SR-CF-6, SR-FV-20)."
+  }
+ ],
+ "skill_redlines": [
+  {
+   "id": "SR-CF-1",
+   "part": "PART-13",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "R1_CONTRACT_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1",
+   "new": "R1_CONTRACT_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1",
+   "count": 1
+  },
+  {
+   "id": "SR-CF-2",
+   "part": "PART-13",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "R1_ROW_COVERAGE: 46/46",
+   "new": "R1_ROW_COVERAGE: 47/47",
+   "count": 1
+  },
+  {
+   "id": "SR-CF-3",
+   "part": "PART-13",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "[bundled 46-row runtime map](references/glow-hde-canonical-change-flow-r1-runtime-map-20260923.json), SHA-256 `aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4`",
+   "new": "[bundled 47-row runtime map](references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json), SHA-256 `4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add`",
+   "count": 1
+  },
+  {
+   "id": "SR-CF-4",
+   "part": "PART-13",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "remains immutable historical provenance, checked by its historical pins.",
+   "new": "remains immutable historical provenance, checked by its historical pins. The 2026-09-23 successor map `glow-hde-canonical-change-flow-r1-runtime-map-20260923.json` (SHA-256 `aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4`) is kept on the same terms.",
+   "count": 1
+  },
+  {
+   "id": "SR-CF-5",
+   "part": "PART-13",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "- GCF-24 — After the complete approved QA Plan reaches truthful terminal state, the same Kronos session creates both the final QA Report and an RCA, including for a clean pass.",
+   "new": "- GCF-24 — After the complete approved QA Plan reaches truthful terminal state, the same Kronos session creates both the final QA Report and an RCA, including for a clean pass.\n- GCF-24.CLOSE — After a final QA Report with verdict PASS, or a closure DO_NOT_CLOSE whose return work is a missing, incomplete or defective close mutation set, the Close Implementer (CL-05) prepares and publishes the close mutation set, and repairs any close tooling the close needs, in a standalone session the Product Owner starts. His invocation is the Proceed and he alone merges. It exits to GCF-25 after the merge and never reopens implementation, QA or the closure decision. An Epic stops after rehearsal until canon admits an Epic close-run family.",
+   "count": 1
+  },
+  {
+   "id": "SR-CF-6",
+   "part": "PART-13",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "A QA PASS, Product Owner action, IA receipt, Kronos report, or memo cannot substitute.",
+   "new": "A QA PASS, Product Owner action, IA receipt, Kronos report, or memo cannot substitute. A DO_NOT_CLOSE whose return work is the close mutation set returns to GCF-24.CLOSE.",
+   "count": 1
+  },
+  {
+   "id": "SR-CF-7",
+   "part": "PART-13",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "final QA Report and RCA; Isis closure;",
+   "new": "final QA Report and RCA; the close mutation set and its close pull request; Isis closure;",
+   "count": 1
+  },
+  {
+   "id": "SR-CF-8",
+   "part": "PART-13",
+   "package": "change-flow",
+   "file": "references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json",
+   "old": null,
+   "new": "NEW FILE written by build_r1_successor_20261027.py (repo_edits RE-1): 48,515 bytes, sha256 4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add",
+   "count": 0
+  },
+  {
+   "id": "SR-CF-9",
+   "part": "PART-13",
+   "package": "change-flow",
+   "file": "scripts/validate_gcfpe_artifact_timing.py",
+   "old": "def validate_artifact_timing_contract(contract):\n    return [] if contract.get('artifact_availability_contract') == EXPECTED_POLICY else ['ARTIFACT_AVAILABILITY_CONTRACT']",
+   "new": "# GCFPE-20261027.1 / 102726.1 (MODIFICATION-20261027-gcfpe-backlog-open-items, PART-13): CL-05 joins the stage categories.\n# EXPECTED_POLICY stays the 091426.1 and 100926.1 value, which their bundled contracts still carry.\nEXPECTED_POLICY_20261027 = {**EXPECTED_POLICY, 'stage_categories': dict(sorted({**EXPECTED_POLICY['stage_categories'], 'CL-05': 'CLOSE_MUTATION_SET'}.items()))}\n\ndef validate_artifact_timing_contract(contract, policy=None):\n    expected = EXPECTED_POLICY if policy is None else policy\n    return [] if contract.get('artifact_availability_contract') == expected else ['ARTIFACT_AVAILABILITY_CONTRACT']",
+   "count": 1,
+   "note": "The 102726.1 release validator (PART-24's validate_gcfpe_20261027.py) calls it with policy=EXPECTED_POLICY_20261027; the 20260914 and 20261009 validators keep the default."
+  },
+  {
+   "id": "SR-FV-1",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "all 46 Change rows",
+   "new": "all 47 Change rows",
+   "count": 1,
+   "note": "frontmatter description"
+  },
+  {
+   "id": "SR-FV-2",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "R1_ORACLE_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1",
+   "new": "R1_ORACLE_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-3",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "R1_ORACLE_SHA256: ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52",
+   "new": "R1_ORACLE_SHA256: f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-4",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "The Change oracle is the bundled file references/glow-hde-canonical-change-flow-r1-20260923.json. It pins:",
+   "new": "The Change oracle is the bundled file references/glow-hde-canonical-change-flow-r1-20261027.json. It pins:",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-5",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "- projection SHA-256 ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52;",
+   "new": "- projection SHA-256 f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d;",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-6",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "- the successor source matrix references/r1-successor-source-20260923.md, SHA-256 8b443eb17180f85e8d615ba56ed6e1d1d78802fcd1a49aa3be3b5dd638bc4d04, which records the three successor rows GCF-14, GCF-17 and GCF-17.LINEAGE;",
+   "new": "- the successor source matrix references/r1-successor-source-20261027.md, SHA-256 088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a, which records the six successor rows GCF-14, GCF-17, GCF-17.LINEAGE, GCF-24, GCF-24.CLOSE (inserted after GCF-24) and GCF-25;\n- the 2026-09-23 successor oracle references/glow-hde-canonical-change-flow-r1-20260923.json (SHA-256 ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52) and its matrix references/r1-successor-source-20260923.md (SHA-256 8b443eb17180f85e8d615ba56ed6e1d1d78802fcd1a49aa3be3b5dd638bc4d04), kept as history;",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-7",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "whose 43 rows outside the successor set the successor keeps unchanged;",
+   "new": "whose 41 rows outside the successor set the successor keeps unchanged, in order;",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-8",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "- 26 core rows plus 20 material branch, loop, and utility rows;",
+   "new": "- 26 core rows plus 21 material branch, loop, and utility rows;",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-9",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "The Change validator must emit 46/46 only when all of these pass:",
+   "new": "The Change validator must emit 47/47 only when all of these pass:",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-10",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "2. All 46 row IDs occur exactly once in oracle order: 26 core and 20 material rows.",
+   "new": "2. All 47 row IDs occur exactly once in oracle order: 26 core and 21 material rows.",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-11",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "SKILL.md",
+   "old": "46/46 Change rows",
+   "new": "47/47 Change rows",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-12",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "ORACLE_RELATIVE = Path(\"references/glow-hde-canonical-change-flow-r1-20260923.json\")",
+   "new": "ORACLE_RELATIVE = Path(\"references/glow-hde-canonical-change-flow-r1-20261027.json\")",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-13",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "CHANGE_RUNTIME_MAP_RELATIVE = Path(\n    \"references/glow-hde-canonical-change-flow-r1-runtime-map-20260923.json\"\n)",
+   "new": "CHANGE_RUNTIME_MAP_RELATIVE = Path(\n    \"references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json\"\n)",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-14",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "EXPECTED_ORACLE_PROFILE = \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1\"",
+   "new": "EXPECTED_ORACLE_PROFILE = \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1\"",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-15",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "EXPECTED_ORACLE_SHA256 = (\n    \"ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52\"\n)",
+   "new": "EXPECTED_ORACLE_SHA256 = (\n    \"f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d\"\n)",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-16",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "EXPECTED_CHANGE_RUNTIME_MAP_SHA256 = (\n    \"aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4\"\n)",
+   "new": "EXPECTED_CHANGE_RUNTIME_MAP_SHA256 = (\n    \"4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add\"\n)",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-17",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1\",\n        \"R1_ROW_COVERAGE: 46/46\",",
+   "new": "        \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1\",\n        \"R1_ROW_COVERAGE: 47/47\",",
+   "count": 1,
+   "note": "CONTRACT_REQUIRED['change-flow']"
+  },
+  {
+   "id": "SR-FV-18",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"rows\": 46,\n        \"core_rows\": 26,\n        \"material_rows\": 20,",
+   "new": "        \"rows\": 47,\n        \"core_rows\": 26,\n        \"material_rows\": 21,",
+   "count": 1,
+   "note": "FMV-ORACLE-004"
+  },
+  {
+   "id": "SR-FV-19",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "if len(ids) != 46 or len(set(ids)) != 46 or core != 26 or material != 20:",
+   "new": "if len(ids) != 47 or len(set(ids)) != 47 or core != 26 or material != 21:",
+   "count": 1,
+   "note": "FMV-ORACLE-005"
+  },
+  {
+   "id": "SR-FV-20",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_gcfpe_artifact_timing.py",
+   "old": "def validate_artifact_timing_contract(contract):\n    return [] if contract.get('artifact_availability_contract') == EXPECTED_POLICY else ['ARTIFACT_AVAILABILITY_CONTRACT']",
+   "new": "# GCFPE-20261027.1 / 102726.1 (MODIFICATION-20261027-gcfpe-backlog-open-items, PART-13): CL-05 joins the stage categories.\n# EXPECTED_POLICY stays the 091426.1 and 100926.1 value, which their bundled contracts still carry.\nEXPECTED_POLICY_20261027 = {**EXPECTED_POLICY, 'stage_categories': dict(sorted({**EXPECTED_POLICY['stage_categories'], 'CL-05': 'CLOSE_MUTATION_SET'}.items()))}\n\ndef validate_artifact_timing_contract(contract, policy=None):\n    expected = EXPECTED_POLICY if policy is None else policy\n    return [] if contract.get('artifact_availability_contract') == expected else ['ARTIFACT_AVAILABILITY_CONTRACT']",
+   "count": 1,
+   "note": "Same as SR-CF-9; the two files must stay identical in this function and constant."
+  },
+  {
+   "id": "SR-FV-21",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "\"expected_rows\": 46,",
+   "new": "\"expected_rows\": 47,",
+   "count": 2,
+   "note": "change_contract_coverage report, both sites"
+  },
+  {
+   "id": "SR-FV-22",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "SUCCESSOR_MATRIX_RELATIVE = Path(\"references/r1-successor-source-20260923.md\")",
+   "new": "SUCCESSOR_MATRIX_RELATIVE = Path(\"references/r1-successor-source-20261027.md\")",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-23",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "SUCCESSOR_ROWS = (\"GCF-14\", \"GCF-17\", \"GCF-17.LINEAGE\")",
+   "new": "SUCCESSOR_ROWS = (\"GCF-14\", \"GCF-17\", \"GCF-17.LINEAGE\", \"GCF-24\", \"GCF-24.CLOSE\", \"GCF-25\")\n# PART-13 (MODIFICATION-20261027-gcfpe-backlog-open-items): a successor row with no historical row, and the row it follows.\nSUCCESSOR_ADDED_ROWS = {\"GCF-24.CLOSE\": \"GCF-24\"}",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-24",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "    \"GCF-17.LINEAGE\": (\"next\", \"failure_stop_condition\", \"source_row_sha256\"),\n}",
+   "new": "    \"GCF-17.LINEAGE\": (\"next\", \"failure_stop_condition\", \"source_row_sha256\"),\n    \"GCF-24\": (\"next\", \"source_row_sha256\"),\n    \"GCF-25\": (\"consumes\", \"next\", \"failure_stop_condition\", \"source_row_sha256\"),\n}",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-25",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "SUCCESSOR_CHANGED_TOP_LEVEL = (\"profile_id\", \"required_global_tokens\", \"authority\")",
+   "new": "SUCCESSOR_CHANGED_TOP_LEVEL = (\"profile_id\", \"required_global_tokens\", \"authority\", \"coverage\")",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-26",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "SUCCESSOR_AUTHORITY = \"D23-D, D23-F; Product Owner 2026-09-23\"",
+   "new": "SUCCESSOR_AUTHORITY = (\n    \"D23-D, D23-F; Product Owner 2026-09-23. D23 successor of 2026-10-27, the close-mutation-set \"\n    \"stage (PF06 §3.5.1; DN-2 of MODIFICATION-20261027-gcfpe-backlog-open-items); Product Owner \"\n    \"2026-10-27\"\n)",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-27",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "    \"GCF-17.LINEAGE\": \"73a133c18b13682cbc57d813b37caacda7ed15b183437515867166bcda70e83e\",\n}",
+   "new": "    \"GCF-17.LINEAGE\": \"73a133c18b13682cbc57d813b37caacda7ed15b183437515867166bcda70e83e\",\n    \"GCF-24\": \"66d4c41e3992a28f5550e1fd12865ac7a127de291d34f6dd676acc07a9ad2215\",\n    \"GCF-24.CLOSE\": \"9c0f70693dc21f0cbaef27c7804e645f33858d30fc52b89ae57854f7e2177453\",\n    \"GCF-25\": \"1b2ab0339aed2a04aff404864a1699605eb3904780c7e3b3ca25881c74ed5ee3\",\n}",
+   "count": 1,
+   "note": "FMV-ORACLE-021 approved row digests; they move only with Nathan's approval of the rows"
+  },
+  {
+   "id": "SR-FV-28",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"references/r1-successor-source-20260923.md\",\n    ),",
+   "new": "        \"references/r1-successor-source-20260923.md\",\n        \"references/glow-hde-canonical-change-flow-r1-20261027.json\",\n        \"references/r1-successor-source-20261027.md\",\n    ),",
+   "count": 1,
+   "note": "REQUIRED_SCRIPTS['flowmaster-validate']"
+  },
+  {
+   "id": "SR-FV-29",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "        \"references/glow-hde-canonical-change-flow-r1-runtime-map-20260923.json\",\n        \"references/gcfpe-20261009.1-100926.1-direct-handoff-contract.json\",\n    },",
+   "new": "        \"references/glow-hde-canonical-change-flow-r1-runtime-map-20260923.json\",\n        \"references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json\",\n        \"references/gcfpe-20261009.1-100926.1-direct-handoff-contract.json\",\n    },",
+   "count": 1,
+   "note": "OPTIONAL_REFERENCES['change-flow']"
+  },
+  {
+   "id": "SR-FV-30",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "old": "CANDIDATE_VALIDATOR_RELATIVE = Path(\"scripts/validate_gcfpe_20261009.py\")",
+   "new": "CANDIDATE_VALIDATOR_RELATIVE = Path(\"scripts/validate_gcfpe_20261027.py\")",
+   "count": 1,
+   "note": "FMV-ORACLE-017 ties this file's 3 r1_oracle_sha256 literals and 1 r1_runtime_map_sha256 literal to the current oracle and map; the file is PART-24's 102726.1 release validator, whose literals are f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d and 4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add"
+  },
+  {
+   "id": "SR-FV-31",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "scripts/run_change_flow_fixtures.py",
+   "old": "ORACLE_PATH = SKILL_DIR / \"references\" / \"glow-hde-canonical-change-flow-r1-20260923.json\"",
+   "new": "ORACLE_PATH = SKILL_DIR / \"references\" / \"glow-hde-canonical-change-flow-r1-20261027.json\"",
+   "count": 1
+  },
+  {
+   "id": "SR-FV-32",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "fixtures/change-flow/scenarios.json",
+   "old": "{\"row\": \"GCF-24\"}, {\"row\": \"GCF-25\"},",
+   "new": "{\"row\": \"GCF-24\"}, {\"row\": \"GCF-24.CLOSE\"}, {\"row\": \"GCF-25\"},",
+   "count": 1,
+   "note": "positive Epic happy path (line 25)"
+  },
+  {
+   "id": "SR-FV-33",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "fixtures/change-flow/scenarios.json",
+   "old": "{\"row\": \"GCF-24\"},\n        {\"row\": \"GCF-25\"}",
+   "new": "{\"row\": \"GCF-24\"}, {\"row\": \"GCF-24.CLOSE\"},\n        {\"row\": \"GCF-25\"}",
+   "count": 2,
+   "note": "positive CRD happy path (lines 44-45) and the specification-denial path (lines 124-125)"
+  },
+  {
+   "id": "SR-FV-34",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "fixtures/change-flow/scenarios.json",
+   "old": null,
+   "new": "ADD two scenarios beside positive_post_closure_adr_drainage: (1) positive_close_stage_do_not_close_return, events GCF-24 → GCF-24.CLOSE → GCF-25 → GCF-24.CLOSE → GCF-25 → GCF-26, expected_pass true; (2) negative_qa_report_skips_close_stage, events GCF-23 → GCF-24 → GCF-25, expected_pass false with the transition rule the validator raises for a destination outside rows[left]['next'] (validate_flowmaster.py line 1697). The second is the injected regression for the R1 successor (D14).",
+   "count": 0
+  },
+  {
+   "id": "SR-FV-35",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "references/glow-hde-canonical-change-flow-r1-20261027.json",
+   "old": null,
+   "new": "NEW FILE written by build_r1_successor_20261027.py (repo_edits RE-1): 55,591 bytes, sha256 f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d",
+   "count": 0
+  },
+  {
+   "id": "SR-FV-36",
+   "part": "PART-13",
+   "package": "flowmaster-validate",
+   "file": "references/r1-successor-source-20261027.md",
+   "old": null,
+   "new": "NEW FILE written by build_r1_successor_20261027.py, byte-identical to the repository copy (repo_edits RE-2): 7,705 bytes, sha256 088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a",
+   "count": 0
+  },
+  {
+   "id": "SR-GG-1",
+   "part": "PART-13",
+   "package": "glow-graph-contract",
+   "file": "scripts/regenerate_contract.py",
+   "old": "SUCCESSOR_ORACLE_SHA256 = \"ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52\"",
+   "new": "SUCCESSOR_ORACLE_SHA256 = \"ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52\"\n# MODIFICATION-20261027-gcfpe-backlog-open-items PART-13: generate() accepts the oracle the graph pins when it is one of\n# these. The 091426.1 and 100926.1 contracts keep ede635b1...; GCFPE-20261027.1 pins the 2026-10-27 successor.\nKNOWN_R1_ORACLE_SHA256 = (SUCCESSOR_ORACLE_SHA256, \"f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d\")",
+   "count": 1,
+   "note": "Confirms §A.4's 'probable' glow-graph-contract package: qa_closure_contract is mirrored (no pin), but the R1 oracle digest is pinned here and asserted by generate()."
+  },
+  {
+   "id": "SR-GG-2",
+   "part": "PART-13",
+   "package": "glow-graph-contract",
+   "file": "scripts/regenerate_contract.py",
+   "old": "    assert hashlib.sha256(open(oracle_path, \"rb\").read()).hexdigest() == SUCCESSOR_ORACLE_SHA256, \"oracle digest\"\n    assert g[\"protected_identities\"][\"r1_oracle_sha256\"] == SUCCESSOR_ORACLE_SHA256, \"graph G16 not applied\"",
+   "new": "    pinned = g[\"protected_identities\"][\"r1_oracle_sha256\"]\n    assert pinned in KNOWN_R1_ORACLE_SHA256, \"graph G16 not applied\"\n    assert hashlib.sha256(open(oracle_path, \"rb\").read()).hexdigest() == pinned, \"oracle digest\"",
+   "count": 1
+  },
+  {
+   "id": "SR-GG-3",
+   "part": "PART-13",
+   "package": "glow-graph-contract",
+   "file": "scripts/regenerate_contract.py",
+   "old": "    ops = VALUE_TABLE + revision_ops(contract_revision, primary_skill_revision) + release_value_ops(release_values, g)",
+   "new": "    ops = (VALUE_TABLE + [(\"set\", (\"protected_identities\", \"r1_oracle_sha256\"), pinned)]\n           + revision_ops(contract_revision, primary_skill_revision) + release_value_ops(release_values, g))",
+   "count": 1,
+   "note": "For a 100926.1 build pinned equals SUCCESSOR_ORACLE_SHA256, so the extra set rewrites the same value and the shipped contracts still regenerate byte for byte (check with contract_recipe.py --check)."
+  },
+  {
+   "id": "SR-GG-4",
+   "part": "PART-13",
+   "package": "glow-graph-contract",
+   "file": "SKILL.md",
+   "old": "      <flowmaster-validate>/references/glow-hde-canonical-change-flow-r1-20260923.json \\",
+   "new": "      <flowmaster-validate>/references/glow-hde-canonical-change-flow-r1-<the graph's oracle>.json \\",
+   "count": 1,
+   "note": "Optional documentation line; the 091426.1 command still names the 2026-09-23 oracle. Leave unchanged if the package review prefers."
+  }
+ ],
+ "validator_changes_needed": [
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "rule": "FMV-ORACLE-019",
+   "change": "Remove SUCCESSOR_ADDED_ROWS ids before comparing ids with history_ids and before computing neighbours; require each added row to sit immediately after its anchor row (GCF-24.CLOSE after GCF-24); skip the field-change check for an added row (it has no historical row)."
+  },
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "rule": "FMV-ORACLE-014",
+   "change": "For a row in SUCCESSOR_ADDED_ROWS, require supersedes_source_row_sha256 to be null."
+  },
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "rule": "FMV-ORACLE-022",
+   "change": "For an added row, require its key order to be R1_ROW_CONTENT_FIELDS then source_row_sha256; replace the literal 'three JSON blocks' messages with len(SUCCESSOR_ROWS)."
+  },
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "rule": "FMV-ORACLE-020",
+   "change": "required_global_tokens: the historical list with the profile_id replaced in place and 'R1_ROW_COVERAGE: 46/46' replaced in place by 'R1_ROW_COVERAGE: 47/47'; coverage must equal {rows: 47, core_rows: 26, material_rows: 21}."
+  },
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "rule": "N9 (FMV-ORACLE-015)",
+   "change": "Comment and message: 41 rows outside the successor set, in historical order (code already excludes SUCCESSOR_ROWS)."
+  },
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_flowmaster.py",
+   "rule": "history pins",
+   "change": "Keep verifying glow-hde-canonical-change-flow-r1.json (52807e58) and add a history pin for the 2026-09-23 oracle (ede635b1), its map (aa6ed8e3) and matrix (8b443eb1), byte-identical; none is executed as current."
+  },
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_gcfpe_20261027.py (PART-24's successor of validate_gcfpe_20261009.py)",
+   "rule": "validate_qa_closure_contract",
+   "change": "expected pass_receivers {EPIC: CL-05, CRD: CL-05}; new subset keys close_stage CL-05, close_stage_result CLOSE_MUTATION_SET_RESULT, close_stage_exit_receivers {EPIC: CL-E-10, CRD: CL-C-10}, close_mutation_set_precedes_closure true, close_mutation_set_is_post_closure false, do_not_close_close_mutation_set_route CL-05, close_tooling_repair_route CL-05_NOT_ESC, epic_close_run_family_admitted false; QA-120 PASS routes and edges go to CL-05 with change_class kept; QA_PASS_RECEIVER_CONTRACT checks CL-05 as DEDICATED_ONE_OFF, 'Close Implementer', CLOSE_MUTATION_SET_RESULT; a new check that CL-05's CLOSE_PR_READY routes reach CL-C-10 (CRD) and CL-E-10 (EPIC) exactly once each, and that CL-C-10 and CL-E-10 each carry exactly one DO_NOT_CLOSE branch to CL-05."
+  },
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_gcfpe_20261027.py",
+   "rule": "QA_PASS_ROW_PIPE_RE / QA_PASS_ROW_HTML_RE / QA_PASS_BODY_CLASS_MAP",
+   "change": "accept the row form '| `PASS` | `EPIC|CRD` | `CL-05 — Prepare and Publish the Close Mutation Set — <version>` at <mention>, which exits to `CL-E-10|CL-C-10 — ...` |' and check that the exit receiver matches the class."
+  },
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/validate_gcfpe_20261027.py and references/gcfpe-20261027.1-102726.1-validation-profile.json",
+   "rule": "release pins",
+   "change": "candidate_member_count 56, node_count 56, member set EXPECTED_MEMBERS + CL-05, r1_rows 47, r1_material_rows 21, r1_oracle_sha256 f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d (3 literals), r1_runtime_map_sha256 4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add (1 literal), proofs.candidate_node_count 56, proofs.sole_added_node ['CL-05'], the candidate member_rule text of graph_edits, artifact timing via EXPECTED_POLICY_20261027, and the 'qa_pass_closure' description string (QA-120 PASS → CL-05; CL-05 CLOSE_PR_READY → class-matching Isis receiver). Baseline: GCFPE-20261009.1 / 100926.1 / 55."
+  },
+  {
+   "package": "flowmaster-validate",
+   "file": "scripts/run_gcfpe_20261027_fixtures.py (successor of run_gcfpe_20261009_fixtures.py)",
+   "rule": "QA closure fixtures",
+   "change": "retarget 'reject-qa-closure-map-both-to-crd' to close_stage_exit_receivers; add reject-qa-pass-straight-to-closure (QA-120 pass_crd edge to CL-C-10), reject-cl05-exit-wrong-class, reject-do-not-close-close-set-to-esc30, reject-close-set-as-post-closure (stage_categories CL-05: POST_CLOSURE); body-source mutations: QA-120 row '`CL-05 — ' → '`CL-C-10 — ' must fail; CL-C-10 sentence 'not ESC-30 work' removed must fail."
+  },
+  {
+   "package": "change-flow",
+   "file": "scripts/validate_gcfpe_20261027.py (successor of validate_gcfpe_20261009.py)",
+   "rule": "require() pins",
+   "change": "candidate member count 56 (line 760 form), graph candidate count 56 (808), pass_receivers {EPIC: CL-05, CRD: CL-05} and the class-specific CL-05 exits (828-835), '56 unique member IDs' (837), protected_identities.r1_rows 47 (1015), artifact timing with EXPECTED_POLICY_20261027."
+  },
+  {
+   "package": "change-flow",
+   "file": "references/gcfpe-20261027.1-102726.1-direct-handoff-contract.json and -candidate-graph-contract.json",
+   "rule": "PART-24 regeneration",
+   "change": "regenerated from the 102726.1 build with the 2026-10-27 oracle (glow-graph-contract SR-GG-1..3); both packages bundle the same bytes."
+  },
+  {
+   "package": "glow-graph-contract",
+   "file": "(no validator of its own)",
+   "rule": "—",
+   "change": "Its scripts carry no member count or closure receiver pin; regenerate_contract.py's '12 fields x 55 members' is a docstring only."
+  }
+ ],
+ "pins_moved": [
+  {
+   "file": "flowmaster-validate/scripts/validate_flowmaster.py",
+   "name": "EXPECTED_ORACLE_SHA256",
+   "current": "ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52",
+   "new": "f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d"
+  },
+  {
+   "file": "flowmaster-validate/scripts/validate_flowmaster.py",
+   "name": "EXPECTED_CHANGE_RUNTIME_MAP_SHA256",
+   "current": "aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4",
+   "new": "4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add"
+  },
+  {
+   "file": "flowmaster-validate/scripts/validate_flowmaster.py",
+   "name": "EXPECTED_ORACLE_PROFILE",
+   "current": "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1",
+   "new": "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1"
+  },
+  {
+   "file": "flowmaster-validate/scripts/validate_flowmaster.py",
+   "name": "coverage / row counts (FMV-ORACLE-004, -005, report expected_rows ×2)",
+   "current": "46 rows, 26 core, 20 material",
+   "new": "47 rows, 26 core, 21 material"
+  },
+  {
+   "file": "flowmaster-validate/scripts/validate_flowmaster.py",
+   "name": "SUCCESSOR_ROWS / SUCCESSOR_ROW_SHA256 / SUCCESSOR_CHANGED_FIELDS / SUCCESSOR_CHANGED_TOP_LEVEL / SUCCESSOR_AUTHORITY / SUCCESSOR_MATRIX_RELATIVE",
+   "current": "3 rows (A1-1) / 2026-09-23 matrix",
+   "new": "6 rows + SUCCESSOR_ADDED_ROWS / 2026-10-27 matrix (SR-FV-22..27)"
+  },
+  {
+   "file": "flowmaster-validate/scripts/validate_flowmaster.py",
+   "name": "CANDIDATE_VALIDATOR_RELATIVE",
+   "current": "scripts/validate_gcfpe_20261009.py",
+   "new": "scripts/validate_gcfpe_20261027.py"
+  },
+  {
+   "file": "flowmaster-validate/scripts/validate_flowmaster.py",
+   "name": "CONTRACT_REQUIRED['change-flow'] R1 tokens",
+   "current": "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1; R1_ROW_COVERAGE: 46/46",
+   "new": "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1; R1_ROW_COVERAGE: 47/47"
+  },
+  {
+   "file": "flowmaster-validate/SKILL.md",
+   "name": "R1_ORACLE_PROFILE / R1_ORACLE_SHA256 / Authority boundary / 46/46 texts / description",
+   "current": "20260923_1 / ede635b1… / 46",
+   "new": "20261027_1 / f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d / 47 (SR-FV-1..11)"
+  },
+  {
+   "file": "flowmaster-validate/scripts/run_change_flow_fixtures.py",
+   "name": "ORACLE_PATH",
+   "current": "references/glow-hde-canonical-change-flow-r1-20260923.json",
+   "new": "references/glow-hde-canonical-change-flow-r1-20261027.json"
+  },
+  {
+   "file": "flowmaster-validate/fixtures/change-flow/scenarios.json",
+   "name": "GCF-24 → GCF-25 transitions",
+   "current": "3 scenario paths",
+   "new": "GCF-24 → GCF-24.CLOSE → GCF-25, plus 2 new scenarios (SR-FV-32..34)"
+  },
+  {
+   "file": "flowmaster-validate and change-flow scripts/validate_gcfpe_artifact_timing.py",
+   "name": "EXPECTED_POLICY['stage_categories']",
+   "current": "55 keys",
+   "new": "EXPECTED_POLICY_20261027 with 56 keys ('CL-05': 'CLOSE_MUTATION_SET'); EXPECTED_POLICY unchanged"
+  },
+  {
+   "file": "change-flow/SKILL.md",
+   "name": "R1_CONTRACT_PROFILE / R1_ROW_COVERAGE / runtime map link and SHA",
+   "current": "20260923_1 / 46/46 / -20260923.json aa6ed8e3…",
+   "new": "20261027_1 / 47/47 / -20261027.json 4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add"
+  },
+  {
+   "file": "glow-graph-contract/scripts/regenerate_contract.py",
+   "name": "SUCCESSOR_ORACLE_SHA256 use in generate()",
+   "current": "single pinned ede635b1…",
+   "new": "KNOWN_R1_ORACLE_SHA256 = (ede635b1…, f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d); generate() takes the graph's pin"
+  },
+  {
+   "file": "102726.1 release validators and profile (PART-24 files)",
+   "name": "member counts, r1 pins, QA closure map",
+   "current": "55 / 46 / ede635b1… / aa6ed8e3… / PASS → CL-[CE]-10",
+   "new": "56 / 47 (21 material) / f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d / 4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add / PASS → CL-05 → CL-[CE]-10 (validator_changes_needed)"
+  },
+  {
+   "file": "docs/graph/parts/global.json",
+   "name": "member facts (L-A12 / L-B1)",
+   "current": "candidate.member_count 55; proofs.candidate_node_count 55; proofs.sole_added_node []; protected_identities r1_rows 46, r1_material_rows 20, r1_oracle_sha256 ede635b1…; stage_categories 55",
+   "new": "56; 56; ['CL-05']; 47, 21, f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d; 56 (graph_edits)"
+  }
+ ],
+ "repo_edits": [
+  {
+   "id": "RE-1",
+   "part": "PART-13",
+   "path": "docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/build_r1_successor_20261027.py",
+   "new_file": true,
+   "content_from": "/tmp/claude-0/-home-user-glow-hdengine-v2/da130297-61dc-52b6-b2b5-7c0e03d18125/scratchpad/w5/build_r1_successor_20261027.py",
+   "content": "\"\"\"Build the 2026-10-27 R1 successor source matrix, successor oracle and successor runtime map\n(MODIFICATION-20261027-gcfpe-backlog-open-items, PART-13, DN-2 (b)).\n\nusage: PYTHONDONTWRITEBYTECODE=1 python3 build_r1_successor_20261027.py <skills-root> <repo-root> [--out-dir DIR]\n\nModelled on docs/ephemeral/modifications/evidence/build_r1_successor.py (D23 Amendment 1). The successor is\ncumulative over the historical oracle: it carries the three 2026-09-23 successor rows unchanged (GCF-14, GCF-17,\nGCF-17.LINEAGE) and adds the close-mutation-set stage between GCF-24 and GCF-25: GCF-24 and GCF-25 change, and\nGCF-24.CLOSE is inserted after GCF-24. Reads the historical oracle and map and the 2026-09-23 successor, confirms\ntheir digests, and writes (with --out-dir, every file goes into DIR instead, for a dry run):\n  <skills-root>/flowmaster-validate/references/r1-successor-source-20261027.md\n  <repo-root>/docs/prompt_ecosystem_management/r1-successor-source-20261027.md            (byte-identical copy)\n  <skills-root>/flowmaster-validate/references/glow-hde-canonical-change-flow-r1-20261027.json\n  <skills-root>/change-flow/references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json\nNever edits the historical or 2026-09-23 files. Prints every digest it writes.\n\"\"\"\nimport copy\nimport hashlib\nimport json\nimport sys\nfrom pathlib import Path\n\nsys.dont_write_bytecode = True\n\nHIST_ORACLE_SHA256 = \"52807e58c4a4659e6c1fc822749f6e50253ad7b01846c833f727ee266ca71d5e\"\nHIST_MAP_SHA256 = \"5574666e5975c104ccf13e77a13d94e0d16f37af37de7eb26d7e0f7b00f45b0e\"\nPREV_ORACLE_SHA256 = \"ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52\"\nPREV_MAP_SHA256 = \"aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4\"\nOLD_PROFILE = \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1\"\nNEW_PROFILE = \"GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1\"\nOLD_COVERAGE_TOKEN = \"R1_ROW_COVERAGE: 46/46\"\nNEW_COVERAGE_TOKEN = \"R1_ROW_COVERAGE: 47/47\"\nCARRIED_ROWS = (\"GCF-14\", \"GCF-17\", \"GCF-17.LINEAGE\")          # 2026-09-23 successor rows, unchanged\nNEW_ROW_ID = \"GCF-24.CLOSE\"\nSUCCESSOR_ROWS = (\"GCF-14\", \"GCF-17\", \"GCF-17.LINEAGE\", \"GCF-24\", \"GCF-24.CLOSE\", \"GCF-25\")\nSUCCESSOR_AUTHORITY = (\"D23-D, D23-F; Product Owner 2026-09-23. D23 successor of 2026-10-27, the close-mutation-set \"\n                       \"stage (PF06 §3.5.1; DN-2 of MODIFICATION-20261027-gcfpe-backlog-open-items); Product Owner \"\n                       \"2026-10-27\")\nCONTENT_FIELDS = (\"id\", \"partition\", \"name\", \"change_class\", \"actor\", \"session\", \"consumes\",\n                  \"produces\", \"next\", \"approval_contract\", \"failure_stop_condition\")\nHEADER = (\"# R1 successor source matrix — 2026-10-27\\n\\n\"\n          \"Authority: D23-D, D23-F; Product Owner 2026-09-23. D23 successor of 2026-10-27 (PF06 §3.5.1; DN-2); \"\n          \"Product Owner 2026-10-27. One block per row that differs from the historical R1 oracle; \"\n          \"a row the historical oracle lacks supersedes null.\\n\")\n\n# Changed fields of existing rows (final values), each with the historical value it replaces, as a guard.\nCHANGES = {\n    \"GCF-24\": {\n        \"next\": ([\"GCF-24.CLOSE\"], [\"GCF-25\"]),\n    },\n    \"GCF-25\": {\n        \"consumes\": ([\"approved_specification_ia_intake\", \"approved_change_wide_implementation_plan\",\n                      \"complete_work_unit_results\", \"final_qa_report\", \"qa_rca\", \"close_mutation_set\",\n                      \"close_mutation_set_result\", \"outstanding_blocker_ledger\"],\n                     [\"approved_specification_ia_intake\", \"approved_change_wide_implementation_plan\",\n                      \"complete_work_unit_results\", \"final_qa_report\", \"qa_rca\", \"outstanding_blocker_ledger\"]),\n        \"next\": ([\"GCF-24.CLOSE\", \"GCF-26\", \"REENTER_EXACT_OWNER\"], [\"GCF-26\", \"REENTER_EXACT_OWNER\"]),\n        \"failure_stop_condition\": (\n            \"STOP_CLOSURE_EVIDENCE_INCOMPLETE or CLOSE_DENIED_WITH_EXACT_OWNER_AND_REENTRY; recovery owner: \"\n            \"Isis/named stage owner, and the close-mutation-set stage (GCF-24.CLOSE) when the return work is a \"\n            \"missing, incomplete or defective close mutation set, a close-tooling defect included.\",\n            \"STOP_CLOSURE_EVIDENCE_INCOMPLETE or CLOSE_DENIED_WITH_EXACT_OWNER_AND_REENTRY; recovery owner: \"\n            \"Isis/named stage owner.\"),\n    },\n}\n# The inserted row (PF06 §3.5.1 \"Close-mutation-set stage\"; PF27 §3B; PF19 §3.1.3).\nNEW_ROW = {\n    \"id\": NEW_ROW_ID,\n    \"partition\": \"MATERIAL_BRANCH_LOOP_OR_UTILITY\",\n    \"name\": \"Close-mutation-set stage prepares and publishes the close mutation set\",\n    \"change_class\": \"Closure prerequisite (PR work unit)\",\n    \"actor\": \"Close Implementer (CL-05); the Product Owner invokes the stage and alone merges the close pull request\",\n    \"session\": (\"A standalone top-level session that the Product Owner starts with the stage prompt and the change ID; \"\n                \"it needs no handoff to start, resolves its inputs from the change's records, and is never a \"\n                \"subagent of another session.\"),\n    \"consumes\": [\"change_identity\", \"final_qa_report\", \"qa_rca\", \"isis_closure_decision\", \"current_repository\",\n                 \"applicable_canon\"],\n    \"produces\": [\"close_mutation_set\", \"close_mutation_set_result\"],\n    \"next\": [\"GCF-25\"],\n    \"approval_contract\": (\"The Product Owner's invocation of the stage for a change authorizes that change's close \"\n                          \"mutation set and any close-tooling repair it needs, and is the Proceed for both. The \"\n                          \"closure authority judges its result at the closure decision; the Product Owner alone \"\n                          \"merges. It never reopens implementation, QA or the closure decision.\"),\n    \"failure_stop_condition\": (\"STOP_CLOSE_INTAKE_FAILED, STOP_APPROVED_QA_EVIDENCE_WOULD_CHANGE, \"\n                               \"STOP_DEFECT_OUTSIDE_CLOSE_TOOLING, STOP_CLOSE_RUN_FAMILY_NOT_ADMITTED or \"\n                               \"STOP_CANON_CONFLICT; recovery owner: the Close Implementer for close-tooling repair, \"\n                               \"with no escalation, rescope or PR-chain stage; otherwise the Product Owner.\"),\n}\n\n\ndef ser(obj) -> bytes:\n    return (json.dumps(obj, indent=2, sort_keys=False, ensure_ascii=False) + \"\\n\").encode(\"utf-8\")\n\n\ndef row_digest(row) -> str:\n    content = {k: row[k] for k in CONTENT_FIELDS}\n    return hashlib.sha256(\n        json.dumps(content, sort_keys=True, ensure_ascii=False, separators=(\",\", \":\")).encode(\"utf-8\")\n    ).hexdigest()\n\n\ndef project_map(oracle):\n    return {key: oracle[key] for key in (\"profile_id\", \"authority\", \"coverage\", \"runtime_rows\")}\n\n\ndef main() -> int:\n    skills, repo = Path(sys.argv[1]), Path(sys.argv[2])\n    out_dir = Path(sys.argv[sys.argv.index(\"--out-dir\") + 1]) if \"--out-dir\" in sys.argv else None\n    fv, cf = skills / \"flowmaster-validate/references\", skills / \"change-flow/references\"\n    hist_bytes = (fv / \"glow-hde-canonical-change-flow-r1.json\").read_bytes()\n    hist_map_bytes = (cf / \"glow-hde-canonical-change-flow-r1-runtime-map.json\").read_bytes()\n    prev_bytes = (fv / \"glow-hde-canonical-change-flow-r1-20260923.json\").read_bytes()\n    prev_map_bytes = (cf / \"glow-hde-canonical-change-flow-r1-runtime-map-20260923.json\").read_bytes()\n    assert hashlib.sha256(hist_bytes).hexdigest() == HIST_ORACLE_SHA256, \"historical oracle digest\"\n    assert hashlib.sha256(hist_map_bytes).hexdigest() == HIST_MAP_SHA256, \"historical map digest\"\n    assert hashlib.sha256(prev_bytes).hexdigest() == PREV_ORACLE_SHA256, \"2026-09-23 oracle digest\"\n    assert hashlib.sha256(prev_map_bytes).hexdigest() == PREV_MAP_SHA256, \"2026-09-23 map digest\"\n    hist, prev = json.loads(hist_bytes), json.loads(prev_bytes)\n    assert ser(prev) == prev_bytes and ser(project_map(prev)) == prev_map_bytes, \"recipe\"\n\n    succ = copy.deepcopy(hist)\n    succ[\"profile_id\"] = NEW_PROFILE\n    tokens = succ[\"required_global_tokens\"]\n    assert tokens.count(OLD_PROFILE) == 1 and tokens.count(OLD_COVERAGE_TOKEN) == 1\n    tokens[tokens.index(OLD_PROFILE)] = NEW_PROFILE\n    tokens[tokens.index(OLD_COVERAGE_TOKEN)] = NEW_COVERAGE_TOKEN\n    prev_rows = {r[\"id\"]: r for r in prev[\"runtime_rows\"]}\n    hist_rows = {r[\"id\"]: r for r in hist[\"runtime_rows\"]}\n    rows = succ[\"runtime_rows\"]\n    for i, r in enumerate(rows):  # the three 2026-09-23 rows, byte-for-byte as approved then\n        if r[\"id\"] in CARRIED_ROWS:\n            rows[i] = copy.deepcopy(prev_rows[r[\"id\"]])\n    by_id = {r[\"id\"]: r for r in rows}\n    for rid, fields in CHANGES.items():\n        for key, (new, old) in fields.items():\n            assert by_id[rid][key] == old, (rid, key, by_id[rid][key])\n            by_id[rid][key] = new\n    new_row = dict(NEW_ROW)\n    new_row[\"source_row_sha256\"] = \"\"\n    rows.insert([r[\"id\"] for r in rows].index(\"GCF-24\") + 1, new_row)\n    succ[\"coverage\"] = {\"rows\": 47, \"core_rows\": 26, \"material_rows\": 21}\n    order = [r[\"id\"] for r in rows if r[\"id\"] in SUCCESSOR_ROWS]\n    assert order == list(SUCCESSOR_ROWS), order\n\n    blocks = []\n    for r in rows:\n        if r[\"id\"] not in SUCCESSOR_ROWS:\n            continue\n        assert list(r)[:11] == list(CONTENT_FIELDS) and list(r)[11] == \"source_row_sha256\"\n        r[\"source_row_sha256\"] = row_digest(r)\n        if r[\"id\"] in CARRIED_ROWS:\n            assert r[\"source_row_sha256\"] == prev_rows[r[\"id\"]][\"source_row_sha256\"]\n        block = {k: r[k] for k in CONTENT_FIELDS}\n        block[\"supersedes_source_row_sha256\"] = hist_rows[r[\"id\"]][\"source_row_sha256\"] if r[\"id\"] in hist_rows else None\n        blocks.append(\"```json\\n\" + json.dumps(block, indent=2, ensure_ascii=False) + \"\\n```\\n\"\n                      + \"source_row_sha256: \" + r[\"source_row_sha256\"] + \"\\n\")\n    matrix = (HEADER + \"\\n\".join(blocks)).encode(\"utf-8\")\n    assert matrix.endswith(b\"\\n\") and not matrix.endswith(b\"\\n\\n\")\n    matrix_sha = hashlib.sha256(matrix).hexdigest()\n\n    authority = succ[\"authority\"]\n    assert list(authority) == [\"r1_source_manifest_library_id\", \"r1_contract_matrix_library_id\",\n                               \"r1_contract_matrix_sha256\", \"r1_frozen_snapshot_sha256\", \"r1_verdict\"]\n    authority[\"successor_source_matrix_sha256\"] = matrix_sha\n    authority[\"successor_rows\"] = list(order)\n    authority[\"successor_authority\"] = SUCCESSOR_AUTHORITY\n    oracle = ser(succ)\n    runtime_map = ser(project_map(succ))\n\n    targets = {\n        \"matrix\": [fv / \"r1-successor-source-20261027.md\",\n                   repo / \"docs/prompt_ecosystem_management/r1-successor-source-20261027.md\"],\n        \"oracle\": [fv / \"glow-hde-canonical-change-flow-r1-20261027.json\"],\n        \"map\": [cf / \"glow-hde-canonical-change-flow-r1-runtime-map-20261027.json\"],\n    }\n    payload = {\"matrix\": matrix, \"oracle\": oracle, \"map\": runtime_map}\n    for kind, paths in targets.items():\n        for p in paths:\n            if out_dir is not None:\n                p = out_dir / (kind + \"-\" + p.name)\n            p.write_bytes(payload[kind])\n\n    # Self-checks: 47 rows, 26 core, the historical order with one insertion, only declared differences.\n    assert len(rows) == 47 and sum(r[\"partition\"] == \"CORE\" for r in rows) == 26\n    assert [r[\"id\"] for r in rows if r[\"id\"] != NEW_ROW_ID] == [r[\"id\"] for r in hist[\"runtime_rows\"]]\n    diffs_vs_prev = sorted((r[\"id\"], k) for r in rows if r[\"id\"] in prev_rows\n                           for k in r if r[k] != prev_rows[r[\"id\"]][k])\n    top_vs_prev = sorted(k for k in succ if succ[k] != prev[k])\n    assert top_vs_prev == [\"authority\", \"coverage\", \"profile_id\", \"required_global_tokens\", \"runtime_rows\"], top_vs_prev\n    for p, sha in ((fv / \"glow-hde-canonical-change-flow-r1.json\", HIST_ORACLE_SHA256),\n                   (fv / \"glow-hde-canonical-change-flow-r1-20260923.json\", PREV_ORACLE_SHA256)):\n        assert hashlib.sha256(p.read_bytes()).hexdigest() == sha\n    print(json.dumps({\n        \"matrix\": {\"bytes\": len(matrix), \"sha256\": matrix_sha},\n        \"oracle\": {\"bytes\": len(oracle), \"sha256\": hashlib.sha256(oracle).hexdigest()},\n        \"runtime_map\": {\"bytes\": len(runtime_map), \"sha256\": hashlib.sha256(runtime_map).hexdigest()},\n        \"row_digests\": {r[\"id\"]: r[\"source_row_sha256\"] for r in rows if r[\"id\"] in SUCCESSOR_ROWS},\n        \"changed_row_fields_vs_20260923\": diffs_vs_prev,\n        \"changed_top_level_keys_vs_20260923\": top_vs_prev,\n    }, indent=2))\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n",
+   "note": "Modelled on docs/ephemeral/modifications/evidence/build_r1_successor.py (D23 Amendment 1). Run at EXECUTE as `PYTHONDONTWRITEBYTECODE=1 python3 build_r1_successor_20261027.py <skills-root-copy> <repo-root>` against the PART-24 package build tree (never the installed tree); it writes RE-2 and the two package references (SR-FV-35, SR-CF-8) and prints the digests. A dry run with --out-dir into this worker's scratchpad printed exactly the digests in this file, and validate_flowmaster.graph_findings returned no finding on the result (interfaces closed)."
+  },
+  {
+   "id": "RE-2",
+   "part": "PART-13",
+   "path": "docs/prompt_ecosystem_management/r1-successor-source-20261027.md",
+   "new_file": true,
+   "content_from": "output of RE-1 (never hand-typed)",
+   "edits": [],
+   "expected": {
+    "bytes": 7705,
+    "sha256": "088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a"
+   },
+   "note": "The existing docs/prompt_ecosystem_management/r1-successor-source-20260923.md stays (AUTH-001)."
+  },
+  {
+   "id": "RE-3",
+   "part": "PART-13",
+   "path": "docs/prompt_ecosystem_management/gcfpe.decision-record.md",
+   "old": "\n## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages",
+   "new": "\n### Successor, 2026-10-27 — the R1 oracle gains the close-mutation-set stage (DN-2)\n\n**Product Owner, 2026-10-27**, approving §A of `MODIFICATION-20261027-gcfpe-backlog-open-items` \"with the recommended options for DN-1, DN-2, …\" and directing that \"PLAN … records PART-13's R1 successor rows in the decision record (L-A14)\". Under DN-2 (b), CL-05 — Prepare and Publish the Close Mutation Set is installed as class B, applying PF06 §3.5.1 *Close-mutation-set stage*, PF27 §3B and his direction of 2026-10-26 (\"It needs to become PART of the change flow\"); his approval of that analysis authorizes the R1 successor rows GCF-24 → the close stage → GCF-25. This entry records those rows and rules nothing new. D23's earlier successors are left as written (`AUTH-001`).\n\n- **A successor oracle, as Amendment 1 made one.** `glow-hde-canonical-change-flow-r1-20261027.json`, profile `GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1`, built by script from the historical oracle. It carries Amendment 1's three rows (GCF-14, GCF-17, GCF-17.LINEAGE) unchanged, so it supersedes the 2026-09-23 successor, which is kept as history. The source matrix is `docs/prompt_ecosystem_management/r1-successor-source-20261027.md`, byte-identical to `flowmaster-validate`'s copy.\n- **Three rows change.**\n  - **GCF-24** (Kronos's final QA Report and RCA): `next` was `GCF-25` and is `GCF-24.CLOSE`.\n  - **GCF-24.CLOSE**, new, inserted after GCF-24, partition `MATERIAL_BRANCH_LOOP_OR_UTILITY`: the close-mutation-set stage. It consumes the change identity, the final QA Report and RCA, a `DO_NOT_CLOSE` closure decision on entry (b), the current repository and the applicable canon; it produces the close mutation set and the stage's result; its `next` is GCF-25. The Product Owner's invocation is the Proceed for the set and any close-tooling repair; the closure authority judges the result; he alone merges.\n  - **GCF-25** (Isis decides closure): `consumes` gains `close_mutation_set` and `close_mutation_set_result`; `next` gains `GCF-24.CLOSE`, first; its recovery owner names the close stage for a missing, incomplete or defective close mutation set, a close-tooling defect included.\n- **Coverage** is 47 rows: 26 core and 21 material. `R1_ROW_COVERAGE: 47/47` replaces `46/46`.\n- **Approved row digests:** GCF-24 `66d4c41e3992a28f5550e1fd12865ac7a127de291d34f6dd676acc07a9ad2215`; GCF-24.CLOSE `9c0f70693dc21f0cbaef27c7804e645f33858d30fc52b89ae57854f7e2177453`; GCF-25 `1b2ab0339aed2a04aff404864a1699605eb3904780c7e3b3ca25881c74ed5ee3`. Matrix `088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a` (7,705 B); oracle `f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d` (55,591 B); runtime map `4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add` (48,515 B).\n- **What it does not decide.** No PF canon changes. No Epic close-run family is admitted: an Epic close stops after its rehearsal until canon maintenance admits one (the Modification's A-7, a listed risk). No other R1 row changes.\n- **Guard (`D14`).** `flowmaster-validate` pins the six successor rows, their digests and the inserted row's position (FMV-ORACLE-019 to -022), and its Change fixtures gain a must-fail path GCF-24 → GCF-25 that skips the stage. The registry guards G-CL05-01 to G-CL05-14 hold the prompt side. Each is fired by an injected regression in the Modification's EXECUTE.\n\n## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages",
+   "count": 1,
+   "note": "L-A14: the D23 successor entry for the R1 rows, placed after D23's last successor (\"the release-line check covers the whole body\") and before D24, as Amendment 1's successor sits under D23 (Q-5). The digests are those the dry run printed; if review changes a row's wording, RE-1 is re-run and the four digests here move with it before EXECUTE writes the entry."
+  },
+  {
+   "id": "RE-4",
+   "part": "PART-13",
+   "path": "docs/prompt_ecosystem_management/project-prompt-contract-registry.md (the GCFPE-PCR-20261027.1 successor PART-24 builds)",
+   "insert_before": "- prompt_key: CL-20",
+   "content": null,
+   "registry_row": {
+    "prompt_key": "CL-05",
+    "notion_page_id": "<CL-05 102726.1 page id>",
+    "notion_url": "https://app.notion.com/p/<CL-05 102726.1 page id>",
+    "expected_title": "CL-05 — Prepare and Publish the Close Mutation Set — 102726.1",
+    "lane": "CL",
+    "sequence": 5,
+    "lifecycle": "ACTIVE",
+    "function": "Execute Prepare and Publish the Close Mutation Set for the exact supplied change.",
+    "session_class": "DEDICATED_ONE_OFF",
+    "session_role": "You are the Close Implementer for the exact supplied change.",
+    "creator_role": "Close Implementer for the exact supplied change.",
+    "reviewer_role": "NONE",
+    "inputs": [
+     "CHANGE_CLASS",
+     "CHANGE_ID",
+     "QA_REPORT_ID",
+     "QA_RCA_ID",
+     "CHANGE_CLOSURE_DECISION_ID"
+    ],
+    "outputs": [
+     {
+      "artifact": "CLOSE_MUTATION_SET_RESULT",
+      "states": "DERIVED by registry_deriver.py --derive from CL-05.json: [BLOCKED, CLOSE_PR_READY]",
+      "consumers": "DERIVED: [CL-C-10, CL-E-10]"
+     }
+    ],
+    "mutations": {
+     "allowed": [
+      "Produce and save the prompt-defined governed result artifact(s)",
+      "Write the change's close mutation set through the canonical writers on its close pull request",
+      "Repair the close tooling, within its surface, in its own pull request"
+     ],
+     "forbidden": [
+      "Edit PF10 directly",
+      "Merge a pull request or enable automatic merge",
+      "Automatically invoke PR-50",
+      "Change approved QA evidence, product code or PF canon",
+      "Hand-edit a governed artifact",
+      "Dispatch or re-run a workflow, or ask the Product Owner to"
+     ]
+    },
+    "evidence_contract": [
+     "Complete native Notion readback matches authored content, allowing native mention display normalization and stripped blank lines.",
+     "No body corpus, body checksum or shipped validator receipt is created.",
+     "Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda, approved in-flight path/version and decision-topic mapping or truthful searched silence.",
+     "The result record carries PF27 §3B's record fields and every command with its exit status; CLOSE_PR_READY only when the hosted test job and the closeout workflow passed on the exact head or a byte-identical later head."
+    ],
+    "failure_contract": [
+     "Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.",
+     "A close-tooling defect is repaired in this stage, with no escalation, rescope or PR-chain stage; any other defect is a stop.",
+     "An Epic close stops after its rehearsal while no Epic close-run family is admitted.",
+     "Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive result."
+    ],
+    "required_interfaces": "DERIVED: same as consumers",
+    "controlling_sources": [
+     "GCFPE-20261027.1",
+     "102726.1",
+     "https://app.notion.com/p/<CL-05 102726.1 page id>?pvs=204",
+     "AGENTS.md and current PF canon on main",
+     "PF06-Canon-Change-Process-Guide §3.5.1 and §3.5.2",
+     "PF27-Canon-Plan-Templates §3B"
+    ],
+    "expected_parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+    "expected_parent_title": "HDE Change Flow — GCFPE-20261009.1 — 100926.1",
+    "supersedes": [],
+    "superseded_by": null,
+    "source_snapshot": "filled at EXECUTE from the read-back: completeness COMPLETE, notion_url, page_last_edited_at, representation NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY",
+    "audit_assertions": {
+     "forbidden_literals": [],
+     "forbidden_regex": "COPY by script, in order, the 34 forbidden_regex entries of the CL-C-10 row (the corpus-wide set: CTR-001 ×20, SRC-001 ×4, CTR-002 ×2, INV-003 ×2, TOP-001 ×7 incl. guards G-TS-3, G-MGMT-1, G-CL-1, G-F05-D), with whatever successor values PART-24 gives that set (G-MGMT-1's version literal); THEN APPEND the registry form (body_check.py to_registry, i.e. `registry --emit`) of the forbidden guards G-CL05-07, G-CL05-09 and G-CL05-10",
+     "required_literals": "COPY from the CL-C-10 row: PF10 (CTR-002), NEXT_PROMPT_HANDOFF (TOP-001), Canon relied on (AF-024-CANON)",
+     "required_regex": "COPY from the CL-C-10 row: docs/pfcanon/; never\\s+carries\\s+the\\s+only\\s+copy; The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\\.; never\\s+as\\s+a\\s+subagent\\s+of\\s+another\\s+session; G-TS-1; G-TS-2; THEN APPEND the registry form of the required guards G-CL05-08, G-CL05-11, G-CL05-12, G-CL05-13 and G-CL05-14",
+     "not_carried_from_CL-C-10": {
+      "Role and artifact continuity (AF-026)": "CL-05 has no such section; adding one has no consumer (NORM-001)",
+      "Required QA evidence indexing (AF-025)": "a QA step-instruction rule; CL-05 authors no QA step",
+      "PR-40 entry sentences (C-DISPATCH, 'that entry creates no runtime approval')": "CL-05's pull requests never enter PR-40 (its body: 'Its PR-20 and PR-40 stages do not apply')",
+      "addendum-producer and lineage-carriage regexes (G-F05-F, 'PF10/addendum lineage …', 'which the handoff names', 'unresolved facts …', 'in the output artifact's permitted metadata')": "CL-05 is not an addendum producer and carries none of those passages"
+     }
+    },
+    "proof": "On this worker's fresh read with the ops applied in memory, CL-05 fails 5 of the 9 copied required assertions before the ops (TOP-001 final-response, CTR-002 subagent, G-TS-1, G-TS-2, AF-024-CANON) and passes all 9 and all 34 copied forbidden regexes after them."
+   },
+   "other_rows": {
+    "QA-120": "outputs[0].consumers and required_interfaces DERIVED → [CL-05, ESC-10, QA-110, QA-90]; append the registry form of G-CL05-01, G-CL05-02 (required) and G-CL05-03, G-CL05-07 (forbidden)",
+    "CL-C-10": "inputs gain CLOSE_MUTATION_SET_RESULT; outputs[0].consumers and required_interfaces DERIVED → [CL-05, CL-20, ESC-30]; append G-CL05-04, G-CL05-05, G-CL05-06 (required) and G-CL05-07 (forbidden)",
+    "CL-E-10": "inputs gain CLOSE_MUTATION_SET_RESULT; outputs[0].consumers and required_interfaces DERIVED → [CL-05, CL-20, CL-E-20, ESC-30]; append G-CL05-04, G-CL05-05, G-CL05-06 (required) and G-CL05-07 (forbidden)"
+   },
+   "registry_level_member_facts": [
+    {
+     "path": "header line `release:`",
+     "old": "`GCFPE-20261009.1 / 100926.1 / 55`",
+     "new": "`GCFPE-20261027.1 / 102726.1 / 56`"
+    },
+    {
+     "path": "yaml workspace_skill_registry_disposition",
+     "old": "the forbidden literal on all 55 rows below is correct.",
+     "new": "the forbidden literal on all 56 rows below is correct."
+    },
+    {
+     "path": "authority_sources[SELECTED_CATALOG].member_count",
+     "old": 55,
+     "new": 56
+    },
+    {
+     "path": "observation.selected_member_count",
+     "old": 55,
+     "new": 56
+    },
+    {
+     "path": "observation.complete_body_count",
+     "old": 55,
+     "new": 56
+    },
+    {
+     "path": "audit_contracts.selected_binding.member_count",
+     "old": 55,
+     "new": 56
+    },
+    {
+     "path": "lanes[lane=CL].title",
+     "old": "Shared closure administration",
+     "new": "Close mutation set and shared closure administration",
+     "note": "optional: CL-05 is not administration (PF19 §3.1.3); leave if the coordinator prefers no lane rename"
+    }
+   ],
+   "note": "The registry successor itself (registry_id, release and version fields, authority URLs) is PART-24's; this lists only what PART-13 moves. Derived fields are produced by glow-graph-contract registry_deriver.py --derive, never typed (D13)."
+  }
+ ],
+ "notion_control_ops": [
+  {
+   "id": "NC-1",
+   "part": "PART-13",
+   "page_id": "<GCFPE-20261027.1 catalog page id> (successor of 3f74590a05eb812db385c2544d7570f7)",
+   "section": "Selected membership",
+   "start": "| <code>CL-20</code> |",
+   "end": null,
+   "new": "| <code>CL-05</code> | CL-05 — Prepare and Publish the Close Mutation Set — 102726.1 | <code>CL</code> | <code>@CL05_URL?pvs=204</code> | <code>102726.1</code> |\n| <code>CL-20</code> |",
+   "span_has_markup": true,
+   "why": "Catalog row for the 56th member, sorted between CF-PO-10 and CL-20 as the catalog orders IDs. The catalog's own count and narrative lines (selected_member_count, 'Exact selected member count', 'No member was added or removed', the Release rule's 'All 55 members') are release-level: the coordinator's PART-24/25 catalog work sets them to 56 and names CL-05 as added."
+  },
+  {
+   "id": "NC-2",
+   "part": "PART-13",
+   "page_id": "4054590a05eb8155b301e2cb6dec31d5 (CL-05 102626.2 candidate)",
+   "action": "DUPLICATE then MOVE",
+   "why": "D23-G: the CL-05 member page at 102726.1 is duplicated from the candidate, so it starts under the GCFPE Modification Backlog. Move the duplicate under 'HDE Change Flow — GCFPE-20261009.1 — 100926.1' (3db4590a05eb81d59059eb6b95ed5fcf), the CL lane's parent the registry expects, before the body ops. The candidate page itself is not edited (Q-6)."
+  },
+  {
+   "id": "NC-3",
+   "part": "PART-13 (runs in PART-25's window)",
+   "page_id": "4054590a05eb8155b301e2cb6dec31d5",
+   "action": "BANNER then ARCHIVE MOVE at promotion",
+   "why": "After promotion the 102626.2 candidate is a superseded predecessor text: banner it, never rewrite it (authoritative-surfaces.md), naming the 102726.1 member page, and move it to 04 Archived Prompt Versions with the other predecessors (D29's archival rule). Q-6."
+  }
+ ],
+ "decisions": [
+  {
+   "id": "W5-D1",
+   "decision": "CD-7 is applied as a set of 26 bounded ops on the candidate text, not a rewrite: every first-run defect named in the CL-05 result records v1.0 §11/§15 and v1.1 §15 and the CL-C-10 decisions v1.1 §9 and v1.2 §11 (CL-L7; merged-before-run route with CL-L9; intake 3 vs entry (b); allowed change 3; the Defects line O-7; 2.31 without a rule number O-1; reading scope on entry (b)), the two drain-stale passages, and the governance-state lines a member body may not carry.",
+   "authority": "CD-7; prompt-body-content-policy.md; D23-G"
+  },
+  {
+   "id": "W5-D2",
+   "decision": "CL-05's 'Before the block' list is replaced by the corpus's canonical handoff line, copied programmatically from CL-C-10 (identical in CL-C-10, CL-E-10 and QA-120), so CL-05 carries C-PLACE, the TypeSafe passage (G-TS-1, G-TS-2) and C-TOP like every member.",
+   "authority": "ecosystem-change-management.md §2 Step 3 (converge on existing wording); PF04 §9.1.3 via G-TS-1/2; D23 clarification (C-TOP in every main-ecosystem body)"
+  },
+  {
+   "id": "W5-D3",
+   "decision": "A third drain-stale passage, 'read with the HDE Build Notes addenda it defers to', is corrected with CD-7's two (op CL05-06).",
+   "authority": "CD-7's defect class; A-11 (NAME-001)"
+  },
+  {
+   "id": "W5-D4",
+   "decision": "The Epic limit (A-7) is carried into CL-05's text as a stop after rehearsal (CL05-11, CL05-12), and the CL-05 → CL-E-10 edge is kept, conditioned on an admitted close-run family.",
+   "authority": "A-7; PF06 §3.5.2.1; PF12 §8.17"
+  },
+  {
+   "id": "W5-D5",
+   "decision": "The CL-C-10 and CL-E-10 DO_NOT_CLOSE text gains the CL-05 branch first, and the ESC-30 branch is narrowed to 'any other' DO_NOT_CLOSE, with the sentence 'A close-tooling defect is CL-05's to repair, not ESC-30 work.'",
+   "authority": "L-A11; PF06 §3.5.1 Close-tooling repair; installation note"
+  },
+  {
+   "id": "W5-D6",
+   "decision": "CD-8's classification is written as one sentence in step 3 and one in step 5 of each closure prompt, in PF19 §3.1.3's words ('a closure prerequisite and precedes the closure decision'; 'lands through the Product Owner's merge of the close pull request before … decision is made').",
+   "authority": "CD-8; PF19 §3.1.3"
+  },
+  {
+   "id": "W5-D7",
+   "decision": "The new R1 row is GCF-24.CLOSE, partition MATERIAL_BRANCH_LOOP_OR_UTILITY, inserted after GCF-24; the successor is cumulative over the historical oracle (Q-1, Q-3).",
+   "authority": "DN-2 (b); D23 Amendment 1 (A1-1) precedent; GCF-17.LINEAGE precedent for a mandatory material row"
+  },
+  {
+   "id": "W5-D8",
+   "decision": "glow-graph-contract is in scope after all: §A.4 called it probable for qa_closure_contract, which is mirrored and unpinned, but regenerate_contract.py pins and asserts the R1 oracle digest (SR-GG-1..3).",
+   "authority": "§A.4 'PLAN confirms or rules it out'"
+  },
+  {
+   "id": "W5-D9",
+   "decision": "EXPECTED_POLICY is not edited in place: both packages gain EXPECTED_POLICY_20261027, because the 091426.1 and 100926.1 validators share the constant and their bundled contracts carry 55 categories.",
+   "authority": "A-6 (PAIR-001, STALE-001): history validation must keep passing"
+  },
+  {
+   "id": "W5-D10",
+   "decision": "QA-120's PASS paragraph is edited only in its last two sentences; its first sentence ('address the actual continuing Isis session and supply …') is a handoff-package sentence left to W3b (Q-7).",
+   "authority": "brief: other workers edit QA-120 (W3b handoff lines)"
+  },
+  {
+   "id": "W5-D11",
+   "decision": "The CL-05 registry row copies the corpus-wide forbidden set and the six common required regexes and three literals from CL-C-10, and omits the assertions whose passages CL-05 has no consumer for (listed in RE-4).",
+   "authority": "D11 (assert behaviour); NORM-001; GUARD-001"
+  }
+ ],
+ "questions": [
+  {
+   "id": "Q-1",
+   "to": "coordinator (Nathan may override)",
+   "question": "Partition of the new R1 row.",
+   "options": [
+    "(a) MATERIAL_BRANCH_LOOP_OR_UTILITY, id GCF-24.CLOSE: core_rows stays 26, material 21",
+    "(b) CORE: core_rows 27, which moves every '26 core' pin and needs a numeric-style id"
+   ],
+   "recommendation": "(a): every CORE id is numeric, and GCF-17.LINEAGE already models a mandatory step as a material row; (b) adds pins for no consumer."
+  },
+  {
+   "id": "Q-2",
+   "to": "coordinator",
+   "question": "Who writes destination-binding labels and URLs that point at other members' successor pages (QA-120's PASS table rows, CL-05's two bindings, the new CL-05 binding in CL-C-10 and CL-E-10)?",
+   "options": [
+    "(a) these PART-13 ops, with tokens @CL05_URL, @CLC10_URL, @CLE10_URL that the coordinator fills, and the central pass skips these lines",
+    "(b) the central pass, after these ops, rewriting every '100926.1' label and URL of a changed member",
+    "(c) the central pass alone; drop CL05-24/25 and keep QA120-02/03's anchors on the 100926.1 text, so they must run before it"
+   ],
+   "recommendation": "(a): QA120-02/03 change the receiver, not only its version, so they cannot be a version rewrite; order: PART-13 ops first, central pass second, skipping lines that already carry 102726.1."
+  },
+  {
+   "id": "Q-3",
+   "to": "coordinator",
+   "question": "Shape of the R1 successor.",
+   "options": [
+    "(a) cumulative over the historical oracle (six rows in one matrix; the 2026-09-23 successor kept as history)",
+    "(b) chained on the 2026-09-23 successor (three rows), which needs a second-level successor check in flowmaster-validate"
+   ],
+   "recommendation": "(a): flowmaster-validate's model is one historical oracle and one successor; (a) moves only its row tables, the added-row rule and coverage (validator_changes_needed)."
+  },
+  {
+   "id": "Q-4",
+   "to": "coordinator (PART-24/PART-25)",
+   "question": "When the 2026-10-27 oracle becomes the packages' current oracle.",
+   "options": [
+    "(a) only in the packages installed at promotion (PART-25), together with the 102726.1 profile as default",
+    "(b) earlier, beside the 100926.1 profile"
+   ],
+   "recommendation": "(a): FMV-ORACLE-017 ties CANDIDATE_VALIDATOR_RELATIVE's literals to the current oracle, and the selected 100926.1 contract pins ede635b1; installing the new oracle before the new profile would fail the selected release's validation. PART-24 qualifies from build trees."
+  },
+  {
+   "id": "Q-5",
+   "to": "coordinator",
+   "question": "Where the R1 rows are recorded (L-A14).",
+   "options": [
+    "(a) a D23 successor section, as Amendment 1 is (RE-3)",
+    "(b) a new D-number after DN-3's ruling"
+   ],
+   "recommendation": "(a): DN-2 (b) made the part class B, so no new ruling is recorded; the R1 successor regime is D23's."
+  },
+  {
+   "id": "Q-6",
+   "to": "coordinator",
+   "question": "CL-05 page lifecycle.",
+   "options": [
+    "(a) duplicate the 102626.2 candidate, move the duplicate under the HDE Change Flow hub, edit it; banner and archive the candidate at promotion (NC-2, NC-3)",
+    "(b) create a fresh page"
+   ],
+   "recommendation": "(a): it follows the brief (duplicate) and D29's archival-by-move."
+  },
+  {
+   "id": "Q-7",
+   "to": "coordinator / W3b",
+   "question": "QA-120's PASS paragraph sentence 1 tells the handoff to 'address the actual continuing Isis session and supply the complete matching …'; the PASS receiver is now the Close Implementer at CL-05.",
+   "options": [
+    "(a) W3b's rewrite of that sentence names CL-05's Close Implementer and the inputs CL-05's intake lists (change ID, QA Report, RCA)",
+    "(b) W5 takes the whole sentence"
+   ],
+   "recommendation": "(a), keeping each worker to its sentences; the coordinator checks the two ops together on the dry run."
+  },
+  {
+   "id": "Q-8",
+   "to": "coordinator",
+   "question": "CL-05's stage category.",
+   "options": [
+    "(a) CLOSE_MUTATION_SET (new)",
+    "(b) CLOSURE",
+    "(c) PR_DELIVERY"
+   ],
+   "recommendation": "(a): (c) would make the PR future-QA-input checks refuse CL-05's required QA Report; (b) conflates it with the decision PF19 §3.1.3 separates it from."
+  }
+ ],
+ "dispositions": [
+  {
+   "item": "ITEM-30",
+   "planned_disposition": "FIXED at EXECUTE as a candidate 102726.1 member (CL-05 page, CL-05.json, registry and catalog rows, QA-120 and closure routing, R1 successor, packages); live only at Nathan's promotion (DN-1 D2)",
+   "evidence": "ops CL05-01..26, QA120-01..05, CLC/CLE-01..05; graph_edits; RE-1..4; NC-1..3; guards G-CL05-01..14 pass after the ops on this worker's fresh reads"
+  },
+  {
+   "item": "ITEM-27",
+   "planned_disposition": "FIXED at EXECUTE: a DO_NOT_CLOSE for a missing, incomplete or defective close mutation set routes to CL-05 (request 1/3), and CL-C-10/CL-E-10 steps 3 and 5 classify the set as a closure prerequisite, never post-closure administration (request 2, CD-8). The brief's 'lands the QA evidence of record' clause is PART-12's (CD-8); request 3 (QA-120 classifies the close pack as a Close Gate prerequisite) is met by QA120-01's 'produces the close mutation set before the closure decision'; request 4 needs no change (PF06 §3.5.1: the invocation is the Proceed, so no Plan unit is needed). The brief's acceptance bullets hold: one lawful next prompt for missing close evidence that returns to the closure decision; no closure text treats the set as post-closure; drainage, board and PF09 maintenance stay post-closure",
+   "evidence": "CLC/CLE-02..04; G-CL05-04..07"
+  },
+  {
+   "item": "L-B3 (CL-05 'Removing stopgaps' note)",
+   "planned_disposition": "NO CHANGE to IA-10, IA-30 or PR-10: the note asks for nothing those bodies carry (F9: 0 hits for a change-local Close Gate work unit or one-time close task prompt); the note is removed with CL-05's installation notes (CL05-26)",
+   "evidence": "scope-measurement.md F9; findings.md MB-030"
+  },
+  {
+   "item": "L-B11 (CL-05's PRs and PF06 §1.1.4 finding disposition)",
+   "planned_disposition": "NO CHANGE to CL-05: CL-05 uses glow-hde-pr-development for PR mechanics, which PART-01 brings to PF06 §1.1.4 for every pull request; CL-05's 'review threads resolved' is covered by that skill",
+   "evidence": "CL-05 body 'Skill.' bullet; PART-01 targets (§A.4)"
+  },
+  {
+   "item": "A-7 (Epic close-run family not admitted)",
+   "planned_disposition": "LISTED LIMIT kept; CL-05's text stops an Epic close after rehearsal (CL05-11, CL05-12), guarded by G-CL05-14",
+   "evidence": "PF06 §3.5.2.1; PF12 §8.17; PF19 Close-pack truthfulness"
+  },
+  {
+   "item": "L-A11",
+   "planned_disposition": "FIXED: ESC-30 branch narrowed in body and graph",
+   "evidence": "CLC-04, CLE-04; graph_edits do_not_close_new_remedy conditions; G-CL05-05"
+  },
+  {
+   "item": "L-A12 / L-B1",
+   "planned_disposition": "PLANNED within PART-13: global.json member_count, member_rule, proofs, protected_identities, stage_categories; both packages' EXPECTED_POLICY (as EXPECTED_POLICY_20261027)",
+   "evidence": "graph_edits; SR-CF-9, SR-FV-20"
+  },
+  {
+   "item": "L-A14",
+   "planned_disposition": "PLANNED: the D23 successor entry RE-3 records the exact rows and digests",
+   "evidence": "RE-3; dry-run digests"
+  },
+  {
+   "item": "J-2 (CL-L2 half)",
+   "planned_disposition": "COVERED by PART-13 (QA-120 PASS → CL-05 schedules the close before the decision); CL-L8 stays adjacent (J-2)",
+   "evidence": "QA120-01; G-CL05-01"
+  }
+ ],
+ "verification": [
+  {
+   "part": "PART-13",
+   "what": "CL-05 member page (102726.1)",
+   "landed": "body_check.py check on a fresh fetch: every CL05 op LANDED by its anchor counts; G-CL05-08..14 pass; the corpus required set (TOP-001, CTR-002 subagent, G-TS-1, G-TS-2, AF-024-CANON, docs/pfcanon/, PF10, NEXT_PROMPT_HANDOFF) passes",
+   "old_text_gone": "G-CL05-09 (drained addenda: before 4, after 0) and G-CL05-10 (candidate status and release-phase lines: before 5, after 0) count 0; 'Installation notes' and '102626' count 0"
+  },
+  {
+   "part": "PART-13",
+   "what": "QA-120",
+   "landed": "G-CL05-01 = 1 and G-CL05-02 = 2 on a fresh fetch",
+   "old_text_gone": "G-CL05-03 = 0 (before 3: the two direct PASS rows and 'select exactly one closure receiver')"
+  },
+  {
+   "part": "PART-13",
+   "what": "CL-C-10 and CL-E-10",
+   "landed": "G-CL05-04 = 1, G-CL05-05 = 1, G-CL05-06 = 2 each",
+   "old_text_gone": "G-CL05-07 = 0; the unnarrowed sentence 'For <code>decision: DO_NOT_CLOSE</code>, return the exact closure finding' survives only inside CLC/CLE-04's replacement ('For any other …')"
+  },
+  {
+   "part": "PART-13",
+   "what": "graph",
+   "landed": "graph_parts.py reindex then build to the scratchpad: 56 nodes, 241 edges (235 + 4 CL-05 + 2 DO_NOT_CLOSE), validation PASS; registry_deriver.py reports the derived consumers in RE-4. Rehearsed by W5 on a scratch copy of docs/graph/parts with only these edits: reindex rewrote 57 files (CL-05 sorts early, so every later index shifts; derived, never typed), build PASS, 56 nodes, 241 edges, 56 state_routes, embedded JSON 608,231 B, sha256 563f7a2e… (PART-13 alone; not the release token, which includes every part)",
+   "old_text_gone": "no QA-120 edge to CL-C-10 or CL-E-10 (script over the built edges); proofs.sole_added_node == ['CL-05']"
+  },
+  {
+   "part": "PART-13",
+   "what": "R1 successor",
+   "landed": "RE-1 run on the build tree prints the digests in RE-3; flowmaster-validate with SR-FV and validator_changes_needed reports 47/47 and its new fixtures behave as expected",
+   "old_text_gone": "negative_qa_report_skips_close_stage fails (GCF-24 → GCF-25 is no longer a transition); FMV-ORACLE-021 refuses any other row digest"
+  },
+  {
+   "part": "PART-13",
+   "what": "decision record",
+   "landed": "RE-3's heading occurs once; its four digests equal RE-1's output",
+   "old_text_gone": "D23's earlier successors are byte-unchanged (git diff shows one insertion hunk)"
+  },
+  {
+   "part": "PART-13",
+   "what": "injected regressions (D14)",
+   "landed": "each G-CL05 guard's fail fixtures fire in body_check selftest (verified here: 14 of 14); at EXECUTE each is also fired by one injected regression on the page text in memory",
+   "old_text_gone": "—"
+  }
+ ],
+ "limits": [
+  "Anchor counts and guard counts were computed in memory over this worker's own fetches (the transcript), the D22 transient read body_check.py also uses; no body was written to disk. The CL-05 candidate's newest edit is 2026-10-26T11:45:19.630Z and the three members' 2026-10-12; EXECUTE re-fetches and refuses a moved revision.",
+  "Shared tokens @CL05_URL, @CLC10_URL, @CLE10_URL stand for successor page URLs that exist only after EXECUTE duplicates the pages (Q-2).",
+  "The R1 digests are those of the rows as written here; any review change to a row's wording changes its digest and the oracle's, and RE-1 must be re-run before RE-3 and SR-FV-27 are applied.",
+  "validator_changes_needed for FMV-ORACLE-014/-019/-020/-022 and the 102726.1 release validators are stated as required behaviour, not as exact redlines; PART-24's package author writes them under D24 review.",
+  "The external input name 'canonical_46_row_contract' (consumed by an unchanged R1 row) is left as an identifier; renaming it would change a row outside the approved set.",
+  "G-CL05-07 is a reintroduction guard only: no current text classifies the set as post-closure (count 0 before and after); its fixtures prove it fires.",
+  "The HDE Change Flow lane hub, the Flow Index and the Living Prompt Flow Map (L-A13 / L-B2) were not read by this worker; see escape_hatch.",
+  "Epic: CL-05 cannot reach CLOSE_PR_READY for an Epic until canon admits an Epic close-run family (A-7); the CL-05 → CL-E-10 edge models the admitted case only."
+ ],
+ "escape_hatch": [
+  {
+   "where": "QA-120, 'Required result and routing', PASS paragraph sentence 1",
+   "line": "For either PASS branch, address the actual continuing Isis session and supply the complete matching approved Specification, …",
+   "issue": "addresses Isis, but the PASS receiver is now CL-05's Close Implementer; it is W3b's handoff-package sentence (Q-7)"
+  },
+  {
+   "where": "QA-120, 'Required result and routing', missing-class paragraph",
+   "line": "…return the exact gap to Nathan without a closure handoff.",
+   "issue": "'closure handoff' now means the close-stage handoff; still correct in effect, left unchanged"
+  },
+  {
+   "where": "CL-C-10 and CL-E-10, 'Prompt navigation by name and directory'",
+   "line": "<code>CL-C-10 — …</code>, <code>CL-20 — …</code> and <code>CL-40 — …</code> are in <code>AI Prompts / HDE Change Flow</code>.",
+   "issue": "does not list CL-05; CLC/CLE-04 names CL-05's directory in the route sentence, so no edit is planned (NORM-001)"
+  },
+  {
+   "where": "CL-C-10 and CL-E-10, 'Native prompt references' mention lists; CL-C-10 'Required result' ('exact required return work')",
+   "line": "—",
+   "issue": "no CL-05 mention is added: the lists name no closure-stage receivers today and the destination binding (CLC/CLE-05) carries the route"
+  },
+  {
+   "where": "CL-C-10 and CL-E-10 'Candidate direct-destination bindings' and QA-120 bindings to CL-20, ESC-30, ESC-10, QA-110, QA-90",
+   "line": "— 100926.1 labels and URLs",
+   "issue": "version/URL rewrite for changed destinations is the central pass's (Q-2)"
+  },
+  {
+   "where": "L-A13 / L-B2",
+   "line": "HDE Change Flow lane hub (3db4590a05eb81d59059eb6b95ed5fcf), Glow HDE Prompt Flow Index, PF04 §9.1.6 Living Prompt Flow Map",
+   "issue": "each must list CL-05 between QA-120 and the closure decisions at candidate publication; not read by W5, so no op is written; owner: the coordinator's PART-24 worker"
+  },
+  {
+   "where": "docs/EVIDENCE_INDEX.md lines 57, 64; docs/INDEX.md line 17; docs/prompt_ecosystem_management/README.md line 71",
+   "line": "closeout workflow 'manual' / 'no close-run family of any change exists yet'",
+   "issue": "CL-05 O-2 and O-4, adjacent (J-11 covers the README line); not PART-13"
+  },
+  {
+   "where": "change-flow SKILL.md line 263 (the CLOSED sentinel)",
+   "line": "The sentinel may be emitted only after GCF-25 closure is proven, …",
+   "issue": "unchanged: GCF-25 still precedes the sentinel and GCF-24.CLOSE precedes GCF-25"
+  },
+  {
+   "where": "flowmaster-validate SKILL.md 'GCFPE release-profile validation boundary'",
+   "line": "It checks QA-120 PASS by verified change class: Epic to CL-E-10 and CRD to CL-C-10 …",
+   "issue": "describes the 100926.1 profile; PART-24's 102726.1 profile paragraph must state QA-120 PASS → CL-05 → class-matching receiver"
+  }
+ ],
+ "transient_reads": "Five Notion pages were fetched once each (fresh_reads). Their bodies were read in memory by scripts over this worker's own transcript (the D22 mechanism body_check.py uses), printing counts only; no body was written to a file. Scratch files in this worker's scratchpad hold scripts, the R1 dry-run outputs (derived JSON and a matrix, not prompt bodies) and this file's inputs; they are deleted at the end of this task."
+}

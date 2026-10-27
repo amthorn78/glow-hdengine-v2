@@ -1,0 +1,1838 @@
+{
+ "worker": "W6",
+ "parts": [
+  "PART-14",
+  "PART-17",
+  "PART-19",
+  "PART-20",
+  "PART-21",
+  "PART-26 (PE half: ITEM-36)",
+  "PART-27",
+  "PART-28"
+ ],
+ "canon_read": [
+  {
+   "title": "PF06-Canon-Change-Process-Guide",
+   "version": "v2.5.5",
+   "sections": [
+    "0 Front Matter",
+    "§0.1 Purpose and scope",
+    "§0.1A Governing lanes, common lifecycle, and authority routing (in full, including the addendum paragraph: 'Resolve the current continuous addendum number and format before authoring. Each addendum has one H2 with the next number and a descriptive title, unique metadata when needed, and only H3 or lower subordinate headings.')"
+   ],
+   "use": "PART-17 restatements (Hub, register); the Hub format pointer"
+  },
+  {
+   "title": "PF27-Canon-Plan-Templates",
+   "version": "v2.0.6",
+   "sections": [
+    "Canon precedence for template use (in full: storage rule; 'Cite HDE Build Notes by title alone ...; Other PF references use their current title and applicable section'; the precedence quote; the agent-authored addendum format paragraph)"
+   ],
+   "use": "PART-17 pointer; PART-26 citation form (PF04 by title and section)"
+  },
+  {
+   "title": "PF04-Canon-HDE-Governance",
+   "version": "v2.8.8",
+   "sections": [
+    "§9.1.3 Artifact storage and execution-surface selection, in full, including GCFPE model and reasoning-level guidance"
+   ],
+   "use": "PART-26 (the TypeSafe rule's home); PART-19 (the home of non-PF operating procedures 'remains undecided; do not invent one')"
+  },
+  {
+   "title": "PF10-HDE-Build-Notes",
+   "version": "v13.9",
+   "sections": [
+    "Front matter headings; §4 Continuous addendum sequence; §8 Silence rule; addendum index (2.1, S19 vendor and security policy) by heading"
+   ],
+   "use": "Silence: no addendum addresses any W6 topic, so permanent canon governs. No older PF10 base version and no PF10 git history read."
+  }
+ ],
+ "rulings_and_controls_read": [
+  "AGENTS.md (canon-first rule; code review guidelines)",
+  "gcfpe.decision-record.md D8, D17, D19, D22, D23 with its successors (incl. 'D23-G reaches the PE Metaprompt; the TW ecosystem stays out'), D24, D26-A, D27, D28, D29",
+  "ecosystem-change-management.md §1-§4 (incl. SCOPE-001, SCOPE-002, STALE-001, DERIV-001, GUARD-001)",
+  "prompt-body-content-policy.md",
+  "authoritative-surfaces.md (whole, incl. 'Restating is allowed; asserting is not')",
+  "skill-identity-and-freeze.md (whole)",
+  "reviewer-prompt-template.md (whole)",
+  "GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md (whole)",
+  "precedent 20261011 plan/edits.json, guards.json, activation-ops.json (register and PE entries), body_check.py docstring, resolve(), state(), landed()",
+  ".claude/hooks/check_canon_relied_on.py (contract and message)",
+  "the Modification §A (frontmatter, §A.1-§A.14), findings.md MB-004/005/006/011/012 and V5a/V5b rows, scope-measurement.md rows",
+  "W1, W2, W3a, W5 outputs (for shared pages and converging wording only)"
+ ],
+ "fresh_reads": [
+  {
+   "prompt_or_page": "PE Metaprompt 100926.1",
+   "page_id": "3f44590a05eb81f98b76c83465dc1960",
+   "as_of": "2026-10-12T13:32:38.514Z",
+   "coverage": "whole body, 82,589 characters, read in full"
+  },
+  {
+   "prompt_or_page": "Glow Operations Hub",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "as_of": "2026-10-27T03:02:37.191Z",
+   "coverage": "188,770 characters: every heading, every line in the in-scope sections read in full (lines 0-96, 293-401, 528-606, 990-1004, 1162-1192, 1293-1300, 1682-1735), and the whole page broad-matched by script for 091426/20260914.1/allocat/candidate/No number/confirms the reference/HDE Build Notes/addendum 2./TypeSafe"
+  },
+  {
+   "prompt_or_page": "GCFPE Membership and Release Register",
+   "page_id": "3d24590a05eb81ce942ad994cfca9fa1",
+   "as_of": "2026-10-12T17:17:45.991Z",
+   "coverage": "104,990 characters: every heading, the current sections (13-45, 476-530, 612-622) read in full, and the whole page broad-matched for operating procedure / v5.0.0 / manual drain / allocat / PF10 reference boundary"
+  },
+  {
+   "prompt_or_page": "Glow HDE Prompt Flow Index — GCFPE-20261009.1 — 100926.1",
+   "page_id": "3db4590a05eb81de9736ea69bac61016",
+   "as_of": "2026-10-12T17:17:19.872Z",
+   "coverage": "whole page, inline (to confirm v5.0.0's pointers at its lines 42-43 still resolve, and to design W6-BIND-4/5)"
+  }
+ ],
+ "ops": [
+  {
+   "id": "W6-PE-27a",
+   "part": "PART-27",
+   "item": "ITEM-34",
+   "prompt": "PE",
+   "section": "GCFPE controlled release overlay > Candidate authoring contract",
+   "start": "## GCFPE 100926.1 authoring requirements",
+   "end": null,
+   "new": "## GCFPE authoring requirements",
+   "why": "The heading binds current authoring instruction to a release label; the seven requirements apply to every GCFPE authoring (D27). prompt-body-content-policy.md: no field whose value changes because of a release event.",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-27b",
+   "part": "PART-27",
+   "item": "ITEM-34",
+   "prompt": "PE",
+   "section": "GCFPE authoring requirements",
+   "start": "For the GCFPE-20261009.1 candidate, author the seven bounded requirements below into each applicable native member and its contract. These requirements supersede conflicting predecessor wording for this candidate only.",
+   "end": null,
+   "new": "Author the seven bounded requirements below into each applicable native member and its contract (<code>D27</code>).",
+   "why": "ITEM-34: GCFPE-20261009.1 is the selected release (D29), not a candidate; the requirements are D27's standing rulings, not candidate-only overrides. Restating is allowed; asserting is not (authoritative-surfaces.md).",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-26",
+   "part": "PART-26",
+   "item": "ITEM-36",
+   "prompt": "PE",
+   "section": "GCFPE authoring requirements",
+   "start": "Under current HDE Build Notes, the reading of the installed TypeSafe scoring skill",
+   "end": null,
+   "new": "Under <code>PF04-Canon-HDE-Governance</code> §9.1.3 (<i>GCFPE model and reasoning-level guidance</i>), the reading of the installed TypeSafe scoring skill",
+   "why": "ITEM-36: the TypeSafe rule drained from HDE Build Notes into PF04 v2.8.8 §9.1.3; PF10 v13.9 carries one unrelated addendum (2.1, S19). Cited by current title and section as PF27 (Canon precedence for template use) directs; form converges on PE's own PF06/PF27 citations.",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-14a",
+   "part": "PART-14",
+   "item": "ITEM-09",
+   "prompt": "PE",
+   "section": "GCFPE authoring requirements (passage 1)",
+   "start": "For the approved 20260914 repair, the successor family is",
+   "end": "it does not recreate this repair or add another PR-35.",
+   "new": "Each change resolves its actual approved successor and membership from the register; it does not recreate the finished 20260914 repair or add another PR-35.",
+   "why": "MB-011 passage 1: the sentence instructs the finished 20260914 repair and pairs GCFPE-20260914.1 with 100926.1, a pair that never existed (D17: 091426.1; D29: 100926.1 is GCFPE-20261009.1). The general rule after it is kept.",
+   "span_has_markup": true,
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-14b",
+   "part": "PART-14",
+   "item": "ITEM-09",
+   "prompt": "PE",
+   "section": "Exact result vocabularies, exceptions, and recovery (passage 2)",
+   "start": "The exact semantic addendum-producer set for <code>GCFPE-20260914.1</code> is",
+   "end": null,
+   "new": "The exact semantic addendum-producer set is",
+   "why": "MB-011 passage 2: the producer set is current instruction with a stale release label; PF10 overlay and addendum contract and every producer body already name the same six without a release scope.",
+   "span_has_markup": true,
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-14c",
+   "part": "PART-14",
+   "item": "ITEM-09",
+   "prompt": "PE",
+   "section": "Publication, archival, and blocked-run evidence (passage 3)",
+   "start": "For this repair, keep production selection on",
+   "end": "candidate passes required deterministic validation",
+   "new": "Keep production selection on the selected release until the complete pinned successor candidate passes required deterministic validation",
+   "why": "MB-011 passage 3: the gate is general; only its release literals (091326.2, 20260914.1/100926.1) and repair scope are stale.",
+   "span_has_markup": true,
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-14d",
+   "part": "PART-14",
+   "item": "ITEM-09",
+   "prompt": "PE",
+   "section": "Publication, archival, and blocked-run evidence (passage 3)",
+   "start": "Candidate creation alone is never publication; later cases use their actual registered baseline and approved successor.",
+   "end": null,
+   "new": "Candidate creation alone is never publication; each case uses its actual registered baseline and approved successor.",
+   "why": "MB-011 passage 3: with the repair scope gone, \"later cases\" has no antecedent.",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-14e",
+   "part": "PART-14",
+   "item": "ITEM-09",
+   "prompt": "PE",
+   "section": "Publication, archival, and blocked-run evidence (passage 3)",
+   "start": "In this bounded repair, ARCHIVE authority becomes usable",
+   "end": null,
+   "new": "ARCHIVE authority becomes usable",
+   "why": "MB-011 passage 3: the archive rule is general (D17, D29 archived the same way); only its repair scope is stale.",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-14f",
+   "part": "PART-14",
+   "item": "ITEM-09",
+   "prompt": "PE",
+   "section": "Validation and completion (adjacent passage 4)",
+   "start": "For this repair, read all 54 predecessor bodies and all 55 candidate bodies completely; for later cases use the actual registered membership and governing coverage requirement.",
+   "end": null,
+   "new": "Read completely every predecessor and candidate body that the actual registered membership and governing coverage requirement put in scope.",
+   "why": "Adjacent repair-scoped passage (findings V5a): the counts 54/55 belong to the 20260914 repair; the general coverage rule is kept.",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-14g",
+   "part": "PART-14",
+   "item": "ITEM-09",
+   "prompt": "PE",
+   "section": "Current Alpha and Product Owner boundaries (adjacent passage 5)",
+   "start": "For this repair, preserve exactly one operative Alpha baseline; historical entries are non-operative:",
+   "end": "the PR03-produced PR04 handoff are historical and non-operative. ",
+   "new": "",
+   "why": "Adjacent repair-scoped passage (findings V5a): the yaml baseline restates a stale Alpha state (ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR) as operative, which the D18 successor forbids on any Notion page; the HDE-EPIC040 PR01-PR04 sentences were part of that baseline. The paragraph that remains already says Alpha state is what the Epic's own artifacts record (D18 successor).",
+   "lines": 12,
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-14h",
+   "part": "PART-14",
+   "item": "ITEM-09",
+   "prompt": "PE",
+   "section": "Current Alpha and Product Owner boundaries (adjacent passage 5)",
+   "start": "preserve legitimate subsequent progress; this historical repair baseline never authorizes resetting it.",
+   "end": null,
+   "new": "preserve legitimate subsequent progress.",
+   "why": "The repair baseline it names is removed by W6-PE-14g.",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-13a",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "PE",
+   "section": "Validation and completion",
+   "start": "ESC-10; QA-120 <code>PASS</code> routes verified <code>EPIC</code> to CL-E-10 and verified <code>CRD</code> to CL-C-10.",
+   "end": null,
+   "new": "ESC-10; QA-120 <code>PASS</code> continues to the close-mutation-set stage CL-05, which exits to CL-E-10 for a verified <code>EPIC</code> and to CL-C-10 for a verified <code>CRD</code>.",
+   "why": "PART-13 (PF06 §3.5.1; DN-2 (b)) moves QA-120 PASS to CL-05; PE would otherwise tell an author the old route. Wording converges on W5 QA120-01.",
+   "span_has_markup": true,
+   "owner_to_confirm": "W5 (PART-13)",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-13b",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "PE",
+   "section": "Prohibited routing and protected authorities",
+   "start": "ESC-10, and QA-120 <code>PASS</code> routes verified <code>EPIC</code> to CL-E-10 and verified <code>CRD</code> to CL-C-10.",
+   "end": null,
+   "new": "ESC-10, and QA-120 <code>PASS</code> continues to the close-mutation-set stage CL-05, which exits to CL-E-10 for a verified <code>EPIC</code> and to CL-C-10 for a verified <code>CRD</code>.",
+   "why": "Same rule as W6-PE-13a, the second PE statement of the route.",
+   "span_has_markup": true,
+   "owner_to_confirm": "W5 (PART-13)",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  },
+  {
+   "id": "W6-PE-13c",
+   "part": "PART-13",
+   "item": "ITEM-30",
+   "prompt": "PE",
+   "section": "Skills and interoperability",
+   "start": "and the live oracle is its 46-row successor",
+   "end": null,
+   "new": "and the live oracle is the successor the decision record names",
+   "why": "PART-13's R1 successor (L-A14) has 47 rows (W5 r1_successor coverage 47/47); a pointer to the decision record does not go stale at the next successor.",
+   "owner_to_confirm": "W5 (PART-13)",
+   "page_note": "PE Metaprompt successor 102726.1, duplicated from 3f44590a05eb81f98b76c83465dc1960 (D23-G and its PE successor); anchors are the 100926.1 text, which the duplicate starts as."
+  }
+ ],
+ "op_order_and_sharing": {
+  "PE": "One PE successor 102726.1 carries CD-12's five passages (PART-14), ITEM-34 (PART-27), ITEM-36 (PART-26) and three PART-13 escape-hatch ops (W6-PE-13a..c, owner W5 to confirm). Apply in the listed order; the 14 spans are disjoint (checked in memory: every start occurs once and each old_str occurs once at application). The coordinator's head operations (title, 'Prompt Version:' line, frontmatter) are not touched by any W6 op; the nearest W6 op is W6-PE-27a at the '## GCFPE 100926.1 authoring requirements' heading, which is not a head line. No other worker (W1, W2, W3a, W5) has a PE op. D26-B/L-B19: a restore of the PE successor reverts all of these together.",
+  "HUB": "W6 is the only worker with Hub ops in PART-17/PART-21. PART-25 (W8) also writes the Hub's selection section at promotion; W6 ops avoid that section except W6-HUB-5 (the note line), so apply PART-17 before PART-25 and have W8 anchor on the Hub as it stands afterwards.",
+  "REGISTER": "W6-REG-1..3 edit the register outside 'Current selection' (PF10 disposition and the current source-reference section), in EXECUTE before PART-25. W8's PART-25 REG-SRC copies the current source-reference section: it must copy the post-W6-REG-2 text. The procedure binding itself (W6-BIND-1..3) runs only inside PART-25."
+ },
+ "guards": [
+  {
+   "id": "G-W6-PE-14F",
+   "part": "PART-14",
+   "rule": "D29; authoritative-surfaces.md \"Restating is allowed; asserting is not\"; ITEM-09",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "(?i)\\b(for|in) (the approved 20260914|this|this bounded) repair\\b|historical repair baseline|\\blater cases\\b|operative Alpha baseline|ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR"
+   ],
+   "fixtures": {
+    "pass": [
+     "Read completely every predecessor and candidate body that the actual registered membership and governing coverage requirement put in scope.",
+     "ARCHIVE authority becomes usable only after the selected production successor passes post-promotion validation."
+    ],
+    "fail": [
+     "For this repair, read all 54 predecessor bodies and all 55 candidate bodies completely.",
+     "In this bounded repair, ARCHIVE authority becomes usable only after validation.",
+     "state: ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR"
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-14L",
+   "part": "PART-14",
+   "rule": "D17; D29 (predecessor release identifiers are history, not instruction)",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "GCFPE-2026091[34]\\.1|091426\\.1|091326\\.2|GCFPE-20260913\\.1"
+   ],
+   "fixtures": {
+    "pass": [
+     "predecessor: PE Metaprompt 091426.1",
+     "The exact semantic addendum-producer set is <code>{CF-C-30}</code>."
+    ],
+    "fail": [
+     "The exact semantic addendum-producer set for <code>GCFPE-20260914.1</code> is <code>{CF-C-30}</code>.",
+     "keep production selection on <code>GCFPE-20260913.1</code> until"
+    ]
+   },
+   "except": [
+    "^predecessor:"
+   ]
+  },
+  {
+   "id": "G-W6-PE-14R",
+   "part": "PART-14",
+   "rule": "D29; ITEM-09 (general rules kept without repair scope)",
+   "kind": "required",
+   "expect": 4,
+   "unit": "sentence",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "Each change resolves its actual approved successor and membership from the register|^The exact semantic addendum-producer set is <code>|^Keep production selection on the selected release until the complete pinned successor candidate passes|^Read completely every predecessor and candidate body that the actual registered membership"
+   ],
+   "fixtures": {
+    "pass": [
+     "Each change resolves its actual approved successor and membership from the register; it does not add another PR-35. The exact semantic addendum-producer set is <code>{X}</code>. Keep production selection on the selected release until the complete pinned successor candidate passes validation. Read completely every predecessor and candidate body that the actual registered membership put in scope."
+    ],
+    "fail": [
+     "For the approved 20260914 repair, the successor family is fixed. Later work resolves its actual approved successor and membership."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-27F",
+   "part": "PART-27",
+   "rule": "D29; prompt-body-content-policy.md (no release-event field); ITEM-34",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "(?i)GCFPE-20261009\\.1 candidate|for this candidate only|^#+ GCFPE \\d{6}\\.\\d+ authoring requirements"
+   ],
+   "fixtures": {
+    "pass": [
+     "## GCFPE authoring requirements",
+     "Author the seven bounded requirements below into each applicable native member and its contract (<code>D27</code>)."
+    ],
+    "fail": [
+     "## GCFPE 100926.1 authoring requirements",
+     "For the GCFPE-20261009.1 candidate, author the seven bounded requirements below.",
+     "These requirements supersede conflicting predecessor wording for this candidate only."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-27R",
+   "part": "PART-27",
+   "rule": "D27; ITEM-34",
+   "kind": "required",
+   "expect": 2,
+   "unit": "line",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "^## GCFPE authoring requirements$|^Author the seven bounded requirements below into each applicable native member and its contract"
+   ],
+   "fixtures": {
+    "pass": [
+     "## GCFPE authoring requirements\n\nAuthor the seven bounded requirements below into each applicable native member and its contract (<code>D27</code>)."
+    ],
+    "fail": [
+     "## GCFPE 100926.1 authoring requirements\n\nFor the GCFPE-20261009.1 candidate, author the seven bounded requirements below."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-26F",
+   "part": "PART-26",
+   "rule": "PF04 v2.8.8 §9.1.3 (the TypeSafe rule's home); PF27 v2.0.6 Canon precedence for template use; ITEM-36",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "(?i)HDE Build Notes|PF10 (addendum )?2\\.1\\b",
+    "(?i)TypeSafe"
+   ],
+   "fixtures": {
+    "pass": [
+     "Under <code>PF04-Canon-HDE-Governance</code> §9.1.3 (<i>GCFPE model and reasoning-level guidance</i>), the reading of the installed TypeSafe scoring skill is the guidance."
+    ],
+    "fail": [
+     "Under current HDE Build Notes, the reading of the installed TypeSafe scoring skill is the guidance.",
+     "PF10 addendum 2.1 makes the TypeSafe reading the guidance."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-26R",
+   "part": "PART-26",
+   "rule": "PF04 v2.8.8 §9.1.3; ITEM-36",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "PF04-Canon-HDE-Governance</code> §9\\.1\\.3",
+    "the reading of the installed TypeSafe scoring skill is the model and reasoning-level guidance for every GCFPE downstream session"
+   ],
+   "fixtures": {
+    "pass": [
+     "Under <code>PF04-Canon-HDE-Governance</code> §9.1.3 (<i>GCFPE model and reasoning-level guidance</i>), the reading of the installed TypeSafe scoring skill is the model and reasoning-level guidance for every GCFPE downstream session; no other workflow is introduced."
+    ],
+    "fail": [
+     "Under current HDE Build Notes, the reading of the installed TypeSafe scoring skill is the model and reasoning-level guidance for every GCFPE downstream session."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-TS1",
+   "part": "PART-26",
+   "rule": "PF04 v2.8.8 §9.1.3 (successor of G-PE-1, which cited \"PF10 2.1 rule 2\")",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "(?i)no replacement scoring|AF-013 skill advice is outside"
+   ],
+   "fixtures": {
+    "pass": [
+     "Under <code>PF04-Canon-HDE-Governance</code> §9.1.3, the reading of the installed TypeSafe scoring skill is the guidance, and no other scoring or advice workflow is introduced."
+    ],
+    "fail": [
+     "The separate AF-013 skill advice is outside this candidate's implementation; no replacement scoring or new workflow is introduced."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-TS2",
+   "part": "PART-26",
+   "rule": "PF04 v2.8.8 §9.1.3 (successor of G-PE-2, which cited \"PF10 2.1 rules 1 and 2\")",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "(?i)the reading of the installed TypeSafe scoring skill is the model and reasoning-level guidance for every GCFPE downstream session"
+   ],
+   "fixtures": {
+    "pass": [
+     "Under <code>PF04-Canon-HDE-Governance</code> §9.1.3, the reading of the installed TypeSafe scoring skill is the model and reasoning-level guidance for every GCFPE downstream session."
+    ],
+    "fail": [
+     "The separate AF-013 skill advice is outside this candidate's implementation; no replacement scoring or new workflow is introduced."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-TS3",
+   "part": "PART-26",
+   "rule": "PF04 v2.8.8 §9.1.3 (successor of G-PE-3, which cited \"PF10 2.1 rule 1; PF04 §9.1.3\")",
+   "kind": "required",
+   "expect": 2,
+   "unit": "sentence",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "(?i)the TypeSafe reading and surface advice that the GCFPE handoff contract requires"
+   ],
+   "fixtures": {
+    "pass": [
+     "These subjects are outside, with one GCFPE exception: the TypeSafe reading and surface advice that the GCFPE handoff contract requires, which route nothing. For GCFPE, the TypeSafe reading and surface advice that the GCFPE handoff contract requires are not prohibited language."
+    ],
+    "fail": [
+     "These subjects are outside this metaprompt and outside every prompt or handoff it creates or revises."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-13F",
+   "part": "PART-13",
+   "rule": "PF06 v2.5.5 §3.5.1; DN-2 (b) (owner W5 to confirm)",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "QA-120 <code>PASS</code> routes verified <code>EPIC</code> to CL-E-10|live oracle is its 46-row successor"
+   ],
+   "fixtures": {
+    "pass": [
+     "QA-120 <code>PASS</code> continues to the close-mutation-set stage CL-05, which exits to CL-E-10 for a verified <code>EPIC</code>.",
+     "the historical 46-row R1 oracle keeps its bytes, and the live oracle is the successor the decision record names."
+    ],
+    "fail": [
+     "QA-120 <code>PASS</code> routes verified <code>EPIC</code> to CL-E-10 and verified <code>CRD</code> to CL-C-10.",
+     "and the live oracle is its 46-row successor (D23)."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-PE-13R",
+   "part": "PART-13",
+   "rule": "PF06 v2.5.5 §3.5.1; DN-2 (b) (owner W5 to confirm)",
+   "kind": "required",
+   "expect": 2,
+   "unit": "sentence",
+   "prompts": [
+    "PE"
+   ],
+   "all": [
+    "QA-120 <code>PASS</code> continues to the close-mutation-set stage CL-05, which exits to CL-E-10 for a verified <code>EPIC</code> and to CL-C-10 for a verified <code>CRD</code>"
+   ],
+   "fixtures": {
+    "pass": [
+     "ESC-10; QA-120 <code>PASS</code> continues to the close-mutation-set stage CL-05, which exits to CL-E-10 for a verified <code>EPIC</code> and to CL-C-10 for a verified <code>CRD</code>. Again: QA-120 <code>PASS</code> continues to the close-mutation-set stage CL-05, which exits to CL-E-10 for a verified <code>EPIC</code> and to CL-C-10 for a verified <code>CRD</code>."
+    ],
+    "fail": [
+     "QA-120 <code>PASS</code> routes verified <code>EPIC</code> to CL-E-10 and verified <code>CRD</code> to CL-C-10."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-HUB-F",
+   "part": "PART-17",
+   "rule": "PF06 v2.5.5 §0.1A; PF27 v2.0.6; D8; D29; DN-9",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "HUB"
+   ],
+   "all": [
+    "(?i)allocates its number|for Product Owner numbering|No number — the paste assigns it|confirms the reference is there|retired in the candidate|in the candidate release|to match the candidate|the current <b>091426\\.1</b>|headed \"Current … — 091426\\.1\"|This canonical format governs|This format is canonical for every|^#{1,2} Current .*— 091426\\.1$|identical text is in the repository"
+   ],
+   "fixtures": {
+    "pass": [
+     "## Historical GCFPE prompt and artifact categories — 091426.1",
+     "The agent that authors an addendum resolves its current continuous number and format before authoring it (<code>PF06-Canon-Change-Process-Guide</code> §0.1A). Nathan / Product Owner pastes it into PF10; from the next turn it is treated as already in PF10 and in force, and no agent tracks, verifies, confirms, gates on or asks about that paste.",
+     "- Unique metadata when needed, and nothing else."
+    ],
+    "fail": [
+     "## Current GCFPE prompt and artifact categories — 091426.1",
+     "Nathan / Product Owner pastes an addendum into PF10 and allocates its number;",
+     "- One heading carrying the addendum title. No number — the paste assigns it.",
+     "the next turn confirms the reference is there and moves on."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-HUB-RH",
+   "part": "PART-17",
+   "rule": "DN-9 (four 091426.1 sections marked historical)",
+   "kind": "required",
+   "expect": 4,
+   "unit": "line",
+   "prompts": [
+    "HUB"
+   ],
+   "all": [
+    "^#{1,2} Historical GCFPE .* — 091426\\.1$"
+   ],
+   "fixtures": {
+    "pass": [
+     "## Historical GCFPE prompt and artifact categories — 091426.1\n## Historical GCFPE PF10 drafting and reference controls — 091426.1\n# Historical GCFPE execution and transport boundary — 091426.1\n# Historical GCFPE invocation and session continuity control — 091426.1"
+    ],
+    "fail": [
+     "## Current GCFPE prompt and artifact categories — 091426.1"
+    ]
+   }
+  },
+  {
+   "id": "G-W6-HUB-RN",
+   "part": "PART-17",
+   "rule": "PF06 v2.5.5 §0.1A (DN-9)",
+   "kind": "required",
+   "expect": 2,
+   "unit": "line",
+   "prompts": [
+    "HUB"
+   ],
+   "all": [
+    "resolves its current continuous number and format before authoring it"
+   ],
+   "fixtures": {
+    "pass": [
+     "The agent that authors an addendum resolves its current continuous number and format before authoring it (<code>PF06-Canon-Change-Process-Guide</code> §0.1A). Nathan / Product Owner pastes it into PF10; from the next turn it is treated as already in PF10 and in force, and no agent tracks, verifies, confirms, gates on or asks about that paste.\nPF10 addenda remain standalone documents; the agent that authors one resolves its current continuous number and format before authoring it."
+    ],
+    "fail": [
+     "Nathan / Product Owner pastes an addendum into PF10 and allocates its number."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-HUB-RP",
+   "part": "PART-17",
+   "rule": "DN-9 (pointer to PF06 §0.1A and PF27); D8",
+   "kind": "required",
+   "expect": 2,
+   "unit": "line",
+   "prompts": [
+    "HUB"
+   ],
+   "all": [
+    "^Canon owns the format of every PF10 build-notes addendum an agent drafts|nothing confirms the paste \\(<code>D8</code>\\)"
+   ],
+   "fixtures": {
+    "pass": [
+     "Canon owns the format of every PF10 build-notes addendum an agent drafts: PF06.\nA later turn reads current PF10, and nothing confirms the paste (<code>D8</code>)."
+    ],
+    "fail": [
+     "This format is canonical for every PF10 build-notes addendum an agent drafts."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-REG-F",
+   "part": "PART-17",
+   "rule": "PF06 v2.5.5 §0.1A; D6; D8; DN-9",
+   "kind": "required",
+   "expect": 2,
+   "unit": "line",
+   "prompts": [
+    "REGISTER"
+   ],
+   "all": [
+    "performs the manual drain"
+   ],
+   "fixtures": {
+    "pass": [
+     "The PF10 reference boundary is unchanged: ... Nathan performs the manual drain.\n<b>Current GCFPE PF10 reference boundary:</b> ... Nathan / Product Owner performs the manual drain."
+    ],
+    "fail": [
+     "Nathan performs the manual drain."
+    ]
+   },
+   "note": "A residual count, not new behaviour: the two lines that survive are the identical copies in the historical 091426.1 and 091326.2 source-reference sections, which a line guard cannot tell apart from the current copies. Before 4, after 2."
+  },
+  {
+   "id": "G-W6-REG-RN",
+   "part": "PART-17",
+   "rule": "PF06 v2.5.5 §0.1A (DN-9)",
+   "kind": "required",
+   "expect": 2,
+   "unit": "line",
+   "prompts": [
+    "REGISTER"
+   ],
+   "all": [
+    "resolves its current continuous number and format before authoring it"
+   ],
+   "fixtures": {
+    "pass": [
+     "The agent that authors an addendum resolves its current continuous number and format before authoring it (<code>PF06-Canon-Change-Process-Guide</code> §0.1A). Nathan / Product Owner pastes it into PF10; from the next turn it is treated as already in PF10 and in force, and no agent tracks, verifies, confirms, gates on or asks about that paste.\nThe agent that authors an addendum resolves its current continuous number and format before authoring it (<code>PF06-Canon-Change-Process-Guide</code> §0.1A). Nathan / Product Owner pastes it into PF10; from the next turn it is treated as already in PF10 and in force, and no agent tracks, verifies, confirms, gates on or asks about that paste."
+    ],
+    "fail": [
+     "Nathan / Product Owner performs the manual drain."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-RE-19F",
+   "part": "PART-19",
+   "rule": "STALE-001; CD-9",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "repo:docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md"
+   ],
+   "all": [
+    "E3-E4-report\\.md|ae2bd159|^release: GCFPE-20260914\\.1|^status: REGISTER_BOUND"
+   ],
+   "fixtures": {
+    "pass": [
+     "release: GCFPE-20261027.1",
+     "its current proof token is recorded in `docs/prompt_ecosystem_management/authoritative-surfaces.md`"
+    ],
+    "fail": [
+     "which body carries which is in `docs/ephemeral/modifications/evidence/e3/E3-E4-report.md`",
+     "proof token `55 nodes · 229 edges · sha256 ae2bd159…`",
+     "release: GCFPE-20260914.1"
+    ]
+   }
+  },
+  {
+   "id": "G-W6-RE-19R",
+   "part": "PART-19",
+   "rule": "CD-9 (pointer to the registry rows; token pointer)",
+   "kind": "required",
+   "expect": 2,
+   "unit": "line",
+   "prompts": [
+    "repo:docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md"
+   ],
+   "all": [
+    "which body carries which is that body's row in `docs/prompt_ecosystem_management/project-prompt-contract-registry\\.md`|its current proof token is recorded in `docs/prompt_ecosystem_management/authoritative-surfaces\\.md`"
+   ],
+   "fixtures": {
+    "pass": [
+     "x; which body carries which is that body's row in `docs/prompt_ecosystem_management/project-prompt-contract-registry.md`, y\nz; its current proof token is recorded in `docs/prompt_ecosystem_management/authoritative-surfaces.md` (*Release baseline*)"
+    ],
+    "fail": [
+     "which body carries which is in `docs/ephemeral/modifications/evidence/e3/E3-E4-report.md`"
+    ]
+   }
+  },
+  {
+   "id": "G-W6-RE-20R",
+   "part": "PART-20",
+   "rule": "skill-identity-and-freeze.md \"Advertised identity must be unspent\"; CD-10",
+   "kind": "required",
+   "expect": 1,
+   "unit": "line",
+   "prompts": [
+    "repo:docs/prompt_ecosystem_management/skill-identity-and-freeze.md"
+   ],
+   "all": [
+    "^\\*\\*One revision, two trees: glow-merged-change-attribution-lock 1\\.2\\.0\\.\\*\\*"
+   ],
+   "fixtures": {
+    "pass": [
+     "**One revision, two trees: glow-merged-change-attribution-lock 1.2.0.** Recorded 2026-10-27."
+    ],
+    "fail": [
+     "Rounds 28 and 29 remain separable only by tree hash."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-RE-21F",
+   "part": "PART-21",
+   "rule": "AGENTS.md canon-first rule; CD-11",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "repo:docs/prompt_ecosystem_management/reviewer-prompt-template.md"
+   ],
+   "all": [
+    "D20-D26|<governing file, e\\.g\\. AGENTS\\.md>"
+   ],
+   "fixtures": {
+    "pass": [
+     "AGENTS.md (the canon-first rule), gcfpe.decision-record.md D20-D29, modification-template.md and"
+    ],
+    "fail": [
+     "gcfpe.decision-record.md D20-D26, modification-template.md and ecosystem-change-management.md.",
+     "Read <governing file, e.g. AGENTS.md> first. It governs."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-RE-21R",
+   "part": "PART-21",
+   "rule": "AGENTS.md canon-first rule; CD-11",
+   "kind": "required",
+   "expect": 4,
+   "unit": "line",
+   "prompts": [
+    "repo:docs/prompt_ecosystem_management/reviewer-prompt-template.md"
+   ],
+   "all": [
+    "Canon relied on block: the PF titles, versions and|^Read AGENTS\\.md first|^AGENTS\\.md \\(the canon-first rule\\), gcfpe\\.decision-record\\.md D20-D29"
+   ],
+   "fixtures": {
+    "pass": [
+     "Read AGENTS.md first, and <x>. They govern.\nAdd a Canon relied on block: the PF titles, versions and sections\nAGENTS.md (the canon-first rule), gcfpe.decision-record.md D20-D29, modification-template.md and\na new defect). Then a Canon relied on block: the PF titles, versions and"
+    ],
+    "fail": [
+     "Read <governing file, e.g. AGENTS.md> first. It governs."
+    ]
+   }
+  },
+  {
+   "id": "G-W6-RE-28F",
+   "part": "PART-28",
+   "rule": "D29; authoritative-surfaces.md Release baseline; ITEM-35",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "repo:docs/prompt_ecosystem_management/ecosystem-change-management.md"
+   ],
+   "all": [
+    "ae2bd159|575,074 bytes"
+   ],
+   "fixtures": {
+    "pass": [
+     "the current token, recorded in `authoritative-surfaces.md` (*Release baseline*), proves a rebuild matched"
+    ],
+    "fail": [
+     "the token `55 nodes · 229 edges · 55 state_routes · 575,074 bytes · sha256 ae2bd159…`"
+    ]
+   }
+  },
+  {
+   "id": "G-W6-RE-28R",
+   "part": "PART-28",
+   "rule": "D29; ITEM-35",
+   "kind": "required",
+   "expect": 1,
+   "unit": "line",
+   "prompts": [
+    "repo:docs/prompt_ecosystem_management/ecosystem-change-management.md"
+   ],
+   "all": [
+    "the current token, recorded in `authoritative-surfaces\\.md` \\(\\*Release baseline\\*\\), proves a rebuild matched"
+   ],
+   "fixtures": {
+    "pass": [
+     "x the current token, recorded in `authoritative-surfaces.md` (*Release baseline*), proves a rebuild matched; y"
+    ],
+    "fail": [
+     "the token ae2bd159 proves a rebuild matched"
+    ]
+   }
+  }
+ ],
+ "guard_counts_on_fresh_reads": {
+  "notion": {
+   "PE": {
+    "start_counts": {
+     "W6-PE-27a": 1,
+     "W6-PE-27b": 1,
+     "W6-PE-26": 1,
+     "W6-PE-14a": 1,
+     "W6-PE-14b": 1,
+     "W6-PE-14c": 1,
+     "W6-PE-14d": 1,
+     "W6-PE-14e": 1,
+     "W6-PE-14f": 1,
+     "W6-PE-14g": 1,
+     "W6-PE-14h": 1,
+     "W6-PE-13a": 1,
+     "W6-PE-13b": 1,
+     "W6-PE-13c": 1
+    },
+    "guards": {
+     "G-W6-PE-14F": {
+      "before": 8,
+      "after": 0
+     },
+     "G-W6-PE-14L": {
+      "before": 3,
+      "after": 0
+     },
+     "G-W6-PE-14R": {
+      "before": 0,
+      "after": 4
+     },
+     "G-W6-PE-27F": {
+      "before": 2,
+      "after": 0
+     },
+     "G-W6-PE-27R": {
+      "before": 0,
+      "after": 2
+     },
+     "G-W6-PE-26F": {
+      "before": 1,
+      "after": 0
+     },
+     "G-W6-PE-26R": {
+      "before": 0,
+      "after": 1
+     },
+     "G-W6-PE-TS1": {
+      "before": 0,
+      "after": 0
+     },
+     "G-W6-PE-TS2": {
+      "before": 1,
+      "after": 1
+     },
+     "G-W6-PE-TS3": {
+      "before": 2,
+      "after": 2
+     },
+     "G-W6-PE-13F": {
+      "before": 3,
+      "after": 0
+     },
+     "G-W6-PE-13R": {
+      "before": 0,
+      "after": 2
+     }
+    }
+   },
+   "HUB": {
+    "start_counts": {
+     "W6-HUB-1": 1,
+     "W6-HUB-2": 1,
+     "W6-HUB-3": 1,
+     "W6-HUB-4": 1,
+     "W6-HUB-5": 1,
+     "W6-HUB-6": 1,
+     "W6-HUB-7": 1,
+     "W6-HUB-8": 1,
+     "W6-HUB-9": 1,
+     "W6-HUB-10": 1,
+     "W6-HUB-11": 1,
+     "W6-HUB-12": 1,
+     "W6-HUB-13": 1,
+     "W6-HUB-14": 1,
+     "W6-HUB-15": 1,
+     "W6-HUB-16": 1,
+     "W6-HUB-17": 1,
+     "W6-HUB-18": 1,
+     "W6-HUB-19": 1,
+     "W6-HUB-20": 1
+    },
+    "guards": {
+     "G-W6-HUB-F": {
+      "before": 13,
+      "after": 0
+     },
+     "G-W6-HUB-RH": {
+      "before": 0,
+      "after": 4
+     },
+     "G-W6-HUB-RN": {
+      "before": 0,
+      "after": 2
+     },
+     "G-W6-HUB-RP": {
+      "before": 0,
+      "after": 2
+     }
+    }
+   },
+   "REGISTER": {
+    "start_counts": {
+     "W6-REG-1": 1,
+     "W6-REG-2": 1,
+     "W6-REG-3": 1
+    },
+    "guards": {
+     "G-W6-REG-F": {
+      "before": 4,
+      "after": 2
+     },
+     "G-W6-REG-RN": {
+      "before": 0,
+      "after": 2
+     }
+    }
+   }
+  },
+  "repo": {
+   "W6-RE-19": {
+    "old_counts": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "guards_before_after": {
+     "G-W6-RE-19F": [
+      4,
+      0
+     ],
+     "G-W6-RE-19R": [
+      0,
+      2
+     ]
+    },
+    "bytes_after": 5376,
+    "sha256_after": "0abe16d23d251e37061cfe82d7540eece19096c0c440afa45ba49ac0bfe066e9"
+   },
+   "W6-RE-20": {
+    "old_counts": [
+     1,
+     1,
+     1
+    ],
+    "guards_before_after": {
+     "G-W6-RE-20R": [
+      0,
+      1
+     ]
+    },
+    "bytes_after": 9105
+   },
+   "W6-RE-21": {
+    "old_counts": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "guards_before_after": {
+     "G-W6-RE-21F": [
+      2,
+      0
+     ],
+     "G-W6-RE-21R": [
+      0,
+      4
+     ]
+    },
+    "bytes_after": 13241
+   },
+   "W6-RE-28": {
+    "old_counts": [
+     1,
+     1,
+     1
+    ],
+    "guards_before_after": {
+     "G-W6-RE-28F": [
+      1,
+      0
+     ],
+     "G-W6-RE-28R": [
+      0,
+      1
+     ]
+    },
+    "bytes_after": 20364
+   }
+  },
+  "fixture_selftest": {
+   "G-W6-PE-14F": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-14L": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-14R": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-27F": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-27R": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-26F": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-26R": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-TS1": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-TS2": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-TS3": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-13F": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-PE-13R": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-HUB-F": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-HUB-RH": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-HUB-RN": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-HUB-RP": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-REG-F": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-REG-RN": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-RE-19F": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-RE-19R": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-RE-20R": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-RE-21F": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-RE-21R": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-RE-28F": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   },
+   "G-W6-RE-28R": {
+    "pass_all_pass": true,
+    "fail_all_fail": true
+   }
+  }
+ },
+ "graph_edits": [],
+ "skill_redlines": [],
+ "skill_checks": "No W6 part edits a skill. Checked: change-flow and flowmaster-validate 100926.1 references (direct-handoff contract, validation profile, candidate graph contract) carry no operating-procedure path, PE title or reviewer-template text; the procedure is resolved through the register binding (change-flow SKILL.md:297). flowmaster-validate validates no PE body. glow-merged-change-attribution-lock: CD-10 records identity in the repository only; installed tree measured 10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f (freeze.py), SKILL.md line 8 MERGED_CHANGE_ATTRIBUTION_SKILL_REVISION: 1.2.0. No validator change is needed for W6's parts.",
+ "repo_edits": [
+  {
+   "id": "W6-RE-19",
+   "part": "PART-19",
+   "item": "ITEM-03",
+   "path": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md",
+   "new_file": true,
+   "content_from": "docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md",
+   "why": "CD-9 under Nathan's condition: a successor procedure written as a new file in EXECUTE; v5.0.0 stays as written (AUTH-001). PF04 v2.8.8 §9.1.3 leaves the home of non-PF operating procedures undecided, so the successor stays beside v5.0.0 in docs/ephemeral/ (do not invent one).",
+   "edits": [
+    {
+     "old": "artifact_version: \"5.0.0\"\ntitle: \"GCFPE Direct-Handoff and Runtime Artifact Operating Procedure v5.0.0 — 20260923\"\nrelease: GCFPE-20260914.1\nstatus: REGISTER_BOUND\nsupersedes: docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v4.0.0-20260914.md\nrecorded_by: GCFPE-MGMT-10, closing MODIFICATION-20260923-alpha-feedback-open-entries (D23), 2026-09-23",
+     "new": "artifact_version: \"5.1.0\"\ntitle: \"GCFPE Direct-Handoff and Runtime Artifact Operating Procedure v5.1.0 — 20261027\"\nrelease: GCFPE-20261027.1\nstatus: REGISTER_CONTROLLED\nselection_rule: \"Operative only while the release register's current selection binds it as the operating procedure. It does not assert its own binding.\"\nsupersedes: docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md\nrecorded_by: GCFPE-MGMT-10, MODIFICATION-20261027-gcfpe-backlog-open-items (PART-19, ITEM-03), 2026-10-27",
+     "count": 1,
+     "why": "Front-matter release made current (CD-9); REGISTER_CONTROLLED, as every control reads, because the binding moves only at PART-25 and the file must not assert it before then."
+    },
+    {
+     "old": "`docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v4.0.0-20260914.md`\nis superseded on 2026-09-23 and kept intact as historical evidence. **Do not execute it.** It was\nwritten before this release was promoted",
+     "new": "`docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md`\nis superseded from the moment the release register binds this file, and is kept intact as historical\nevidence (`AUTH-001`). It pointed to a dated 091426.1 report for which body carries which canonical\ntext, and it named the 091426.1 release and its graph proof token.\n\n`docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v4.0.0-20260914.md`\nwas superseded on 2026-09-23 and is kept intact as historical evidence. **Do not execute either.** v4.0.0 was\nwritten before GCFPE-20260914.1 was promoted",
+     "count": 1,
+     "why": "Names what v5.1.0 supersedes and when; keeps v5.0.0's account of v4.0.0, with its 'this release' made explicit."
+    },
+    {
+     "old": "(C-NOTION, C-ART, C-HANDOFF, C-PLACE, C-TOP, C-DEC, C-LAT, C-SESSION, C-SUB, C-DISPATCH, C-PROCEED, C-REPLAN, C-PR20-ENTRY)",
+     "new": "(among them C-NOTION, C-ART, C-HANDOFF, C-PLACE, C-TOP, C-DEC, C-LAT, C-SESSION, C-SUB, C-DISPATCH, C-PROCEED, C-REPLAN, C-PR20-ENTRY and C-TYPESAFE)",
+     "count": 1,
+     "why": "STALE-001 on the same row: C-TYPESAFE (MODIFICATION-20261011, PE's 'Complete handoff contract') was missing; 'among them' stops the list claiming to be exhaustive. Coordinator decision D-W6-3."
+    },
+    {
+     "old": "; which body carries which is in `docs/ephemeral/modifications/evidence/e3/E3-E4-report.md`, *E3: totals over 55 bodies* |",
+     "new": "; which body carries which is that body's row in `docs/prompt_ecosystem_management/project-prompt-contract-registry.md`, whose `required_regex` and `forbidden_regex` assertions name each text's guard |",
+     "count": 1,
+     "why": "ITEM-03 / MB-004: the pointer goes to the registry rows (CD-9) instead of the dated E3 report."
+    },
+    {
+     "old": "| The final wording of those canonical texts | `docs/ephemeral/modifications/specs/EXECUTION-SPEC-20260923-alpha-feedback-open-entries-v2.md` §3, with `gcfpe.decision-record.md` `D23`, *Successor — PR-40 is entered once per merge*, for C-DISPATCH's last sentence. The two Modifications' §P texts are their provenance |",
+     "new": "| The final wording of those canonical texts | the §P of the Modification that last applied each text, under `docs/ephemeral/modifications/`, beginning with `docs/ephemeral/modifications/specs/EXECUTION-SPEC-20260923-alpha-feedback-open-entries-v2.md` §3 and `gcfpe.decision-record.md` `D23`, *Successor — PR-40 is entered once per merge*, for C-DISPATCH's last sentence; the registry row's assertions guard each text as it now stands |",
+     "count": 1,
+     "why": "STALE-001 on the next row: C-TYPESAFE (MODIFICATION-20261011) and this Modification's texts (for example W1's finding rule, W3a's handoff family) have their wording in later §P records. Coordinator decision D-W6-3."
+    },
+    {
+     "old": "proof token `55 nodes · 229 edges · 55 state_routes · 575,074 bytes · sha256 ae2bd159…` |",
+     "new": "its current proof token is recorded in `docs/prompt_ecosystem_management/authoritative-surfaces.md` (*Release baseline*) and in the register's current selection |",
+     "count": 1,
+     "why": "CD-9: the graph token made current. A pointer, not a literal, because the binding takes effect at a promotion whose graph PART-24 has not yet built, and a literal goes stale at every rebuild (DERIV-001). Alternative in questions Q-W6-2."
+    },
+    {
+     "old": "and two copies drift (`DERIV-001`).\n",
+     "new": "and two copies drift (`DERIV-001`). The graph\nproof token is a pointer for the same reason: the release baseline records it, so this file does not\ngo stale when the graph is rebuilt.\n\n## Canon relied on\n\n- `PF04-Canon-HDE-Governance` v2.8.8 §9.1.3: the repository home of ongoing non-PF operating procedures\n  remains undecided, so this successor stays in `docs/ephemeral/` beside its predecessor.\n- `PF10-HDE-Build-Notes` v13.9: silent on this procedure (its one addendum, 2.1, is S19 vendor and\n  security policy), so permanent canon governs.\n",
+     "count": 1,
+     "why": "States why the token is a pointer, and records the canon relied on (AGENTS.md canon-first rule)."
+    }
+   ]
+  },
+  {
+   "id": "W6-RE-20",
+   "part": "PART-20",
+   "item": "ITEM-04",
+   "path": "docs/prompt_ecosystem_management/skill-identity-and-freeze.md",
+   "why": "CD-10: the repository records the 1.2.0 of record in the convention that owns 'Advertised identity must be unspent', beside the rounds 28/29 case of the same defect. Not the decision record: CD-10 is the coordinator's evidence-determined decision, not a Product Owner ruling (ecosystem-change-management.md §2 step 5). Alternatives in Q-W6-3.",
+   "edits": [
+    {
+     "old": "artifact_version: \"1.1\"",
+     "new": "artifact_version: \"1.2\"",
+     "count": 1
+    },
+    {
+     "old": "revised_date: 2026-10-12 — D28, a skill's name line reads the same quoted or plain",
+     "new": "revised_date: 2026-10-27 — the glow-merged-change-attribution-lock 1.2.0 of record (MB-005); 1.1, 2026-10-12: D28, a skill's name line reads the same quoted or plain",
+     "count": 1
+    },
+    {
+     "old": "Rounds 28 and 29 remain separable only by tree hash. That cannot be repaired — both are published\nand both carry `SKILL_REPAIR_REQUIRED`, so confusing them costs nothing — but it is the shape of the\ndamage, and it is permanent.\n",
+     "new": "Rounds 28 and 29 remain separable only by tree hash. That cannot be repaired — both are published\nand both carry `SKILL_REPAIR_REQUIRED`, so confusing them costs nothing — but it is the shape of the\ndamage, and it is permanent.\n\n**One revision, two trees: glow-merged-change-attribution-lock 1.2.0.** Recorded 2026-10-27 by\n`MODIFICATION-20261027-gcfpe-backlog-open-items` (MB-005). Two trees have advertised\n`MERGED_CHANGE_ATTRIBUTION_SKILL_REVISION: 1.2.0`: the installed tree, 10 files, freeze digest\n`c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f`, and an analysed tree, 11 files,\n`ee253cfaf844a5ce28da3646e469d3a926167ecb3898e5dc205b0365dc946a8e`, which is not held in this\nrepository or in the installed skills. **The installed 10-file tree is the 1.2.0 of record:** sessions\nload it, and qualification binds it by digest (DN-E E1, `MODIFICATION-20261011-gcfpe-mb008-to-promotion`).\nRevision 1.2.0 is spent on it. Any other content of this skill, the 11-file tree included, is delivered\nagain only under a revision that no package, verdict or install has used.\n",
+     "count": 1
+    }
+   ]
+  },
+  {
+   "id": "W6-RE-21",
+   "part": "PART-21",
+   "item": "ITEM-05",
+   "path": "docs/prompt_ecosystem_management/reviewer-prompt-template.md",
+   "why": "CD-11 (AGENTS.md canon-first rule: 'Record the PF titles and sections relied on in each artifact you produce'); wording converges on .claude/hooks/check_canon_relied_on.py's message. §3 and §5 and the rubric, cap and exit are untouched; §6 gains one sentence (L-B13, accepted).",
+   "edits": [
+    {
+     "old": "artifact_version: \"1.2\"",
+     "new": "artifact_version: \"1.3\"",
+     "count": 1
+    },
+    {
+     "old": "revised_date: 2026-09-24 — D26, a second template for ANALYZE and PLAN reviews (1.1, 2026-09-23: D24, delivered to reviewer subagents rather than pasted by Nathan)",
+     "new": "revised_date: 2026-10-27 — both briefs name AGENTS.md and ask for a Canon relied on block (MB-006); 1.2, 2026-09-24: D26, a second template for ANALYZE and PLAN reviews (1.1, 2026-09-23: D24, delivered to reviewer subagents rather than pasted by Nathan)",
+     "count": 1
+    },
+    {
+     "old": "Read <governing file, e.g. AGENTS.md> first. It governs.",
+     "new": "Read AGENTS.md first, and <any other governing file>. They govern.",
+     "count": 1
+    },
+    {
+     "old": "State which gates you actually ran and which you could not, plainly, rather than inferring a result.\n",
+     "new": "State which gates you actually ran and which you could not, plainly, rather than inferring a result.\nAdd a Canon relied on block: the PF titles, versions and sections, and the in-flight documents, you\nactually read for this review (AGENTS.md canon-first rule).\n",
+     "count": 1
+    },
+    {
+     "old": "read\ngcfpe.decision-record.md D20-D26, modification-template.md and ecosystem-change-management.md.",
+     "new": "read\nAGENTS.md (the canon-first rule), gcfpe.decision-record.md D20-D29, modification-template.md and\necosystem-change-management.md.",
+     "count": 1
+    },
+    {
+     "old": "a new defect), and the trend in the count.\n",
+     "new": "a new defect), and the trend in the count. Then a Canon relied on block: the PF titles, versions and\nsections, and the in-flight documents, you actually read for this review (AGENTS.md canon-first rule).\n",
+     "count": 1
+    }
+   ]
+  },
+  {
+   "id": "W6-RE-28",
+   "part": "PART-28",
+   "item": "ITEM-35",
+   "path": "docs/prompt_ecosystem_management/ecosystem-change-management.md",
+   "why": "ITEM-35 (DN-12 rider 3, J-12): §3 showed the pre-D29 token. The current token lives in authoritative-surfaces.md and D29; §3 points there and keeps the D29 value as a dated measurement, as it kept D23's.",
+   "edits": [
+    {
+     "old": "artifact_version: \"1.2\"",
+     "new": "artifact_version: \"1.3\"",
+     "count": 1
+    },
+    {
+     "old": "revised_date: 2026-09-24 — DISP-001 and §5 item 6: what resolves a finding (D26)",
+     "new": "revised_date: 2026-10-27 — §3, the graph proof token points to the release baseline (J-12); 1.2, 2026-09-24: DISP-001 and §5 item 6, what resolves a finding (D26)",
+     "count": 1
+    },
+    {
+     "old": "the token `55 nodes · 229 edges · 55 state_routes · 575,074 bytes · sha256 ae2bd159…`, as measured after `D23`, proves a rebuild matched.",
+     "new": "the current token, recorded in `authoritative-surfaces.md` (*Release baseline*), proves a rebuild matched; measured after `D29`, it was `55 nodes · 235 edges · 55 state_routes · 593,569 bytes · sha256 43f84f29…`.",
+     "count": 1
+    }
+   ]
+  }
+ ],
+ "registry_side": {
+  "G-PE-1..3": "Measured: the registry (project-prompt-contract-registry.md, GCFPE-PCR-20261009.1) has no PE row and no G-PE assertion; 0 hits for 'G-PE' and for 'PF10 2.1'. G-PE-1..3 exist only in the dated docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/plan/guards.json, which stays as written (AUTH-001). Their successors are W6's G-W6-PE-TS1..3, with the same patterns and the rule cited to PF04 v2.8.8 §9.1.3; PF10 v13.9 restarted its numbering, so 'PF10 2.1' now names S19 vendor and security policy (A-11). PART-24's registry build adds no PE row (PE is not a member).",
+  "registry_rows": "None. No W6 part changes a member's registry row."
+ },
+ "notion_control_ops": [
+  {
+   "id": "W6-HUB-1",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Current GCFPE prompt and artifact categories — 091426.1",
+   "start": "## Current GCFPE prompt and artifact categories — 091426.1",
+   "end": null,
+   "new": "## Historical GCFPE prompt and artifact categories — 091426.1\n\nPreserved as historical evidence. Superseded 2026-10-12 by the 100926.1 prompts; not a current locator, routing instruction, approval or source authority. The register's current selection and its selected prompts govern.",
+   "why": "DN-9: the four 091426.1 sections are marked historical with pointers to the 100926.1 prompts and the register; wording converges on the Hub's existing historical-section line."
+  },
+  {
+   "id": "W6-HUB-2",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Current GCFPE PF10 drafting and reference controls — 091426.1",
+   "start": "## Current GCFPE PF10 drafting and reference controls — 091426.1",
+   "end": null,
+   "new": "## Historical GCFPE PF10 drafting and reference controls — 091426.1\n\nPreserved as historical evidence. Superseded 2026-10-12 by the 100926.1 prompts; not a current locator, routing instruction, approval or source authority. The register's current selection and its selected prompts govern.",
+   "why": "DN-9, as W6-HUB-1."
+  },
+  {
+   "id": "W6-HUB-3",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Current GCFPE execution and transport boundary — 091426.1",
+   "start": "# Current GCFPE execution and transport boundary — 091426.1",
+   "end": null,
+   "new": "# Historical GCFPE execution and transport boundary — 091426.1\n\nPreserved as historical evidence. Superseded 2026-10-12 by the 100926.1 prompts; not a current locator, routing instruction, approval or source authority. The register's current selection and its selected prompts govern.",
+   "why": "DN-9, as W6-HUB-1. Its \"adds no model, surface, effort or eligibility appraisal\" conflicts with the TypeSafe reading PF04 §9.1.3 requires; marking it historical resolves the conflict MB-012 recorded."
+  },
+  {
+   "id": "W6-HUB-4",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Current GCFPE invocation and session continuity control — 091426.1",
+   "start": "# Current GCFPE invocation and session continuity control — 091426.1",
+   "end": null,
+   "new": "# Historical GCFPE invocation and session continuity control — 091426.1\n\nPreserved as historical evidence. Superseded 2026-10-12 by the 100926.1 prompts; not a current locator, routing instruction, approval or source authority. The register's current selection and its selected prompts govern.",
+   "why": "DN-9, as W6-HUB-1; the same TypeSafe conflict (\"No GCFPE model, reasoning ... appraisal or recommendation is performed\")."
+  },
+  {
+   "id": "W6-HUB-5",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Current selection — GCFPE-20261009.1 / 100926.1",
+   "start": "Sections on this page headed \"Current … — 091426.1\" were written for the predecessor",
+   "end": null,
+   "new": "Sections on this page headed \"Historical … — 091426.1\" were written for the predecessor",
+   "why": "The note names the headings W6-HUB-1..4 relabel; it stays true after them."
+  },
+  {
+   "id": "W6-HUB-6",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Preserved earlier prompt-storage policy — non-GCFPE scope; historical for GCFPE",
+   "start": "For GCFPE, the current <b>091426.1</b> prompt/artifact categories above are the controlling policy, together with",
+   "end": null,
+   "new": "For GCFPE, the prompt and artifact categories of the register's selected prompts are the controlling policy, together with",
+   "why": "MB-012 third line: it calls the 091426.1 categories current and controlling (D29).",
+   "span_has_markup": true
+  },
+  {
+   "id": "W6-HUB-7",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Mandatory PR and PF-document authority boundaries — Product Owner, 2026-09-05",
+   "start": "Nathan / Product Owner pastes an addendum into PF10 and allocates its number;",
+   "end": "gates on or asks about that paste.",
+   "new": "The agent that authors an addendum resolves its current continuous number and format before authoring it (<code>PF06-Canon-Change-Process-Guide</code> §0.1A). Nathan / Product Owner pastes it into PF10; from the next turn it is treated as already in PF10 and in force, and no agent tracks, verifies, confirms, gates on or asks about that paste.",
+   "why": "DN-9: the un-versioned PF10 reference-boundary paragraph restated to PF06 §0.1A (\"Resolve the current continuous addendum number and format before authoring\"); the paste and no-tracking rule (D8) are kept."
+  },
+  {
+   "id": "W6-HUB-8",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Mandatory PR and PF-document authority boundaries — Product Owner, 2026-09-05",
+   "start": "The drainage lifecycle is retired in the candidate ",
+   "end": null,
+   "new": "The drainage lifecycle is retired from ",
+   "why": "MB-012: the amendment note calls 091426.1 \"the candidate\" (D29)."
+  },
+  {
+   "id": "W6-HUB-9",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Mandatory PR and PF-document authority boundaries — Product Owner, 2026-09-05",
+   "start": "; blocks scoped to the selected release ",
+   "end": null,
+   "new": "; blocks scoped to the then-selected release ",
+   "why": "MB-012: the same note calls 091326.2 \"the selected release\"."
+  },
+  {
+   "id": "W6-HUB-10",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Mandatory PR and PF-document authority boundaries — Product Owner, 2026-09-05",
+   "start": "superseded for required GCFPE read-only source checks:",
+   "end": null,
+   "new": "superseded for required GCFPE read-only source checks, and for addendum numbering by <code>PF06-Canon-Change-Process-Guide</code> §0.1A:",
+   "why": "SCOPE-002: the historical 2026-09-05 quote (\"The Product Owner handles numbering\") is labelled by scope, not rewritten."
+  },
+  {
+   "id": "W6-HUB-11",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "PF Canon authority (callout)",
+   "start": "PF10 addenda remain standalone documents for Product Owner numbering and manual insertion.",
+   "end": null,
+   "new": "PF10 addenda remain standalone documents for the Product Owner's manual insertion; the agent that authors one resolves its current continuous number and format before authoring it (<code>PF06-Canon-Change-Process-Guide</code> §0.1A; <code>PF27-Canon-Plan-Templates</code> (<i>Canon precedence for template use</i>)).",
+   "why": "DN-9 recommended: workspace-wide text restated to PF06 §0.1A and PF27; PF06 makes no ecosystem exception."
+  },
+  {
+   "id": "W6-HUB-12",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "PF10 build-notes addendum format — canonical",
+   "start": "This canonical format governs every PF10 build-notes addendum an agent drafts. ",
+   "end": null,
+   "new": "",
+   "why": "DN-9 recommended: the section stops claiming to own the format; W6-HUB-16 states who does."
+  },
+  {
+   "id": "W6-HUB-13",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "PF10 build-notes addendum format — canonical",
+   "start": "in the candidate release ",
+   "end": null,
+   "new": "from the release ",
+   "why": "MB-012: the release-scope note calls 091426.1 \"the candidate release\" (D29)."
+  },
+  {
+   "id": "W6-HUB-14",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "PF10 build-notes addendum format — canonical",
+   "start": "scoped to the <b>selected</b> release ",
+   "end": null,
+   "new": "scoped to the earlier release ",
+   "why": "MB-012: the same note calls 091326.2 \"the selected release\".",
+   "span_has_markup": true
+  },
+  {
+   "id": "W6-HUB-15",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "PF10 build-notes addendum format — canonical",
+   "start": "do not apply them to the candidate, and do not edit them to match the candidate.",
+   "end": null,
+   "new": "do not apply them to a later release, and do not edit them to match one.",
+   "why": "MB-012: \"the candidate\" in the same note."
+  },
+  {
+   "id": "W6-HUB-16",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "PF10 build-notes addendum format — canonical",
+   "start": "This format is canonical for every PF10 build-notes addendum an agent drafts. It lives here rather than inside PF10, so it can change without a PF10 revision.",
+   "end": null,
+   "new": "Canon owns the format of every PF10 build-notes addendum an agent drafts: <code>PF06-Canon-Change-Process-Guide</code> §0.1A and <code>PF27-Canon-Plan-Templates</code> (<i>Canon precedence for template use</i>), in <code>docs/pfcanon/</code>. This section points to them; where it and they differ, they govern.",
+   "why": "DN-9 recommended: the numbering and format text is replaced by a pointer to PF06 §0.1A and PF27 (DERIV-001)."
+  },
+  {
+   "id": "W6-HUB-17",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "PF10 build-notes addendum format — canonical (Required shape)",
+   "start": "heading carrying the addendum title. No number — the paste assigns it. Refer to the addendum by title afterwards.",
+   "end": null,
+   "new": "heading with the next continuous number and a descriptive title, and only H3 or lower subordinate headings, as <code>PF06-Canon-Change-Process-Guide</code> §0.1A states.",
+   "why": "DN-9: the \"No number\" bullet contradicts PF06 §0.1A (\"one H2 with the next number and a descriptive title ... only H3 or lower subordinate headings\"); canon's sentence is used."
+  },
+  {
+   "id": "W6-HUB-18",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "PF10 build-notes addendum format — canonical (Required shape)",
+   "start": "- Nothing else.",
+   "end": null,
+   "new": "- Unique metadata when needed, as <code>PF06-Canon-Change-Process-Guide</code> §0.1A allows, and nothing else.",
+   "why": "PF06 §0.1A allows \"unique metadata when needed\"; \"Nothing else\" contradicts it and the producers' required addendum schema (findings V5a)."
+  },
+  {
+   "id": "W6-HUB-19",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "PF10 build-notes addendum format — canonical (Why)",
+   "start": "; the next turn confirms the reference is there and moves on.",
+   "end": null,
+   "new": ". A later turn reads current PF10 as part of its normal job, and nothing confirms the paste (<code>D8</code>).",
+   "why": "DN-9: D8 struck the confirmation step; the Why paragraph still described it."
+  },
+  {
+   "id": "W6-HUB-20",
+   "part": "PART-21",
+   "item": "ITEM-05",
+   "page_id": "3ce4590a05eb814f8892f88ff8539308",
+   "section": "Standard skill reviewer prompt — canonical template — 2026-09-21",
+   "start": "The identical text is in the repository at <code>docs/prompt_ecosystem_management/reviewer-prompt-template.md</code>, which is normative if the two ever differ.",
+   "end": null,
+   "new": "The normative text is the repository copy at <code>docs/prompt_ecosystem_management/reviewer-prompt-template.md</code>, which has changed since this copy was made; where the two differ, it governs.",
+   "why": "SCOPE-002 label for PART-21: after CD-11 the Hub copy is no longer identical (it already lacked the second template); the copy is labelled, not rewritten.",
+   "span_has_markup": true
+  },
+  {
+   "id": "W6-REG-1",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3d24590a05eb81ce942ad994cfca9fa1",
+   "section": "PF10 disposition and operational authority > Mandatory PR and PF-document authority boundaries",
+   "start": "requested direct mutation.\n\n<b>Current GCFPE PF10 reference boundary:</b> an authorized GCFPE source check reads the authoritative Markdown PF10 and applicable addenda as needed to establish status, base-plan overlay and lineage. That read-only check does not authorize numbering, inserting, editing, replacing or mirroring PF10. Nathan / Product Owner performs the manual drain.",
+   "end": null,
+   "new": "requested direct mutation.\n\n<b>Current GCFPE PF10 reference boundary:</b> an authorized GCFPE source check reads the authoritative Markdown PF10 and applicable addenda as needed to establish status, base-plan overlay and lineage. That read-only check does not authorize numbering, inserting, editing, replacing or mirroring PF10. The agent that authors an addendum resolves its current continuous number and format before authoring it (<code>PF06-Canon-Change-Process-Guide</code> §0.1A). Nathan / Product Owner pastes it into PF10; from the next turn it is treated as already in PF10 and in force, and no agent tracks, verifies, confirms, gates on or asks about that paste.",
+   "why": "DN-9: the register's copy of the PF10 reference-boundary paragraph restated to PF06 §0.1A; it still stated the retired manual drain (D6, D8).",
+   "span_has_markup": true
+  },
+  {
+   "id": "W6-REG-2",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3d24590a05eb81ce942ad994cfca9fa1",
+   "section": "Current source-reference policy — 100926.1",
+   "start": "Nathan performs the manual drain.\n\n## Historical source-reference policy — 091426.1",
+   "end": null,
+   "new": "The agent that authors an addendum resolves its current continuous number and format before authoring it (<code>PF06-Canon-Change-Process-Guide</code> §0.1A). Nathan / Product Owner pastes it into PF10; from the next turn it is treated as already in PF10 and in force, and no agent tracks, verifies, confirms, gates on or asks about that paste.\n\n## Historical source-reference policy — 091426.1",
+   "why": "SCOPE-001: the same paragraph's second copy on the register, in a current section, states the retired manual drain. Anchored on the following heading because the identical line recurs in the historical 091426.1 section.",
+   "span_has_markup": true
+  },
+  {
+   "id": "W6-REG-3",
+   "part": "PART-17",
+   "item": "ITEM-10",
+   "page_id": "3d24590a05eb81ce942ad994cfca9fa1",
+   "section": "PF10 disposition and operational authority",
+   "start": "superseded for required GCFPE read-only source checks:",
+   "end": null,
+   "new": "superseded for required GCFPE read-only source checks, and for addendum numbering by <code>PF06-Canon-Change-Process-Guide</code> §0.1A:",
+   "why": "SCOPE-002: as W6-HUB-10, the register's copy of the historical label."
+  },
+  {
+   "id": "W6-BIND-1",
+   "part": "PART-19",
+   "item": "ITEM-03",
+   "window": "PART-25 (promotion transaction; placed by W8)",
+   "page_id": "3d24590a05eb81ce942ad994cfca9fa1",
+   "section": "the new 'Current selection — GCFPE-20261027.1 / 102726.1' table that W8's REG-SEL writes (D29 precedent: activation-ops.json REG-SEL)",
+   "binding_cell": "operating procedure",
+   "new": "<code>docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md</code> (on <code>main</code> from PR #@PROCEDURE_PR) — a pointer that restates no rule; the sources it names govern. v5.0.0 is superseded (@ACTIVATION_DATE) and historical, and v4.0.0 (2026-09-23); do not execute either.",
+   "precondition": "W6-RE-19 is merged to main (its path resolves on main with the sha256 EXECUTE records); Nathan's exact promotion approval (DN-1 D2).",
+   "why": "CD-9 under Nathan's condition of 2026-10-27: 'move the register's procedure binding in the promotion transaction (PART-25), not before.' Wording converges on the 100926.1 row."
+  },
+  {
+   "id": "W6-BIND-2",
+   "part": "PART-19",
+   "item": "ITEM-03",
+   "window": "PART-25",
+   "page_id": "3d24590a05eb81ce942ad994cfca9fa1",
+   "section": "the new 'Current source-reference policy — 102726.1' that W8's REG-SRC writes",
+   "replaces_in_template": "<code>docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md</code> is this release's operating procedure (on <code>main</code> from PR #477); it restates no rule and points to where each lives.",
+   "new": "<code>docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md</code> is this release's operating procedure (on <code>main</code> from PR #@PROCEDURE_PR); it restates no rule and points to where each lives.",
+   "also": "the same section's closing 'v4.0.0 is superseded (2026-09-23) and historical.' becomes 'v5.0.0 is superseded (@ACTIVATION_DATE) and historical, and v4.0.0 (2026-09-23).', and its PF10 reference-boundary paragraph carries W6-REG-2's corrected text (copy the section from the register as it stands after PART-17).",
+   "why": "CD-9: the register's current sections bind the procedure in three places; all three move together inside the transaction."
+  },
+  {
+   "id": "W6-BIND-3",
+   "part": "PART-19",
+   "item": "ITEM-03",
+   "window": "PART-25",
+   "page_id": "3d24590a05eb81ce942ad994cfca9fa1",
+   "section": "the new 'Current GCFPE procedure and operator access — 102726.1' that W8's REG-PROC writes",
+   "replaces_in_template": "<code>docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md</code> is the GCFPE operating procedure (on <code>main</code> from PR #477): a pointer that restates no rule; the sources it names govern. v4.0.0 is superseded (2026-09-23) and historical.",
+   "new": "<code>docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md</code> is the GCFPE operating procedure (on <code>main</code> from PR #@PROCEDURE_PR): a pointer that restates no rule; the sources it names govern. v5.0.0 is superseded (@ACTIVATION_DATE) and historical, and v4.0.0 (2026-09-23).",
+   "why": "CD-9, as W6-BIND-2. The PE Metaprompt link in the same paragraph moves to the PE successor (W8's head binding)."
+  },
+  {
+   "id": "W6-BIND-4",
+   "part": "PART-19",
+   "item": "ITEM-03",
+   "window": "PART-25",
+   "page_id": "3db4590a05eb81de9736ea69bac61016",
+   "section": "Direct successor control bindings (Flow Index, updated in place at promotion; L-A13)",
+   "start": "The operating-procedure binding is v5.0.0, unchanged since 2026-09-23.",
+   "end": null,
+   "new": "The operating-procedure binding is v5.1.0 from @ACTIVATION_DATE; v5.0.0 is superseded and historical.",
+   "why": "The Flow Index mirrors the register's binding; leaving it would assert v5.0.0 after the register moved (authoritative-surfaces.md 'Restating is allowed; asserting is not')."
+  },
+  {
+   "id": "W6-BIND-5",
+   "part": "PART-19",
+   "item": "ITEM-03",
+   "window": "PART-25",
+   "page_id": "3db4590a05eb81de9736ea69bac61016",
+   "section": "Direct successor control bindings, row 'Operating procedure'",
+   "start": "| Operating procedure | <code>docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md</code> in <code>amthorn78/glow-hdengine-v2</code> (on <code>main</code> from PR #477) — a pointer that restates no rule; the sources it names govern.",
+   "end": null,
+   "span_has_markup": true,
+   "new": "| Operating procedure | <code>docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.1.0-20261027.md</code> in <code>amthorn78/glow-hdengine-v2</code> (on <code>main</code> from PR #@PROCEDURE_PR) — a pointer that restates no rule; the sources it names govern. ⛔ v5.0.0 (<code>docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md</code>) is <b>SUPERSEDED @ACTIVATION_DATE</b> and kept intact as historical evidence; do not execute it.",
+   "why": "As W6-BIND-4, the table row. W8 may fold W6-BIND-4/5 into its own Flow Index operation; the anchors were counted once each by reading the inline fetch of 2026-10-12T17:17:19.872Z (not by script)."
+  }
+ ],
+ "decisions": [
+  {
+   "id": "D-W6-1",
+   "decision": "PE successor frontmatter (selected_release, status, selection_rule, predecessor, activated_at, promotion_authorized, validation_status, validation_scope, source_modification) is left to the coordinator's head operations at creation and to W8's activation operations at promotion, as the 20261011 activation-ops.json frontmatter_rule did. W6 writes no frontmatter op.",
+   "authority": "Brief (coordinator writes head operations); D29 precedent; prompt-body-content-policy.md"
+  },
+  {
+   "id": "D-W6-2",
+   "decision": "CD-12's 'five repair-scoped passages' are read as: (1) 'For the approved 20260914 repair ...' in GCFPE authoring requirements; (2) the 'addendum-producer set for GCFPE-20260914.1' sentence; (3) the Publication, archival paragraphs ('For this repair', 'later cases', 'In this bounded repair'); (4) 'For this repair, read all 54 predecessor bodies'; (5) the Alpha baseline block 'For this repair, preserve exactly one operative Alpha baseline' with its yaml and the HDE-EPIC040 PR01-PR04 sentences. Each keeps its general rule and loses the repair scope.",
+   "authority": "MB-011 findings (V5a), §A.4 PART-14, CD-12; D18 successor (no Notion page restates Alpha state); D29"
+  },
+  {
+   "id": "D-W6-3",
+   "decision": "v5.1.0's rows 37 and 38 also gain C-TYPESAFE and a pointer to later §P wording, beyond CD-9's three named values, and its token is a pointer, not a literal. Leaving C-TYPESAFE out would make the successor stale on the day it is written (STALE-001, the rule CD-9 applies).",
+   "authority": "CD-9; STALE-001; DERIV-001; SCOPE-001 (same rule, same file)"
+  },
+  {
+   "id": "D-W6-4",
+   "decision": "v5.1.0 front matter reads release GCFPE-20261027.1 and status REGISTER_CONTROLLED with a selection_rule, not REGISTER_BOUND, because it is written before PART-25 binds it and must not assert the binding.",
+   "authority": "CD-9 under Nathan's condition; D17 'No page asserts its own selection'; authoritative-surfaces.md"
+  },
+  {
+   "id": "D-W6-5",
+   "decision": "CD-10's record goes into skill-identity-and-freeze.md, as a paragraph under 'Advertised identity must be unspent' beside the rounds 28/29 case, with artifact_version 1.1 -> 1.2.",
+   "authority": "CD-10; skill-identity-and-freeze.md (owns the unspent-identity rule); D19 (the digest is the identity); ecosystem-change-management.md §2 step 5"
+  },
+  {
+   "id": "D-W6-6",
+   "decision": "DN-9's 'pointer to PF06 §0.1A and PF27' replaces the Hub format section's ownership claim, its 'No number' bullet (with canon's own sentence), 'Nothing else' (PF06 allows unique metadata) and the Why paragraph's confirmation step (D8). The section heading '— canonical' and its other bullets (forbidden fields, pinned versions) stay: they agree with canon.",
+   "authority": "DN-9 recommended; PF06 §0.1A; PF27 Canon precedence for template use; D8; DERIV-001"
+  },
+  {
+   "id": "D-W6-7",
+   "decision": "The register's second current copy of the PF10 boundary ('Current source-reference policy — 100926.1', 'Nathan performs the manual drain.') is restated with the first (W6-REG-2). Historical-labelled copies on the Hub and register are left as written.",
+   "authority": "DN-9 ('the PF10 reference-boundary paragraph on the Hub and on the register restated'); SCOPE-001; SCOPE-002 for historical blocks"
+  },
+  {
+   "id": "D-W6-8",
+   "decision": "The historical 2026-09-05 addendum-request label on the Hub and register gains 'and for addendum numbering by PF06 §0.1A' (label, not rewrite).",
+   "authority": "SCOPE-002; DN-9"
+  },
+  {
+   "id": "D-W6-9",
+   "decision": "The Hub's copy of the reviewer template keeps its text and its 'identical text' claim is relabelled (W6-HUB-20, PART-21).",
+   "authority": "CD-11; SCOPE-002; Hub 'Where procedure lives' (the repository document is normative)"
+  },
+  {
+   "id": "D-W6-10",
+   "decision": "PE citations of canon use PE's own form, the full current title in code plus the section (PF04-Canon-HDE-Governance §9.1.3), as PE already cites PF06 and PF27; W1's skill rider uses 'PF04 §9.1.3, GCFPE model and reasoning-level guidance'. Both name the same section.",
+   "authority": "PF27 Canon precedence for template use ('current title and applicable section'); ecosystem-change-management.md §2 step 3 (converge on existing wording)"
+  }
+ ],
+ "questions": [
+  {
+   "id": "Q-W6-1",
+   "to": "coordinator (and W5)",
+   "question": "PE carries three PART-13 surfaces W5's ops do not cover: the QA-120 PASS route stated twice (Validation and completion; Prohibited routing) and 'the live oracle is its 46-row successor' (Skills and interoperability). W6 planned them as W6-PE-13a..c with guards G-W6-PE-13F/13R.",
+   "options": [
+    "(a) keep them as PART-13 ops on the PE successor, W5 confirming the wording",
+    "(b) move them to W5's file",
+    "(c) drop them; PE then tells authors the old route after promotion"
+   ],
+   "recommendation": "(a): one PE successor carries every PE change (CD-12), and leaving them splits PART-13's rule (SCOPE-001)."
+  },
+  {
+   "id": "Q-W6-2",
+   "to": "coordinator",
+   "question": "v5.1.0's graph token: pointer or literal?",
+   "options": [
+    "(a) pointer to authoritative-surfaces.md and the register (planned)",
+    "(b) the successor's literal token, filled by script from PART-24's build into a @SUCCESSOR_TOKEN placeholder before the file is written"
+   ],
+   "recommendation": "(a): the file binds at promotion and must stay true at every later rebuild; (b) repeats the defect MB-004 found."
+  },
+  {
+   "id": "Q-W6-3",
+   "to": "coordinator",
+   "question": "Where CD-10's 1.2.0 record lives.",
+   "options": [
+    "(a) skill-identity-and-freeze.md, beside the rounds 28/29 case (planned)",
+    "(b) a decision-record successor under D19 or D24",
+    "(c) a dated record in this Modification's evidence only"
+   ],
+   "recommendation": "(a): the convention owns 'Advertised identity must be unspent' and is what a packager reads before packaging; (c) would not be found again (§2 step 5), and (b) is for Nathan's rulings."
+  },
+  {
+   "id": "Q-W6-4",
+   "to": "Nathan, through the coordinator",
+   "question": "PE 'GCFPE bounded implementation phase labels' says C-VERSION applies 'from the release after 100926.1'; D23-G applied it from the release after 091426.1 (prompt-body-content-policy.md). It is a different defect from ITEM-09 and ITEM-34, so it is outside the frozen scope.",
+   "options": [
+    "(a) a rider on the PE successor: replace '(C-VERSION, <code>D23-G</code>, from the release after 100926.1)' with '(C-VERSION, <code>D23-G</code>)'",
+    "(b) record it on the backlog (template rule 3)"
+   ],
+   "recommendation": "(b) unless Nathan opts in, as DN-12 required for each rider; it is zero-cost under (a)."
+  },
+  {
+   "id": "Q-W6-5",
+   "to": "coordinator",
+   "question": "The Hub's 'Earlier PF10 drafting/reference controls — historical for GCFPE' keeps 'Leave the addendum number and its insertion into PF10 to the Product Owner', labelled historical only for GCFPE, so it reads as current elsewhere; PF06 §0.1A makes no ecosystem exception. DN-9's recommended option names only the canonical format section.",
+   "options": [
+    "(a) add a scope label to the section's first paragraph: 'Its addendum-numbering bullet is superseded everywhere by PF06 §0.1A.'",
+    "(b) leave it, with DN-8 (c)'s evidence that no non-GCFPE producer authors an addendum"
+   ],
+   "recommendation": "(a): it is the same rule on a workspace-wide surface (SCOPE-001), and a label is SCOPE-002's remedy; if the coordinator reads it as outside DN-9, (b) with a backlog row."
+  },
+  {
+   "id": "Q-W6-6",
+   "to": "coordinator (W8)",
+   "question": "Brief correction: the registry carries no PE guards, so 'G-PE-1..3 cite PF10 2.1' is not a registry-side change. Their successors are W6's G-W6-PE-TS1..3; should PART-24's qualification run them on the PE successor?",
+   "options": [
+    "(a) yes, with the other W6 PE guards",
+    "(b) no"
+   ],
+   "recommendation": "(a)."
+  }
+ ],
+ "dispositions": [
+  {
+   "item": "ITEM-09",
+   "planned_disposition": "APPLY (PART-14): W6-PE-14a..h on the PE successor; guards G-W6-PE-14F (8 -> 0), G-W6-PE-14L (3 -> 0), G-W6-PE-14R (0 -> 4)",
+   "evidence": "PE 100926.1 read whole, 2026-10-12T13:32:38.514Z; findings MB-011 and V5a"
+  },
+  {
+   "item": "ITEM-10",
+   "planned_disposition": "APPLY (PART-17): W6-HUB-1..19 and W6-REG-1..3; guards G-W6-HUB-F (13 -> 0), G-W6-HUB-RH (0 -> 4), G-W6-HUB-RN (0 -> 2), G-W6-HUB-RP (0 -> 2), G-W6-REG-F (4 -> 2, the historical copies), G-W6-REG-RN (0 -> 2)",
+   "evidence": "Hub as of 2026-10-27T03:02:37.191Z; register as of 2026-10-12T17:17:45.991Z; findings MB-012 and V5a"
+  },
+  {
+   "item": "ITEM-03",
+   "planned_disposition": "APPLY (PART-19): W6-RE-19 writes v5.1.0 in EXECUTE; W6-BIND-1..5 move the binding inside PART-25 (Nathan's CD-9 condition)",
+   "evidence": "v5.0.0 read whole; register lines 24, 508, 618 and Flow Index bindings bind v5.0.0; findings MB-004 and V5b"
+  },
+  {
+   "item": "ITEM-04",
+   "planned_disposition": "APPLY (PART-20): W6-RE-20, the 1.2.0 of record in skill-identity-and-freeze.md",
+   "evidence": "freeze.py on the installed tree: 10 c518ccb0…; DN-E E1 (MODIFICATION-20261011 §12); ee253cfa… named in 7 repository records, the tree absent here"
+  },
+  {
+   "item": "ITEM-05",
+   "planned_disposition": "APPLY (PART-21): W6-RE-21 (both briefs) and W6-HUB-20 (the Hub copy's label)",
+   "evidence": "reviewer-prompt-template.md read whole; findings MB-006 and V5b; CD-11; L-B13 accepted"
+  },
+  {
+   "item": "ITEM-36",
+   "planned_disposition": "APPLY (PART-26, PE half): W6-PE-26; guards G-W6-PE-26F (1 -> 0), G-W6-PE-26R (0 -> 1), G-W6-PE-TS1..3",
+   "evidence": "PE line 'Under current HDE Build Notes, the reading of the installed TypeSafe scoring skill ...'; PF04 v2.8.8 §9.1.3; PF10 v13.9 addendum 2.1 is S19"
+  },
+  {
+   "item": "ITEM-34",
+   "planned_disposition": "APPLY (PART-27): W6-PE-27a, W6-PE-27b; guards G-W6-PE-27F (2 -> 0), G-W6-PE-27R (0 -> 2)",
+   "evidence": "PE 'For the GCFPE-20261009.1 candidate, ...' and its '## GCFPE 100926.1 authoring requirements' heading; D29"
+  },
+  {
+   "item": "ITEM-35",
+   "planned_disposition": "APPLY (PART-28): W6-RE-28; guards G-W6-RE-28F (1 -> 0), G-W6-RE-28R (0 -> 1)",
+   "evidence": "ecosystem-change-management.md:144 shows ae2bd159…; authoritative-surfaces.md and D29 give 43f84f29…"
+  }
+ ],
+ "verification": {
+  "PART-14, PART-26 (PE half), PART-27": "EXECUTE fetches the PE successor fresh after its update_content calls and runs body_check.py's landed() logic for each W6-PE op (replacement present once, start and end anchors only where replacements carry them; for W6-PE-14g, the deletion: its start and end anchors occur 0 times and 'ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR' 0 times), then every W6 PE guard: forbidden G-W6-PE-14F, -14L, -27F, -26F, -TS1, -13F at 0; required G-W6-PE-14R 4, -27R 2, -26R 1, -TS2 1, -TS3 2, -13R 2. The old text is shown gone by the forbidden guards' 0 against their before-counts on the 100926.1 read (8, 3, 2, 1, 0, 3). The selected PE 100926.1 is re-read and shown unchanged (its last-edited value equal to 2026-10-12T13:32:38.514Z).",
+  "PART-17": "Fresh fetch of the Hub and the register after the writes; landed() per op; G-W6-HUB-F 0 (was 13), G-W6-HUB-RH 4, G-W6-HUB-RN 2, G-W6-HUB-RP 2; G-W6-REG-F 2 (was 4: only the two historical copies survive), G-W6-REG-RN 2. control_check.py (precedent) on both pages for retired literals.",
+  "PART-19": "After the PR that adds v5.1.0 merges: the file on main has the sha256 EXECUTE computes from content_from plus edits (in-memory build here: 5,376 bytes, sha256 0abe16d23d251e37061cfe82d7540eece19096c0c440afa45ba49ac0bfe066e9; EXECUTE recomputes and records its own), G-W6-RE-19F 0 (v5.0.0 copy before: 4), G-W6-RE-19R 2; v5.0.0 unchanged (git diff empty). Inside PART-25, after W6-BIND-1..5: the register's current selection row, current source-reference and current procedure sections name v5.1.0, and a line count of 'Operating-Procedure-v5.0.0-20260923.md</code> is this release' / 'is the GCFPE operating procedure' in sections headed 'Current' is 0; the Flow Index bindings row names v5.1.0. change-flow resolves the procedure through the register binding (SKILL.md:297): the resolved path exists on main.",
+  "PART-20": "grep on main: G-W6-RE-20R 1; 'c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f' and 'Revision 1.2.0 is spent on it' each once in skill-identity-and-freeze.md; freeze.py on the installed tree still prints 10 c518ccb0… (nothing installed changes).",
+  "PART-21": "grep on main: G-W6-RE-21F 0 (was 2: 'D20-D26', '<governing file, e.g. AGENTS.md>'), G-W6-RE-21R 4; §3 and §5 of the second template byte-identical to before (diff of the two fenced sections is empty). Hub: W6-HUB-20 landed; G-W6-HUB-F 0 covers 'identical text is in the repository'.",
+  "PART-28": "grep on main: G-W6-RE-28F 0 (was 1), G-W6-RE-28R 1; the D29 token string equals authoritative-surfaces.md's Graph proof token row."
+ },
+ "limits": [
+  "L-W6-1. The Hub (188,770 characters) and the register (104,990) were read in full in their in-scope sections and broad-matched by script across the whole page, not read line by line throughout; a stale-policy line that uses none of the matched terms could remain.",
+  "L-W6-2. The register and Flow Index reads are as of 2026-10-12; EXECUTE refuses an op if either page has moved, and re-anchors on a fresh read.",
+  "L-W6-3. W6-BIND-4/5's Flow Index anchors were counted by reading the inline fetch, not by script; W8 or EXECUTE counts them before writing.",
+  "L-W6-4. The analysed 11-file attribution-lock tree is not in this environment; W6-RE-20 records its digest only as the repository already records it.",
+  "L-W6-5. carried-forward-operating-rules.md:25 and operating-procedures/archive/README.md name v5.0.0 as what was read or what superseded earlier versions; both are provenance and stay as written.",
+  "L-W6-6. The in-memory guard counts use body_check.py's unit splitter on the fetch representation; update_content's representation may differ in escapes, which EXECUTE's fresh read settles.",
+  "Transient reads (D22): the PE, Hub and register fetches were saved by the harness in its tool-results store and read there in memory by scratch scripts in the scratchpad; no body text was written to a new file, nothing was hashed as a body's identity, and the harness saves are left to its teardown. This output holds anchors and replacement sentences only."
+ ],
+ "escape_hatch": [
+  {
+   "where": "PE 'GCFPE bounded implementation phase labels'",
+   "line": "(C-VERSION, <code>D23-G</code>, from the release after 100926.1)",
+   "issue": "wrong as history (D23-G applies from the release after 091426.1); outside ITEM-09/ITEM-34; see Q-W6-4"
+  },
+  {
+   "where": "PE 'GCFPE authoring requirements', last paragraph",
+   "line": "Every authored GCFPE body carries the canonical texts its registry row requires, in their final wording (EXECUTION-SPEC-20260923-...-v2.md §3, ...)",
+   "issue": "omits C-TYPESAFE and later Modifications' texts, the same staleness W6-RE-19 fixes in v5.1.0 rows 37-38; not repair-scoped, so not planned; candidate rider or backlog row"
+  },
+  {
+   "where": "PE 'Validation and completion' and 'Prohibited routing and protected authorities'; 'Skills and interoperability'",
+   "line": "QA-120 PASS routes verified EPIC to CL-E-10 ...; the live oracle is its 46-row successor",
+   "issue": "PART-13 surfaces W5 did not plan; planned here as W6-PE-13a..c pending Q-W6-1"
+  },
+  {
+   "where": "Hub 'Earlier PF10 drafting/reference controls — historical for GCFPE'",
+   "line": "Leave the addendum number and its insertion into PF10 to the Product Owner ...",
+   "issue": "see Q-W6-5"
+  },
+  {
+   "where": "Hub 'Historical GCFPE PF10 drafting and reference controls — 091326.2', the 091426.1 section W6-HUB-2 relabels, and the register's historical 091426.1 and 091326.2 source-reference sections",
+   "line": "'Nathan / Product Owner performs the manual drain.'",
+   "issue": "historical-labelled; left as written (SCOPE-002)"
+  },
+  {
+   "where": "flowmaster-validate scripts/validate_gcfpe_20261009.py:2530 and run_gcfpe_20261009_fixtures.py:320 (comments)",
+   "line": "'HDE Build Notes, the TypeSafe reading' / '(HDE Build Notes; PF04 §9.1.3)'",
+   "issue": "the same stale attribution as ITEM-33/ITEM-36, in code comments; flowmaster-validate is rebuilt in PART-24, so the package owner may correct them at no extra cost; no check reads them"
+  },
+  {
+   "where": "change-flow references/gcfpe-current-direct-handoff-contract.json control_manifest",
+   "line": "successor_pe_metaprompt 'PE Metaprompt 091326.2'; successor_operating_procedure v3.1.0",
+   "issue": "the file is the 20260913.1 contract under a 'current' file name (target_release GCFPE-20260913.1); the 100926.1 contracts carry no procedure or PE pin. Reported for PART-24's contract regeneration (A-6), not changed by W6"
+  },
+  {
+   "where": "Flow Index 'Native flow changes'",
+   "line": "QA-120 PASS routes verified EPIC to CL-E-10 and verified CRD to CL-C-10",
+   "issue": "PART-13 / L-A13 surface for W5/W8 at promotion"
+  }
+ ]
+}

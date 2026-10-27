@@ -1558,6 +1558,20 @@ Recorded by `MODIFICATION-20260923-closeout-residuals` (ITEM-36), whose analysis
 patterns, and `flowmaster-validate` gains fixtures for its check. Each fails on a label line
 injected past the eighth non-blank line, which the window let through.
 
+### Successor, 2026-10-27 — the R1 oracle gains the close-mutation-set stage (DN-2)
+
+**Product Owner, 2026-10-27**, approving §A of `MODIFICATION-20261027-gcfpe-backlog-open-items` "with the recommended options for DN-1, DN-2, …" and directing that "PLAN … records PART-13's R1 successor rows in the decision record (L-A14)". Under DN-2 (b), CL-05 — Prepare and Publish the Close Mutation Set is installed as class B, applying PF06 §3.5.1 *Close-mutation-set stage*, PF27 §3B and his direction of 2026-10-26 ("It needs to become PART of the change flow"); his approval of that analysis authorizes the R1 successor rows GCF-24 → the close stage → GCF-25. This entry records those rows and rules nothing new. D23's earlier successors are left as written (`AUTH-001`).
+
+- **A successor oracle, as Amendment 1 made one.** EXECUTE builds it: `glow-hde-canonical-change-flow-r1-20261027.json`, profile `GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20261027_1`, built by script from the historical oracle. It carries Amendment 1's three rows (GCF-14, GCF-17, GCF-17.LINEAGE) unchanged, so it supersedes the 2026-09-23 successor, which is kept as history. Its source matrix, `docs/prompt_ecosystem_management/r1-successor-source-20261027.md`, is written in the same EXECUTE, byte-identical to `flowmaster-validate`'s copy.
+- **Three rows change.**
+  - **GCF-24** (Kronos's final QA Report and RCA): `next` was `GCF-25` and is `GCF-24.CLOSE`.
+  - **GCF-24.CLOSE**, new, inserted after GCF-24, partition `MATERIAL_BRANCH_LOOP_OR_UTILITY`: the close-mutation-set stage. It consumes the change identity, the final QA Report and RCA, a `DO_NOT_CLOSE` closure decision on entry (b), the current repository and the applicable canon; it produces the close mutation set and the stage's result; its `next` is GCF-25. The Product Owner's invocation is the Proceed for the set and any close-tooling repair; the closure authority judges the result; he alone merges.
+  - **GCF-25** (Isis decides closure): `consumes` gains `close_mutation_set` and `close_mutation_set_result`; `next` gains `GCF-24.CLOSE`, first; its recovery owner names the close stage for a missing, incomplete or defective close mutation set, a close-tooling defect included.
+- **Coverage** is 47 rows: 26 core and 21 material. `R1_ROW_COVERAGE: 47/47` replaces `46/46`.
+- **Row digests, as measured by PLAN's build** (EXECUTE must reproduce them): GCF-24 `66d4c41e3992a28f5550e1fd12865ac7a127de291d34f6dd676acc07a9ad2215`; GCF-24.CLOSE `9c0f70693dc21f0cbaef27c7804e645f33858d30fc52b89ae57854f7e2177453`; GCF-25 `1b2ab0339aed2a04aff404864a1699605eb3904780c7e3b3ca25881c74ed5ee3`. Matrix `088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a` (7,705 B); oracle `f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d` (55,591 B); runtime map `4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add` (48,515 B).
+- **What it does not decide.** No PF canon changes. No Epic close-run family is admitted: an Epic close stops after its rehearsal until canon maintenance admits one (the Modification's A-7, a listed risk). No other R1 row changes.
+- **Guard (`D14`).** `flowmaster-validate` pins the six successor rows, their digests and the inserted row's position (FMV-ORACLE-019 to -022), and its Change fixtures gain a must-fail path GCF-24 → GCF-25 that skips the stage. The registry guards G-CL05-01 to G-CL05-14 hold the prompt side. Each is fired by an injected regression in the Modification's EXECUTE.
+
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
 **Product Owner, 2026-09-23:** *"It would be ideal if you could use sub agents to do the skill
@@ -1938,3 +1952,62 @@ promotion packet's §6 and the Modification's §E stay listed; none is resolved 
 `activation_render.py check` on every operation written; X18's production validation with the
 installed skills; and X22's rebuild of the parts and check of the registry from `main`. Each is in
 the Modification's evidence.
+
+## D30 — A Plan's acceptance never rests on emulating an external system; a PR instruction pins it or states a precondition
+
+**Product Owner, 2026-10-27**, approving §A of `MODIFICATION-20261027-gcfpe-backlog-open-items` in its PLAN
+invocation: *"DN-3: option (a) for ITEM-18; option (b) for ITEM-15 and ITEM-17, recorded as a
+decision-record ruling before execution."* The record quotes the whole approval in its §A.14.
+
+### What was wrong
+
+The backlog entries MB-016 and MB-017 come from HDE-CRD-0002's WU-PR-06, the `ci.yml` replay case. They ask
+that no acceptance criterion depend on emulating an external system, and that a PR instruction require a pin
+or a stated precondition for such a system instead. The rule was an HDE Build Notes rule that the drain of
+v13.8.8 recorded as out of target (the Modification's §A.13, L-A02), so no permanent canon carries it, and
+PF10 is now silent on it. PF06 §1.1.4's
+*Real input* bullet ("an input outside the real set receives one refusal or a stated limit, never a model of
+it") has the same intent, but its heading scopes it to review findings. No 100926.1 body states the rule: IA-30
+and PR-10 carry no emulation, pin, precondition or fidelity-target text (the Modification's `findings.md`,
+MB-016 and MB-017).
+
+### The rulings
+
+- **D30-A — IA-30 rejects an acceptance criterion that depends on emulating an external system, in both of its
+  reviews.**
+  - In `INITIAL_PLAN_REVIEW`, such a criterion is a ground for `INITIAL_DENY`.
+  - In `MATERIAL_PLAN_DELTA_REVIEW`, every acceptance criterion the delta adds or changes is checked, whether or
+    not the delta edits a work unit, and such a criterion is a ground for `DELTA_DENY`.
+  - The redline asks for a pin or a stated precondition instead.
+- **D30-B — PR-10 requires a pin or a stated precondition, never a fidelity target, for a unit that depends on an
+  external system.** It is part of PR-10's semantic readiness: no `INSTRUCTION_READY` without it.
+- **The terms, as the bodies apply them.**
+  - An *external system* is a system the change does not own, such as a vendor service or the hosted CI runner.
+  - A *pin* fixes the exact version, response or input the unit is built and tested against.
+  - A *stated precondition* says what must hold in the real system for the unit to work.
+  - A *fidelity target* promises that a model or replay matches the real system.
+
+These rulings are class A (`ecosystem-change-management.md` §2): canon is silent, so they rest on this entry,
+recorded before execution as Nathan required. ITEM-18, PR-20's real-input set, is not ruled here. It applies
+PF06 §1.1.4's *Real input* bullet by its words (DN-3 (a)) and is class B.
+
+### What it does not decide
+
+- **No canon changes.** A permanent canon home for the rule is canon maintenance, which is Nathan's. This entry
+  claims none.
+- **Review findings are untouched.** PF06 §1.1.4 governs them, as before.
+- **It does not forbid testing against the real system.** A stated precondition points to it. The open-rails
+  Live QA rules of PF27 and PF06 are unchanged.
+- **The author prompts are not changed for it.** IA-10, IA-20 and IA-40 meet it through IA-30's redline, and
+  PR-20 through the instruction PR-10 issues.
+- **The TW ecosystem is outside it.**
+
+### The tested guard (`D14`)
+
+The Modification's §P lists five guards, each with synthetic pass and fail fixtures:
+- required: `G-W2-EM-1` (IA-30 initial review), `G-W2-EM-2` (IA-30 delta review, by acceptance criterion) and
+  `G-W2-PIN-1` (PR-10);
+- forbidden: `G-W2-F4` (an acceptance criterion or instruction resting on emulating, replaying or modelling an
+  external system) and `G-W2-F5` (a fidelity target).
+Each is fired by an injected regression at the successor release's qualification (PART-24). **Until those land,
+`D30` is ruled but not applied.**
