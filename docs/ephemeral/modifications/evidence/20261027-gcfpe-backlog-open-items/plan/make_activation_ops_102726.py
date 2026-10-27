@@ -30,6 +30,12 @@ graph parts at render time.
             X1 records once (execute/controls-pr-102726.1.json) when it opens that pull request and X9 fills with
             --set @CONTROLS_PR=<number>. activation_render_102726.py refuses an unfilled marker (UNFILLED_MARKER).
 
+  AM-4      (EXECUTE, Nathan's decision after X9) the four multi-line frontmatter inserts, P1b-CAT-4, P1b-CAT-7,
+            P1c-PE-3 and P1c-PE-5, are written as the target page stores them: each line its own paragraph (a blank
+            line between lines). Notion stores lines sent with single line breaks as one paragraph joined by <br />
+            (X9, the 102726.1 catalog's frontmatter); the catalog and PE store each frontmatter line as its own
+            paragraph. Each must carry single line breaks before the repair and none after.
+
   make_activation_ops_102726.py build     write plan/activation-ops.json
   make_activation_ops_102726.py check     rebuild in memory and compare with the file on disk (exit 1 on drift)
   make_activation_ops_102726.py selftest  each C-22 check refuses its injected defect
@@ -140,6 +146,20 @@ def controls_pr_link(text: str) -> str:
     return text.replace(PR768, CONTROLS_PR)
 
 
+AM4_OPS = ("P1b-CAT-4", "P1b-CAT-7", "P1c-PE-3", "P1c-PE-5")
+SINGLE_BREAK = re.compile(r"(?<!\n)\n(?!\n)")
+
+
+def paragraph_form(o: dict) -> dict:
+    """AM-4: a multi-line frontmatter insert with each line its own paragraph; refused unless its lines are joined by
+    single line breaks only (so the repair is applied once, and only where it changes the stored form)."""
+    new = o["new"]
+    if not SINGLE_BREAK.search(new) or "\n\n" in new:
+        raise SystemExit(f"AM-4: {o['id']}: expected a replacement whose lines are joined by single line breaks only")
+    return {**o, "new": new.replace("\n", "\n\n"),
+            "why": (o.get("why") or "") + " AM-4: each inserted line its own paragraph, the target page's stored form."}
+
+
 def head_pe_text() -> str:
     edits = json.loads((HERE / "edits.json").read_text(encoding="utf-8"))
     return next(o for o in edits["ops"] if o["id"] == "HEAD-PE")["new"]
@@ -237,6 +257,14 @@ def build(head_pe: str | None = None) -> dict:
         raise SystemExit(f"C-22: expected W8's five P1c-PE ops, found {len(p1c)}")
     escaped = {o["id"]: o for o in pe_fetch_form(p1c, head_pe)}
     page("@PE_PAGE_ID")["ops"] = [escaped.get(o["id"], o) for o in pe_ops]
+    # AM-4: the four multi-line frontmatter inserts in paragraph form
+    found = 0
+    for key in ("@CATALOG_PAGE_ID", "@PE_PAGE_ID"):
+        ops = page(key)["ops"]
+        found += sum(o["id"] in AM4_OPS for o in ops)
+        page(key)["ops"] = [paragraph_form(o) if o["id"] in AM4_OPS else o for o in ops]
+    if found != len(AM4_OPS):
+        raise SystemExit(f"AM-4: expected the {len(AM4_OPS)} multi-line frontmatter inserts, found {found}")
 
     # D-W8-7 / CD-9: W6-BIND-1..3 carried verbatim in P2-REG-*; W6-BIND-4 folded into P1d-FI-BIND-P
     carried = []
@@ -392,6 +420,14 @@ def selftest() -> dict:
     rows["c26_creg_carries_controls_pr_marker"] = creg["new"].count("@CONTROLS_PR") == 2 and "#768" not in creg["new"]
     rows["c26_rejects_text_without_pr768_link"] = refused(lambda: controls_pr_link("Work record: x."))
     rows["c26_rejects_doubled_pr768_link"] = refused(lambda: controls_pr_link(PR768 + " " + PR768))
+    # AM-4: the four inserts carry each line as its own paragraph; a second repair, or a one-line op, is refused
+    built = build(head)["pages"]
+    am4 = [o for k in ("@CATALOG_PAGE_ID", "@PE_PAGE_ID") for o in built[k]["ops"] if o["id"] in AM4_OPS]
+    rows["am4_inserts_in_paragraph_form"] = (len(am4) == len(AM4_OPS)
+                                             and all("\n\n" in o["new"] and not SINGLE_BREAK.search(o["new"])
+                                                     for o in am4))
+    rows["am4_rejects_insert_already_in_paragraph_form"] = refused(lambda: paragraph_form(am4[0]))
+    rows["am4_rejects_one_line_insert"] = refused(lambda: paragraph_form({"id": "X", "new": "status: VALIDATED"}))
     return {"mode": "selftest", "rows": rows, "ok": all(rows.values())}
 
 

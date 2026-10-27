@@ -1149,3 +1149,34 @@ EXECUTE stops at X9, after the catalog's creation and before the six control wri
 - That is inside the 18–30 h and 16–26M re-price.
 
 **In one line, if you take the recommendations:** "AM-4 as described (option A); I merge #773 as the record pull request."
+
+### Nathan's decisions after X9 — 2026-10-27
+
+Nathan's words:
+
+> "AM-4 as described (option A), widened: write every remaining multi-line insert as the target page stores it, each line its own paragraph, in catalog_text, entry_text and the operations P1b-CAT-4, P1b-CAT-7, P1c-PE-3 and P1c-PE-5, with a self-test case each way. Then, before C-FI, rehearse both write forms on a real page: create one private draft page with the register entry's rendered text, apply one P1c-style multi-line insert to it, read it back, confirm it equals the plan's model, record the result in §E, and delete the draft page. If the rehearsal fails, stop and return before C-FI. I have merged #773 as the record pull request; continue on a branch restarted from main, in a new pull request."
+
+**Applied.**
+
+- **The record pull request.** #773 merged as `92956b7`, detected by files on `main` (D26-C): the X9 failure record and its receipts are on `main`, and `main`'s tree equals the branch's (`3103e376…`). The branch was restarted from `main` at `92956b7` and pushed. The run continues in a new pull request.
+- **Every remaining multi-line insert, inventoried first.** In memory, the chain from the candidate phase through the last (`sweep`) applies 258 operations, 79 listed and 179 generated. Only the four Nathan named join two plain lines with a single line break. The others that carry single breaks put them before table rows or list items, which Notion keeps as their own blocks: C-FI, C-FI-REV, P1d-FI-FLOW-ADD, P2-REG-SEL and the generated member rows.
+- **AM-4**, widened as directed, committed before any further Notion write.
+  - *[plan/make_activation_ops_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/make_activation_ops_102726.py).* A repair after C-22 and C-26: P1b-CAT-4, P1b-CAT-7, P1c-PE-3 and P1c-PE-5 carry each line as its own paragraph. Each must have single line breaks before the repair and none after. [plan/activation-ops.json](evidence/20261027-gcfpe-backlog-open-items/plan/activation-ops.json) was rebuilt by the generator; only those four operations' `new` and `why` changed. PE stores its frontmatter one line per paragraph (its read after X6), as does the 100926.1 catalog.
+  - *[plan/activation_render_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/activation_render_102726.py).*
+    - `catalog_text` and `entry_text` write each frontmatter line as its own paragraph.
+    - `as_fetched` models what X9 observed: frontmatter lines separated by blank lines stay paragraphs, and lines separated by single breaks are joined into one paragraph with `<br />`. On the X9 template it reproduces the real X9 read of the catalog exactly. On the AM-4 template its result is the old model, so X8b's chain still holds.
+    - `apply` refuses a replacement that joins two lines with a single break unless the second is a table row or a list item (`SINGLE_BREAK_JOIN`).
+  - *Self-tests, a case each way.*
+    - `make_activation_ops_102726.py selftest`: `ok`, 13 rows. `am4_inserts_in_paragraph_form`; a second repair, or a one-line operation, is refused.
+    - `activation_render_102726.py selftest`: `ok`, 36 of 36, on the real map and on the PLAN stand-in map. The seven AM-4 cases:
+      - the catalog's frontmatter is written as paragraphs and reads as 17 lines;
+      - written with single breaks, it is stored joined and fails `catalog_staging_ok`;
+      - the entry's frontmatter is written as paragraphs and reads back as its planned lines;
+      - written with single breaks, it reads as one line;
+      - the four inserts apply and each inserted line reads as its own frontmatter line, with P1's catalog check passing;
+      - a single-break insert is refused;
+      - table rows and list items may follow a single break.
+    - `control_check_102726.py selftest`: `ok`, 42 of 42, on both maps. `make_activation_ops_102726.py check`: current.
+  - *The chain after AM-4* ([execute/am4-chain-through-sweep-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/am4-chain-through-sweep-102726.1.json)): `plan --chain --standin-values --from-phase candidate --phase sweep`, read-only, on the real map and the newest reads of the 10 control pages, each pinned at that read. `ok`; 258 operations, 0 refused; PART-17's 24 read `LANDED`; after every phase every judged page passes with 0 findings (9, 9, 11, 11, 11, 11, 11, 11, 11 and 13 pages judged).
+- **The repair write, planned.** On the catalog's X9 read, the joined paragraph occurs once. Replacing it with its 17 segments separated by blank lines gives the modeled page exactly.
+- **The rehearsal before C-FI, Nathan's addition**, and the catalog repair: recorded below as X9a and X9b.

@@ -39,6 +39,13 @@ it is refused, so no stand-in value reaches a write. `plan --chain --from-phase 
 reads: every earlier phase's listed operation must read LANDED (it is not applied again), a page already holding a
 child-page block is not given a second, and --pin gives each page the revision just read.
 
+AM-4 (Nathan, 2026-10-27, after EXECUTE's X9 stop): Notion stores lines sent with single line breaks as one
+paragraph joined by <br /> (X9: the 102726.1 catalog's frontmatter). Every remaining multi-line insert is written as
+the target page stores it, each line its own paragraph: the catalog's and the register entry's frontmatter here, and
+P1b-CAT-4, P1b-CAT-7, P1c-PE-3 and P1c-PE-5 in activation-ops.json (make_activation_ops_102726.py). as_fetched models
+what X9 observed, and `apply` refuses a replacement that joins two lines with a single break unless the second is a
+table row or a list item, which Notion keeps as their own blocks (SINGLE_BREAK_JOIN).
+
 The successor map is the only source of successor ids, titles and dispositions (W7 successor_page_map); with a
 stand-in map the ids are binding_pass.probe() synthetic ids, so retired predecessors and successors stay distinct,
 and every report says stand_in: true. Control-page text is read as a transient read of this session's harness
@@ -233,6 +240,10 @@ def apply(text: str, ops: list, ctx: Ctx):
             row["markers"] = sorted(set(MARKER.findall(op["new"])))
             rows.append(row)
             continue
+        if single_break_join(op["new"]):   # AM-4
+            row["refusal"] = "SINGLE_BREAK_JOIN"
+            rows.append(row)
+            continue
         if op.get("append"):
             if occ(text, op["new"]) or occ(text, esc(op["new"])):
                 row["refusal"] = "APPEND_ALREADY_PRESENT"
@@ -345,7 +356,7 @@ def catalog_text(ctx: Ctx) -> str:
             body[-1] = body[-1] + "\n" + line
         else:
             body.append(line)
-    return ctx.fill("\n".join(blocks) + "\n" + "\n\n".join(body) + "\n")
+    return ctx.fill("\n\n".join(blocks) + "\n\n" + "\n\n".join(body) + "\n")   # AM-4: each frontmatter line its own paragraph
 
 
 def entry_text(ctx: Ctx) -> str:
@@ -356,8 +367,8 @@ def entry_text(ctx: Ctx) -> str:
             table.append(line)
         else:
             body.append(line)
-    return ctx.fill("---\n" + "\n".join(spec["frontmatter"]) + "\n---\n" + "\n\n".join(body) + "\n\n"
-                    + "\n".join(table) + "\n")
+    return ctx.fill("\n\n".join(["---", *spec["frontmatter"], "---"]) + "\n\n" + "\n\n".join(body) + "\n\n"
+                    + "\n".join(table) + "\n")   # AM-4: each frontmatter line its own paragraph
 
 
 def pe_head(ctx: Ctx) -> str:
@@ -368,14 +379,35 @@ def pe_head(ctx: Ctx) -> str:
 
 
 def as_fetched(content: str) -> str:
-    """How Notion's fetch renders a page written from `content`: frontmatter lines as paragraphs, underscores
-    outside code escaped (observed on the 100926.1 catalog the precedent created from unescaped text)."""
+    """How Notion's fetch renders a page written from `content`: underscores outside code escaped (observed on the
+    100926.1 catalog the precedent created from unescaped text); the frontmatter's dividers as their own blocks; its
+    lines separated by blank lines as paragraphs, and lines separated by single line breaks joined into one paragraph
+    with <br /> (AM-4: observed on the 102726.1 catalog at X9)."""
     lines = content.split("\n")
     if lines and lines[0] == "---":
         j = lines.index("---", 1)
-        fm = "\n\n".join(lines[: j + 1])
-        content = fm + "\n\n" + "\n".join(lines[j + 1:])
+        paras, cur = [], []
+        for line in lines[1:j] + [""]:
+            if line:
+                cur.append(line)
+            elif cur:
+                paras.append("<br />".join(cur))
+                cur = []
+        rest = lines[j + 1:]
+        while rest and rest[0] == "":
+            rest = rest[1:]
+        content = "\n\n".join(["---", *paras, "---"]) + "\n\n" + "\n".join(rest)
     return esc(content)
+
+
+LIST_ITEM = re.compile(r"^\s*(- |\* |\d+\. )")
+
+
+def single_break_join(new: str) -> bool:
+    """AM-4: True when `new` joins two lines with a single line break and the second is neither a table row nor a
+    list item. Notion stores such lines as one paragraph joined by <br />, not as they were sent (X9)."""
+    lines = (new or "").split("\n")
+    return any(a and b and not (b.lstrip().startswith("|") or LIST_ITEM.match(b)) for a, b in zip(lines, lines[1:]))
 
 
 # --- pins ------------------------------------------------------------------------------------------------------
@@ -729,6 +761,7 @@ def selftest(a) -> dict:
         "standin_values_refused_with_real_map_for_writes": _real_map_refuses(a),
         "standin_values_accepted_with_real_map_read_only": _real_map_read_only(a),
         **_am3_cases(ctx),
+        **_am4_cases(ctx),
         **_part17_cases(ctx),
         **_c26_cases(a),
     }
@@ -785,6 +818,56 @@ def _am3_cases(ctx: Ctx) -> dict:
             "am3_missing_replacement_not_landed": not landed(before, op, [op], ctx)
                                                   and not landed("<b>Superseded.</b>\n", op, [op], ctx),
             "am3_child_block_added_once": add_child(once, "e" * 32, "X") == once and once.count("<page url=") == 1}
+
+
+def _am4_cases(ctx: Ctx) -> dict:
+    """AM-4: the catalog's and the register entry's frontmatter, and the four multi-line inserts, are written with each
+    line its own paragraph and read back as lines; the single-break form is stored joined and fails, or is refused."""
+    def fm_block(text):
+        ls = text.split("\n")
+        j = ls.index("---", 1)
+        return ls[1:j]
+
+    def paragraphs_only(text):
+        block = fm_block(text)
+        return bool(block) and not any(x and y for x, y in zip(block, block[1:]))
+
+    def single_break(text):   # the X9 form: the same frontmatter lines with single line breaks
+        ls = text.split("\n")
+        j = ls.index("---", 1)
+        return "\n".join(["---", *[x for x in ls[1:j] if x], "---"] + ls[j + 1:])
+
+    def lines_of(text):
+        return [x for x in C.frontmatter_lines(text) if x and x != "---"]
+
+    cat, ent = catalog_text(ctx), entry_text(ctx)
+    title = OPS["new_pages"]["CATALOG"]["title"]
+    cat_joined = C.check_text("CATALOG", title, as_fetched(single_break(cat)), ctx.cc, "candidate")
+    want_entry = [C.unescape(ctx.fill(x)) for x in OPS["new_pages"]["REGISTER_ENTRY"]["frontmatter"]]
+    cat_ops = page_ops("@CATALOG_PAGE_ID", "activation")
+    t_cat, r_cat = apply(as_fetched(cat), cat_ops, ctx)
+    pe_ops = [o for o in page_ops("@PE_PAGE_ID", "activation") if o["id"] in ("P1c-PE-3", "P1c-PE-5")]
+    t_pe, r_pe = apply(pe_head(ctx), pe_ops, ctx)
+    inserted = [C.unescape(ctx.fill(x)) for o in cat_ops + pe_ops if o["id"] in
+                ("P1b-CAT-4", "P1b-CAT-7", "P1c-PE-3", "P1c-PE-5") for x in o["new"].split("\n\n")]
+    single = {"id": "S4", "start": "predecessor_release: GCFPE-20261009.1", "end": None,
+              "new": "activation_authority: Nathan / Product Owner\npredecessor_release: GCFPE-20261009.1"}
+    return {
+        "am4_catalog_frontmatter_written_as_paragraphs": paragraphs_only(cat) and len(lines_of(as_fetched(cat))) == 17,
+        "am4_catalog_single_break_frontmatter_stored_joined_fails": (
+            "<br />" in as_fetched(single_break(cat)) and not cat_joined["ok"]
+            and "catalog_staging_ok" in cat_joined["failed_checks"]),
+        "am4_entry_frontmatter_written_as_paragraphs": paragraphs_only(ent) and lines_of(as_fetched(ent)) == want_entry,
+        "am4_entry_single_break_frontmatter_not_read_as_lines": len(lines_of(as_fetched(single_break(ent)))) == 1,
+        "am4_paragraph_inserts_apply_and_read_as_lines": (
+            all(r["applied"] for r in r_cat + r_pe) and len(r_pe) == 2
+            and all(x in lines_of(t_cat) + lines_of(t_pe) for x in inserted)
+            and C.check_text("CATALOG", title, t_cat, ctx.cc, "activation")["ok"]),
+        "am4_single_break_insert_refused": apply(as_fetched(cat), [single], ctx)[1][0]["refusal"] == "SINGLE_BREAK_JOIN",
+        "am4_table_rows_and_list_items_may_follow_a_single_break": (
+            not single_break_join("| a | b |\n| c | d |") and not single_break_join("text.\n- <b>item</b>")
+            and not single_break_join("- a\n- b") and single_break_join("a: 1\nb: 2")),
+    }
 
 
 def _real_map_read_only(a) -> bool:
