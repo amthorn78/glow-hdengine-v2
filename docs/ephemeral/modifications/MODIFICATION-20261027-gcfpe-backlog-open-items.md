@@ -817,26 +817,26 @@ Because R-P1 and R-P2 are taken, neither goes on the backlog (C-14).
 | X7 | all body parts | VERIFIED | Fresh reads of the 56 successors and GCFPE-MGMT-10 by seven read-only workers after 13:24:41.758Z. `body_check.py check --successor-map <map> --with-conditional R-P1 R-P2` ([execute/landing-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/landing-check-102726.1.json), counts, ids and revisions only): on all 56 written pages `ok`, each revision moved from its map pin; 447 checked operations, every one `LANDED`; bindings current on all 57; 756 of 756 guard rows pass, so every forbidden guard finds no surviving old text (template rule 4, D26-E); `G-W7-BIND-1` and `G-W8-NAME-1` 0 on all 57 bodies and `G-W7-REL-1` 0 on its 56. GCFPE-MGMT-10 is the only row with `ok` false, and only on `revision_moved`: it is the KEPT member, with no operations, and the plan does not change it (PLAN §2), so its revision stays at its pin as it must. `body_check.py registry --audit-root <installed amthor-workspace-governance-audit>`: `ok`; 329 fixture rows and 756 page rows, the registry form agreeing on every row |
 | X8 | PART-17, 21 | VERIFIED after AM-3 | Fresh reads of the Hub and the register after 13:29:44.374Z: the Hub at `2026-10-27T03:02:37.191Z`, pinned at that read (`--pin`), and the register at its pin `2026-10-12T17:17:45.991Z`. `activation_render_102726.py plan --phase part17`: `ok`. On the Hub, 21 operations apply and none is refused, with its notion-control guards at W6's before-counts (`G-W6-HUB-F` 13, RH 0, RN 0, RP 0); on the register, 3 apply, with `G-W6-REG-F` 4 and RN 0. 13:30–13:31Z: one update_content per page, the register's 3 then the Hub's 21, each returning success with no warning. Fresh reads after 13:31:46.801Z: `activation_render_102726.py check --phase part17` `ok` false ([execute/x8-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8-check-102726.1.json)). Both revisions moved, and every guard is at W6's after-count (`G-W6-HUB-F` 0, RH 4, RN 2, RP 2; `G-W6-REG-F` 2, RN 2), with control `ok` and 0 findings on both. But only 22 of 24 operations read `LANDED`: `W6-REG-3` and `W6-HUB-10` hold their text in Notion's split-bold form (*Failure record — 2026-10-27, X8*). The register's *Current selection* is unchanged. First check: BLOCKED, as above; D26-B record and Nathan's decisions below. **After AM-3, VERIFIED** on the same reads ([execute/x8-check-am3-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8-check-am3-102726.1.json)): `ok`; the register 3 of 3 and the Hub 21 of 21 `LANDED`, both revisions moved, every guard at W6's after-count, control `ok` on both |
 | X8b | PART-24, 25 (Nathan's addition after X8) | VERIFIED | `activation_render_102726.py plan --chain --standin-values --from-phase candidate --phase register` (after AM-3), read-only, on the real successor map, the candidate parts in scratch, and fresh reads of the 11 control pages after 13:49:58.426Z, each pinned at the revision just read ([execute/x8b-chain-through-p2-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8b-chain-through-p2-102726.1.json)). Real values: `@CONTROLS_PR` 770 and `@PUBLICATION_DATE` 2026-10-27. The 15 values that exist only later (activation, promotion and archival dates, review verdicts, receipts, the production token) took the named stand-ins, as the report lists. `ok` true: 10 of 10 pages at their pins, and the 100926.1 catalog at its read-only pin. Earlier phases: PART-17's 3 register and 21 Hub operations read `LANDED` and were not applied again. Then each phase applied in memory, in order: C3 (`candidate`) 7 pages (the register, the Flow Index, the five hubs); C4 (`review`) the Flow Index; P1 (`activation`) the Flow Index 92, Change Flow 32, IA 33, QA 24, Escalation 16, TW 14, the Alpha checklist 10, the new catalog 8 and PE 5; P1's entry step (`activation-done`) the new register entry 1; P2 (`register`) the register 6. In all 249 operations (70 listed, 179 generated), 0 refused. After every phase, every judged page passed its control rules with 0 findings (9, 9, 11, 11, 11 pages judged). The new catalog renders 56 rows with no marker left; the register entry has no marker left; the 57 P5 moves equal the archive set. Limit: an in-memory chain cannot reproduce Notion's storage forms, such as AM-3's split bold, so each write's own readback check still decides |
-| X9 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X10 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X11 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X12 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X13 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X14 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X15 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X16 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X17 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X18 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X19 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X20 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X21 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X22 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X23 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X24 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X25 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X26 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X27 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
-| X28 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X9 | PART-24 | BLOCKED | 13:54Z: the catalog (C-CAT), one `notion-create-pages` call under the Flow Index, sent once, from `activation_render_102726.py plan --phase candidate --emit`'s catalog text (56 rows, 0 markers left): `4064590a05eb8113ae7de73041631c00`, titled "Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1", recorded once in [execute/notion-controls-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/notion-controls-102726.1.json). Fresh reads of the catalog, the Flow Index, the register and the five hubs after 13:56:52.690Z. `plan --phase candidate` with `@CATALOG_PAGE_ID` filled and each page pinned at that read (the Flow Index at `2026-10-27T13:54:13.135Z`, moved by the catalog's child-page block): `ok`, 7 of 7 pages, one operation each, none refused ([execute/x9-plan-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-plan-102726.1.json)); nothing was emitted or sent. `control_check_102726.py check --phase candidate --catalog <id>`, run before the control writes ([execute/x9-precheck-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-precheck-102726.1.json)): the catalog's title is right and it links all 56 members at the map's ids, but `catalog_staging_ok` is false, because Notion stored the catalog's 17 frontmatter lines as one paragraph (*Failure record — 2026-10-27, X9*). C-FI, the five C-HUB notes and C-REG were not sent |
+| X10 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X11 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X12 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X13 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X14 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X15 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X16 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X17 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X18 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X19 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X20 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X21 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X22 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X23 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X24 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X25 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X26 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X27 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
+| X28 | — | NOT_RUN | the stop at X9 (*Failure record — 2026-10-27, X9*) |
 
 ### Failure record — 2026-10-27, X2 (D26-B)
 
@@ -867,6 +867,8 @@ EXECUTE stops at X2. The plan's normal path cannot be executed mechanically on a
 - **X2, a narrower launch than intended.** The first launch for the remaining duplications was given only two rows (CF-C-20 and CF-E-40) instead of all 53. Both were duplicated once and retitled. The relaunch read its 51 rows from a file and excluded those two, so no source was duplicated twice. `write_successor_map_102726.py rows` refuses any prompt with more or fewer than one duplication.
 - **X2, two helpers and the readiness test.** `execute/x2_partial_map_102726.py` builds the scratch map for Nathan's three-page check; it refuses any path in the repository. `execute/write_successor_map_102726.py` writes the map once. `page_facts_102726.py` tests a duplicate's readiness by line count and first line, not character count, because Notion's remap changes a duplicate's length.
 - **X6a, a payload in a scratch file.** CF-C-30's payload was written once to a scratch temp file for one command, then deleted at once. The plan's rule is that payloads travel on stdout only (D22); nothing was committed, and later payloads are read from stdout. The batch helper `payload_102726.py` gained a `--max-chars` fallback, which sends a payload too large for a worker's tool output to show in full as ordered chunks, one call each.
+- **X9, the catalog check run before the control writes.** The plan runs `control_check_102726.py --phase candidate` after C-FI, the hub notes and C-REG. It was also run, read-only, on the catalog's first read, before them, so that no control page would link to a catalog failing its own check.
+- **X9, a diagnostic helper and one terminal view.** `execute/x9_catalog_probe_102726.py` compares the real catalog read with the page the plan models for it and runs the candidate and P1 catalog checks on both, in memory; it prints counts, booleans and check names only. Before it existed, the catalog's first 16 lines were printed once in the terminal, cut at 160 characters, to see the stored form. The catalog is a control page this Modification created, not a member body, and nothing was written to disk.
 
 ### Return to Nathan — 2026-10-27, after X2
 
@@ -1093,3 +1095,57 @@ Nathan's words:
     - `make_activation_ops_102726.py check`: the operations file is current and unchanged.
 - **X8 rerun** on the same post-write reads: `ok` (the X8 row above).
 - **The chain through P2 before X9, Nathan's addition.** Its result is recorded below as X8b, before X9's first write.
+
+### Failure record — 2026-10-27, X9 (D26-B)
+
+EXECUTE stops at X9, after the catalog's creation and before the six control writes. The catalog holds every planned line, but Notion stored its 17 frontmatter lines as one paragraph, so X9's catalog check cannot pass, and P1's catalog check would fail the same way. D26-B applies.
+
+- **What was done.** 13:54Z: the catalog (C-CAT), one `notion-create-pages` call under the Flow Index, sent once: `4064590a05eb8113ae7de73041631c00`. Its id is recorded once in [execute/notion-controls-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/notion-controls-102726.1.json).
+- **What failed.** `control_check_102726.py check --phase candidate --catalog <id>` on the catalog's fresh read after 13:56:52.690Z ([execute/x9-precheck-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-precheck-102726.1.json)).
+  - The catalog's title is right, and it links all 56 members at the map's ids (0 missing).
+  - `catalog_staging_ok` is false: the check does not find "status: UNSELECTED_CANDIDATE", "promotion_authorized: false" or a `candidate_release:` line among the frontmatter lines.
+  - The page's other failures are the expected ones before the control writes: no candidate section yet on the Flow Index and the five hubs, no candidate record on the register, and the Alpha checklist not read.
+- **The cause.**
+  - `catalog_text` writes the frontmatter with single line breaks between its lines. Notion stored them as one paragraph joined by `<br />` soft breaks: `---`, the joined paragraph, `---`.
+  - The plan models each frontmatter line as its own paragraph (`as_fetched`). That is the 100926.1 catalog's form: 43 frontmatter lines, none joined. The check reads the frontmatter line by line.
+  - The content is right ([execute/x9-catalog-probe-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x9-catalog-probe-102726.1.json)): the joined paragraph's 17 segments equal the 17 planned lines, and everything after the frontmatter equals the modeled page.
+- **It reaches P1.** In memory on the real read, P1's 8 catalog operations all apply, but P1's catalog check (`catalog_selected_ok`, "status: REGISTER_CONTROLLED" as a frontmatter line) fails the same way. On the modeled page both checks pass, which is why X8b passed.
+- **Why it blocks.** X9's verification requires that check to pass, and it cannot while the catalog's frontmatter is joined, whatever the control writes do. Sending them first would link six control pages to a catalog that fails its own check, so they were not sent.
+- **Read-only sweep.**
+  - The catalog, the Flow Index, the register and the five hubs were read after the catalog's creation (above). The register and the hubs are at the revisions X8 and X6 left. The Flow Index moved only by the catalog's child-page block (as of 13:54:13.135Z), and the catalog is at its creation (13:54:13.282Z).
+  - Nothing was written to the 56 successors or GCFPE-MGMT-10 after X7's reads, or to the Glow Operations Hub after X8's.
+- **What is live.**
+  - Notion: X8's state, plus the catalog as a child page of the Flow Index. No candidate section, candidate record or selection change.
+  - Repository: this branch, in draft [amthorn78/glow-hdengine-v2#773](https://github.com/amthorn78/glow-hdengine-v2/pull/773).
+  - Skills: nothing built or installed.
+- **The freeze is kept.** No Notion write follows until Nathan decides.
+- **The record reaches `main`** when #773 merges (D21-C).
+
+### Return to Nathan — 2026-10-27, after X9
+
+**EXECUTE stopped at X9, after creating the catalog and before the six control writes. The catalog holds every planned line, but Notion stored its 17 frontmatter lines as one paragraph, so its staging check fails now and its selection check would fail at P1. `DECISION NEEDED`.**
+
+| # | Question | Recommendation |
+|---|---|---|
+| 1 | How the catalog's frontmatter is repaired | amendment AM-4, below |
+| 2 | The record pull request | mark #773 ready and merge it as the record pull request |
+
+**1. The repair.** The catalog's checks read its frontmatter one line at a time. The plan wrote those lines with single line breaks, and Notion joined them into one paragraph. If nothing changes, X9's check fails now and P1's check fails after promotion approval.
+- **Option A, AM-4 (recommended).** Store the catalog's frontmatter in the form the plan models, then resume X9 at C-FI.
+  - *One Notion write.* One update_content on the catalog replaces the joined paragraph with the same 17 lines as separate paragraphs. Its payload is printed on stdout from the read and the plan's catalog text, and sent once.
+  - *The template.* In `plan/activation_render_102726.py`, `catalog_text` and `entry_text` write frontmatter lines as separate paragraphs, so the register entry created at P1 is stored the same way, and `as_fetched` models that result. A self-test case each way: the written frontmatter reads as lines, and a joined paragraph still fails the check.
+  - *Verified before C-FI.* On a fresh read the catalog equals the modeled page exactly, and the probe's candidate and P1 checks pass on it. The real catalog is then the page X8b's chain validated through P2.
+  - Cost: about 30 minutes and under 0.3M tokens.
+- **Option B: a read fold.** `frontmatter_lines` splits a `<br />` paragraph into lines. No Notion write. But two of P1's catalog operations (P1b-CAT-4 and P1b-CAT-7) insert new lines, which would land inside the joined paragraph in a form no read or chain has seen. That unknown would surface only after promotion approval.
+- **Option C: the plan's rollback for a wrong catalog.** Move this catalog to the archive and create a new one from a corrected template. That is two writes and a new catalog id, and the template change in option A is still needed.
+
+**2. Record pull request.** Draft #773 carries AM-3, the X8b chain and this record.
+- **Mark it ready and merge it now (recommended).** The run continues on this branch, restarted from `main`, in a new pull request.
+- **Keep it open.** The X9 record stays off `main` until it merges.
+
+**Spend in EXECUTE so far.**
+- **Time:** about 2 h 50 min, 11:20Z to 14:10Z.
+- **Tokens:** about 8.2M of subagent tokens, plus the coordinator's. Since the X8 return, the X8b and X9 reads added about 0.4M.
+- That is inside the 18–30 h and 16–26M re-price.
+
+**In one line, if you take the recommendations:** "AM-4 as described (option A); I merge #773 as the record pull request."

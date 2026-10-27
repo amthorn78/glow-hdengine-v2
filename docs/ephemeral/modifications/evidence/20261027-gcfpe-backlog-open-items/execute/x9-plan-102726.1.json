@@ -1,0 +1,159 @@
+{
+ "mode": "plan",
+ "phase": "candidate",
+ "stand_in": false,
+ "stand_in_ids": null,
+ "stand_in_marker_values": [],
+ "map_parts_errors": [],
+ "pages": [
+  {
+   "page": "3d24590a05eb81ce942ad994cfca9fa1",
+   "id": "3d24590a05eb81ce942ad994cfca9fa1",
+   "name": "register",
+   "as_of": "2026-10-27T13:31:04.126Z",
+   "revision_matches_pin": true,
+   "prior_not_landed": [],
+   "ops_listed": 1,
+   "ops_generated": 0,
+   "applied": 1,
+   "refused": [],
+   "control": {
+    "ok": true,
+    "judged": true,
+    "findings": 0,
+    "failed_checks": [],
+    "finding_sections": []
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb81de9736ea69bac61016",
+   "id": "3db4590a05eb81de9736ea69bac61016",
+   "name": "Flow Index",
+   "as_of": "2026-10-27T13:54:13.135Z",
+   "revision_matches_pin": true,
+   "prior_not_landed": [],
+   "ops_listed": 1,
+   "ops_generated": 0,
+   "applied": 1,
+   "refused": [],
+   "control": {
+    "ok": true,
+    "judged": true,
+    "findings": 0,
+    "failed_checks": [],
+    "finding_sections": []
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "name": "hub HDE Change Flow",
+   "as_of": "2026-10-27T13:22:27.779Z",
+   "revision_matches_pin": true,
+   "prior_not_landed": [],
+   "ops_listed": 1,
+   "ops_generated": 0,
+   "applied": 1,
+   "refused": [],
+   "control": {
+    "ok": true,
+    "judged": true,
+    "findings": 0,
+    "failed_checks": [],
+    "finding_sections": []
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "name": "hub HDE IA",
+   "as_of": "2026-10-27T13:22:09.622Z",
+   "revision_matches_pin": true,
+   "prior_not_landed": [],
+   "ops_listed": 1,
+   "ops_generated": 0,
+   "applied": 1,
+   "refused": [],
+   "control": {
+    "ok": true,
+    "judged": true,
+    "findings": 0,
+    "failed_checks": [],
+    "finding_sections": []
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb814d96d3dcfa8835f96d",
+   "id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "name": "hub HDE QA",
+   "as_of": "2026-10-27T13:21:17.380Z",
+   "revision_matches_pin": true,
+   "prior_not_landed": [],
+   "ops_listed": 1,
+   "ops_generated": 0,
+   "applied": 1,
+   "refused": [],
+   "control": {
+    "ok": true,
+    "judged": true,
+    "findings": 0,
+    "failed_checks": [],
+    "finding_sections": []
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb81cd938de84cfffead9c",
+   "id": "3db4590a05eb81cd938de84cfffead9c",
+   "name": "hub Escalation",
+   "as_of": "2026-10-27T13:11:05.410Z",
+   "revision_matches_pin": true,
+   "prior_not_landed": [],
+   "ops_listed": 1,
+   "ops_generated": 0,
+   "applied": 1,
+   "refused": [],
+   "control": {
+    "ok": true,
+    "judged": true,
+    "findings": 0,
+    "failed_checks": [],
+    "finding_sections": []
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb811b9c14f2ae89c28df7",
+   "id": "3db4590a05eb811b9c14f2ae89c28df7",
+   "name": "hub HDE TW",
+   "as_of": "2026-10-27T13:11:38.789Z",
+   "revision_matches_pin": true,
+   "prior_not_landed": [],
+   "ops_listed": 1,
+   "ops_generated": 0,
+   "applied": 1,
+   "refused": [],
+   "control": {
+    "ok": true,
+    "judged": true,
+    "findings": 0,
+    "failed_checks": [],
+    "finding_sections": []
+   },
+   "ok": true
+  }
+ ],
+ "new_pages": {
+  "CATALOG": {
+   "markers_left": 0,
+   "ok": true,
+   "parent": "3db4590a05eb81de9736ea69bac61016"
+  }
+ },
+ "ok": true,
+ "d22": "transient reads of this session's harness records; control pages only; counts, ids and booleans"
+}

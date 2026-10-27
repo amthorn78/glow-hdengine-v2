@@ -1,0 +1,133 @@
+{
+ "mode": "check",
+ "phase": "candidate",
+ "register_pending": false,
+ "stand_in": false,
+ "archive_set_102726": 57,
+ "archive_set_091426": 57,
+ "pages": [
+  {
+   "page": "3d24590a05eb81ce942ad994cfca9fa1",
+   "phase": "candidate",
+   "judged_as": "candidate",
+   "candidate_record_once": false,
+   "current_selection_ok": true,
+   "title_ok": true,
+   "findings": 0,
+   "finding_rows": [],
+   "failed_checks": [
+    "candidate_record_once"
+   ],
+   "ok": false,
+   "as_of": "2026-10-27T13:31:04.126Z"
+  },
+  {
+   "page": "3db4590a05eb81de9736ea69bac61016",
+   "phase": "candidate",
+   "judged_as": "candidate",
+   "candidate_section_once": false,
+   "title_ok": true,
+   "findings": 0,
+   "finding_rows": [],
+   "failed_checks": [
+    "candidate_section_once"
+   ],
+   "ok": false,
+   "as_of": "2026-10-27T13:54:13.135Z"
+  },
+  {
+   "page": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "phase": "candidate",
+   "judged_as": "candidate",
+   "candidate_section_once": false,
+   "title_ok": true,
+   "findings": 0,
+   "finding_rows": [],
+   "failed_checks": [
+    "candidate_section_once"
+   ],
+   "ok": false,
+   "as_of": "2026-10-27T13:22:27.779Z"
+  },
+  {
+   "page": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "phase": "candidate",
+   "judged_as": "candidate",
+   "candidate_section_once": false,
+   "title_ok": true,
+   "findings": 0,
+   "finding_rows": [],
+   "failed_checks": [
+    "candidate_section_once"
+   ],
+   "ok": false,
+   "as_of": "2026-10-27T13:22:09.622Z"
+  },
+  {
+   "page": "3db4590a05eb814d96d3dcfa8835f96d",
+   "phase": "candidate",
+   "judged_as": "candidate",
+   "candidate_section_once": false,
+   "title_ok": true,
+   "findings": 0,
+   "finding_rows": [],
+   "failed_checks": [
+    "candidate_section_once"
+   ],
+   "ok": false,
+   "as_of": "2026-10-27T13:21:17.380Z"
+  },
+  {
+   "page": "3db4590a05eb81cd938de84cfffead9c",
+   "phase": "candidate",
+   "judged_as": "candidate",
+   "candidate_section_once": false,
+   "title_ok": true,
+   "findings": 0,
+   "finding_rows": [],
+   "failed_checks": [
+    "candidate_section_once"
+   ],
+   "ok": false,
+   "as_of": "2026-10-27T13:11:05.410Z"
+  },
+  {
+   "page": "3db4590a05eb811b9c14f2ae89c28df7",
+   "phase": "candidate",
+   "judged_as": "candidate",
+   "candidate_section_once": false,
+   "title_ok": true,
+   "findings": 0,
+   "finding_rows": [],
+   "failed_checks": [
+    "candidate_section_once"
+   ],
+   "ok": false,
+   "as_of": "2026-10-27T13:11:38.789Z"
+  },
+  {
+   "page": "3db4590a05eb812f87caed515836687f",
+   "error": "NO_FETCH_FOUND",
+   "ok": false
+  },
+  {
+   "page": "4064590a05eb8113ae7de73041631c00",
+   "phase": "candidate",
+   "judged_as": "candidate",
+   "catalog_staging_ok": false,
+   "catalog_members_missing": 0,
+   "title_ok": true,
+   "findings": 0,
+   "finding_rows": [],
+   "failed_checks": [
+    "catalog_staging_ok"
+   ],
+   "ok": false,
+   "as_of": "2026-10-27T13:54:13.282Z"
+  }
+ ],
+ "findings_total": 0,
+ "failed_checks_total": 9,
+ "ok": false,
+ "d22": "transient reads of this session's harness records; counts, ids and headings only"
+}

@@ -1,0 +1,31 @@
+{
+ "receipt": "X9 (C3): the candidate records of GCFPE-20261027.1 / 102726.1, recorded once",
+ "stand_in": false,
+ "values": {
+  "@CATALOG_PAGE_ID": "4064590a05eb8113ae7de73041631c00",
+  "@CONTROLS_PR": "770",
+  "@PUBLICATION_DATE": "2026-10-27"
+ },
+ "catalog": {
+  "op": "C-CAT",
+  "page_id": "4064590a05eb8113ae7de73041631c00",
+  "title": "Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1",
+  "parent": "3db4590a05eb81de9736ea69bac61016",
+  "created_by": "notion-create-pages, sent once",
+  "created_at": "2026-10-27T13:54Z",
+  "revision_at_first_read": "2026-10-27T13:54:13.282Z",
+  "first_read_after": "2026-10-27T13:56:52.690Z",
+  "check": "catalog_staging_ok false: frontmatter stored as one <br />-joined paragraph (X9 failure record)"
+ },
+ "controls": {},
+ "controls_note": "C-FI, C-HUB-CF, C-HUB-IA, C-HUB-QA, C-HUB-ESC, C-HUB-TW and C-REG not sent: the stop at X9",
+ "pins_at_x9_plan": {
+  "3d24590a05eb81ce942ad994cfca9fa1": "2026-10-27T13:31:04.126Z",
+  "3db4590a05eb81de9736ea69bac61016": "2026-10-27T13:54:13.135Z",
+  "3db4590a05eb81d59059eb6b95ed5fcf": "2026-10-27T13:22:27.779Z",
+  "3db4590a05eb8195a2ccf7c0959a8b6e": "2026-10-27T13:22:09.622Z",
+  "3db4590a05eb814d96d3dcfa8835f96d": "2026-10-27T13:21:17.380Z",
+  "3db4590a05eb81cd938de84cfffead9c": "2026-10-27T13:11:05.410Z",
+  "3db4590a05eb811b9c14f2ae89c28df7": "2026-10-27T13:11:38.789Z"
+ }
+}
