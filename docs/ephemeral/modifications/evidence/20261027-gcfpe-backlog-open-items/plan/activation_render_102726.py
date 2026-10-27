@@ -59,6 +59,11 @@ AM-7 (X9b rehearsal, under Nathan's rule 2): update_content does not match a <br
 it, so X9's catalog repair is one replace_content whose new_str is the catalog's AM-4 template (catalog_text), the
 plan's own text for the page; catalog_repair_payload() refuses unless the read is exactly the page C-CAT created
 (as_fetched of the X9 template), so nothing else on the page is replaced.
+AM-9 (Nathan, 2026-10-27, after X18: "AM-9 as proposed, outside rule 4's count"): landed() counted a start anchor
+once per replacement the page carries up to the phase, so an operation anchored inside an earlier operation's
+replacement (C-FI-REV inside C-FI; P1d-FI-CAND-H and the five P1e-*-CAND) was expected twice where the page holds it
+once. It now counts the anchor in the operation's own replacement and in the other replacements still on the page
+whole, each once; no written content changes.
 
 The successor map is the only source of successor ids, titles and dispositions (W7 successor_page_map); with a
 stand-in map the ids are binding_pass.probe() synthetic ids, so retired predecessors and successors stay distinct,
@@ -296,12 +301,15 @@ def apply(text: str, ops: list, ctx: Ctx, page_id: str | None = None):
 def landed(text: str, op: dict, page_ops: list, ctx: Ctx) -> bool:
     """LANDED: the start anchor occurs only inside the replacements this page carries, and the replacement is
     present (a deletion: the anchor gone). Raw and escaped forms are counted together, on the page as read after
-    AM-3's fold of Notion's split bold."""
+    AM-3's fold of Notion's split bold. AM-9: the anchor is counted only in the operation's own replacement and in
+    the other replacements still on the page whole, each once."""
     text = C.fold(text)
     new = C.fold(ctx.fill(op["new"]) or "")
     if op.get("append"):
         return occ(text, new) + occ(text, esc(new)) >= 1
     news = [C.fold(ctx.fill(o["new"]) or "") for o in page_ops]
+    news = [x for x in news if x and x != new and (occ(text, x) + (occ(text, esc(x)) if esc(x) != x else 0)) >= 1]
+    news = list(dict.fromkeys(news)) + ([new] if new else [])
     s, wl = op["start"], op.get("whole_line", False)
     n_text = occ(text, s, wl) + (occ(text, esc(s), wl) if esc(s) != s else 0)
     n_want = sum(occ(x, s, wl) + (occ(x, esc(s), wl) if esc(s) != s else 0) for x in news)
@@ -850,6 +858,7 @@ def selftest(a) -> dict:
         **_am4_cases(ctx),
         **_am5_cases(ctx),
         **_am6_am7_cases(ctx),
+        **_am9_cases(ctx),
         **_part17_cases(ctx),
         **_c26_cases(a),
     }
@@ -1019,6 +1028,22 @@ def _am6_am7_cases(ctx: Ctx) -> dict:
         "am7_repair_refused_on_any_other_read": (
             refused(lambda: catalog_repair_payload(created.replace("56", "55", 1), ctx))
             and refused(lambda: catalog_repair_payload(as_fetched(catalog_text(ctx)), ctx))),
+    }
+
+
+def _am9_cases(ctx: Ctx) -> dict:
+    """AM-9: an operation anchored inside an earlier one's replacement is landed (X18: C-FI-REV inside C-FI); a
+    missing replacement, a leftover anchor and an unapplied operation are not."""
+    a = {"id": "A", "start": "alpha beta.", "end": None, "new": "intro alpha beta. gamma"}
+    b = {"id": "B", "start": "alpha beta.", "end": None, "new": "alpha beta.\n- delta"}
+    base = "head\nalpha beta.\ntail\n"
+    t_a = base.replace("alpha beta.", a["new"])
+    t_ab = t_a.replace("alpha beta.", b["new"])
+    return {
+        "am9_op_inside_earlier_replacement_landed": landed(t_ab, b, [a, b], ctx) and landed(t_a, a, [a], ctx),
+        "am9_missing_replacement_not_landed": not landed(t_a, b, [a, b], ctx),
+        "am9_leftover_anchor_not_landed": not landed(t_ab + "alpha beta.\n", b, [a, b], ctx),
+        "am9_unapplied_op_not_landed": not landed(base, a, [a], ctx),
     }
 
 

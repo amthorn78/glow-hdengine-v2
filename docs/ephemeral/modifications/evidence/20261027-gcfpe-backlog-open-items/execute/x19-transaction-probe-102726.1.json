@@ -1,0 +1,198 @@
+{
+ "am10": {
+  "ok": true,
+  "phases": [
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "activation",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "activation-done",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "register",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "register-done",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "install-done",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "prodval-done",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "archived",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "sweep",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   }
+  ]
+ },
+ "am10_negatives": {
+  "earlier_op_landed_after_later_op_changed_it": true,
+  "earlier_op_landed_before_later_op": true,
+  "earlier_op_missing_not_landed": true,
+  "foreign_edit_inside_replacement_not_landed": true,
+  "later_op_landed": true,
+  "leftover_anchor_not_landed": true,
+  "unrelated_change_not_landed": true
+ },
+ "am10_selftest_real_map": {
+  "cases": 53,
+  "failing": [],
+  "ok": true,
+  "passed": 53
+ },
+ "am10_selftest_standin_map": {
+  "cases": 53,
+  "failing": [],
+  "ok": true,
+  "passed": 53
+ },
+ "am9": {
+  "ok": false,
+  "phases": [
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": false,
+    "phase": "activation",
+    "plan_prior_not_landed": {
+     "Flow Index": [
+      "C-FI"
+     ]
+    },
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "activation-done",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "register",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "register-done",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "install-done",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "prodval-done",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": false,
+    "phase": "archived",
+    "plan_prior_not_landed": {
+     "Flow Index": [
+      "C-FI"
+     ]
+    },
+    "refused": {}
+   },
+   {
+    "check_not_landed": {},
+    "control_failing": {},
+    "ok": true,
+    "phase": "sweep",
+    "plan_prior_not_landed": {},
+    "refused": {}
+   }
+  ]
+ },
+ "am9_on_the_same_negatives": {
+  "earlier_op_landed_after_later_op_changed_it": false,
+  "earlier_op_landed_before_later_op": true,
+  "earlier_op_missing_not_landed": true,
+  "foreign_edit_inside_replacement_not_landed": true,
+  "later_op_landed": true,
+  "leftover_anchor_not_landed": true,
+  "unrelated_change_not_landed": true
+ },
+ "as_of": {
+  "3c74590a05eb811d8433e7022629e213": "2026-10-12T17:34:33.909Z",
+  "3ce4590a05eb814f8892f88ff8539308": "2026-10-27T14:22:01.528Z",
+  "3d24590a05eb81ce942ad994cfca9fa1": "2026-10-27T15:35:32.914Z",
+  "3db4590a05eb811b9c14f2ae89c28df7": "2026-10-27T15:35:23.456Z",
+  "3db4590a05eb812f87caed515836687f": "2026-10-12T13:37:58.821Z",
+  "3db4590a05eb814d96d3dcfa8835f96d": "2026-10-27T15:35:17.895Z",
+  "3db4590a05eb8195a2ccf7c0959a8b6e": "2026-10-27T15:35:15.062Z",
+  "3db4590a05eb81cd938de84cfffead9c": "2026-10-27T15:35:20.690Z",
+  "3db4590a05eb81d59059eb6b95ed5fcf": "2026-10-27T15:35:12.051Z",
+  "3db4590a05eb81de9736ea69bac61016": "2026-10-27T22:40:18.010Z",
+  "@CATALOG_PAGE_ID": "2026-10-27T15:33:12.290Z",
+  "@PE_PAGE_ID": "2026-10-27T13:09:24.084Z"
+ },
+ "fetched_after": "2026-10-27T22:40:38.875Z",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "ok_am10": true,
+ "ops_file_sha256": "a3d9a42db0cee9b916ecb70ac32abf4c6dbf39caaf1c26f6f60d0807ad33cab7",
+ "record_type": "GCFPE_102726_X19_TRANSACTION_PROBE",
+ "renderer_sha256": "ab95561f75224d4ad1365e01f615a3d704b07fd8d2d67257020fe60c0c02351d"
+}

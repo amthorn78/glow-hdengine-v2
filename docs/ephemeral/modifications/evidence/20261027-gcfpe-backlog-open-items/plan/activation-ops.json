@@ -573,6 +573,17 @@
      "why": "the candidate section becomes a dated record (ALPHA-FB precedent)"
     },
     {
+     "id": "P1d-FI-PFB-W4",
+     "phase": "activation",
+     "source": "opt-in PF-B W-4 (Nathan, promotion approval)",
+     "part": "PART-25",
+     "item": "ITEM-32",
+     "start": "qualification pending: the graph build, the registry, the validators over every member, the D24 package review and the independent post-flight.",
+     "end": null,
+     "new": "qualification complete: the graph build, the registry, the validators over every member, the D24 package review and the independent post-flight.",
+     "why": "PF-B W-4: the qualification C-FI recorded as pending is complete (the packet, X18); P1(d) makes the section historical, so the record keeps the true state."
+    },
+    {
      "id": "P5-FI-DISP",
      "phase": "archived",
      "source": "W8",
@@ -1146,8 +1157,8 @@
      "item": "ITEM-32",
      "start": "## Current selection — GCFPE-20261009.1 / 100926.1",
      "end": null,
-     "new": "## Current selection — GCFPE-20261027.1 / 102726.1\n\n<b>Selected GCFPE contract:</b> <code>GCFPE-20261027.1</code> / <code>102726.1</code>, exactly <b>56 members</b>: @SUCCESSOR_COUNT successor pages at <code>102726.1</code>, the new member <code>CL-05</code>, and <code>GCFPE-MGMT-10</code> unchanged at <code>100926.1</code>. Selected @ACTIVATION_DATE by Product Owner approval (<code>@PROMOTION_D</code>); the register selects it from @REGISTER_SELECTED_AT.\n\n<b>Selection is resolved only from</b> [GCFPE Membership and Release Register](https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1). No catalog, index, hub or prompt asserts its own selection.\n\nMembership: [Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1](https://app.notion.com/p/@CATALOG_PAGE_ID). Index: [Glow HDE Prompt Flow Index — GCFPE-20261027.1 — 102726.1](https://app.notion.com/p/3db4590a05eb81de9736ea69bac61016). Management: [GCFPE-MGMT-10 — 100926.1](https://app.notion.com/p/3f74590a05eb81b69bd8c27106f7a59d). Authoring: [PE Metaprompt 102726.1](https://app.notion.com/p/@PE_PAGE_ID).\n\n<b>Archival:</b> the @ARCHIVED_COUNT superseded pages — the changed members' <code>100926.1</code> pages, PE Metaprompt 100926.1, the <code>100926.1</code> catalog and the CL-05 candidate page — were <b>moved</b> intact to <i>04 Archived Prompt Versions</i> on @ARCHIVAL_DATE. Record: <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>.\n\n<b>Sections on this page headed \"Historical … — 091426.1\" were written for the predecessor</b> and are kept as written; where they differ from the selected 102726.1 prompts or the register, those govern.\n\n## Historical selection — GCFPE-20261009.1 / 100926.1",
-     "why": "authoritative-surfaces.md \"Restating is allowed; asserting is not\" and the sweep rule; W6 left the Hub's selection section to W8 and runs PART-17 first (W6-HUB-5 stays in the old section, now historical; its sentence is carried, at 102726.1)"
+     "new": "## Current selection — GCFPE-20261027.1 / 102726.1\n\n<b>Selected GCFPE contract:</b> <code>GCFPE-20261027.1</code> / <code>102726.1</code>, exactly <b>56 members</b>: @SUCCESSOR_COUNT successor pages at <code>102726.1</code>, the new member <code>CL-05</code>, and <code>GCFPE-MGMT-10</code> unchanged at <code>100926.1</code>. Selected @ACTIVATION_DATE by Product Owner approval (<code>@PROMOTION_D</code>); the register selects it from @REGISTER_SELECTED_AT.\n\n<b>Selection is resolved only from</b> [GCFPE Membership and Release Register](https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1). No catalog, index, hub or prompt asserts its own selection.\n\nMembership: [Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1](https://app.notion.com/p/@CATALOG_PAGE_ID). Index: [Glow HDE Prompt Flow Index — GCFPE-20261027.1 — 102726.1](https://app.notion.com/p/3db4590a05eb81de9736ea69bac61016). Management: [GCFPE-MGMT-10 — 100926.1](https://app.notion.com/p/3f74590a05eb81b69bd8c27106f7a59d). Authoring: [PE Metaprompt 102726.1](https://app.notion.com/p/@PE_PAGE_ID).\n\n<b>Archival:</b> the @ARCHIVED_COUNT superseded pages — the changed members' <code>100926.1</code> pages, PE Metaprompt 100926.1, the <code>100926.1</code> catalog and the CL-05 candidate page — were <b>moved</b> intact to <i>04 Archived Prompt Versions</i> on @ARCHIVAL_DATE. Record: <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>.\n\n<b>Sections on this page headed \"Historical …\" were written for earlier releases</b> and are kept as written; where they differ from the selected 102726.1 prompts or the register, those govern.\n\n## Historical selection — GCFPE-20261009.1 / 100926.1",
+     "why": "authoritative-surfaces.md \"Restating is allowed; asserting is not\" and the sweep rule; W6 left the Hub's selection section to W8 and runs PART-17 first (W6-HUB-5 stays in the old section, now historical; its sentence is carried, at 102726.1) PF-A F-4 (Nathan, promotion approval): the historical sections were written for earlier releases, not for one predecessor."
     },
     {
      "id": "P6-HUB-FIND",
