@@ -1,0 +1,1469 @@
+{
+ "worker": "W1",
+ "parts": [
+  "PART-01",
+  "PART-02",
+  "PART-06",
+  "PART-08",
+  "PART-26 (skill half: ITEM-33)"
+ ],
+ "canon_read": [
+  {
+   "title": "PF10-HDE-Build-Notes",
+   "version": "v13.9",
+   "sections": "Front matter: Purpose; Precedence §1 PF10 authority, §2 Scope within an individual PF10 document, §8 Silence rule; §1.1 Addendum Index; addendum 2.1 heading and its D-1 to D-5 headings",
+   "use": "Silent on PR review finding disposition, the Codex security review, PR-40 entry and DOC-20 routing: its only addendum, 2.1, is S19 vendor and security policy (it mentions HDE-CRD-0002's code security review only as the origin of the S19 findings). Permanent canon governs (§8). No older PF10 and no PF10 git history was read."
+  },
+  {
+   "title": "PF06-Canon-Change-Process-Guide",
+   "version": "v2.5.5",
+   "sections": "§1.1.4 Live QA mechanical evidence expectations, read in full, including *PR review finding disposition (every pull request; real inputs only)*: Real input; Findings below P1; P1 findings; The one P1 exception; Repeated finding class; Unchanged duty",
+   "use": "The rule PART-01 applies (ITEM-11, ITEM-12, ITEM-23), in canon's sentences, with L-A06's security-decline and unchanged-duty sentences. 'not merge-ready' grounds CD-3's PR-40 check."
+  },
+  {
+   "title": "PF27-Canon-Plan-Templates",
+   "version": "v2.0.6",
+   "sections": "Review guardrails > *Source-bound review authority and exact-fix limits*, read in full, including *Finding disposition on real inputs*, *P1 findings* and *Repeated finding class (pull-request review)*",
+   "use": "Same rule; its plain modal form ('is fixed', 'is not declined', 'may be declined') is used for the P1 sentences in prompt bodies and skills."
+  },
+  {
+   "title": "PF04-Canon-HDE-Governance",
+   "version": "v2.8.8",
+   "sections": "§9.7.7 Plan approval gate (anti-thrash; token scope disciplined), read in full, including *Business case for every requirement and work unit*, *No cost ceiling* and *Gates*; §9.1.3 *GCFPE model and reasoning-level guidance* paragraph and its bullets (for ITEM-33's citation target)",
+   "use": "CD-14: 'A work unit whose business case is met stops; further work on it needs a new business case', placed on PR-35's correction loop. CD-15: no ceiling, and 'Spend, elapsed time and the number of sessions, review rounds or pushes are not, by themselves, a reason to stop work'. ITEM-33: the TypeSafe rule's permanent home is §9.1.3."
+  }
+ ],
+ "rulings_read": [
+  "D22 (with its refinements and statuses)",
+  "D23 A to G; Correction 2026-09-23 (D23-F names GCF-17.LINEAGE); Clarification 2026-09-23 (no subagents, no automatic sessions); Successor Amendment 1; Successor 'PR-40 is entered once per merge (D23-E)'; Successor D23-G reaches PE; Successor C-LAT; Successor release-line check",
+  "CD-1, CD-2, CD-3, CD-4, CD-14, CD-15; listed findings L-A06, L-A07, L-A08, L-A20",
+  "Nathan's direction of 2026-10-13, as recorded in docs/ephemeral/HDE-CRD-0002-PF10-build-notes-addendum-codex-security-review-deprecation-v1.0.md (read for CD-4 only; it is an ephemeral record, not PF10)"
+ ],
+ "fresh_reads": [
+  {
+   "prompt_or_page": "PR-35",
+   "page_id": "3f44590a05eb811ebf72e949b7b1572e",
+   "as_of": "2026-10-12T02:30:15.569Z",
+   "fetched": "2026-10-27"
+  },
+  {
+   "prompt_or_page": "RS-40",
+   "page_id": "3f44590a05eb813993beccaaf88523d4",
+   "as_of": "2026-10-12T02:30:54.130Z",
+   "fetched": "2026-10-27"
+  },
+  {
+   "prompt_or_page": "PR-40",
+   "page_id": "3f44590a05eb81088487e918fd642a7f",
+   "as_of": "2026-10-12T02:29:38.234Z",
+   "fetched": "2026-10-27"
+  },
+  {
+   "prompt_or_page": "PR-20",
+   "page_id": "3f44590a05eb819fbea5dcd966a750ba",
+   "as_of": "2026-10-12T02:29:47.327Z",
+   "fetched": "2026-10-27"
+  },
+  {
+   "prompt_or_page": "DOC-20",
+   "page_id": "3f44590a05eb81d8a582eec0e93e6ee7",
+   "as_of": "2026-10-12T02:29:19.255Z",
+   "fetched": "2026-10-27"
+  }
+ ],
+ "canonical_texts": {
+  "FDR_LEAD": "These rules govern every review finding on this pull request, from the automated code review or from a person.",
+  "FDR_BULLETS": [
+   "- Real input. A finding's triggering input is real when it exists on main or in an approved work unit's planned deliverable; occurs in the product's real operating environment, such as the deployed services, the hosted CI runner, the operator's shell or the vendor's responses; or can be supplied by a user, a vendor or an attacker through an interface the product exposes. An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding; an input outside the real set receives one refusal or a stated limit, never a model of it.",
+   "- Findings below P1. A finding is fixed when it shows a wrong result, a crash or a guarantee breach on a real input. Otherwise, the reply on the thread gives the traced path and the stated limit, and the thread is resolved. Declining a security finding goes to the Product Owner first. A blanket instruction to fix every finding on a pull request is read under this rule. The standing default is to fix only a wrong result on a real input, or a breach of a read-only or no-secrets guarantee; a snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself, or code it runs in the checkout, can make.",
+   "- P1 findings. A P1 finding is a review finding labelled P1 or any higher priority, such as P0; the priority is the label the reviewer gives. A P1 finding whose triggering input is real is fixed. It is not declined, deferred to a later change, recorded as a stated limit, or resolved on cost, effort, design preference, a plan's earlier choice, an ADR's stated limit or a \"not worth its code\" judgement. Fixed means that the wrong result, crash or guarantee breach the finding reports no longer occurs on that real input, shown by a test that fails without the fix; a typed refusal of the input is a fix when refusing it is correct behavior for the product. The thread stays open until the fix is pushed and the finding's own check of it is answered. A pull request with an open P1 thread on a real input is not merge-ready.",
+   "- The one P1 exception. A P1 finding may be declined only when its triggering input is not real, so that the input is one constructed only to exercise the code. The reply on the thread gives the traced path and shows why the input can never occur in the product. Declining a P1 goes to the Product Owner first, and the thread is resolved only after that.",
+   "- Repeated finding class. When two consecutive review rounds on one pull request raise findings of the same class, meaning the same component or contract, stop fixing instances and ask the Product Owner one design question: narrow the design, accept a stated limit, or rescope. For a P1 on a real input, accepting a stated limit is not an option: the answer is a fix, a narrowed design that removes the wrong result (a typed refusal included), or a rescope through the native route, and the P1 is resolved before the pull request merges. This is a design trigger by finding class. It is not a push count, a pause threshold or a CI-budget control. Ask the question in this session and continue on the answer: work a narrowed design or a stated limit here, and take a rescope through the formal rescope route.",
+   "- Unchanged duty. Nothing in these rules weakens the existing duty to fix a real defect at any priority."
+  ],
+  "STOP": "A work unit whose business case is met stops; further work on it needs a new business case. Record such work as a candidate for its owner, and do not do it here.",
+  "note": "Plain text, no Notion markup, so a fresh fetch reproduces it byte for byte. PR-35 carries FDR under a new heading '## Review findings on real inputs'; RS-40 carries the same FDR inside its PR_RETURN_PHASE: PR-35 section. The skill carries the same bullets in Markdown, with `main` in code and 'the PR-35 session' for 'this session'."
+ },
+ "ops": [
+  {
+   "id": "W1-PR35-01",
+   "part": "PART-01",
+   "item": "ITEM-11",
+   "prompt": "PR-35",
+   "section": "Review-first and action-efficient execution, step 3",
+   "start": "3. Classify findings as substantive in-scope correction, already resolved, duplicate/superseded, unsupported/out of scope, evidence pending, or material change (D23-C) requiring rescope.",
+   "end": null,
+   "new": "3. Classify findings as substantive in-scope correction, already resolved, duplicate/superseded, unsupported/out of scope, evidence pending, or material change (D23-C) requiring rescope. Classify under the review-finding rules below: a substantive in-scope correction is a finding that shows a wrong result, a crash or a guarantee breach on a real input, and every other finding is answered on its thread.",
+   "why": "Step 3 had no real-input test, so every in-scope finding was treated as substantive (MB-013: 47 fixes of 49 constructed-input findings on #660). Applies PF06 v2.5.5 §1.1.4 *Findings below P1* and PF27 v2.0.6 *Finding disposition on real inputs*: a finding is fixed when it shows a wrong result, a crash or a guarantee breach on a real input; otherwise it gets the traced path and the stated limit.",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-PR35-02",
+   "part": "PART-01",
+   "item": "ITEM-11",
+   "prompt": "PR-35",
+   "section": "Review-first and action-efficient execution, step 4",
+   "start": "4. Resolve all then-known substantive in-scope findings locally before the next push.",
+   "end": null,
+   "new": "4. Fix each then-known substantive in-scope finding locally before the next push, and answer every other finding on its thread as the review-finding rules below state.",
+   "why": "'Resolve all ... findings' is the fix-every-finding instruction PF06 §1.1.4 reads under the real-input rule ('A blanket instruction to fix every finding on a pull request is read under this rule'). The step now fixes only the substantive in-scope (real-input) findings step 3 defines and answers the rest.",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-PR35-03",
+   "part": "PART-01",
+   "item": "ITEM-11",
+   "prompt": "PR-35",
+   "section": "Review-first and action-efficient execution, step 10 (CD-14 stop rule)",
+   "start": "10. Continue until genuine merge readiness or a lawful alternate result below.",
+   "end": null,
+   "new": "10. Continue until genuine merge readiness or a lawful alternate result below. A work unit whose business case is met stops; further work on it needs a new business case. Record such work as a candidate for its owner, and do not do it here.",
+   "why": "CD-14: PF04 v2.8.8 §9.7.7 Gates, 'A work unit whose business case is met stops; further work on it needs a new business case', placed on the implementing phase that would otherwise continue: PR-35's correction loop ('Continue until genuine merge readiness'). The second sentence uses the corpus's existing wording ('Record it as a candidate for its owner', Decide it during work step 3).",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-PR35-04",
+   "part": "PART-01",
+   "item": "ITEM-11",
+   "prompt": "PR-35",
+   "section": "Review-first and action-efficient execution, new subsection after step 10",
+   "start": "A short remote delay is not completion and does not justify stopping while useful local work remains.",
+   "end": null,
+   "new": "A short remote delay is not completion and does not justify stopping while useful local work remains.\n\n## Review findings on real inputs\n\nThese rules govern every review finding on this pull request, from the automated code review or from a person.\n\n- Real input. A finding's triggering input is real when it exists on main or in an approved work unit's planned deliverable; occurs in the product's real operating environment, such as the deployed services, the hosted CI runner, the operator's shell or the vendor's responses; or can be supplied by a user, a vendor or an attacker through an interface the product exposes. An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding; an input outside the real set receives one refusal or a stated limit, never a model of it.\n- Findings below P1. A finding is fixed when it shows a wrong result, a crash or a guarantee breach on a real input. Otherwise, the reply on the thread gives the traced path and the stated limit, and the thread is resolved. Declining a security finding goes to the Product Owner first. A blanket instruction to fix every finding on a pull request is read under this rule. The standing default is to fix only a wrong result on a real input, or a breach of a read-only or no-secrets guarantee; a snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself, or code it runs in the checkout, can make.\n- P1 findings. A P1 finding is a review finding labelled P1 or any higher priority, such as P0; the priority is the label the reviewer gives. A P1 finding whose triggering input is real is fixed. It is not declined, deferred to a later change, recorded as a stated limit, or resolved on cost, effort, design preference, a plan's earlier choice, an ADR's stated limit or a \"not worth its code\" judgement. Fixed means that the wrong result, crash or guarantee breach the finding reports no longer occurs on that real input, shown by a test that fails without the fix; a typed refusal of the input is a fix when refusing it is correct behavior for the product. The thread stays open until the fix is pushed and the finding's own check of it is answered. A pull request with an open P1 thread on a real input is not merge-ready.\n- The one P1 exception. A P1 finding may be declined only when its triggering input is not real, so that the input is one constructed only to exercise the code. The reply on the thread gives the traced path and shows why the input can never occur in the product. Declining a P1 goes to the Product Owner first, and the thread is resolved only after that.\n- Repeated finding class. When two consecutive review rounds on one pull request raise findings of the same class, meaning the same component or contract, stop fixing instances and ask the Product Owner one design question: narrow the design, accept a stated limit, or rescope. For a P1 on a real input, accepting a stated limit is not an option: the answer is a fix, a narrowed design that removes the wrong result (a typed refusal included), or a rescope through the native route, and the P1 is resolved before the pull request merges. This is a design trigger by finding class. It is not a push count, a pause threshold or a CI-budget control. Ask the question in this session and continue on the answer: work a narrowed design or a stated limit here, and take a rescope through the formal rescope route.\n- Unchanged duty. Nothing in these rules weakens the existing duty to fix a real defect at any priority.",
+   "why": "Carries PF06 v2.5.5 §1.1.4 *PR review finding disposition (every pull request; real inputs only)* in canon's own sentences (L-A06: including 'Declining a security finding goes to the Product Owner first' and the unchanged duty), with PF27's plain modal form for the P1 rules. CD-2: the design question is asked in this session, which continues on the answer; no new result state. Inserted as a new section after step 10 so the numbered steps keep their numbers.",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-PR35-05",
+   "part": "PART-01",
+   "item": "ITEM-23",
+   "prompt": "PR-35",
+   "section": "Genuine merge-readiness gate, first predicate",
+   "start": "every applicable current-head review has been read and every required substantive finding is resolved or explicitly lawfully waived;",
+   "end": null,
+   "new": "every applicable current-head review has been read, every finding is fixed or answered under the review-finding rules above, and no P1 thread on a real input is open;",
+   "why": "'resolved or explicitly lawfully waived' let a real-input P1 be waived; PF06 §1.1.4: a real-input P1 'MUST NOT be declined, deferred ... or recorded as a stated limit', and 'A pull request with an open P1 thread on a real input is not merge-ready'.",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-RS40-01",
+   "part": "PART-01",
+   "item": "ITEM-11",
+   "prompt": "RS-40",
+   "section": "Recorded-phase continuation > PR_RETURN_PHASE: PR-35",
+   "start": "resolve every known substantive in-scope finding locally;",
+   "end": null,
+   "new": "fix locally each known finding that shows a wrong result, a crash or a guarantee breach on a real input, and answer every other one on its thread, under the review-finding rules below;",
+   "why": "RS-40's PR-35 section carried PR-35's fix-every-finding rule (verifier V1). Same rule, same pass (D12): PF06 §1.1.4 and PF27.",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-RS40-02",
+   "part": "PART-01",
+   "item": "ITEM-11",
+   "prompt": "RS-40",
+   "section": "Recorded-phase continuation > PR_RETURN_PHASE: PR-35 (rule text and CD-14 stop rule)",
+   "start": "Do not push again until all then-known findings are resolved and locally tested.",
+   "end": null,
+   "new": "Do not push again until all then-known findings are resolved and locally tested. A work unit whose business case is met stops; further work on it needs a new business case. Record such work as a candidate for its owner, and do not do it here.\n\nThese rules govern every review finding on this pull request, from the automated code review or from a person.\n\n- Real input. A finding's triggering input is real when it exists on main or in an approved work unit's planned deliverable; occurs in the product's real operating environment, such as the deployed services, the hosted CI runner, the operator's shell or the vendor's responses; or can be supplied by a user, a vendor or an attacker through an interface the product exposes. An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding; an input outside the real set receives one refusal or a stated limit, never a model of it.\n- Findings below P1. A finding is fixed when it shows a wrong result, a crash or a guarantee breach on a real input. Otherwise, the reply on the thread gives the traced path and the stated limit, and the thread is resolved. Declining a security finding goes to the Product Owner first. A blanket instruction to fix every finding on a pull request is read under this rule. The standing default is to fix only a wrong result on a real input, or a breach of a read-only or no-secrets guarantee; a snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself, or code it runs in the checkout, can make.\n- P1 findings. A P1 finding is a review finding labelled P1 or any higher priority, such as P0; the priority is the label the reviewer gives. A P1 finding whose triggering input is real is fixed. It is not declined, deferred to a later change, recorded as a stated limit, or resolved on cost, effort, design preference, a plan's earlier choice, an ADR's stated limit or a \"not worth its code\" judgement. Fixed means that the wrong result, crash or guarantee breach the finding reports no longer occurs on that real input, shown by a test that fails without the fix; a typed refusal of the input is a fix when refusing it is correct behavior for the product. The thread stays open until the fix is pushed and the finding's own check of it is answered. A pull request with an open P1 thread on a real input is not merge-ready.\n- The one P1 exception. A P1 finding may be declined only when its triggering input is not real, so that the input is one constructed only to exercise the code. The reply on the thread gives the traced path and shows why the input can never occur in the product. Declining a P1 goes to the Product Owner first, and the thread is resolved only after that.\n- Repeated finding class. When two consecutive review rounds on one pull request raise findings of the same class, meaning the same component or contract, stop fixing instances and ask the Product Owner one design question: narrow the design, accept a stated limit, or rescope. For a P1 on a real input, accepting a stated limit is not an option: the answer is a fix, a narrowed design that removes the wrong result (a typed refusal included), or a rescope through the native route, and the P1 is resolved before the pull request merges. This is a design trigger by finding class. It is not a push count, a pause threshold or a CI-budget control. Ask the question in this session and continue on the answer: work a narrowed design or a stated limit here, and take a rescope through the formal rescope route.\n- Unchanged duty. Nothing in these rules weakens the existing duty to fix a real defect at any priority.",
+   "why": "The resumed PR-35 phase reads RS-40's body, so it carries the same canonical review-finding rules as PR-35 (restating canon is allowed, authoritative-surfaces.md) and the same CD-14 stop rule on the same correction loop.",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-RS40-03",
+   "part": "PART-01",
+   "item": "ITEM-23",
+   "prompt": "RS-40",
+   "section": "Recorded-phase continuation > PR_RETURN_PHASE: PR-35, MERGE_PENDING predicate",
+   "start": "mergeability, and no unresolved required thread. Do not merge or enable automatic merge.",
+   "end": null,
+   "new": "mergeability, no unresolved required thread, and no open P1 thread on a real input. Do not merge or enable automatic merge.",
+   "why": "PF06 §1.1.4: 'A pull request with an open P1 thread on a real input is not merge-ready.'",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-PR40-01",
+   "part": "PART-01",
+   "item": "ITEM-23",
+   "prompt": "PR-40",
+   "section": "Execute, step 6",
+   "start": "6. Evaluate unresolved findings and evidence gaps.",
+   "end": null,
+   "new": "6. Evaluate unresolved findings and evidence gaps. A P1 finding, labelled P1 or any higher priority, whose triggering input is real and that was declined or left open before merge is a precise substantiated defect; real has the meaning the Change Process Guide gives it for pull-request review findings.",
+   "why": "CD-3: PR-40 gains one check, a real-input P1 declined or left open before merge is a substantiated defect, which step 7 already sends to REJECT. Applies PF06 §1.1.4 ('not merge-ready'; 'MUST NOT be declined').",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-PR20-01",
+   "part": "PART-01",
+   "item": "ITEM-11",
+   "prompt": "PR-20",
+   "section": "Next step and recovery > PR-35 REVIEW AND READINESS PHASE IN ITS OWN DEDICATED SESSION, Native result and boundary",
+   "start": "PR-35 retrieves and resolves all current actionable review findings, locally retests the combined corrections,",
+   "end": null,
+   "new": "PR-35 retrieves every current review finding, fixes each one that shows a wrong result, a crash or a guarantee breach on a real input, answers every other one on its thread with the traced path and the stated limit, asks the Product Owner one design question when two consecutive review rounds raise findings of the same class, locally retests the combined corrections,",
+   "why": "PR-20's description of PR-35 restated the retired fix-every-finding rule (MB-013 scope). Restated to PF06 §1.1.4 in PR-35's new wording; restating is allowed, asserting is not.",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-PR20-02",
+   "part": "PART-06",
+   "item": "ITEM-02",
+   "prompt": "PR-20",
+   "section": "Next step and recovery > PR-40 DOWNSTREAM LINEAGE REVIEW, Native result and boundary",
+   "start": "REJECT returns precise in-scope findings to the PR owner;",
+   "end": null,
+   "new": "REJECT re-plans: the finding returns to this prompt, which plans that work unit again in a new top-level session that Nathan creates, for a new Proceed;",
+   "why": "D23-F and its correction: a PR-40 REJECT re-plans through PR-20 in a new session Nathan seeds, with a new Proceed; PR-40.json routes REJECT reject_replan to PR-20. Converges on PR-20's own Re-plan entry wording ('runs in a new top-level session that Nathan creates, plans that work unit again').",
+   "rehearsal": "OK/LANDED"
+  },
+  {
+   "id": "W1-DOC20-01",
+   "part": "PART-08",
+   "item": "ITEM-01",
+   "prompt": "DOC-20",
+   "section": "Result routing, the landed-lineage review bullet",
+   "start": "- Actual merged-state or landed-lineage review needed after Nathan's merge assertion, only where no ",
+   "end": "and expect the read-only review.",
+   "span_has_markup": true,
+   "new": "- No accepted PR-40 lineage review for the identified merge, or one that cannot be verified: do not enter PR-40 from here, because PR-40 is entered once per merge, from that merge's handoff. A remediation result takes the native-owner branch above when its exact lawful receiver and complete recovery package are known; otherwise return terminally to Nathan with the evidence.",
+   "why": "CD-1: DOC-20's only inbound edge is PR-40's ACCEPT for the same merge, so this route was always a second PR-40 entry, against D23-E's successor 'PR-40 is entered once per merge'. A missing or unverifiable acceptance takes the existing ORIGINAL_NATIVE_STAGE recovery for remediation, or the terminal return (L-A07: ordinary documentation uses the terminal return). The span is the whole bullet, which carries code and mention markup.",
+   "rehearsal": "OK/LANDED"
+  }
+ ],
+ "op_order_and_sharing": "No two W1 ops on one page overlap, and none overlaps a W3a op on PR-20 or PR-40 (checked in memory: 0 overlaps). W1's PR-35 spans: step 3's first sentence, step 4's first sentence, step 10's two sentences, the readiness gate's first predicate; the coordinator checks them against W3b's PR-35 handoff lines and W2's PR-20 and PR-40 lines, which this worker could not see. W1-PR35-03 and W1-PR35-04 are adjacent on step 10's line (each anchors on one of its two sentences) and apply in either order.",
+ "guards": [
+  {
+   "id": "G-W1-R1",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 Real input (definition)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)A finding's triggering input is real when it exists on main or in an approved work unit's planned deliverable"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- Real input. A finding's triggering input is real when it exists on main or in an approved work unit's planned deliverable; occurs in the product's real operating environment, such as the deployed services, the hosted CI runner, the operator's shell or the vendor's responses; or can be supplied by a user, a vendor or an attacker through an interface the product exposes. An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding; an input outside the real set receives one refusal or a stated limit, never a model of it."
+    ],
+    "fail": [
+     "Fix every in-scope finding.",
+     "A finding's triggering input is real when a reviewer can imagine it."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R2",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 Real input (constructed input; one refusal or a stated limit)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding; an input outside the real set receives one refusal or a stated limit, never a model of it"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- Real input. A finding's triggering input is real when it exists on main or in an approved work unit's planned deliverable; occurs in the product's real operating environment, such as the deployed services, the hosted CI runner, the operator's shell or the vendor's responses; or can be supplied by a user, a vendor or an attacker through an interface the product exposes. An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding; an input outside the real set receives one refusal or a stated limit, never a model of it."
+    ],
+    "fail": [
+     "An input constructed only to exercise code justifies a fix.",
+     "Model every input a reviewer constructs."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R3",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 Findings below P1 (traced path and stated limit)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)Otherwise, the reply on the thread gives the traced path and the stated limit, and the thread is resolved"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- Findings below P1. A finding is fixed when it shows a wrong result, a crash or a guarantee breach on a real input. Otherwise, the reply on the thread gives the traced path and the stated limit, and the thread is resolved. Declining a security finding goes to the Product Owner first. A blanket instruction to fix every finding on a pull request is read under this rule. The standing default is to fix only a wrong result on a real input, or a breach of a read-only or no-secrets guarantee; a snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself, or code it runs in the checkout, can make."
+    ],
+    "fail": [
+     "Otherwise, fix it anyway.",
+     "Resolve all then-known substantive in-scope findings locally before the next push."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R4",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 Findings below P1 (security decline goes to the Product Owner first; L-A06)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)Declining a security finding goes to the Product Owner first"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- Findings below P1. A finding is fixed when it shows a wrong result, a crash or a guarantee breach on a real input. Otherwise, the reply on the thread gives the traced path and the stated limit, and the thread is resolved. Declining a security finding goes to the Product Owner first. A blanket instruction to fix every finding on a pull request is read under this rule. The standing default is to fix only a wrong result on a real input, or a breach of a read-only or no-secrets guarantee; a snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself, or code it runs in the checkout, can make."
+    ],
+    "fail": [
+     "Declining a security finding needs no one.",
+     "Decline security findings freely."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R5",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 / PF27 P1 findings (a real-input P1 is fixed)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)A P1 finding whose triggering input is real is fixed"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- P1 findings. A P1 finding is a review finding labelled P1 or any higher priority, such as P0; the priority is the label the reviewer gives. A P1 finding whose triggering input is real is fixed. It is not declined, deferred to a later change, recorded as a stated limit, or resolved on cost, effort, design preference, a plan's earlier choice, an ADR's stated limit or a \"not worth its code\" judgement. Fixed means that the wrong result, crash or guarantee breach the finding reports no longer occurs on that real input, shown by a test that fails without the fix; a typed refusal of the input is a fix when refusing it is correct behavior for the product. The thread stays open until the fix is pushed and the finding's own check of it is answered. A pull request with an open P1 thread on a real input is not merge-ready."
+    ],
+    "fail": [
+     "A P1 finding may be recorded as a stated limit.",
+     "A P1 finding is fixed when convenient."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R6",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 / PF27 P1 findings (open real-input P1 is not merge-ready)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)A pull request with an open P1 thread on a real input is not merge-ready"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- P1 findings. A P1 finding is a review finding labelled P1 or any higher priority, such as P0; the priority is the label the reviewer gives. A P1 finding whose triggering input is real is fixed. It is not declined, deferred to a later change, recorded as a stated limit, or resolved on cost, effort, design preference, a plan's earlier choice, an ADR's stated limit or a \"not worth its code\" judgement. Fixed means that the wrong result, crash or guarantee breach the finding reports no longer occurs on that real input, shown by a test that fails without the fix; a typed refusal of the input is a fix when refusing it is correct behavior for the product. The thread stays open until the fix is pushed and the finding's own check of it is answered. A pull request with an open P1 thread on a real input is not merge-ready."
+    ],
+    "fail": [
+     "A pull request with an open P1 thread may merge.",
+     "Every required substantive finding is resolved or explicitly lawfully waived."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R7",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 / PF27 The one P1 exception (Product Owner first)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)Declining a P1 goes to the Product Owner first, and the thread is resolved only after that"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- The one P1 exception. A P1 finding may be declined only when its triggering input is not real, so that the input is one constructed only to exercise the code. The reply on the thread gives the traced path and shows why the input can never occur in the product. Declining a P1 goes to the Product Owner first, and the thread is resolved only after that."
+    ],
+    "fail": [
+     "Declining a P1 is the session's call.",
+     "A P1 may be declined on cost."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R8",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 / PF27 Repeated finding class (one design question)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)stop fixing instances and ask the Product Owner one design question: narrow the design, accept a stated limit, or rescope"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- Repeated finding class. When two consecutive review rounds on one pull request raise findings of the same class, meaning the same component or contract, stop fixing instances and ask the Product Owner one design question: narrow the design, accept a stated limit, or rescope. For a P1 on a real input, accepting a stated limit is not an option: the answer is a fix, a narrowed design that removes the wrong result (a typed refusal included), or a rescope through the native route, and the P1 is resolved before the pull request merges. This is a design trigger by finding class. It is not a push count, a pause threshold or a CI-budget control. Ask the question in this session and continue on the answer: work a narrowed design or a stated limit here, and take a rescope through the formal rescope route."
+    ],
+    "fail": [
+     "When findings repeat, keep fixing instances.",
+     "After five pushes, pause and ask the Product Owner."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R9",
+   "part": "PART-01",
+   "rule": "CD-2: the design question is asked in the PR-35 session, which continues on the answer",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)Ask the question in this session and continue on the answer"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- Repeated finding class. When two consecutive review rounds on one pull request raise findings of the same class, meaning the same component or contract, stop fixing instances and ask the Product Owner one design question: narrow the design, accept a stated limit, or rescope. For a P1 on a real input, accepting a stated limit is not an option: the answer is a fix, a narrowed design that removes the wrong result (a typed refusal included), or a rescope through the native route, and the P1 is resolved before the pull request merges. This is a design trigger by finding class. It is not a push count, a pause threshold or a CI-budget control. Ask the question in this session and continue on the answer: work a narrowed design or a stated limit here, and take a rescope through the formal rescope route."
+    ],
+    "fail": [
+     "Return PRODUCT_OWNER_DECISION_REQUIRED terminally with the design question.",
+     "Open a new session for the design question."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R10",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 Unchanged duty / PF27",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)Nothing in these rules weakens the existing duty to fix a real defect at any priority"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- Unchanged duty. Nothing in these rules weakens the existing duty to fix a real defect at any priority."
+    ],
+    "fail": [
+     "These rules end the duty to fix low-priority defects.",
+     "Only P1 defects are fixed."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R11",
+   "part": "PART-01",
+   "rule": "PF04 §9.7.7 Gates: 'A work unit whose business case is met stops' (CD-14)",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40"
+   ],
+   "all": [
+    "(?i)A work unit whose business case is met stops; further work on it needs a new business case"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "A work unit whose business case is met stops; further work on it needs a new business case. Record such work as a candidate for its owner, and do not do it here."
+    ],
+    "fail": [
+     "Continue improving the work unit while reviewers ask.",
+     "A work unit whose business case is met continues until every reviewer is satisfied."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 0,
+     "after": 1
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R12",
+   "part": "PART-01",
+   "rule": "CD-3: PR-40 checks that no real-input P1 was declined or left open before merge",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-40"
+   ],
+   "all": [
+    "(?i)A P1 finding, labelled P1 or any higher priority, whose triggering input is real and that was declined or left open before merge is a precise substantiated defect"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "6. Evaluate unresolved findings and evidence gaps. A P1 finding, labelled P1 or any higher priority, whose triggering input is real and that was declined or left open before merge is a precise substantiated defect; real has the meaning the Change Process Guide gives it for pull-request review findings."
+    ],
+    "fail": [
+     "6. Evaluate unresolved findings and evidence gaps.",
+     "A declined P1 is acceptable when the PR merged."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-40": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R13",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 restated in PR-20's description of PR-35",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-20"
+   ],
+   "all": [
+    "(?i)\\bfixes each one that shows a wrong result, a crash or a guarantee breach on a real input\\b"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "Native result and boundary: PR-35 retrieves every current review finding, fixes each one that shows a wrong result, a crash or a guarantee breach on a real input, answers every other one on its thread."
+    ],
+    "fail": [
+     "Native result and boundary: PR-35 retrieves and resolves all current actionable review findings, locally retests the combined corrections."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-20": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R14",
+   "part": "PART-06",
+   "rule": "D23-F and its correction: a PR-40 REJECT re-plans through PR-20",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-20"
+   ],
+   "all": [
+    "(?i)\\bREJECT re-plans\\b"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "REJECT re-plans: the finding returns to this prompt, which plans that work unit again in a new top-level session that Nathan creates, for a new Proceed;"
+    ],
+    "fail": [
+     "REJECT returns precise in-scope findings to the PR owner;"
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-20": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-R15",
+   "part": "PART-08",
+   "rule": "D23-E successor 'PR-40 is entered once per merge' (CD-1): DOC-20 does not enter PR-40",
+   "kind": "required",
+   "expect": 1,
+   "unit": "line",
+   "prompts": [
+    "DOC-20"
+   ],
+   "all": [
+    "(?i)\\bdo not enter PR-40 from here\\b"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- No accepted PR-40 lineage review for the identified merge, or one that cannot be verified: do not enter PR-40 from here, because PR-40 is entered once per merge, from that merge's handoff."
+    ],
+    "fail": [
+     "- Actual merged-state or landed-lineage review needed after Nathan's merge assertion: continue to PR-40 — Review PR Work-Unit Lineage — 100926.1 and expect the read-only review."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "DOC-20": {
+     "before": 0,
+     "after": 1
+    }
+   }
+  },
+  {
+   "id": "G-W1-F1",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 Findings below P1: 'A blanket instruction to fix every finding on a pull request is read under this rule'; no body tells a PR session to fix or resolve every finding",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40",
+    "PR-20",
+    "PR-40",
+    "DOC-20"
+   ],
+   "all": [
+    "(?i)\\b(fix|fixes|resolve|resolves|correct|corrects)\\b[^.;]{0,30}\\b(all|every)\\b[^.;]{0,40}\\b(findings?|review issues?)\\b"
+   ],
+   "except": [
+    "(?i)\\bblanket instruction\\b"
+   ],
+   "fixtures": {
+    "pass": [
+     "- Findings below P1. A finding is fixed when it shows a wrong result, a crash or a guarantee breach on a real input. Otherwise, the reply on the thread gives the traced path and the stated limit, and the thread is resolved. Declining a security finding goes to the Product Owner first. A blanket instruction to fix every finding on a pull request is read under this rule. The standing default is to fix only a wrong result on a real input, or a breach of a read-only or no-secrets guarantee; a snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself, or code it runs in the checkout, can make.",
+     "4. Fix each then-known substantive in-scope finding locally before the next push, and answer every other finding on its thread as the review-finding rules below state.",
+     "9. After all then-known findings are resolved and local tests pass, make one coherent corrective push.",
+     "fix locally each known finding that shows a wrong result, a crash or a guarantee breach on a real input, and answer every other one on its thread, under the review-finding rules below;"
+    ],
+    "fail": [
+     "4. Resolve all then-known substantive in-scope findings locally before the next push.",
+     "Resume only PR-35 responsibilities: resolve every known substantive in-scope finding locally;",
+     "Native result and boundary: PR-35 retrieves and resolves all current actionable review findings, locally retests the combined corrections.",
+     "Fix every review finding before merge."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 1,
+     "after": 0
+    },
+    "RS-40": {
+     "before": 1,
+     "after": 0
+    },
+    "PR-20": {
+     "before": 1,
+     "after": 0
+    },
+    "PR-40": {
+     "before": 0,
+     "after": 0
+    },
+    "DOC-20": {
+     "before": 0,
+     "after": 0
+    }
+   }
+  },
+  {
+   "id": "G-W1-F2",
+   "part": "PART-01",
+   "rule": "PF06 §1.1.4 P1 findings: a real-input P1 'MUST NOT be declined, deferred ... or recorded as a stated limit'; no readiness predicate lets a finding be waived",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "PR-35",
+    "RS-40",
+    "PR-20",
+    "PR-40",
+    "DOC-20"
+   ],
+   "all": [
+    "(?i)\\bfindings?\\b[^.;]{0,80}\\bwaived\\b"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "every applicable current-head review has been read, every finding is fixed or answered under the review-finding rules above, and no P1 thread on a real input is open;",
+     "required current-head CI passes, or an explicit valid waiver identifies exact check/scope/owner/effect;"
+    ],
+    "fail": [
+     "every applicable current-head review has been read and every required substantive finding is resolved or explicitly lawfully waived;",
+     "A P1 finding may be waived by the session."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-35": {
+     "before": 1,
+     "after": 0
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 0
+    },
+    "PR-20": {
+     "before": 0,
+     "after": 0
+    },
+    "PR-40": {
+     "before": 0,
+     "after": 0
+    },
+    "DOC-20": {
+     "before": 0,
+     "after": 0
+    }
+   }
+  },
+  {
+   "id": "G-W1-F3",
+   "part": "PART-06",
+   "rule": "D23-F and its correction: a PR-40 REJECT does not return findings to the PR owner",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "PR-20"
+   ],
+   "all": [
+    "(?i)\\bREJECT\\b[^.;]{0,40}\\breturns?\\b[^.;]{0,60}\\b(PR owner|in-scope findings)\\b"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "REJECT re-plans: the finding returns to this prompt, which plans that work unit again in a new top-level session that Nathan creates, for a new Proceed;",
+     "REJECT returns the decision and preserved evidence to the actual originating native owner, preserving the recorded phase's own dedicated session when one exists, without a base rewrite."
+    ],
+    "fail": [
+     "REJECT returns precise in-scope findings to the PR owner;",
+     "On REJECT, PR-40 returns its findings to the PR owner for correction."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "PR-20": {
+     "before": 1,
+     "after": 0
+    }
+   }
+  },
+  {
+   "id": "G-W1-F4",
+   "part": "PART-08",
+   "rule": "D23-E successor 'PR-40 is entered once per merge' (CD-1): DOC-20 never continues to PR-40",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "DOC-20"
+   ],
+   "all": [
+    "(?i)\\bcontinue to\\b[^.]{0,20}\\bPR-40\\b"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "- No accepted PR-40 lineage review for the identified merge, or one that cannot be verified: do not enter PR-40 from here, because PR-40 is entered once per merge, from that merge's handoff.",
+     "PR-40 is entered once per merge: paste the MERGE_OBSERVED handoff when one arrives, otherwise the fallback block."
+    ],
+    "fail": [
+     "- Landed-lineage review needed after the merge assertion: continue to <code>PR-40 — Review PR Work-Unit Lineage</code> and expect the read-only review.",
+     "- Landed-lineage review needed: continue to PR-40."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "DOC-20": {
+     "before": 1,
+     "after": 0
+    }
+   }
+  },
+  {
+   "id": "G-W1-F5",
+   "part": "PART-02",
+   "rule": "CD-4: Nathan's direction of 2026-10-13 deprecates the Codex security review, and canon names none; no prompt names a Codex security review",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "CF-C-10",
+    "CF-C-20",
+    "CF-C-30",
+    "CF-C-40",
+    "CF-E-10",
+    "CF-E-20",
+    "CF-E-30",
+    "CF-E-40",
+    "CF-PO-10",
+    "CL-20",
+    "CL-30",
+    "CL-40",
+    "CL-C-10",
+    "CL-E-10",
+    "CL-E-20",
+    "CL-E-30",
+    "CL-E-40",
+    "DOC-10",
+    "DOC-20",
+    "ESC-10",
+    "ESC-25",
+    "ESC-30",
+    "ESC-40",
+    "GCFPE-MGMT-10",
+    "IA-10",
+    "IA-20",
+    "IA-30",
+    "IA-40",
+    "IA-50",
+    "IA-60",
+    "MGR-10",
+    "OPS-10",
+    "OPS-20",
+    "OPS-30",
+    "PR-10",
+    "PR-20",
+    "PR-30",
+    "PR-35",
+    "PR-40",
+    "PR-50",
+    "QA-10",
+    "QA-100",
+    "QA-110",
+    "QA-120",
+    "QA-20",
+    "QA-50",
+    "QA-60",
+    "QA-70",
+    "QA-80",
+    "QA-90",
+    "RS-10",
+    "RS-20",
+    "RS-30",
+    "RS-40",
+    "UTIL-10"
+   ],
+   "all": [
+    "(?i)\\bcodex\\b",
+    "(?i)\\bsecurity\\b"
+   ],
+   "except": [],
+   "fixtures": {
+    "pass": [
+     "PR local tests, acceptance evidence, and code/security reviews remain required under the approved work unit and actual repository instructions.",
+     "Read every applicable code review, security review, formal review, inline thread, summary comment, requested change, unresolved conversation, and current required check for the exact PR."
+    ],
+    "fail": [
+     "Read all applicable Codex code and security reviews, inline threads, summary comments, and current check state.",
+     "Wait for the Codex security review before merge."
+    ]
+   },
+   "counts_on_W1_pages": {
+    "DOC-20": {
+     "before": 0,
+     "after": 0
+    },
+    "PR-20": {
+     "before": 0,
+     "after": 0
+    },
+    "PR-35": {
+     "before": 0,
+     "after": 0
+    },
+    "PR-40": {
+     "before": 0,
+     "after": 0
+    },
+    "RS-40": {
+     "before": 0,
+     "after": 0
+    }
+   },
+   "counts_note": "Counted here on the five W1 pages only (0 before, 0 after). The other 50 members: 0 by the ANALYZE corpus sweep, family F3 (0 of 56 pages name Codex, 2026-10-27); PART-24 runs it on every successor and unchanged member."
+  }
+ ],
+ "guard_selftest": {
+  "fixtures_all_pass": true,
+  "registry_form_agrees": true,
+  "method": "Each guard against its fixtures and against the five fresh reads before and after the ops in memory, by body_check.py's units/guard_count semantics; and its to_registry() form re-implemented here and run with re.search over the same texts. The shipped governance-audit engine runs it in PART-24 (body_check.py registry)."
+ },
+ "graph_edits": [
+  {
+   "part": "PART-08",
+   "file": "docs/graph/parts/prompts/DOC-20.json",
+   "json_path": "$.edges[3]",
+   "change": "remove",
+   "old_value": {
+    "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+    "automatic": false,
+    "from": "DOC-20",
+    "from_kind": "prompt",
+    "immediate": true,
+    "route_branches": [
+     {
+      "applicable_states": [
+       "INCOMPLETE",
+       "PENDING",
+       "BLOCKED"
+      ],
+      "branch_id": "landed_lineage_review",
+      "condition": "actual merged state or landed-lineage review is required after Nathan asserts the manual merge",
+      "next_prompt_handoff_count": 1,
+      "public_result": true,
+      "route_kind": "CONDITIONAL_RECOVERY",
+      "route_steps": [],
+      "source_evidence": {
+       "path": "candidate/prompts/b/DOC-20.md",
+       "section": "Required result and routing"
+      },
+      "state": null,
+      "terminal_for_invocation": false
+     }
+    ],
+    "state_predicates": [
+     "INCOMPLETE",
+     "PENDING",
+     "BLOCKED"
+    ],
+    "to": "PR-40",
+    "to_kind": "prompt",
+    "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+   },
+   "new_value": null,
+   "why": "CD-1: DOC-20's only inbound edge is PR-40's ACCEPT for the same merge, so this branch was always a second PR-40 entry (D23-E successor, once per merge)."
+  },
+  {
+   "part": "PART-08",
+   "file": "docs/graph/parts/prompts/DOC-20.json",
+   "json_path": "$.state_route_order",
+   "change": "replace",
+   "old_value": [
+    "complete",
+    "remediation_complete_native_return",
+    "remediation_incomplete_native_return",
+    "instruction_repair",
+    "landed_lineage_review",
+    "material_delta",
+    "documentation_terminal"
+   ],
+   "new_value": [
+    "complete",
+    "remediation_complete_native_return",
+    "remediation_incomplete_native_return",
+    "instruction_repair",
+    "material_delta",
+    "documentation_terminal"
+   ],
+   "why": "The removed branch leaves the order."
+  },
+  {
+   "part": "PART-08",
+   "file": "docs/graph/parts/prompts/DOC-20.json",
+   "json_path": "$.edges[1].route_branches[0].condition (branch_id documentation_terminal)",
+   "change": "replace",
+   "old_value": "product-intent, source, authority, or unrecoverable merge-evidence failure",
+   "new_value": "product-intent, source, authority, or unrecoverable merge-evidence failure, including an ordinary documentation result with no accepted or verifiable PR-40 lineage review for the merge",
+   "why": "Restates the new body bullet's terminal case (L-A07: ordinary documentation uses the terminal return; remediation keeps edges[2]'s remediation_incomplete_native_return, whose condition already covers it). Optional for routing: the graph routes the same without it."
+  },
+  {
+   "part": "PART-08",
+   "file": "docs/graph/parts/prompts/DOC-20.json",
+   "json_path": "$.edge_indices",
+   "change": "derived",
+   "note": "Not typed: glow-graph-contract's reindex derives it, and every later part's indices shift by one (the assembled graph goes from 235 to 234 edges from this part alone)."
+  }
+ ],
+ "graph_other_references": "landed_lineage_review appears in no other docs/graph/parts file and in no R1 oracle row (R1 has no DOC-20 row). It appears in the embedded 100926.1 contracts in change-flow and flowmaster-validate references (candidate graph and direct-handoff contract), which PART-24 regenerates for the successor release, and in the frozen 091426.1 template docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json and 091426.1 references, which are history and stay as written (AUTH-001). The registry's DOC-20 row's graph-derived fields are regenerated by script (D13).",
+ "skill_redlines": [
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "`GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.4.0`",
+   "new": "`GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0`",
+   "count": 1,
+   "why": "Changed content carries an unspent revision (skill-identity-and-freeze.md). The coordinator confirms 1.5.0 is unspent and owns the number."
+  },
+  {
+   "part": "PART-02",
+   "package": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "- Read all applicable Codex code and security reviews, inline threads, summary comments, and current check state after publication and after material updates.",
+   "new": "- Read all applicable Codex code reviews, any security review that the approved work unit and the actual repository instructions require, inline threads, summary comments, and current check state after publication and after material updates.",
+   "count": 1,
+   "why": "ITEM-24, CD-4: Nathan's direction of 2026-10-13 deprecates the Codex security review; canon names none. Converges on PR-35's own wording ('code/security reviews remain required under the approved work unit and actual repository instructions'). The Codex code review is unchanged (line 86)."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "- Before another push, resolve every known substantive in-scope review issue locally and verify the affected behavior.",
+   "new": "- Before another push, fix each known finding that shows a wrong result, a crash or a guarantee breach on a real input, verify the affected behavior locally, and answer every other finding on its thread with the traced path and the stated limit, as *Review findings on real inputs* below states.",
+   "count": 1,
+   "why": "ITEM-12: the skill states PR-35's finding rule (PF06 v2.5.5 §1.1.4; PF27 v2.0.6)."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "- If CI starts automatically and later becomes stale because a substantive finding requires another candidate revision, stop treating that run as a gate. Cancel it only when a supported authorized interface permits cancellation.",
+   "new": "- If CI starts automatically and later becomes stale because a finding that must be fixed on a real input requires another candidate revision, stop treating that run as a gate. Cancel it only when a supported authorized interface permits cancellation.\n\n### Review findings on real inputs\n\nThese rules govern every review finding on the pull request, from the automated code review or from a person.\n\n- Real input. A finding's triggering input is real when it exists on `main` or in an approved work unit's planned deliverable; occurs in the product's real operating environment, such as the deployed services, the hosted CI runner, the operator's shell or the vendor's responses; or can be supplied by a user, a vendor or an attacker through an interface the product exposes. An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding; an input outside the real set receives one refusal or a stated limit, never a model of it.\n- Findings below P1. A finding is fixed when it shows a wrong result, a crash or a guarantee breach on a real input. Otherwise, the reply on the thread gives the traced path and the stated limit, and the thread is resolved. Declining a security finding goes to the Product Owner first. A blanket instruction to fix every finding on a pull request is read under this rule. The standing default is to fix only a wrong result on a real input, or a breach of a read-only or no-secrets guarantee; a snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself, or code it runs in the checkout, can make.\n- P1 findings. A P1 finding is a review finding labelled P1 or any higher priority, such as P0; the priority is the label the reviewer gives. A P1 finding whose triggering input is real is fixed. It is not declined, deferred to a later change, recorded as a stated limit, or resolved on cost, effort, design preference, a plan's earlier choice, an ADR's stated limit or a \"not worth its code\" judgement. Fixed means that the wrong result, crash or guarantee breach the finding reports no longer occurs on that real input, shown by a test that fails without the fix; a typed refusal of the input is a fix when refusing it is correct behavior for the product. The thread stays open until the fix is pushed and the finding's own check of it is answered. A pull request with an open P1 thread on a real input is not merge-ready.\n- The one P1 exception. A P1 finding may be declined only when its triggering input is not real, so that the input is one constructed only to exercise the code. The reply on the thread gives the traced path and shows why the input can never occur in the product. Declining a P1 goes to the Product Owner first, and the thread is resolved only after that.\n- Repeated finding class. When two consecutive review rounds on one pull request raise findings of the same class, meaning the same component or contract, stop fixing instances and ask the Product Owner one design question: narrow the design, accept a stated limit, or rescope. For a P1 on a real input, accepting a stated limit is not an option: the answer is a fix, a narrowed design that removes the wrong result (a typed refusal included), or a rescope through the native route, and the P1 is resolved before the pull request merges. This is a design trigger by finding class. It is not a push count, a pause threshold or a CI-budget control. Ask the question in the PR-35 session and continue there on the answer: work a narrowed design or a stated limit in that session, and take a rescope through the formal rescope route.\n- Unchanged duty. Nothing in these rules weakens the existing duty to fix a real defect at any priority.",
+   "count": 1,
+   "why": "Line 96 tied stale CI to an undefined 'substantive finding'; it now names the real-input test. The new subsection, closing §4, carries PF06 §1.1.4's rules in canon's sentences (L-A06), with CD-2's in-session design question. CD-15: no ceiling and no round-count escalation; the repeated-class trigger is by finding class, 'not a push count'."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "Continue in this phase's own dedicated session until all applicable predicates are true:",
+   "new": "Continue in this phase's own dedicated session until all applicable predicates are true. A work unit whose business case is met stops; further work on it needs a new business case: record such work as a candidate for its owner, and do not do it in this session. The predicates:",
+   "count": 1,
+   "why": "CD-14: PF04 v2.8.8 §9.7.7's stop rule on the same PR-35 correction loop the prompt carries it on; the validator's 'merge-ready ownership' marker (this exact opening) is preserved."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "- applicable code and security review findings and required threads are resolved on the current remote head, or a truthful clean current-head review is evidenced;",
+   "new": "- every applicable review finding is fixed or answered under *Review findings on real inputs*, no P1 thread on a real input is open, and required threads are resolved on the current remote head, or a truthful clean current-head review is evidenced;",
+   "count": 1,
+   "why": "PF06 §1.1.4: 'A pull request with an open P1 thread on a real input is not merge-ready.' Keeps the validator's 'current-head reviews' marker ('required threads are resolved on the current remote head')."
+  },
+  {
+   "part": "PART-26",
+   "package": "glow-hde-pr-development",
+   "file": "SKILL.md",
+   "old": "(HDE Build Notes; PF04 §9.1.3)",
+   "new": "(PF04 §9.1.3, *GCFPE model and reasoning-level guidance*)",
+   "count": 1,
+   "why": "ITEM-33 (DN-12 rider 1): the TypeSafe rule drained from PF10 addendum 2.1 into PF04 v2.8.8 §9.1.3 (ledger A01). PF10 v13.9 restarted its numbering, and its addendum 2.1 is now unrelated S19 vendor and security policy, so 'HDE Build Notes' names a home that does not carry the rule."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "PR-35 processes reviews, corrects all known findings locally, verifies the current remote head and current-head CI, and stops only at genuine merge readiness.",
+   "new": "PR-35 processes reviews, fixes each known finding that shows a wrong result, a crash or a guarantee breach on a real input, answers every other finding on its thread with the traced path and the stated limit, verifies the current remote head and current-head CI, and stops only at genuine merge readiness.",
+   "count": 1,
+   "why": "Line 7: the same rule."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "Resolve known substantive findings before treating CI as a gate, retest locally,",
+   "new": "Fix the known findings that show a wrong result, a crash or a guarantee breach on a real input before treating CI as a gate, answer every other finding on its thread with the traced path and the stated limit, retest locally,",
+   "count": 1,
+   "why": "Line 17: the same rule."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "Given substantive open review issues on a pushed revision, address the issues locally immediately.",
+   "new": "Given open review findings on a pushed revision that show a wrong result, a crash or a guarantee breach on a real input, fix them locally immediately, and answer every other open finding on its thread with the traced path and the stated limit.",
+   "count": 1,
+   "why": "Line 41: the same rule."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "Given an open substantive review, failing or stale CI, or unpushed intended commit,",
+   "new": "Given an open finding that must be fixed on a real input, an open P1 thread on a real input, failing or stale CI, or unpushed intended commit,",
+   "count": 1,
+   "why": "Line 91: the same rule, and PF06's 'not merge-ready'."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "references/behavior-cases.md",
+   "old": "## Pull request subscription\n",
+   "new": "## Finding on a constructed input\n\nGiven a review finding below P1 whose triggering input exists nowhere on `main`, in an approved deliverable, in the product's real operating environment or behind an interface the product exposes, PR-35 replies on the thread with the traced path and the stated limit and resolves the thread. It writes no fix, test or model of that input. A security finding declined this way goes to the Product Owner first.\n\n## Real-input P1\n\nGiven a P1 finding whose triggering input is real, PR-35 fixes it, with a test that fails without the fix, and keeps the thread open until the fix is pushed and the finding's own check of it is answered. It never records a stated limit for it or declines it on cost, effort or design preference, and it does not return `MERGE_PENDING` while that thread is open. Only a P1 whose input is not real may be declined, Product Owner first.\n\n## Repeated finding class\n\nGiven two consecutive review rounds on one pull request that raise findings of the same component or contract, PR-35 stops fixing instances and asks the Product Owner one design question in its own session: narrow the design, accept a stated limit, or rescope. It continues on the answer. For a P1 on a real input the answer is a fix, a narrowed design or a rescope, never a stated limit. Push count, review-round count and CI spend are not triggers.\n\n## Pull request subscription\n",
+   "count": 1,
+   "why": "Behavior cases for the three new rules; the validator's case_headings gains the three headings."
+  },
+  {
+   "part": "PART-01",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "Resolve all then-known findings and retest locally before the next coherent corrective push.",
+   "new": "Fix each then-known finding that shows a wrong result, a crash or a guarantee breach on a real input, answer every other finding on its thread with the traced path and the stated limit, and retest locally before the next coherent corrective push. A P1 finding whose triggering input is real is fixed and never declined; declining a security finding or a P1 goes to the Product Owner first. When two consecutive review rounds on one pull request raise findings of the same class, PR-35 asks the Product Owner one design question in its own session and continues on the answer.",
+   "count": 1,
+   "why": "change-flow SKILL.md:317 restated PR-35's fix-every-finding rule (verifier V1). Restated to PF06 §1.1.4 in the prompt's wording."
+  },
+  {
+   "part": "PART-01",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "PR-35 reaches `MERGE_PENDING` only with resolved current-head reviews and required threads, passing required current-head CI",
+   "new": "PR-35 reaches `MERGE_PENDING` only with resolved current-head reviews and required threads, no open P1 thread on a real input, passing required current-head CI",
+   "count": 1,
+   "why": "PF06 §1.1.4: 'A pull request with an open P1 thread on a real input is not merge-ready.'"
+  }
+ ],
+ "validator_redlines": [
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "scripts/validate_glow_hde_pr_development.py",
+   "old": "\"revision\": \"GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.4.0\",",
+   "new": "\"revision\": \"GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0\",",
+   "count": 1,
+   "why": "Revision pin follows the SKILL.md revision."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "scripts/validate_glow_hde_pr_development.py",
+   "old": "        \"specification change terminal\":",
+   "new": "        # MODIFICATION-20261027 PART-01 (PF06 §1.1.4; PF27): review findings on real inputs; CD-2; CD-14 (PF04 §9.7.7).\n        \"real input\": \"A finding's triggering input is real when it exists on `main` or in an approved work unit's planned deliverable\",\n        \"constructed input\": \"An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding\",\n        \"below-P1 reply\": \"the reply on the thread gives the traced path and the stated limit\",\n        \"security decline\": \"Declining a security finding goes to the Product Owner first.\",\n        \"real-input P1 fixed\": \"A P1 finding whose triggering input is real is fixed.\",\n        \"P1 merge readiness\": \"A pull request with an open P1 thread on a real input is not merge-ready.\",\n        \"P1 exception\": \"Declining a P1 goes to the Product Owner first, and the thread is resolved only after that.\",\n        \"repeated finding class\": \"stop fixing instances and ask the Product Owner one design question\",\n        \"in-session design question\": \"Ask the question in the PR-35 session and continue there on the answer\",\n        \"unchanged duty\": \"Nothing in these rules weakens the existing duty to fix a real defect at any priority.\",\n        \"business case stop\": \"A work unit whose business case is met stops; further work on it needs a new business case\",\n        \"specification change terminal\":",
+   "count": 1,
+   "why": "Required markers for every rule the redline adds (GUARD-001); the existing markers are kept."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "scripts/validate_glow_hde_pr_development.py",
+   "old": "        \"select final PF10 numbering\",\n",
+   "new": "        \"select final PF10 numbering\",\n        # MODIFICATION-20261027 PART-01, PART-02, PART-26: retired finding, Codex security review and drained-citation text.\n        \"resolve every known substantive in-scope review issue\",\n        \"corrects all known findings locally\",\n        \"Resolve known substantive findings before treating CI\",\n        \"address the issues locally immediately\",\n        \"explicitly lawfully waived\",\n        \"Codex code and security reviews\",\n        \"Codex security review\",\n        \"spend against a ceiling\",\n        \"growing number of review rounds\",\n        \"HDE Build Notes; PF04\",\n        \"because a substantive finding requires another candidate revision\",\n        \"applicable code and security review findings and required threads are resolved\",\n",
+   "count": 1,
+   "why": "Forbidden markers for every retired phrase (GUARD-001, D26-E), each fired by its injected regression; matching is case-insensitive over SKILL.md and behavior-cases.md."
+  },
+  {
+   "part": "PART-01",
+   "package": "glow-hde-pr-development",
+   "file": "scripts/validate_glow_hde_pr_development.py",
+   "old": "        \"## Pull request subscription\",",
+   "new": "        \"## Finding on a constructed input\",\n        \"## Real-input P1\",\n        \"## Repeated finding class\",\n        \"## Pull request subscription\",",
+   "count": 1,
+   "why": "The three new behavior cases are required."
+  }
+ ],
+ "skill_checks": {
+  "counts": "Every old string occurs exactly its count in the installed file (14 of 14 skill redlines, 4 of 4 validator redlines).",
+  "package_validator": "glow-hde-pr-development validate_glow_hde_pr_development.py, run on a scratch copy with all redlines applied: PASS (exit 0).",
+  "injected_regressions": "On that copy: each retired SKILL.md line re-inserted (lines 90, 91, 96, 105 and 184's citation) fails the validator (5 of 5); each of four new required sentences deleted fails it (4 of 4).",
+  "flowmaster_validate_markers": "Every marker flowmaster-validate's validate_gcfpe_20261009.py and validate_gcfpe_current.py require of glow-hde-pr-development survives, except its revision pin; every CHANGE_FLOW_CONTRACT marker survives in change-flow SKILL.md.",
+  "validator_changes_needed_outside_these_packages": [
+   "flowmaster-validate validate_gcfpe_20261009.py:2758 and validate_gcfpe_current.py:688 pin 'GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.4.0', and validate_gcfpe_20261009.py:1836 pins the contract's pr_development_contract.primary_skill_revision '1.4.0': the successor release's validator and profile pin 1.5.0, and glow-graph-contract regenerate_contract.py takes primary_skill_revision 1.5.0 as its argument (PART-24).",
+   "flowmaster-validate PR40_MANUAL_MERGE_BOUNDARY (validate_gcfpe_20261009.py:2053-2071) still tolerates a DOC-20 recovery edge into PR-40. It passes after the removal (the list is empty) but would not catch the edge coming back: the successor validator requires no prompt-originated inbound PR-40 edge other than the two observed-merge edges, with an injected regression that re-adds DOC-20 -> PR-40 (GUARD-001 for CD-1's graph half).",
+   "flowmaster-validate's frozen_graph pin edge_count 235 (validate_gcfpe_20261009.py:1200): the successor profile's count is derived after every routing part lands.",
+   "change-flow CHANGE_FLOW_SPECIALIZATION_REVISION 3.4.0: its bump is shared with the routing parts' contract regeneration; the coordinator owns the number."
+  ]
+ },
+ "repo_edits": [
+  {
+   "part": "PART-02",
+   "path": "docs/prompt_ecosystem_management/gcfpe.decision-record.md",
+   "old": "installed skills; and X22's rebuild of the parts and check of the registry from `main`. Each is in\nthe Modification's evidence.\n",
+   "count": 1,
+   "new": "installed skills; and X22's rebuild of the parts and check of the registry from `main`. Each is in\nthe Modification's evidence.\n\n## Note, 2026-10-27 — the Codex security review rests on Nathan's direction of 2026-10-13\n\nRecorded by `MODIFICATION-20261027-gcfpe-backlog-open-items` (PART-02, ITEM-24, CD-4), whose\nanalysis Nathan approved on 2026-10-27. It applies a direction already given and rules nothing new,\nso it takes no D-number.\n\n- **The direction.** Nathan, 2026-10-13, in the HDE-CRD-0002 WU-PR-01 PR-35 session: *\"This\n  feature (security review) is no longer available. We will need to deprecate it.\"* It is recorded\n  in `docs/ephemeral/HDE-CRD-0002-PF10-build-notes-addendum-codex-security-review-deprecation-v1.0.md`.\n- **Why it is recorded here.** The addendum that carried it drained with no permanent home (the\n  drainage ledger records it as \"N for PF canon\"), and permanent canon names no Codex security\n  review. Without this note the direction is findable only through a closed change's record.\n- **What follows for GCFPE.** No prompt or skill names a Codex security review as part of a pull\n  request's review chain. `glow-hde-pr-development` reads the Codex code review and any security\n  review that the approved work unit and the repository's instructions require. PR-35's generic\n  security-review wording is unchanged, and so is the Codex code review.\n- **Guard (`D14`).** The registry forbids, on every member row, a sentence naming both Codex and a\n  security review, and `glow-hde-pr-development`'s validator forbids \"Codex code and security\n  reviews\" and \"Codex security review\". Each is fired by an injected regression in the\n  Modification's EXECUTE.\n",
+   "placement_note": "Appended after D29. Other workers append decision-record entries in this Modification (the DN-3 ruling for ITEM-15 and ITEM-17; PART-13's R1 successor rows, L-A14): the coordinator orders all appends and numbers any D-entries; this note takes no D-number (CD-4).",
+   "why": "L-A08: I judge it required. ecosystem-change-management.md §2 step 5 puts 'A Product Owner ruling and its consequences' in gcfpe.decision-record.md, and the skill change and guard G-W1-F5 rest on a direction with no permanent canon home. CD-4 rules out a new D-number, not a record."
+  }
+ ],
+ "notion_control_ops": [],
+ "decisions": [
+  {
+   "id": "W1-D1",
+   "decision": "Bodies and skills carry canon's sentences: PF06 v2.5.5 §1.1.4's for Real input, Findings below P1 (with the standing-default sentence), the one P1 exception, Repeated finding class and Unchanged duty; PF27 v2.0.6's plain modal form for the P1 sentences ('is fixed', 'is not declined'), since bodies use no RFC capitals.",
+   "authority": "ecosystem-change-management.md §2 step 3 (converge on existing wording); the brief's wording rule; L-A06"
+  },
+  {
+   "id": "W1-D2",
+   "decision": "PR-35 carries the rules as a new section '## Review findings on real inputs' after step 10, and steps 3, 4 and the readiness gate point to it, so the numbered steps keep their numbers. RS-40's PR-35 section carries the same block in full rather than a pointer to PR-35, because the resumed phase reads RS-40's body.",
+   "authority": "D12 (one rule never split); authoritative-surfaces.md 'Restating is allowed; asserting is not'"
+  },
+  {
+   "id": "W1-D3",
+   "decision": "CD-14's stop rule is placed on PR-35 step 10 ('Continue until genuine merge readiness'), on RS-40's PR-35 continuation, and on the skill's §5 loop. PR-30 is not that phase: it ends at its first coherent publication and hands to PR-35 (PR-20 line 'PR-30 ends only at coherent locally tested initial publication'; skill: 'stop PR-30 with PR_CANDIDATE_PUBLISHED'), so it has no loop that would continue past a met business case.",
+   "authority": "CD-14; PF04 v2.8.8 §9.7.7 Gates"
+  },
+  {
+   "id": "W1-D4",
+   "decision": "CD-2's in-session design question is worded 'Ask the question in this session and continue on the answer: work a narrowed design or a stated limit here, and take a rescope through the formal rescope route.' No result state, graph edge or R1 row changes.",
+   "authority": "CD-2"
+  },
+  {
+   "id": "W1-D5",
+   "decision": "PR-40's CD-3 check names the real-input meaning by the Change Process Guide rather than restating the definition a third time; step 7 already sends 'a precise substantiated defect' to REJECT, which re-plans under D23-F.",
+   "authority": "CD-3; PF06 v2.5.5 §1.1.4"
+  },
+  {
+   "id": "W1-D6",
+   "decision": "DOC-20: the bullet becomes a no-entry rule; a missing or unverifiable PR-40 acceptance takes the existing native-owner (ORIGINAL_NATIVE_STAGE) branch for remediation and the terminal return otherwise. The terminal branch's graph condition is restated to match.",
+   "authority": "CD-1; L-A07; D23-E successor 'PR-40 is entered once per merge'"
+  },
+  {
+   "id": "W1-D7",
+   "decision": "G-W1-F5 forbids a sentence naming both Codex and a security review, not every Codex mention: the Codex code review stays in the review chain (the 2026-10-13 direction's rule 3; AGENTS.md Code review guidelines).",
+   "authority": "CD-4; D26-E broad match minus named exceptions"
+  },
+  {
+   "id": "W1-D8",
+   "decision": "No forbidden guard is specific to PR-40 beyond G-W1-F1 and G-W1-F2: no PR-40 text the CD-3 check contradicts exists (step 6 'Do not silently waive a finding' agrees with it), so none can survive.",
+   "authority": "GUARD-001 (a forbidden guard wherever contradicting old text could survive)"
+  },
+  {
+   "id": "W1-D9",
+   "decision": "glow-hde-pr-development moves to revision 1.5.0, and its validator gains required markers for every new rule and forbidden markers for every retired phrase (lines 90, 91, 96, 105, 184's citation; behavior cases 7, 17, 41, 91; the entry's ceiling and round-count phrases, CD-15). Three behavior cases are added.",
+   "authority": "skill-identity-and-freeze.md (changed content, unspent revision); GUARD-001; CD-15; modification-template.md rule 7 (one package, one review, one install)"
+  },
+  {
+   "id": "W1-D10",
+   "decision": "ITEM-33's citation becomes '(PF04 §9.1.3, *GCFPE model and reasoning-level guidance*)'.",
+   "authority": "DN-12 rider 1 as approved; PF04 v2.8.8 §9.1.3 read"
+  },
+  {
+   "id": "W1-D11",
+   "decision": "L-A08: a short decision-record note is drafted (repo_edits), with no D-number.",
+   "authority": "ecosystem-change-management.md §2 step 5; CD-4"
+  },
+  {
+   "id": "W1-D12",
+   "decision": "L-A20 is not repaired: PR-20's corrected REJECT sentence still omits PR-40.json's reject_instruction_owner -> PR-10 branch (J-3).",
+   "authority": "§A.14: L-A20 accepted as a risk"
+  }
+ ],
+ "questions": [
+  {
+   "id": "W1-Q1",
+   "to": "coordinator",
+   "question": "The direct-handoff contract's pr_development_contract.merge_pending_requirements (from the 4.0.6 template) restates PR-35's readiness predicates and will omit the new 'no open P1 thread on a real input' predicate. Add it?",
+   "options": [
+    "(a) Add the item in the successor contract through glow-graph-contract's value table, and add it to the successor flowmaster-validate EXPECTED_MERGE_PENDING_REQUIREMENTS, with an injected regression (PART-24).",
+    "(b) Leave the contract's list as a partial restatement and list it as a limit."
+   ],
+   "recommendation": "(a): the packages are already rebuilt in PART-24, and the restatement would otherwise be stale against PR-35's gate (STALE-001)."
+  },
+  {
+   "id": "W1-Q2",
+   "to": "coordinator",
+   "question": "PF04 §9.7.7's measure is 'checked after delivery', so a business case is rarely observably met inside PR-35's pre-merge loop. Further work on a delivered unit arrives as a PR-40 REJECT re-plan (D23-F, PR-20's Re-plan entry). Should the stop rule also go there?",
+   "options": [
+    "(a) Keep CD-14's placement as planned (PR-35, RS-40's PR-35 continuation, the skill's §5).",
+    "(b) Also place it on PR-20's Re-plan entry, which is W2's and W3a's page as well."
+   ],
+   "recommendation": "(a) for this Modification, as CD-14 directs; record (b) as a candidate for a later Modification if a re-plan of a met unit is observed (PF04 §9.7.7: a business case needs an observed incident)."
+  },
+  {
+   "id": "W1-Q3",
+   "to": "Nathan, through the coordinator",
+   "question": "The same stale citation as ITEM-33 sits in two packages this Modification already changes: flowmaster-validate SKILL.md:168 '(HDE Build Notes; PF04 §9.1.3)' and its fixture comment run_gcfpe_20261009_fixtures.py:320; change-flow SKILL.md:305 'Under current HDE Build Notes, the model and reasoning-level guidance ... is the TypeSafe reading' and its revision note at line 10. PF10 v13.9 no longer carries the rule. Riders need his yes (DN-12).",
+   "options": [
+    "(a) Ride them in this Modification as zero-cost riders on packages already being rebuilt.",
+    "(b) Add them to J-9 on the backlog for a separate Modification."
+   ],
+   "recommendation": "(a): change-flow:305 states as current a home that no longer holds the rule, and the files are already in this Modification's packages."
+  }
+ ],
+ "dispositions": [
+  {
+   "item": "ITEM-01",
+   "planned_disposition": "APPLIED (PART-08): DOC-20 body bullet W1-DOC20-01; DOC-20.json edge to PR-40 removed; guards G-W1-F4 (forbidden) and G-W1-R15 (required)",
+   "evidence": "In memory on DOC-20 100926.1: op resolves once and lands; G-W1-F4 1 -> 0; G-W1-R15 0 -> 1; the graph edit removes the only prompt-originated non-observed-merge inbound PR-40 edge."
+  },
+  {
+   "item": "ITEM-02",
+   "planned_disposition": "APPLIED (PART-06): W1-PR20-02; guards G-W1-F3, G-W1-R14",
+   "evidence": "In memory on PR-20 100926.1: G-W1-F3 1 -> 0; G-W1-R14 0 -> 1. L-A20 (J-3) stays an accepted risk."
+  },
+  {
+   "item": "ITEM-11",
+   "planned_disposition": "APPLIED (PART-01): PR-35 W1-PR35-01 to -04; RS-40 W1-RS40-01, -02; PR-20 W1-PR20-01; change-flow SKILL.md:317; guards G-W1-R1 to R11, R13, G-W1-F1",
+   "evidence": "In memory: 11 required guards 0 -> 1 on PR-35 and RS-40; G-W1-F1 1 -> 0 on PR-35, RS-40 and PR-20; 0 -> 0 on PR-40 and DOC-20."
+  },
+  {
+   "item": "ITEM-12",
+   "planned_disposition": "APPLIED (PART-01): glow-hde-pr-development SKILL.md 91, 96, §4 subsection, §5, 105; behavior-cases 7, 17, 41, 91 and three new cases; validator markers; revision 1.5.0",
+   "evidence": "Scratch-copy validator PASS; 9 of 9 injected regressions fail it."
+  },
+  {
+   "item": "ITEM-23",
+   "planned_disposition": "APPLIED (PART-01): PR-35 gate W1-PR35-05 and the P1 bullets; RS-40 W1-RS40-03; PR-40 W1-PR40-01 (CD-3); guards G-W1-R5 to R7, R12, G-W1-F2",
+   "evidence": "In memory: G-W1-F2 1 -> 0 on PR-35; G-W1-R12 0 -> 1 on PR-40."
+  },
+  {
+   "item": "ITEM-24",
+   "planned_disposition": "APPLIED (PART-02): glow-hde-pr-development SKILL.md:90; validator forbids 'Codex code and security reviews' and 'Codex security review'; G-W1-F5 on all 55 rows; decision-record note (L-A08)",
+   "evidence": "G-W1-F5 0 on the five W1 pages before and after; 0 of 56 pages name Codex (ANALYZE sweep F3); injected regression of line 90 fails the validator."
+  },
+  {
+   "item": "ITEM-33",
+   "planned_disposition": "APPLIED (PART-26, skill half): SKILL.md:184 citation; validator forbids 'HDE Build Notes; PF04'",
+   "evidence": "Old string occurs once; injected regression fails the validator. Same defect elsewhere is W1-Q3."
+  }
+ ],
+ "verification": [
+  {
+   "part": "PART-01",
+   "landed": "EXECUTE fetches the PR-35, RS-40, PR-40 and PR-20 successor pages fresh (D22) and runs body_check check with W1's ops: every op LANDED by its anchor counts. Installed glow-hde-pr-development: validate_glow_hde_pr_development.py PASS, the SKILL.md revision line reads 1.5.0, and freeze.py's digest is recorded; change-flow SKILL.md carries the two new strings once each.",
+   "old_text_gone": "On the same reads: G-W1-F1 and G-W1-F2 count 0 on PR-35, RS-40, PR-20, PR-40 and DOC-20; G-W1-R1 to R11 count 1 on PR-35 and RS-40, G-W1-R12 1 on PR-40, G-W1-R13 1 on PR-20. grep on the installed trees: 0 hits for 'resolve every known substantive in-scope review issue', 'corrects all known findings', 'Resolve all then-known findings'. Registry: each guard's registry form (body_check registry) agrees on every fixture and page.",
+   "regression": "Inject PR-35's old step 4, RS-40's old clause, or PR-20's old description into a landed page in memory: G-W1-F1 fires. Inject the old gate predicate: G-W1-F2 fires. Delete any rule bullet: its required guard fires. Re-insert any retired skill line: the package validator fails (9 of 9 here)."
+  },
+  {
+   "part": "PART-02",
+   "landed": "Installed SKILL.md line 90 reads the new text once; the decision-record note is on main after the Modification's pull request merges.",
+   "old_text_gone": "grep -c 'Codex code and security reviews' and 'Codex security review' in the installed tree: 0. G-W1-F5 counts 0 on every successor and unchanged member in PART-24's run.",
+   "regression": "Re-insert the old line 90: the validator fails 'forbidden ... Codex code and security reviews'. A fixture sentence naming a Codex security review fails G-W1-F5."
+  },
+  {
+   "part": "PART-06",
+   "landed": "PR-20 successor fresh fetch: W1-PR20-02 LANDED.",
+   "old_text_gone": "G-W1-F3 counts 0 and G-W1-R14 counts 1 on PR-20.",
+   "regression": "Re-insert 'REJECT returns precise in-scope findings to the PR owner;': G-W1-F3 fires."
+  },
+  {
+   "part": "PART-08",
+   "landed": "DOC-20 successor fresh fetch: W1-DOC20-01 LANDED. glow-graph-contract builds the successor graph from the parts: DOC-20 has no edge to PR-40, state_route_order lacks landed_lineage_review, and PR-40's inbound edges are the PR-35 and RS-40 observed-merge edges and the NATHAN_MANUAL_MERGE_ASSERTION boundary only.",
+   "old_text_gone": "G-W1-F4 counts 0 and G-W1-R15 counts 1 on DOC-20; 'landed_lineage_review' occurs 0 times in docs/graph/parts and in the successor contracts.",
+   "regression": "Re-add the DOC-20 -> PR-40 edge to a copy of the built graph: the successor flowmaster-validate PR40_MANUAL_MERGE_BOUNDARY check (tightened, skill_checks) fails. Re-insert the old bullet: G-W1-F4 fires."
+  },
+  {
+   "part": "PART-26 (ITEM-33)",
+   "landed": "Installed SKILL.md line 184 ends '(PF04 §9.1.3, *GCFPE model and reasoning-level guidance*)'.",
+   "old_text_gone": "grep -c 'HDE Build Notes' in the installed glow-hde-pr-development tree: 0.",
+   "regression": "Re-insert '(HDE Build Notes; PF04 §9.1.3)': the validator fails."
+  }
+ ],
+ "limits": [
+  "The 'as of' times are the pages' last-edited times (2026-10-12); the pages were fetched on 2026-10-27. EXECUTE edits the successor duplicates, so it re-anchors on a fresh read of each successor.",
+  "Other workers' ops were checked for overlap only against W3a (0 overlaps on PR-20 and PR-40). W3b's PR-35 ops and W2's PR-20 and PR-40 ops were not visible; the coordinator checks them against the spans named in op_order_and_sharing.",
+  "G-W1-F5 was counted on the five W1 pages only; the other 50 members rest on the ANALYZE sweep's F3 (0 of 56) until PART-24's run.",
+  "Each guard's registry form was checked with a local re-implementation of body_check.py's to_registry(), not with the shipped governance-audit engine; PART-24 runs body_check.py registry.",
+  "The package validator ran on a scratch copy of the installed glow-hde-pr-development; the flowmaster-validate and change-flow suites were not run, since they pin the 100926.1 contract and profile, which PART-24 replaces.",
+  "PR-35 and RS-40 now each carry the same rule block of about 450 words; a later change to the rule edits both (D12), and the required guards hold both to one text.",
+  "L-A20 (J-3): PR-20's REJECT sentence still omits the reject_instruction_owner -> PR-10 branch.",
+  "Transient reads (D22): PR-20 and PR-40 fetch results were saved by the harness to its session tool-results store; all five bodies were read in memory by scratch scripts, which printed only counts, ids and booleans. No body text was written. The scratch scripts and the scratch skill copy were deleted at the end of this task; the harness's own saves are left to its teardown and never read again. No body was hashed or byte-compared with another read."
+ ],
+ "escape_hatch": [
+  "flowmaster-validate SKILL.md:168 and scripts/run_gcfpe_20261009_fixtures.py:320 (comment) cite '(HDE Build Notes; PF04 §9.1.3)'; change-flow SKILL.md:305 says 'Under current HDE Build Notes, the model and reasoning-level guidance ... is the TypeSafe reading', and line 10 repeats it in the revision note. Same defect as ITEM-33 (A-11), not covered by any approved rider: W1-Q3.",
+  "flowmaster-validate SKILL.md:174 and DOC-20's 'PR-phase, merge, and abort boundaries' paragraph ('MERGE_PENDING — Ready to merge requires resolved current-head reviews, ...') restate PR-35's readiness predicates without the new P1 predicate. They are incomplete, not contradictory; W1 made no op for them. If W1-Q1 (a) is chosen, the coordinator may want both restatements to match.",
+  "PR-20 Execute step 7 ('Carry the PR-35 obligations for review retrieval/correction, ...') and DOC-20's 'PR-35 owns review and thread retrieval, local correction and retest ...' describe PR-35 generically and contradict nothing; left unchanged. Step 7's first sentence is W3a's (HP-PR-20-02), and its 'boundary cases' clause is W2's (ITEM-18).",
+  "PR-40 'Accepted-final lineage protection' sends a merged-but-not-accepted finding to RS-10 (J-4, L-A19): outside W1's rule, not edited.",
+  "The graph's source_evidence pointers on DOC-20's remaining edges name 'candidate/prompts/b/DOC-20.md' (J-10): not edited."
+ ]
+}

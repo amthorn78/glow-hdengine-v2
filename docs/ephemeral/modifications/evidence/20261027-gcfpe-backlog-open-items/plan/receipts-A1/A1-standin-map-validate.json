@@ -1,0 +1,14 @@
+{
+ "members_56": true,
+ "members_cover_tsv_plus_cl05": true,
+ "only_added_is_cl05": true,
+ "kept_ids_equal_tsv": true,
+ "successor_predecessors_equal_tsv": true,
+ "pe_predecessor": true,
+ "page_ids_32_hex": true,
+ "successor_titles_102726": true,
+ "distinct_successor_ids": "NOT_APPLICABLE_STAND_IN",
+ "ok": true,
+ "stand_in": true,
+ "mode": "validate"
+}

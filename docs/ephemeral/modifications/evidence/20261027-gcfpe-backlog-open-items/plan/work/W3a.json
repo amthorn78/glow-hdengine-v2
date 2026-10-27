@@ -1,0 +1,2216 @@
+{
+ "worker": "W3a",
+ "parts": [
+  "PART-07"
+ ],
+ "canon_read": [
+  {
+   "title": "PF10-HDE-Build-Notes",
+   "version": "v13.9",
+   "sections": "Front matter: Precedence §1 PF10 authority, §2 scope, §8 Silence rule; addendum index; addendum 2.1 heading and decision headings (S19 vendor and security policy)",
+   "use": "PF10 is silent on handoff format and package content; permanent canon governs (§8)"
+  },
+  {
+   "title": "PF04-Canon-HDE-Governance",
+   "version": "v2.8.8",
+   "sections": "§9.1.1 Change authority and exact-artifact lineage (in full); §9.1.2 Canon precedence and persistent sources (in full); §9.1.3 Artifact storage and execution-surface selection (in full); §9.1.6 Prompt ecosystem governance and provenance (in full)",
+   "use": "§9.1.1: 'Every handoff resolves its exact substantive artifact by stable ID or durable reference, preserving source class, version, approval and predecessor lineage.' The canonical lead meets it by naming each artifact by its versioned repository path, whose artifact holds the lineage. §9.1.3: work needed for continuity or handoff is saved in the repository first (D23-A)."
+  },
+  {
+   "title": "PF06-Canon-Change-Process-Guide",
+   "version": "v2.5.5",
+   "sections": "§3 Implementation Plan template, 'Execution prompt portability rule (Implementation Plan codex_inputs)' paragraph (in full)",
+   "use": "The self-contained final implementation prompt is an Implementation Plan template rule; it does not require a GCFPE handoff block to restate artifact contents. Not governing PART-07's wording."
+  },
+  {
+   "title": "PF19-Canon-Glow-QA-Guide",
+   "version": "v3.0.7",
+   "sections": "§0.4.3 Core principles (in full)",
+   "use": "Prompt-use attribution 'belongs in the responsible actor's existing permitted artifact or handoff': the artifact suffices, so the edits remove nothing canon requires."
+  },
+  {
+   "title": "Search, not governing",
+   "version": "main",
+   "sections": "git grep 'handoff|input package|session identity' over docs/pfcanon on origin/main: PF04 (12 hits), PF06 (11), PF19 (8), PF27 (2), PF14 (9) read in context; PF27 §3B CL-05 bullet and phase-block bullet, PF14 §0.2 storage line, PF06 backlog-handoff lines",
+   "use": "No canon section governs GCFPE handoff-block content; findings.md MB-010 agrees ('No PF canon governs handoff format'). Governing repository controls: D23-A, D23-B, D27 Continuity, global.json handoff_contract."
+  }
+ ],
+ "fresh_reads": [
+  {
+   "prompt_or_page": "QA-10",
+   "page_id": "3f44590a05eb8134af92e7c85a48e67c",
+   "as_of": "2026-10-12T02:30:12.398Z"
+  },
+  {
+   "prompt_or_page": "PR-40",
+   "page_id": "3f44590a05eb81088487e918fd642a7f",
+   "as_of": "2026-10-12T02:29:38.234Z"
+  },
+  {
+   "prompt_or_page": "PR-20",
+   "page_id": "3f44590a05eb819fbea5dcd966a750ba",
+   "as_of": "2026-10-12T02:29:47.327Z"
+  },
+  {
+   "prompt_or_page": "OPS-30",
+   "page_id": "3f44590a05eb81ec8da3effc3b28cf97",
+   "as_of": "2026-10-12T02:30:04.097Z"
+  }
+ ],
+ "canonical_texts": {
+  "family": {
+   "HP_ROUTE": "Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest.",
+   "HP_HOLD": "The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest.",
+   "HP_PACKAGE": "Each package names its destination and its input artifacts by repository path; it restates nothing the destination prompt or the artifacts hold.",
+   "HP_SESSION": "The receiving side chooses or recovers the session.",
+   "HP_LABEL": "Handoff:",
+   "HP_REST": "the artifacts hold the rest.",
+   "HP_ACCESS": "Required tools, stores, environment and access limitations: the destination prompt holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "HP_GATES": "Applicable gates and manual prerequisites: the destination prompt holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "HP_TERMINAL": "Handoff: the output artifact and its predecessor artifacts, each by repository path; the artifacts hold the decision state, the pending manual act or terminal state, the return point and the rest.",
+   "HP_ACCESS_FORM": "Required tools, stores, environment and access limitations: {destination} holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "HP_GATES_FORM": "Applicable gates and manual prerequisites: {destination} holds them; name only a manual prerequisite that the artifacts do not record, as minimum context."
+  },
+  "sources": {
+   "HP_ROUTE": "converges on the corpus sentence in every body's 'Source discovery and reference discipline': 'a runtime handoff names its destination and input artifacts by those links, versions and paths, and the artifacts hold their lineage' and on D23-B's field list; points to the body's own Mandatory single-block handoff (C-HANDOFF)",
+   "HP_HOLD": "C-PLACE 'the artifact holds the rest'; D23-A",
+   "HP_PACKAGE": "D23-B 'restates nothing the named prompt, canon or files hold'",
+   "HP_SESSION": "D27 Continuity verbatim: 'the receiving side chooses or recovers the session'",
+   "HP_LABEL": "replaces 'Complete native input package:' and 'Complete RS-NN package:' (RS-NN labels become 'RS-NN handoff:')",
+   "HP_REST": "C-PLACE; already used in PR-20 and PR-40 package lines ('the artifacts hold the rest')",
+   "HP_ACCESS_FORM / HP_GATES_FORM": "C-HANDOFF 'only for a condition those artifacts do not already record, the minimum context it needs'; {destination} is the branch's destination prompt or owner, so each replacement is unique on its page (body_check state() and landed())",
+   "HP_TERMINAL": "terminal/manual-prerequisite branches: D23-A, D23-B"
+  },
+  "use_by_W3b": "Reuse these texts verbatim; put the branch's destination in the {destination} slot; where a page carries the same text twice, extend the span to a unique neighbouring clause rather than rewording (each 'new' must not already occur on the page)."
+ },
+ "ops": [
+  {
+   "id": "HP-PR-20-01",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "Managed entry, execution posture and continuing identity",
+   "start": "Each handoff carries the complete native input package, exact artifact and version lineage, session identity, manual prerequisites, recovery context and result-specific terminal behavior.",
+   "end": null,
+   "new": "Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest.",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-PR-20-02",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "Execute",
+   "start": "Prepare the complete Product Owner invocation package for PR-30 for the exact plan/version and repository baseline.",
+   "end": null,
+   "new": "Write into the plan everything PR-30 needs, for the exact plan version and repository baseline; the PR-30 handoff names the plan by repository path.",
+   "why": "Execute step 7's first sentence tells PR-20 to prepare a complete invocation package for PR-30 (D23-B). Only this first sentence is replaced; the rest of step 7, including 'boundary cases' (PART-04, ITEM-18), belongs to its own worker and is untouched. After the edit 'Include ...' and 'Carry ...' refer to the plan.",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-PR-20-03",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "Next step and recovery",
+   "start": "reached by a direct native handoff",
+   "end": "result and result-specific terminal behavior.",
+   "new": "reached by a direct native handoff. The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest.",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-PR-20-04",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "COMPLETE APPROVED-SCOPE PLAN → PR-30",
+   "start": "Preserve session\\_disposition, role\\_session\\_ref, invocation\\_binding, context\\_conflict, originating IA/Isis/PR continuity, and the actual Product Owner invocation boundary.",
+   "end": null,
+   "new": "The receiving side chooses or recovers the session.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "span_has_markup": true,
+   "layer": "session"
+  },
+  {
+   "id": "HP-PR-20-05",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "COMPLETE APPROVED-SCOPE PLAN → PR-30",
+   "start": "Complete native input package:\n\n- Product Owner invocation of PR-30",
+   "end": null,
+   "new": "Handoff:\n\n- Product Owner invocation of PR-30",
+   "why": "Per-branch 'Complete ... package' label (findings.md V2, second layer). The label alone tells an agent the handoff carries a complete package; D23-B. Content kept; label becomes 'Handoff:'.",
+   "lines": 2,
+   "layer": "label"
+  },
+  {
+   "id": "HP-PR-20-06",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "COMPLETE APPROVED-SCOPE PLAN → PR-30",
+   "start": "- PR\\_IMPLEMENTATION\\_PLAN\\_ID,",
+   "end": "Audit/Plan/review lineage.",
+   "new": "- PR\\_IMPLEMENTATION\\_PLAN\\_ID, PR\\_INSTRUCTION\\_ID and WORK\\_UNIT\\_ID; the plan and the instruction hold the approved Specification, Implementation Audit, Plan and review lineage.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-20-07",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "COMPLETE APPROVED-SCOPE PLAN → PR-30",
+   "start": "Required tools, stores, environment and access limitations: preserve the actual",
+   "end": "access fact.",
+   "new": "Required tools, stores, environment and access limitations: PR-30 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-PR-20-08",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "PR-35 REVIEW AND READINESS PHASE IN ITS OWN DEDICATED SESSION",
+   "start": "Complete native input package: PR-35's own dedicated session",
+   "end": null,
+   "new": "Handoff: PR-35's own dedicated session",
+   "why": "Per-branch 'Complete ... package' label (findings.md V2, second layer). The label alone tells an agent the handoff carries a complete package; D23-B. Content kept; label becomes 'Handoff:'.",
+   "layer": "label"
+  },
+  {
+   "id": "HP-PR-20-09",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "PR-40 DOWNSTREAM LINEAGE REVIEW",
+   "start": "Complete native input package:\n\n- PR\\_INSTRUCTION\\_ID, PR\\_IMPLEMENTATION\\_PLAN\\_ID, PR-30",
+   "end": null,
+   "new": "Handoff:\n\n- PR\\_INSTRUCTION\\_ID, PR\\_IMPLEMENTATION\\_PLAN\\_ID, PR-30",
+   "why": "Per-branch 'Complete ... package' label (findings.md V2, second layer). The label alone tells an agent the handoff carries a complete package; D23-B. Content kept; label becomes 'Handoff:'.",
+   "lines": 2,
+   "span_has_markup": true,
+   "layer": "label"
+  },
+  {
+   "id": "HP-PR-20-10",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "PR-40 DOWNSTREAM LINEAGE REVIEW",
+   "start": " and the continuing reviewer/session identity; the artifacts hold the rest",
+   "end": null,
+   "new": "; the artifacts hold the reviewer binding and the rest",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "layer": "session"
+  },
+  {
+   "id": "HP-PR-20-11",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "PR-40 DOWNSTREAM LINEAGE REVIEW",
+   "start": "Required tools, stores, environment and access limitations: preserve read-only",
+   "end": "automation boundaries.",
+   "new": "Required tools, stores, environment and access limitations: PR-40 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-PR-20-12",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "Complete RS-10 package:",
+   "end": null,
+   "new": "RS-10 handoff:",
+   "why": "Per-branch 'Complete ... package' label (findings.md V2, second layer). The label alone tells an agent the handoff carries a complete package; D23-B. Content kept; label becomes 'Handoff:'.",
+   "layer": "label"
+  },
+  {
+   "id": "HP-PR-20-13",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "- Read-only substantiation of the",
+   "end": "prerequisites.",
+   "new": "- The output artifact records the substantiated mismatch, its cause, the bounded delta and the alternatives; name only a Product Owner prerequisite it does not record, as minimum context.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-20-14",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "Required tools, stores, environment and access limitations: preserve canonical",
+   "end": "access facts.",
+   "new": "Required tools, stores, environment and access limitations: RS-10 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-PR-20-15",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "Complete RS-20 package:",
+   "end": null,
+   "new": "RS-20 handoff:",
+   "why": "Per-branch 'Complete ... package' label (findings.md V2, second layer). The label alone tells an agent the handoff carries a complete package; D23-B. Content kept; label becomes 'Handoff:'.",
+   "layer": "label"
+  },
+  {
+   "id": "HP-PR-20-16",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "- RESCOPE\\_PROPOSAL\\_ID and the",
+   "end": "obligations.",
+   "new": "- RESCOPE\\_PROPOSAL\\_ID, naming the proposal by repository path; the artifacts hold the finding, change, work-unit, baseline and stage lineage, the approved Specification, Plan and review, and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-20-17",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "- Same proposal author, IA reviewer",
+   "end": "PR; and Required tools, stores, environment and access limitations.",
+   "new": "- The same proposal author and IA reviewer. The receiving side chooses or recovers the session. Name any existing RS-20 decision or addendum by repository path.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "layer": "session"
+  },
+  {
+   "id": "HP-PR-20-18",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "Required tools, stores, environment and access limitations: preserve the exact",
+   "end": "automation controls.",
+   "new": "Required tools, stores, environment and access limitations: RS-20 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-PR-20-19",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "Complete RS-30 package:",
+   "end": null,
+   "new": "RS-30 handoff:",
+   "why": "Per-branch 'Complete ... package' label (findings.md V2, second layer). The label alone tells an agent the handoff carries a complete package; D23-B. Content kept; label becomes 'Handoff:'.",
+   "layer": "label"
+  },
+  {
+   "id": "HP-PR-20-20",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": ", and same author and IA reviewer/session.",
+   "end": null,
+   "new": ", for the same author and IA reviewer.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "layer": "session"
+  },
+  {
+   "id": "HP-PR-20-21",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "- Every redline retains unique",
+   "end": "satisfied accounting.",
+   "new": "- The RS-20 review holds every redline; the handoff names it and restates none of it.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-20-22",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN BOUNDARY → RS-10, RS-20, RS-30",
+   "start": "Required tools, stores, environment and access limitations: preserve exact redline, storage, recovery, terminal, automation, Product Owner and Specification boundaries.",
+   "end": null,
+   "new": "Required tools, stores, environment and access limitations: RS-30 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-PR-20-23",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "SAME-OWNER CORRECTION OR RECOVERY",
+   "start": "Complete native input package: exact",
+   "end": "point; and Required tools, stores, environment and access limitations.",
+   "new": "Handoff: the output artifact and the PR instruction, each by repository path; the artifacts hold the plan state, the missing fact, the owner, the resume point and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-20-24",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-20",
+   "section": "ACCEPTED MANUAL-PREREQUISITE OR TERMINAL RETURN",
+   "start": "Complete native input package: all",
+   "end": "EXECUTED values.",
+   "new": "Handoff: the output artifact and its predecessor artifacts, each by repository path; the artifacts hold the decision state, the pending manual act or terminal state, the return point and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-40-01",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "Inputs",
+   "start": "The sole substantive review input is the complete native package containing:",
+   "end": null,
+   "new": "The sole substantive review inputs are the artifacts the handoff names by repository path:",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-PR-40-02",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "Inputs",
+   "start": "- CHANGE\\_CLASS, CHANGE\\_ID, WORK\\_UNIT\\_ID, approved Specification, Implementation Audit, Plan, Plan review, dependency and acceptance/evidence lineage.",
+   "end": null,
+   "new": "- The approved Specification, Implementation Audit, Plan and Plan review, each by repository path; the artifacts hold the change identity, dependencies and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-40-03",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "Inputs",
+   "start": "- Existing PR reviewer/session lineage for a rereview, the PR-30 and PR-35 session identities, the whole-change IA context and exact return owner.",
+   "end": null,
+   "new": "- For a rereview, the prior lineage review, by repository path. The receiving side chooses or recovers the session.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "layer": "session"
+  },
+  {
+   "id": "HP-PR-40-04",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "Inputs",
+   "start": "- CANON\\_CONFLICT\\_REGISTER, recovery state, truthful pending, NOT PRODUCED and NOT EXECUTED values, and all actual access limitations.",
+   "end": null,
+   "new": "- Only a denied or unavailable access fact that the artifacts do not record, as minimum context; the artifacts hold the conflict register, the result states and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-40-05",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "Managed entry, execution posture and continuing identity",
+   "start": "Each handoff carries the complete native input package, exact artifact and version lineage, session identity, manual prerequisites, recovery context and result-specific terminal behavior.",
+   "end": null,
+   "new": "Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest.",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-PR-40-06",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "Direct native handoff packages",
+   "start": "Preserve exact artifact and version lineage, owner and session continuity, manual prerequisites, return owner, recovery state, native result and all actual access limitations.",
+   "end": null,
+   "new": "The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest.",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-PR-40-07",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "ACCEPT → next approved Plan stage",
+   "start": "Complete native input package:\n",
+   "end": null,
+   "new": "Handoff:\n",
+   "why": "Per-branch 'Complete ... package' label (findings.md V2, second layer). The label alone tells an agent the handoff carries a complete package; D23-B. Content kept; label becomes 'Handoff:'.",
+   "lines": 1,
+   "layer": "label"
+  },
+  {
+   "id": "HP-PR-40-08",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "ACCEPT → next approved Plan stage",
+   "start": "- Preserve any dependent IA Plan state, QA readiness state, originating owner, recovery state and explicit NOT PRODUCED or NOT EXECUTED values.",
+   "end": null,
+   "new": "- Any dependent IA Plan or QA readiness state that the artifacts do not record, as minimum context.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-40-09",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "ACCEPT → next approved Plan stage",
+   "start": "Required tools, stores, environment and access limitations: preserve read-only",
+   "end": "all denied or unavailable access facts.",
+   "new": "Required tools, stores, environment and access limitations: the next stage's prompt holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-PR-40-10",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN CHANGE → RS-10, RS-20, RS-30",
+   "start": "- Read-only substantiation of the",
+   "end": "prerequisites.",
+   "new": "- The finding in the lineage review records the substantiated mismatch and its evidence; name only a Product Owner prerequisite it does not record, as minimum context.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-40-11",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN CHANGE → RS-10, RS-20, RS-30",
+   "start": "Required tools, stores, environment and access limitations: preserve canonical",
+   "end": "and denied or unavailable access facts.",
+   "new": "Required tools, stores, environment and access limitations: RS-10 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-PR-40-12",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN CHANGE → RS-10, RS-20, RS-30",
+   "start": "- RESCOPE\\_PROPOSAL\\_ID, naming",
+   "end": "unchanged obligations.",
+   "new": "- RESCOPE\\_PROPOSAL\\_ID, naming the proposal and the lineage review finding by repository path; the artifacts hold the change identity, baseline, stage, approved bases, evidence and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-40-13",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN CHANGE → RS-10, RS-20, RS-30",
+   "start": "- Same proposal author, IA reviewer,",
+   "end": "present; and Required tools, stores, environment and access limitations.",
+   "new": "- The same proposal author and IA reviewer. The receiving side chooses or recovers the session. Name any existing RS-20 decision, addendum or RESCOPE\\_REVIEW\\_ID by repository path.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "span_has_markup": true,
+   "layer": "session"
+  },
+  {
+   "id": "HP-PR-40-14",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN CHANGE → RS-10, RS-20, RS-30",
+   "start": "- RESCOPE\\_PROPOSAL\\_ID and exact",
+   "end": "prerequisites; and Required tools, stores, environment and access limitations.",
+   "new": "- The pending RESCOPE\\_PROPOSAL and the RS-20 REVISION\\_REQUIRED review, each by repository path, for the same author and IA reviewer; the artifacts hold the change identity, base, findings and the rest. Name only a Product Owner prerequisite they do not record, as minimum context.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-PR-40-15",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN CHANGE → RS-10, RS-20, RS-30",
+   "start": "- Complete redline package for",
+   "end": "recovery history.",
+   "new": "- The RS-20 review holds the redlines for every required correction; name any existing application report or checkpoint by repository path as recovery history.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-PR-40-16",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "PENDING MERGE OR UNAVAILABLE EVIDENCE",
+   "start": "Complete native input package: PR",
+   "end": null,
+   "new": "Handoff: PR",
+   "why": "Per-branch 'Complete ... package' label (findings.md V2, second layer). The label alone tells an agent the handoff carries a complete package; D23-B. Content kept; label becomes 'Handoff:'.",
+   "layer": "label"
+  },
+  {
+   "id": "HP-PR-40-17",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "PENDING MERGE OR UNAVAILABLE EVIDENCE",
+   "start": "may return the complete package for a rereview.",
+   "end": null,
+   "new": "may hand off again for a rereview.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-PR-40-18",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "PR-40",
+   "section": "TERMINAL OR MANUAL-PREREQUISITE RETURN",
+   "start": "Complete native input package: exact",
+   "end": "proof and explicit NOT PRODUCED or NOT EXECUTED values.",
+   "new": "Handoff: the output artifact and its predecessor artifacts, each by repository path; the artifacts hold the decision state, the pending manual act or terminal state, the return point and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-QA-10-01",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Execution posture and continuing identity",
+   "start": " with complete native input packages and exact carried lineage.",
+   "end": null,
+   "new": ". Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest.",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-QA-10-02",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Next step and recovery",
+   "start": "Preserve the exact immediate actor, session continuity, native inputs, artifact lineage, current state, gates, manual prerequisites, risks, recovery and required next action.",
+   "end": null,
+   "new": "The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest.",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-QA-10-03",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Next step and recovery",
+   "start": " with <code>QA_READINESS_ID</code>,",
+   "end": "continuing session identity.",
+   "new": ", naming the three QA-10 output artifacts by repository path; the artifacts hold the change identity, lineage, evidence and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-QA-10-04",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Next step and recovery",
+   "start": " with <code>ORIGINATING_FINDING_REF</code>,",
+   "end": "remediation package.",
+   "new": ", naming the finding and the QA-10 output artifacts by repository path; the artifacts hold the failed objective, its evidence, the affected scope, the required return evidence and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-QA-10-05",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Next step and recovery",
+   "start": "Carry the missing source/unit,",
+   "end": "precise resume point.",
+   "new": "Name the partial artifacts by repository path; they record the missing source or unit, at most two materially different supported retrieval attempts, the observed failure, the smallest missing input, the owner and the precise resume point.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-QA-10-06",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "5. Establish whole-change readiness and the actual branch",
+   "start": "Prepare the complete ESC-30 native package for continuing Thoth and return it directly to ESC-30;",
+   "end": null,
+   "new": "Record them in the QA-10 output artifacts and hand off directly to continuing Thoth through ESC-30;",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-QA-10-07",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Required result",
+   "start": ", and carry the complete native remediation package to continuing Thoth.",
+   "end": null,
+   "new": " in the output artifacts, and hand off to continuing Thoth through ESC-30.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-QA-10-08",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Next step and recovery",
+   "start": "named by the complete package,",
+   "end": null,
+   "new": "named in the QA-10 output artifacts,",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-QA-10-09",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "READY\\_FOR\\_QA → QA-20 — Create Live QA Guide",
+   "start": " readiness owner and correctly",
+   "end": "exact session continuity.",
+   "new": " readiness owner. The receiving side chooses or recovers the session.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "span_has_markup": true,
+   "layer": "session"
+  },
+  {
+   "id": "HP-QA-10-10",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "READY\\_FOR\\_QA → QA-20 — Create Live QA Guide",
+   "start": "Exact native inputs and artifact lineage: complete <code>QA_READINESS_ID</code>",
+   "end": "lineage; redaction, access limits and truthful absence states.",
+   "new": "Handoff: <code>QA_READINESS</code> with <code>READY_FOR_QA</code>, <code>REALITY_AUDIT</code> and <code>CHANGE_AUDIT_TRIAGE</code>, each by repository path; the artifacts hold the change identity, the approved and delivery lineage, the Product Owner disposition and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-QA-10-11",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "READY\\_FOR\\_QA → QA-20 — Create Live QA Guide",
+   "start": "Required tools, stores, environment and access limitations: preserve QA-20's",
+   "end": "same-Isis continuity, redaction, terminal behavior, active automation hold and every denied or unavailable access fact.",
+   "new": "Required tools, stores, environment and access limitations: QA-20 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "span_has_markup": true,
+   "layer": "tools"
+  },
+  {
+   "id": "HP-QA-10-12",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "READY\\_FOR\\_QA → QA-20 — Create Live QA Guide",
+   "start": "Applicable gates and manual prerequisites: complete three",
+   "end": "named by QA-20.",
+   "new": "Applicable gates and manual prerequisites: QA-20 holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-QA-10-13",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "READY\\_FOR\\_QA → QA-20 — Create Live QA Guide",
+   "start": "carry the complete package directly to QA-20.",
+   "end": null,
+   "new": "hand off directly to QA-20.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-QA-10-14",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "NOT\\_READY → ESC-30 — Diagnose and Propose Bounded Remediation",
+   "start": " remediation authority, with the exact originating IA/Isis/QA owner, Product Owner, reviewer and session continuity carried from the finding.",
+   "end": null,
+   "new": " remediation authority. The receiving side chooses or recovers the session.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "layer": "session"
+  },
+  {
+   "id": "HP-QA-10-15",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "NOT\\_READY → ESC-30 — Diagnose and Propose Bounded Remediation",
+   "start": "Exact native inputs and artifact lineage: complete <code>ORIGINATING_FINDING_REF</code>;",
+   "end": "return evidence.",
+   "new": "Handoff: <code>ORIGINATING_FINDING_REF</code>, the <code>REALITY_AUDIT</code> finding and the <code>QA_READINESS</code> result, each by repository path; the artifacts hold the failed objective, its evidence, the affected scope, the required return evidence and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-QA-10-16",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "NOT\\_READY → ESC-30 — Diagnose and Propose Bounded Remediation",
+   "start": "Required tools, stores, environment and access limitations: preserve ESC-30's",
+   "end": "same-Thoth/Isis/IA continuity, redaction, terminal behavior, active automation hold and every denied or unavailable access fact.",
+   "new": "Required tools, stores, environment and access limitations: ESC-30 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "span_has_markup": true,
+   "layer": "tools"
+  },
+  {
+   "id": "HP-QA-10-17",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "NOT\\_READY → ESC-30 — Diagnose and Propose Bounded Remediation",
+   "start": "Applicable gates and manual prerequisites: evidenced",
+   "end": "ESC-40 review.",
+   "new": "Applicable gates and manual prerequisites: ESC-30 holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-QA-10-18",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "NOT\\_READY → ESC-30 — Diagnose and Propose Bounded Remediation",
+   "start": "send the complete finding package directly to ESC-30.",
+   "end": null,
+   "new": "hand off directly to ESC-30.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-QA-10-19",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Accepted repair delivery → same Isis QA-10 reassessment",
+   "start": "Preserve the original session,",
+   "end": "Owner identity.",
+   "new": "The receiving side chooses or recovers the session; the artifacts record the originating owner, the Thoth review and the Product Owner identity.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "span_has_markup": true,
+   "layer": "session"
+  },
+  {
+   "id": "HP-QA-10-20",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Accepted repair delivery → same Isis QA-10 reassessment",
+   "start": "Exact native inputs and artifact lineage: prior",
+   "end": "references; redaction, access limits and truthful absence states.",
+   "new": "Handoff: the prior <code>REALITY_AUDIT</code>, <code>CHANGE_AUDIT_TRIAGE</code> and <code>QA_READINESS</code>, the approved <code>REMEDIATION_PROPOSAL_ID</code> and <code>REMEDIATION_REVIEW_ID</code>, and the accepted returned evidence, each by repository path; the artifacts hold the repair scope, the affected objectives and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-QA-10-21",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Accepted repair delivery → same Isis QA-10 reassessment",
+   "start": "Required tools, stores, environment and access limitations: preserve the same",
+   "end": "same-Isis/Thoth/IA continuity, redaction, terminal behavior, active automation hold and every denied or unavailable access fact.",
+   "new": "Required tools, stores, environment and access limitations: QA-10 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "span_has_markup": true,
+   "layer": "tools"
+  },
+  {
+   "id": "HP-QA-10-22",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Accepted repair delivery → same Isis QA-10 reassessment",
+   "start": "Applicable gates and manual prerequisites: accepted",
+   "end": "when supplied.",
+   "new": "Applicable gates and manual prerequisites: QA-10 holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-QA-10-23",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Accepted repair delivery → same Isis QA-10 reassessment",
+   "start": "with the complete predecessor and accepted-return package.",
+   "end": null,
+   "new": "from the artifacts the handoff names.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-QA-10-24",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "ASSESSMENT\\_INCOMPLETE → named evidence/retrieval owner and QA-10 resume phase",
+   "start": "Preserve <code>session_disposition</code>, <code>role_session_ref</code>, <code>invocation_binding</code>, <code>context_conflict</code>, owner identity, attempts and return point.",
+   "end": null,
+   "new": "The receiving side chooses or recovers the session; the artifacts record the owner, the attempts and the return point.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "span_has_markup": true,
+   "layer": "session"
+  },
+  {
+   "id": "HP-QA-10-25",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "ASSESSMENT\\_INCOMPLETE → named evidence/retrieval owner and QA-10 resume phase",
+   "start": "Exact native inputs and artifact lineage: partial",
+   "end": "recovery owner and resume point.",
+   "new": "Handoff: the partial <code>REALITY_AUDIT</code>, <code>CHANGE_AUDIT_TRIAGE</code> and <code>QA_READINESS</code>, each by repository path; they record the missing source or unit, the retrieval attempts, the recovery owner, the resume point and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-QA-10-26",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "ASSESSMENT\\_INCOMPLETE → named evidence/retrieval owner and QA-10 resume phase",
+   "start": "Required tools, stores, environment and access limitations: preserve the exact",
+   "end": "owner/session continuity, redaction, terminal behavior, active automation hold and every denied or unavailable access fact.",
+   "new": "Required tools, stores, environment and access limitations: the evidence or retrieval owner's prompt holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "span_has_markup": true,
+   "layer": "tools"
+  },
+  {
+   "id": "HP-QA-10-27",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "ASSESSMENT\\_INCOMPLETE → named evidence/retrieval owner and QA-10 resume phase",
+   "start": "Applicable gates and manual prerequisites: identify",
+   "end": "before reassessment.",
+   "new": "Applicable gates and manual prerequisites: the evidence or retrieval owner's prompt holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-QA-10-28",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "ASSESSMENT\\_INCOMPLETE → named evidence/retrieval owner and QA-10 resume phase",
+   "start": "return the complete incomplete package directly to the named evidence/retrieval owner or actual originating owner.",
+   "end": null,
+   "new": "hand off directly to the named evidence or retrieval owner or the actual originating owner.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-QA-10-29",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Material scope, Canon, Specification, Plan or authority boundary → existing native owner",
+   "start": "Preserve whole-change IA, continuing Isis/Thoth, Product Owner, PR/Ops/documentation and originating session continuity.",
+   "end": null,
+   "new": "The receiving side chooses or recovers the session for each named owner.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "layer": "session"
+  },
+  {
+   "id": "HP-QA-10-30",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Material scope, Canon, Specification, Plan or authority boundary → existing native owner",
+   "start": "Exact native inputs and artifact lineage: complete QA-10",
+   "end": "access limits.",
+   "new": "Handoff: the QA-10 finding or pending state in its output artifact, and the Specification, Plan or rescope artifact it concerns, each by repository path; the artifacts hold the mismatch evidence, the suspended boundary and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-QA-10-31",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Material scope, Canon, Specification, Plan or authority boundary → existing native owner",
+   "start": "Required tools, stores, environment and access limitations: preserve read-only",
+   "end": "boundary, redaction, recovery, terminal behavior, active automation hold and every denied or unavailable access fact.",
+   "new": "Required tools, stores, environment and access limitations: the native owner's prompt holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "span_has_markup": true,
+   "layer": "tools"
+  },
+  {
+   "id": "HP-QA-10-32",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Material scope, Canon, Specification, Plan or authority boundary → existing native owner",
+   "start": "Applicable gates and manual prerequisites: complete boundary",
+   "end": "selected route.",
+   "new": "Applicable gates and manual prerequisites: the native owner's prompt holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-QA-10-33",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Material scope, Canon, Specification, Plan or authority boundary → existing native owner",
+   "start": "carry the complete substantiated package directly to the existing native owner.",
+   "end": null,
+   "new": "hand off directly to the existing native owner.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-QA-10-34",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Terminal or manual-prerequisite state → actual native owner",
+   "start": "; QA-10 preserves the continuing",
+   "end": "<code>context_conflict</code> and return point.",
+   "new": "; the artifacts record the return point.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "span_has_markup": true,
+   "layer": "session"
+  },
+  {
+   "id": "HP-QA-10-35",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Terminal or manual-prerequisite state → actual native owner",
+   "start": "Exact native inputs and artifact lineage: the",
+   "end": "resume/terminal condition.",
+   "new": "Handoff: the partial or terminal <code>REALITY_AUDIT</code>, <code>CHANGE_AUDIT_TRIAGE</code> and <code>QA_READINESS</code>, each by repository path; the artifacts hold the missing manual act, owner, evidence or decision, the resume or terminal condition and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-QA-10-36",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Terminal or manual-prerequisite state → actual native owner",
+   "start": "Required tools, stores, environment and access limitations: preserve the actual",
+   "end": "continuity, redaction, recovery, terminal behavior, active automation hold and every denied or unavailable access fact.",
+   "new": "Required tools, stores, environment and access limitations: the actual owner's prompt holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "span_has_markup": true,
+   "layer": "tools"
+  },
+  {
+   "id": "HP-QA-10-37",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Terminal or manual-prerequisite state → actual native owner",
+   "start": "Applicable gates and manual prerequisites: exact",
+   "end": "return condition.",
+   "new": "Applicable gates and manual prerequisites: the actual owner's prompt holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-QA-10-38",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "QA-10",
+   "section": "Terminal or manual-prerequisite state → actual native owner",
+   "start": "return the complete pending or terminal package to the actual native owner.",
+   "end": null,
+   "new": "hand off to the actual native owner.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-OPS-30-01",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Execution posture and continuing identity",
+   "start": ", with a complete native input package and exact carried lineage.",
+   "end": null,
+   "new": ". Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest.",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-OPS-30-02",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Next step and recovery",
+   "start": "reached by a direct native handoff with its complete native package. Preserve manual prerequisites, result-specific terminal exceptions, exact return owner and all actual carried lineage.",
+   "end": null,
+   "new": "reached by a direct native handoff. The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest.",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-OPS-30-03",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Direct native handoff packages",
+   "start": "Every package carries the exact",
+   "end": "next action.",
+   "new": "Each package names its destination and its input artifacts by repository path; it restates nothing the destination prompt or the artifacts hold.",
+   "why": "Lead sentence tells an agent that each handoff or package carries the complete native input package and lineage, session identity, prerequisites or recovery context. D23-B (a handoff restates nothing the named prompt, canon or files hold) and D27 Continuity reverse it. Replaced by the canonical lead, which names artifacts by repository path and leaves lineage to the artifacts (PF04 §9.1.1: a handoff resolves its artifact by durable reference).",
+   "layer": "lead"
+  },
+  {
+   "id": "HP-OPS-30-04",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Accepted receipt → IA progress and dependent work",
+   "start": "Preserve <code>session_disposition</code>, <code>role_session_ref</code>, <code>invocation_binding</code>, <code>context_conflict</code>, change identity and return owner.",
+   "end": null,
+   "new": "The receiving side chooses or recovers the session.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "span_has_markup": true,
+   "layer": "session"
+  },
+  {
+   "id": "HP-OPS-30-05",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Accepted receipt → IA progress and dependent work",
+   "start": "Native inputs and artifact lineage: One",
+   "end": "absent-state values.",
+   "new": "Handoff: the accepted <code>OPS_TASK_RECEIPT</code>, <code>OPS_TASK_ID</code> and <code>OPS_EXECUTION_RESULT_ID</code>, each by repository path; the artifacts hold the criterion-by-criterion evidence, the change and unit identity, the lineage and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-OPS-30-06",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Accepted receipt → IA progress and dependent work",
+   "start": "Required tools, stores, environment and access limitations: Preserve the exact",
+   "end": "behavior; and automation hold.",
+   "new": "Required tools, stores, environment and access limitations: the downstream consumer's prompt holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-OPS-30-07",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Accepted receipt → IA progress and dependent work",
+   "start": "Applicable gates and manual prerequisites: Complete task/result",
+   "end": "acceptance gates.",
+   "new": "Applicable gates and manual prerequisites: the downstream consumer's prompt holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-OPS-30-08",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Accepted receipt → IA progress and dependent work",
+   "start": "carry this complete accepted package to that consumer.",
+   "end": null,
+   "new": "hand off to that consumer.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-OPS-30-09",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Rejected or incomplete receipt → OPS-10 then OPS-20",
+   "start": "with the supplied environment, operator and session identity.",
+   "end": null,
+   "new": "in the environment the corrective task names. The receiving side chooses or recovers the session.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "layer": "session"
+  },
+  {
+   "id": "HP-OPS-30-10",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Rejected or incomplete receipt → OPS-10 then OPS-20",
+   "start": "Native inputs and artifact lineage: The rejected",
+   "end": "correction scope.",
+   "new": "Handoff: the rejected or incomplete <code>OPS_TASK_RECEIPT</code>, <code>OPS_TASK_ID</code> and <code>OPS_EXECUTION_RESULT_ID</code>, each by repository path; the receipt records the unmet criterion or evidence gap and the bounded correction scope, and the artifacts hold the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-OPS-30-11",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Rejected or incomplete receipt → OPS-10 then OPS-20",
+   "start": "Required tools, stores, environment and access limitations: Preserve the corrective",
+   "end": "storage, terminal behavior and automation hold.",
+   "new": "Required tools, stores, environment and access limitations: OPS-10 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-OPS-30-12",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Rejected or incomplete receipt → OPS-10 then OPS-20",
+   "start": "Applicable gates and manual prerequisites: Exact",
+   "end": "corrective task.",
+   "new": "Applicable gates and manual prerequisites: OPS-10 holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-OPS-30-13",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Rejected or incomplete receipt → OPS-10 then OPS-20",
+   "start": "named by the native recovery package for OPS-10.",
+   "end": null,
+   "new": "named in the receipt, for OPS-10.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-OPS-30-14",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Explicit remediation-discovery condition → ESC-25 then ESC-30",
+   "start": "uses the supplied session and same",
+   "end": "continuity where required.",
+   "new": "returns to the same continuing Thoth. The receiving side chooses or recovers the session.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "span_has_markup": true,
+   "layer": "session"
+  },
+  {
+   "id": "HP-OPS-30-15",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Explicit remediation-discovery condition → ESC-25 then ESC-30",
+   "start": "Native inputs and artifact lineage: Exact <code>REMEDIATION_PROPOSAL_ID</code>",
+   "end": "limits; recovery.",
+   "new": "Handoff: <code>REMEDIATION_PROPOSAL_ID</code> with its one embedded <code>DISCOVERY_TASK_ID</code>, <code>ORIGINATING_FINDING_REF</code>, <code>OPS_TASK_ID</code> and <code>OPS_EXECUTION_RESULT_ID</code>, any applicable <code>TRIAGE_RECEIPT_ID</code> or <code>REMEDIATION_REVIEW_ID</code>, and <code>DISCOVERY_RESULT_IDS</code> once they exist, each by repository path; the artifacts hold the discovery question, scope, return identity, lineage and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-OPS-30-16",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Explicit remediation-discovery condition → ESC-25 then ESC-30",
+   "start": "Required tools, stores, environment and access limitations: Preserve the controlled-Markdown-only",
+   "end": "access facts.",
+   "new": "Required tools, stores, environment and access limitations: ESC-25 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-OPS-30-17",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Explicit remediation-discovery condition → ESC-25 then ESC-30",
+   "start": "Applicable gates and manual prerequisites: Complete remediation",
+   "end": "reconciling the result.",
+   "new": "Applicable gates and manual prerequisites: ESC-25 holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "span_has_markup": true,
+   "layer": "gates"
+  },
+  {
+   "id": "HP-OPS-30-18",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Explicit remediation-discovery condition → ESC-25 then ESC-30",
+   "start": "carry the complete package directly",
+   "end": "other owner named by the complete recovery package.",
+   "new": "hand off directly to ESC-25 and return its result to ESC-30. If any discovery prerequisite is missing or contradictory, return the recoverable state to the actual Thoth, creator IA, Product Owner or other owner named in the receipt.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-OPS-30-19",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Material scope, architecture, requirement or design boundary → RS-10, then RS-20/RS-30 when required",
+   "start": "Preserve the same author/reviewer/session and the exact Product Owner return owner where applicable.",
+   "end": null,
+   "new": "Preserve the same author and reviewer and the exact Product Owner return owner where applicable. The receiving side chooses or recovers the session.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "layer": "session"
+  },
+  {
+   "id": "HP-OPS-30-20",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Material scope, architecture, requirement or design boundary → RS-10, then RS-20/RS-30 when required",
+   "start": "Native inputs and artifact lineage: Exact <code>OPS_TASK_ID</code>",
+   "end": "limitations</code> input.",
+   "new": "Handoff: <code>OPS_TASK_ID</code> or <code>ORIGINATING_FINDING_REF</code>, and any existing <code>RESCOPE_PROPOSAL_ID</code>, <code>RESCOPE_REVIEW_ID</code> or <code>REMEDIATION_PROPOSAL_ID</code>, each by repository path; the artifacts hold the mismatch evidence, the approved lineage, the suspended boundary and the rest. Name only a Product Owner disposition they do not record, as minimum context.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-OPS-30-21",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Material scope, architecture, requirement or design boundary → RS-10, then RS-20/RS-30 when required",
+   "start": "Required tools, stores, environment and access limitations: Preserve PFCanon",
+   "end": "automation controls.",
+   "new": "Required tools, stores, environment and access limitations: RS-10 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-OPS-30-22",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Material scope, architecture, requirement or design boundary → RS-10, then RS-20/RS-30 when required",
+   "start": "Applicable gates and manual prerequisites: Read-only",
+   "end": "rescope branch.",
+   "new": "Applicable gates and manual prerequisites: RS-10 holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-OPS-30-23",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Material scope, architecture, requirement or design boundary → RS-10, then RS-20/RS-30 when required",
+   "start": "send the complete package to RS-10,",
+   "end": null,
+   "new": "hand off to RS-10,",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-OPS-30-24",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Blocked, contradictory, incomplete or access-limited receipt → actual native owner",
+   "start": "named by the complete recovery package. No fixed destination is invented when the native package identifies another owner.",
+   "end": null,
+   "new": "named in the receipt. No fixed destination is invented when the receipt identifies another owner.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  },
+  {
+   "id": "HP-OPS-30-25",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Blocked, contradictory, incomplete or access-limited receipt → actual native owner",
+   "start": "Retain the exact owner, role, <code>session_disposition</code>,",
+   "end": "incomplete package.",
+   "new": "Name the exact owner and role; the artifacts record the return point. The receiving side chooses or recovers the session.",
+   "why": "Tells the handoff to carry or preserve session fields or session identity. D27 Continuity: handoffs use role and exact task/artifact binding; the receiving side chooses or recovers the session; persistent platform identity is not required. Role continuity is kept.",
+   "span_has_markup": true,
+   "layer": "session"
+  },
+  {
+   "id": "HP-OPS-30-26",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Blocked, contradictory, incomplete or access-limited receipt → actual native owner",
+   "start": "Native inputs and artifact lineage: The complete",
+   "end": "limitations</code> field.",
+   "new": "Handoff: the partial task and prior result, each by repository path; they record the missing, contradictory or inaccessible fact, the completed work, the attempts and the rest.",
+   "why": "Per-branch input list restates artifact contents, lineage, owner/session or recovery facts the named artifacts already record (findings.md V2, second layer; D23-A, D23-B). Replaced by the artifacts named by repository path, with 'the artifacts hold the rest' (C-PLACE wording).",
+   "span_has_markup": true,
+   "layer": "inputs"
+  },
+  {
+   "id": "HP-OPS-30-27",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Blocked, contradictory, incomplete or access-limited receipt → actual native owner",
+   "start": "Required tools, stores, environment and access limitations: Preserve the actual",
+   "end": "recovery, terminal behavior and automation hold.",
+   "new": "Required tools, stores, environment and access limitations: the actual owner's prompt holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's own tools, storage, boundary and recovery rules (D23-B: restates nothing the named prompt holds). Only a denied or unavailable access fact the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "tools"
+  },
+  {
+   "id": "HP-OPS-30-28",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Blocked, contradictory, incomplete or access-limited receipt → actual native owner",
+   "start": "Applicable gates and manual prerequisites: The",
+   "end": "package requires them.",
+   "new": "Applicable gates and manual prerequisites: the actual owner's prompt holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+   "why": "Package field restates the destination prompt's gates and manual prerequisites (D23-B). Only a manual prerequisite the artifacts do not record stays, as minimum context (C-HANDOFF).",
+   "layer": "gates"
+  },
+  {
+   "id": "HP-OPS-30-29",
+   "part": "PART-07",
+   "item": "ITEM-08",
+   "prompt": "OPS-30",
+   "section": "Blocked, contradictory, incomplete or access-limited receipt → actual native owner",
+   "start": "Return the complete recoverable package to the actual owner named by the current artifact.",
+   "end": null,
+   "new": "Hand off to the actual owner named by the current artifact.",
+   "why": "Tells the agent to carry, send or return 'the complete ... package' (or names an owner by 'the complete package'). Replaced by a plain hand-off whose artifacts hold the rest (D23-A, D23-B).",
+   "layer": "recovery"
+  }
+ ],
+ "guards": [
+  {
+   "id": "G-HP-1",
+   "part": "PART-07",
+   "rule": "D23-B; D27 Continuity: no 'complete ... package' / 'native (input) package' sentence or label",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "CF-C-10",
+    "CF-C-20",
+    "CF-C-30",
+    "CF-C-40",
+    "CF-E-10",
+    "CF-E-20",
+    "CF-E-30",
+    "CF-E-40",
+    "CF-PO-10",
+    "CL-20",
+    "CL-30",
+    "CL-40",
+    "CL-C-10",
+    "CL-E-10",
+    "CL-E-20",
+    "CL-E-30",
+    "CL-E-40",
+    "DOC-10",
+    "DOC-20",
+    "ESC-10",
+    "ESC-25",
+    "ESC-30",
+    "ESC-40",
+    "GCFPE-MGMT-10",
+    "IA-10",
+    "IA-20",
+    "IA-30",
+    "IA-40",
+    "IA-50",
+    "IA-60",
+    "MGR-10",
+    "OPS-10",
+    "OPS-20",
+    "OPS-30",
+    "PR-10",
+    "PR-20",
+    "PR-30",
+    "PR-35",
+    "PR-40",
+    "PR-50",
+    "QA-10",
+    "QA-100",
+    "QA-110",
+    "QA-120",
+    "QA-20",
+    "QA-50",
+    "QA-60",
+    "QA-70",
+    "QA-80",
+    "QA-90",
+    "RS-10",
+    "RS-20",
+    "RS-30",
+    "RS-40",
+    "UTIL-10",
+    "PE"
+   ],
+   "all": [
+    "(?i)\\bcomplete\\b[^.;:\\n]{0,40}\\bpackages?\\b|\\bnative\\s+(?:input\\s+)?packages?\\b"
+   ],
+   "except": [],
+   "except_why": [],
+   "fixtures": {
+    "pass": [
+     "Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest.",
+     "Handoff: the output artifact and its predecessor artifacts, each by repository path; the artifacts hold the decision state, the pending manual act or terminal state, the return point and the rest.",
+     "Do not emit a runnable PR-30 package while a decisive prerequisite is missing.",
+     "Handoff: the output artifact, by repository path; the artifacts hold the rest."
+    ],
+    "fail": [
+     "Each handoff carries the complete native input package.",
+     "Complete RS-20 package:",
+     "Return the complete recoverable package to the owner.",
+     "All results use direct native handoffs with complete native input packages."
+    ]
+   },
+   "counts_on_W3a_pages": {
+    "PR-20": {
+     "before": 11,
+     "after": 0
+    },
+    "PR-40": {
+     "before": 7,
+     "after": 0
+    },
+    "QA-10": {
+     "before": 10,
+     "after": 0
+    },
+    "OPS-30": {
+     "before": 10,
+     "after": 0
+    }
+   }
+  },
+  {
+   "id": "G-HP-2",
+   "part": "PART-07",
+   "rule": "D23-B; D27 Continuity: no sentence telling a handoff or package to carry, preserve, include or supply lineage, session identity, recovery context, manual prerequisites, branch or commit",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "CF-C-10",
+    "CF-C-20",
+    "CF-C-30",
+    "CF-C-40",
+    "CF-E-10",
+    "CF-E-20",
+    "CF-E-30",
+    "CF-E-40",
+    "CF-PO-10",
+    "CL-20",
+    "CL-30",
+    "CL-40",
+    "CL-C-10",
+    "CL-E-10",
+    "CL-E-20",
+    "CL-E-30",
+    "CL-E-40",
+    "DOC-10",
+    "DOC-20",
+    "ESC-10",
+    "ESC-25",
+    "ESC-30",
+    "ESC-40",
+    "GCFPE-MGMT-10",
+    "IA-10",
+    "IA-20",
+    "IA-30",
+    "IA-40",
+    "IA-50",
+    "IA-60",
+    "MGR-10",
+    "OPS-10",
+    "OPS-20",
+    "OPS-30",
+    "PR-10",
+    "PR-20",
+    "PR-30",
+    "PR-35",
+    "PR-40",
+    "PR-50",
+    "QA-10",
+    "QA-100",
+    "QA-110",
+    "QA-120",
+    "QA-20",
+    "QA-50",
+    "QA-60",
+    "QA-70",
+    "QA-80",
+    "QA-90",
+    "RS-10",
+    "RS-20",
+    "RS-30",
+    "RS-40",
+    "UTIL-10",
+    "PE"
+   ],
+   "all": [
+    "(?i)\\b(?:handoffs?|packages?)\\b",
+    "(?i)\\b(?:carr(?:y|ies|ied|ying)|preserv(?:e|es|ed|ing)|retain(?:s|ed|ing)?|transports?|includ(?:e|es|ed|ing)|contain(?:s|ed|ing)?|suppl(?:y|ies|ied|ying))\\b",
+    "(?i)\\b(?:lineage|session identit(?:y|ies)|session continuity|session_disposition|role_session_ref|recovery (?:context|state)|manual prerequisites?|manual gates?|branch(?:es)?\\s*(?:,|and|or)\\s*(?:head|commits?)|working branch|branch state|head commit|commits?)\\b"
+   ],
+   "except": [
+    "(?i)\\b(?:no|not|never|nor|without|neither|nothing|none)\\b",
+    "(?i)\\bartifacts?\\s+(?:hold|holds|record|records)\\b|\\bthey\\s+(?:hold|record)\\b"
+   ],
+   "except_why": [
+    "negation: a sentence that says a handoff does NOT carry these (C-HANDOFF 'It carries no branch and no commit'; 'the handoff does not carry them') is the rule itself",
+    "conformant wording: lineage or state is said to be held by the artifacts, not carried by the handoff (C-PLACE; 'the artifacts hold their lineage' in Source discovery and reference discipline)"
+   ],
+   "fixtures": {
+    "pass": [
+     "Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest.",
+     "The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest.",
+     "Each package names its destination and its input artifacts by repository path; it restates nothing the destination prompt or the artifacts hold.",
+     "The branch, head and commits are verified at entry; the handoff does not carry them.",
+     "A blocked or terminal branch must preserve its owner rather than a fabricated runnable package."
+    ],
+    "fail": [
+     "Each handoff carries exact artifact lineage and session identity.",
+     "The package preserves the recovery state and manual prerequisites.",
+     "The handoff includes the working branch and head commit."
+    ]
+   },
+   "counts_on_W3a_pages": {
+    "PR-20": {
+     "before": 1,
+     "after": 0
+    },
+    "PR-40": {
+     "before": 1,
+     "after": 0
+    },
+    "QA-10": {
+     "before": 1,
+     "after": 0
+    },
+    "OPS-30": {
+     "before": 3,
+     "after": 0
+    }
+   }
+  },
+  {
+   "id": "G-HP-3",
+   "part": "PART-07",
+   "rule": "D23-B: no 'goes directly to X with ... lineage / session identity' summary",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "CF-C-10",
+    "CF-C-20",
+    "CF-C-30",
+    "CF-C-40",
+    "CF-E-10",
+    "CF-E-20",
+    "CF-E-30",
+    "CF-E-40",
+    "CF-PO-10",
+    "CL-20",
+    "CL-30",
+    "CL-40",
+    "CL-C-10",
+    "CL-E-10",
+    "CL-E-20",
+    "CL-E-30",
+    "CL-E-40",
+    "DOC-10",
+    "DOC-20",
+    "ESC-10",
+    "ESC-25",
+    "ESC-30",
+    "ESC-40",
+    "GCFPE-MGMT-10",
+    "IA-10",
+    "IA-20",
+    "IA-30",
+    "IA-40",
+    "IA-50",
+    "IA-60",
+    "MGR-10",
+    "OPS-10",
+    "OPS-20",
+    "OPS-30",
+    "PR-10",
+    "PR-20",
+    "PR-30",
+    "PR-35",
+    "PR-40",
+    "PR-50",
+    "QA-10",
+    "QA-100",
+    "QA-110",
+    "QA-120",
+    "QA-20",
+    "QA-50",
+    "QA-60",
+    "QA-70",
+    "QA-80",
+    "QA-90",
+    "RS-10",
+    "RS-20",
+    "RS-30",
+    "RS-40",
+    "UTIL-10",
+    "PE"
+   ],
+   "all": [
+    "(?i)\\bgo(?:es)? directly to\\b[^.;]{0,200}\\bwith\\b",
+    "(?i)\\b(?:lineage|session identit(?:y|ies)|session continuity|recovery context|manual prerequisites?)\\b"
+   ],
+   "except": [
+    "(?i)\\b(?:no|not|never|nor|without|neither|nothing|none)\\b",
+    "(?i)\\bartifacts?\\s+(?:hold|holds|record|records)\\b|\\bthey\\s+(?:hold|record)\\b"
+   ],
+   "except_why": [
+    "negation: a sentence that says a handoff does NOT carry these (C-HANDOFF 'It carries no branch and no commit'; 'the handoff does not carry them') is the rule itself",
+    "conformant wording: lineage or state is said to be held by the artifacts, not carried by the handoff (C-PLACE; 'the artifacts hold their lineage' in Source discovery and reference discipline)"
+   ],
+   "fixtures": {
+    "pass": [
+     "READY goes directly to QA-20, naming the output artifacts by repository path; the artifacts hold the lineage and the rest.",
+     "Return REJECT with the finding, and hand off to PR-20 for a PR-lineage defect."
+    ],
+    "fail": [
+     "READY goes directly to QA-20 with the readiness record, the Plan lineage and the continuing session identity.",
+     "NOT_READY goes directly to ESC-30 with the finding and exact owner/session continuity."
+    ]
+   },
+   "counts_on_W3a_pages": {
+    "PR-20": {
+     "before": 0,
+     "after": 0
+    },
+    "PR-40": {
+     "before": 0,
+     "after": 0
+    },
+    "QA-10": {
+     "before": 2,
+     "after": 0
+    },
+    "OPS-30": {
+     "before": 0,
+     "after": 0
+    }
+   }
+  },
+  {
+   "id": "G-HP-4",
+   "part": "PART-07",
+   "rule": "D23-B (findings.md V2 second layer): no per-branch template field restating the destination prompt's tools, gates or the artifacts' inputs and lineage",
+   "kind": "forbidden",
+   "unit": "line",
+   "prompts": [
+    "CF-C-10",
+    "CF-C-20",
+    "CF-C-30",
+    "CF-C-40",
+    "CF-E-10",
+    "CF-E-20",
+    "CF-E-30",
+    "CF-E-40",
+    "CF-PO-10",
+    "CL-20",
+    "CL-30",
+    "CL-40",
+    "CL-C-10",
+    "CL-E-10",
+    "CL-E-20",
+    "CL-E-30",
+    "CL-E-40",
+    "DOC-10",
+    "DOC-20",
+    "ESC-10",
+    "ESC-25",
+    "ESC-30",
+    "ESC-40",
+    "GCFPE-MGMT-10",
+    "IA-10",
+    "IA-20",
+    "IA-30",
+    "IA-40",
+    "IA-50",
+    "IA-60",
+    "MGR-10",
+    "OPS-10",
+    "OPS-20",
+    "OPS-30",
+    "PR-10",
+    "PR-20",
+    "PR-30",
+    "PR-35",
+    "PR-40",
+    "PR-50",
+    "QA-10",
+    "QA-100",
+    "QA-110",
+    "QA-120",
+    "QA-20",
+    "QA-50",
+    "QA-60",
+    "QA-70",
+    "QA-80",
+    "QA-90",
+    "RS-10",
+    "RS-20",
+    "RS-30",
+    "RS-40",
+    "UTIL-10",
+    "PE"
+   ],
+   "all": [
+    "^(?:- )?(?:Required tools, stores, environment and access limitations:|Applicable gates and manual prerequisites:|(?:Exact )?[Nn]ative inputs and artifact lineage:)"
+   ],
+   "except": [
+    "\\bholds them; name only\\b"
+   ],
+   "except_why": [
+    "the canonical replacement form of the tools and gates fields (HP_ACCESS_FORM, HP_GATES_FORM)"
+   ],
+   "fixtures": {
+    "pass": [
+     "Required tools, stores, environment and access limitations: QA-20 holds them; name only a denied or unavailable access fact that the artifacts do not record, as minimum context.",
+     "Applicable gates and manual prerequisites: RS-10 holds them; name only a manual prerequisite that the artifacts do not record, as minimum context.",
+     "Required tools are named in the plan."
+    ],
+    "fail": [
+     "Required tools, stores, environment and access limitations: preserve read-only access, recovery and terminal behavior.",
+     "Applicable gates and manual prerequisites: exact owner and session.",
+     "Exact native inputs and artifact lineage: complete readiness record.",
+     "- Required tools, stores, environment and access limitations: preserve the dedicated PR session."
+    ]
+   },
+   "counts_on_W3a_pages": {
+    "PR-20": {
+     "before": 5,
+     "after": 0
+    },
+    "PR-40": {
+     "before": 2,
+     "after": 0
+    },
+    "QA-10": {
+     "before": 18,
+     "after": 0
+    },
+    "OPS-30": {
+     "before": 15,
+     "after": 0
+    }
+   }
+  },
+  {
+   "id": "G-HP-5",
+   "part": "PART-07",
+   "rule": "D27 Continuity: no instruction to preserve, retain or carry session_disposition, role_session_ref, session identity or session continuity",
+   "kind": "forbidden",
+   "unit": "sentence",
+   "prompts": [
+    "CF-C-10",
+    "CF-C-20",
+    "CF-C-30",
+    "CF-C-40",
+    "CF-E-10",
+    "CF-E-20",
+    "CF-E-30",
+    "CF-E-40",
+    "CF-PO-10",
+    "CL-20",
+    "CL-30",
+    "CL-40",
+    "CL-C-10",
+    "CL-E-10",
+    "CL-E-20",
+    "CL-E-30",
+    "CL-E-40",
+    "DOC-10",
+    "DOC-20",
+    "ESC-10",
+    "ESC-25",
+    "ESC-30",
+    "ESC-40",
+    "GCFPE-MGMT-10",
+    "IA-10",
+    "IA-20",
+    "IA-30",
+    "IA-40",
+    "IA-50",
+    "IA-60",
+    "MGR-10",
+    "OPS-10",
+    "OPS-20",
+    "OPS-30",
+    "PR-10",
+    "PR-20",
+    "PR-30",
+    "PR-35",
+    "PR-40",
+    "PR-50",
+    "QA-10",
+    "QA-100",
+    "QA-110",
+    "QA-120",
+    "QA-20",
+    "QA-50",
+    "QA-60",
+    "QA-70",
+    "QA-80",
+    "QA-90",
+    "RS-10",
+    "RS-20",
+    "RS-30",
+    "RS-40",
+    "UTIL-10",
+    "PE"
+   ],
+   "all": [
+    "(?i)\\b(?:preserv\\w*|retain\\w*|carr(?:y|ies|ied|ying))\\b",
+    "(?i)\\b(?:session_disposition|role_session_ref|session identit(?:y|ies)|session continuity)\\b"
+   ],
+   "except": [
+    "(?i)\\b(?:no|not|never|nor|without|neither|nothing|none)\\b",
+    "while retaining the supplied PR reviewer/session identity for this review",
+    "Carry the exact continuing Isis role and supplied session identity across"
+   ],
+   "except_why": [
+    "negation: a sentence that says a handoff does NOT carry these (C-HANDOFF 'It carries no branch and no commit'; 'the handoff does not carry them') is the rule itself",
+    "PR-40's own reviewer posture (its 'continuing identity' section), not handoff content; outside the MB-010 test; D27 tension listed in escape_hatch",
+    "QA-10's own-role continuity across its integrated operation, not handoff content; outside the MB-010 test; D27 tension listed in escape_hatch"
+   ],
+   "fixtures": {
+    "pass": [
+     "The receiving side chooses or recovers the session.",
+     "Do not preserve a platform session identity.",
+     "Carry the exact continuing Isis role and supplied session identity across the audit.",
+     "Preserve the same author and reviewer and the exact Product Owner return owner where applicable."
+    ],
+    "fail": [
+     "Preserve session_disposition, role_session_ref and invocation_binding.",
+     "Retain the exact owner, role and session continuity.",
+     "Carry the supplied session identity to the receiver."
+    ]
+   },
+   "counts_on_W3a_pages": {
+    "PR-20": {
+     "before": 2,
+     "after": 0
+    },
+    "PR-40": {
+     "before": 3,
+     "after": 0
+    },
+    "QA-10": {
+     "before": 8,
+     "after": 0
+    },
+    "OPS-30": {
+     "before": 4,
+     "after": 0
+    }
+   }
+  },
+  {
+   "id": "G-HP-R1",
+   "part": "PART-07",
+   "rule": "D23-B, D27, PF04 §9.1.1: the canonical lead is present once",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-20",
+    "PR-40",
+    "QA-10",
+    "OPS-30"
+   ],
+   "all": [
+    "Each\\ handoff\\ follows\\ the\\ mandatory\\ single\\-block\\ handoff\\ rule\\ below:\\ it\\ names\\ the\\ destination\\ prompt,\\ the\\ receiving\\ role\\ and\\ each\\ input\\ artifact\\ by\\ repository\\ path,\\ and\\ the\\ artifacts\\ hold\\ their\\ lineage\\ and\\ the\\ rest\\."
+   ],
+   "fixtures": {
+    "pass": [
+     "Intro. Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest."
+    ],
+    "fail": [
+     "Each handoff names its destination.",
+     "Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest. Each handoff follows the mandatory single-block handoff rule below: it names the destination prompt, the receiving role and each input artifact by repository path, and the artifacts hold their lineage and the rest."
+    ]
+   },
+   "counts_on_W3a_pages": {
+    "PR-20": {
+     "before": 0,
+     "after": 1
+    },
+    "PR-40": {
+     "before": 0,
+     "after": 1
+    },
+    "QA-10": {
+     "before": 0,
+     "after": 1
+    },
+    "OPS-30": {
+     "before": 0,
+     "after": 1
+    }
+   },
+   "note": "W3b extends 'prompts' to each page where it places this sentence once."
+  },
+  {
+   "id": "G-HP-R2",
+   "part": "PART-07",
+   "rule": "D23-A, D23-B: the canonical next-step lead is present once",
+   "kind": "required",
+   "expect": 1,
+   "unit": "sentence",
+   "prompts": [
+    "PR-20",
+    "PR-40",
+    "QA-10",
+    "OPS-30"
+   ],
+   "all": [
+    "The\\ handoff\\ names\\ its\\ input\\ artifacts\\ by\\ repository\\ path;\\ they\\ hold\\ their\\ lineage,\\ owners,\\ recovery\\ point\\ and\\ the\\ rest\\."
+   ],
+   "fixtures": {
+    "pass": [
+     "Every destination is reached by a direct native handoff. The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest."
+    ],
+    "fail": [
+     "Preserve exact lineage, owner and session continuity.",
+     "The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest. The handoff names its input artifacts by repository path; they hold their lineage, owners, recovery point and the rest."
+    ]
+   },
+   "counts_on_W3a_pages": {
+    "PR-20": {
+     "before": 0,
+     "after": 1
+    },
+    "PR-40": {
+     "before": 0,
+     "after": 1
+    },
+    "QA-10": {
+     "before": 0,
+     "after": 1
+    },
+    "OPS-30": {
+     "before": 0,
+     "after": 1
+    }
+   },
+   "note": "W3b extends 'prompts' to each page where it places this sentence once."
+  }
+ ],
+ "graph_edits": [],
+ "skill_redlines": [
+  {
+   "part": "PART-07",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "continue directly to the exact selected IA-10 destination with the complete native package when the required IA session is available",
+   "new": "continue directly to the exact selected IA-10 destination, naming its input artifacts by repository path, when the required IA session is available",
+   "count": 1,
+   "conditional": "Q-2: outside PART-07's frozen targets; only on Nathan's yes. No change-flow or flowmaster-validate validator, fixture or CONTRACT_REQUIRED/CONTRACT_FORBIDDEN entry pins this sentence (grep of both packages' scripts and references: 0 hits)"
+  },
+  {
+   "part": "PART-07",
+   "package": "change-flow",
+   "file": "SKILL.md",
+   "old": "Success hands the complete native package directly to the exact selected IA-30 or QA-70 prompt.",
+   "new": "Success hands off directly to the exact selected IA-30 or QA-70 prompt, naming its input artifacts by repository path.",
+   "count": 1,
+   "conditional": "Q-2, as above"
+  }
+ ],
+ "repo_edits": [],
+ "notion_control_ops": [],
+ "decisions": [
+  {
+   "decision": "Canonical replacement family HP_* built only from wording already in the corpus and its rulings (Source discovery and reference discipline's 'the artifacts hold their lineage'; C-PLACE; C-HANDOFF; D27's 'the receiving side chooses or recovers the session'). No new phrasing for a rule already applied.",
+   "authority": "ecosystem-change-management.md §2 Step 3 ('Converge on existing wording'); D23-B; D27 Continuity"
+  },
+  {
+   "decision": "PF04 §9.1.1 ('Every handoff resolves its exact substantive artifact by stable ID or durable reference, preserving ... lineage') is met, not contradicted: the handoff names each artifact by its versioned repository path (durable reference) and the artifact holds its lineage. Canon governs over the in-flight rule, and the two agree, so no question to Nathan.",
+   "authority": "PF04 v2.8.8 §9.1.1; AGENTS.md canon-first rule; D23-B"
+  },
+  {
+   "decision": "Re-measured by the stated test (scope-measurement.md §2) including findings.md V2's second layer, which reaches the per-branch template fields 'Destination actor and session' (session fields), '(Exact) native inputs and artifact lineage', 'Required tools, stores, environment and access limitations: preserve ...', 'Applicable gates and manual prerequisites' and 'Recovery and required next action: carry the complete package'. Contradicting lines on the 100926.1 read: QA-10 38 (measured 19), PR-40 18 (13), PR-20 24 (12), OPS-30 29 (10). None of the four pages drops out. The ops carry a 'layer' tag so the coordinator can narrow (Q-1).",
+   "authority": "scope-measurement.md §2 test; findings.md V2; L-B5 ('PLAN re-measures with the stated test'); SCOPE-001; D26-E"
+  },
+  {
+   "decision": "Lines kept as permitted (no op): role-and-artifact-continuity paragraph (conformant D27 text); 'Catalogs carry ... the artifacts hold their lineage'; 'the handoff does not carry them' (branch, head, commits); PR-20 'It returns a complete PR-35 handoff ... naming PR_IMPLEMENTATION_RESULT by repository path ...; the artifacts hold the rest'; lines that name artifacts by ID or path (remediation IDs, PF10 paths, RS-10 'naming ... by repository path'); 'a conditional post-merge handoff states its manual prerequisite explicitly' (minimum context D23-B allows); destination, predicate ('use this package only when'), operation and 'do not fabricate' risk lines; output-artifact content lists (Required result), which D23-A puts in the artifact.",
+   "authority": "scope-measurement.md §2 permitted classes; D23-A; D23-B; D27"
+  },
+  {
+   "decision": "Each repeated canonical text carries the branch's destination ({destination} slot) or a unique neighbouring clause, so no op's replacement already occurs on its page; body_check's state() refuses a replacement already present and landed() counts each replacement.",
+   "authority": "body_check.py resolve(), state(), landed()"
+  },
+  {
+   "decision": "Neighbouring workers' sentences on PR-20 and PR-40 are untouched: PR-20 'Native result and boundary' lines for PR-35 (PART-01) and PR-40 ('REJECT returns precise in-scope findings to the PR owner', PART-06), PR-20 Execute step 7 after its first sentence (PART-04, ITEM-18), PR-40 Execute steps and Required result (PART-01 CD-3, PART-05). PART-07's only Execute edit on PR-20 is step 7's first sentence. Ops on one page do not overlap (checked by span), so their order is free; a D26-B restore of a shared successor page reverts all parts on it (L-B19).",
+   "authority": "computed task brief; L-B19; body_check apply_all"
+  },
+  {
+   "decision": "No graph edit: global.json handoff_contract already requires only the D23-B fields and prohibits 'branch', 'commit' and 'restated artifact content'; its 'required' entry carries D27's 'receiving side selects or recovers the session; no persistent session or executor identity prerequisite'.",
+   "authority": "findings.md MB-010 'Class and effect' (Graph: None); docs/graph/parts/global.json handoff_contract read"
+  },
+  {
+   "decision": "G-HP-5 carries two named exceptions for own-role continuity sentences (PR-40 'Preserve the same dedicated whole-change IA context ... while retaining the supplied PR reviewer/session identity for this review'; QA-10 'Carry the exact continuing Isis role and supplied session identity across ...'). They are not handoff content, so the MB-010 test does not reach them; their D27 tension is listed in escape_hatch, not edited.",
+   "authority": "D26-E, SCOPE-001 (broad match minus named exceptions); scope-measurement.md §2 test"
+  }
+ ],
+ "questions": [
+  {
+   "id": "Q-1",
+   "for": "coordinator",
+   "question": "Keep the second layer as re-measured (tools, gates, destination-session and inputs fields on every branch), or narrow PART-07 to the measured family?",
+   "options": [
+    "(a) Apply all 109 ops and the five forbidden guards, W3b likewise on its pages. Recommended: it is the stated test and V2's second layer; leaving the fields keeps 'Required tools ...: preserve ... recovery' and 'Applicable gates and manual prerequisites' as handoff content beside a lead that says the artifacts hold them (two contradicting statements on one page, SCOPE-001).",
+    "(b) Keep only layers lead, label, session, inputs and recovery (drop 'tools' and 'gates' ops: 29 of 109) and drop G-HP-4. Smaller, but the dropped fields still restate the destination prompts' rules."
+   ],
+   "recommendation": "(a)"
+  },
+  {
+   "id": "Q-2",
+   "for": "coordinator, then Nathan if (a)",
+   "question": "The same rule sits on four installed-skill lines outside PART-07's frozen targets: change-flow SKILL.md:436 and :453; amthor-workspace-governance-audit SKILL.md:61 and references/interoperability-contracts.md:62 ('with the complete native package'). No validator pins them.",
+   "options": [
+    "(a) Add them: change-flow rides its existing package (redlines in skill_redlines); the audit skill adds one package, review and install. Needs Nathan's yes, since scope is frozen (template rule 3; D12).",
+    "(b) Record all four lines on the backlog for a separate Modification. Recommended: they describe routing, the bodies' Mandatory single-block handoff governs the emitted block, and no guard reads skill text.",
+    "(c) change-flow only, as a DN-12-style rider on Nathan's yes; the audit pair goes to the backlog."
+   ],
+   "recommendation": "(b), offering (c) to Nathan in the plan's approval request"
+  },
+  {
+   "id": "Q-3",
+   "for": "coordinator (PART-03 worker)",
+   "question": "ITEM-16 says 'the Proceed package PR-20 prepares carries' the business case. Under D23-B the business case belongs in PR_IMPLEMENTATION_PLAN (PR-20 Required result) and the PR-30 handoff names the plan by repository path; PART-07 rewrites step 7's first sentence to 'Write into the plan everything PR-30 needs ...'.",
+   "options": [
+    "(a) PART-03 adds the business case to PR-20's Required result list and to the plan, not to the PR-30 handoff list. Recommended: it meets PF04 §9.7.7 ('PR-10 carries it into the PR Instruction'; the Proceed is given against it) and D23-B together.",
+    "(b) PART-03 adds a bullet to the PR-30 'Handoff:' list. It would restate plan content (D23-B by function); the G-HP guards would not fire on it."
+   ],
+   "recommendation": "(a)"
+  },
+  {
+   "id": "Q-4",
+   "for": "W3b",
+   "question": "On W3b's pages the tools/gates/inputs template likely recurs (QA and OPS lanes). Apply HP_ACCESS_FORM and HP_GATES_FORM with each branch's destination, and report any G-HP match on a line that the stated test permits as a new named exception with its reason, before and after counts per page.",
+   "options": [
+    "(a) As stated. Recommended.",
+    "(b) W3b narrows per Q-1 (b) if the coordinator chooses it."
+   ],
+   "recommendation": "(a)"
+  }
+ ],
+ "dispositions": [
+  {
+   "item": "ITEM-08",
+   "planned_disposition": "APPLIED on QA-10, PR-40, PR-20 and OPS-30 successor pages (109 ops) with guards G-HP-1 to G-HP-5 (forbidden, all 55 members and PE) and G-HP-R1, G-HP-R2 (required, these four pages); the other 19 pages are W3b's. ITEM-08 is APPLIED only when W3b's pages also land (CD-13: one rule on all pages).",
+   "evidence": "In memory on the 100926.1 reads: 109 of 109 ops resolve once and apply in order; 109 of 109 LANDED by body_check landed(); forbidden G-HP-1..5 before→after PR-20 11/1/0/5/2→0, PR-40 7/1/0/2/3→0, QA-10 10/1/2/18/8→0, OPS-30 10/3/0/15/4→0; required G-HP-R1 and G-HP-R2 0→1 on each page; 0 of 57+60+56+52 registry assertions on the four rows change status."
+  }
+ ],
+ "verification": [
+  {
+   "part": "PART-07",
+   "landed": "EXECUTE fetches each successor page fresh (D22) and runs body_check check with these ops: every op LANDED by its anchor counts (start and end occur only where a replacement carries them; each replacement occurs once).",
+   "old_text_gone": "On the same read: G-HP-1, G-HP-2, G-HP-3, G-HP-4 and G-HP-5 count 0 and G-HP-R1 and G-HP-R2 count 1 on QA-10, PR-40, PR-20 and OPS-30; every start anchor counts 0 outside the replacements. Registry: the four rows' existing assertions still pass, and the G-HP assertions are added in PART-24 for every member row.",
+   "regression": "Inject, in memory, 'Each handoff carries the complete native input package, exact artifact and version lineage, session identity, manual prerequisites, recovery context and result-specific terminal behavior.' into a landed page: G-HP-1, G-HP-2 and G-HP-5 must fire. Re-insert 'Required tools, stores, environment and access limitations: preserve read-only repository evidence, recovery and terminal behavior.': G-HP-4 must fire. Delete HP_ROUTE: G-HP-R1 must fire. Every fixture: pass fixtures pass and fail fixtures fail (selftest run here: 7 of 7 guards)."
+  }
+ ],
+ "limits": [
+  "Counts differ from §A.5 (19, 13, 12, 10) because the stated test was applied to every per-branch template field (decision 3); the 13 residue lines of the ANALYZE measurement are not named in a committed file (L-B5), so the difference cannot be reconciled line by line.",
+  "The G-HP family reads sentences and lines. A bullet that restates artifact content under a 'Handoff:' label, or a sentence like 'uses OPS-20 with the supplied environment, operator and session identity' without a preserve or carry verb, is found only by reading (FUNC-001; D14 prose-paraphrase limit).",
+  "The NEG exception in G-HP-2, G-HP-3 and G-HP-5 masks any sentence containing a negation word; G-HP-4 still catches the template lines it masked here (one QA-10 'Required tools' line containing 'no secret inspection').",
+  "Guards were counted on these four pages only. W3b must count them on its 19 pages and PE before and after; a match on a permitted line becomes a named exception.",
+  "The registry check used Python re over the whole body, not the governance-audit engine; body_check's registry mode is EXECUTE's check.",
+  "The 'as of' values are what the Notion fetch reported for each page (2026-10-12), read on 2026-10-27; EXECUTE re-fetches the successor, which starts as a duplicate of this text.",
+  "D22 transient reads: the harness saved the four fetch results (QA-10, OPS-30 as text; PR-40, PR-20 as JSON) and one scan listing of PR-20 in its tool-results store; they are left to its teardown and not read again. Scratch extracts of PR-40, QA-10 and OPS-30 lines and the builder scripts were in the session scratchpad and are deleted at the end of this task. No body text is in this file beyond the anchors."
+ ],
+ "escape_hatch": [
+  {
+   "line": "'A handoff transports the approved package; it does not supply new approval, implementation, merge, publication, session-creation, or scope authority.' (Save and hand off, all four pages; probably every body)",
+   "disposition": "Left. Its function is an authority limit. If it is in scope, it is corpus-wide and beyond §A.5's 23 pages; G-HP-2 does not match it (no restated class)."
+  },
+  {
+   "line": "'For an actionable nonterminal recovery, write the smallest complete recovery prompt to the actual owner with preserved state and the exact missing item.' (Mandatory single-block handoff, all four pages)",
+   "disposition": "Left: the shared C-HANDOFF neighbour; the exact missing item is D23-B's minimum context. 'with preserved state' arguably restates; corpus-wide, so a coordinator call."
+  },
+  {
+   "line": "'A missing continuing named-session identity still requires clarification.' (PR-20, PR-40 'Execution posture and continuing identity')",
+   "disposition": "Not handoff content, outside the MB-010 test; contradicts D27 ('Persistent platform identity is not required') by function. Report for a separate item."
+  },
+  {
+   "line": "Own-role session identity sentences: PR-40 '... while retaining the supplied PR reviewer/session identity for this review'; QA-10 'Carry the exact continuing Isis role and supplied session identity across ...'; QA-10 and OPS-30 'Preserve the exact change/artifact/stage/task binding ...' (conformant).",
+   "disposition": "Named exceptions in G-HP-5; D27 tension reported, not edited."
+  },
+  {
+   "line": "QA-10 'A complete handoff may carry linked references without requiring the operator to re-enter every value.' (Inputs)",
+   "disposition": "Left: names artifacts by reference (permitted)."
+  },
+  {
+   "line": "OPS-30 'Return the accepted receipt and complete evidence to IA progress ...' and 'Return the complete discovery result and lineage to the same Thoth author through ESC-30.' (Native operation and result)",
+   "disposition": "Left: describe what the destination returns (an artifact), not handoff content."
+  },
+  {
+   "line": "Installed skills: change-flow SKILL.md:436, :453; amthor-workspace-governance-audit SKILL.md:61, references/interoperability-contracts.md:62 ('the complete native package')",
+   "disposition": "Q-2."
+  }
+ ]
+}

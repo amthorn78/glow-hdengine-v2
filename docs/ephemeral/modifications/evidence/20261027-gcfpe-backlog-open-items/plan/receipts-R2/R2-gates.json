@@ -1,0 +1,480 @@
+{
+ "record_type": "GCFPE_102726_PLAN_R2_GATES",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "repair": "R2 (tooling; coordinator decisions C-15 other check paths, C-18, C-19, C-20, C-21, C-22 package items)",
+ "date_utc": "2026-10-27T09:33:45+00:00",
+ "repository_head": "acc39b04ce73d7d212953e066e1d401f95be0150",
+ "working_tree": "uncommitted (no commit or push, per task)",
+ "reads": {
+  "fetched_after": "2026-10-27T08:59:59.000Z",
+  "source": "R1's reads in this session's harness records (57 pages, captured 09:00:07Z-09:02:22Z); no new fetch",
+  "control_pages_read_after_fetched_after": 0,
+  "d22": "transient reads; no body text in this receipt"
+ },
+ "successor_map": "plan/successor-map-standin.json",
+ "stand_in": true,
+ "c15_inherited_100926_assertions_on_unedited_selected_bodies": {
+  "registry": "docs/prompt_ecosystem_management/project-prompt-contract-registry.md on origin/main (GCFPE-PCR-20261009.1, 55 rows)",
+  "engine": "installed amthor-workspace-governance-audit",
+  "tool": "registry_assemble_102726.py assertions --as-read --compare-raw / --inject",
+  "rows": 55,
+  "before_normalization": {
+   "rows_failing": 54,
+   "findings": 167
+  },
+  "after_normalization": {
+   "rows_failing": 0,
+   "findings": 0,
+   "rows_ok": 55
+  },
+  "with_inject": {
+   "rows_ok": 55,
+   "assertions_evaluated": 2398,
+   "injected_fired": 860,
+   "injected_missed": 0
+  },
+  "as_of_range": [
+   "2026-10-12T02:29:03.544Z",
+   "2026-10-12T02:30:54.130Z"
+  ]
+ },
+ "c18": {
+  "decision": "PF06 v2.5.5 §3.5.1 makes the final QA Report (verdict PASS, with its separate RCA) and the change ID the close-mutation-set stage's input; the stage resolves the rest from the change's records and needs no handoff to start. HP-QA-120-01 names exactly those, so the operation is kept unchanged and the profile's QA_PASS_BODY_INTAKE markers follow it (make_profile_20261027.py QA_PASS_INTAKE_MARKERS, 5 markers)",
+  "hp_qa_120_01_changed": false,
+  "old_markers_absent_after_edit": 6,
+  "profile_regressions": {
+   "qa_pass_intake_cl05_wording_passes": true,
+   "qa_pass_intake_rejects_dropped_change_id": true,
+   "qa_pass_intake_rejects_fetch_form_unnormalized": true,
+   "qa_pass_intake_rejects_old_isis_wording": true
+  }
+ },
+ "c19": {
+  "contracts_run": {
+   "ok": true,
+   "Q1_PASS": true,
+   "Q5_checks": {
+    "both_written": true,
+    "no_promoted_at": true,
+    "contract_ids": true,
+    "candidate_prompt_ids_56": true,
+    "heads": true,
+    "r1_pins": true,
+    "route_edge_count_240": true,
+    "qa_closure_via_cl05": true,
+    "merge_pending_real_input_p1": true,
+    "historical_refs_include_20260923": true,
+    "candidate_member_rule_from_graph": true,
+    "lifecycle": true,
+    "release_semantic_equal": true,
+    "cl05_parent_from_map": true,
+    "carried_parents_template_values": true
+   },
+   "injected_refusals": {
+    "unfilled_marker_refused_by_regenerator": true,
+    "fill_refuses_unknown_marker": true,
+    "fill_refuses_55_member_ids": true,
+    "predecessor_release_values_refused": true,
+    "oracle_not_pinned_by_graph_refused": true,
+    "unknown_graph_pin_refused": true,
+    "unpatched_regenerator_refuses_102726": true,
+    "c19_other_member_parent_refused": true,
+    "c19_other_cl05_field_refused": true,
+    "c19_cl05_without_parent_refused": true,
+    "c19_manifest_parent_mismatch_refused": true,
+    "c19_fill_refuses_map_without_cl05_parent": true,
+    "c19_fill_refuses_without_map": true
+   },
+   "c19_listed": {
+    "added_member_parent": {
+     "member": "CL-05",
+     "source": "successor map CL-05.parent_id",
+     "value": "3db4590a05eb81d59059eb6b95ed5fcf",
+     "stand_in": true
+    },
+    "carried_members_template_values": 55,
+    "note": "the 55 carried members keep their template-carried staged_parent_id and notion_page_manifest parent_id, as 100926.1 did (C-19)"
+   },
+   "contract_digests": {
+    "candidate": {
+     "exit": 0,
+     "bytes": 649672,
+     "sha256": "6994f51afdefb94423777e2b74e3daab91f98a39b06c330d9fbc0b2e45fa91ed"
+    },
+    "production": {
+     "exit": 0,
+     "bytes": 646247,
+     "sha256": "cd58119960a2424a4e5940e317e8ccbc67503d114ef293357fb7b471b9351490"
+    }
+   }
+  },
+  "cf_validate_gcfpe_20261027": {
+   "exit": 0,
+   "pass_line": true,
+   "error_tail": "",
+   "classification": null
+  }
+ },
+ "c20_profile_timing_standin": {
+  "sr_fv_20_from_package_redlines": true,
+  "w4_value_in_20261027_policy": true,
+  "cl05_category_in_20261027_policy": true,
+  "expected_policy_unchanged": true
+ },
+ "dry_run_tools_in_scratch": {
+  "gate_ok": {
+   "N0_identities": true,
+   "N1_selftests": true,
+   "N2_body_rehearsal": true,
+   "N3_registry_form": true,
+   "N4_graph": true,
+   "N5_contracts_regenerator": true,
+   "N6_profile_102726": true,
+   "N7_bodies_through_profile": true,
+   "N8_packages": true,
+   "N9_registry": true,
+   "N10_activation": false,
+   "dry_run_selftest": true
+  },
+  "N10_note": "N10 fails only for want of control-page reads after the R1 fetched-after (pages_read 0, pins 0/10); activation_render chain on A5's control reads (fetched-after 2026-10-27T08:16:14.442Z) with the rebuilt activation-ops.json: ok True, totals {\"listed\": 103, \"generated\": 179, \"applied\": 282, \"refused\": 0}, every phase's pages ok, PE's 5 P1c ops applied",
+  "N5": {
+   "r1_build.exit": 0,
+   "r1_build.build_ok": true,
+   "r1_build.rows": 47,
+   "r1_build.decision_record_match": true,
+   "r1_selftest.selftest_ok": true,
+   "release_values.check": {
+    "exit": 0,
+    "release_values_file_current": true
+   },
+   "contracts.run.ok": true,
+   "Q1_PASS": true,
+   "Q5_checks_false": [],
+   "injected_refusals_false": [],
+   "contract_digests": {
+    "candidate": {
+     "exit": 0,
+     "bytes": 649672,
+     "sha256": "6994f51afdefb94423777e2b74e3daab91f98a39b06c330d9fbc0b2e45fa91ed"
+    },
+    "production": {
+     "exit": 0,
+     "bytes": 646247,
+     "sha256": "cd58119960a2424a4e5940e317e8ccbc67503d114ef293357fb7b471b9351490"
+    }
+   },
+   "ok": true
+  },
+  "N6": {
+   "make_profile.dryrun.exit": 0,
+   "make_profile.dryrun.ok": true,
+   "substitutions": 42,
+   "profile_errors": [
+    "CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.5.0",
+    "SKILL_CONTRACT:glow-hde-pr-development:GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0",
+    "SKILL_SELF_IDENTITY:DECLARED_b1f00f3ae3b7_MEASURED_3803014f6ff0"
+   ],
+   "unexpected_errors": [],
+   "expected_pending": [
+    "CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.5.0",
+    "SKILL_CONTRACT:glow-hde-pr-development:GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0",
+    "SKILL_SELF_IDENTITY:DECLARED_b1f00f3ae3b7_MEASURED_3803014f6ff0"
+   ],
+   "regressions_false": [],
+   "ok": true
+  },
+  "N7": {
+   "before": {
+    "exit": 1,
+    "bodies_validated": 56,
+    "errors_total": 845,
+    "body_scoped_errors": 845,
+    "body_scoped_error_classes": [
+     "PROMPT_BINDING_SUPERSEDED",
+     "PROMPT_BODY_IDENTITY",
+     "PROMPT_HANDOFF_RECEIVER",
+     "PROMPT_TYPESAFE_READING",
+     "QA_CLOSE_SET_REPAIR_ROUTE_BODY",
+     "QA_PASS_BODY_CLASS_MAP",
+     "QA_PASS_BODY_INTAKE"
+    ],
+    "contract_level_error_classes": []
+   },
+   "before__raw_fetch_form_diagnostic": {
+    "exit": 1,
+    "bodies_validated": 46,
+    "errors_total": 786,
+    "body_scoped_errors": 786,
+    "body_scoped_error_classes": [
+     "PROMPT_BINDING_SUPERSEDED",
+     "PROMPT_BODY_IDENTITY",
+     "PROMPT_BODY_ID_MISMATCH",
+     "PROMPT_HANDOFF_RECEIVER",
+     "PROMPT_TYPESAFE_READING",
+     "QA_CLOSE_SET_REPAIR_ROUTE_BODY",
+     "QA_PASS_BODY_CLASS_MAP",
+     "QA_PASS_BODY_INTAKE",
+     "QA_PASS_RECEIVER_BODY"
+    ],
+    "contract_level_error_classes": []
+   },
+   "after_stand_in_map": {
+    "exit": 1,
+    "bodies_validated": 56,
+    "errors_total": 779,
+    "body_scoped_errors": 779,
+    "body_scoped_error_classes": [
+     "PROMPT_BINDING_SUPERSEDED"
+    ],
+    "contract_level_error_classes": []
+   },
+   "after_probe_ids": {
+    "exit": 1,
+    "bodies_validated": 56,
+    "errors_total": 111,
+    "body_scoped_errors": 0,
+    "body_scoped_error_classes": [],
+    "contract_level_error_classes": [
+     "GRAPH_NODE_CONTRACT",
+     "MEMBER_BINDING",
+     "PRODUCTION_CONTRACT_SEMANTIC_BUNDLE_MISMATCH"
+    ]
+   },
+   "after_probe_ids__raw_fetch_form_diagnostic": {
+    "exit": 1,
+    "bodies_validated": 46,
+    "errors_total": 124,
+    "body_scoped_errors": 13,
+    "body_scoped_error_classes": [
+     "PROMPT_BODY_ID_MISMATCH",
+     "QA_PASS_BODY_INTAKE",
+     "QA_PASS_RECEIVER_BODY"
+    ],
+    "contract_level_error_classes": [
+     "GRAPH_NODE_CONTRACT",
+     "MEMBER_BINDING",
+     "PRODUCTION_CONTRACT_SEMANTIC_BUNDLE_MISMATCH"
+    ]
+   },
+   "ok": true
+  },
+  "N8": {
+   "a3_package_dryrun.exit": 0,
+   "stderr_tail": null,
+   "G1_redlines.ok": true,
+   "G2_build.ok": true,
+   "G3_suite.ok": true,
+   "G4_release_validators.ok": true,
+   "G5_contracts.ok": true,
+   "G6_injections.ok": true,
+   "G3_suite.ok_except_preexisting": true,
+   "G3_suite.findings_preexisting_in_installed_suite": 3,
+   "G3_suite.findings_from_this_change": [],
+   "G4.cf_validate_gcfpe_20261027": {
+    "exit": 0,
+    "pass_line": true,
+    "error_tail": "",
+    "classification": null
+   },
+   "G4.cf_validate_diagnostic_with_cl05_parent": {
+    "note": "diagnostic only, not a gate: the same run on a scratch contract copy with only CL-05's two parent fields added",
+    "exit": 0,
+    "pass_line": true
+   },
+   "real_errors": [],
+   "built_digests": {
+    "change-flow": "29 95b9ef0caf1d1bde6c6ca419324f56daeb62c5b6f825c0d008b1671f1420114a",
+    "flowmaster-validate": "45 424b76c02a4ad0586c3d2ab637ac7479bf0c2ace153ed07ffbf14a7c03b4b218",
+    "glow-hde-pr-development": "4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee",
+    "glow-graph-contract": "9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1"
+   },
+   "G3_suite.c21_unchanged_suite_findings_are_the_named_three": true,
+   "G3_suite.c21_built_suite_findings_are_the_named_three": true,
+   "ok": true
+  },
+  "N9": {
+   "a3_registry_dryrun.exit": 0,
+   "a3_registry_dryrun.ok": true,
+   "build_candidate.ok": true,
+   "check_candidate.ok": true,
+   "assertions_candidate_synthetic_inject.ok": true,
+   "build_selected.ok": true,
+   "check_selected.ok": true,
+   "compare.ok": true,
+   "rebuild_byte_identical": true,
+   "selftest.selftest_ok": true,
+   "body_rows": 56,
+   "body_rows_ok": 56,
+   "assertions_evaluated": 3177,
+   "findings_after_total": 0,
+   "injected_fired": 972,
+   "injected_missed": 0,
+   "rows_failing_before_edits": 55,
+   "findings_inherited_total": 0,
+   "rows_with_inherited": 0,
+   "findings_new_total": 0,
+   "rows_with_new": [],
+   "text_form": "normalize_fetch.normalize (C-15)",
+   "raw_fetch_form_diagnostic": {
+    "note": "diagnostic only, not a gate: the edited bodies in the unnormalized fetch form",
+    "findings_total": 176,
+    "rows_with_findings": 55
+   },
+   "bodies_edited_with": "probe ids",
+   "ok": true
+  },
+  "N2": {
+   "pages_ok": 57,
+   "pages_total": 57,
+   "ops": 559,
+   "ops_applied": 559,
+   "guard_rows": 756,
+   "guard_rows_failing_after": 0,
+   "ok": true
+  },
+  "N3": {
+   "body_check.registry.exit": 0,
+   "body_check.registry.ok": true,
+   "fixture_rows": 327,
+   "fixtures_disagreeing": 0,
+   "page_rows": 756,
+   "page_rows_not_ok": 0,
+   "page_rows_where_registry_form_and_guard_disagree": 0,
+   "page_rows_not_ok_only_because_guard_fails_after": 0,
+   "registry_form_agrees_everywhere": true,
+   "ok": true
+  }
+ },
+ "a3_package_gates": {
+  "G1_redlines": true,
+  "G2_build": true,
+  "G3_suite": true,
+  "G4_release_validators": true,
+  "G5_contracts": true,
+  "G6_injections": true
+ },
+ "a3_registry_gates": {
+  "stand_in_used": true,
+  "build_candidate": true,
+  "rebuild_byte_identical": true,
+  "check_candidate": true,
+  "assertions_candidate_synthetic_inject": true,
+  "build_selected": true,
+  "check_selected": true,
+  "compare": true,
+  "selftest": true,
+  "ok": true
+ },
+ "selftests_and_checks": {
+  "x12_qualify_102726.selftest": {
+   "exit": 0,
+   "ok": true,
+   "rows": {
+    "payload_normalized": true,
+    "payload_gate_passes_normalized": true,
+    "injected_raw_payload_refused": true,
+    "c21_preexisting_only_passes": true,
+    "c21_suite_clean_passes": true,
+    "injected_change_finding_fails_c21": true,
+    "built_intake_passes_normalized": true,
+    "built_intake_injected_raw_fails": true
+   }
+  },
+  "x18_validate_102726.selftest": {
+   "exit": 0,
+   "ok": true,
+   "rows": {
+    "payload_normalized": true,
+    "injected_raw_payload_refused": true,
+    "targets_six": true,
+    "registry_assertion_text_normalizes": true,
+    "injected_raw_registry_text_differs": true
+   }
+  },
+  "make_activation_ops_102726.selftest": {
+   "exit": 0,
+   "ok": true,
+   "rows": {
+    "clean_build_passes": true,
+    "p1c_anchors_escaped": true,
+    "p1c_marker_kept": true,
+    "rejects_head_without_escaped_anchor": true,
+    "rejects_anchor_twice_in_head": true,
+    "rejects_escaped_marker": true,
+    "esc_fetch_keeps_markers_and_code": true
+   }
+  },
+  "make_activation_ops_102726.check": {
+   "exit": 0,
+   "ok": true,
+   "file_equals_rebuild": true
+  },
+  "make_package_redlines_102726.selftest": {
+   "exit": 0,
+   "ok": true,
+   "rows_false": [],
+   "rows": 18
+  },
+  "make_package_redlines_102726.check": {
+   "exit": 0,
+   "equal": true,
+   "sha256": "ed8fd183f24d6a998b8d3289f3b63d0558f713845523193a6f4862da344272b5"
+  },
+  "successor_map_102726.selftest": {
+   "exit": 0,
+   "ok": true,
+   "rows_false": []
+  },
+  "successor_map_102726.check": {
+   "exit": 0,
+   "ok": true
+  },
+  "dry_run_102726.selftest": {
+   "exit": 0,
+   "ok": true,
+   "rows_false": [],
+   "rows": 19
+  },
+  "contracts_102726.values.check": {
+   "exit": 0,
+   "release_values_file_current": true
+  },
+  "assemble_edits.py.check": {
+   "exit": 0,
+   "edits_json_current": true
+  },
+  "assemble_guards.py.check": {
+   "exit": 0,
+   "guards_json_current": true
+  },
+  "make_graph_edits_102726.check": {
+   "exit": 0,
+   "graph_edits_file_current": true,
+   "edits": 37
+  },
+  "binding_pass.selftest": {
+   "exit": 0,
+   "ok": true
+  },
+  "normalize_fetch.selftest": {
+   "exit": 0,
+   "ok": true
+  },
+  "body_check.selftest": {
+   "exit": 0,
+   "ok": true
+  },
+  "registry_assemble_102726.selftest (via a3_registry_dryrun)": {
+   "ok": true,
+   "rows_false": [],
+   "c15_and_c22_rows": {
+    "refuses_unfilled_marker": true,
+    "refuses_typed_catalog_id": true,
+    "refuses_catalog_record_without_page_id": true,
+    "c15_assertions_pass_on_normalized_text": true,
+    "c15_injected_raw_text_reported": true,
+    "c15_assertion_text_idempotent": true
+   }
+  }
+ }
+}

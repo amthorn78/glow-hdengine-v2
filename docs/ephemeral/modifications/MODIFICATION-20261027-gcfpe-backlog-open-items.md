@@ -2,7 +2,7 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261027-gcfpe-backlog-open-items"
-status: "ANALYZED"
+status: "PLANNING"
 targets: ["prompt", "skill", "rule", "graph", "registry", "notion_control", "tool"]
 gate_tier: 2
 closure: {"upstream": ["CF-C-20", "CF-C-30", "CF-C-40", "CF-E-20", "CF-E-30", "CF-E-40", "CL-20", "CL-30", "CL-C-10", "CL-E-10", "CL-E-40", "DOC-10", "DOC-20", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "MGR-10", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "downstream": ["CF-C-10", "CF-C-40", "CF-E-10", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "state_sharers": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-E-10", "CF-E-20", "CF-E-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "DOC-10", "DOC-20", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-100", "QA-110", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-20", "RS-30", "RS-40", "UTIL-10"]}
@@ -11,7 +11,7 @@ override: {"by": "", "overrides": [], "reason": ""}
 interaction_cost_predicted: 23
 interaction_cost_actual:
 estimate: {"plan": "10–16 h and 6–10M aggregate tokens: a fresh read of about 56 pages for the dry run; operations for about 35 bodies, the CL-05 member, PE and two control pages; graph-part edits for five parts and a new part; registry guards with injected regressions for about twelve rules; redlines for three to five skill packages; the R1 successor rows; the qualification and promotion plans; then one FULL round of two reviewers and at most one DIFF_CHECK", "execute": "24–40 h and 12–20M aggregate tokens, excluding Product Owner waiting time: about 40 Notion body operations with fresh-read checks, a new member page, three to five packages through one D24 cycle, the qualification gates and post-flight, and, under DN-1 option D2, the promotion transaction of about 80 Notion writes and moves plus the sweep by literal"}
-reviews: [{"mode": "ANALYZE", "kind": "DRY_RUN", "date": "2026-10-27", "required_open": 0, "outcome": "Author dry run, read-only, before any full review: 55 of 55 closure.py calls exit 0; the graph build reproduces D29's token (55 nodes, 235 edges, 593,569 bytes, sha256 43f84f29…); 8 of 9 installed skill digests equal their recorded values, and typesafe-scoring has no repository record; 240 of 240 repository and canon quotes match their sources; 52 Notion quotes are reproduced by an independent sweep and none conflicts; the decisive sentences of MB-001, MB-002, MB-012, MB-020, MB-021, MB-026 and MB-030 re-read on fresh fetches and in the graph parts; the record validator passes. No defect in the analysis is open from the dry run."}, {"mode": "ANALYZE", "kind": "FULL", "date": "2026-10-27", "required_open": 2, "outcome": "Round 1 at 4780f64a, two fresh reviewers, briefs at 8134979c. A: 2 required. R-A1 (R1): ITEM-14 confined PF04 §9.7.7's IA-30 business-case gate to the initial Plan review, so a material Plan delta adding or changing a work unit would pass unchecked. R-A2 (R3): DN-6 (a) recommended a commit route that the installed glow-write-boundary excludes, since an earlier task's instruction 'is not that instruction'. A also listed 24. B: 0 required, 19 listed. Both confirmed A-1's class reading, CD-1, CD-4, MB-010's test on the bodies they fetched, the derived items and tier 2. Distinct required count 2, none in repaired text. The author repairs R-A1 and R-A2 only (ITEM-14, ITEM-15, PART-03's targets, A-5, DN-6); the listed findings stay listed (D26-A rule 4); one DIFF_CHECK follows."}, {"mode": "ANALYZE", "kind": "DIFF_CHECK", "date": "2026-10-27", "required_open": 0, "outcome": "Reviewer C, who was neither A nor B, checked 02ba1797..46160491 under BRIEF-ANALYZE-DIFF.md (43fe026b). R-A1 fixed: the two named IA-30 reviews are its only approving modes. R-A2 fixed: A-5's quotes match the installed skill, and DN-6 (a) now asks in the committing session; ITEM-22 and PF19 §3.4.3 hold under every option. No new required defect. 5 LISTED (L-C1 to L-C5). Required count 2 to 0. This is the last ANALYZE review D26-A allows; the analysis returns to Nathan with every open finding listed."}]
+reviews: [{"mode": "ANALYZE", "kind": "DRY_RUN", "date": "2026-10-27", "required_open": 0, "outcome": "Author dry run, read-only, before any full review: 55 of 55 closure.py calls exit 0; the graph build reproduces D29's token (55 nodes, 235 edges, 593,569 bytes, sha256 43f84f29…); 8 of 9 installed skill digests equal their recorded values, and typesafe-scoring has no repository record; 240 of 240 repository and canon quotes match their sources; 52 Notion quotes are reproduced by an independent sweep and none conflicts; the decisive sentences of MB-001, MB-002, MB-012, MB-020, MB-021, MB-026 and MB-030 re-read on fresh fetches and in the graph parts; the record validator passes. No defect in the analysis is open from the dry run."}, {"mode": "ANALYZE", "kind": "FULL", "date": "2026-10-27", "required_open": 2, "outcome": "Round 1 at 4780f64a, two fresh reviewers, briefs at 8134979c. A: 2 required. R-A1 (R1): ITEM-14 confined PF04 §9.7.7's IA-30 business-case gate to the initial Plan review, so a material Plan delta adding or changing a work unit would pass unchecked. R-A2 (R3): DN-6 (a) recommended a commit route that the installed glow-write-boundary excludes, since an earlier task's instruction 'is not that instruction'. A also listed 24. B: 0 required, 19 listed. Both confirmed A-1's class reading, CD-1, CD-4, MB-010's test on the bodies they fetched, the derived items and tier 2. Distinct required count 2, none in repaired text. The author repairs R-A1 and R-A2 only (ITEM-14, ITEM-15, PART-03's targets, A-5, DN-6); the listed findings stay listed (D26-A rule 4); one DIFF_CHECK follows."}, {"mode": "ANALYZE", "kind": "DIFF_CHECK", "date": "2026-10-27", "required_open": 0, "outcome": "Reviewer C, who was neither A nor B, checked 02ba1797..46160491 under BRIEF-ANALYZE-DIFF.md (43fe026b). R-A1 fixed: the two named IA-30 reviews are its only approving modes. R-A2 fixed: A-5's quotes match the installed skill, and DN-6 (a) now asks in the committing session; ITEM-22 and PF19 §3.4.3 hold under every option. No new required defect. 5 LISTED (L-C1 to L-C5). Required count 2 to 0. This is the last ANALYZE review D26-A allows; the analysis returns to Nathan with every open finding listed."}, {"mode": "PLAN", "kind": "DRY_RUN", "date": "2026-10-27", "required_open": 0, "outcome": "Author dry run, read-only, of every normal-path gate (N0 to N10, plan/dry_run_102726.py). The first, on reads after 08:16:14Z, failed N2, N3, N7, N8 and N9 (13 uncovered guard rows; Notion's <code>/\\_ fetch rendering against Markdown-form assertions; CL-05's missing contract parent; three pre-existing suite findings; QA-120 intake markers). One bounded repair under D26-F trigger 2 (C-15 to C-22). The second, at acc39b04 on reads after 09:38:45Z, passes all eleven: 57/57 pages, 559/559 operations, 0 of 756 guard rows failing after, 56/56 registry rows with 972 injected regressions reported, 282 control operations rendered with none refused. Receipts plan/dry-run-1.json and plan/dry-run.json."}, {"mode": "PLAN", "kind": "FULL", "date": "2026-10-27", "required_open": 4, "outcome": "Round 1 at b0f2481, two fresh reviewers, briefs at 6385dbf. A: 2 required. R-1 (R1, R4): X1's and X26's repository edits had no committed applier, W1's note was stored anchored before D30, and the repository and notion-control guards ran only on fixtures, so X8 passed with a surviving retired line. R-2 (R3): L-C1, accepted by Nathan as a risk, was repaired without his opt-in in IA-30's delta review, G-W2-EM-2 and D30-A. A listed 15. B: 2 required. R-B1 (R1): the X17 post-flight would pipe raw fetches outside C-15's normalized form. R-B2 (R2): C-REG wrote the stale pull request #768 on the register. B listed 10. Distinct required 4, none in text the dry-run repair added (R-B1 sits in C-15's reach). Both confirmed the cascade (C-1), its fixpoint, the binding pass, C-15, C-16, CD-6, CD-9, PE's general rules, PART-13 and the D17 order. The author repairs the four only (C-23 to C-26); one DIFF_CHECK follows."}, {"mode": "PLAN", "kind": "DIFF_CHECK", "date": "2026-10-27", "required_open": 0, "outcome": "Reviewer C, who was neither A nor B, checked f2346b2..885638d under BRIEF-PLAN-DIFF.md (6474eca). R-1, R-2, R-B1 and R-B2 fixed, none with a new defect: repo_edits_102726.py self-test 14/14 and X1 then X26 clean on a scratch copy; the PART-17 guards reproduce the plan's counts on fresh Hub and register reads; D30 states exactly DN-3 (b). 8 LISTED (L-D1 to L-D8). Required count 4 to 0. This is the last PLAN review D26-A allows; the plan returns to Nathan with every open finding listed."}]
 items:
   - {"id": "ITEM-01", "statement": "DOC-20 no longer routes a second PR-40 entry for a merge whose lineage PR-40 has already accepted (D23-E, once per merge).", "source": "MB-001", "disposition": ""}
   - {"id": "ITEM-02", "statement": "PR-20's description of PR-40 says that a REJECT re-plans through PR-20 (D23-F), not that it returns findings to the PR owner.", "source": "MB-002", "disposition": ""}
@@ -45,6 +45,10 @@ items:
   - {"id": "ITEM-30", "statement": "The close-mutation-set stage CL-05 is a release member, entered from QA-120 PASS and from a closure DO_NOT_CLOSE, and exiting to the closure decision (PF06 §3.5.1).", "source": "MB-030", "disposition": ""}
   - {"id": "ITEM-31", "statement": "The successor release that carries this Modification's prompt and skill parts is qualified, and its promotion packet is returned to Nathan.", "source": "Derived: D23-G and PF04 §9.1.6, one coherent successor selection for every member change", "disposition": ""}
   - {"id": "ITEM-32", "statement": "The promotion transaction runs after Nathan's exact promotion approval, if he gives it to this Modification under DN-1.", "source": "Derived: DN-1", "disposition": ""}
+  - {"id": "ITEM-33", "statement": "glow-hde-pr-development SKILL.md:184 no longer cites a drained PF10 addendum by number.", "source": "DN-12 rider 1, approved 2026-10-27 (A-11)", "disposition": ""}
+  - {"id": "ITEM-34", "statement": "PE Metaprompt no longer labels GCFPE-20261009.1 as the candidate.", "source": "DN-12 rider 2, approved 2026-10-27", "disposition": ""}
+  - {"id": "ITEM-35", "statement": "ecosystem-change-management.md section 3 shows the current graph proof token, not the pre-D29 one.", "source": "DN-12 rider 3, approved 2026-10-27 (J-12)", "disposition": ""}
+  - {"id": "ITEM-36", "statement": "PE Metaprompt no longer credits the TypeSafe rule to a drained HDE Build Notes addendum.", "source": "Nathan's DN-12 condition, 2026-10-27 (A-11, J-9 in part)", "disposition": ""}
 parts:
   - {"id": "PART-01", "name": "PR review findings on real inputs (PF06 §1.1.4, PF27)", "items": ["ITEM-11", "ITEM-12", "ITEM-23"], "class": "B", "after": []}
   - {"id": "PART-02", "name": "Codex security review wording", "items": ["ITEM-24"], "class": "B", "after": []}
@@ -69,12 +73,16 @@ parts:
   - {"id": "PART-21", "name": "Review briefs: Canon relied on", "items": ["ITEM-05"], "class": "C", "after": []}
   - {"id": "PART-22", "name": "Unchanged prompts outside GCFPE keep their pages", "items": ["ITEM-28"], "class": "A", "after": []}
   - {"id": "PART-23", "name": "Relay-safety scoring", "items": ["ITEM-29"], "class": "A", "after": []}
-  - {"id": "PART-24", "name": "Successor release qualification and promotion packet", "items": ["ITEM-31"], "class": "C", "after": ["PART-01", "PART-02", "PART-03", "PART-04", "PART-05", "PART-06", "PART-07", "PART-08", "PART-09", "PART-10", "PART-11", "PART-12", "PART-13", "PART-14", "PART-15", "PART-16", "PART-18"]}
+  - {"id": "PART-24", "name": "Successor release qualification and promotion packet", "items": ["ITEM-31"], "class": "C", "after": ["PART-01", "PART-02", "PART-03", "PART-04", "PART-05", "PART-06", "PART-07", "PART-08", "PART-09", "PART-10", "PART-11", "PART-12", "PART-13", "PART-14", "PART-15", "PART-16", "PART-18", "PART-26", "PART-27"]}
   - {"id": "PART-25", "name": "Promotion transaction", "items": ["ITEM-32"], "class": "B", "after": ["PART-24"]}
+  - {"id": "PART-26", "name": "Stale drained-addendum citations (glow-hde-pr-development, PE)", "items": ["ITEM-33", "ITEM-36"], "class": "B", "after": []}
+  - {"id": "PART-27", "name": "PE's candidate label for GCFPE-20261009.1", "items": ["ITEM-34"], "class": "B", "after": []}
+  - {"id": "PART-28", "name": "Pre-D29 proof token in ecosystem-change-management.md", "items": ["ITEM-35"], "class": "C", "after": []}
 request: "MODE = ANALYZE. Subject: every open item on the GCFPE Modification Backlog https://app.notion.com/p/3e54590a05eb81eb818fd0f42045167a"
 requested_by: "Nathan"
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan"
+analyze_approved_date: "2026-10-27"
+item_count_at_approval: 36
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
@@ -536,9 +544,235 @@ The reading below came from running the installed TypeSafe scoring skill's scrip
 - **In a fresh session.** Invoke GCFPE-MGMT-10 with `MODE = PLAN` and `MODIFICATION-20261027-gcfpe-backlog-open-items`, naming branch `claude/cool-bardeen-zwduzl` until the pull request merges (L-A24).
 - **The PLAN session's reading** is in §A.12: **TypeSafe v8.2: Opus 5.5 at high**, no flags. You pick the cell.
 
+### 14. Approval to enter PLAN — 2026-10-27
+
+Nathan, approving, in the PLAN invocation of 2026-10-27:
+
+> "approve §A of MODIFICATION-20261027-gcfpe-backlog-open-items with the recommended options for DN-1, DN-2, DN-4, DN-5, DN-6, DN-7, DN-8, DN-9, DN-10 and DN-12, and with these choices and conditions:
+> - DN-3: option (a) for ITEM-18; option (b) for ITEM-15 and ITEM-17, recorded as a decision-record ruling before execution.
+> - DN-11: close MB-029 as delivered. Its quantified relay reading is the typesafe-scoring skill, which every GCFPE handoff runs (PF04 §9.1.3); its qualitative Claude recommendation is withdrawn by my direction of 2026-10-11 that no AI model recommendation is given.
+> - CD-9: move the register's procedure binding in the promotion transaction (PART-25), not before.
+> - CD-6: adopt request 4 as a new QA-70 reviewer duty, stated as new.
+> - DN-12: also carry PE's stale addendum citation for the TypeSafe rule into PART-14's PE successor.
+> - PLAN covers L-A12 / L-B1 and L-A13 / L-B2 within PART-13 and PART-24, and records PART-13's R1 successor rows in the decision record (L-A14).
+> All other listed findings are accepted as risks."
+
+**What this approves.**
+
+| Decision | Answer | Effect on PLAN |
+|---|---|---|
+| DN-1 | D2 | After PART-24, EXECUTE returns `PROMOTION_CHECKPOINT_REQUIRED`; Nathan's exact promotion approval authorizes PART-25 for this run only |
+| DN-2 | (b) | PART-13 is class B. The R1 successor rows (GCF-24 → the close stage → GCF-25) are authorized; PLAN records them in the decision record (L-A14). The Epic limit (A-7) stays a listed risk |
+| DN-3 | (a) for ITEM-18; (b) for ITEM-15 and ITEM-17 | ITEM-18 applies PF06 §1.1.4's *Real input* bullet (class B). ITEM-15 and ITEM-17 rest on a new decision-record ruling, recorded before execution (class A). PART-04 stays class A |
+| DN-4 | (a) | PR-40 records the business-case measure's status as a fact, with no effect on its verdict |
+| DN-5 | (a) | The HDE-CRD-0002 v1.1 route, generalised: QA-70 reviews, a `DENY` sends redlines to QA-80, QA-70 approves the successor, no PF10 addendum |
+| DN-6 | (a) | No skill change: QA-90 names paths and route; QA-100 asks for Nathan's instruction in its own session and stops without it |
+| DN-7 | (a) | WON'T DO. PART-16 makes no edit; MB-009's risk is accepted |
+| DN-8 | (c) | No change. PART-15 and PART-22 close `NOT_APPLICABLE` with their evidence |
+| DN-9 | recommended | The Hub's workspace-wide *PF10 build-notes addendum format — canonical* numbering and confirmation text is replaced by a pointer to PF06 §0.1A and PF27 |
+| DN-10 | (b) | The provenance clause is kept; PART-18 makes no edit; the PENDING row is an accepted risk |
+| DN-11 | close as delivered | PART-23 makes no edit. MB-029 closes as delivered by typesafe-scoring under PF04 §9.1.3, with the qualitative recommendation withdrawn by Nathan's direction of 2026-10-11 |
+| DN-12 | yes to both, plus one | J-1 to J-14 go on the backlog now. The three riders and PE's stale TypeSafe-rule citation become ITEM-33 to ITEM-36 (PART-26 to PART-28) |
+| CD-6 | condition | Request 4 is adopted as a new QA-70 reviewer duty and stated as new, not as an extension of the apply simulation (L-A22) |
+| CD-9 | condition | The register's procedure binding moves inside the promotion transaction, not before (L-B12). PART-19's successor file is written earlier; its binding step runs in PART-25's window |
+| L-A12 / L-B1, L-A13 / L-B2 | opted in | PLAN plans `global.json`'s member facts, both packages' `EXPECTED_POLICY`, the Living Prompt Flow Map and the Flow Index inside PART-13 and PART-24 |
+| L-A14 | opted in | PLAN writes PART-13's R1 successor rows into the decision record |
+
+**Scope at approval: 36 items.** The four approved riders were added as ITEM-33 to ITEM-36 when this approval was recorded, before `item_count_at_approval` was set, so they are inside the frozen scope (template rule 3). They sit in their own parts because each is a different defect from the part whose file it rides (§A.7, DN-12). The analysis above (§A.1 to §A.13) is otherwise unchanged and now frozen. Every other listed finding in §A.13 is accepted as a risk (`DISP-001`). `plan_approved_by` stays empty until Nathan approves the plan.
+
+**The PLAN session's model and setting.** The invocation repeats §A.12's reading and ends "Nathan picks the cell"; it states no pick, so none is recorded.
+
 ## §P — Plan
 
-*Written by MODE = PLAN. Requires analyze_approved_by. Frozen once approved.*
+**PLAN is complete, and its normal path passes a full dry run.** The detail is in [PLAN-20261027.md](evidence/20261027-gcfpe-backlog-open-items/PLAN-20261027.md). Its tools, operations, guards, registry inputs, activation operations and dry-run receipts are under [plan/](evidence/20261027-gcfpe-backlog-open-items/plan/). EXECUTE lands the 36 items as one successor release, `GCFPE-20261027.1 / 102726.1 / 56`:
+- 54 runtime successors, PE and the new member CL-05 (C-1); GCFPE-MGMT-10 is kept;
+- four skill packages;
+- `PROMOTION_CHECKPOINT_REQUIRED` with the packet, then, after Nathan's exact promotion approval, the register-last transaction (DN-1 D2).
+
+The first dry run failed five gates. One bounded repair (C-15 to C-22, D26-F trigger 2) fixed them. The second, at `acc39b04` on reads after 2026-10-27T09:38:45Z, passes all eleven gates, N0 to N10. The PLAN review's first FULL round found four required defects; they are repaired (C-23 to C-26), and one diff check follows (D26-A).
+
+Canon relied on:
+- PF10-HDE-Build-Notes v13.9: its one addendum, 2.1 (S19), is silent here, and its numbering restart makes drained "2.x" citations ambiguous.
+- PF04-Canon-HDE-Governance v2.8.8 §9.1.1 to §9.1.6 and §9.7.7.
+- PF06-Canon-Change-Process-Guide v2.5.5 §0.1A, §1.0.6, §1.1.4, §3.5.1 and §3.5.2.
+- PF19-Canon-Glow-QA-Guide v3.0.7 §0.4.3, §3.1.2, §3.1.3, §3.3, §3.4.3, §3.4.14, §3.5.7, §3.6 and §10.6.
+- PF27-Canon-Plan-Templates v2.0.6: the sections in PLAN §1, with §3B.
+- PF12-Canon-HDE-Schemas-and-Artifacts v2.9.7 §1.2 and §8.17.
+- PF30.1-Canon-HDE-CRD-Records v0.9.2 §4.1.
+- Decisions D8, D12 to D14, D17 and D20 to D30.
+
+### Steps
+
+Every step's verification can fail; a forbidden guard searches every page for surviving old text (template rule 4, D26-E). A failure takes D26-B's path: a failure record that reaches `main` in a record pull request, a read-only sweep, the freeze kept, and a return to Nathan. Resumption is only at D26-C's checkpoints: X0, X18's check on `main`, and X27. Not safe to send twice: X2, X5, X6, X8, X9, X20, X21 and X28 (PLAN §5).
+
+| # | part | target | edit | authority | verification | rollback |
+|---|---|---|---|---|---|---|
+| X0 | all | skills, graph, PF10, register, 57 pages, 11 control pages | none: preflight; dry run rerun | D26-C | 9 digests; D29 token; PF10 v13.9 with only 2.1; selection 100926.1 / 55; every pin; D30 once on the branch | stop |
+| X1 | 02, 19, 20, 21, 28 | v5.1.0 file; `skill-identity-and-freeze.md`; `reviewer-prompt-template.md`; `ecosystem-change-management.md` §3; PART-02 note after D30 | `plan/repo_edits_102726.py check --state before`, `apply` and `check --state after`, `--set X1`; controls pull request, its number recorded once in `execute/controls-pr-102726.1.json`; Nathan merges it before the packet | CD-9, CD-10, CD-11, C-11, C-12, C-23, C-26 | each `old` string at its count, each `new` once; the 7 repository guards through `body_check.py`'s guard functions; the note once, after `## D30`; v5.0.0 unchanged; validator | revert before merge |
+| X2 | 24 | 56 source pages | duplicate; move where needed; title | C-1; D23-G | parent, title, head, no child, source revision unchanged | move to archive |
+| X3 | 24 | `execute/successor-pages-102726.1.json` | write the map once | W7-D8; D26-C | map checks: 56 members, 54 SUCCESSOR, 1 KEPT, 1 ADDED, PE | stop |
+| X4 | body parts | 56 successors and GCFPE-MGMT-10 | none: fresh reads; `body_check.py plan` | D22 | `ok`; revisions at the map's pins | stop the page |
+| X5 | 24 | PR-50 102726.1 | head and binding operations, one call | C-22 | every operation LANDED; head read back as planned | page history |
+| X6 | 01, 03–14, 24, 26, 27 | the other 55 successors | one update_content each | §A.14 decisions; C-1 to C-22 | each call succeeds | page history |
+| X7 | body parts | the same pages | none: `check` and `registry` | GUARD-001 | every operation LANDED; every guard passes; BIND, NAME and REL guards at 0 | page history |
+| X8 | 17, 21 | Glow Operations Hub, register | 21 and 3 operations | DN-9; C-10; C-23 | `activation_render_102726.py plan` and `check --phase part17`, which evaluate the Hub and register guards (G-W6-HUB-*, G-W6-REG-*) on the normalized reads: W6's counts before, every guard passing after | page history |
+| X9 | 24 | catalog (new), Flow Index, five hubs, register | candidate records; C-REG's link filled with `--set @CONTROLS_PR=<number>`, refused unfilled | L-A13 / L-B2; D-W8-3, D-W8-5; C-26 | `check --phase candidate`; `control_check_102726.py --phase candidate` | page history |
+| X10 | 24, 13 | regenerator, R1 successor | Q0 to Q2 | D23 successor; L-A14 | 100926.1 contract EQUAL; R1 47 rows at the recorded digests | discard scratch |
+| X11 | 24, 08–10, 13 | candidate and production graphs | Q3, Q4 | C-11 | 56 · 240 · 56; route checks; flip-only difference | discard scratch |
+| X12 | 24 | 102726.1 contracts | Q5 | W7-D5; C-7; C-19 | 56 ids; no `promoted_at`; semantic equality; PLAN pin | none |
+| X13 | 24 and skill parts | 4 packages | Q6: 105 redlines, build, gates in two copies | D24; D28; W7-D2, W7-D3 | all LANDED; suite, fixtures, validators pass with only C-21's named findings | rebuild |
+| X14 | 24 | 56 bodies | Q7, `x12_qualify_102726.py` | promotion predicate 1 | 56 validated, none unevaluated, `ok` | stop |
+| X15 | 24 | `GCFPE-PCR-20261027.1` | Q8 | D13; GUARD-001 | validator 0; 56 rows; every regression reported | revert |
+| X16 | 24 | the 4 packages | Q9, D24, two reviewers | D24; D26-A | both `SKILL_FIT_CONFIRMED` on the same digests | repair within cap |
+| X17 | 24 | the release | Q10, post-flight, two reviewers; the brief names `plan/normalize_fetch.py` as the one text form, and the reviewers run `x12_qualify_102726.py` and `registry_assemble_102726.py assertions` on their own reads | postflight-procedure; C-15; C-25 | `PASS` or `PASS WITH WARNINGS`, no mandatory finding; both runs report the normalized form (56 bodies validated, none unevaluated; 56 rows evaluated) | stop |
+| X18 | 24 | Flow Index; packet | C4, Q11; controls merge checked on `main` | DN-1 D2 | every packet value from a receipt; pins recorded | none |
+| X19 | 25 | all | P0 | promotion approval | selection, pins, map, digests, v5.1.0 sha256 equal | stop |
+| X20 | 25, 19 | entry (new), catalog, PE, Flow Index, five hubs, Alpha checklist | P1 bindings | D17 | `check`; `control_check_102726.py --phase activation --register-pending` | stop |
+| X21 | 25, 19 | register | P2, last; procedure binding to v5.1.0 | D17; CD-9 | ten pages pass; selection names 102726.1 / 56 and v5.1.0 | stop |
+| X22 | 25 | installed skills | P3: Nathan installs 4 | D24 | `freeze.py` digests equal the reviewed ones | reinstall |
+| X23 | 25 | activated state | P4, `x18_validate_102726.py` | D17 | every flag; 56 bodies; every row passes | stop; no archival |
+| X24 | 25 | 57 pages | P5, move to the archive | D17; D29 | all 57 under the archive, intact; `--phase archived` ok | move back |
+| X25 | 25 | workspace | P6, sweep by literal; never a member body | authoritative-surfaces | a second search finds none | page history |
+| X26 | 25 | this branch | R1 to R5: parts, registry, surfaces, D31, §E, the surfaces and D31 by `plan/repo_edits_102726.py --set X26` with the receipts' values; promotion pull request | D17; C-23 | token reproduced; registry checks; validator | revert |
+| X27 | 25 | `main` | R7 after Nathan's merge, detected by files | D26-C | token, registry, D31, digests on `main` | stop |
+| X28 | all | backlog; record pull request | dispositions; `ECOSYSTEM_CHANGE_COMPLETE` | template rule 5 | backlog rows re-fetched | page history |
+
+### Decisions applied
+
+DN-1 to DN-12, CD-1 to CD-15 with Nathan's CD-6 and CD-9 conditions, and the opt-ins L-A12 / L-B1, L-A13 / L-B2 and L-A14 apply as recorded in §A.14. C-1 to C-26 apply as recorded in `plan/coordinator-decisions.md`. Among them:
+- C-1, the cascade: every member citing a changed member's page gets a successor, so 54 plus PE plus CL-05.
+- One successor map, written once.
+- D30 is recorded now, the PART-02 note follows it, and the promotion entry is D31.
+- A frozen PLAN file is pinned by the contract.
+- The controls pull request is merged before the packet.
+- One normalized text form for every check.
+- C-16's judged lines.
+- CL-05's parent comes from the map.
+- One successor's write is read back before the batch.
+
+PART-15 and PART-22 close `NOT_APPLICABLE` (DN-8 (c)). PART-16 and PART-18 are accepted risks (DN-7 (a), DN-10 (b)). PART-23 closes delivered (DN-11, in Nathan's words). PART-19's binding moves inside PART-25 (CD-9). R-P1 and R-P2 are prepared as excluded conditional sets (C-13).
+
+### Open findings, accepted as risks
+
+28, P-L1 to P-L28, each with its path, likelihood, consequence and reason in PLAN §10, together with those accepted at ANALYZE approval (§A.13, less the three opt-ins). They include:
+- C-11's stale `candidate_member_rule`;
+- C-19's carried parent ids;
+- C-21's pre-existing suite findings;
+- C-15's pre-existing rendering failure of the selected registry;
+- the Hub's "all 55" line;
+- C-16's judgement calls;
+- stand-in-dependent digests;
+- the Ops Hub's volatility;
+- R-P1, R-P2 and the governance-audit lines of C-3, which are Nathan's.
+
+Approving this plan accepts them (`DISP-001`).
+
+### Product Owner actions
+
+- Approve this plan in Nathan's own words, saying whether R-P1 and R-P2 are opted in.
+- Merge the controls pull request before X18; X18 and P0 verify it on `main`.
+- Approve promotion of the exact X18 packet snapshot.
+- Install the four packages at X22, verified by `freeze.py` digest.
+- Merge the promotion pull request; X27 verifies it from `main`.
+- Merge the record pull request.
+
+Each merge preserves the record and approves nothing (D21-C).
+
+### Explicitly not in scope
+
+- J-1 to J-14 and the C-14 backlog rows.
+- The governance-audit lines (C-3); R-P1 and R-P2 unless opted in.
+- QA-70's delta-mode retirement.
+- The TW ecosystem and PE's general rules.
+- typesafe-scoring and session-relay-flowmaster.
+- The selected 100926.1 contract bytes.
+- PF canon and A-10's canon inconsistencies.
+- Alpha state.
+
+### Disclosed deviations
+
+- **Branch.** The branch is the harness's `claude/ecosystem-change-mgmt-drvb4v`, not `docs/20261027-modification-gcfpe-backlog-open-items`, as ANALYZE used the harness's branch.
+- **Riders.** The four riders (ITEM-33 to ITEM-36) were added at approval, inside the frozen scope.
+- **Cascade.** C-1 widens ITEM-31's measured surface to 54 runtime successors, PE and CL-05. No item is added.
+- **PF10.** PF10 moved to v13.9 after ANALYZE's v13.8.9 baseline.
+- **Merges.** The controls pull request adds a third merge to §A.8's count.
+- **Re-price.** EXECUTE is re-priced at 18–30 h and 16–26M, replacing 24–40 h and 12–20M (PLAN §13).
+- **D30-A.** D30-A was corrected in place on the unmerged branch under C-24: its delta bullet now reads by work unit, as ITEM-15 does, and L-C1 stays an accepted risk.
+
+### Return to Nathan — 2026-10-27
+
+**`PRODUCT_OWNER_ACTION_PENDING` — `DECISION NEEDED`: approve this plan, and say which of four opt-ins you take.**
+
+- **The plan is reviewed.** It had a dry run (failed once, repaired under D26-F trigger 2, then passed N0 to N10), one FULL round by two fresh reviewers, and one check of the repair's diff by a third. Required defects went **4 → 0**.
+  - Round 1: [REVIEW-PLAN-1-A.md](evidence/20261027-gcfpe-backlog-open-items/REVIEW-PLAN-1-A.md), [REVIEW-PLAN-1-B.md](evidence/20261027-gcfpe-backlog-open-items/REVIEW-PLAN-1-B.md). The four required (R-1, R-2, R-B1, R-B2) are repaired as C-23 to C-26 in `plan/coordinator-decisions.md`.
+  - Diff check: [REVIEW-PLAN-DIFF.md](evidence/20261027-gcfpe-backlog-open-items/REVIEW-PLAN-DIFF.md): all four fixed, none with a new defect.
+- **Who set this stop:** D26-A (two FULL reviews at most, then one diff check; a second FULL round was not needed). Every open finding is listed below; approving the plan accepts them (`DISP-001`).
+- **Correction, stated once:** while repairing, the PLAN document's introduction was also changed to state D26-A's bound correctly ("at most two FULL reviews, then one diff check"). That resolves round 1's listed L-8, which the repair record does not name (L-D4).
+- **Scope:** still 36 items. The cascade (C-1: 54 runtime successors, PE and CL-05; GCFPE-MGMT-10 kept) is ITEM-31's measured surface; both reviewers confirmed it is the coordinator's call and that its fixpoint holds.
+
+**Your opt-ins.** Each is outside the frozen scope, so none is applied unless you say so.
+
+| Opt-in | What it does | Cost |
+|---|---|---|
+| **R-P1** | The stale drained-addendum citation ITEM-33 fixes, also in flowmaster-validate `SKILL.md:168` (and a fixture comment) and change-flow `SKILL.md:305` (and its revision note). PF10 v13.9 restarted at 2.1, so these now point at the unrelated S19 addendum | zero: both packages are rebuilt anyway; the redlines are prepared as an excluded set |
+| **R-P2** | PE's "from the release after 100926.1" corrected to 091426.1 | zero: one PE operation, prepared and dry-run |
+| **L-C1** | IA-30's delta review also checks a criterion or outcome a delta changes without editing a work unit (accepted as a risk at ANALYZE; reverted here under C-24) | small: the reverted clause, D30-A's wider bullet and G-W2-EM-2's cut, restored; one more fresh dry run of IA-30 |
+| **Governance-audit lines** (C-3) | The two lines in amthor-workspace-governance-audit that keep ITEM-08's retired rule (now MB-045) | not prepared: a fifth package, review and install, so a plan revision |
+
+Recommendation: take R-P1 and R-P2; leave L-C1 and the governance-audit lines on the backlog.
+
+**Approval, in one line if you take the recommendation:** "approve the plan of MODIFICATION-20261027-gcfpe-backlog-open-items at `<commit>` with R-P1 and R-P2, accepting the open findings listed in §P." Name any opt-in you choose differently. `plan_approved_by` stays empty until you approve (D21-C: merging approves nothing).
+
+**Open findings, accepted as risks on approval** (path; likelihood; consequence). Each is listed rather than repaired because none meets R1 to R4 (D26-A rule 3). The plan's own 28 are P-L1 to P-L28 in [PLAN-20261027.md](evidence/20261027-gcfpe-backlog-open-items/PLAN-20261027.md) §10. The reviewers' are below; their full text is in the three records.
+
+| ID | Finding | Path | Likelihood | Consequence |
+|---|---|---|---|---|
+| L-1 / L-B4 | X2's duplicate check passes on a duplicate missing a span no anchor, guard or profile marker reaches | normal | low | content lost silently outside every guarded passage |
+| L-2 / L-B1 | X5's head-first page (PR-50) writes no `<code>`, `<b>` or `\_` span; those first appear in X6's 55-page batch | normal | possible | loud at X7, then 55 pages restored by Nathan from page history (D26-B) |
+| L-3 / L-B2 | the normalizer ships in no skill: after promotion, raw-read audits and profile runs report false failures (now MB-050) | normal, after promotion | certain | false failures that can hide a real reintroduction |
+| L-4 | X14's `ok` was never observed true; 111 contract-level errors were accepted as probe artefacts | normal | possible | a loud stop at X14 |
+| L-5 / L-B8 | the binding pass matches exact predecessor titles only, and rewrites any "<title> — 100926.1", historical mentions included | normal | low | a variant title survives, or a historical mention is rewritten |
+| L-6 / L-B5 | the controls pull request stays open while X2 to X17 commit to the same branch; no merge detection before X18 | normal | likely | post-merge commits mis-landed or a conflict at X26 (loud) |
+| L-7 | C-REG cited #768 | — | — | repaired as R-B2 (C-26) |
+| L-8 | the D26-A bound stated as one FULL round | — | — | resolved by the wording change (L-D4) |
+| L-9 | merges and review rounds undercounted in `interaction_cost` (see below) | normal | certain | the prediction understated by about 4 |
+| L-10 / L-B10 | P-L6 counts "four exceptions on five rows"; the receipt has five exceptions on four prompts | normal | certain | a count only |
+| L-11 | D30's guard paragraph says "§P lists five guards"; PLAN §3 PART-04 lists them | normal | certain | wording |
+| L-12 | C-16's DOC-10 G-HP-5 exception is a judgement call | normal | low | ITEM-08 arguably incomplete on DOC-10 |
+| L-13 | GCF-24.CLOSE sits in the material partition although the stage is on every close path | normal | certain | a consumer treating non-core rows as optional misreads it; the must-fail fixture mitigates |
+| L-14 | DN-5 (a)'s "no PF10 addendum" rests on QA-70's existing contract only, with no guard | normal | low | a successor approval read as a material delta |
+| L-15 | C-15's "no verdict changes but rendering ones" is shown by counts, not class by class | normal | possible | an unreconciled class difference |
+| L-B3 | the 100926.1 catalog and CL-05 candidate ids are not forbidden in member bodies | normal | low | silent if real: a body points at an archived page |
+| L-B6 | binding by page URL makes D23-G's "unchanged keeps its page" reachable only for GCFPE-MGMT-10 (now MB-051) | — | certain | a design cost, not a defect |
+| L-B7 | frontmatter `interaction_cost_predicted` (23) and `estimate.execute` are ANALYZE's and differ from §P's re-price | normal | certain | the validator does not compare them |
+| L-B9 | W6-PE-14g removes "preserve exactly one operative Alpha baseline" with the stale baseline | normal | certain | low; the remaining sentence keeps the rule |
+| L-D1 | X8 refuses a page whose before-count differs from W6's, even when a foreign edit removed a retired line | failure | low | a loud stop before any write |
+| L-D2 | `@CONTROLS_PR` and `@PROCEDURE_PR` name one pull request from two sources, unchecked for equality | failure | low | two pull requests cited on the register |
+| L-D3 | C-24's L-C1 opt-in was not in the plan's actions | — | — | answered by this return's opt-in table |
+| L-D4 | the L-8 wording change was not disclosed | — | — | disclosed above |
+| L-D5 | `repo_edits_102726.py check --state before` reports `ok` without `--values` | normal, if misinvoked | low | a before-check that tests no marker; no write follows |
+| L-D6 | X26's after-check defaults to `origin/main`; a stale one fails falsely | failure | low | a loud false stop |
+| L-D7 | the EXECUTE TypeSafe action text says four control files; X1 writes five | normal | certain | the reading's input is worded slightly low |
+| L-D8 | D30 carries no mark of its in-place correction; the disclosure is in §P, PLAN §12 and C-24 | normal | certain | a decision-record reader sees no trace; branch history keeps it |
+
+**Recorded on the backlog now** (template rule 3), read back: MB-045 (governance-audit lines), MB-046 (QA-70's authorless delta mode), MB-047 (the continuing named-session sentence, D27), MB-048 (the Hub's "all 55"), MB-049 (the pre-existing suite failure), MB-050 (raw-rendering audits, S2), MB-051 (binding by URL, not rated), and an update on MB-039. R-P1 and R-P2 go on it only if you do not take them.
+
+**Interaction cost.** Predicted 23 at ANALYZE. On today's count it is about 27: two more review rounds (ANALYZE's and PLAN's diff checks), and two more merges (this record's pull request and the controls pull request). Answering the opt-ins with the approval keeps the rest at the prediction.
+
+**Spend, PLAN.**
+- **Time:** about 6 h 25 min, from the approval at about 04:45Z to about 11:10Z, inside the 10–16 h estimate.
+- **Tokens:** subagents 10.4M as the harness reported them (design workers 4.39M, assembly 2.01M, dry-run repair 1.83M, drafting 0.49M, PLAN reviewers A and B 0.86M, round-1 repair 0.42M, reviewer C 0.27M, backlog worker 0.15M), plus the coordinator's about 0.5M: about 10.9M. That is above the 6–10M estimate and under twice it, so D26-D needs no re-price. The binding cascade and the dry-run repair drove the excess.
+
+**EXECUTE, re-priced:** 18–30 h and 16–26M tokens, excluding your waiting time (PLAN §13), against ANALYZE's 24–40 h and 12–20M.
+
+**TypeSafe reading for the EXECUTE session.** Taken by running the installed TypeSafe scoring skill's script once on the action text in [typesafe-execute.md](evidence/20261027-gcfpe-backlog-open-items/typesafe-execute.md). The skill's Notion row was not written.
+- **TypeSafe v8.2: Opus 5.5 at extra high.** Effort score 2.89 (confidence 0.39); rung probabilities low 0.02, medium 0.14, high 0.17, extra high 0.40, max 0.14, ultracode 0.13. Model probabilities Fable 5.1 0.01, Opus 5.5 0.97, Sonnet 5.5 0.01, Haiku 5.5 0.01 (confidence 0.96). The 24 cells are in the evidence file. Flags: none printed. Sent 2026-10-27T10:34:38Z. Nathan picks the cell.
+- **Surface advice** (no model or effort content): a Claude Code cloud session on this branch, with GitHub push, the Notion connector (writes at X2 to X9, X18, X20 to X25 and X28) and the TypeSafe service attached, and the installed skills directory readable. The four installs at X22 and the merges are yours, on your own surfaces. The session is long, so compaction is likely: it resumes only at D26-C's checkpoints (X0, X18, X27), and X2, X5, X6, X8, X9, X20, X21 and X28 are not safe to send twice.
+- **Your pick:** recorded here when you state it; none is recorded now.
+
+**Then.**
+- **In this session:** on your approval I record it in the frontmatter with your words quoted here, apply your opt-ins, and go on to EXECUTE at X0 (D21-D).
+- **In a fresh session:** invoke GCFPE-MGMT-10 with `MODE = EXECUTE` and `MODIFICATION-20261027-gcfpe-backlog-open-items`, naming branch `claude/ecosystem-change-mgmt-drvb4v` until its pull request merges.
 
 ## §E — Execution
 

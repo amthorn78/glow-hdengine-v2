@@ -1,0 +1,33 @@
+{
+ "mode": "selftest",
+ "checks": {
+  "ops_emitted": true,
+  "duplicate_lines_made_unique": true,
+  "kept_untouched": true,
+  "covered_skipped": true,
+  "already_102726_skipped": true,
+  "near_misses_untouched": true,
+  "bind_guard_fails_before": true,
+  "name_guard_fails_before": true,
+  "bind_guard_after_counts_only_unrewritten": true,
+  "name_guard_after_counts_covered_and_c9_lines": true,
+  "second_generation_emits_only_c9_and_covered_lines": true,
+  "replacement_rewrite": true,
+  "pe_rewritten": true,
+  "code_url_query_kept": true,
+  "injected_title_drop_caught": true,
+  "injected_url_drop_caught": true,
+  "injected_ignore_coverage_caught": true,
+  "partial_line_op_emitted": true,
+  "partial_line_op_outside_span": true,
+  "partial_line_current_after": true,
+  "citation_inside_span_left_to_replacement": true,
+  "standin_validates": true,
+  "standin_bind_guard_vacuous": true,
+  "probe_bind_guard_not_vacuous": true,
+  "probe_validates_distinct": true,
+  "injected_bad_predecessor_refused": true,
+  "injected_second_added_refused": true
+ },
+ "ok": true
+}

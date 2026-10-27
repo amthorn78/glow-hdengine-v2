@@ -1,0 +1,509 @@
+{
+ "record_type": "A2_PLAN_RECEIPT",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "worker": "A2",
+ "date": "2026-10-27",
+ "stand_in_used": true,
+ "stand_ins": [
+  "successor map: plan/successor_map_102726.py standin (each SUCCESSOR page id = its 100926.1 page id; CL-05 = candidate 4054590a05eb8155b301e2cb6dec31d5; PE = 3f44590a05eb81f98b76c83465dc1960)",
+  "PLAN file: a 116-byte scratch stand-in for PLAN-20261027.md (fills @PLAN_SHA256/@PLAN_BYTES)",
+  "EXPECTED_POLICY_20261027: scratch stand-in for the merged W5 SR-FV-20 + W4 SR-4 redline (W7-D4)",
+  "fixtures: the 100926.1 scenarios with release fields moved"
+ ],
+ "token_note": "The candidate and production graph and contract digests below depend on the stand-in URLs; EXECUTE re-measures them from the real successor map. Node, edge and state_route counts do not depend on the map.",
+ "inputs": {
+  "main_parts_build": [
+   "build: 55 nodes, 235 edges, 55 state_routes",
+   "       embedded JSON 593569 bytes  sha256 43f84f29b9921c21f63ffbe21dd36a14bd846a89ae697ba3cf38746c2f887eb1"
+  ],
+  "graph_edits_sha256": "bc1d4ee707ba8775cf8c8593f6de923b0fc37efb160833100f27aeeadbb0c514",
+  "release_values_sha256": "b732dc1439e7c6e3b9f885fdeb4678585ea5399b15649cf2ef12ba67a98aa5ce",
+  "standin_map_sha256": "ddc372e6625dbb8f61736b6adc9514a66e64e01e1ddc26490a3f32c7cc83547c",
+  "patch_sha256": "2f05fb2d8879ee4184f2ee808ba332f0dd3b0b8ed127160da4afda6fbd796c41"
+ },
+ "graph": {
+  "candidate": {
+   "nodes": 56,
+   "edges": 240,
+   "state_routes": 56,
+   "bytes": 608051,
+   "sha256": "0ca4ce983b9c35cfb31573bb402edc67de75548ba396483fc2251a4cff6a0f0e",
+   "selection_status": "UNSELECTED_CANDIDATE"
+  },
+  "production": {
+   "nodes": 56,
+   "edges": 240,
+   "state_routes": 56,
+   "bytes": 607994,
+   "sha256": "ef7ef01b218ac07d3ef28039d47b7c41c8d9ce94c910e1e4e06eafda47b35931",
+   "selection_status": "SELECTED_PRODUCTION"
+  },
+  "routes_ok": {
+   "candidate": true,
+   "production": true
+  },
+  "route_flags_candidate": {
+   "nodes_56": true,
+   "edges_240": true,
+   "state_routes_56": true,
+   "no_qa120_edge_to_cl_c10_or_cl_e10": true,
+   "qa120_pass_to_cl05": true,
+   "no_doc20_edge_to_pr40": true,
+   "ia40_redline_incomplete_routes_to_ia30_only": true,
+   "cl_c10_do_not_close_reaches_cl05": true,
+   "cl_e10_do_not_close_reaches_cl05": true,
+   "cl05_exits_cl_c10_cl_e10_and_terminal": true,
+   "proofs_sole_added_node_cl05": true,
+   "proofs_candidate_node_count_56": true,
+   "proofs_unresolved_edges_empty": true,
+   "candidate_head": true,
+   "baseline_head": true,
+   "r1_pins": true
+  },
+  "check": {
+   "candidate": {
+    "check_ok": true,
+    "flipped": false,
+    "errors": [],
+    "stand_in_used": true
+   },
+   "production": {
+    "check_ok": true,
+    "flipped": true,
+    "errors": [],
+    "stand_in_used": true
+   }
+  },
+  "selftest": {
+   "mode": "selftest",
+   "rows": {
+    "clean_apply_passes": true,
+    "second_apply_refused": true,
+    "old_value_mismatch_refused": true,
+    "refused_apply_writes_nothing": true,
+    "clean_flip_passes": true,
+    "unflipped_fails_flipped_check": true,
+    "flipped_fails_candidate_check": true,
+    "flipped_prologue_is_selected": true,
+    "rejects_extra_edited_field": true,
+    "rejects_missing_graph_edit": true,
+    "rejects_node_with_old_title": true,
+    "rejects_predecessor_not_from_map": true,
+    "rejects_selected_lifecycle_in_candidate": true,
+    "rejects_global_change": true,
+    "rejects_stale_proofs": true,
+    "rejects_kept_member_given_successor_head": true,
+    "rejects_cl05_marker_left": true,
+    "rejects_missing_cl05": true,
+    "rejects_unreindexed_parts": true,
+    "routes_clean_build_passes": true,
+    "routes_rejects_qa120_to_cl_c10": true,
+    "routes_rejects_doc20_to_pr40": true,
+    "routes_rejects_ia40_terminal_redline": true,
+    "routes_rejects_239_edges": true
+   },
+   "selftest_ok": true,
+   "stand_in_used": true
+  },
+  "map_selftest": {
+   "mode": "selftest",
+   "rows": {
+    "clean_standin_passes": true,
+    "standin_refused_without_flag": true,
+    "rejects_missing_member": true,
+    "rejects_second_kept": true,
+    "rejects_wrong_predecessor": true,
+    "rejects_old_title": true,
+    "rejects_cl05_not_from_candidate": true,
+    "rejects_duplicate_page_id": true,
+    "rejects_typed_page_id_form": true,
+    "real_map_rejects_reused_predecessor_ids": true
+   },
+   "selftest_ok": true
+  },
+  "edge_arithmetic": "235 - 1 (DOC-20 -> PR-40, W1) + 4 (CL-05) + 1 (CL-C-10 -> CL-05) + 1 (CL-E-10 -> CL-05) = 240; W4 moves a branch and adds no edge"
+ },
+ "r1": {
+  "build": {
+   "matrix": {
+    "bytes": 7705,
+    "sha256": "088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a"
+   },
+   "oracle": {
+    "bytes": 55591,
+    "sha256": "f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d"
+   },
+   "runtime_map": {
+    "bytes": 48515,
+    "sha256": "4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add"
+   },
+   "row_digests": {
+    "GCF-14": "42db7a9e614ecf943f042a9c012112fd3934f12e504cd4b980f404735b9cfe6b",
+    "GCF-17": "6774529046ba5050b2e62b8cf01b024766c5e99d343d0fcfdd32b0367fb99602",
+    "GCF-17.LINEAGE": "73a133c18b13682cbc57d813b37caacda7ed15b183437515867166bcda70e83e",
+    "GCF-24": "66d4c41e3992a28f5550e1fd12865ac7a127de291d34f6dd676acc07a9ad2215",
+    "GCF-24.CLOSE": "9c0f70693dc21f0cbaef27c7804e645f33858d30fc52b89ae57854f7e2177453",
+    "GCF-25": "1b2ab0339aed2a04aff404864a1699605eb3904780c7e3b3ca25881c74ed5ee3"
+   },
+   "rows": 47,
+   "core_rows": 26,
+   "material_rows": 21,
+   "decision_record_match": true,
+   "decision_record_mismatches": {},
+   "build_ok": true
+  },
+  "selftest": {
+   "mode": "selftest",
+   "rows": {
+    "clean_build_passes": true,
+    "decision_record_compare_runs": true,
+    "rejects_changed_hist_input": true,
+    "rejects_changed_prev_input": true,
+    "rejects_changed_hmap_input": true,
+    "rejects_changed_pmap_input": true,
+    "rejects_guarded_old_value_mismatch": true,
+    "decision_record_mismatch_reported": true,
+    "rejects_decision_record_without_heading": true
+   },
+   "selftest_ok": true
+  }
+ },
+ "contracts": {
+  "Q1": {
+   "main_build": [
+    "build: 55 nodes, 235 edges, 55 state_routes",
+    "       embedded JSON 593569 bytes  sha256 43f84f29b9921c21f63ffbe21dd36a14bd846a89ae697ba3cf38746c2f887eb1"
+   ],
+   "recipe_exit": 0,
+   "equal_lines": 2,
+   "different_lines": 0,
+   "sha256": "cd291f17ac832cc0aad62b5cc7e554bd6d524e18de7aea7f2f4fec5a1651317f",
+   "bytes": 631061,
+   "Q1_PASS": true
+  },
+  "patch": {
+   "patch_ok": true,
+   "rows": [
+    {
+     "id": "SR-GG-1",
+     "file": "scripts/regenerate_contract.py",
+     "landed": true
+    },
+    {
+     "id": "SR-GG-2",
+     "file": "scripts/regenerate_contract.py",
+     "landed": true
+    },
+    {
+     "id": "SR-GG-3",
+     "file": "scripts/regenerate_contract.py",
+     "landed": true
+    }
+   ]
+  },
+  "patch_second_application_refused": true,
+  "patch_reapply_in_place_refused": true,
+  "patched_regenerator_sha256": "985597770ec92b1757b3020e144863ed670039b0bd743737d7b7a851247487f7",
+  "candidate": {
+   "exit": 0,
+   "sha256": "cee23f2f53d25468d679f58e081544a56bae1c207662c19cfefdc4c4e9dd29f5",
+   "bytes": 649555
+  },
+  "production": {
+   "exit": 0,
+   "sha256": "10d8a0edeedbf46311c8b84491f3f13f16c4d940e503749a0ed62cd2d48e95ad",
+   "bytes": 646130
+  },
+  "Q5_checks": {
+   "both_written": true,
+   "no_promoted_at": true,
+   "contract_ids": true,
+   "candidate_prompt_ids_56": true,
+   "heads": true,
+   "r1_pins": true,
+   "route_edge_count_240": true,
+   "qa_closure_via_cl05": true,
+   "merge_pending_real_input_p1": true,
+   "historical_refs_include_20260923": true,
+   "candidate_member_rule_from_graph": true,
+   "lifecycle": true,
+   "release_semantic_equal": true
+  },
+  "injected_refusals": {
+   "unfilled_marker_refused_by_regenerator": true,
+   "fill_refuses_unknown_marker": true,
+   "fill_refuses_55_member_ids": true,
+   "predecessor_release_values_refused": true,
+   "oracle_not_pinned_by_graph_refused": true,
+   "unknown_graph_pin_refused": true,
+   "unpatched_regenerator_refuses_102726": true
+  },
+  "ok": true
+ },
+ "profile": {
+  "build": {
+   "exit": 0,
+   "substitutions": 42,
+   "measured": {
+    "surface": "a184364736e3550be464127cda420816",
+    "surface_rows": 296,
+    "graph_sha": "ef7ef01b218ac07d3ef28039d47b7c41c8d9ce94c910e1e4e06eafda47b35931",
+    "graph_bytes": 607994,
+    "contract_sha": "10d8a0edeedbf46311c8b84491f3f13f16c4d940e503749a0ed62cd2d48e95ad",
+    "contract_bytes": 646130,
+    "fixture_sha": "d5a64904691d54fc4821f61cc7e7d987acbcfcda10cba8616f11f41522002ad5",
+    "fixture_count": 54,
+    "edge_count": 240,
+    "node_count": 56,
+    "member_rule": "the 100926.1 members, each a 102726.1 successor page where its body changes and its 100926.1 page where it does not (D23-G), plus CL-05 — Prepare and Publish the Close Mutation Set, added (PF06 §3.5.1; DN-2); no removals",
+    "plan_sha": "da2ac1d9584cf7948f408c048f3e0031b59a3a49b0502ec125719ae6182eb588",
+    "plan_bytes": 116,
+    "seg_contract_sha": "566cbe4672dd20cf1acd399d7fda0a96e6bf30a086c53e1c417f520f7bd1248f",
+    "seg_bodies_sha": "dd5082a1b08fb90ecb9d26df734d1756857810b86fc0f65c6ffa0c9b3e1d5b1e",
+    "stand_in_used": true
+   },
+   "leftover_literal_counts": {
+    "GCFPE-20260914.1": 0,
+    "091426.1": 1,
+    "ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52": 0,
+    "aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4": 0,
+    "\"3.4.1\"": 0,
+    "100926.1": 12
+   },
+   "successor_members": 54,
+   "kept_members": [
+    "GCFPE-MGMT-10"
+   ],
+   "validator_sha256": "e1ddb11d45eeacde89f6399aac8081566a645c8f1a986d178d679f44a8254c1e",
+   "profile": {
+    "profile": "/tmp/claude-0/-home-user-glow-hdengine-v2/da130297-61dc-52b6-b2b5-7c0e03d18125/scratchpad/a2/profile-dryrun/flowmaster-validate/references/gcfpe-20261027.1-102726.1-validation-profile.json",
+    "sha256": "b4a8b9c1dc105894d271cbe05dffe0d81e4ea78e4a87cf94bff405b0eb9a1c98",
+    "bytes": 2454
+   }
+  },
+  "substitution_report": [
+   {
+    "substitution": "S01 module title",
+    "count": 1
+   },
+   {
+    "substitution": "S02 artifact timing import",
+    "count": 1
+   },
+   {
+    "substitution": "S03 CL-05 joins the members",
+    "count": 1
+   },
+   {
+    "substitution": "S04 member versions and superseded pages from the successor map",
+    "count": 1
+   },
+   {
+    "substitution": "S05 routing surface pin",
+    "count": 1
+   },
+   {
+    "substitution": "S06 merge-pending real-input P1 (C-7)",
+    "count": 1
+   },
+   {
+    "substitution": "S07 qa_pass_closure semantics (release values)",
+    "count": 1
+   },
+   {
+    "substitution": "S08 bundled byte pins",
+    "count": 1
+   },
+   {
+    "substitution": "S09 profile identity",
+    "count": 1
+   },
+   {
+    "substitution": "S10 profile release and staging identity",
+    "count": 1
+   },
+   {
+    "substitution": "S11 profile graph counts",
+    "count": 1
+   },
+   {
+    "substitution": "S12 profile fixture count",
+    "count": 1
+   },
+   {
+    "substitution": "S13 profile R1 pins",
+    "count": 1
+   },
+   {
+    "substitution": "S14 graph candidate and baseline profile",
+    "count": 1
+   },
+   {
+    "substitution": "S15 graph node count",
+    "count": 1
+   },
+   {
+    "substitution": "S16 graph proofs: node count",
+    "count": 1
+   },
+   {
+    "substitution": "S17 graph proofs: CL-05 added",
+    "count": 1
+   },
+   {
+    "substitution": "S18 graph protected identities",
+    "count": 1
+   },
+   {
+    "substitution": "S19 historical references gain the 2026-09-23 pair (C-11)",
+    "count": 1
+   },
+   {
+    "substitution": "S20 contract identity",
+    "count": 1
+   },
+   {
+    "substitution": "S21 contract ids",
+    "count": 2
+   },
+   {
+    "substitution": "S22 selected member count",
+    "count": 1
+   },
+   {
+    "substitution": "S23 member set",
+    "count": 1
+   },
+   {
+    "substitution": "S24 member version from the map",
+    "count": 1
+   },
+   {
+    "substitution": "S25 manifest page version from the map",
+    "count": 1
+   },
+   {
+    "substitution": "S26 governing plan and predecessor contract pins",
+    "count": 1
+   },
+   {
+    "substitution": "S27 PR skill revision in the contract",
+    "count": 1
+   },
+   {
+    "substitution": "S28 abort prompt version from the map",
+    "count": 1
+   },
+   {
+    "substitution": "S29 QA closure route graph (release values)",
+    "count": 1
+   },
+   {
+    "substitution": "S30 PR40_MANUAL_MERGE_BOUNDARY: no prompt-originated recovery entry (W1, CD-1)",
+    "count": 1
+   },
+   {
+    "substitution": "S31 contract graph proofs member count",
+    "count": 1
+   },
+   {
+    "substitution": "S32 contract protected identities",
+    "count": 1
+   },
+   {
+    "substitution": "S33 artifact timing policy 20261027 (W7-D4)",
+    "count": 1
+   },
+   {
+    "substitution": "S34 PR skill revision marker",
+    "count": 1
+   },
+   {
+    "substitution": "S35 R1 runtime map pin",
+    "count": 1
+   },
+   {
+    "substitution": "S36 PROMPT_BINDING_SUPERSEDED body check (G-W7-BIND-1)",
+    "count": 1
+   },
+   {
+    "substitution": "S37 QA closure contract: the close-mutation-set stage (W5)",
+    "segment_sha256": "566cbe4672dd20cf1acd399d7fda0a96e6bf30a086c53e1c417f520f7bd1248f"
+   },
+   {
+    "substitution": "S38 QA closure bodies: CL-05 rows and the close-set repair sentence (W5)",
+    "segment_sha256": "dd5082a1b08fb90ecb9d26df734d1756857810b86fc0f65c6ffa0c9b3e1d5b1e"
+   },
+   {
+    "substitution": "S90 bundled file names",
+    "count": 7
+   },
+   {
+    "substitution": "S91 graph file name",
+    "count": 1
+   },
+   {
+    "substitution": "S92 profile id",
+    "count": 1
+   },
+   {
+    "substitution": "S93 graph contract id",
+    "count": 1
+   }
+  ],
+  "profile_run": {
+   "exit": 1,
+   "ok_flag": false,
+   "errors": [
+    "CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.5.0",
+    "SKILL_CONTRACT:glow-hde-pr-development:GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0",
+    "SKILL_SELF_IDENTITY:DECLARED_b1f00f3ae3b7_MEASURED_25f38213ecd1"
+   ],
+   "expected_pending": [
+    "CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.5.0",
+    "SKILL_CONTRACT:glow-hde-pr-development:GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.5.0",
+    "SKILL_SELF_IDENTITY:DECLARED_b1f00f3ae3b7_MEASURED_25f38213ecd1"
+   ],
+   "unexpected_errors": [],
+   "profile": "GCFPE-20261027.1-102726.1-VALIDATION",
+   "contract_status": "SELECTED_PRODUCTION",
+   "frozen_graph_node_count": 56,
+   "frozen_graph_edge_count": 240,
+   "prompt_body_checks_not_evaluated": [
+    "ALL_BODY_LEVEL_CHECKS"
+   ],
+   "pending_by_design": "change-flow 3.5.0 and glow-hde-pr-development 1.5.0 land with their redlines in EXECUTE's package build; SKILL_TREE_SHA256 is recomputed last (I step), so the scratch tree's self-identity differs"
+  },
+  "regressions": {
+   "clean_contract_no_contract_errors": true,
+   "rejects_qa_pass_straight_to_closure": true,
+   "rejects_cl05_exit_wrong_class": true,
+   "rejects_do_not_close_close_set_to_esc30": true,
+   "rejects_close_set_as_post_closure": true,
+   "rejects_qa_closure_map_both_to_crd": true,
+   "rejects_doc20_inbound_pr40": true,
+   "rejects_member_version_off_map": true,
+   "rejects_kept_member_at_102726": true,
+   "rejects_55_member_contract": true,
+   "rejects_merge_pending_without_real_input_p1": true,
+   "rejects_old_r1_oracle_pin": true,
+   "rejects_20260923_oracle_not_historical": true,
+   "binding_superseded_fires": true,
+   "binding_superseded_fires_on_dashed_id": true,
+   "binding_superseded_silent_on_other_page": true,
+   "qa_pass_rows_parse_two": true,
+   "qa_pass_rows_html_code_form": true,
+   "qa_pass_body_map_clean": true,
+   "qa_pass_body_map_rejects_wrong_exit": true,
+   "qa_pass_body_map_rejects_straight_to_closure": true,
+   "close_set_repair_sentence_present_passes": true,
+   "close_set_repair_sentence_removed_fails": true
+  },
+  "ok": true,
+  "timing_standin": {
+   "sr_fv_20_applied": true,
+   "w4_sr4_value_in_20261027_policy": true,
+   "expected_policy_unchanged": true
+  }
+ }
+}
