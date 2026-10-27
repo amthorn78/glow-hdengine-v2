@@ -61,7 +61,7 @@
   {
    "id": "R",
    "item": "fixture runner",
-   "how": "run_gcfpe_20261027_fixtures.py from run_gcfpe_20261009_fixtures.py: release literals moved, revision 3.5.0, selected count 56, the QA-closure contract cases retargeted to CL-05's exit, and 14 new mutation cases (QA PASS straight to closure, CL-05 exit wrong class, DO_NOT_CLOSE to ESC-30, close set as post-closure, DOC-20 inbound PR-40, member version off the map, kept member at 102726.1, 55-member contract, merge-pending real-input P1, old R1 pin, 2026-09-23 oracle not historical, PROMPT_BINDING_SUPERSEDED on synthetic text x2 plus its silent case); every case also requires the clean contract to lack its code"
+   "how": "run_gcfpe_20261027_fixtures.py from run_gcfpe_20261009_fixtures.py: release literals moved, revision 3.5.0, selected count 56, the QA-closure contract cases retargeted to CL-05's exit, and 14 new mutation cases (QA PASS straight to closure, CL-05 exit wrong class, DO_NOT_CLOSE to ESC-30, close set as post-closure, DOC-20 inbound PR-40, member version off the map, kept member at 102726.1, 55-member contract, merge-pending real-input P1, old R1 pin, 2026-09-23 oracle not historical, PROMPT_BINDING_SUPERSEDED on synthetic text x2 plus its silent case); every case also requires the clean contract to lack its code; AM-8 (EXECUTE, after X14): R08 to R11 move the QA-120 source cases' anchors to the written body, the RCA intake sentence and the CRD class cell in either table rendering"
   },
   {
    "id": "C",
@@ -91,6 +91,6 @@
  ],
  "sources": {
   "plan/package-redlines.json": "d27be0375a428d6bcab7007e82fb04b0352de89dd1004185ebc83f7dff44003d",
-  "plan/package_build_102726.py": "cdfc5a756e6b7294d62cede0d26b8d7038ba36696c22b0f8b717558a8cd561a1"
+  "plan/package_build_102726.py": "5179abbc333b80c92c1c837fc723f72e3aa02c026d58e69e9796a47b2b690052"
  }
 }

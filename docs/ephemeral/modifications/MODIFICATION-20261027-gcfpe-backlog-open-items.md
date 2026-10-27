@@ -1419,3 +1419,29 @@ The options:
 - **Tokens:** 8.7M of subagent tokens, measured from this session's workflow records, plus the coordinator's.
 
 **In one line, if you take the recommendations:** "AM-8 as described (option A), outside rule 4's count; I merge #775 as the record pull request."
+
+### Nathan's decisions after X14 — 2026-10-27
+
+Nathan's words:
+
+> "AM-8 as described (option A), outside rule 4's count; the 30-hour limit still applies. I have merged #775 as the record pull request; continue on a branch restarted from main, in a new pull request.
+>
+> For the record: the Glow Operations Hub's two revision moves, at 13:46:03Z and 14:22:01Z, were PE40's writes to the Prompt and Session Control Error Log, which is a child page of the Hub. The Hub's content did not change. PE40 will not write to any page under the Hub until this run is finished."
+
+**Applied.**
+
+- **The record pull request.** #775 merged as `4823eae`, detected by files on `main` (D26-C): the X14 record and its receipts are on `main`, and `main`'s tree equals the branch's (`11316b61…`). The remote branch had been deleted at the merge; the branch was restarted from `main` at `4823eae` and pushed fresh. The run continues in a new pull request.
+- **The Glow Operations Hub.** Recorded as Nathan states it: the two revision moves were PE40's writes to the Prompt and Session Control Error Log, a child page of the Hub, and the Hub's content equals its X8 read. PE40 writes nothing under the Hub until this run is finished. X25 (P6) plans the Hub's writes on its own fresh read and pins it there, so nothing in the plan changes.
+- **Rule 4.** AM-8 is outside the count, so 0 of the 2 storage-form amendments are used. The 30 hours run from 11:20Z to 2026-10-28T17:20Z; at 20:07Z, 8 h 47 min were used.
+- **AM-8**, committed before the rebuild.
+  - *[plan/package_build_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/package_build_102726.py), step R.* Four named substitutions on the 100926.1 runner, each required exactly once:
+    - R08 takes the CRD class cell in the rendering QA-120's read carries: `` <td>`CRD`</td> `` when the HTML cell is present, otherwise the pipe row `` | `PASS` | `CRD` | ``.
+    - R09 moves `reject-source-missing-rca` to "`QA_RCA` with their IDs", the sentence HP-QA-120-01 wrote and the validator reads (`QA_PASS_INTAKE_MARKERS`).
+    - R10 makes `reject-source-absent-crd-class-branch` delete that cell.
+    - R11 makes `reject-source-duplicate-crd-class-branch` find the CRD row by line scan in either rendering: the HTML `<tr>` block, or the one pipe line.
+    - Each case keeps its expected error. The runner's docstring and the build's description of R say what moved and why.
+  - *[execute/package_build_102726.py](evidence/20261027-gcfpe-backlog-open-items/execute/package_build_102726.py).* A byte-identical copy, as X13's G2 requires.
+  - *[plan/package-build-spec-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/plan/package-build-spec-102726.1.json).* R's description, and its pin of `plan/package_build_102726.py` moved to `5179abbc…`. No tool reads that pin, and the frozen PLAN pins neither file.
+  - *Applied in memory to the 100926.1 runner:* every one of step R's 15 substitutions lands at its count, and the result compiles.
+  - *[execute/am8_runner_check_102726.py](evidence/20261027-gcfpe-backlog-open-items/execute/am8_runner_check_102726.py), the check each way.* It runs a built runner five times on the 56 bodies this session read: as read (pipe), with QA-120's class map re-rendered as HTML in memory, and three variants that must stop on their named anchor (the RCA sentence absent; the CRD cell in neither rendering; the CRD pipe row not beginning its line). On X13's pre-AM-8 build, with X14's reads, the two passing runs fail: the runner stops on `reject-source-missing-rca`. So the check detects the defect ([execute/am8-check-pre-am8-build-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/am8-check-pre-am8-build-102726.1.json)). The rebuilt package is checked after X13 is run again.
+- **Then** X13 again on the same inputs, X14 again on a fresh read of the 56, and on to X18.
