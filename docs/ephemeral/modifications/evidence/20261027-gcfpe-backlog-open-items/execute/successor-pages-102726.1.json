@@ -1,0 +1,576 @@
+{
+ "release": "GCFPE-20261027.1",
+ "version_family": "102726.1",
+ "baseline": "GCFPE-20261009.1 / 100926.1 / 55",
+ "stand_in": false,
+ "written_by": "execute/write_successor_map_102726.py (X3, C2)",
+ "fetched_after": "2026-10-27T12:17:20.643Z",
+ "members": {
+  "CF-C-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 2 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb811e821bc064f56de3a3",
+   "title": "CF-C-10 — Prepare CRD Specification Kickoff Handoff — 102726.1",
+   "predecessor_page_id": "3f44590a05eb810f83d4d539e5b0e588",
+   "duplicated_from": "3f44590a05eb810f83d4d539e5b0e588",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:00:19.250Z"
+  },
+  "CF-C-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 4 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb811f8305e12dc130b197",
+   "title": "CF-C-20 — Create CRD Specification — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81a7a944f19bd9a2e3de",
+   "duplicated_from": "3f44590a05eb81a7a944f19bd9a2e3de",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:05:36.626Z"
+  },
+  "CF-C-30": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81c1846df3512494d51d",
+   "title": "CF-C-30 — Review and Approve CRD Specification — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8121af3bf2249c6d6ca8",
+   "duplicated_from": "3f44590a05eb8121af3bf2249c6d6ca8",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:07:35.870Z"
+  },
+  "CF-C-40": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81c5851deb1cf765e49b",
+   "title": "CF-C-40 — Revise CRD Specification — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81458686cc39d8d98b2a",
+   "duplicated_from": "3f44590a05eb81458686cc39d8d98b2a",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:14:13.927Z"
+  },
+  "CF-E-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 2 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb81a0a3a8e043017dffbb",
+   "title": "CF-E-10 — Prepare Epic Specification Kickoff Handoff — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81129b09cddebcc18458",
+   "duplicated_from": "3f44590a05eb81129b09cddebcc18458",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:08:25.554Z"
+  },
+  "CF-E-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 4 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb8129a159df9439b4e922",
+   "title": "CF-E-20 — Create Epic Specification — 102726.1",
+   "predecessor_page_id": "3f44590a05eb813cb9cbc61c225b88e2",
+   "duplicated_from": "3f44590a05eb813cb9cbc61c225b88e2",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:15:17.100Z"
+  },
+  "CF-E-30": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81a88f00d49a698027bb",
+   "title": "CF-E-30 — Review and Approve Epic Specification — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8104824fe084354a0ef8",
+   "duplicated_from": "3f44590a05eb8104824fe084354a0ef8",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:09:14.815Z"
+  },
+  "CF-E-40": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb8113a64dda1a380c1b96",
+   "title": "CF-E-40 — Revise Epic Specification — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81f1994df5f6ab3a7f32",
+   "duplicated_from": "3f44590a05eb81f1994df5f6ab3a7f32",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:05:51.649Z"
+  },
+  "CF-PO-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 2 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb81809a74c181d50922eb",
+   "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81f9bf84f4585d9f7a2c",
+   "duplicated_from": "3f44590a05eb81f9bf84f4585d9f7a2c",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:10:57.878Z"
+  },
+  "CL-05": {
+   "disposition": "ADDED",
+   "reason": "new member (PART-13, DN-2 (b))",
+   "page_id": "4064590a05eb814fba57ed387ee2cddd",
+   "title": "CL-05 — Prepare and Publish the Close Mutation Set — 102726.1",
+   "predecessor_page_id": null,
+   "duplicated_from": "4054590a05eb8155b301e2cb6dec31d5",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:01:54.121Z"
+  },
+  "CL-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81c28ac8ff12b072826b",
+   "title": "CL-20 — Prepare Closure Memo and Post-Closure Record — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81739b57da57c285f45d",
+   "duplicated_from": "3f44590a05eb81739b57da57c285f45d",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:15:25.587Z"
+  },
+  "CL-30": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81c1b64cfe813b3c0819",
+   "title": "CL-30 — Prepare Conditional Post-Change ADR Maintenance — 102726.1",
+   "predecessor_page_id": "3f44590a05eb816ea12febba885940e8",
+   "duplicated_from": "3f44590a05eb816ea12febba885940e8",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:12:12.275Z"
+  },
+  "CL-40": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81e18744cabb341b0113",
+   "title": "CL-40 — Scan for PF09 Gaps and CRD Candidates — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8155934dd1c4c2b5d1eb",
+   "duplicated_from": "3f44590a05eb8155934dd1c4c2b5d1eb",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:16:18.828Z"
+  },
+  "CL-C-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81119e59dd3b3b835f24",
+   "title": "CL-C-10 — Perform CRD Retrospective and Decide Closure — 102726.1",
+   "predecessor_page_id": "3f44590a05eb819b8022f2a4cdd3b022",
+   "duplicated_from": "3f44590a05eb819b8022f2a4cdd3b022",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:13:27.870Z"
+  },
+  "CL-E-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb813990f7d29936a6b205",
+   "title": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81248741f4679b050262",
+   "duplicated_from": "3f44590a05eb81248741f4679b050262",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:07:01.067Z"
+  },
+  "CL-E-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 11 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb819f9a30f9d51249a91c",
+   "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8186913fcb9f6b2a2f32",
+   "duplicated_from": "3f44590a05eb8186913fcb9f6b2a2f32",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:10:57.722Z"
+  },
+  "CL-E-30": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 11 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb81e58a4efd0845689472",
+   "title": "CL-E-30 — Review Bounded PF09 Revalidation — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81be834efe3faf7abb6f",
+   "duplicated_from": "3f44590a05eb81be834efe3faf7abb6f",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:07:58.901Z"
+  },
+  "CL-E-40": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 13 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb81a6a86ccb922e99db36",
+   "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8101a264f9fa702b8a6e",
+   "duplicated_from": "3f44590a05eb8101a264f9fa702b8a6e",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:11:52.753Z"
+  },
+  "DOC-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 17 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb81b3a8b5dad3b0c20ed1",
+   "title": "DOC-10 — Create Final Repository Documentation PR Instructions — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81ce99b1d2ade30c572f",
+   "duplicated_from": "3f44590a05eb81ce99b1d2ade30c572f",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:08:50.988Z"
+  },
+  "DOC-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb810a8895f107fe9e1679",
+   "title": "DOC-20 — Verify Final Repository Documentation Completion — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81d8a582eec0e93e6ee7",
+   "duplicated_from": "3f44590a05eb81d8a582eec0e93e6ee7",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:12:49.391Z"
+  },
+  "ESC-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 12 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb819f949fd8f201e0a8b6",
+   "title": "ESC-10 — Create QA Escalation Report — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81f2af47fff48995f272",
+   "duplicated_from": "3f44590a05eb81f2af47fff48995f272",
+   "parent_id": "3db4590a05eb81cd938de84cfffead9c",
+   "created_last_edited_at": "2026-10-27T12:07:16.391Z"
+  },
+  "ESC-25": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 12 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb815ba64ef9ebfb75eb80",
+   "title": "ESC-25 — Execute Bounded Escalation Discovery — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81949370e6d1b222b40b",
+   "duplicated_from": "3f44590a05eb81949370e6d1b222b40b",
+   "parent_id": "3db4590a05eb81cd938de84cfffead9c",
+   "created_last_edited_at": "2026-10-27T12:13:52.691Z"
+  },
+  "ESC-30": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 13 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb814284b9cd1450419bfb",
+   "title": "ESC-30 — Diagnose and Propose Bounded Remediation — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81e385dbd4fe337ad9d9",
+   "duplicated_from": "3f44590a05eb81e385dbd4fe337ad9d9",
+   "parent_id": "3db4590a05eb81cd938de84cfffead9c",
+   "created_last_edited_at": "2026-10-27T12:08:08.572Z"
+  },
+  "ESC-40": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81eb8d3ced2d01c3c108",
+   "title": "ESC-40 — Review and Return Approved Remediation — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8173905cc6d17a40457b",
+   "duplicated_from": "3f44590a05eb8173905cc6d17a40457b",
+   "parent_id": "3db4590a05eb81cd938de84cfffead9c",
+   "created_last_edited_at": "2026-10-27T12:14:56.171Z"
+  },
+  "GCFPE-MGMT-10": {
+   "disposition": "KEPT",
+   "reason": "its 100926.1 body names no other member page (W7, 0 lines); no worker edits it (D23-G)",
+   "page_id": "3f74590a05eb81b69bd8c27106f7a59d",
+   "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926.1",
+   "predecessor_page_id": null,
+   "duplicated_from": null,
+   "parent_id": "3db4590a05eb81de9736ea69bac61016",
+   "created_last_edited_at": "2026-10-12T02:30:05.584Z"
+  },
+  "IA-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb813281cbc25f2f30db13",
+   "title": "IA-10 — Create Whole-Change Implementation Audit and Plan — 102726.1",
+   "predecessor_page_id": "3f44590a05eb813aa0ccd709ebd134d0",
+   "duplicated_from": "3f44590a05eb813aa0ccd709ebd134d0",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:08:58.079Z"
+  },
+  "IA-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81db9c6befccd5e520f1",
+   "title": "IA-20 — Create Whole-Change Implementation Plan — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81a8bf39f4b16cc61a5f",
+   "duplicated_from": "3f44590a05eb81a8bf39f4b16cc61a5f",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:16:04.136Z"
+  },
+  "IA-30": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81ebb110fb0202874d8c",
+   "title": "IA-30 — Review Whole-Change Implementation Plan — 102726.1",
+   "predecessor_page_id": "3f44590a05eb811db88dece791f1f60c",
+   "duplicated_from": "3f44590a05eb811db88dece791f1f60c",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:10:34.871Z"
+  },
+  "IA-40": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81a5a137f6912fba26b9",
+   "title": "IA-40 — Prepare or Revise Whole-Change Implementation Plan — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81ca83ecdac0960a6f16",
+   "duplicated_from": "3f44590a05eb81ca83ecdac0960a6f16",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:15:07.226Z"
+  },
+  "IA-50": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 7 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb81d2b388fde42922edc7",
+   "title": "IA-50 — IA Answer Seeder — 102726.1",
+   "predecessor_page_id": "3f44590a05eb810aa299fbb05a34dece",
+   "duplicated_from": "3f44590a05eb810aa299fbb05a34dece",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:11:46.496Z"
+  },
+  "IA-60": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 2 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb818498a9faf265f7129c",
+   "title": "IA-60 — Thoth Planning Research — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81cdab15c7e7f7094a64",
+   "duplicated_from": "3f44590a05eb81cdab15c7e7f7094a64",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:16:00.891Z"
+  },
+  "MGR-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb812cac4cfa7143f53d36",
+   "title": "MGR-10 — Coordinate the Complete Change Flow within Current Authority — 102726.1",
+   "predecessor_page_id": "3f44590a05eb813ea53ac959e7a4e597",
+   "duplicated_from": "3f44590a05eb813ea53ac959e7a4e597",
+   "parent_id": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "created_last_edited_at": "2026-10-27T12:13:04.671Z"
+  },
+  "OPS-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81fab31ef7c8921fc312",
+   "title": "OPS-10 — Create Bounded Ops Task — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81509957c43992c03625",
+   "duplicated_from": "3f44590a05eb81509957c43992c03625",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:16:56.035Z"
+  },
+  "OPS-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81c18158d838050befbc",
+   "title": "OPS-20 — Execute Bounded Ops Task — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8155aebacd56f469643e",
+   "duplicated_from": "3f44590a05eb8155aebacd56f469643e",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:10:41.246Z"
+  },
+  "OPS-30": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb813b8c9bdd5d92cd6cde",
+   "title": "OPS-30 — Review Ops Execution Receipt — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81ec8da3effc3b28cf97",
+   "duplicated_from": "3f44590a05eb81ec8da3effc3b28cf97",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:07:42.069Z"
+  },
+  "PR-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81de9686f14e4693b315",
+   "title": "PR-10 — Create PR Work-Unit Instructions — 102726.1",
+   "predecessor_page_id": "3f44590a05eb815d97d5f3930c7d3e8a",
+   "duplicated_from": "3f44590a05eb815d97d5f3930c7d3e8a",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:11:35.894Z"
+  },
+  "PR-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb8141a25be9a48df6c2a9",
+   "title": "PR-20 — Create Detailed PR Implementation Plan — 102726.1",
+   "predecessor_page_id": "3f44590a05eb819fbea5dcd966a750ba",
+   "duplicated_from": "3f44590a05eb819fbea5dcd966a750ba",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:08:34.300Z"
+  },
+  "PR-30": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb8157bcb9c79a43cefb08",
+   "title": "PR-30 — PR Implementation Proceed — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8148a538f5c80588db14",
+   "duplicated_from": "3f44590a05eb8148a538f5c80588db14",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:12:29.718Z"
+  },
+  "PR-35": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb8108a9f5cececa4b3149",
+   "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 102726.1",
+   "predecessor_page_id": "3f44590a05eb811ebf72e949b7b1572e",
+   "duplicated_from": "3f44590a05eb811ebf72e949b7b1572e",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:09:24.315Z"
+  },
+  "PR-40": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81479a74fa542b90cadb",
+   "title": "PR-40 — Review PR Work-Unit Lineage — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81088487e918fd642a7f",
+   "duplicated_from": "3f44590a05eb81088487e918fd642a7f",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:13:34.133Z"
+  },
+  "PR-50": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 7 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb81dcbf95e23b4112e43c",
+   "title": "PR-50 — Abort PR and Escalate — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81d29748eb21df73b02c",
+   "duplicated_from": "3f44590a05eb81d29748eb21df73b02c",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:07:52.872Z"
+  },
+  "QA-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb8161b170fbb23f7aeb28",
+   "title": "QA-10 — Audit Implementation and Establish QA Readiness — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8134af92e7c85a48e67c",
+   "duplicated_from": "3f44590a05eb8134af92e7c85a48e67c",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:14:33.878Z"
+  },
+  "QA-100": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb8150bcfff1e25129b368",
+   "title": "QA-100 — Execute Bounded QA Task — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8182a201f0e177dad431",
+   "duplicated_from": "3f44590a05eb8182a201f0e177dad431",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:08:41.940Z"
+  },
+  "QA-110": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81719360c698e54b260c",
+   "title": "QA-110 — Review QA Evidence and Route the Next Action — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81ee9a09e00af51f33cb",
+   "duplicated_from": "3f44590a05eb81ee9a09e00af51f33cb",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:15:41.905Z"
+  },
+  "QA-120": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb810ea503f98b34fa85aa",
+   "title": "QA-120 — Create Final QA Report and RCA — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81a4a3fbc0fae65d153e",
+   "duplicated_from": "3f44590a05eb81a4a3fbc0fae65d153e",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:09:36.857Z"
+  },
+  "QA-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb810ca861ff615ddb7e79",
+   "title": "QA-20 — Create Live QA Guide — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81289c7be77f66bac909",
+   "duplicated_from": "3f44590a05eb81289c7be77f66bac909",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:14:50.194Z"
+  },
+  "QA-50": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81dbb28ed028d68b8816",
+   "title": "QA-50 — Create Whole-Change QA Audit and Plan — 102726.1",
+   "predecessor_page_id": "3f44590a05eb815d89d3e602973d83ad",
+   "duplicated_from": "3f44590a05eb815d89d3e602973d83ad",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:11:21.519Z"
+  },
+  "QA-60": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81c4b5fcde0e9e5a6fa9",
+   "title": "QA-60 — Create Whole-Change QA Plan — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81489053f72637577807",
+   "duplicated_from": "3f44590a05eb81489053f72637577807",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:15:43.347Z"
+  },
+  "QA-70": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb819ca94af85f1561b596",
+   "title": "QA-70 — Review Whole-Change QA Plan — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81209128ea7c82938faf",
+   "duplicated_from": "3f44590a05eb81209128ea7c82938faf",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:12:39.699Z"
+  },
+  "QA-80": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81708849ef4ce804753b",
+   "title": "QA-80 — Revise Whole-Change QA Plan — 102726.1",
+   "predecessor_page_id": "3f44590a05eb818789e9ff3ffa9e06d8",
+   "duplicated_from": "3f44590a05eb818789e9ff3ffa9e06d8",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:16:37.789Z"
+  },
+  "QA-90": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81929057e6667f7193c6",
+   "title": "QA-90 — Create Bounded QA Execution Task — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81bea720f004a7e1a6d8",
+   "duplicated_from": "3f44590a05eb81bea720f004a7e1a6d8",
+   "parent_id": "3db4590a05eb814d96d3dcfa8835f96d",
+   "created_last_edited_at": "2026-10-27T12:13:51.000Z"
+  },
+  "RS-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb81e3ab0de978fbd97b2f",
+   "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81a588c9c82aa8a2d3f2",
+   "duplicated_from": "3f44590a05eb81a588c9c82aa8a2d3f2",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:07:25.927Z"
+  },
+  "RS-20": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 12 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb81e3bcdddac78d3027da",
+   "title": "RS-20 — Review Bounded Work-Unit Rescope — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81be9566cd6397c9424c",
+   "duplicated_from": "3f44590a05eb81be9566cd6397c9424c",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:11:16.668Z"
+  },
+  "RS-30": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 12 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb813eb33ce2fdc351092b",
+   "title": "RS-30 — Revise Bounded Work-Unit Rescope Proposal — 102726.1",
+   "predecessor_page_id": "3f44590a05eb8131bc61e346a46840e9",
+   "duplicated_from": "3f44590a05eb8131bc61e346a46840e9",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:08:17.736Z"
+  },
+  "RS-40": {
+   "disposition": "SUCCESSOR",
+   "reason": "edited by this Modification (W1 to W6 ops)",
+   "page_id": "4064590a05eb813b9234f34caeb67537",
+   "title": "RS-40 — Approved Rescope — Resume PR Implementation — 102726.1",
+   "predecessor_page_id": "3f44590a05eb813993beccaaf88523d4",
+   "duplicated_from": "3f44590a05eb813993beccaaf88523d4",
+   "parent_id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "created_last_edited_at": "2026-10-27T12:12:11.413Z"
+  },
+  "UTIL-10": {
+   "disposition": "SUCCESSOR",
+   "reason": "unedited, but its body cites 2 line(s) of changed members' 100926.1 pages (Q-W8-1 (a)); KEPT only under Q-W8-1 (c)",
+   "page_id": "4064590a05eb8147b104c0998060ae6f",
+   "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 102726.1",
+   "predecessor_page_id": "3f44590a05eb81d997d1fd2b8d1b5042",
+   "duplicated_from": "3f44590a05eb81d997d1fd2b8d1b5042",
+   "parent_id": "3db4590a05eb811b9c14f2ae89c28df7",
+   "created_last_edited_at": "2026-10-27T12:09:07.243Z"
+  }
+ },
+ "pe": {
+  "page_id": "4064590a05eb8173b2e7d37929e7fe4d",
+  "predecessor_page_id": "3f44590a05eb81f98b76c83465dc1960",
+  "title": "PE Metaprompt 102726.1",
+  "created_last_edited_at": "2026-10-27T12:01:54.647Z"
+ }
+}

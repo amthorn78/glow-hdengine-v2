@@ -807,34 +807,34 @@ Because R-P1 and R-P2 are taken, neither goes on the backlog (C-14).
 |---|---|---|---|
 | X0 | all | VERIFIED | Fresh reads of the 57 pages and the 11 control pages by seven read-only workers, captured 11:30:20–11:33:56Z after `fetched-after` 2026-10-27T11:29:52.469Z. (a), (b), (f): `plan/dry_run_102726.py run` on those reads ([execute/x0-dry-run.json](evidence/20261027-gcfpe-backlog-open-items/execute/x0-dry-run.json), `--previous-receipt plan/dry-run.json`): `ok` true, every gate N0 to N12 and the dry run's self-test true. N0: 9 of 9 installed skills and their copies equal W7's digests; `docs/graph/parts` builds `55 nodes · 235 edges · 55 state_routes · 593569 bytes · 43f84f29…`, D29's token. N2: 57 of 57 pages read, every revision at its pin, none moved; 559 of 559 operations apply once (113 binding under the stand-in map); 57 batches safe; 756 guard rows, 240 failing before and 0 after; with R-P2, PE 16 operations and no guard failing. N10: control pins 10 of 10 and the 100926.1 catalog's read-only pin match; the Glow Operations Hub also reads at its PLAN revision `2026-10-27T03:02:37.191Z`. N11 and N12 pass. (c) `main` `229a4291` carries only `PF10-HDE-Build-Notes-v13.9.md`; its §1.1 index lists one addendum, 2.1 (S19 vendor and security policy), and a search of 2.1's body for this plan's topics finds none, so PF10 has not moved past v13.9 and Nathan's condition 2 needs no further read. (d) the register's first current section is *Current selection — GCFPE-20261009.1 / 100926.1*, "exactly 55 members", at its pin `2026-10-12T17:17:45.991Z`. (e) a workspace search for `102726.1` finds no page titled "— 102726.1". (g) `grep -c '^## D30 — '` on the branch's decision record: 1 (also on `main`). (h) Nathan's words take R-P1 and R-P2 (§P, *Approval to enter EXECUTE*) |
 | X1 | PART-02, 19, 20, 21, 28 | VERIFIED | `plan/repo_edits_102726.py --set X1` ([execute/x1-repo-edits-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x1-repo-edits-102726.1.json)). Before: `ok`, the 20 `old` strings at their counts, v5.1.0 absent, the 7 repository guards at W6's counts (19F 4, 19R 0, 20R 0, 21F 2, 21R 0, 28F 1, 28R 0). Apply: 5 files written. After: `ok`, each `new` once and each `old` only inside its own replacement; G-W6-RE-19F 0, 19R 2, 20R 1, 21F 0, 21R 4, 28F 0, 28R 1; v5.0.0 byte-equal to `origin/main`; the PART-02 note heading once, after `## D30`; `reviewer-prompt-template.md` at 1.3. A second apply is refused (`NEW_FILE_EXISTS`, `OLD_COUNT`) and writes nothing. Committed at `ccb5de0`; `modification_validate.py` 17 of 17. The controls pull request is [amthorn78/glow-hdengine-v2#770](https://github.com/amthorn78/glow-hdengine-v2/pull/770), recorded once in [execute/controls-pr-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/controls-pr-102726.1.json) at `ff7039a`. Nathan merges it before X18 (C-12) |
-| X2 | PART-24 | BLOCKED | Started 11:40:48.720Z. One `notion-duplicate-page` call on W8's first row, CF-C-10 (`3f44590a05eb810f83d4d539e5b0e588`), at 11:40:51Z created `4064590a05eb811e821bc064f56de3a3` under the HDE Change Flow hub, its planned parent, so no move was needed. It was not retitled. Fresh read (as of 11:40:52.663Z): parent as planned; no child page; the body's first line equals the source's. **But Notion remapped both of the body's self-references**: the source's id (2 occurrences) became the duplicate's own id, and the self-mention's title reads "… — 100926.1 (1)". With those remapped back, the body equals the source's. So `HEAD-CF-C-10-U`, whose start anchor is the predecessor's own `Notion URL` mention, resolves 0 times. In memory, `body_check.py plan --no-ops --prompts CF-C-10` on the duplicate's read, with a scratch map naming the duplicate: `START_COUNT_0`, `ops_not_applied` `["HEAD-CF-C-10-U"]`, `ok` false. `edits.json` carries 54 such head self-mention operations on 54 pages, so X4's verification, "every operation applies once", cannot pass on any successor: the plan is wrong. The other 55 duplications and the title were not run |
-| X3 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X4 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X5 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X6a | PART-24 (Nathan's condition 1) | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X6 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X7 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X8 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X9 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X10 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X11 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X12 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X13 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X14 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X15 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X16 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X17 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X18 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X19 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X20 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X21 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X22 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X23 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X24 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X25 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X26 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X27 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
-| X28 | — | NOT_RUN | the stop at X2 (*Failure record — 2026-10-27, X2*) |
+| X2 | PART-24 | VERIFIED after AM-1 | Started 11:40:48.720Z. One `notion-duplicate-page` call on W8's first row, CF-C-10 (`3f44590a05eb810f83d4d539e5b0e588`), at 11:40:51Z created `4064590a05eb811e821bc064f56de3a3` under the HDE Change Flow hub, its planned parent, so no move was needed. It was not retitled. Fresh read (as of 11:40:52.663Z): parent as planned; no child page; the body's first line equals the source's. **But Notion remapped both of the body's self-references**: the source's id (2 occurrences) became the duplicate's own id, and the self-mention's title reads "… — 100926.1 (1)". With those remapped back, the body equals the source's. So `HEAD-CF-C-10-U`, whose start anchor is the predecessor's own `Notion URL` mention, resolves 0 times. In memory, `body_check.py plan --no-ops --prompts CF-C-10` on the duplicate's read, with a scratch map naming the duplicate: `START_COUNT_0`, `ops_not_applied` `["HEAD-CF-C-10-U"]`, `ok` false. `edits.json` carries 54 such head self-mention operations on 54 pages, so X4's verification, "every operation applies once", cannot pass on any successor: the plan is wrong. The other 55 duplications and the title were not run. First run: BLOCKED, as above; D26-B record and Nathan's decisions below. **After AM-1, VERIFIED.** In Nathan's order, CF-C-10's kept duplicate was retitled; PE was duplicated as `4064590a05eb8173b2e7d37929e7fe4d` under the TW hub; and CL-05 as `4064590a05eb814fba57ed387ee2cddd`, moved under the HDE Change Flow hub; both were retitled. Fresh reads after 12:02:02.990Z: all three pass X2's checks ([execute/x2-three-verify-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x2-three-verify-102726.1.json)). X4's `body_check.py plan` in memory on those reads, with a scratch map naming the three, returned `ok`, 3 of 3 ([execute/x2-three-x4-plan-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x2-three-x4-plan-102726.1.json)): every revision at its pin; CF-C-10 10 operations, with `HEAD-CF-C-10-U` `SATISFIED_BY_DUPLICATION`; PE 16 operations (R-P2's included); CL-05 27; every batch safe; no guard failing after; bindings current, 0 unresolved. Then the other 53 sources were duplicated once each, in two runs: two rows in one lane (a narrower launch than intended, disclosed below) and 51 in six lanes. Each id was logged when its call returned; each page was fetched once and retitled; none was moved, since each landed under its planned parent. Every source was duplicated exactly once ([execute/x2-duplications-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x2-duplications-102726.1.json)). Fresh reads of the 56 duplicates, their 56 sources and GCFPE-MGMT-10 after 12:17:20.643Z: `page_facts_102726.py x2` `ok`, 56 of 56 ([execute/x2-verify-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x2-verify-102726.1.json)): parent as planned, title exact, the body's first line the source's, fully copied (same line count), no child page, source revision unchanged, and 56 distinct new ids |
+| X3 | PART-24 | VERIFIED | [execute/successor-pages-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/successor-pages-102726.1.json), written once by `execute/write_successor_map_102726.py` from the X2 logs and the reads after 12:17:20.643Z (each revision is the duplicate's newest read, after its title). It records 56 members: 54 `SUCCESSOR`, each with a distinct new id and its TSV predecessor; GCFPE-MGMT-10 `KEPT` at `3f74590a05eb81b69bd8c27106f7a59d`; CL-05 the only `ADDED`, duplicated from the candidate; and PE `4064590a05eb8173b2e7d37929e7fe4d`. `successor_map_102726.py check` with no `--stand-in-ok`: `map_ok`, no errors. `binding_pass.py validate`: `ok` |
+| X4 | all body parts | BLOCKED | Fresh reads of the 56 successors and GCFPE-MGMT-10 by seven read-only workers after 12:23:13.860Z. `body_check.py plan --no-ops --successor-map <map> --with-conditional R-P1 R-P2` ([execute/x4-plan-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x4-plan-102726.1.json)): `ok` false, 55 of 57 pages `ok`. CL-E-20 and DOC-10 fail `G-W8-NAME-1` after the edits; the cause is in *Failure record — 2026-10-27, X4*. Every other predicate holds on all 57: 57 revisions at their map pins, 1,134 operations apply once, 54 head self-mentions `SATISFIED_BY_DUPLICATION` (AM-1), 57 batches safe, 57 landing checks would pass, 57 bindings current, 0 unresolved, 295 guard rows failing before and 2 after. GCFPE-MGMT-10 needs no edit |
+| X5 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X6a | PART-24 (Nathan's condition 1) | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X6 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X7 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X8 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X9 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X10 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X11 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X12 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X13 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X14 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X15 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X16 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X17 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X18 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X19 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X20 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X21 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X22 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X23 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X24 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X25 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X26 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X27 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X28 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
 
 ### Failure record — 2026-10-27, X2 (D26-B)
 
@@ -862,6 +862,8 @@ EXECUTE stops at X2. The plan's normal path cannot be executed mechanically on a
 - **X2, one in-memory comparison (D22).** To diagnose the failed anchor, the duplicate's body was compared once in memory with its source's X0 read: lengths, the positions of differing segments, counts of the two page ids, and equality after remapping the ids. D22 forbids comparing a body with another read. Nothing was written and no digest was taken. The result is used for the diagnosis above, not as X2's verification.
 - **An EXECUTE helper.** `execute/page_facts_102726.py` reports header facts (revision, title, parent, child-page count, body length) from this session's fetch records, using `body_check.py`'s reader. It was added for X0(d) and X2's checks. It prints no body text.
 - **Fetch results saved by the harness.** At X0 and in the sweep, the harness saved six large fetch results to its own tool-results folder. Workers did not open them, and the tools read them only as D22 transient reads. They stay there for the harness's cleanup.
+- **X2, a narrower launch than intended.** The first launch for the remaining duplications was given only two rows (CF-C-20 and CF-E-40) instead of all 53. Both were duplicated once and retitled. The relaunch read its 51 rows from a file and excluded those two, so no source was duplicated twice. `write_successor_map_102726.py rows` refuses any prompt with more or fewer than one duplication.
+- **X2, two helpers and the readiness test.** `execute/x2_partial_map_102726.py` builds the scratch map for Nathan's three-page check; it refuses any path in the repository. `execute/write_successor_map_102726.py` writes the map once. `page_facts_102726.py` tests a duplicate's readiness by line count and first line, not character count, because Notion's remap changes a duplicate's length.
 
 ### Return to Nathan — 2026-10-27, after X2
 
@@ -895,3 +897,93 @@ EXECUTE stops at X2. The plan's normal path cannot be executed mechanically on a
 - That is well inside the 18–30 h and 16–26M re-price.
 
 **In one line, if you take the recommendations:** "AM-1 as described; keep the CF-C-10 duplicate; I merge #770 as the record pull request."
+
+### Nathan's decisions after X2 — 2026-10-27
+
+Nathan's words:
+
+> "AM-1 as described, with one addition: after CF-C-10, duplicate PE and CL-05 next, and run X4's plan check in memory on those three real duplicates before duplicating the rest. Keep the CF-C-10 duplicate. I have merged #770 as the record pull request; continue on a branch restarted from main, in a new pull request."
+
+**Applied.**
+
+- **The record pull request.** #770 merged as `5b3ccdc`, detected by files on `main` (D26-C):
+  - the X2 failure record, `execute/controls-pr-102726.1.json` and the v5.1.0 file are on `main`;
+  - `reviewer-prompt-template.md` is at 1.3;
+  - `main`'s tree equals the branch's (`50aa28c1…`).
+
+  The branch `claude/ecstatic-mccarthy-m9b2lz` was deleted at merge. It was restarted from `main` at `5b3ccdc` and pushed fresh, and the run continues in a new pull request. #770 also merged X1's controls, so C-12's precondition for X18 is met; X18 still verifies it by files.
+- **AM-1**, in [plan/body_check.py](evidence/20261027-gcfpe-backlog-open-items/plan/body_check.py), committed before any further Notion write.
+  - *The rule.* In `plan` mode, a head self-mention operation (`head: true`, its start a `<mention url=…>`) whose start is absent counts as `SATISFIED_BY_DUPLICATION`, and is not sent, when two things hold:
+    - its expanded replacement occurs exactly once;
+    - that replacement names the page's own URL.
+  - *What `plan` reports.* `ops_satisfied_by_duplication` lists them, `ops_not_applied` excludes them, and a page's `ok` accepts them.
+  - *Unchanged.* `check` mode, `apply_all`, the batch-safety check and the payload: an operation satisfied this way is never in `ops_payload_for_execute`.
+  - *Scope.* `edits.json` has exactly 54 operations whose start or end names their own page's 100926.1 id, all head self-mentions (`HEAD-<ID>-U`). PE's head (`HEAD-PE`, frontmatter) and CL-05's (`HEAD-CL-05`, on `Prompt ID: CL-05`) name none, so AM-1 reaches only those 54.
+  - *Self-test.* `body_check.py selftest`: `ok`; 118 guards; 377 fixture rows, none failing. Five AM-1 cases are added, each true:
+    - a duplicate whose self-mention already names the duplicate is satisfied;
+    - with neither the start nor the replacement present, it is refused;
+    - with the replacement present twice, it is refused;
+    - a head operation that is not a self-mention never qualifies;
+    - with the start still present, it is not satisfied.
+
+  The fifth case, beyond the three described, shows the rule never displaces an operation that can still apply. No other plan file changes, and `PLAN-20261027.md` is untouched (C-11, P-L14).
+- **The order of X2**, Nathan's addition:
+  1. retitle CF-C-10's duplicate `4064590a05eb811e821bc064f56de3a3`, which is kept;
+  2. duplicate PE, then CL-05, moving CL-05 under the HDE Change Flow hub;
+  3. read all three fresh and run X4's `body_check.py plan` on them in memory, with a scratch map that names the three real duplicates;
+  4. only if that passes, duplicate the remaining 53.
+
+  The scratch map is not the successor map: X3 writes that once, after all 56.
+
+### Failure record — 2026-10-27, X4 (D26-B)
+
+EXECUTE stops at X4, before X5's first body write. X4's verification is not met on 2 of 57 pages, and the cause is a second plan defect from the same remap as X2's: the plan's normal path still cannot be executed mechanically on real duplicates. D26-B applies, as at X2.
+
+- **What failed.** `body_check.py plan` on fresh reads of the 56 successors and GCFPE-MGMT-10 after 12:23:13.860Z, with the successor map and `--with-conditional R-P1 R-P2` ([execute/x4-plan-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x4-plan-102726.1.json)).
+  - Not met on 2 pages: `ok` false, 55 of 57 pages `ok`. On CL-E-20 and DOC-10, `G-W8-NAME-1` (no body names a member with a successor by its "— 100926.1" title) fails after the edits.
+  - Every other predicate holds on all 57:
+    - every revision at its map pin;
+    - 1,134 operations apply once, and the 54 head self-mentions are satisfied by duplication (AM-1);
+    - every batch safe; the landing check would pass;
+    - bindings current, 0 unresolved;
+    - 295 guard rows failing before, 2 after.
+- **The cause.**
+  - On each of those two pages, one line names the page itself twice: its own title in a `<code>` span, then a self-mention.
+  - On the source page, that self-mention carried the predecessor's URL. So the binding pass treated the whole line as stale and rewrote both the mention and the `<code>` title (the PLAN dry run, on the stand-in map, did exactly that).
+  - On the real duplicate, Notion has remapped that self-mention to the duplicate, and it renders the new "… — 102726.1" title. The binding pass's C-9 rule skips any line that already carries `102726.1`, so the line is left alone and the `<code>` title "… — 100926.1" survives.
+  - `G-W8-NAME-1` passes on the other 55 pages, so no other page has such a line.
+- **Read-only sweep.**
+  - The X4 reads above are a fresh read of all 57 member pages after the last write. Each is at its map revision: the duplicate's state after its title, with no body edit.
+  - The register, the Flow Index and the five hubs were read after 12:30:00.255Z: the register at its pin `2026-10-12T17:17:45.991Z`, its first current section still *Current selection — GCFPE-20261009.1 / 100926.1*; the Flow Index at its pin `2026-10-12T17:17:19.872Z`; each hub's revision moved only because the duplicates are its children, and each holds exactly twice its member count: Change Flow 38 (19 + 19), IA 42 (21 + 21), QA 20 (10 + 10), Escalation 8 (4 + 4), TW 4 (2 + 2)
+- **What is live.**
+  - Notion: the 56 successor pages, created, placed and titled, their bodies as duplicated, and nothing else. No body operation, control page or register change.
+  - Repository: this branch, in draft [amthorn78/glow-hdengine-v2#771](https://github.com/amthorn78/glow-hdengine-v2/pull/771), with AM-1, the successor map and this record.
+  - Skills: nothing built or installed.
+- **The freeze is kept.** No Notion write follows until Nathan decides.
+- **The record reaches `main`** when #771 merges (D21-C: merging preserves the record and approves nothing).
+
+### Return to Nathan — 2026-10-27, after X4
+
+**EXECUTE stopped at X4, before any page body was written. On 2 of the 56 real duplicates, CL-E-20 and DOC-10, the plan would leave each page's own old title "… — 100926.1" in one line, so X4's guard `G-W8-NAME-1` fails. `DECISION NEEDED`.**
+
+| # | Question | Recommendation |
+|---|---|---|
+| 1 | How this second remap defect is repaired | amendment AM-2, below |
+| 2 | The record pull request | mark #771 ready and merge it as the record pull request |
+
+**1. The repair.** The binding pass rewrites every line that cites a superseded member. Its rule C-9 skips a line already carrying "102726.1". On a real duplicate, the page's own self-mention, remapped by Notion, now carries "102726.1", so C-9 also skips a line whose other citation, the page's own title in a `<code>` span, is still stale. If nothing changes, those two bodies keep their superseded titles, and X4, X7 and the post-flight all fail on them.
+- **Option A, AM-2 (recommended).** In `plan/binding_pass.py`'s `generate`, C-9's test ignores the page's own successor self-mention, so that a line whose only "102726.1" is that self-mention still has its stale citations rewritten. Nothing else changes.
+  - **Measured in memory** on the X4 reads (no file changed): X4 then passes on all 57 pages. Only CL-E-20 and DOC-10 change, each gaining one binding operation. 1,136 operations apply, 54 are satisfied by duplication, and 0 guard rows fail after.
+  - **With it:** three self-test cases (a remapped self-mention line with a stale own title gets one operation; a line with any other "102726.1" is still skipped; after the operation the line is current), then the self-tests rerun and X4 rerun on these same reads before X5. Cost: about 30 minutes and under 0.3M tokens.
+- **Option B: two stored operations instead.** One per page, on the `<code>` title, added to `plan/edits.json` through its assembler. It reaches only these two lines, and it leaves the binding pass blind to the same pattern if it recurs. Cost: similar, and `assemble_edits.py` must regenerate `edits.json`.
+
+**2. Record pull request.** #771 is a draft and now carries both failure records, AM-1 and the successor map.
+- **Mark it ready and merge it now (recommended):** D26-B step 1, as #770 was. The run then continues on this branch, restarted from `main`, in a new pull request.
+- **Keep it open:** the X4 record stays off `main` until it merges.
+
+**Spend in EXECUTE so far.**
+- **Time:** about 1 h 10 min, 11:20Z to 12:31Z.
+- **Tokens:** about 5.4M of subagent tokens, plus the coordinator's. The X0, X2-verify and X4 reads were 3.6M; the duplication lanes 1.1M.
+- That is inside the 18–30 h and 16–26M re-price.
+
+**In one line, if you take the recommendations:** "AM-2 as described (option A); I merge #771 as the record pull request."

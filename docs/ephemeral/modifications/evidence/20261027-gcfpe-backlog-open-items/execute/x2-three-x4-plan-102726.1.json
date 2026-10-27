@@ -1,0 +1,1227 @@
+{
+ "mode": "plan",
+ "stand_in": false,
+ "conditional_sets": [
+  "R-P2"
+ ],
+ "pages": [
+  {
+   "prompt": "CF-C-10",
+   "fetch_captured": "2026-10-27T12:02:21.748Z",
+   "as_of": "2026-10-27T12:00:19.250Z",
+   "binding_ops": 8,
+   "binding_identity_under_stand_in": 0,
+   "binding_stale_lines": 9,
+   "binding_skipped_covered": 1,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "binding_unresolved_lines": [],
+   "worker_replacements_binding_rewritten": 0,
+   "ops_by_source": {
+    "A1": 2,
+    "binding_pass": 8
+   },
+   "revision_matches_plan": true,
+   "guards_before": {
+    "G-W1-F5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-2": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-3": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-4": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-6": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W7-BIND-1": {
+     "count": 5,
+     "pass": false
+    },
+    "G-W7-REL-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W8-NAME-1": {
+     "count": 4,
+     "pass": false
+    }
+   },
+   "batch_safe": true,
+   "ops": [
+    {
+     "id": "HEAD-CF-C-10-T",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "HEAD-CF-C-10-U",
+     "state_before": "LANDED",
+     "refusal": "START_COUNT_0",
+     "applied": false,
+     "old_str_count_at_application": null,
+     "satisfied_by_duplication": true
+    },
+    {
+     "id": "BIND-CF-C-10-01",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "BIND-CF-C-10-02",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "BIND-CF-C-10-03",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "BIND-CF-C-10-04",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "BIND-CF-C-10-05",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "BIND-CF-C-10-06",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "BIND-CF-C-10-07",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "BIND-CF-C-10-08",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    }
+   ],
+   "ops_not_applied": [],
+   "ops_satisfied_by_duplication": [
+    "HEAD-CF-C-10-U"
+   ],
+   "markup_spans_allowed": 8,
+   "markup_spans_refused": [],
+   "refs_dropped": [],
+   "guards_after": {
+    "G-W1-F5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-2": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-3": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-4": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-6": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W7-BIND-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W7-REL-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W8-NAME-1": {
+     "count": 0,
+     "pass": true
+    }
+   },
+   "guards_failing_after": [],
+   "landed_state_after": {
+    "HEAD-CF-C-10-T": "LANDED",
+    "HEAD-CF-C-10-U": "LANDED",
+    "BIND-CF-C-10-01": "LANDED",
+    "BIND-CF-C-10-02": "LANDED",
+    "BIND-CF-C-10-03": "LANDED",
+    "BIND-CF-C-10-04": "LANDED",
+    "BIND-CF-C-10-05": "LANDED",
+    "BIND-CF-C-10-06": "LANDED",
+    "BIND-CF-C-10-07": "LANDED",
+    "BIND-CF-C-10-08": "LANDED"
+   },
+   "end_anchor_not_unique": [],
+   "check_would_pass": true,
+   "binding_current_after": true,
+   "ok": true
+  },
+  {
+   "prompt": "CL-05",
+   "fetch_captured": "2026-10-27T12:02:33.629Z",
+   "as_of": "2026-10-27T12:01:54.121Z",
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 0,
+   "binding_stale_lines": 2,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "binding_unresolved_lines": [],
+   "worker_replacements_binding_rewritten": 0,
+   "ops_by_source": {
+    "W5": 26,
+    "A1": 1
+   },
+   "revision_matches_plan": true,
+   "guards_before": {
+    "G-HP-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-2": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-3": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-4": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-6": {
+     "count": 0,
+     "pass": true
+    },
+    "G-CL05-07": {
+     "count": 0,
+     "pass": true
+    },
+    "G-CL05-08": {
+     "count": 0,
+     "pass": false
+    },
+    "G-CL05-09": {
+     "count": 4,
+     "pass": false
+    },
+    "G-CL05-10": {
+     "count": 5,
+     "pass": false
+    },
+    "G-CL05-11": {
+     "count": 0,
+     "pass": false
+    },
+    "G-CL05-12": {
+     "count": 0,
+     "pass": false
+    },
+    "G-CL05-13": {
+     "count": 0,
+     "pass": false
+    },
+    "G-CL05-14": {
+     "count": 0,
+     "pass": false
+    },
+    "G-W7-BIND-1": {
+     "count": 2,
+     "pass": false
+    },
+    "G-W7-REL-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W8-NAME-1": {
+     "count": 2,
+     "pass": false
+    }
+   },
+   "batch_safe": true,
+   "ops": [
+    {
+     "id": "CL05-01",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "CL05-02",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-03",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-04",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-05",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-06",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "CL05-07",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": true
+    },
+    {
+     "id": "CL05-08",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-09",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-10",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-11",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-12",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "CL05-13",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-14",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-15",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-16",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-17",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "CL05-18",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-19",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-20",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "CL05-21",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "CL05-22",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-23",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "CL05-24",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "CL05-25",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "CL05-26",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "HEAD-CL-05",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": true
+    }
+   ],
+   "ops_not_applied": [],
+   "ops_satisfied_by_duplication": [],
+   "markup_spans_allowed": 9,
+   "markup_spans_refused": [],
+   "refs_dropped": [],
+   "guards_after": {
+    "G-HP-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-2": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-3": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-4": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-6": {
+     "count": 0,
+     "pass": true
+    },
+    "G-CL05-07": {
+     "count": 0,
+     "pass": true
+    },
+    "G-CL05-08": {
+     "count": 1,
+     "pass": true
+    },
+    "G-CL05-09": {
+     "count": 0,
+     "pass": true
+    },
+    "G-CL05-10": {
+     "count": 0,
+     "pass": true
+    },
+    "G-CL05-11": {
+     "count": 1,
+     "pass": true
+    },
+    "G-CL05-12": {
+     "count": 1,
+     "pass": true
+    },
+    "G-CL05-13": {
+     "count": 1,
+     "pass": true
+    },
+    "G-CL05-14": {
+     "count": 1,
+     "pass": true
+    },
+    "G-W7-BIND-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W7-REL-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W8-NAME-1": {
+     "count": 0,
+     "pass": true
+    }
+   },
+   "guards_failing_after": [],
+   "landed_state_after": {
+    "CL05-01": "LANDED",
+    "CL05-02": "LANDED",
+    "CL05-03": "LANDED",
+    "CL05-04": "LANDED",
+    "CL05-05": "LANDED",
+    "CL05-06": "LANDED",
+    "CL05-07": "LANDED",
+    "CL05-08": "LANDED",
+    "CL05-09": "LANDED",
+    "CL05-10": "LANDED",
+    "CL05-11": "LANDED",
+    "CL05-12": "LANDED",
+    "CL05-13": "LANDED",
+    "CL05-14": "LANDED",
+    "CL05-15": "LANDED",
+    "CL05-16": "LANDED",
+    "CL05-17": "LANDED",
+    "CL05-18": "LANDED",
+    "CL05-19": "LANDED",
+    "CL05-20": "LANDED",
+    "CL05-21": "LANDED",
+    "CL05-22": "LANDED",
+    "CL05-23": "LANDED",
+    "CL05-24": "LANDED",
+    "CL05-25": "LANDED",
+    "CL05-26": "LANDED",
+    "HEAD-CL-05": "LANDED"
+   },
+   "end_anchor_not_unique": [],
+   "check_would_pass": true,
+   "binding_current_after": true,
+   "ok": true
+  },
+  {
+   "prompt": "PE",
+   "fetch_captured": "2026-10-27T12:02:28.196Z",
+   "as_of": "2026-10-27T12:01:54.647Z",
+   "binding_ops": 0,
+   "binding_identity_under_stand_in": 0,
+   "binding_stale_lines": 2,
+   "binding_skipped_covered": 2,
+   "binding_partial_line_ops": 0,
+   "binding_unresolved": 0,
+   "binding_unresolved_lines": [],
+   "worker_replacements_binding_rewritten": 0,
+   "ops_by_source": {
+    "W6": 14,
+    "A1": 1,
+    "W6 (Q-W6-4) / C-13": 1
+   },
+   "revision_matches_plan": true,
+   "guards_before": {
+    "G-HP-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-2": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-3": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-4": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-6": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-14F": {
+     "count": 8,
+     "pass": false
+    },
+    "G-W6-PE-14L": {
+     "count": 3,
+     "pass": false
+    },
+    "G-W6-PE-14R": {
+     "count": 0,
+     "pass": false
+    },
+    "G-W6-PE-27F": {
+     "count": 2,
+     "pass": false
+    },
+    "G-W6-PE-27R": {
+     "count": 0,
+     "pass": false
+    },
+    "G-W6-PE-26F": {
+     "count": 1,
+     "pass": false
+    },
+    "G-W6-PE-26R": {
+     "count": 0,
+     "pass": false
+    },
+    "G-W6-PE-TS1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-TS2": {
+     "count": 1,
+     "pass": true
+    },
+    "G-W6-PE-TS3": {
+     "count": 2,
+     "pass": true
+    },
+    "G-W6-PE-13F": {
+     "count": 3,
+     "pass": false
+    },
+    "G-W6-PE-13R": {
+     "count": 0,
+     "pass": false
+    },
+    "G-W7-BIND-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W8-NAME-1": {
+     "count": 2,
+     "pass": false
+    }
+   },
+   "batch_safe": true,
+   "ops": [
+    {
+     "id": "W6-PE-27a",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-27b",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-26",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14a",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-14b",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-14c",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-14d",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14e",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14f",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14g",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-14h",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "W6-PE-13a",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-13b",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "W6-PE-13c",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": false,
+     "markup_allowed": false
+    },
+    {
+     "id": "HEAD-PE",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    },
+    {
+     "id": "RP2-PE",
+     "state_before": "UNTOUCHED",
+     "refusal": null,
+     "applied": true,
+     "old_str_unique_in_original": true,
+     "end_unique_in_original": true,
+     "old_str_once_at_application": true,
+     "old_str_only_in_own_new_after": true,
+     "span_has_markup": true,
+     "markup_allowed": true,
+     "refs_kept": true
+    }
+   ],
+   "ops_not_applied": [],
+   "ops_satisfied_by_duplication": [],
+   "markup_spans_allowed": 7,
+   "markup_spans_refused": [],
+   "refs_dropped": [],
+   "guards_after": {
+    "G-HP-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-2": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-3": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-4": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-5": {
+     "count": 0,
+     "pass": true
+    },
+    "G-HP-6": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-14F": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-14L": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-14R": {
+     "count": 4,
+     "pass": true
+    },
+    "G-W6-PE-27F": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-27R": {
+     "count": 2,
+     "pass": true
+    },
+    "G-W6-PE-26F": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-26R": {
+     "count": 1,
+     "pass": true
+    },
+    "G-W6-PE-TS1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-TS2": {
+     "count": 1,
+     "pass": true
+    },
+    "G-W6-PE-TS3": {
+     "count": 2,
+     "pass": true
+    },
+    "G-W6-PE-13F": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W6-PE-13R": {
+     "count": 2,
+     "pass": true
+    },
+    "G-W7-BIND-1": {
+     "count": 0,
+     "pass": true
+    },
+    "G-W8-NAME-1": {
+     "count": 0,
+     "pass": true
+    }
+   },
+   "guards_failing_after": [],
+   "landed_state_after": {
+    "W6-PE-27a": "LANDED",
+    "W6-PE-27b": "LANDED",
+    "W6-PE-26": "LANDED",
+    "W6-PE-14a": "LANDED",
+    "W6-PE-14b": "LANDED",
+    "W6-PE-14c": "LANDED",
+    "W6-PE-14d": "LANDED",
+    "W6-PE-14e": "LANDED",
+    "W6-PE-14f": "LANDED",
+    "W6-PE-14g": "LANDED",
+    "W6-PE-14h": "LANDED",
+    "W6-PE-13a": "LANDED",
+    "W6-PE-13b": "LANDED",
+    "W6-PE-13c": "LANDED",
+    "HEAD-PE": "LANDED",
+    "RP2-PE": "LANDED"
+   },
+   "end_anchor_not_unique": [],
+   "check_would_pass": true,
+   "binding_current_after": true,
+   "ok": true
+  }
+ ],
+ "pages_ok": 3,
+ "pages_total": 3,
+ "ok": true,
+ "d22": "transient reads of this session's harness records; no body text in this report",
+ "successor_map_checks": {
+  "members_56": true,
+  "members_cover_tsv_plus_cl05": true,
+  "only_added_is_cl05": true,
+  "kept_ids_equal_tsv": true,
+  "successor_predecessors_equal_tsv": true,
+  "pe_predecessor": true,
+  "page_ids_32_hex": true,
+  "successor_titles_102726": true,
+  "distinct_successor_ids": true,
+  "revision_pins_present": true,
+  "ok": true,
+  "stand_in": false,
+  "successor_map_102726_errors": []
+ }
+}
