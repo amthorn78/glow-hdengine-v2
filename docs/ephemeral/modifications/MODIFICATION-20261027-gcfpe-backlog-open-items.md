@@ -2,7 +2,7 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261027-gcfpe-backlog-open-items"
-status: "ANALYZED"
+status: "PLANNING"
 targets: ["prompt", "skill", "rule", "graph", "registry", "notion_control", "tool"]
 gate_tier: 2
 closure: {"upstream": ["CF-C-20", "CF-C-30", "CF-C-40", "CF-E-20", "CF-E-30", "CF-E-40", "CL-20", "CL-30", "CL-C-10", "CL-E-10", "CL-E-40", "DOC-10", "DOC-20", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "MGR-10", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "downstream": ["CF-C-10", "CF-C-40", "CF-E-10", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "state_sharers": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-E-10", "CF-E-20", "CF-E-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "DOC-10", "DOC-20", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-100", "QA-110", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-20", "RS-30", "RS-40", "UTIL-10"]}
@@ -45,6 +45,10 @@ items:
   - {"id": "ITEM-30", "statement": "The close-mutation-set stage CL-05 is a release member, entered from QA-120 PASS and from a closure DO_NOT_CLOSE, and exiting to the closure decision (PF06 §3.5.1).", "source": "MB-030", "disposition": ""}
   - {"id": "ITEM-31", "statement": "The successor release that carries this Modification's prompt and skill parts is qualified, and its promotion packet is returned to Nathan.", "source": "Derived: D23-G and PF04 §9.1.6, one coherent successor selection for every member change", "disposition": ""}
   - {"id": "ITEM-32", "statement": "The promotion transaction runs after Nathan's exact promotion approval, if he gives it to this Modification under DN-1.", "source": "Derived: DN-1", "disposition": ""}
+  - {"id": "ITEM-33", "statement": "glow-hde-pr-development SKILL.md:184 no longer cites a drained PF10 addendum by number.", "source": "DN-12 rider 1, approved 2026-10-27 (A-11)", "disposition": ""}
+  - {"id": "ITEM-34", "statement": "PE Metaprompt no longer labels GCFPE-20261009.1 as the candidate.", "source": "DN-12 rider 2, approved 2026-10-27", "disposition": ""}
+  - {"id": "ITEM-35", "statement": "ecosystem-change-management.md section 3 shows the current graph proof token, not the pre-D29 one.", "source": "DN-12 rider 3, approved 2026-10-27 (J-12)", "disposition": ""}
+  - {"id": "ITEM-36", "statement": "PE Metaprompt no longer credits the TypeSafe rule to a drained HDE Build Notes addendum.", "source": "Nathan's DN-12 condition, 2026-10-27 (A-11, J-9 in part)", "disposition": ""}
 parts:
   - {"id": "PART-01", "name": "PR review findings on real inputs (PF06 §1.1.4, PF27)", "items": ["ITEM-11", "ITEM-12", "ITEM-23"], "class": "B", "after": []}
   - {"id": "PART-02", "name": "Codex security review wording", "items": ["ITEM-24"], "class": "B", "after": []}
@@ -69,12 +73,16 @@ parts:
   - {"id": "PART-21", "name": "Review briefs: Canon relied on", "items": ["ITEM-05"], "class": "C", "after": []}
   - {"id": "PART-22", "name": "Unchanged prompts outside GCFPE keep their pages", "items": ["ITEM-28"], "class": "A", "after": []}
   - {"id": "PART-23", "name": "Relay-safety scoring", "items": ["ITEM-29"], "class": "A", "after": []}
-  - {"id": "PART-24", "name": "Successor release qualification and promotion packet", "items": ["ITEM-31"], "class": "C", "after": ["PART-01", "PART-02", "PART-03", "PART-04", "PART-05", "PART-06", "PART-07", "PART-08", "PART-09", "PART-10", "PART-11", "PART-12", "PART-13", "PART-14", "PART-15", "PART-16", "PART-18"]}
+  - {"id": "PART-24", "name": "Successor release qualification and promotion packet", "items": ["ITEM-31"], "class": "C", "after": ["PART-01", "PART-02", "PART-03", "PART-04", "PART-05", "PART-06", "PART-07", "PART-08", "PART-09", "PART-10", "PART-11", "PART-12", "PART-13", "PART-14", "PART-15", "PART-16", "PART-18", "PART-26", "PART-27"]}
   - {"id": "PART-25", "name": "Promotion transaction", "items": ["ITEM-32"], "class": "B", "after": ["PART-24"]}
+  - {"id": "PART-26", "name": "Stale drained-addendum citations (glow-hde-pr-development, PE)", "items": ["ITEM-33", "ITEM-36"], "class": "B", "after": []}
+  - {"id": "PART-27", "name": "PE's candidate label for GCFPE-20261009.1", "items": ["ITEM-34"], "class": "B", "after": []}
+  - {"id": "PART-28", "name": "Pre-D29 proof token in ecosystem-change-management.md", "items": ["ITEM-35"], "class": "C", "after": []}
 request: "MODE = ANALYZE. Subject: every open item on the GCFPE Modification Backlog https://app.notion.com/p/3e54590a05eb81eb818fd0f42045167a"
 requested_by: "Nathan"
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan"
+analyze_approved_date: "2026-10-27"
+item_count_at_approval: 36
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
@@ -535,6 +543,44 @@ The reading below came from running the installed TypeSafe scoring skill's scrip
 - **In this session.** On your approval, I record it in the frontmatter with your words quoted here, mark the taken backlog entries with this Modification's ID, record J-1 to J-14 on the backlog under template rule 3, and go on to PLAN (D21-D).
 - **In a fresh session.** Invoke GCFPE-MGMT-10 with `MODE = PLAN` and `MODIFICATION-20261027-gcfpe-backlog-open-items`, naming branch `claude/cool-bardeen-zwduzl` until the pull request merges (L-A24).
 - **The PLAN session's reading** is in §A.12: **TypeSafe v8.2: Opus 5.5 at high**, no flags. You pick the cell.
+
+### 14. Approval to enter PLAN — 2026-10-27
+
+Nathan, approving, in the PLAN invocation of 2026-10-27:
+
+> "approve §A of MODIFICATION-20261027-gcfpe-backlog-open-items with the recommended options for DN-1, DN-2, DN-4, DN-5, DN-6, DN-7, DN-8, DN-9, DN-10 and DN-12, and with these choices and conditions:
+> - DN-3: option (a) for ITEM-18; option (b) for ITEM-15 and ITEM-17, recorded as a decision-record ruling before execution.
+> - DN-11: close MB-029 as delivered. Its quantified relay reading is the typesafe-scoring skill, which every GCFPE handoff runs (PF04 §9.1.3); its qualitative Claude recommendation is withdrawn by my direction of 2026-10-11 that no AI model recommendation is given.
+> - CD-9: move the register's procedure binding in the promotion transaction (PART-25), not before.
+> - CD-6: adopt request 4 as a new QA-70 reviewer duty, stated as new.
+> - DN-12: also carry PE's stale addendum citation for the TypeSafe rule into PART-14's PE successor.
+> - PLAN covers L-A12 / L-B1 and L-A13 / L-B2 within PART-13 and PART-24, and records PART-13's R1 successor rows in the decision record (L-A14).
+> All other listed findings are accepted as risks."
+
+**What this approves.**
+
+| Decision | Answer | Effect on PLAN |
+|---|---|---|
+| DN-1 | D2 | After PART-24, EXECUTE returns `PROMOTION_CHECKPOINT_REQUIRED`; Nathan's exact promotion approval authorizes PART-25 for this run only |
+| DN-2 | (b) | PART-13 is class B. The R1 successor rows (GCF-24 → the close stage → GCF-25) are authorized; PLAN records them in the decision record (L-A14). The Epic limit (A-7) stays a listed risk |
+| DN-3 | (a) for ITEM-18; (b) for ITEM-15 and ITEM-17 | ITEM-18 applies PF06 §1.1.4's *Real input* bullet (class B). ITEM-15 and ITEM-17 rest on a new decision-record ruling, recorded before execution (class A). PART-04 stays class A |
+| DN-4 | (a) | PR-40 records the business-case measure's status as a fact, with no effect on its verdict |
+| DN-5 | (a) | The HDE-CRD-0002 v1.1 route, generalised: QA-70 reviews, a `DENY` sends redlines to QA-80, QA-70 approves the successor, no PF10 addendum |
+| DN-6 | (a) | No skill change: QA-90 names paths and route; QA-100 asks for Nathan's instruction in its own session and stops without it |
+| DN-7 | (a) | WON'T DO. PART-16 makes no edit; MB-009's risk is accepted |
+| DN-8 | (c) | No change. PART-15 and PART-22 close `NOT_APPLICABLE` with their evidence |
+| DN-9 | recommended | The Hub's workspace-wide *PF10 build-notes addendum format — canonical* numbering and confirmation text is replaced by a pointer to PF06 §0.1A and PF27 |
+| DN-10 | (b) | The provenance clause is kept; PART-18 makes no edit; the PENDING row is an accepted risk |
+| DN-11 | close as delivered | PART-23 makes no edit. MB-029 closes as delivered by typesafe-scoring under PF04 §9.1.3, with the qualitative recommendation withdrawn by Nathan's direction of 2026-10-11 |
+| DN-12 | yes to both, plus one | J-1 to J-14 go on the backlog now. The three riders and PE's stale TypeSafe-rule citation become ITEM-33 to ITEM-36 (PART-26 to PART-28) |
+| CD-6 | condition | Request 4 is adopted as a new QA-70 reviewer duty and stated as new, not as an extension of the apply simulation (L-A22) |
+| CD-9 | condition | The register's procedure binding moves inside the promotion transaction, not before (L-B12). PART-19's successor file is written earlier; its binding step runs in PART-25's window |
+| L-A12 / L-B1, L-A13 / L-B2 | opted in | PLAN plans `global.json`'s member facts, both packages' `EXPECTED_POLICY`, the Living Prompt Flow Map and the Flow Index inside PART-13 and PART-24 |
+| L-A14 | opted in | PLAN writes PART-13's R1 successor rows into the decision record |
+
+**Scope at approval: 36 items.** The four approved riders were added as ITEM-33 to ITEM-36 when this approval was recorded, before `item_count_at_approval` was set, so they are inside the frozen scope (template rule 3). They sit in their own parts because each is a different defect from the part whose file it rides (§A.7, DN-12). The analysis above (§A.1 to §A.13) is otherwise unchanged and now frozen. Every other listed finding in §A.13 is accepted as a risk (`DISP-001`). `plan_approved_by` stays empty until Nathan approves the plan.
+
+**The PLAN session's model and setting.** The invocation repeats §A.12's reading and ends "Nathan picks the cell"; it states no pick, so none is recorded.
 
 ## §P — Plan
 
