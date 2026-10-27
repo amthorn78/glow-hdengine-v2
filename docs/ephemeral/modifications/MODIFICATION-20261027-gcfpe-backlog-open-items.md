@@ -2,7 +2,7 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261027-gcfpe-backlog-open-items"
-status: "PLANNING"
+status: "EXECUTING"
 targets: ["prompt", "skill", "rule", "graph", "registry", "notion_control", "tool"]
 gate_tier: 2
 closure: {"upstream": ["CF-C-20", "CF-C-30", "CF-C-40", "CF-E-20", "CF-E-30", "CF-E-40", "CL-20", "CL-30", "CL-C-10", "CL-E-10", "CL-E-40", "DOC-10", "DOC-20", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "MGR-10", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "downstream": ["CF-C-10", "CF-C-40", "CF-E-10", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "state_sharers": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-E-10", "CF-E-20", "CF-E-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "DOC-10", "DOC-20", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-100", "QA-110", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-20", "RS-30", "RS-40", "UTIL-10"]}
@@ -83,8 +83,8 @@ requested_by: "Nathan"
 analyze_approved_by: "Nathan"
 analyze_approved_date: "2026-10-27"
 item_count_at_approval: 36
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan"
+plan_approved_date: "2026-10-27"
 supersedes: ""
 spawned_from: ""
 shares_package_with: []
@@ -773,6 +773,31 @@ Recommendation: take R-P1 and R-P2; leave L-C1 and the governance-audit lines on
 **Then.**
 - **In this session:** on your approval I record it in the frontmatter with your words quoted here, apply your opt-ins, and go on to EXECUTE at X0 (D21-D).
 - **In a fresh session:** invoke GCFPE-MGMT-10 with `MODE = EXECUTE` and `MODIFICATION-20261027-gcfpe-backlog-open-items`, naming branch `claude/ecosystem-change-mgmt-drvb4v` until its pull request merges.
+
+### Approval to enter EXECUTE — 2026-10-27
+
+Nathan, approving, in the EXECUTE invocation of 2026-10-27:
+
+> "approve the plan of MODIFICATION-20261027-gcfpe-backlog-open-items at `58e20b0` (merged to main as `229a4291`) with R-P1 and R-P2, accepting the open findings listed in §P, with two conditions:
+> - After X5 and before the rest of X6, send one successor whose operations carry <code>, <b> and \_ spans, and confirm on a fresh read that every one of its operations LANDED before the remaining pages are written (reviewer A's smallest fix for L-2).
+> - At X0, if PF10 has moved past v13.9, read every addendum it adds. If they are silent on this Modification's subjects, record that and continue; otherwise stop and return."
+
+**What this approves.**
+
+| Subject | Answer | Effect on EXECUTE |
+|---|---|---|
+| The plan | approved at `58e20b0` | `58e20b0`'s tree is `main` `229a4291`'s (`8c810564…`), so the plan EXECUTE runs is the one on `main`. `PLAN-20261027.md` is frozen at that tree (sha256 `a3b11f46…`, 84,106 B; C-11, P-L14) |
+| R-P1 | opted in | X4 and X13 run with `--with-conditional R-P1`: the stale drained-addendum citation also leaves flowmaster-validate `SKILL.md:168` and its fixture comment, and change-flow `SKILL.md:305` and its revision note (C-13) |
+| R-P2 | opted in | X4 runs with `--with-conditional R-P2`: PE's "from the release after 100926.1" reads 091426.1 (C-13) |
+| L-C1 | not opted in | stays an accepted risk on the backlog (C-24) |
+| Governance-audit lines (C-3) | not opted in | stay on the backlog as MB-045; no fifth package |
+| Open findings | accepted | every finding §P lists, P-L1 to P-L28 and the reviewers' L-1 to L-D8, with those accepted at ANALYZE approval (`DISP-001`). P-L9 and P-L10 are resolved by the opt-ins rather than accepted |
+| Condition 1 (L-2 / L-B1) | adopted | between X5 and the rest of X6, one successor whose operations carry `<code>`, `<b>` and `\_` spans is sent alone and every one of its operations is confirmed `LANDED` on a fresh read before the remaining pages are written (§E, X6a) |
+| Condition 2 (PF10) | adopted | X0(c) reads PF10 on `main`; if it has moved past v13.9, every addendum it adds is read, and EXECUTE stops and returns unless all are silent on this Modification's subjects |
+
+Because R-P1 and R-P2 are taken, neither goes on the backlog (C-14).
+
+**The EXECUTE session's model and setting.** The invocation repeats the reading in [typesafe-execute.md](evidence/20261027-gcfpe-backlog-open-items/typesafe-execute.md) (TypeSafe v8.2: Opus 5.5 at extra high) and ends "Nathan picks the cell"; it states no pick, so none is recorded.
 
 ## §E — Execution
 
