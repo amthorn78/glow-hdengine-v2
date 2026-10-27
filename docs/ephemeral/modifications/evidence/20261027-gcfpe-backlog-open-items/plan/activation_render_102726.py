@@ -52,6 +52,14 @@ title, only when the target is the page itself or one of its child pages; every 
 on the page it is written to (MENTION_FORM): inner text, equal to the child-page block's title for a child, or
 self-closing for any other page. frontmatter_paragraph_repair() builds the catalog's one repair operation (X9).
 
+AM-6 (X9b rehearsal, under Nathan's rule 2): when a child page moves out, Notion removes its child-page block and
+leaves one blank line between the blocks around it (none after the page's last block); the chain's move rule
+(remove_children) now does the same, and a mention of a page that is no longer a child is self-closing.
+AM-7 (X9b rehearsal, under Nathan's rule 2): update_content does not match a <br />-joined paragraph as fetch renders
+it, so X9's catalog repair is one replace_content whose new_str is the catalog's AM-4 template (catalog_text), the
+plan's own text for the page; catalog_repair_payload() refuses unless the read is exactly the page C-CAT created
+(as_fetched of the X9 template), so nothing else on the page is replaced.
+
 The successor map is the only source of successor ids, titles and dispositions (W7 successor_page_map); with a
 stand-in map the ids are binding_pass.probe() synthetic ids, so retired predecessors and successors stay distinct,
 and every report says stand_in: true. Control-page text is read as a transient read of this session's harness
@@ -433,6 +441,40 @@ def mention_form_errors(new: str, page_id: str, text: str) -> list:
     return bad
 
 
+def remove_children(text: str, gone) -> str:
+    """AM-6: the page after the children in `gone` move out: each child-page block removed, one blank line left
+    between the blocks around it and none after the last; a mention of a removed child self-closing (AM-5)."""
+    gone = {g.replace("-", "") for g in gone}
+    pat = re.compile(r'\n*<page url="https://app\.notion\.com/p/([0-9a-f]{32})[^"]*">\n[^\n]*\n</page>\n*')
+
+    def cut(m):
+        if m.group(1) not in gone:
+            return m.group(0)
+        return "\n" if m.end() == len(m.string) else "\n\n"
+    out = pat.sub(cut, text)
+    return MENTION.sub(lambda m: f'<mention url="{URL}{m.group(1)}" />' if m.group(1) in gone else m.group(0), out)
+
+
+def x9_template(ctx) -> str:
+    """The catalog text C-CAT sent at X9: catalog_text with its frontmatter lines joined by single line breaks."""
+    ls = catalog_text(ctx).split("\n")
+    j = ls.index("---", 1)
+    rest = ls[j + 1:]
+    while rest and rest[0] == "":
+        rest = rest[1:]
+    return "\n".join(["---", *[x for x in ls[1:j] if x], "---"]) + "\n" + "\n".join(rest)
+
+
+def catalog_repair_payload(read: str, ctx) -> str:
+    """AM-7: the replace_content new_str for X9's catalog repair (catalog_text, the AM-4 template); refused unless the
+    read is exactly the page C-CAT created, so the write changes only the frontmatter's paragraph form."""
+    if read != as_fetched(x9_template(ctx)):
+        raise SystemExit("catalog_repair_payload: the catalog read is not the page C-CAT created")
+    if CHILD_BLOCK.search(read):
+        raise SystemExit("catalog_repair_payload: the catalog has a child page; replace_content would remove it")
+    return catalog_text(ctx)
+
+
 def frontmatter_paragraph_repair(text: str):
     """AM-4/AM-5 (X9): the one update_content that stores a <br />-joined frontmatter paragraph as one paragraph per
     line: (old_str, new_str), or None when the frontmatter holds no joined paragraph. Refused unless it occurs once."""
@@ -598,8 +640,7 @@ def chain(a, ctx: Ctx) -> dict:
         if ph == "archived":
             gone = set(ctx.moves)
             for st in state.values():
-                st["text"] = re.sub(r'\n?<page url="https://app\.notion\.com/p/([0-9a-f]{32})">\n[^\n]*\n</page>\n?',
-                                    lambda m: "\n" if m.group(1) in gone else m.group(0), st["text"])
+                st["text"] = remove_children(st["text"], gone)
         for key in keys:
             if key not in state:
                 continue
@@ -808,6 +849,7 @@ def selftest(a) -> dict:
         **_am3_cases(ctx),
         **_am4_cases(ctx),
         **_am5_cases(ctx),
+        **_am6_am7_cases(ctx),
         **_part17_cases(ctx),
         **_c26_cases(a),
     }
@@ -947,6 +989,36 @@ def _am5_cases(ctx: Ctx) -> dict:
             new == "artifact\\_type: X\n\nstatus: Y\n\npromotion\\_authorized: false"
             and "<br />" not in repaired and frontmatter_paragraph_repair(repaired) is None
             and frontmatter_paragraph_repair(as_fetched(catalog_text(ctx))) is None),
+    }
+
+
+def _am6_am7_cases(ctx: Ctx) -> dict:
+    """AM-6: a moved-out child leaves one blank line (X9b's read), none at the end; AM-7: the catalog repair."""
+    kid = "b" * 32
+    block = f'<page url="{URL}{kid}">\nKid\n</page>'
+    middle = f'A <mention url="{URL}{kid}">Kid</mention>.\n\n{block}\n\n## Next\n'
+    end = f"A.\n\n{block}\n"
+    old_rule = re.sub(r'\n?<page url="https://app\.notion\.com/p/([0-9a-f]{32})">\n[^\n]*\n</page>\n?', "\n", middle)
+    created = as_fetched(x9_template(ctx))
+
+    def refused(fn):
+        try:
+            fn()
+        except SystemExit:
+            return True
+        return False
+    return {
+        "am6_middle_child_leaves_one_blank_line": remove_children(middle, {kid}) == f'A <mention url="{URL}{kid}" />.\n\n## Next\n',
+        "am6_end_child_leaves_one_newline": remove_children(end, {kid}) == "A.\n",
+        "am6_old_rule_left_an_extra_blank_line": "\n\n\n## Next" in old_rule,
+        "am6_other_children_kept": remove_children(middle, {"c" * 32}) == middle,
+        "am7_repair_is_the_am4_template_on_the_created_page": (
+            catalog_repair_payload(created, ctx) == catalog_text(ctx)
+            and as_fetched(catalog_text(ctx)) != created and "<br />" in created
+            and "<br />" not in as_fetched(catalog_text(ctx))),
+        "am7_repair_refused_on_any_other_read": (
+            refused(lambda: catalog_repair_payload(created.replace("56", "55", 1), ctx))
+            and refused(lambda: catalog_repair_payload(as_fetched(catalog_text(ctx)), ctx))),
     }
 
 

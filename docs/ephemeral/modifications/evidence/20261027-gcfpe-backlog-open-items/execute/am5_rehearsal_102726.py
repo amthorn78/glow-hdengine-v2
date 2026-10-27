@@ -14,8 +14,8 @@ repair, P1a's page creation, the P1 titles, the P5 moves, X25's banners and navi
 backlog dispositions (from the backlog's own structure). Each form is mapped to the rehearsal stage that covers it.
 
 The rehearsal, in order (each write sent once; each page read back and compared after each stage):
-  1  create the draft (private, workspace level): the 102726.1 catalog's text with its frontmatter in X9's
-     single-break form, plus the anchors the later stages use
+  1  create the draft (private, workspace level): the 102726.1 catalog's text (its first three member rows) with
+     its frontmatter in X9's single-break form, plus the anchors the later stages use
   2  create the child under the draft: the register entry (AM-5's template)
   3  one update_content on the draft: the catalog's frontmatter repair, C-FI, P2-REG-SEL, P6-OV-FIND (a span over
      lines), P1d-FI-ACT (a span on one line), P5-FI-DISP (a whole line), the two generated member-row operations (a
@@ -27,6 +27,12 @@ The rehearsal, in order (each write sent once; each page read back and compared 
   7  insert_content at the start of the draft: a dated banner (X25's form)
   8  update_properties: the child retitled (the P1 titles' form)
   9  move the child to the workspace level (the P5 moves' form)
+The one repeat Nathan allows (rule 1), on the same two pages, after the first pass's fixes (AM-6, AM-7):
+  10 replace_content of the draft: its text with the joined frontmatter paragraph as one paragraph per line, sent in
+     its written form (AM-7's form for X9's catalog repair)
+  11 one update_content on the draft: P1b-CAT-1 .. 8, held from stage 5 because their anchors needed the repair
+  12 move the child back under the draft (a page parent, as P5's moves are)
+  13 move the child to the workspace level again (AM-6's rule)
 The plan's model of each stage is activation_render_102726's: as_fetched for a created page, apply() for an
 update_content (page_id given, so AM-5's mention rule applies), its append rule, add_child for a created child; and,
 for a retitle and a move, the chain's own rules (the child-page block's title follows the page, a moved page leaves
@@ -60,7 +66,7 @@ CHILD_RETITLE = "AM-5 rehearsal child — retitled, to be deleted"
 BANNER = ("<b>Historical record, superseded 2026-10-28.</b> The selected release is <code>GCFPE-20261027.1</code> / "
           "<code>102726.1</code>; see the [release register](https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1).")
 PE_PRED = "3f44590a05eb81f98b76c83465dc1960"
-STAGES = range(1, 10)
+STAGES = range(1, 14)
 
 
 def load():
@@ -83,7 +89,14 @@ def context(ar, parts, draft="d" * 32, child="e" * 32):
 
 def draft_content(ar, ctx) -> str:
     cat = ar.catalog_text(ctx)
-    ls = cat.split("\n")
+    rows_seen = [0]
+
+    def keep(line):   # the catalog's first three member rows: the forms are the same, the page shorter
+        if line.startswith("| <code>"):
+            rows_seen[0] += 1
+            return rows_seen[0] <= 3
+        return True
+    ls = [x for x in cat.split("\n") if keep(x)]
     j = ls.index("---", 1)
     rest = ls[j + 1:]
     while rest and rest[0] == "":
@@ -149,8 +162,10 @@ def remention(ar, text, page_id, children):
     return re.sub(r'<mention url="https://app\.notion\.com/p/([0-9a-f]{32})"(?: />|>[^<]*</mention>)', sub, text)
 
 
-def models(ar, ctx, draft, child, upto):
-    """[(stage, draft_text, child_text, child_title, payload)] up to `upto`, each stage applied to the previous model."""
+def models(ar, ctx, draft, child, upto, held=()):
+    """[(stage, draft_text, child_text, child_title, payload)] up to `upto`, each stage applied to the previous model.
+    `held`: operation ids left out of this pass (the X9b first pass: the catalog repair, which Notion did not match,
+    and the catalog operations whose anchors it creates)."""
     d = ar.as_fetched(draft_content(ar, ctx))
     out = [(1, d, None, None, {"title": DRAFT_TITLE, "content": draft_content(ar, ctx)})]
     k, ktitle = None, CHILD_TITLE
@@ -161,7 +176,7 @@ def models(ar, ctx, draft, child, upto):
             k = ar.as_fetched(ar.entry_text(ctx))
             d = ar.add_child(d, child, CHILD_TITLE)
         elif st in (3, 5):
-            ops = stage_ops(ar, ctx, st, draft, child, d)
+            ops = [o for o in stage_ops(ar, ctx, st, draft, child, d) if o["id"] not in held]
             d, rows = ar.apply(d, ops, ctx, draft)
             pay = {"page_id": draft, "rows": rows}
         elif st == 4:
@@ -180,10 +195,21 @@ def models(ar, ctx, draft, child, upto):
             ktitle = CHILD_RETITLE
             d = remention(ar, d, draft, {child: CHILD_RETITLE})
             pay = {"page_id": child, "title": CHILD_RETITLE}
-        elif st == 9:
-            d = re.sub(r'\n?<page url="https://app\.notion\.com/p/' + child + r'">\n[^\n]*\n</page>\n?', "\n", d)
-            d = remention(ar, d, draft, {})
+        elif st in (9, 13):
+            d = ar.remove_children(d, {child})   # AM-6
             pay = {"page_id": child, "new_parent": "workspace"}
+        elif st == 10:
+            joined = [x for x in d.split("\n") if "<br />" in x]
+            assert len(joined) == 1 and d.count(joined[0]) == 1
+            d = d.replace(joined[0], "\n\n".join(s.strip() for s in joined[0].split("<br />")))
+            pay = {"page_id": draft, "replace": True, "new_str": ar.C.unescape(d)}
+        elif st == 11:
+            ops = [op_by_id(ar, f"P1b-CAT-{i}") for i in range(1, 9)]
+            d, rows = ar.apply(d, ops, ctx, draft)
+            pay = {"page_id": draft, "rows": rows}
+        elif st == 12:
+            d = remention(ar, ar.add_child(d, child, ktitle), draft, {child: ktitle})
+            pay = {"page_id": child, "new_parent": draft}
         out.append((st, d, k, ktitle, pay))
     return out
 
@@ -326,6 +352,7 @@ def main() -> int:
     ap.add_argument("--child", default="e" * 32)
     ap.add_argument("--fetched-after", default="")
     ap.add_argument("--pin", action="append", default=[])
+    ap.add_argument("--held", nargs="*", default=[])
     a = ap.parse_args()
     ar = load()
     if a.mode == "inventory":
@@ -334,10 +361,13 @@ def main() -> int:
         return 0 if res["ok"] else 1
     ctx = context(ar, a.parts, a.draft, a.child)
     if a.mode == "render":
-        m = models(ar, ctx, a.draft, a.child, 2)
+        m = models(ar, ctx, a.draft, a.child, 2, set(a.held))
         print(json.dumps(m[0][4] if a.page == "draft" else m[1][4], ensure_ascii=False, indent=1))
         return 0
-    ms = models(ar, ctx, a.draft, a.child, max(a.stage, 1))
+    held = set(a.held)
+    if "X9-CAT-REPAIR" in held:
+        held |= {f"P1b-CAT-{i}" for i in range(1, 9)}
+    ms = models(ar, ctx, a.draft, a.child, max(a.stage, 1), held)
     if a.mode == "plan" and a.stage < 2:
         print(json.dumps({"ok": False, "error": "STAGE_1_IS_RENDER"}))
         return 1
