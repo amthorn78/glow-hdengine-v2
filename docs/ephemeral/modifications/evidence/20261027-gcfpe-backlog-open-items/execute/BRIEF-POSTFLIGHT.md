@@ -117,7 +117,7 @@ repository root, with VALUES and PINS below:
       @QUAL_VALIDATORS_PATH=docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/x14r-bodies-102726.1.json
       @QUAL_FIXTURES_PATH=docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/x14r-bodies-102726.1.json
       @QUAL_RECEIPT_PATHS=<code>docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/x14r-bodies-102726.1.json</code> (the shipped validators and fixtures over the 56 bodies) and <code>docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/x15-registry-102726.1.json</code> (the registry's assertions)
-      @D24_RECORDS=@@D24_RECORDS@@
+      @D24_RECORDS=<code>docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/REVIEW-D24-A.md</code> and <code>docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/REVIEW-D24-B.md</code>: both <code>SKILL_FIT_CONFIRMED</code>, 0 required findings, on the four packages' digests; their listed findings are in the promotion packet
     stand-ins (the values exist only later; a stand-in is not a finding):
       @ACTIVATION_DATE=2026-10-28
       @ARCHIVAL_DATE=2026-10-28
@@ -163,7 +163,13 @@ L3. activation_render_102726.py plan --chain --from-phase review does not model 
     rendered by (b), on their real reads, as P1 itself renders them. The author recorded this in §E.
 L4. C-FI-REV (C4, the review line on the Flow Index) is not yet written: X18 writes it after your review, as (a)
     renders it.
-L5. The four packages are under their own D24 review: @@D24_STATUS@@ You check that the packages' gates pass and
+L5. The four packages are under their own D24 review: both reviewers returned SKILL_FIT_CONFIRMED with 0
+    REQUIRED findings on the digests of E/execute/BRIEF-D24.md §1 (E/execute/REVIEW-D24-A.md, -B.md), with three
+    LISTED findings; you may read those records. Two of the LISTED findings are one: the D24 brief's expected result
+    for package_apply.py --check on the extracted trees (104 LANDED, SR-W7-CF-04 UNTOUCHED, not 105). The third,
+    REVIEW-D24-B's LISTED-2, is yours to weigh as a flow question: no package gate checks what CL-05's handoff to
+    the closure receiver (Isis) carries, while CL-E-10 and CL-C-10 still read `QA_REPORT_ID` and `QA_RCA_ID`. Read
+    CL-05's body for it. You check that the packages' gates pass and
     that they fit the release, not their code quality.
 L6. The open findings accepted at plan approval are in PLAN §10 and the record's §P; restating one is not a new
     finding. The suite's three pre-existing FMV-SKILL-STRUCTURE-001 findings on human-design-reading-flowmaster
