@@ -815,27 +815,27 @@ Because R-P1 and R-P2 are taken, neither goes on the backlog (C-14).
 | X6a | PART-24 (Nathan's condition 1) | VERIFIED | After X5 and before the rest of X6, CF-C-30 was sent alone: its operations carry all three span forms (`<code>`, `<b>` and `\_`). 13:02Z: one update_content, 10 operations (W2-CF-C-30-BC-1 and -BC-2, C16-CF-C-30-01, `HEAD-CF-C-30-T` and 6 binding operations; `HEAD-CF-C-30-U` satisfied by duplication), success with no warning. Fresh read (as of 13:03:01.779Z): `body_check.py check --prompts CF-C-30` `ok` ([execute/x6a-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x6a-check-102726.1.json)): revision moved; every operation `LANDED`; bindings current; 14 of 14 guards pass. The `<code>PF04-Canon-HDE-Governance</code>` span, both `<b>…— 102726.1</b>` titles and the `INITIAL\_APPROVE` and `INITIAL\_DENY, CORRECTION\_REDLINE, or DELTA\_DENY` escapes read back exactly as sent, and no `— 100926.1</b>` remains. So every operation LANDED before the remaining pages were written (Nathan's condition 1) |
 | X6 | PART-01, 03–14, 24, 26, 27 | APPLIED | 13:07–13:24Z, by six write workers, one lane each, two at a time. One update_content on each of the remaining 54 successors, each payload printed on stdout by `execute/payload_102726.py` from `body_check.py plan` on the X4 read and sent once: 1,117 operations, one call per page (no page needed the `--max-chars` fallback); every call returned success, with no warning. With X5's 9 and X6a's 10: 56 pages, 1,136 operations ([execute/x6-writes-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x6-writes-102726.1.json), ids and counts only). The 54 head self-mentions satisfied by duplication were not sent (AM-1) |
 | X7 | all body parts | VERIFIED | Fresh reads of the 56 successors and GCFPE-MGMT-10 by seven read-only workers after 13:24:41.758Z. `body_check.py check --successor-map <map> --with-conditional R-P1 R-P2` ([execute/landing-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/landing-check-102726.1.json), counts, ids and revisions only): on all 56 written pages `ok`, each revision moved from its map pin; 447 checked operations, every one `LANDED`; bindings current on all 57; 756 of 756 guard rows pass, so every forbidden guard finds no surviving old text (template rule 4, D26-E); `G-W7-BIND-1` and `G-W8-NAME-1` 0 on all 57 bodies and `G-W7-REL-1` 0 on its 56. GCFPE-MGMT-10 is the only row with `ok` false, and only on `revision_moved`: it is the KEPT member, with no operations, and the plan does not change it (PLAN §2), so its revision stays at its pin as it must. `body_check.py registry --audit-root <installed amthor-workspace-governance-audit>`: `ok`; 329 fixture rows and 756 page rows, the registry form agreeing on every row |
-| X8 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X9 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X10 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X11 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X12 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X13 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X14 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X15 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X16 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X17 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X18 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X19 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X20 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X21 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X22 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X23 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X24 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X25 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X26 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X27 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
-| X28 | — | NOT_RUN | the stop at X4 (*Failure record — 2026-10-27, X4*) |
+| X8 | PART-17, 21 | BLOCKED | Fresh reads of the Hub and the register after 13:29:44.374Z: the Hub at `2026-10-27T03:02:37.191Z`, pinned at that read (`--pin`), and the register at its pin `2026-10-12T17:17:45.991Z`. `activation_render_102726.py plan --phase part17`: `ok`. On the Hub, 21 operations apply and none is refused, with its notion-control guards at W6's before-counts (`G-W6-HUB-F` 13, RH 0, RN 0, RP 0); on the register, 3 apply, with `G-W6-REG-F` 4 and RN 0. 13:30–13:31Z: one update_content per page, the register's 3 then the Hub's 21, each returning success with no warning. Fresh reads after 13:31:46.801Z: `activation_render_102726.py check --phase part17` `ok` false ([execute/x8-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8-check-102726.1.json)). Both revisions moved, and every guard is at W6's after-count (`G-W6-HUB-F` 0, RH 4, RN 2, RP 2; `G-W6-REG-F` 2, RN 2), with control `ok` and 0 findings on both. But only 22 of 24 operations read `LANDED`: `W6-REG-3` and `W6-HUB-10` hold their text in Notion's split-bold form (*Failure record — 2026-10-27, X8*). The register's *Current selection* is unchanged |
+| X9 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X10 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X11 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X12 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X13 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X14 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X15 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X16 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X17 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X18 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X19 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X20 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X21 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X22 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X23 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X24 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X25 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X26 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X27 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
+| X28 | — | NOT_RUN | the stop at X8 (*Failure record — 2026-10-27, X8*) |
 
 ### Failure record — 2026-10-27, X2 (D26-B)
 
@@ -1014,3 +1014,58 @@ Nathan's words:
   - Guard rows: 756, of which 295 fail before and 0 after.
   - Only CL-E-20 and DOC-10 changed against the first X4 run, each gaining one binding operation.
 - **The dry run before X5, Nathan's addition.** Its result is recorded below as X4b, before any body write.
+
+### Failure record — 2026-10-27, X8 (D26-B)
+
+EXECUTE stops at X8, after PART-17's two writes. X8's verification requires all 24 operations `LANDED`. 22 do; the other two hold their text in a form the landing check does not read as landed. D26-B applies.
+
+- **What failed.** `activation_render_102726.py check --phase part17` on fresh reads after 13:31:46.801Z ([execute/x8-check-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x8-check-102726.1.json)): `ok` false.
+  - The register: 2 of 3 operations `LANDED`; `W6-REG-3` not.
+  - The Glow Operations Hub: 20 of 21; `W6-HUB-10` not.
+  - Both revisions moved.
+  - Every PART-17 guard passes at W6's after-count: `G-W6-HUB-F` 0, `G-W6-HUB-RH` 4, `G-W6-HUB-RN` 2, `G-W6-HUB-RP` 2, `G-W6-REG-F` 2, `G-W6-REG-RN` 2.
+  - Both pages' control judgement is `ok`, with 0 findings.
+  - The register's first current section is still *Current selection — GCFPE-20261009.1 / 100926.1*.
+- **The cause.** `W6-REG-3` and `W6-HUB-10` are the same edit on the two pages. It extends a sentence inside a bold run, "superseded for required GCFPE read-only source checks:", with ", and for addendum numbering by `<code>PF06-Canon-Change-Process-Guide</code>` §0.1A:".
+  - Notion stored the inline code by closing and reopening the bold around it: `…by </b><b><code>PF06-Canon-Change-Process-Guide</code></b><b> §0.1A:`.
+  - On each page that form occurs once, the planned raw form occurs 0 times, and the normalized page text contains the normalized planned text. The bold runs balance.
+  - The landing check compares raw text (C-15 keeps landing on the raw read), so it reads both as not landed.
+  - The 56 bodies had no such case: all 447 checked operations landed at X7.
+- **Why it blocks.** X9's `activation_render_102726.py plan --phase candidate` refuses any page on which an earlier phase's listed operation has not landed. The register is that page: C-REG is appended to it at X9, and P2 writes it later. The Hub's later sweep operations meet the same refusal.
+- **Read-only sweep.** No page has changed since its last read:
+  - the two X8 pages, read after their writes (above);
+  - the 56 successors and GCFPE-MGMT-10, read at X7 after their writes (after 13:24:41.758Z);
+  - the Flow Index and the five hubs, read at 12:30, before the body writes. The writes do not touch them, but a page's revision is the newest edit in its subtree, so the hubs' revisions have moved; that is expected, and X9 re-pins them.
+- **What is live.**
+  - Notion: the 56 successors with all 1,136 operations, the register's three PART-17 operations, and the Hub's twenty-one. Nothing else changed: no candidate record, no catalog, no selection.
+  - Repository: this branch, in draft [amthorn78/glow-hdengine-v2#772](https://github.com/amthorn78/glow-hdengine-v2/pull/772).
+  - Skills: nothing built or installed.
+- **The freeze is kept.** No Notion write follows until Nathan decides.
+- **The record reaches `main`** when #772 merges (D21-C).
+
+### Return to Nathan — 2026-10-27, after X8
+
+**EXECUTE stopped at X8. Both PART-17 pages hold every planned edit, and all their guards pass. But on one edit per page Notion stored the inline code by splitting the surrounding bold, so the raw landing check reads 2 of 24 operations as not landed. X9 refuses to write the register until they read as landed. `DECISION NEEDED`.**
+
+| # | Question | Recommendation |
+|---|---|---|
+| 1 | How the landing check treats Notion's split bold | amendment AM-3, below |
+| 2 | The record pull request | mark #772 ready and merge it as the record pull request |
+
+**1. The repair.** The landing check proves an operation's replacement is on the page. Notion rewrites `<b>A <code>B</code> C</b>` as `<b>A </b><b><code>B</code></b><b> C</b>`: the same text and formatting, in a different raw form. If nothing changes, X9 refuses the register, and every later step that writes the register or the Hub refuses the same way.
+- **Option A, AM-3 (recommended).** In `plan/activation_render_102726.py`'s landing predicate, an operation also counts as `LANDED` when the page holds its replacement after one fold: `</b><b><code>` read as `<code>`, and `</code></b><b>` as `</code>`, on the read and the replacement alike. Nothing else changes.
+  - With it: a self-test case each way (a split replacement lands; a missing one still does not), the self-tests rerun, and X8's check rerun on these same reads, before X9's first write.
+  - Cost: about 30 minutes and under 0.3M tokens.
+  - The prompt bodies need no change: none of their operations met this form.
+- **Option B: a re-write.** Write the two sentences again in Notion's split form, so the raw check matches. That is two more Notion writes, outside the plan's operations, and the next nested code span would stop the run the same way.
+
+**2. Record pull request.** Draft #772 carries this record, AM-2, the X4b dry run and every receipt through X7.
+- **Mark it ready and merge it now (recommended).** The run continues on this branch, restarted from `main`, in a new pull request.
+- **Keep it open.** The X8 record stays off `main` until it merges.
+
+**Spend in EXECUTE so far.**
+- **Time:** about 2 h 15 min, 11:20Z to 13:36Z.
+- **Tokens:** about 7.8M of subagent tokens, plus the coordinator's. Reads were about 5.7M; the duplication and write lanes 2.0M.
+- That is inside the 18–30 h and 16–26M re-price.
+
+**In one line, if you take the recommendations:** "AM-3 as described (option A); I merge #772 as the record pull request."
