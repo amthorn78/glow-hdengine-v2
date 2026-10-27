@@ -1,0 +1,158 @@
+{
+ "record_type": "GCFPE_102726_X15_REGISTRY",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "step": "X15",
+ "stand_in_used": false,
+ "stand_ins": [
+  "@PROMOTION_APPROVAL_DATE 2026-10-27 in the selected-stage build only (to scratch); the real value is X26's"
+ ],
+ "base": {
+  "source": "git show origin/main:docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+  "origin_main": "4823eaec3d9b8dc45d1f497f55213c7857d58871",
+  "sha256": "1b1507ed5deb02f5d42cdd74af6f3ea9f09047f9fd0782818bee29cea8e7d5b7",
+  "bytes": 535408
+ },
+ "inputs": {
+  "audit_root": "installed amthor-workspace-governance-audit (copied)",
+  "graph_contract": "installed glow-graph-contract (copied)",
+  "parts_sha_count": 57,
+  "revisions": "execute/landing-check-102726.1.json check.pages[*].as_of (X7), 57 pages",
+  "catalog_record": "execute/notion-controls-102726.1.json @CATALOG_PAGE_ID 4064590a05eb8113ae7de73041631c00",
+  "fetched_after": "2026-10-27T20:14:34.643Z"
+ },
+ "build_candidate": {
+  "exit": 0,
+  "ok": true,
+  "error": null,
+  "rows": 56,
+  "bytes": 1419546,
+  "read_back_equal": true,
+  "successor_rows": 54,
+  "kept_rows": [
+   "GCFPE-MGMT-10"
+  ],
+  "added_rows": [
+   "CL-05"
+  ],
+  "hand_edits": [
+   "CL-C-10 inputs gain CLOSE_MUTATION_SET_RESULT (W5 RE-4 other_rows)",
+   "CL-E-10 inputs gain CLOSE_MUTATION_SET_RESULT (W5 RE-4 other_rows)",
+   "QA-80 inputs (W4 PART-10)",
+   "header workspace_skill_registry_disposition: all 56 rows (W5 RE-4 member facts)"
+  ],
+  "plan_assertions_added": 736,
+  "stand_in_used": false,
+  "sha256": "137a911eda1e782b3de4a1d76eaa7463d940a43b38bdaf8824e52b1c4b100e52"
+ },
+ "rebuild_byte_identical": true,
+ "report_form_build_byte_identical": true,
+ "check_candidate": {
+  "exit": 0,
+  "mode": "check",
+  "stage": "candidate",
+  "validator_errors": 0,
+  "validator_error_codes": [],
+  "validator_warnings": 0,
+  "deriver_drift": [],
+  "rows_without_part": [],
+  "rows": 56,
+  "rows_active": 56,
+  "row_keys_unique": true,
+  "cl05_before_cl20": true,
+  "header_values_ok": true,
+  "header_values_failing": [],
+  "markers_left": [],
+  "release_literals_left": [],
+  "parent_titles_in_control_titles": true,
+  "ok": true
+ },
+ "assertions_synthetic_inject": {
+  "exit": 0,
+  "mode": "assertions",
+  "form": "SYNTHETIC_INJECT",
+  "engine": "amthor-workspace-governance-audit _evaluate_assertions",
+  "rows": 56,
+  "rows_ok": 56,
+  "failing_rows": [],
+  "ok": true,
+  "d22": "no prompt body is read or written; body-level assertions are A5's",
+  "required_reported_total": 860,
+  "forbidden_injected_reported_total": 112
+ },
+ "assertions_body_landed_inject": {
+  "exit": 0,
+  "error": null,
+  "form": "BODY_LANDED",
+  "text_form": "normalize_fetch.normalize (C-15)",
+  "stand_in": false,
+  "rows_total": 56,
+  "rows_ok": 56,
+  "findings_total": 0,
+  "rows_with_findings": 0,
+  "ok": true,
+  "rows_not_fetched": [],
+  "operations_not_landed": {},
+  "injected_fired_total": 972,
+  "injected_missed": {},
+  "rows_failing": [],
+  "as_of_min": "2026-10-12T02:30:05.584Z",
+  "as_of_max": "2026-10-27T13:22:27.779Z"
+ },
+ "build_selected_standin": {
+  "exit": 0,
+  "ok": true,
+  "error": null
+ },
+ "check_selected_standin": {
+  "exit": 0,
+  "ok": true,
+  "validator_errors": 0,
+  "deriver_drift": [],
+  "rows": 56,
+  "rows_active": 56,
+  "header_values_ok": true
+ },
+ "compare": {
+  "exit": 0,
+  "mode": "compare",
+  "differing_paths": [
+   "approved_at",
+   "approved_by",
+   "status"
+  ],
+  "preamble_lines_differing": [
+   3,
+   4,
+   5
+  ],
+  "ok": true
+ },
+ "selftest": {
+  "exit": 0,
+  "mode": "selftest",
+  "rows": {
+   "clean_build_passes": true,
+   "clean_check_passes": true,
+   "refuses_non_selected_base": true,
+   "refuses_missing_revision": true,
+   "refuses_unfilled_marker": true,
+   "refuses_typed_catalog_id": true,
+   "refuses_catalog_record_without_page_id": true,
+   "refuses_map_missing_member": true,
+   "check_reports_derivation_drift": true,
+   "check_fails_55_rows": true,
+   "check_fails_inactive_row": true,
+   "check_fails_stale_title": true,
+   "check_fails_header_value": true,
+   "clean_assertions_pass": true,
+   "assertions_report_dropped_forbidden": true,
+   "assertions_report_vacuous_required": true,
+   "c15_assertions_pass_on_normalized_text": true,
+   "c15_injected_raw_text_reported": true,
+   "c15_assertion_text_idempotent": true
+  },
+  "selftest_ok": true,
+  "ok": true
+ },
+ "ok": true
+}
