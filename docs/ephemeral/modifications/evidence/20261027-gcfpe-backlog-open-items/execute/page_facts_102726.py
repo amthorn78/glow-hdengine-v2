@@ -12,13 +12,15 @@ line, and the number of child-page tags in the body. No body text is printed, ha
     page_facts_102726.py dupready --fetched-after T --source-after T0 DUPLICATE SOURCE
 
 `dupready` is X2's wait for an asynchronous duplicate: on the newest fetch of DUPLICATE after T and of SOURCE after
-T0 it reports the duplicate's parent and title, and `ready` when both bodies have the same character count and the
-same first line (counts and booleans only).
+T0 it reports the duplicate's parent and title, and `ready` when both bodies have the same number of lines and the
+same first line (counts and booleans only). Character counts are not compared: Notion remaps a duplicate's own
+references to the new page and suffixes their titles, so a complete duplicate's length differs (X2 failure record).
 
 `x2` reads the duplication results ({"rows": [{"prompt", "source", "duplicate", "parent", "title"}]}) and checks,
 on the newest fetch of each duplicate and each source after T: the duplicate's parent is the planned parent, its
 title is exact, its body's first line equals the source's first line, it has no child page, and the source's
-revision equals its X0 read (from the X0 dry-run receipt's N2 rows, or edits.json's pin). Run with
+revision equals its X0 read (from the X0 dry-run receipt's N2 rows, or edits.json's pin), and both bodies have the
+same number of lines (populated; character counts differ by Notion's self-reference remap). Run with
 PYTHONDONTWRITEBYTECODE=1 and CLAUDE_CODE_SESSION_ID set.
 """
 from __future__ import annotations
@@ -108,7 +110,7 @@ def facts(page_id: str, root: str, session: str, since: int, fetched_after: str)
     first = body.split("\n", 1)[0] if body else ""
     return {"page_id": page_id, "captured": captured, "as_of": as_of, "title": title,
             "parent": pm.group(1) if pm else None, "child_pages": len(CHILD.findall(body)),
-            "body_chars": len(body), "_first": first}
+            "body_chars": len(body), "body_lines": body.count("\n"), "_first": first}
 
 
 def main() -> int:
@@ -128,11 +130,12 @@ def main() -> int:
     if a.mode == "dupready":
         d = facts(a.ids[0], a.harness_root, a.session, a.since_minutes, a.fetched_after)
         s = facts(a.ids[1], a.harness_root, a.session, a.since_minutes, a.source_after)
-        ready = (not d.get("error") and not s.get("error") and d.get("body_chars") == s.get("body_chars")
+        ready = (not d.get("error") and not s.get("error") and d.get("body_lines") == s.get("body_lines")
                  and d.get("_first") == s.get("_first"))
         print(json.dumps({"mode": "dupready", "duplicate": a.ids[0], "source": a.ids[1], "duplicate_as_of": d.get("as_of"),
                           "parent": d.get("parent"), "title": d.get("title"), "child_pages": d.get("child_pages"),
-                          "chars_equal": d.get("body_chars") == s.get("body_chars"),
+                          "lines_equal": d.get("body_lines") == s.get("body_lines"),
+                          "chars_delta": (d.get("body_chars") or 0) - (s.get("body_chars") or 0),
                           "head_equal": d.get("_first") == s.get("_first"),
                           "errors": [x.get("error") for x in (d, s) if x.get("error")], "ready": ready},
                          ensure_ascii=False))
@@ -163,10 +166,11 @@ def main() -> int:
              "no_child_page": d.get("child_pages") == 0,
              "source_revision_unchanged": s.get("as_of") is not None and s.get("as_of") == pins.get(row["prompt"]),
              "distinct": row["duplicate"] not in seen and row["duplicate"] != row["source"],
+             "populated": d.get("body_lines") is not None and d.get("body_lines") == s.get("body_lines"),
              "errors": [x.get("error") for x in (d, s) if x.get("error")]}
         seen.add(row["duplicate"])
         r["ok"] = all(r[k] for k in ("parent_ok", "title_ok", "head_ok", "no_child_page",
-                                      "source_revision_unchanged", "distinct")) and not r["errors"]
+                                      "source_revision_unchanged", "distinct", "populated")) and not r["errors"]
         ok &= r["ok"]
         out.append(r)
     print(json.dumps({"mode": "x2", "rows": out, "rows_total": len(out), "rows_ok": sum(1 for r in out if r["ok"]),
