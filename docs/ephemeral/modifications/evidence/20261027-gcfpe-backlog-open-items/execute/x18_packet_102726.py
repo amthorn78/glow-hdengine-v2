@@ -109,8 +109,17 @@ def build(delivery: Path) -> str:
         w(f"| {k} | `{p['skill_sha256']}` | {p['skill_bytes']:,} | `{p['extracted_freeze']}` |")
     w("\nAdvertised revisions: change-flow 3.5.0, flowmaster-validate 3.5.0 (`SKILL_TREE_SHA256` "
       "`e5723d286cecc4768050e76d64e03a4f59dd67ca1900c2aa5c18da348bb19779`), glow-hde-pr-development 1.5.0; glow-graph-contract "
-      "advertises none. Unchanged: amthor-workspace-governance-audit, session-relay-flowmaster, glow-write-boundary, "
-      "typesafe-scoring, glow-merged-change-attribution-lock.\n")
+      "advertises none.\n")
+    fr = x13["roots"]["plain"]["freeze"]
+    w("**The five unchanged skills** (installed; X13r's trees, `freeze.py`, D28 name-line form). P0 and P3 compare all nine "
+      "digests, these and the four above.\n")
+    w("| skill | tree |\n|---|---|")
+    for k in ("amthor-workspace-governance-audit", "session-relay-flowmaster", "glow-write-boundary", "typesafe-scoring",
+              "glow-merged-change-attribution-lock"):
+        w(f"| {k} | `{fr[k]}` |")
+    mp = HERE / "successor-pages-102726.1.json"
+    w(f"\n**The successor map** `execute/successor-pages-102726.1.json`: {mp.stat().st_size:,} B, sha256 `{sha(mp)}` "
+      f"(written once at X3; P0 compares it).\n")
     ct, pt = x11["candidate_token"], x11["production_token"]
     c = x12["contracts"]
     w("**Contracts and graph**\n")
