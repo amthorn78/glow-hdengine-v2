@@ -68,8 +68,9 @@ disagree, the repository governs and the Notion entry is a defect to be correcte
 This material is **not part of the Glow application runtime**. It is excluded from
 application CI — `docs/prompt_ecosystem_management/**` is in `ci.yml`'s `paths-ignore`,
 alongside the other documentation paths — because nothing here affects the application
-build or test surface. `epic-closeout-validation.yml` is `workflow_dispatch` only and
-needs no exclusion.
+build or test surface. `epic-closeout-validation.yml` runs on pull requests that change a
+close pack or the close tooling, and on dispatch; its path filter does not include this
+directory, so it needs no exclusion.
 
 **Three places have to agree, and they did not.** `paths-ignore` only skips the workflow
 when *every* changed file matches it; any other file in the same diff runs the job, and

@@ -4,8 +4,8 @@ Reader v2 exposes the full Magic-10 set as bands only. HDE-EPIC040-PR06a deliver
 
 ## Owning sources
 
-- Normative contract: `PF10-HDE-Build-Notes`, addendum "HDE-EPIC040-PR07-F01 — Add PR06a for Reader v2 Full Magic-10 Exposure and the Deferred Reader Contract Work" (Canon conflict C040-07). While that addendum is active, it is the authoritative source for Reader v2 and supersedes conflicting permanent canon, including the statement in `PF05-Canon-HDE-CLI-API-Vendor-Ref` that the production Reader refuses `v=2`.
-- Drainage: as of HDE-EPIC040-PR07, C040-07 has not been drained into `PF01-Canon-HDE-Math-Spec`, `PF04-Canon-HDE-Governance`, `PF05-Canon-HDE-CLI-API-Vendor-Ref` or `PF12-Canon-HDE-Schemas-and-Artifacts`, nor into the consequential statements of `PF14-Canon-HDE-Mechanics-Guide` and `PF29-Canon-HDE-Users-Guide`. That drainage belongs to their maintainers.
+- Normative contract: HDE CLI/API/Vendor Ref §5 (route and request), HDE Governance (the C040-07 Reader v2 exposure rule) and HDE Schemas & Artifacts (the Reader schemas).
+- Drainage: C040-07 is drained into HDE Governance, HDE CLI/API/Vendor Ref, HDE Schemas & Artifacts, HDE Mechanics Guide and HDE Users Guide. Whether HDE Math Spec §§6.1 to 6.2 need more is open (FND-021, with the Product Owner).
 - Machine contract: `schemas/reader.v2.schema.json` with its `schemas/reader.v2.schema.json.sha256` sidecar. The schema is a release member.
 - Goldens: `goldens/reader/v2/`, written by `scripts/make_reader_v1_goldens.py`.
 
