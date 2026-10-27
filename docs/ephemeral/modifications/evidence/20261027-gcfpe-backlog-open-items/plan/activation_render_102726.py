@@ -46,6 +46,12 @@ P1b-CAT-4, P1b-CAT-7, P1c-PE-3 and P1c-PE-5 in activation-ops.json (make_activat
 what X9 observed, and `apply` refuses a replacement that joins two lines with a single break unless the second is a
 table row or a list item, which Notion keeps as their own blocks (SINGLE_BREAK_JOIN).
 
+AM-5 (Nathan, 2026-10-27, after the X9a rehearsal): Notion stores a page mention with inner text, the target's
+title, only when the target is the page itself or one of its child pages; every other mention is self-closing
+(X9a: 929 stored mentions on 69 pages). `apply` refuses a replacement whose mention does not take its stored form
+on the page it is written to (MENTION_FORM): inner text, equal to the child-page block's title for a child, or
+self-closing for any other page. frontmatter_paragraph_repair() builds the catalog's one repair operation (X9).
+
 The successor map is the only source of successor ids, titles and dispositions (W7 successor_page_map); with a
 stand-in map the ids are binding_pass.probe() synthetic ids, so retired predecessors and successors stay distinct,
 and every report says stand_in: true. Control-page text is read as a transient read of this session's harness
@@ -230,7 +236,7 @@ def resolve(text: str, op: dict):
     return (i, j + len(end)), None, (new, name)
 
 
-def apply(text: str, ops: list, ctx: Ctx):
+def apply(text: str, ops: list, ctx: Ctx, page_id: str | None = None):
     rows = []
     for op in ops:
         op = {**op, "new": ctx.fill(op["new"])}
@@ -242,6 +248,10 @@ def apply(text: str, ops: list, ctx: Ctx):
             continue
         if single_break_join(op["new"]):   # AM-4
             row["refusal"] = "SINGLE_BREAK_JOIN"
+            rows.append(row)
+            continue
+        if page_id is not None and mention_form_errors(op["new"], page_id, text):   # AM-5
+            row["refusal"] = "MENTION_FORM"
             rows.append(row)
             continue
         if op.get("append"):
@@ -401,6 +411,41 @@ def as_fetched(content: str) -> str:
 
 
 LIST_ITEM = re.compile(r"^\s*(- |\* |\d+\. )")
+MENTION = re.compile(r'<mention url="https://app\.notion\.com/p/([0-9a-f]{32})[^"]*"( />|>([^<]*)</mention>)')
+CHILD_BLOCK = re.compile(r'<page url="https://app\.notion\.com/p/([0-9a-f]{32})[^"]*">\n([^\n]*)\n</page>')
+
+
+def mention_form_errors(new: str, page_id: str, text: str) -> list:
+    """AM-5: each mention in `new` that would not be stored as written on page `page_id` (whose text is `text`)."""
+    page_id = (page_id or "").replace("-", "")
+    children = dict(CHILD_BLOCK.findall(text or ""))
+    bad = []
+    for m in MENTION.finditer(new or ""):
+        target, inner = m.group(1), m.group(3)
+        if target == page_id:
+            ok = inner is not None and inner != ""
+        elif target in children:
+            ok = inner is not None and inner == children[target]
+        else:
+            ok = inner is None
+        if not ok:
+            bad.append(target)
+    return bad
+
+
+def frontmatter_paragraph_repair(text: str):
+    """AM-4/AM-5 (X9): the one update_content that stores a <br />-joined frontmatter paragraph as one paragraph per
+    line: (old_str, new_str), or None when the frontmatter holds no joined paragraph. Refused unless it occurs once."""
+    ls = text.split("\n")
+    if not ls or ls[0] != "---":
+        return None
+    j = ls.index("---", 1)
+    joined = [x for x in ls[1:j] if "<br />" in x]
+    if not joined:
+        return None
+    if len(joined) != 1 or text.count(joined[0]) != 1:
+        raise SystemExit("frontmatter_paragraph_repair: the joined paragraph is not unique")
+    return joined[0], "\n\n".join(s.strip() for s in joined[0].split("<br />"))
 
 
 def single_break_join(new: str) -> bool:
@@ -562,7 +607,7 @@ def chain(a, ctx: Ctx) -> dict:
             ops = page_ops(key, ph)
             gen = generated(key, page, state[key]["text"], ph, ctx)
             if ops or gen:
-                text, rows = apply(state[key]["text"], ops + gen, ctx)
+                text, rows = apply(state[key]["text"], ops + gen, ctx, ctx.values.get(key, key))
                 state[key]["text"] = text
                 refused = [{"id": r["id"], "refusal": r["refusal"], **({"markers": r["markers"]} if "markers" in r else {})}
                            for r in rows if not r["applied"]]
@@ -643,7 +688,7 @@ def run_plan(a) -> dict:
             row["part17_guards_before"] = b["guards"]
             row["part17_before_equals_w6"] = b["ok"]
         gen = generated(key, page, got[3], a.phase, ctx)
-        text, rows = apply(got[3], ops + gen, ctx)
+        text, rows = apply(got[3], ops + gen, ctx, real)
         row.update({"ops_listed": len(ops), "ops_generated": len(gen), "applied": sum(r["applied"] for r in rows),
                     "refused": [{"id": r["id"], "refusal": r["refusal"]} for r in rows if not r["applied"]]})
         title = page.get("titles", {}).get(a.phase) or got[2]
@@ -762,6 +807,7 @@ def selftest(a) -> dict:
         "standin_values_accepted_with_real_map_read_only": _real_map_read_only(a),
         **_am3_cases(ctx),
         **_am4_cases(ctx),
+        **_am5_cases(ctx),
         **_part17_cases(ctx),
         **_c26_cases(a),
     }
@@ -867,6 +913,40 @@ def _am4_cases(ctx: Ctx) -> dict:
         "am4_table_rows_and_list_items_may_follow_a_single_break": (
             not single_break_join("| a | b |\n| c | d |") and not single_break_join("text.\n- <b>item</b>")
             and not single_break_join("- a\n- b") and single_break_join("a: 1\nb: 2")),
+    }
+
+
+def _am5_cases(ctx: Ctx) -> dict:
+    """AM-5: a mention is written in the form Notion stores on the page it lands on; the catalog's repair operation."""
+    me, kid, other = "a" * 32, "b" * 32, "c" * 32
+    page = f'Intro.\n<page url="{URL}{kid}">\nKid title\n</page>\n'
+
+    def op(new):
+        return {"id": "M", "start": "Intro.", "end": None, "new": new}
+
+    def refusal(new):
+        return apply(page, [op(new)], ctx, me)[1][0]["refusal"]
+    ent = entry_text(ctx)
+    joined = "---\n\nartifact\\_type: X<br />status: Y<br />promotion\\_authorized: false\n\n---\n\n# T\n"
+    old, new = frontmatter_paragraph_repair(joined)
+    repaired = joined.replace(old, new)
+    return {
+        "am5_other_mention_self_closing_applies": refusal(f'Intro. <mention url="{URL}{other}" />') is None,
+        "am5_other_mention_with_inner_text_refused": refusal(f'Intro. <mention url="{URL}{other}">Other</mention>') == "MENTION_FORM",
+        "am5_child_mention_with_its_title_applies": refusal(f'Intro. <mention url="{URL}{kid}">Kid title</mention>') is None,
+        "am5_child_mention_self_closing_or_wrong_title_refused": (
+            refusal(f'Intro. <mention url="{URL}{kid}" />') == "MENTION_FORM"
+            and refusal(f'Intro. <mention url="{URL}{kid}">Old title</mention>') == "MENTION_FORM"),
+        "am5_self_mention_with_inner_text_applies_self_closing_refused": (
+            refusal(f'Intro. <mention url="{URL}{me}">Me</mention>') is None
+            and refusal(f'Intro. <mention url="{URL}{me}" />') == "MENTION_FORM"),
+        "am5_entry_mentions_take_the_stored_form": (
+            "</mention>" not in ent and not mention_form_errors(ent, "e" * 32, "")
+            and '<mention url="https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1" />' in ent),
+        "am5_catalog_repair_gives_paragraphs_once": (
+            new == "artifact\\_type: X\n\nstatus: Y\n\npromotion\\_authorized: false"
+            and "<br />" not in repaired and frontmatter_paragraph_repair(repaired) is None
+            and frontmatter_paragraph_repair(as_fetched(catalog_text(ctx))) is None),
     }
 
 

@@ -1237,3 +1237,68 @@ EXECUTE stops before C-FI. Nathan's rehearsal failed on the created form. The re
 - That is inside the 18–30 h and 16–26M re-price.
 
 **In one line, if you take the recommendations:** "AM-5 as described (option A); I merge #774 as the record pull request."
+
+### Nathan's decisions after X9a — 2026-10-27
+
+Nathan's words:
+
+> "I have merged #774 as the record pull request. Continue on a branch restarted from main, in a new pull request.
+>
+> 1. AM-5 as described (option A), widened.
+> - Before C-FI, inventory every distinct write form in every remaining Notion step, X9 to X28: code, bold, code inside bold, separate-line paragraphs, mentions of the page itself, of a child page and of any other page, Markdown links to a child page and to any other page, page creation, and any other form the inventory finds.
+> - Rehearse all of them in one pass on one private draft page with one child page, no more. Read each write back and compare it with the plan's model.
+> - Then delete both pages, and record the inventory and the results in §E.
+> - If the rehearsal shows a difference, you may fix it under rule 2 and repeat the rehearsal once, on the same two pages before deleting them. If it still fails, stop and return before C-FI.
+>
+> 2. Standing authority for the rest of this run.
+> - When a fresh read shows Notion stored a write in a different form, but its normalized text equals the plan's model, you may fix the plan's model, renderer or check. Never change the content.
+> - Add a self-test case each way, record the fix in §E as the next AM number quoting these words, and continue without returning to me.
+> - For a write form not covered by the rehearsal, rehearse it first on a private draft page and delete the draft.
+>
+> 3. Stop and return to me when any of these holds:
+> - content or meaning would differ from the approved plan;
+> - a live page would be left wrong;
+> - the register's selection write (P2) is affected;
+> - the rehearsal fails after its one repeat.
+>
+> 4. Exit rule, set by me.
+> - After the rehearsal in rule 1, at most two more storage-form amendments are allowed. Fixes made inside the rehearsal do not count.
+> - The run also ends if it reaches 30 hours of session time in total, counted from EXECUTE's start at 2026-10-27 11:20Z.
+> - If either limit is reached, stop at the next safe point before any promotion write, record the state in §E, and return. 100926.1 stays selected, and the remaining work moves to MB-052 on the backlog."
+
+**Applied.**
+
+- **The record pull request.** #774 merged as `e6aebea`, detected by files on `main` (D26-C): the X9a record and its receipts are on `main`, and `main`'s tree equals the branch's (`09eff226…`). The remote branch had been deleted at the merge; the branch was restarted from `main` at `e6aebea` and pushed fresh. The run continues in a new pull request.
+- **AM-5**, committed before any Notion write.
+  - *[plan/make_activation_ops_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/make_activation_ops_102726.py).* A repair after AM-4: the register entry's one inner-text mention, of the register, is written self-closing. The entry sits under the register, so under Notion's rule the register is neither the page nor a child. [plan/activation-ops.json](evidence/20261027-gcfpe-backlog-open-items/plan/activation-ops.json) was rebuilt by the generator; only `new_pages.REGISTER_ENTRY` changed.
+  - *[plan/activation_render_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/activation_render_102726.py).*
+    - `apply` refuses a replacement whose mention would not be stored as written on its page (`MENTION_FORM`). A mention of the page itself must carry inner text. A mention of a child must carry inner text equal to the child-page block's title. Any other mention must be self-closing.
+    - The chain and `plan` pass the page's id.
+    - `frontmatter_paragraph_repair()` builds X9's catalog repair from the read: the joined paragraph, unique, becomes one paragraph per line.
+  - *Self-tests, a case each way.*
+    - `make_activation_ops_102726.py selftest`: `ok`, 15 rows. The entry's mention is self-closing; a second repair is refused.
+    - `activation_render_102726.py selftest`: `ok`, 43 of 43, on the real map and on the PLAN stand-in map. The seven AM-5 cases:
+      - another page's mention applies self-closing and is refused with inner text;
+      - a child's mention applies with its title, and is refused self-closing or with a stale title;
+      - the page's own mention applies with inner text and is refused self-closing;
+      - the entry's mentions take the stored form;
+      - the catalog repair gives paragraphs once, and finds nothing to repair on the AM-4 template.
+    - `control_check_102726.py selftest`: `ok`, 42 of 42. `make_activation_ops_102726.py check`: current.
+  - *The chain after AM-5* ([execute/am5-chain-through-sweep-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/am5-chain-through-sweep-102726.1.json)): from the candidate phase through `sweep`, read-only, on the real map and the newest reads, each page pinned at that read. `ok`; 258 operations, 0 refused; after every phase every judged page passes with 0 findings. P1e-HUB-TW-PE passes the mention rule: PE is a child of the TW hub, titled "PE Metaprompt 102726.1".
+- **The inventory, rule 1** ([execute/am5-inventory-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/am5-inventory-102726.1.json), `execute/am5_rehearsal_102726.py inventory`). It classifies every write of X9 to X28.
+  - It runs the chain (258 operations).
+  - It adds the writes the chain does not render: X9's catalog repair, P1a's page creation, the nine P1 titles, the 57 P5 moves, X25's banners and navigation corrections, and X28's backlog dispositions. X28's are read from the backlog itself: 52 entries, each a `## MB-0xx — title — STATUS` heading, a field table and bold-led paragraphs.
+  - *Write tools:* update_content (one or many operations per call); insert_content at the end (C-REG, P2-REG-EXEC); insert_content at the start (X25's banners); page creation under a parent (P1a); update_properties for a title (P1); move pages (P5).
+  - *Content forms:*
+    - inline code, bold, code inside bold, italic (`<i>`), plain-text underscores (stored `\_`);
+    - separate-line paragraphs, headings, bulleted and numbered list items;
+    - table rows, and a table row inserted before another (CL-05 before CL-20);
+    - a span within a line (`end`), a span over lines (`lines`), a whole line (`whole_line`);
+    - Markdown links to a child page and to another page; external links;
+    - mentions of a child page (P1e) and of another page (the created entry);
+    - typographic characters and double quotes;
+    - on created pages, the frontmatter divider;
+    - X9's joined frontmatter paragraph replaced by paragraphs.
+  - No remaining write mentions the page itself; the rehearsal covers that form anyway, as Nathan listed it.
+  - Every form maps to a rehearsal stage; none is uncovered.
+- **The rehearsal** in one pass: recorded below as X9b.

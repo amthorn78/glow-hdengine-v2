@@ -1,0 +1,211 @@
+{
+ "mode": "inventory",
+ "chain_ok": true,
+ "chain_totals": {
+  "listed": 79,
+  "generated": 179,
+  "applied": 258,
+  "refused": 0
+ },
+ "steps": {
+  "X9": {
+   "ops": 7,
+   "tools": {
+    "insert_content (append)": 1,
+    "update_content": 6,
+    "update_content (frontmatter repair)": 1
+   },
+   "forms": {
+    "Markdown link to a Notion page": 7,
+    "Markdown link to a child page": 1,
+    "Markdown link to another page": 6,
+    "bold": 1,
+    "bulleted list item": 1,
+    "external link": 1,
+    "heading": 7,
+    "inline code": 7,
+    "joined paragraph replaced by separate-line paragraphs": 1,
+    "separate-line paragraphs": 7,
+    "typographic characters (— § ’ “)": 7
+   }
+  },
+  "X18": {
+   "ops": 1,
+   "tools": {
+    "update_content": 1
+   },
+   "forms": {
+    "bold": 1,
+    "bulleted list item": 1,
+    "inline code": 1
+   }
+  },
+  "X20": {
+   "ops": 235,
+   "tools": {
+    "update_content": 235,
+    "create page under a parent (P1a)": 1,
+    "update_properties (title)": 9
+   },
+   "forms": {
+    "Markdown link to a Notion page": 9,
+    "Markdown link to a child page": 2,
+    "Markdown link to another page": 7,
+    "bold": 3,
+    "bulleted list item": 2,
+    "code inside bold": 2,
+    "created page: divider (frontmatter ---)": 1,
+    "created page: double quotes": 1,
+    "created page: escaped underscore (plain-text _)": 1,
+    "created page: heading": 1,
+    "created page: inline code": 1,
+    "created page: mention of other page": 1,
+    "created page: page mention": 1,
+    "created page: separate-line paragraphs": 1,
+    "created page: table row": 1,
+    "created page: typographic characters (— § ’ “)": 1,
+    "double quotes": 39,
+    "escaped underscore (plain-text _)": 69,
+    "heading": 6,
+    "inline code": 130,
+    "mention of child page": 1,
+    "page mention": 1,
+    "separate-line paragraphs": 4,
+    "span within a line": 7,
+    "table row": 127,
+    "table row inserted before another": 2,
+    "typographic characters (— § ’ “)": 135,
+    "whole line": 172
+   }
+  },
+  "X21": {
+   "ops": 7,
+   "tools": {
+    "update_content": 6,
+    "insert_content (append)": 1
+   },
+   "forms": {
+    "Markdown link to a Notion page": 4,
+    "Markdown link to a child page": 1,
+    "Markdown link to another page": 11,
+    "bold": 4,
+    "code inside bold": 1,
+    "heading": 6,
+    "inline code": 6,
+    "italic": 1,
+    "numbered list item": 1,
+    "separate-line paragraphs": 6,
+    "table row": 2,
+    "typographic characters (— § ’ “)": 6
+   }
+  },
+  "X22": {
+   "ops": 1,
+   "tools": {
+    "update_content": 1
+   },
+   "forms": {
+    "table row": 1,
+    "typographic characters (— § ’ “)": 1
+   }
+  },
+  "X23": {
+   "ops": 1,
+   "tools": {
+    "update_content": 1
+   },
+   "forms": {
+    "table row": 1,
+    "typographic characters (— § ’ “)": 1
+   }
+  },
+  "X24": {
+   "ops": 2,
+   "tools": {
+    "update_content": 2,
+    "move pages (P5)": 57
+   },
+   "forms": {
+    "escaped underscore (plain-text _)": 1,
+    "table row": 1,
+    "typographic characters (— § ’ “)": 1,
+    "whole line": 1
+   }
+  },
+  "X25": {
+   "ops": 4,
+   "tools": {
+    "update_content": 4,
+    "insert_content (start: a dated record's banner)": 1,
+    "update_content (navigation corrected)": 1
+   },
+   "forms": {
+    "Markdown link to a Notion page": 4,
+    "Markdown link to another page": 21,
+    "bold": 3,
+    "double quotes": 1,
+    "heading": 4,
+    "inline code": 3,
+    "italic": 2,
+    "separate-line paragraphs": 4,
+    "span over lines": 1,
+    "typographic characters (— § ’ “)": 4
+   }
+  },
+  "X28": {
+   "ops": 0,
+   "tools": {
+    "update_content (backlog dispositions)": 1
+   },
+   "forms": {
+    "bold": 1,
+    "external link": 1,
+    "heading": 1,
+    "inline code": 1,
+    "separate-line paragraphs": 1,
+    "table row": 1
+   }
+  }
+ },
+ "covered_by_stage": {
+  "update_content": 3,
+  "insert_content (append)": 6,
+  "insert_content (start: a dated record's banner)": 7,
+  "create page under a parent (P1a)": 2,
+  "update_properties (title)": 8,
+  "move pages (P5)": 9,
+  "update_content (frontmatter repair)": 3,
+  "update_content (navigation corrected)": 3,
+  "update_content (backlog dispositions)": 3,
+  "joined paragraph replaced by separate-line paragraphs": 3,
+  "span over lines": 3,
+  "span within a line": 3,
+  "whole line": 3,
+  "table row inserted before another": 3,
+  "mention of child page": 3,
+  "mention of self page": 3,
+  "mention of other page": 1,
+  "Markdown link to a child page": 3,
+  "Markdown link to another page": 3,
+  "external link": 6,
+  "table row": 4,
+  "divider (frontmatter ---)": 1,
+  "created page": 2,
+  "inline code": 3,
+  "bold": 3,
+  "code inside bold": 3,
+  "italic": 3,
+  "escaped underscore (plain-text _)": 3,
+  "separate-line paragraphs": 3,
+  "heading": 3,
+  "bulleted list item": 3,
+  "numbered list item": 3,
+  "Markdown link to a Notion page": 3,
+  "page mention": 3,
+  "typographic characters (— § ’ “)": 3,
+  "double quotes": 4
+ },
+ "uncovered": [],
+ "ok": true,
+ "d22": "transient reads of this session's harness records; counts and form names only"
+}

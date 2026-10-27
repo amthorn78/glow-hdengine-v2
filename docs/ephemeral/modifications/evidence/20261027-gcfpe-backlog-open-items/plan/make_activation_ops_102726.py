@@ -36,6 +36,11 @@ graph parts at render time.
             (X9, the 102726.1 catalog's frontmatter); the catalog and PE store each frontmatter line as its own
             paragraph. Each must carry single line breaks before the repair and none after.
 
+  AM-5      (EXECUTE, Nathan's decision after X9a) the register entry's mention of the register is written
+            self-closing, the form Notion stores for a mention of any page other than the page itself or one of its
+            child pages (X9a: 929 stored mentions on 69 pages, no exception); the entry sits under the register, so
+            the register is neither. The repair converts exactly that one mention.
+
   make_activation_ops_102726.py build     write plan/activation-ops.json
   make_activation_ops_102726.py check     rebuild in memory and compare with the file on disk (exit 1 on drift)
   make_activation_ops_102726.py selftest  each C-22 check refuses its injected defect
@@ -147,6 +152,15 @@ def controls_pr_link(text: str) -> str:
 
 
 AM4_OPS = ("P1b-CAT-4", "P1b-CAT-7", "P1c-PE-3", "P1c-PE-5")
+INNER_MENTION = re.compile(r'<mention url="([^"]+)">[^<]*</mention>')
+
+
+def self_closing_mentions(lines: list) -> list:
+    """AM-5: the register entry's inner-text mention of the register, self-closing; refused unless exactly one."""
+    n = sum(len(INNER_MENTION.findall(x)) for x in lines)
+    if n != 1:
+        raise SystemExit(f"AM-5: expected the register entry's one inner-text mention, found {n}")
+    return [INNER_MENTION.sub(lambda m: f'<mention url="{m.group(1)}" />', x) for x in lines]
 SINGLE_BREAK = re.compile(r"(?<!\n)\n(?!\n)")
 
 
@@ -337,7 +351,7 @@ def build(head_pe: str | None = None) -> dict:
                         "note": cand["catalog"]["note"]},
             "REGISTER_ENTRY": {"phase": "activation", "step": "P1(a) (P1a-ENTRY)", "parent": REGISTER,
                                "title": act["register_entry"]["title"],
-                               "frontmatter": act["register_entry"]["frontmatter"],
+                               "frontmatter": self_closing_mentions(act["register_entry"]["frontmatter"]),
                                "body": act["register_entry"]["body"]}},
         "duplication": {"step": "C1 (C-DUP; W5 NC-2)", "rule": w8["C-DUP"]["why"],
                         "members": "transaction.candidate_publication.members of W8, read from the map at EXECUTE",
@@ -428,6 +442,12 @@ def selftest() -> dict:
                                                      for o in am4))
     rows["am4_rejects_insert_already_in_paragraph_form"] = refused(lambda: paragraph_form(am4[0]))
     rows["am4_rejects_one_line_insert"] = refused(lambda: paragraph_form({"id": "X", "new": "status: VALIDATED"}))
+    # AM-5: the entry's register mention is self-closing; a second repair, or none to repair, is refused
+    entry = built and build(head)["new_pages"]["REGISTER_ENTRY"]
+    rows["am5_entry_mention_self_closing"] = (not any(INNER_MENTION.search(x) for x in entry["frontmatter"] + entry["body"])
+                                              and any('<mention url="https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1" />'
+                                                      in x for x in entry["frontmatter"]))
+    rows["am5_rejects_second_repair"] = refused(lambda: self_closing_mentions(entry["frontmatter"]))
     return {"mode": "selftest", "rows": rows, "ok": all(rows.values())}
 
 

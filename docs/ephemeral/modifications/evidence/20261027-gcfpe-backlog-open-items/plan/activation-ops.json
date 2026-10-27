@@ -1477,7 +1477,7 @@
     "selected_member_count: 56",
     "status: REGISTER_CONTROLLED",
     "selection_authority: GCFPE Membership and Release Register",
-    "selection_authority_url: \"<mention url=\"https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1\">GCFPE Membership and Release Register</mention>\"",
+    "selection_authority_url: \"<mention url=\"https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1\" />\"",
     "activation_authority: Nathan / Product Owner",
     "activated_at: @ACTIVATION_DATE",
     "predecessor_release: GCFPE-20261009.1",
