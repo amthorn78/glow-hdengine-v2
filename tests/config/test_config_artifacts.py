@@ -1626,3 +1626,23 @@ def test_classifier_binds_the_fixture_and_tools_to_this_module() -> None:
         assert this_module in classifier._config_writer_owner_targets(ROOT, tool)
         assert this_module in classifier.changed_test_targets(ROOT, [tool])
     assert this_module in classifier._full_validation_test_targets()
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F09): the golden comparison's --report refusal covers the candidate root
+# as compare_goldens admits it (the lexical absolute path), so <symlink>/.. in the candidate argument
+# cannot place the report inside that root (HDE Mechanics Guide §25.6) -------------------------------
+
+def test_s19_golden_report_refusal_covers_the_lexically_admitted_candidate_root(tmp_path):
+    (tmp_path / "x" / "cand").mkdir(parents=True)
+    (tmp_path / "deep" / "inner").mkdir(parents=True)
+    (tmp_path / "deep" / "cand").mkdir()
+    (tmp_path / "x" / "link").symlink_to(tmp_path / "deep" / "inner")
+    candidate = tmp_path / "x" / "link" / ".." / "cand"  # admitted as x/cand; resolves to deep/cand
+    goldens = tmp_path / "goldens.json"
+    for inside in (tmp_path / "x" / "cand" / "report.json", tmp_path / "deep" / "cand" / "report.json"):
+        with pytest.raises(artifact_tools.GoldenComparisonRefusal) as caught:
+            config_tools._golden_report_destination(inside, candidate, goldens)
+        assert str(caught.value) == "REPORT_PATH_INVALID"
+    outside = tmp_path / "reports" / "report.json"
+    outside.parent.mkdir()
+    assert config_tools._golden_report_destination(outside, candidate, goldens) == outside

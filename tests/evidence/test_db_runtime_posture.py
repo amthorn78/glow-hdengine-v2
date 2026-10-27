@@ -6,19 +6,24 @@ ENV={**os.environ,'SAFE_MODE':'1','ALLOW_NETWORK':'0','LC_ALL':'C','LANG':'C','T
 def run(args): return subprocess.run(['python',*args],cwd=ROOT,env=ENV,check=True,capture_output=True,text=True)
 def assert_lf(p):
     b=(ROOT/p).read_bytes(); assert b.endswith(b'\n') and not b.endswith(b'\n\n') and b'\r\n' not in b
-def test_db_runtime_outputs_and_check_residue():
+def test_db_runtime_outputs_and_check_residue(tmp_path, monkeypatch):
     proof=ROOT/'artifacts/db/boundary_view.readonly.proof.txt.path_proof.txt'; before=proof.read_bytes() if proof.exists() else b''
     env_paths=['artifacts/runtime/env_connectivity.snapshot.json','artifacts/runtime/env_connectivity.nondev_failure.json']
     env_before={p:(ROOT/p).read_bytes() for p in env_paths}
+    paths=['artifacts/db/ddl_fingerprint.json','artifacts/db/grants.txt','artifacts/db/check_schema.txt','artifacts/db/check_constraints.txt','artifacts/db/boundary_view.readonly.proof.txt','artifacts/db/partition_plan.txt','artifacts/db/partition_verify.log']
+    h0={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
     run(['tools/evidence/generate_db_runtime_posture.py','--check'])
     assert (proof.read_bytes() if proof.exists() else b'') == before
     assert {p:(ROOT/p).read_bytes() for p in env_paths} == env_before
-    run(['tools/evidence/generate_db_runtime_posture.py'])
+    # Write mode runs against an isolated output root; the checkout is never written.
+    for key, value in {'SAFE_MODE':'1','ALLOW_NETWORK':'0','LC_ALL':'C','LANG':'C','TZ':'UTC'}.items(): monkeypatch.setenv(key, value)
+    isolated={key:tmp_path/path.relative_to(ROOT) for key,path in generator.OUTS.items()}
+    monkeypatch.setattr(generator,'OUTS',isolated)
+    generator.generate(check=False); h1={p:hashlib.sha256((tmp_path/p).read_bytes()).hexdigest() for p in paths}; assert h1==h0
+    generator.generate(check=False); h2={p:hashlib.sha256((tmp_path/p).read_bytes()).hexdigest() for p in paths}; assert h1==h2
+    generator.generate(check=True)
     after=proof.read_bytes() if proof.exists() else b''; assert before==after
-    paths=['artifacts/db/ddl_fingerprint.json','artifacts/db/grants.txt','artifacts/db/check_schema.txt','artifacts/db/check_constraints.txt','artifacts/db/boundary_view.readonly.proof.txt','artifacts/db/partition_plan.txt','artifacts/db/partition_verify.log']
-    h1={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
-    run(['tools/evidence/generate_db_runtime_posture.py']); h2={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h1==h2
-    run(['tools/evidence/generate_db_runtime_posture.py','--check']); h3={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h2==h3
+    run(['tools/evidence/generate_db_runtime_posture.py','--check']); h3={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h0==h3
     for p in paths: assert_lf(p)
     assert (ROOT/'artifacts/db/check_schema.txt').read_text()=='hde, public\n'
     assert 'PASS constraint unique_body_graph_identity' in (ROOT/'artifacts/db/check_constraints.txt').read_text()

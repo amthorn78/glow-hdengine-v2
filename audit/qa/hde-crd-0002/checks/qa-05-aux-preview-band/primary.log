@@ -1,0 +1,163 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-05-aux-preview-band","check_name":"--band applies to pair-file input","claimed_tokens":[],"command":[["mkdir","-p","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05"],["hdctl","showcompat","--a-file","fixtures/charts/alice.json","--b-file","fixtures/charts/bob.json"],["sha256sum","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json"],["python","-c","import json; d=json.load(open('/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json')); print([(c.get('id') or c.get('category_id'), c.get('band')) for c in d['categories']])"],["hdctl","aux-preview","--pair-file","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json","--category","harmony","--band","Open","--show-narrative"],["hdctl","aux-preview","--category","harmony","--band","Open","--perspective","shared","--show-narrative"],["hdctl","aux-preview","--pair-file","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json","--category","harmony","--band","Warm","--show-narrative"],["hdctl","aux-preview","--category","harmony","--band","Warm","--perspective","shared","--show-narrative"],["hdctl","aux-preview","--pair-file","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json","--category","harmony","--band","Glow","--show-narrative"],["hdctl","aux-preview","--category","harmony","--band","Glow","--perspective","shared","--show-narrative"],["hdctl","aux-preview","--pair-file","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json","--category","harmony","--show-narrative"],["hdctl","aux-preview","--category","harmony","--band","Cool","--perspective","shared","--show-narrative"],["bash","-c","# T05 step 3 comparisons in one asserting script (Plan \u00a75.2; NZ-05 pattern): equal pairs exit 0, differing pairs exit 1.\nFAIL=0\nc() { exp=$1; shift; \"$@\"; rc=$?; if [ \"$rc\" = \"$exp\" ]; then echo \"cmp exit $rc (expected $exp) ASSERT_OK: $*\"; else echo \"cmp exit $rc (expected $exp) ASSERT_FAIL: $*\"; FAIL=1; fi; }\nfor B in Open Warm Glow; do c 0 cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-$B.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/flag-$B.txt; done\nc 0 cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/flag-Cool.txt\nfor B in Open Warm Glow; do c 1 cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-$B.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt; done\nexit $FAIL"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/cli/test_aux_preview.py","-k","pair_file"]],"command_provenance":"QA Plan v1.2 check 5; QA-90 task T05 attempt 1; normalizations: NZ-01 (scratch paths under the session scratchpad); step 3 cmp comparisons in one asserting bash -c script (Plan \u00a75.2, the NZ-05 pattern)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-05-aux-preview-band/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref","PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-24T23:47:31Z"}
+=== CONTEXT ===
+check_id: qa-05-aux-preview-band
+task: QA-90 task T05, attempt 1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.0.md); QA Plan v1.2 check 5 (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.2.md, blob 66f6016cc75bd1ab4ff9730ea89e5e25c7ec629c)
+tested_commit: 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; tested_tree: af5293473238c17d72c7d73013493739b9f32750
+environment_class: E-L (label: local/offline); E-L clone /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el; venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv (NZ-01 scratch paths)
+interpreter: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state
+presence in the check shell: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session abab87ae-fdb9-4eb6-b2b9-de5380cee6cb, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+start_utc: 2026-10-24T23:47:21Z
+readiness reads (collection §4.5; Plan §7 rule A):
+--- command: ["git", "rev-parse", "HEAD"]
+started_utc: 2026-10-24T23:47:21Z; exit_code: 0
+stdout (41 bytes):
+2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+stderr (0 bytes):
+(empty)
+--- command: ["git", "rev-parse", "--is-shallow-repository"]
+started_utc: 2026-10-24T23:47:21Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-24T23:47:22Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["python", "--version"]
+started_utc: 2026-10-24T23:47:22Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "--version"]
+started_utc: 2026-10-24T23:47:22Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import engine; print(engine.__file__)"]
+started_utc: 2026-10-24T23:47:22Z; exit_code: 0
+stdout (143 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
+stderr (0 bytes):
+(empty)
+readiness result: PASS (HEAD=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 shallow=false status_empty=yes python='Python 3.12.15' engine=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py)
+end_utc: 2026-10-24T23:47:31Z
+=== COMMANDS ===
+--- command: ["mkdir", "-p", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05"]
+started_utc: 2026-10-24T23:47:22Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["hdctl", "showcompat", "--a-file", "fixtures/charts/alice.json", "--b-file", "fixtures/charts/bob.json"]
+started_utc: 2026-10-24T23:47:23Z; exit_code: 0
+stdout (3298 bytes):
+{"categories":[{"band":"Cool","category_id":"harmony","personal_hi_to_lo_key":"nar.harmony.cool.b_to_a.1.sage-01","personal_lo_to_hi_key":"nar.harmony.cool.a_to_b.1.sage-01","score":16,"shared_key":"nar.harmony.cool.shared.1.sage-01"},{"band":"Cool","category_id":"heat","personal_hi_to_lo_key":"nar.heat.cool.b_to_a.1.spark-01","personal_lo_to_hi_key":"nar.heat.cool.a_to_b.1.spark-01","score":10,"shared_key":"nar.heat.cool.shared.1.spark-01"},{"band":"Cool","category_id":"communication","personal_hi_to_lo_key":"nar.communication.cool.b_to_a.1.voice-01","personal_lo_to_hi_key":"nar.communication.cool.a_to_b.1.voice-01","score":20,"shared_key":"nar.communication.cool.shared.1.voice-01"},{"band":"Cool","category_id":"alignment","personal_hi_to_lo_key":"nar.alignment.cool.b_to_a.1.face-01","personal_lo_to_hi_key":"nar.alignment.cool.a_to_b.1.face-01","score":13,"shared_key":"nar.alignment.cool.shared.1.face-01"},{"band":"Cool","category_id":"comfort","personal_hi_to_lo_key":"nar.comfort.cool.b_to_a.1.safe-01","personal_lo_to_hi_key":"nar.comfort.cool.a_to_b.1.safe-01","score":16,"shared_key":"nar.comfort.cool.shared.1.safe-01"},{"band":"Cool","category_id":"consistency","personal_hi_to_lo_key":"nar.consistency.cool.b_to_a.1.rhythm-01","personal_lo_to_hi_key":"nar.consistency.cool.a_to_b.1.rhythm-01","score":13,"shared_key":"nar.consistency.cool.shared.1.rhythm-01"},{"band":"Cool","category_id":"expansion","personal_hi_to_lo_key":"nar.expansion.cool.b_to_a.1.wide-01","personal_lo_to_hi_key":"nar.expansion.cool.a_to_b.1.wide-01","score":0,"shared_key":"nar.expansion.cool.shared.1.wide-01"},{"band":"Cool","category_id":"creativity","personal_hi_to_lo_key":"nar.creativity.cool.b_to_a.1.make-01","personal_lo_to_hi_key":"nar.creativity.cool.a_to_b.1.make-01","score":23,"shared_key":"nar.creativity.cool.shared.1.make-01"},{"band":"Cool","category_id":"drive","personal_hi_to_lo_key":"nar.drive.cool.b_to_a.1.move-01","personal_lo_to_hi_key":"nar.drive.cool.a_to_b.1.move-01","score":15,"shared_key":"nar.drive.cool.shared.1.move-01"},{"band":"Cool","category_id":"balance","personal_hi_to_lo_key":"nar.balance.cool.b_to_a.1.fair-01","personal_lo_to_hi_key":"nar.balance.cool.a_to_b.1.fair-01","score":8,"shared_key":"nar.balance.cool.shared.1.fair-01"}],"config_id":"m10-channel-state-v1.0.0","pair_key":"3f4cb287c925a3a7f7541f59e022ee7d53cb7121cf0139d853a7d4acec77c3ef","release_id":"77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e","schema":"magic10_compat_result.v1","signals":[{"q":0,"signal_id":"rapport_delta"},{"q":63,"signal_id":"resonance_strength"},{"q":0,"signal_id":"spark_intensity"},{"q":38,"signal_id":"momentum_flux"},{"q":60,"signal_id":"signal_clarity"},{"q":20,"signal_id":"exchange_density"},{"q":50,"signal_id":"vector_cohesion"},{"q":0,"signal_id":"axis_agreement"},{"q":25,"signal_id":"soothe_index"},{"q":38,"signal_id":"buffer_resilience"},{"q":50,"signal_id":"pattern_integrity"},{"q":0,"signal_id":"variance_stability"},{"q":0,"signal_id":"growth_tendency"},{"q":0,"signal_id":"horizon_reach"},{"q":50,"signal_id":"novelty_factor"},{"q":40,"signal_id":"expression_flow"},{"q":0,"signal_id":"willpower_current"},{"q":60,"signal_id":"focus_pressure"},{"q":0,"signal_id":"equilibrium_score"},{"q":33,"signal_id":"counterweight_ratio"}]}
+stderr (0 bytes):
+(empty)
+--- command: ["sha256sum", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json"]
+started_utc: 2026-10-24T23:47:24Z; exit_code: 0
+stdout (202 bytes):
+701c773e8b1e0f5210e1d85975ecc8f194da5061953446c13355fc48f294ab34  /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import json; d=json.load(open('/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json')); print([(c.get('id') or c.get('category_id'), c.get('band')) for c in d['categories']])"]
+started_utc: 2026-10-24T23:47:24Z; exit_code: 0
+stdout (223 bytes):
+[('harmony', 'Cool'), ('heat', 'Cool'), ('communication', 'Cool'), ('alignment', 'Cool'), ('comfort', 'Cool'), ('consistency', 'Cool'), ('expansion', 'Cool'), ('creativity', 'Cool'), ('drive', 'Cool'), ('balance', 'Cool')]
+stderr (0 bytes):
+(empty)
+--- command: ["hdctl", "aux-preview", "--pair-file", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json", "--category", "harmony", "--band", "Open", "--show-narrative"]
+started_utc: 2026-10-24T23:47:24Z; exit_code: 0
+stdout (72 bytes):
+Together you feel clear and unhurried. Attention rests on what matters.
+stderr (0 bytes):
+(empty)
+--- command: ["hdctl", "aux-preview", "--category", "harmony", "--band", "Open", "--perspective", "shared", "--show-narrative"]
+started_utc: 2026-10-24T23:47:25Z; exit_code: 0
+stdout (72 bytes):
+Together you feel clear and unhurried. Attention rests on what matters.
+stderr (0 bytes):
+(empty)
+--- command: ["hdctl", "aux-preview", "--pair-file", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json", "--category", "harmony", "--band", "Warm", "--show-narrative"]
+started_utc: 2026-10-24T23:47:25Z; exit_code: 0
+stdout (62 bytes):
+Together you feel kind and steady. Care shows without effort.
+stderr (0 bytes):
+(empty)
+--- command: ["hdctl", "aux-preview", "--category", "harmony", "--band", "Warm", "--perspective", "shared", "--show-narrative"]
+started_utc: 2026-10-24T23:47:26Z; exit_code: 0
+stdout (62 bytes):
+Together you feel kind and steady. Care shows without effort.
+stderr (0 bytes):
+(empty)
+--- command: ["hdctl", "aux-preview", "--pair-file", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json", "--category", "harmony", "--band", "Glow", "--show-narrative"]
+started_utc: 2026-10-24T23:47:26Z; exit_code: 0
+stdout (64 bytes):
+Together you feel easy and trusted. The way ahead feels simple.
+stderr (0 bytes):
+(empty)
+--- command: ["hdctl", "aux-preview", "--category", "harmony", "--band", "Glow", "--perspective", "shared", "--show-narrative"]
+started_utc: 2026-10-24T23:47:27Z; exit_code: 0
+stdout (64 bytes):
+Together you feel easy and trusted. The way ahead feels simple.
+stderr (0 bytes):
+(empty)
+--- command: ["hdctl", "aux-preview", "--pair-file", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/pair.json", "--category", "harmony", "--show-narrative"]
+started_utc: 2026-10-24T23:47:28Z; exit_code: 0
+stdout (64 bytes):
+Together you feel calm and even. The pace is kind and unforced.
+stderr (0 bytes):
+(empty)
+--- command: ["hdctl", "aux-preview", "--category", "harmony", "--band", "Cool", "--perspective", "shared", "--show-narrative"]
+started_utc: 2026-10-24T23:47:28Z; exit_code: 0
+stdout (64 bytes):
+Together you feel calm and even. The pace is kind and unforced.
+stderr (0 bytes):
+(empty)
+--- command: ["bash", "-c", "# T05 step 3 comparisons in one asserting script (Plan \u00a75.2; NZ-05 pattern): equal pairs exit 0, differing pairs exit 1.\nFAIL=0\nc() { exp=$1; shift; \"$@\"; rc=$?; if [ \"$rc\" = \"$exp\" ]; then echo \"cmp exit $rc (expected $exp) ASSERT_OK: $*\"; else echo \"cmp exit $rc (expected $exp) ASSERT_FAIL: $*\"; FAIL=1; fi; }\nfor B in Open Warm Glow; do c 0 cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-$B.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/flag-$B.txt; done\nc 0 cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/flag-Cool.txt\nfor B in Open Warm Glow; do c 1 cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-$B.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt; done\nexit $FAIL"]
+started_utc: 2026-10-24T23:47:29Z; exit_code: 0
+stdout (3145 bytes):
+cmp exit 0 (expected 0) ASSERT_OK: cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-Open.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/flag-Open.txt
+cmp exit 0 (expected 0) ASSERT_OK: cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-Warm.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/flag-Warm.txt
+cmp exit 0 (expected 0) ASSERT_OK: cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-Glow.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/flag-Glow.txt
+cmp exit 0 (expected 0) ASSERT_OK: cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/flag-Cool.txt
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-Open.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt differ: char 20, line 1
+cmp exit 1 (expected 1) ASSERT_OK: cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-Open.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-Warm.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt differ: char 19, line 1
+cmp exit 1 (expected 1) ASSERT_OK: cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-Warm.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-Glow.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt differ: char 19, line 1
+cmp exit 1 (expected 1) ASSERT_OK: cmp /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-Glow.txt /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05/file-none.txt
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/cli/test_aux_preview.py", "-k", "pair_file"]
+started_utc: 2026-10-24T23:47:29Z; exit_code: 0
+stdout (112 bytes):
+.......                                                                  [100%]
+7 passed, 2 deselected in 0.82s
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness (collection §4.5) | observed: PASS | PASS
+- step 1: showcompat exit 0, empty stderr; harmony band recorded | observed: exit 0, stderr 0 bytes; bands [('harmony', 'Cool'), ('heat', 'Cool'), ('communication', 'Cool'), ('alignment', 'Cool'), ('comfort', 'Cool'), ('consistency', 'Cool'), ('expansion', 'Cool'), ('creativity', 'Cool'), ('drive', 'Cool'), ('balance', 'Cool')] | PASS
+- step 1: harmony is Cool (else the three other bands are used) | observed: harmony=Cool | PASS
+- steps 2 and 3: every aux-preview command exits 0 with empty stderr (8 commands) | observed: exits 0 0 0 0 0 0 0 0; stderr bytes 0 0 0 0 0 0 0 0 | PASS
+- step 3: for each of Open, Warm, Glow the file and flag outputs are byte-identical | observed: cmp exit 0 (expected 0) ASSERT_OK: cmp file-Open.txt flag-Open.txt;cmp exit 0 (expected 0) ASSERT_OK: cmp file-Warm.txt flag-Warm.txt;cmp exit 0 (expected 0) ASSERT_OK: cmp file-Glow.txt flag-Glow.txt; | PASS
+- step 3: file-none (pair file, no --band) equals flag-Cool | observed: cmp exit 0 (expected 0) ASSERT_OK: cmp file-none.txt flag-Cool.txt | PASS
+- step 3: each of file-Open, file-Warm, file-Glow differs from file-none | observed: file-Open.txt file-none.txt differ: char 20, line 1;cmp exit 1 (expected 1) ASSERT_OK: cmp file-Open.txt file-none.txt;file-Warm.txt file-none.txt differ: char 19, line 1;cmp exit 1 (expected 1) ASSERT_OK: cmp file-Warm.txt file-none.txt;file-Glow.txt file-none.txt differ: char 19, line 1;cmp exit 1 (expected 1) ASSERT_OK: cmp file-Glow.txt file-none.txt; | PASS
+- step 3 asserting script exit 0 | observed: exit 0 | PASS
+- step 4: '7 passed' | observed: 7 passed, 2 deselected in 0.82s (exit 0) | PASS
+=== NOTES ===
+- input: the pair file is a real hdctl showcompat output from the tracked fixtures fixtures/charts/alice.json and fixtures/charts/bob.json, produced offline under closed rails (local/offline label); it and the aux-preview outputs are scratch files outside the repository at /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa05 (not evidence). Narrative text is public Aux output and is recorded above.
+- capture: each command's stdout was captured by the QA glue (the command records above) and copied to the collection's named scratch files (pair.json, file-<B>.txt, flag-<B>.txt, file-none.txt, flag-Cool.txt); the collection's shell redirections are carried by that capture.
+- normalization (Plan §5.2, the NZ-05 pattern): step 3's cmp comparisons ran in one asserting bash -c script, because a 'differs' comparison exits 1 by design; the script asserts 0 for the four equal pairs and 1 for the three differing pairs, and each cmp's real exit status is in its output. The Plan's 'every command exits 0 with empty stderr' is read as applying to the product commands (showcompat and aux-preview).
+- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-L clone hde-crd-0002-el, venv hde-crd-0002-el-venv, XDG_STATE_HOME hde-crd-0002-xdg-state, evidence checkout hde-crd-0002-evidence, QA files hde-crd-0002-qa).
+- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 exports unset them in this check shell (presence table above); no value is recorded.

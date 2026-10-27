@@ -1,0 +1,289 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"prod","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"qa-18-deployed-dev-surfaces","check_name":"Dev and retired routes refuse in the deployed service","claimed_tokens":[],"command":[["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/d1.hdr","-o","/tmp/hde-crd-0002-qa18/d1.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/reader?v=1"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/d2.hdr","-o","/tmp/hde-crd-0002-qa18/d2.body","-w","%{http_code} %{http_version}\\n","-I","https://glow-hdengine-v2-production.up.railway.app/reader?v=1"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/d3.hdr","-o","/tmp/hde-crd-0002-qa18/d3.body","-w","%{http_code} %{http_version}\\n","-X","POST","-H","Content-Type: application/json; charset=utf-8","--data-binary","{}","https://glow-hdengine-v2-production.up.railway.app/internal/dev/sampler"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/d4.hdr","-o","/tmp/hde-crd-0002-qa18/d4.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/dev/sampler/conjunction"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/d5.hdr","-o","/tmp/hde-crd-0002-qa18/d5.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/dev/reader/conjunction"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/d6.hdr","-o","/tmp/hde-crd-0002-qa18/d6.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/dev/writer/conjunction"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/d7.hdr","-o","/tmp/hde-crd-0002-qa18/d7.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/ops/probe/env"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/d8.hdr","-o","/tmp/hde-crd-0002-qa18/d8.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/ops/db/unavailable"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/d9.hdr","-o","/tmp/hde-crd-0002-qa18/d9.body","-w","%{http_code} %{http_version}\\n","-X","POST","-H","Content-Type: application/json; charset=utf-8","--data-binary","{}","https://glow-hdengine-v2-production.up.railway.app/ops/writer/diagnostic"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/o1.hdr","-o","/tmp/hde-crd-0002-qa18/o1.body","-w","%{http_code} %{http_version}\\n","-X","OPTIONS","https://glow-hdengine-v2-production.up.railway.app/dev/sampler/conjunction"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa18/o2.hdr","-o","/tmp/hde-crd-0002-qa18/o2.body","-w","%{http_code} %{http_version}\\n","--path-as-is","https://glow-hdengine-v2-production.up.railway.app//reader?v=1"]],"command_provenance":"QA Plan v1.3 check 18; QA-90 collection v1.2 task T18, attempt 1; normalizations: NZ-01, NZ-06, NZ-25; executed by Product Owner direction before collection v1.2 merged (PR 743)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-18-deployed-dev-surfaces/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-25T23:24:24Z"}
+=== CONTEXT ===
+check: qa-18-deployed-dev-surfaces (QA Plan v1.3 check 18; QA-90 collection v1.2 task T18; attempt 1); requirement(s) S10, S19 (S19-F03)
+class: 1/2, internal (deployed); handled by QA outside the Product Owner's Live QA time (Glow QA Guide 3.5.6)
+target: https://glow-hdengine-v2-production.up.railway.app (Railway service glow-hdengine-v2, environment production)
+candidate: release_id 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e; dependency: check 16 qa-16-deployed-identity published PASS (evidence commit ee7b8d9c, captured_at_utc 2026-10-25T23:40:00Z)
+environment class: E-P (the Product Owner's workstation shell)
+actor: Kronos (Claude Code CLI session on the Product Owner's workstation, local session 5c9c7c47-41bd-437a-a9ee-63879dec618b), executor chosen by the Product Owner
+started_at_utc: 2026-10-25T23:23:42Z
+ended_at_utc: 2026-10-25T23:23:45Z
+readiness reads (Plan section 7 rule A, E-P):
+curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+Python 3.14.4
+SAFE_MODE=0
+ALLOW_NETWORK=1
+APP_ENV=prod
+LC_ALL=C
+LANG=C
+TZ=UTC
+HD_API_KEY=SET
+GEO_API_KEY=SET
+HD_API_BASE_URL=SET
+HDAPI_BASE_URL=UNSET
+DATABASE_URL=SET
+HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET
+ENGINE_ENV=UNSET
+nathan
+=== COMMANDS ===
+--- request d1 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/d1.hdr -o /tmp/hde-crd-0002-qa18/d1.body -w '%{http_code} %{http_version}\n' 'https://glow-hdengine-v2-production.up.railway.app/reader?v=1' 2>/tmp/hde-crd-0002-qa18/d1.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 403 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 403 Forbidden
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:43 GMT
+Server: railway-hikari
+x-railway-request-id: 5wWGpVNlTxiKf5tzm3z_FQ
+Content-Length: 92
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+Connection: keep-alive
+body (92 bytes, sha256 cbf3de126393c739e0f538498c2550504911a743dc4f6e9cc370120fae8e7c33, final LF no):
+{"code":"ERR_READER_FORBIDDEN","error":"reader endpoint disabled","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request d2 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/d2.hdr -o /tmp/hde-crd-0002-qa18/d2.body -w '%{http_code} %{http_version}\n' -I 'https://glow-hdengine-v2-production.up.railway.app/reader?v=1' 2>/tmp/hde-crd-0002-qa18/d2.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 403 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 403 Forbidden
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:44 GMT
+Server: railway-hikari
+x-railway-request-id: 7JYIz98QQduzlLTvm3z_FQ
+Content-Length: 92
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+Connection: keep-alive
+body: not written (curl -I reads headers only; HEAD body not observable)
+curl stderr (0 bytes):
+--- request d3 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/d3.hdr -o /tmp/hde-crd-0002-qa18/d3.body -w '%{http_code} %{http_version}\n' -X POST -H 'Content-Type: application/json; charset=utf-8' --data-binary '{}' https://glow-hdengine-v2-production.up.railway.app/internal/dev/sampler 2>/tmp/hde-crd-0002-qa18/d3.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 403 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 403 Forbidden
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:44 GMT
+Server: railway-hikari
+x-railway-request-id: kQeimtk2Sn2T3MmDALIuDA
+Content-Length: 86
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+Connection: keep-alive
+body (86 bytes, sha256 7d18dd2d18090514d4559ec66932cb52dc77f70549ad8f9c206658fe4d8a24c8, final LF no):
+{"code":"ERR_WRITER_FORBIDDEN","error":"insufficient scope","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request d4 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/d4.hdr -o /tmp/hde-crd-0002-qa18/d4.body -w '%{http_code} %{http_version}\n' https://glow-hdengine-v2-production.up.railway.app/dev/sampler/conjunction 2>/tmp/hde-crd-0002-qa18/d4.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 403 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 403 Forbidden
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:44 GMT
+Server: railway-hikari
+x-railway-request-id: wqGmoYt_QGaawaAXs_GTAg
+Content-Length: 86
+x-hikari-trace: jfk1.48ys
+x-railway-edge: jfk1
+Connection: keep-alive
+body (86 bytes, sha256 7d18dd2d18090514d4559ec66932cb52dc77f70549ad8f9c206658fe4d8a24c8, final LF no):
+{"code":"ERR_WRITER_FORBIDDEN","error":"insufficient scope","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request d5 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/d5.hdr -o /tmp/hde-crd-0002-qa18/d5.body -w '%{http_code} %{http_version}\n' https://glow-hdengine-v2-production.up.railway.app/dev/reader/conjunction 2>/tmp/hde-crd-0002-qa18/d5.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 403 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 403 Forbidden
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:44 GMT
+Server: railway-hikari
+x-railway-request-id: uFQ3vZafQ4W6BdbjALIuDA
+Content-Length: 86
+x-hikari-trace: jfk1.57w5
+x-railway-edge: jfk1
+Connection: keep-alive
+body (86 bytes, sha256 7d18dd2d18090514d4559ec66932cb52dc77f70549ad8f9c206658fe4d8a24c8, final LF no):
+{"code":"ERR_WRITER_FORBIDDEN","error":"insufficient scope","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request d6 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/d6.hdr -o /tmp/hde-crd-0002-qa18/d6.body -w '%{http_code} %{http_version}\n' https://glow-hdengine-v2-production.up.railway.app/dev/writer/conjunction 2>/tmp/hde-crd-0002-qa18/d6.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 403 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 403 Forbidden
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:44 GMT
+Server: railway-hikari
+x-railway-request-id: WrAC9oavQmy-5RvVEuroCg
+Content-Length: 86
+x-hikari-trace: jfk1.cv40
+x-railway-edge: jfk1
+Connection: keep-alive
+body (86 bytes, sha256 7d18dd2d18090514d4559ec66932cb52dc77f70549ad8f9c206658fe4d8a24c8, final LF no):
+{"code":"ERR_WRITER_FORBIDDEN","error":"insufficient scope","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request d7 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/d7.hdr -o /tmp/hde-crd-0002-qa18/d7.body -w '%{http_code} %{http_version}\n' https://glow-hdengine-v2-production.up.railway.app/ops/probe/env 2>/tmp/hde-crd-0002-qa18/d7.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 404 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:44 GMT
+Server: railway-hikari
+x-railway-request-id: WCGZ_6awTfKNHCOUss7a6g
+Content-Length: 70
+x-hikari-trace: jfk1.48ys
+x-railway-edge: jfk1
+Connection: keep-alive
+body (70 bytes, sha256 80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629, final LF no):
+{"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request d8 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/d8.hdr -o /tmp/hde-crd-0002-qa18/d8.body -w '%{http_code} %{http_version}\n' https://glow-hdengine-v2-production.up.railway.app/ops/db/unavailable 2>/tmp/hde-crd-0002-qa18/d8.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 404 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:44 GMT
+Server: railway-hikari
+x-railway-request-id: ZUsN2IsOTSaAwpINm3z_FQ
+Content-Length: 70
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+Connection: keep-alive
+body (70 bytes, sha256 80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629, final LF no):
+{"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request d9 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/d9.hdr -o /tmp/hde-crd-0002-qa18/d9.body -w '%{http_code} %{http_version}\n' -X POST -H 'Content-Type: application/json; charset=utf-8' --data-binary '{}' https://glow-hdengine-v2-production.up.railway.app/ops/writer/diagnostic 2>/tmp/hde-crd-0002-qa18/d9.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 404 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:45 GMT
+Server: railway-hikari
+x-railway-request-id: oggENv1gQGeaclATm3z_FQ
+Content-Length: 70
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+Connection: keep-alive
+body (70 bytes, sha256 80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629, final LF no):
+{"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request o1 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/o1.hdr -o /tmp/hde-crd-0002-qa18/o1.body -w '%{http_code} %{http_version}\n' -X OPTIONS https://glow-hdengine-v2-production.up.railway.app/dev/sampler/conjunction 2>/tmp/hde-crd-0002-qa18/o1.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 200 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 200 OK
+allow: HEAD, OPTIONS, GET
+Content-Type: text/html; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:45 GMT
+Server: railway-hikari
+x-railway-request-id: q519LiL3SWW3H7rKm3z_FQ
+Content-Length: 0
+x-hikari-trace: jfk1.cv40
+x-railway-edge: jfk1
+Connection: keep-alive
+body (0 bytes, sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855, final LF no):
+
+curl stderr (0 bytes):
+--- request o2 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa18/o2.hdr -o /tmp/hde-crd-0002-qa18/o2.body -w '%{http_code} %{http_version}\n' --path-as-is 'https://glow-hdengine-v2-production.up.railway.app//reader?v=1' 2>/tmp/hde-crd-0002-qa18/o2.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 403 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 403 Forbidden
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:45 GMT
+Server: railway-hikari
+x-railway-request-id: HhNaFJ7sTXiqqzfa55So4g
+Content-Length: 92
+x-hikari-trace: jfk1.pqzh
+x-railway-edge: jfk1
+Connection: keep-alive
+body (92 bytes, sha256 cbf3de126393c739e0f538498c2550504911a743dc4f6e9cc370120fae8e7c33, final LF no):
+{"code":"ERR_READER_FORBIDDEN","error":"reader endpoint disabled","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+=== PREDICATES ===
+PASS | d1: status 403 | observed: 403
+PASS | d1: HTTP/1.1 | observed: 'HTTP/1.1 403 Forbidden', 1.1
+PASS | d1: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | d1: Cache-Control no-store | observed: no-store
+PASS | d1: no ETag | observed: None
+PASS | d1: body exactly {"code":"ERR_READER_FORBIDDEN","error":"reader endpoint disabled","ok":false,"schema":"v1"} plus one LF | observed: 92 bytes, sha256 cbf3de126393c739e0f538498c2550504911a743dc4f6e9cc370120fae8e7c33
+PASS | d2: status 403 | observed: 403
+PASS | d2: HTTP/1.1 | observed: 'HTTP/1.1 403 Forbidden', 1.1
+PASS | d2: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | d2: Cache-Control no-store | observed: no-store
+PASS | d2: no ETag | observed: None
+LIMIT | d2: HEAD body empty | not observable: curl -I reads no body (recorded as in check 16)
+PASS | d3: status 403 | observed: 403
+PASS | d3: HTTP/1.1 | observed: 'HTTP/1.1 403 Forbidden', 1.1
+PASS | d3: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | d3: Cache-Control no-store | observed: no-store
+PASS | d3: no ETag | observed: None
+PASS | d3: body exactly {"code":"ERR_WRITER_FORBIDDEN","error":"insufficient scope","ok":false,"schema":"v1"} plus one LF | observed: 86 bytes, sha256 7d18dd2d18090514d4559ec66932cb52dc77f70549ad8f9c206658fe4d8a24c8
+PASS | d4: status 403 | observed: 403
+PASS | d4: HTTP/1.1 | observed: 'HTTP/1.1 403 Forbidden', 1.1
+PASS | d4: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | d4: Cache-Control no-store | observed: no-store
+PASS | d4: no ETag | observed: None
+PASS | d4: body exactly {"code":"ERR_WRITER_FORBIDDEN","error":"insufficient scope","ok":false,"schema":"v1"} plus one LF | observed: 86 bytes, sha256 7d18dd2d18090514d4559ec66932cb52dc77f70549ad8f9c206658fe4d8a24c8
+PASS | d5: status 403 | observed: 403
+PASS | d5: HTTP/1.1 | observed: 'HTTP/1.1 403 Forbidden', 1.1
+PASS | d5: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | d5: Cache-Control no-store | observed: no-store
+PASS | d5: no ETag | observed: None
+PASS | d5: body exactly {"code":"ERR_WRITER_FORBIDDEN","error":"insufficient scope","ok":false,"schema":"v1"} plus one LF | observed: 86 bytes, sha256 7d18dd2d18090514d4559ec66932cb52dc77f70549ad8f9c206658fe4d8a24c8
+PASS | d6: status 403 | observed: 403
+PASS | d6: HTTP/1.1 | observed: 'HTTP/1.1 403 Forbidden', 1.1
+PASS | d6: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | d6: Cache-Control no-store | observed: no-store
+PASS | d6: no ETag | observed: None
+PASS | d6: body exactly {"code":"ERR_WRITER_FORBIDDEN","error":"insufficient scope","ok":false,"schema":"v1"} plus one LF | observed: 86 bytes, sha256 7d18dd2d18090514d4559ec66932cb52dc77f70549ad8f9c206658fe4d8a24c8
+PASS | d7: status 404 | observed: 404
+PASS | d7: HTTP/1.1 | observed: 'HTTP/1.1 404 Not Found', 1.1
+PASS | d7: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | d7: Cache-Control no-store | observed: no-store
+PASS | d7: no ETag | observed: None
+PASS | d7: body exactly {"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"} plus one LF | observed: 70 bytes, sha256 80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629
+PASS | d8: status 404 | observed: 404
+PASS | d8: HTTP/1.1 | observed: 'HTTP/1.1 404 Not Found', 1.1
+PASS | d8: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | d8: Cache-Control no-store | observed: no-store
+PASS | d8: no ETag | observed: None
+PASS | d8: body exactly {"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"} plus one LF | observed: 70 bytes, sha256 80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629
+PASS | d9: status 404 | observed: 404
+PASS | d9: HTTP/1.1 | observed: 'HTTP/1.1 404 Not Found', 1.1
+PASS | d9: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | d9: Cache-Control no-store | observed: no-store
+PASS | d9: no ETag | observed: None
+PASS | d9: body exactly {"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"} plus one LF | observed: 70 bytes, sha256 80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629
+OBSERVATION | o1: status line 'HTTP/1.1 200 OK'; Allow HEAD, OPTIONS, GET; Location None; Content-Type text/html; charset=utf-8 | no predicate
+OBSERVATION | o2: status line 'HTTP/1.1 403 Forbidden'; Allow None; Location None; Content-Type application/json; charset=utf-8 | no predicate
+=== NOTES ===
+attempt 1 of check 18 (Plan section 9); no earlier attempt.
+Each request was sent once, with no auth header and no redirect following (Plan check 16 protocol). Header captures: CRLF normalized to LF in this body; predicates were judged on the raw captured bytes. curl stderr captured apart from the headers (Glow QA Guide 3.5.10).
+For HEAD requests curl -I writes the response headers to its -o target, so that file is not a response body; the HEAD body is recorded as not observable, as check 16 records it.
+Normalizations: NZ-01 (scratch /tmp/hde-crd-0002-qa18), NZ-06 (publication helper), NZ-25 (the Plan's request lines written as curl --http1.1 commands; HEAD -I; OPTIONS/DELETE/POST -X; bodies --data-binary; --path-as-is for //reader).
+Observation rows o1 (OPTIONS /dev/sampler/conjunction) and o2 (GET //reader?v=1, --path-as-is) carry no predicate (IR-3; LR5-O1): a 200 with Allow to OPTIONS, or a 404 or 308 to the doubled slash, is the router's answer, not a defect on its own. Observed: o1 200 text/html with Allow HEAD, OPTIONS, GET; o2 403 ERR_READER_FORBIDDEN (the doubled slash reached the Reader refusal).
+Nonclaims: no claim from the env guard (IR-4) or the dead after_request hook (IR-5).

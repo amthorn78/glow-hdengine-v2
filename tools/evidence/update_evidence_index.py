@@ -18,6 +18,7 @@ import datetime as _dt
 import hashlib
 import json
 import os
+import re
 import stat as _stat
 import sys
 import tempfile
@@ -44,11 +45,47 @@ from engine.runtime.determinism_env import (  # noqa: E402
 )
 from tools.qa import qa_harness  # noqa: E402
 
-# Source-owned admission for this approved CRD. This is not a check roster or
-# directory discovery rule; another CRD needs its own explicit admission.
-CRD_QA_ID = "HDE-CRD-0001"
-CRD_QA_ROOT_REL = "audit/qa/hde-crd-0001"
-CRD_QA_KEY = "audit.qa.hde_crd_0001"
+# Source-owned admission table for approved CRDs (HDE-CRD-0002 IF-5): each
+# admitted ID maps to its QA root and key prefix. This is not a check roster or
+# directory discovery rule; another CRD needs its own explicit row here.
+ADMITTED_CRD_QA: Mapping[str, tuple[str, str]] = {
+    "HDE-CRD-0001": ("audit/qa/hde-crd-0001", "audit.qa.hde_crd_0001"),
+    "HDE-CRD-0002": ("audit/qa/hde-crd-0002", "audit.qa.hde_crd_0002"),
+}
+
+# HDE-CRD-0002 IF-7: Mirror rows for primaries whose bytes the admitted release
+# determines carry a release label inside the PF12 §8.3 allowed key set (notes).
+# A capture takes the label of the release in catalog/manifest.json only when
+# its owner has regenerated it (its bytes differ from those the Mirror last
+# recorded); a release change alone never relabels a capture. Frozen
+# capture-time families are not listed and keep their labels.
+CURRENT_RELEASE_CAPTURE_PATHS = frozenset({
+    "artifacts/catalog/catalog_schema_validation.log",
+    "artifacts/catalog/domain_closure_report.log",
+    "artifacts/core/abba/ab_ba_parity.json",
+    "artifacts/core/json_compare/core_result_json_compare.json",
+    "artifacts/core/two_run/identity.json",
+    "artifacts/proofs/reader_success_get_head_304.json",
+    "artifacts/proofs/success_304.txt",
+    "artifacts/proofs/success_encoding_invariance.txt",
+    "artifacts/proofs/success_get.txt",
+    "artifacts/proofs/success_head.txt",
+    "artifacts/writer/conjunction_write_readback.log",
+    "artifacts/writer/conjunction_writer_summary.json",
+    "audit/gates/canonical_json/json_canon_compare.log",
+    "audit/gates/canonical_json/json_canonical_check.log",
+    "audit/gates/determinism/abba.bytes",
+    "audit/gates/determinism/open_rails_abba.json",
+    "audit/gates/determinism/tworun_identity.sha256",
+    "audit/gates/json_gate/canonical/json_gate_check_log.ndjson",
+    "audit/gates/json_gate/canonical/json_gate_compare_log.ndjson",
+    "audit/gates/parity/reader_cli/ab.json",
+    "audit/gates/parity/reader_cli/ba.json",
+    "audit/gates/parity/reader_cli/summary.json",
+})
+_CURRENT_RELEASE_LABEL_RE = re.compile(
+    r"(?:^|; )(?P<label>current-release capture: release [^\s,;]+, release_id [0-9a-f]{64})$"
+)
 
 
 class _WriteTransaction:
@@ -3709,6 +3746,7 @@ def _write_path_proof(
 
 _ALLOWED_INDEX_FIELDS = {
     "artifact_key",
+    "crd_id",
     "discovered_physical_path",
     "epic_id",
     "record_type",
@@ -3741,6 +3779,9 @@ def _normalize_index_entry(entry: Mapping[str, object]) -> dict[str, object]:
                 normalized_parts.append(part)
         path = "/".join(normalized_parts)
 
+    if "epic_id" in entry and "crd_id" in entry:
+        # PF12 §8.3: a record may carry epic_id or crd_id, never both.
+        raise ValueError(f"Index entry carries both epic_id and crd_id: {key}")
     normalized: dict[str, object] = {
         "artifact_key": key,
         "discovered_physical_path": path,
@@ -3773,15 +3814,132 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
     return sorted(deduped.values(), key=lambda item: (item["artifact_key"], item["discovered_physical_path"]))
 
 
-def _crd_qa_entry(check_id: str | None = None) -> dict[str, object]:
+def _current_release_label() -> str:
+    from engine.serializer import canon
+    from scripts.release_id_recompute import manifest_only_problems
+
+    manifest_path = ROOT / "catalog/manifest.json"
+    # The repository's full manifest validation (canonical bytes, schema and
+    # every member's bytes and size): no label names an invalid release.
+    if manifest_only_problems(manifest_path):
+        raise SystemExit("CURRENT_RELEASE_LABEL_MANIFEST_INVALID")
+    raw = _read_bytes(manifest_path)
+    try:
+        manifest = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise SystemExit("CURRENT_RELEASE_LABEL_MANIFEST_INVALID") from exc
+    version = manifest.get("version") if isinstance(manifest, dict) else None
+    if (
+        not isinstance(version, str)
+        or not re.fullmatch(r"[^\s,;]+", version)
+        or canon.sercanon(manifest, sort_keys=True) != raw
+    ):
+        raise SystemExit("CURRENT_RELEASE_LABEL_MANIFEST_INVALID")
+    return f"current-release capture: release {version}, release_id {_sha256_bytes(raw)}"
+
+
+def _strip_current_release_label(entry: object) -> object:
+    if not isinstance(entry, dict) or not isinstance(entry.get("notes"), str):
+        return entry
+    notes = _CURRENT_RELEASE_LABEL_RE.sub("", entry["notes"])
+    if notes == entry["notes"]:
+        return entry
+    stripped = dict(entry)
+    if notes:
+        stripped["notes"] = notes
+    else:
+        del stripped["notes"]
+    return stripped
+
+
+def _retained_release_labels(entries: Iterable[object]) -> dict[str, set[str]]:
+    labels: dict[str, set[str]] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        path, notes = entry.get("discovered_physical_path"), entry.get("notes")
+        if path in CURRENT_RELEASE_CAPTURE_PATHS and isinstance(notes, str):
+            match = _CURRENT_RELEASE_LABEL_RE.search(notes)
+            if match:
+                labels.setdefault(path, set()).add(match["label"])
+    return labels
+
+
+def _recorded_capture_digests() -> dict[str, set[str]]:
+    """Return the sha256 the Mirror recorded per capture at the last updater run."""
+    if not _path_exists(MIRROR_PATH):
+        return {}
+    try:
+        rows = [json.loads(line) for line in _read_bytes(MIRROR_PATH).decode("utf-8").splitlines() if line]
+    except (UnicodeError, json.JSONDecodeError):
+        # No readable record means no regeneration evidence: labels are kept.
+        return {}
+    digests: dict[str, set[str]] = {}
+    for row in rows:
+        if (
+            isinstance(row, dict)
+            and row.get("discovered_physical_path") in CURRENT_RELEASE_CAPTURE_PATHS
+            and isinstance(row.get("sha256"), str)
+        ):
+            digests.setdefault(row["discovered_physical_path"], set()).add(row["sha256"])
+    return digests
+
+
+def _current_release_labels(retained: Mapping[str, set[str]]) -> dict[str, str]:
+    """Label each capture with the release that produced it (HDE-CRD-0002 IF-7).
+
+    A capture takes the admitted release's label when it has no label yet
+    (initial adoption) or when its bytes differ from those the Mirror last
+    recorded, i.e. its owner regenerated it. Otherwise it keeps its label, so
+    a manifest cut before the owners rerun publishes no new-release claim.
+    """
+    current = _current_release_label()
+    recorded: dict[str, set[str]] | None = None
+    labels: dict[str, str] = {}
+    for path in sorted(CURRENT_RELEASE_CAPTURE_PATHS):
+        prior = retained.get(path, set())
+        if len(prior) > 1:
+            raise ValueError(f"CURRENT_RELEASE_LABEL_INCOHERENT:{path}")
+        if not prior or prior == {current}:
+            labels[path] = current
+            continue
+        if recorded is None:
+            recorded = _recorded_capture_digests()
+        capture = ROOT / path
+        regenerated = (
+            path in recorded
+            and _path_exists(capture)
+            and _sha256_bytes(_read_bytes(capture)) not in recorded[path]
+        )
+        labels[path] = current if regenerated else next(iter(prior))
+    return labels
+
+
+def _apply_current_release_label(
+    entries: Sequence[dict[str, object]],
+    labels: Mapping[str, str],
+) -> list[dict[str, object]]:
+    labeled = []
+    for entry in entries:
+        entry = dict(entry)
+        label = labels.get(entry["discovered_physical_path"])
+        if label is not None:
+            notes = entry.get("notes")
+            entry["notes"] = f"{notes}; {label}" if notes else label
+        labeled.append(entry)
+    return labeled
+
+
+def _crd_qa_entry(crd_id: str, check_id: str | None = None) -> dict[str, object]:
+    root_rel, key_prefix = ADMITTED_CRD_QA[crd_id]
     if check_id is None:
         suffix, path, role = "qa_step_logs_manifest", "qa_step_logs_manifest.json", "snapshot"
     else:
         qa_harness.validate_check_id(check_id)
         suffix, path, role = f"checks.{check_id}.primary.log", f"checks/{check_id}/primary.log", "log"
     return {
-        "artifact_key": f"{CRD_QA_KEY}.{suffix}",
-        "discovered_physical_path": f"{CRD_QA_ROOT_REL}/{path}",
+        "artifact_key": f"{key_prefix}.{suffix}",
+        "discovered_physical_path": f"{root_rel}/{path}",
         "role": role,
     }
 
@@ -3791,7 +3949,7 @@ def _load_crd_qa_entries(
 ) -> tuple[list[Mapping[str, object]], list[dict[str, object]]]:
     """Reconcile only selected current CRD rows, before generic deduplication."""
     unrelated: list[Mapping[str, object]] = []
-    selected: list[Mapping[str, object]] = []
+    selected: dict[str, list[Mapping[str, object]]] = {crd_id: [] for crd_id in ADMITTED_CRD_QA}
     seen_keys: set[str] = set()
     seen_paths: set[str] = set()
     for entry in retained:
@@ -3799,31 +3957,135 @@ def _load_crd_qa_entries(
         # bypass this boundary and collide with the generated current rows.
         key = entry.get("artifact_key") or entry.get("title")
         path = entry.get("discovered_physical_path") or entry.get("path")
-        claims_key = isinstance(key, str) and (key == CRD_QA_KEY or key.startswith(CRD_QA_KEY + "."))
         normalized_path = os.path.normpath(path) if isinstance(path, str) else ""
-        claims_path = normalized_path == CRD_QA_ROOT_REL or normalized_path.startswith(CRD_QA_ROOT_REL + "/")
-        if not claims_key and not claims_path:
+        claims = {
+            crd_id
+            for crd_id, (root_rel, key_prefix) in ADMITTED_CRD_QA.items()
+            if (isinstance(key, str) and (key == key_prefix or key.startswith(key_prefix + ".")))
+            or normalized_path == root_rel
+            or normalized_path.startswith(root_rel + "/")
+        }
+        if not claims:
             unrelated.append(entry)
             continue
-        expected = _crd_qa_entry()
+        if len(claims) != 1:
+            raise ValueError("CRD index row has foreign or contradictory key/path/metadata")
+        crd_id, = claims
+        root_rel = ADMITTED_CRD_QA[crd_id][0]
+        expected = _crd_qa_entry(crd_id)
         if path != expected["discovered_physical_path"]:
             parts = path.split("/") if isinstance(path, str) else []
-            if len(parts) != 6 or "/".join(parts[:4]) != f"{CRD_QA_ROOT_REL}/checks" or parts[-1] != "primary.log":
+            family = "/".join(parts[:4])
+            if (
+                len(parts) != 6
+                or family not in {f"{root_rel}/checks", f"{root_rel}/close"}
+                or parts[-1] != "primary.log"
+            ):
                 raise ValueError("CRD index key/path relationship is malformed")
-            expected = _crd_qa_entry(parts[-2])
+            if family == f"{root_rel}/close":
+                expected = _crd_close_run_entry(crd_id, parts[-2])
+            else:
+                expected = _crd_qa_entry(crd_id, parts[-2])
         if dict(entry) != expected:
             raise ValueError("CRD index row has foreign or contradictory key/path/metadata")
         if key in seen_keys or path in seen_paths:
             raise ValueError("duplicate CRD index identity or path")
         seen_keys.add(key)
         seen_paths.add(path)
-        selected.append(entry)
+        selected[crd_id].append(entry)
 
-    config = qa_harness.HarnessConfig(crd_id=CRD_QA_ID, repo_root=ROOT)
-    if not config.qa_root.exists() and not selected:
-        return unrelated, []
-    checks = qa_harness.validate_crd_check_family(config)
-    return unrelated, [_crd_qa_entry(), *(_crd_qa_entry(check_id) for check_id in sorted(checks))]
+    current: list[dict[str, object]] = []
+    for crd_id in sorted(ADMITTED_CRD_QA):
+        config = qa_harness.HarnessConfig(crd_id=crd_id, repo_root=ROOT)
+        if not config.qa_root.exists() and not selected[crd_id]:
+            continue
+        checks = qa_harness.validate_crd_check_family(config)
+        current.extend([_crd_qa_entry(crd_id), *(_crd_qa_entry(crd_id, check_id) for check_id in sorted(checks))])
+        current.extend(_crd_close_run_entry(crd_id, check_id) for check_id in _crd_close_run_check_ids(config))
+    return unrelated, current
+
+
+# HDE-CRD-0002 IF-4: the post-verdict close-run family of an admitted CRD,
+# audit/qa/<crd-id>/close/<check_id>/primary.log, admitted by the S21 ADR. Its
+# members are the primaries on disk; it never enters qa_step_logs_manifest.json.
+def _crd_close_run_entry(crd_id: str, check_id: str) -> dict[str, object]:
+    root_rel, key_prefix = ADMITTED_CRD_QA[crd_id]
+    qa_harness.validate_check_id(check_id)
+    return {
+        "artifact_key": f"{key_prefix}.close.{check_id}.primary.log",
+        "discovered_physical_path": f"{root_rel}/close/{check_id}/primary.log",
+        "role": "log",
+    }
+
+
+def _crd_close_run_check_ids(config: qa_harness.HarnessConfig) -> list[str]:
+    """Validate and list the close-run family; any other member is refused."""
+    close_root = config.qa_root / "close"
+    qa_harness._validate_crd_path(config, close_root, directory=True)
+    if close_root.is_symlink():
+        raise ValueError("CRD close-run root is aliased")
+    if not close_root.exists():
+        return []
+    check_ids: list[str] = []
+    for name in sorted(os.listdir(close_root)):
+        member = close_root / name
+        if member.is_symlink() or not member.is_dir():
+            raise ValueError(f"CRD close-run family has an unexpected member: {name}")
+        check_id = qa_harness.validate_check_id(name)
+        if set(os.listdir(member)) - {"primary.log", "primary.log.path_proof.txt"}:
+            raise ValueError(f"CRD close-run family has an unexpected member: {name}")
+        primary = member / "primary.log"
+        snapshot = qa_harness._crd_file_snapshot(config, primary)
+        qa_harness._parse_crd_primary(config, check_id, snapshot.payload, family="close")
+        check_ids.append(check_id)
+    if not check_ids:
+        raise ValueError("CRD close-run root exists without a primary")
+    return check_ids
+
+
+def _crd_close_pack_entries(
+    retained: Sequence[Mapping[str, object]],
+) -> tuple[list[Mapping[str, object]], list[dict[str, object]]]:
+    """Absent-tolerant CRD close-pack rows (review v1.1 note M1).
+
+    Neither file present: no rows. Both present: one row each. One present,
+    or a row whose file is absent: refused.
+    """
+    expected: dict[str, dict[str, object]] = {}
+    pairs: list[tuple[str, tuple[str, str]]] = []
+    for crd_id in sorted(ADMITTED_CRD_QA):
+        key = crd_id.lower().replace("-", "_")
+        report = f"audit/{crd_id}_close_report.md"
+        manifest = f"audit/{crd_id}_MANIFEST.json"
+        for suffix, rel in (("close_report", report), ("manifest", manifest)):
+            expected[rel] = {
+                "artifact_key": f"{key}.{suffix}",
+                "crd_id": crd_id,
+                "discovered_physical_path": rel,
+            }
+        pairs.append((crd_id, (report, manifest)))
+    keys = {str(row["artifact_key"]) for row in expected.values()}
+    unrelated: list[Mapping[str, object]] = []
+    indexed: set[str] = set()
+    for entry in retained:
+        key = entry.get("artifact_key") or entry.get("title")
+        path = entry.get("discovered_physical_path") or entry.get("path")
+        normalized_path = os.path.normpath(path) if isinstance(path, str) else ""
+        if key not in keys and normalized_path not in expected:
+            unrelated.append(entry)
+            continue
+        if normalized_path not in expected or dict(entry) != expected[normalized_path]:
+            raise ValueError("CRD_CLOSE_PACK_REGISTRATION_COLLISION")
+        indexed.add(normalized_path)
+    current: list[dict[str, object]] = []
+    for crd_id, pair in pairs:
+        present = {rel for rel in pair if _path_exists(ROOT / rel)}
+        if present and present != set(pair):
+            raise ValueError(f"CRD_CLOSE_PACK_INCOMPLETE:{crd_id}")
+        if indexed & set(pair) - present:
+            raise ValueError(f"CRD_CLOSE_PACK_INDEXED_BUT_ABSENT:{crd_id}")
+        current.extend(expected[rel] for rel in pair if rel in present)
+    return unrelated, current
 
 
 # The two catalog reports are already required by PF12 §8.1. Their presence
@@ -3857,7 +4119,7 @@ def _catalog_validation_entries(
         normalized_path = os.path.normpath(path) if isinstance(path, str) else ""
         if key not in expected and normalized_path not in paths:
             continue
-        if key not in expected or dict(row) != expected[key]:
+        if key not in expected or _strip_current_release_label(dict(row)) != expected[key]:
             raise ValueError("CONFIG_CATALOG_REGISTRATION_COLLISION")
         if key in selected:
             raise ValueError("CONFIG_CATALOG_DUPLICATE_REGISTRATION")
@@ -3878,8 +4140,11 @@ def _catalog_validation_entries(
 
 def _load_human_index() -> list[dict[str, object]]:
     payload = qa_harness._loads_json_strict(_read_bytes(HUMAN_INDEX).decode("utf-8"))
+    release_labels = _retained_release_labels(payload)
+    payload = [_strip_current_release_label(entry) for entry in payload]
     catalog_entries = _catalog_validation_entries(payload)
     payload, crd_entries = _load_crd_qa_entries(payload)
+    payload, crd_close_pack_entries = _crd_close_pack_entries(payload)
     payload = [
         entry
         for entry in payload
@@ -3913,10 +4178,11 @@ def _load_human_index() -> list[dict[str, object]]:
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC038_PR06_SUPERSEDED_INDEX_KEYS
     ]
-    return _dedupe_entries(
+    return _apply_current_release_label(_dedupe_entries(
         [
             *payload,
             *crd_entries,
+            *crd_close_pack_entries,
             *catalog_entries,
             *BASELINE_ENTRIES,
             *EPIC021_PRIMARY_ARTIFACTS,
@@ -3969,7 +4235,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *CLI_CONFORMANCE_ARTIFACTS,
             *CONJUNCTION_WRITER_ARTIFACTS,
         ]
-    )
+    ), _current_release_labels(release_labels))
 
 
 def _render_human_index(entries: Iterable[Mapping[str, object]]) -> bytes:
@@ -4783,12 +5049,12 @@ def _config_logical_delta(
             expected = additions[identity]
             if mirror:
                 metadata = {
-                    key: value for key, value in row.items()
+                    key: value for key, value in _strip_current_release_label(dict(row)).items()
                     if key not in {"sha256", "size_bytes", "proof_anchor", "produced_at_utc"}
                 }
                 if metadata != expected or row.get("proof_anchor") != identity[1] + ".path_proof.txt":
                     raise ValueError("CONFIG_PUBLICATION_NEW_RECORD_METADATA_DRIFT")
-            elif dict(row) != expected:
+            elif _strip_current_release_label(dict(row)) != expected:
                 raise ValueError("CONFIG_PUBLICATION_NEW_RECORD_METADATA_DRIFT")
             continue
         mutable = {"sha256", "size_bytes"} if (
@@ -4800,6 +5066,9 @@ def _config_logical_delta(
             mutable.add("produced_at_utc")
         prior = {key: value for key, value in before[identity].items() if key not in mutable}
         current = {key: value for key, value in row.items() if key not in mutable}
+        if identity[1] in changed_primaries:
+            # A regenerated current-release capture's label follows its new bytes.
+            prior, current = _strip_current_release_label(prior), _strip_current_release_label(current)
         if prior != current:
             raise ValueError(f"CONFIG_PUBLICATION_UNRELATED_RECORD_DRIFT:{identity}")
 
@@ -4908,10 +5177,17 @@ def publish_crd_check_family(
     inside the recovery boundary. Recovery covers exceptions, not process death
     or atomic visibility to concurrent readers. No acceptance claim is inferred.
     """
-    if not isinstance(config, qa_harness.HarnessConfig) or config.crd_id != CRD_QA_ID:
-        raise ValueError("governed CRD publication admits only HDE-CRD-0001")
+    if not isinstance(config, qa_harness.HarnessConfig) or config.crd_id not in ADMITTED_CRD_QA:
+        refused = getattr(config, "crd_id", None)
+        raise ValueError(
+            "governed CRD publication admits only "
+            + ", ".join(sorted(ADMITTED_CRD_QA))
+            + f"; refused {refused}"
+        )
     if config.repo_root != ROOT:
         raise ValueError("CRD config must select this updater's repository root")
+    if config.qa_root != ROOT / ADMITTED_CRD_QA[config.crd_id][0]:
+        raise ValueError("CRD config QA root differs from its admitted root")
     if _ACTIVE_WRITE_TRANSACTION is not None or _STAGED_VIEW is not None:
         raise RuntimeError("CRD publication requires its own outer transaction")
     ensure_determinism_env()
@@ -4941,6 +5217,78 @@ def publish_crd_check_family(
         if coherence_verifier is not None:
             coherence_verifier()
         return published
+
+
+def publish_crd_close_run_family(
+    config: qa_harness.HarnessConfig,
+    results: Sequence[qa_harness.CheckResult],
+    *,
+    captured_at_utc: str | None = None,
+    coherence_verifier: Callable[[], None] | None = None,
+) -> tuple[Path, ...]:
+    """Publish an admitted CRD's post-verdict close-run family with recovery.
+
+    Each primary is rendered only from its captured command, exit code and
+    output, under audit/qa/<crd-id>/close/<check_id>/ (HDE-CRD-0002 IF-4). The
+    given results replace the whole family. This entrypoint writes neither
+    qa_step_logs_manifest.json nor any checks/ primary; the shared convergence
+    reads them read-only, as every updater run does. Recovery has the same
+    bounds as publish_crd_check_family. No acceptance claim is inferred.
+    """
+    if not isinstance(config, qa_harness.HarnessConfig) or config.crd_id not in ADMITTED_CRD_QA:
+        refused = getattr(config, "crd_id", None)
+        raise ValueError(
+            "governed CRD close-run publication admits only "
+            + ", ".join(sorted(ADMITTED_CRD_QA))
+            + f"; refused {refused}"
+        )
+    if config.repo_root != ROOT:
+        raise ValueError("CRD config must select this updater's repository root")
+    if config.qa_root != ROOT / ADMITTED_CRD_QA[config.crd_id][0]:
+        raise ValueError("CRD config QA root differs from its admitted root")
+    if _ACTIVE_WRITE_TRANSACTION is not None or _STAGED_VIEW is not None:
+        raise RuntimeError("CRD close-run publication requires its own outer transaction")
+    ensure_determinism_env()
+    staged_results = tuple(results)
+    if not staged_results or not all(isinstance(result, qa_harness.CheckResult) for result in staged_results):
+        raise ValueError("CRD close-run publication requires a nonempty CheckResult family")
+    result_ids = [qa_harness.validate_check_id(result.check_id) for result in staged_results]
+    if len(result_ids) != len(set(result_ids)):
+        raise ValueError("CRD close-run publication contains duplicate check IDs")
+    planned = [
+        qa_harness._primary_log_content(
+            config, result, captured_at_utc=captured_at_utc, family="close"
+        )
+        for result in staged_results
+    ]
+    # T0: the close-run family follows a recorded QA family. Refuse its
+    # absence, and any existing incoherence, before touching any byte.
+    qa_harness.validate_crd_check_family(config)
+    stale = [
+        config.qa_root / "close" / check_id
+        for check_id in _crd_close_run_check_ids(config)
+        if check_id not in result_ids
+    ]
+    _run_once(check=True)
+    with _WriteTransaction(ROOT) as transaction:
+        for path, _ in planned:
+            transaction.capture(path)
+        for directory in stale:
+            for name in ("primary.log", "primary.log.path_proof.txt"):
+                transaction.capture(directory / name)
+                (directory / name).unlink(missing_ok=True)
+            directory.rmdir()
+        for path, content in planned:
+            qa_harness._atomic_write(path, content)
+        _converge_and_publish()
+        if _crd_close_run_check_ids(config) != sorted(result_ids):
+            raise RuntimeError("CRD close-run family differs from the published results")
+        for path, content in planned:
+            if path.read_text(encoding="utf-8") != content:
+                raise RuntimeError(f"CRD close-run primary changed during publication: {path}")
+        if coherence_verifier is not None:
+            coherence_verifier()
+        return tuple(path for path, _ in planned)
 
 
 def main(argv: list[str] | None = None) -> None:

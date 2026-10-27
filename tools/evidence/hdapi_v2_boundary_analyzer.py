@@ -1866,6 +1866,36 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             for node in fn.body:
                 yield node
 
+        presenter_bound_params_by_key: dict[str, frozenset[str]] = {}
+        # Reflection fails closed for the presenter-bound helper shape: a module may
+        # use it only if it imports from an allowlist of project and plain modules,
+        # reaches no dunder attribute but `__init__`, no frame, generator or
+        # traceback attribute and nothing that hands back a class from an object
+        # or an annotation (`type()`, `mro()`, typing introspection), names no
+        # reflective builtin, and calls getattr or hasattr only with a constant
+        # ordinary attribute name.
+        reflection_free_import_roots = {"adapter", "engine", "presenter", "flask", "werkzeug", "__future__", "collections", "datetime", "hashlib", "json", "os", "pathlib", "threading", "typing"}
+        frame_attributes = {"f_globals", "f_locals", "f_back", "f_builtins", "f_code", "f_trace", "gi_frame", "gi_code", "cr_frame", "cr_code", "ag_frame", "ag_code", "tb_frame", "tb_next", "mro", "get_type_hints", "get_args", "get_origin"}
+        reflective_builtins = {"globals", "vars", "locals", "exec", "eval", "compile", "setattr", "delattr", "__import__", "breakpoint", "type", "get_type_hints", "get_args", "get_origin"}
+
+        def is_reflection(node: ast.AST) -> bool:
+            if isinstance(node, ast.Import):
+                return any(alias.name.split(".", 1)[0] not in reflection_free_import_roots for alias in node.names)
+            if isinstance(node, ast.ImportFrom):
+                return node.level == 0 and (node.module or "").split(".", 1)[0] not in reflection_free_import_roots
+            if isinstance(node, ast.Attribute):
+                return (node.attr.startswith("__") and node.attr.endswith("__") and node.attr != "__init__") or node.attr in frame_attributes
+            if isinstance(node, ast.Name):
+                return node.id in reflective_builtins or (node.id.startswith("__") and node.id.endswith("__") and node.id not in {"__name__", "__file__"})
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {"getattr", "hasattr"}:
+                name_arg = node.args[1] if len(node.args) >= 2 else None
+                if not (isinstance(name_arg, ast.Constant) and isinstance(name_arg.value, str)):
+                    return True
+                return (name_arg.value.startswith("__") and name_arg.value.endswith("__")) or name_arg.value in frame_attributes
+            return False
+
+        module_has_dynamic_namespace_access = any(is_reflection(node) for node in ast.walk(tree))
+
         def presenter_callable_names_for(owner: str) -> set[str]:
             def is_none_constant(value: ast.AST) -> bool:
                 return isinstance(value, ast.Constant) and value.value is None
@@ -1930,6 +1960,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             names = set(imported_presenter_callable_names)
             for key in reversed(chain):
                 fn = function_defs[key]
+                names.update(presenter_bound_params_by_key.get(key, frozenset()))
                 for node in direct_body_nodes(fn):
                     if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in names:
                         names.remove(node.name)
@@ -2015,6 +2046,649 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             for name in names:
                 candidates.update(simple_names.get(name, []))
             return candidates
+
+        def name_is_bound_in(node: ast.AST, name: str) -> bool:
+            for child in ast.walk(node):
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and child.name == name:
+                    return True
+                if isinstance(child, (ast.Global, ast.Nonlocal)) and name in child.names:
+                    return True
+                if _effect_binds_or_unbinds_name(child, name) or _import_binds_name(child, name):
+                    return True
+            return False
+
+        def binding_site_counts(nodes) -> dict[str, int]:
+            counts: dict[str, int] = {}
+            for node in nodes:
+                bound_names: list[str] = []
+                if isinstance(node, ast.Name) and isinstance(node.ctx, (ast.Store, ast.Del)):
+                    bound_names = [node.id]
+                elif isinstance(node, ast.arg):
+                    bound_names = [node.arg]
+                elif isinstance(node, (ast.ExceptHandler, ast.MatchAs, ast.MatchStar)) and node.name:
+                    bound_names = [node.name]
+                elif isinstance(node, ast.MatchMapping) and node.rest:
+                    bound_names = [node.rest]
+                elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    bound_names = [node.name]
+                elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                    bound_names = [(alias.asname or alias.name).split(".", 1)[0] for alias in node.names]
+                elif isinstance(node, (ast.Global, ast.Nonlocal)):
+                    bound_names = list(node.names)
+                for bound_name in bound_names:
+                    counts[bound_name] = counts.get(bound_name, 0) + 1
+            return counts
+
+        module_binding_counts = binding_site_counts(ast.walk(tree))
+        presenter_trust_names = {
+            name for name, target in aliases.items()
+            if _is_sanctioned_presenter_call(name, aliases) or target in {"engine.presenter", "engine.presenter.emitter", "presenter.reader_v1.emitter"}
+        }
+
+        # Exact identity for the presenter-bound helper shape. `aliases` maps a plain
+        # `import a.b` to `a.b` although the statement binds `a`, and it ignores
+        # relative-import levels; `exact_import_targets` records what each import
+        # binds. A relative or star import leaves the module out of the shape.
+        exact_import_targets: dict[str, str] = {}
+        module_has_inexact_import = False
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    root_name = alias.name.split(".", 1)[0]
+                    exact_import_targets[alias.asname or root_name] = alias.name if alias.asname else root_name
+            elif isinstance(node, ast.ImportFrom):
+                module_has_inexact_import = module_has_inexact_import or bool(node.level) or any(alias.name == "*" for alias in node.names)
+                for alias in node.names:
+                    exact_import_targets[alias.asname or alias.name] = f"{node.module}.{alias.name}"
+        sanctioned_response_classes = {"flask.Response", "flask.wrappers.Response", "werkzeug.Response", "werkzeug.wrappers.Response", "werkzeug.wrappers.response.Response"}
+
+        def is_pure_chain(node: ast.AST) -> bool:
+            while isinstance(node, ast.Attribute):
+                node = node.value
+            return isinstance(node, ast.Name)
+
+        def resolved_import_chain(node: ast.AST) -> str | None:
+            """The dotted target a pure name chain reaches through the import that is
+            the only binding of its root, or ``None``."""
+            if not isinstance(node, (ast.Name, ast.Attribute)) or not is_pure_chain(node):
+                return None
+            root, _, rest = _attribute_chain(node).partition(".")
+            target = exact_import_targets.get(root)
+            if target is None or aliases.get(root) != target or module_binding_counts.get(root, 0) != 1:
+                return None
+            return f"{target}.{rest}" if rest else target
+
+        def is_response_ctor(node: ast.AST) -> bool:
+            # A call of an imported Flask or Werkzeug Response class, resolved through
+            # its import rather than by the local name.
+            return isinstance(node, ast.Call) and resolved_import_chain(node.func) in sanctioned_response_classes
+
+        def looks_like_response_ctor(node: ast.Call) -> bool:
+            # What the general return proof treats as building a response.
+            chain = _attribute_chain(node.func)
+            return chain in {"Response", "make_response"} or chain.endswith((".Response", ".make_response", "TransportResponse"))
+
+        def is_presenter_value_call(node: ast.AST, presenter_params: frozenset[str]) -> bool:
+            return isinstance(node, ast.Call) and (
+                (isinstance(node.func, ast.Name) and node.func.id in presenter_params)
+                or (is_pure_chain(node.func) and _is_sanctioned_presenter_call(_attribute_chain(node.func), aliases))
+            )
+
+        def exits_return_values(fn: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            """Every way out of ``fn`` but an exception returns a value: ``fn`` is
+            neither async nor a generator, each ``return`` in its own body carries a
+            value, and its body ends in one, so no path falls through to ``None``."""
+            if isinstance(fn, ast.AsyncFunctionDef) or not fn.body or not isinstance(fn.body[-1], ast.Return) or fn.body[-1].value is None:
+                return False
+            return not any(isinstance(node, (ast.Yield, ast.YieldFrom, ast.Await)) or (isinstance(node, ast.Return) and node.value is None) for node in iter_body_nodes(fn))
+
+        # Same-module patching of what the shape trusts fails closed. An object that
+        # holds a response class, or a module that a response class or a trusted
+        # presenter lives in (any chain ending in `Response` or `response_class`, or
+        # one resolving through its import to such a class or module, or to a module
+        # above one), is only called, subclassed, annotated or read through; and no
+        # attribute store, attribute delete or getattr names a trusted presenter or
+        # response name or a route-registration method.
+        trusted_modules = (
+            {"engine.presenter", "engine.presenter.emitter", "presenter.reader_v1.emitter"}
+            | {aliases[name].rsplit(".", 1)[0] for name in presenter_trust_names if _is_sanctioned_presenter_call(name, aliases)}
+            | {cls.rsplit(".", 1)[0] for cls in sanctioned_response_classes}
+        )
+
+        def holds_trusted_object(node: ast.AST) -> bool:
+            if not isinstance(node, (ast.Name, ast.Attribute)):
+                return False
+            if (node.id if isinstance(node, ast.Name) else node.attr) in {"Response", "response_class"}:
+                return True
+            resolved = resolved_import_chain(node)
+            return resolved is not None and (resolved in sanctioned_response_classes or any(module == resolved or module.startswith(f"{resolved}.") for module in trusted_modules))
+
+        def is_annotation(node: ast.AST) -> bool:
+            current, parent = node, ast_parents.get(node)
+            while parent is not None and not isinstance(parent, ast.stmt):
+                if isinstance(parent, ast.arg):
+                    return parent.annotation is current
+                current, parent = parent, ast_parents.get(parent)
+            return (isinstance(parent, (ast.FunctionDef, ast.AsyncFunctionDef)) and parent.returns is current) or (isinstance(parent, ast.AnnAssign) and parent.annotation is current)
+
+        def is_inert_use(node: ast.AST) -> bool:
+            parent = ast_parents.get(node)
+            return (
+                (isinstance(node.ctx, ast.Load) and isinstance(parent, ast.Call) and parent.func is node)
+                or (isinstance(parent, ast.ClassDef) and node in parent.bases)
+                or (isinstance(parent, ast.Attribute) and parent.value is node and isinstance(parent.ctx, ast.Load))
+                or is_annotation(node)
+            )
+
+        def is_trusted_name(name: str) -> bool:
+            # A trusted presenter or response name, or a route-registration method.
+            return (
+                name in presenter_trust_names
+                or name in {"Response", "response_class", "make_response", "route", "get", "post", "put", "patch", "delete", "add_url_rule"}
+                or _is_sanctioned_presenter_call(f"presenter.{name}", {"presenter": "engine.presenter"})
+            )
+
+        module_patches_trusted_names = any(
+            (holds_trusted_object(node) and not is_inert_use(node))
+            or (isinstance(node, ast.Attribute) and isinstance(node.ctx, (ast.Store, ast.Del)) and any(is_trusted_name(part) for part in _attribute_chain(node).split(".")))
+            or (
+                isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {"getattr", "hasattr"}
+                and len(node.args) >= 2 and isinstance(node.args[1], ast.Constant) and isinstance(node.args[1].value, str) and is_trusted_name(node.args[1].value)
+            )
+            for node in ast.walk(tree)
+        )
+
+        # An HTTP exception the module raises is served as Werkzeug's own error page,
+        # not presenter bytes, so for the shape it fails closed wherever it sits: the
+        # module names nothing `abort` or `Aborter` (by import, name, attribute or
+        # constant getattr), uses a name it imports from Werkzeug, other than an exact
+        # response class, only as the class isinstance() tests or an except clause
+        # catches, reads `routing_exception` only as the object isinstance() tests,
+        # and raises nothing reached through a Flask or Werkzeug import.
+        http_exit_names = {"abort", "Aborter"}
+        werkzeug_names = {
+            name for name, target in exact_import_targets.items()
+            if (target == "werkzeug" or target.startswith("werkzeug.")) and target not in sanctioned_response_classes
+        }
+
+        def isinstance_argument(node: ast.AST, index: int) -> bool:
+            parent = ast_parents.get(node)
+            if index == 1 and isinstance(parent, ast.Tuple):
+                node, parent = parent, ast_parents.get(parent)
+            if index == 1 and isinstance(parent, ast.ExceptHandler) and parent.type is node:
+                return True
+            return (
+                isinstance(parent, ast.Call) and isinstance(parent.func, ast.Name) and parent.func.id == "isinstance"
+                and "isinstance" not in module_binding_counts and len(parent.args) == 2 and not parent.keywords and parent.args[index] is node
+            )
+
+        def raises_http_exception(node: ast.AST) -> bool:
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                return any(alias.name.rsplit(".", 1)[-1] in http_exit_names or alias.asname in http_exit_names for alias in node.names)
+            if isinstance(node, ast.Name):
+                if node.id in http_exit_names:
+                    return True
+                if node.id not in werkzeug_names:
+                    return False
+                top: ast.AST = node
+                while isinstance(ast_parents.get(top), ast.Attribute) and ast_parents[top].value is top:
+                    top = ast_parents[top]
+                rest = _attribute_chain(top).partition(".")[2]
+                resolved = f"{exact_import_targets[node.id]}.{rest}" if rest else exact_import_targets[node.id]
+                return resolved not in sanctioned_response_classes and not isinstance_argument(top, 1)
+            if isinstance(node, ast.Attribute):
+                return node.attr in http_exit_names or (node.attr == "routing_exception" and not isinstance_argument(node, 0))
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {"getattr", "hasattr"} and len(node.args) >= 2:
+                return isinstance(node.args[1], ast.Constant) and node.args[1].value in http_exit_names | {"routing_exception"}
+            if isinstance(node, ast.Raise) and node.exc is not None:
+                raised = node.exc.func if isinstance(node.exc, ast.Call) else node.exc
+                if not is_pure_chain(raised):
+                    return False
+                target = exact_import_targets.get(_attribute_chain(raised).split(".", 1)[0], "")
+                return target.split(".", 1)[0] in {"flask", "werkzeug"}
+            return False
+
+        module_raises_http_exceptions = any(raises_http_exception(node) for node in ast.walk(tree))
+
+        # Flask's response path beyond the analyzed decorators fails closed for the
+        # shape. A per-request callback, an after-request hook, error handler or
+        # endpoint registered other than by a decorator, a replaced view or hook map,
+        # a response-processing override, WSGI middleware or a request-finished
+        # receiver can each change what the view returned. A `before_request` hook
+        # registered by call is accepted only as `<registrar>.before_request(<name>)`
+        # whose argument is a module function proven as a before-request hook (see
+        # ``before_hook_is_proven``).
+        response_path_names = {
+            "after_this_request", "_after_request_functions", "after_request_funcs", "before_request_funcs", "view_functions",
+            "error_handler_spec", "register_error_handler", "process_response", "preprocess_request", "finalize_request",
+            "full_dispatch_request", "handle_user_exception", "handle_http_exception", "handle_exception", "wsgi_app",
+            "request_finished",
+        }
+        call_registered_before_hooks: list[ast.Name] = []
+        decorator_only_hooks = {"after_request", "after_app_request", "errorhandler", "app_errorhandler"}
+
+        def in_decorator_position(node: ast.AST) -> bool:
+            parent = ast_parents.get(node)
+            target = parent if isinstance(parent, ast.Call) and parent.func is node else node
+            holder = ast_parents.get(target)
+            return isinstance(holder, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and target in holder.decorator_list
+
+        def touches_response_path(node: ast.AST) -> bool:
+            if isinstance(node, ast.Name):
+                return node.id in response_path_names
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                return any(alias.name.rsplit(".", 1)[-1] in response_path_names or alias.asname in response_path_names for alias in node.names)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {"getattr", "hasattr"} and len(node.args) >= 2:
+                name_arg = node.args[1]
+                return isinstance(name_arg, ast.Constant) and name_arg.value in response_path_names | decorator_only_hooks | {"endpoint"}
+            if not isinstance(node, ast.Attribute):
+                return False
+            if node.attr in response_path_names:
+                return True
+            if node.attr == "endpoint":
+                parent = ast_parents.get(node)
+                return (isinstance(parent, ast.Call) and parent.func is node) or in_decorator_position(node)
+            if node.attr in {"before_request", "before_app_request"}:
+                if in_decorator_position(node):
+                    return False
+                parent = ast_parents.get(node)
+                if isinstance(parent, ast.Call) and parent.func is node and len(parent.args) == 1 and not parent.keywords and isinstance(parent.args[0], ast.Name):
+                    call_registered_before_hooks.append(parent.args[0])
+                    return False
+                return True
+            return node.attr in decorator_only_hooks and not in_decorator_position(node)
+
+        module_touches_response_path = any(touches_response_path(node) for node in ast.walk(tree))
+        registered_hooks_proven: list[bool] = []
+
+        def before_hook_is_proven(argument: ast.Name) -> bool:
+            """A hook registered by call is one undecorated function of this module,
+            neither async nor a generator, bound once, defining nothing nested and
+            named only as this argument or as a callee, that the general return proof
+            proves as a before-request hook: each return is ``None`` or
+            presenter-backed."""
+            keys = simple_names.get(argument.id, [])
+            if len(keys) != 1 or argument.id in aliases or module_binding_counts.get(argument.id, 0) != 1:
+                return False
+            hook = function_defs[keys[0]]
+            if hook.decorator_list or isinstance(hook, ast.AsyncFunctionDef) or not defines_nothing(hook):
+                return False
+            if any(isinstance(node, (ast.Yield, ast.YieldFrom, ast.Await)) for node in iter_body_nodes(hook)):
+                return False
+            if any(
+                (isinstance(node, ast.Name) and node.id == argument.id and node is not argument and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
+                or (isinstance(node, ast.Attribute) and node.attr == argument.id)
+                for node in ast.walk(tree)
+            ):
+                return False
+            hook_key = f"{keys[0]}#before_request_by_call"
+            function_defs[hook_key] = hook
+            hook_kind_by_key[hook_key] = "before_request"
+            return function_returns_presenter(hook_key)
+
+        # A decorated after-request hook receives the response the view returned and
+        # can change it in place. For the shape, its response parameter may only be
+        # read through a body-free attribute or a constant getattr of one, reach
+        # `.headers`, be returned, or go to a statement call of a header-only helper.
+        body_free_response_attributes = {"headers", "status_code", "status", "mimetype", "content_type", "content_length", "request"}
+
+        def after_hook_is_header_only(hook: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            params = list(hook.args.posonlyargs) + list(hook.args.args)
+            if not params:
+                return True
+            param = params[0].arg
+            if not defines_nothing(hook):
+                return False
+            nodes = [node for stmt in hook.body for node in ast.walk(stmt)]
+            if binding_site_counts(nodes).get(param, 0):
+                return False
+            for node in nodes:
+                if not (isinstance(node, ast.Name) and node.id == param):
+                    continue
+                parent = ast_parents.get(node)
+                if isinstance(parent, ast.Attribute) and parent.value is node:
+                    if parent.attr not in body_free_response_attributes or not isinstance(parent.ctx, ast.Load):
+                        return False
+                    continue
+                if isinstance(parent, ast.Return) and parent.value is node:
+                    continue
+                if isinstance(parent, ast.Call) and node in parent.args:
+                    if (
+                        isinstance(parent.func, ast.Name) and parent.func.id == "getattr" and "getattr" not in module_binding_counts
+                        and parent.args[0] is node and len(parent.args) >= 2
+                        and isinstance(parent.args[1], ast.Constant) and parent.args[1].value in body_free_response_attributes
+                    ):
+                        continue
+                    if isinstance(parent.func, ast.Name) and isinstance(ast_parents.get(parent), ast.Expr) and header_only_helper_param(parent.func.id, parent.args.index(node)):
+                        continue
+                return False
+            return True
+
+        hook_decorator_suffixes = (".errorhandler", ".app_errorhandler", ".before_request", ".before_app_request", ".after_request", ".after_app_request")
+
+        def module_alters_response_path() -> bool:
+            # A decorated hook is one the hook map analyzes (an app-wide hook on a
+            # Blueprint under a non-public prefix is not) and carries exactly one
+            # decorator, its registration on a registrar, so what Flask runs is the
+            # analyzed hook itself. Every before- and after-request hook keeps the
+            # helper's body rules (see ``hook_body_is_exact``).
+            if module_touches_response_path:
+                return True
+            if not registered_hooks_proven:
+                registered_hooks_proven.append(
+                    all(
+                        key in hook_kind_by_key and len(fn.decorator_list) == 1 and is_hook_registration(fn.decorator_list[0], key)
+                        for key, fn in list(function_defs.items())
+                        if "#" not in key and any(_attribute_chain(deco.func if isinstance(deco, ast.Call) else deco).endswith(hook_decorator_suffixes) for deco in fn.decorator_list)
+                    )
+                    and all(before_hook_is_proven(argument) for argument in call_registered_before_hooks)
+                    and all(after_hook_is_header_only(function_defs[key]) for key, kind in list(hook_kind_by_key.items()) if kind == "after_request")
+                    and all(hook_body_is_exact(function_defs[key]) for key, kind in list(hook_kind_by_key.items()) if kind in {"before_request", "after_request"})
+                )
+            return not registered_hooks_proven[0]
+
+        sanctioned_registrars = {"flask.Blueprint", "flask.Flask", "flask.blueprints.Blueprint", "flask.app.Flask"}
+
+        def is_route_registration(deco: ast.AST, owner: str) -> bool:
+            """``<name>.route(...)`` (or ``.get``, ``.post``, ``.put``, ``.patch`` or
+            ``.delete``) on a registrar (see ``is_registrar``)."""
+            if not (isinstance(deco, ast.Call) and isinstance(deco.func, ast.Attribute) and deco.func.attr in {"route", "get", "post", "put", "patch", "delete"} and isinstance(deco.func.value, ast.Name)):
+                return False
+            return is_registrar(deco.func.value.id, owner)
+
+        def is_hook_registration(deco: ast.AST, owner: str) -> bool:
+            """``<name>.after_request`` (or ``.after_app_request``, ``.before_request``
+            or ``.before_app_request``) or ``<name>.errorhandler(<key>)`` (or
+            ``.app_errorhandler``) on a registrar (see ``is_registrar``)."""
+            if isinstance(deco, ast.Attribute) and deco.attr in {"after_request", "after_app_request", "before_request", "before_app_request"}:
+                target = deco.value
+            elif isinstance(deco, ast.Call) and isinstance(deco.func, ast.Attribute) and deco.func.attr in {"errorhandler", "app_errorhandler"} and len(deco.args) == 1 and not deco.keywords:
+                target = deco.func.value
+            else:
+                return False
+            return isinstance(target, ast.Name) and is_registrar(target.id, owner)
+
+        def is_registrar(name: str, owner: str) -> bool:
+            """``<name>`` is not bound in the decorated function and is bound exactly
+            once, in the nearest enclosing scope that binds it, by constructing an
+            imported Flask app or Blueprint."""
+            owner_fn = function_defs[owner]
+            if binding_site_counts([*ast.walk(owner_fn.args), *(node for stmt in owner_fn.body for node in ast.walk(stmt))]).get(name, 0):
+                return False
+            scope = parent_function_by_key.get(owner)
+            while scope is not None:
+                scope_fn = function_defs[scope]
+                count = binding_site_counts([*ast.walk(scope_fn.args), *(node for stmt in scope_fn.body for node in ast.walk(stmt))]).get(name, 0)
+                if count:
+                    statements = scope_fn.body
+                    break
+                scope = parent_function_by_key.get(scope)
+            else:
+                count, statements = module_binding_counts.get(name, 0), tree.body
+            return count == 1 and any(
+                isinstance(stmt, ast.Assign) and len(stmt.targets) == 1 and isinstance(stmt.targets[0], ast.Name) and stmt.targets[0].id == name
+                and isinstance(stmt.value, ast.Call) and resolved_import_chain(stmt.value.func) in sanctioned_registrars
+                for stmt in statements
+            )
+
+        def defines_nothing(body_fn: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            # No nested function, class or lambda: nothing in the body carries code
+            # that runs outside the returns the proof checks.
+            return not any(isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)) for stmt in body_fn.body for node in ast.walk(stmt))
+
+        def header_only_helper_param(name: str, index: int) -> bool:
+            keys = simple_names.get(name, [])
+            if len(keys) != 1 or module_binding_counts.get(name, 0) != 1:
+                return False
+            header_helper = function_defs[keys[0]]
+            if header_helper.decorator_list or ast_parents.get(header_helper) is not tree or header_helper.args.vararg is not None:
+                return False
+            if any(
+                (isinstance(node, ast.Name) and node.id == name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
+                or (isinstance(node, ast.Attribute) and node.attr == name)
+                for node in ast.walk(tree)
+            ):
+                return False
+            params = list(header_helper.args.posonlyargs) + list(header_helper.args.args)
+            if index >= len(params):
+                return False
+            param = params[index].arg
+            nodes = [node for stmt in header_helper.body for node in ast.walk(stmt)]
+            if binding_site_counts(nodes).get(param, 0):
+                return False
+            return all(
+                (isinstance(ast_parents.get(node), ast.Attribute) and ast_parents[node].attr == "headers") or isinstance(ast_parents.get(node), ast.Return)
+                for node in nodes
+                if isinstance(node, ast.Name) and node.id == param
+            )
+
+        # Fail closed on how presenter-derived values are used. A presenter call, a
+        # response built in the function, and any local holding one may only feed a
+        # response constructor or len(), be assigned once to a local (calls only,
+        # never name to name), reach `.headers`, be returned, or go to a statement
+        # call of a module helper whose parameter is used only for `.headers` and
+        # its return.
+        def derived_use_is_safe(node: ast.AST, *, may_assign: bool) -> bool:
+            parent = ast_parents.get(node)
+            if isinstance(parent, ast.keyword):
+                return is_response_ctor(ast_parents.get(parent))
+            if isinstance(parent, ast.Return):
+                return True
+            if isinstance(parent, ast.Tuple) and isinstance(ast_parents.get(parent), ast.Return):
+                return bool(parent.elts) and parent.elts[0] is node
+            if may_assign and isinstance(parent, (ast.Assign, ast.AnnAssign)) and parent.value is node:
+                targets = parent.targets if isinstance(parent, ast.Assign) else [parent.target]
+                return len(targets) == 1 and isinstance(targets[0], ast.Name)
+            if isinstance(parent, ast.Attribute) and parent.value is node:
+                return parent.attr == "headers"
+            if isinstance(parent, ast.Call) and node in parent.args:
+                if is_response_ctor(parent) or (isinstance(parent.func, ast.Name) and parent.func.id == "len" and "len" not in module_binding_counts):
+                    return True
+                return isinstance(parent.func, ast.Name) and isinstance(ast_parents.get(parent), ast.Expr) and header_only_helper_param(parent.func.id, parent.args.index(node))
+            return False
+
+        def own_body_is_exact(body_fn: ast.FunctionDef | ast.AsyncFunctionDef, presenter_params: frozenset[str]) -> bool:
+            """The flow-independent body rules for the helper and for a function it
+            returns through: the body defines no nested function, class or lambda
+            (see ``defines_nothing``), a presenter parameter is only ever called (never aliased
+            or passed on), every local name has one binding site, no response
+            content or status is replaced after construction, every response is
+            built with an exact response class (see ``is_response_ctor``), and
+            presenter-derived values are used only as ``derived_use_is_safe`` allows."""
+            if not defines_nothing(body_fn):
+                return False
+            nodes = [node for stmt in body_fn.body for node in ast.walk(stmt)]
+            if any(isinstance(node, ast.Name) and node.id in presenter_params and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node) for node in nodes):
+                return False
+            if any(count > 1 for count in binding_site_counts(nodes).values()):
+                return False
+            if any(
+                (isinstance(node, ast.Attribute) and isinstance(node.ctx, (ast.Store, ast.Del)) and node.attr in {"data", "response", "status", "status_code"})
+                or (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr in {"set_data", "set_json"})
+                or (isinstance(node, ast.Call) and looks_like_response_ctor(node) and not is_response_ctor(node))
+                for node in nodes
+            ):
+                return False
+            derived_names: set[str] = set()
+            for node in nodes:
+                if is_presenter_value_call(node, presenter_params) or is_response_ctor(node):
+                    if not derived_use_is_safe(node, may_assign=True):
+                        return False
+                    parent = ast_parents.get(node)
+                    if isinstance(parent, (ast.Assign, ast.AnnAssign)):
+                        derived_names.add((parent.targets[0] if isinstance(parent, ast.Assign) else parent.target).id)
+            return not any(
+                isinstance(node, ast.Name) and node.id in derived_names and isinstance(node.ctx, ast.Load) and not derived_use_is_safe(node, may_assign=False)
+                for node in nodes
+            )
+
+        def delegated_call(node: ast.Return, presenter_params: frozenset[str]) -> ast.Call | None:
+            # A return that hands off to another call rather than returning a
+            # presenter value or a response the function builds itself.
+            value = node.value
+            if isinstance(value, ast.Tuple) and value.elts:
+                value = value.elts[0]
+            if isinstance(value, ast.Call) and not is_response_ctor(value) and not is_presenter_value_call(value, presenter_params):
+                return value
+            return None
+
+        def delegate_is_exact(value: ast.Call, helper: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            """A helper's return may hand off only to another undecorated module-level
+            function of this module, named only as a callee, that returns a value on
+            every exit, keeps the helper's body rules and hands off no further."""
+            if not isinstance(value.func, ast.Name):
+                return False
+            name = value.func.id
+            keys = simple_names.get(name, [])
+            if len(keys) != 1 or name in aliases or module_binding_counts.get(name, 0) != 1:
+                return False
+            callee = function_defs[keys[0]]
+            if callee is helper or callee.decorator_list or ast_parents.get(callee) is not tree or not exits_return_values(callee) or not own_body_is_exact(callee, frozenset()):
+                return False
+            if any(
+                (isinstance(node, ast.Name) and node.id == name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
+                or (isinstance(node, ast.Attribute) and node.attr == name)
+                for node in ast.walk(tree)
+            ):
+                return False
+            return not any(isinstance(node, ast.Return) and delegated_call(node, frozenset()) is not None for node in iter_body_nodes(callee))
+
+        def hook_body_is_exact(hook: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            """A before- or after-request hook, whose return Flask can serve in place
+            of the view's, keeps the helper's body rules (``own_body_is_exact``): each
+            local name has one binding site, so the general return proof's
+            flow-independent reading of assignments holds. A return that hands off
+            must satisfy ``delegate_is_exact``."""
+            if not own_body_is_exact(hook, frozenset()):
+                return False
+            return not any(
+                isinstance(node, ast.Return) and delegated_call(node, frozenset()) is not None and not delegate_is_exact(delegated_call(node, frozenset()), hook)
+                for node in iter_body_nodes(hook)
+            )
+
+        def presenter_bound_helper_key(call: ast.Call, owner: str, candidate: str) -> str | None:
+            """Prove a call to a module-level helper of this module that receives a
+            sanctioned presenter callable: the argument's bound value in the caller, or,
+            when the argument is omitted, the helper parameter's default.  The helper
+            must be undecorated, its name must appear only as the callee of a call
+            (never as a value or an attribute name, such as ``module._respond``), and the
+            module must be free of reflection (see ``is_reflection``), of relative and
+            star imports, of same-module patching of what the proof trusts (see
+            ``module_patches_trusted_names``) and of Flask response-path registration
+            outside the analyzed decorators (see ``touches_response_path``) and of
+            HTTP exceptions (see ``raises_http_exception``), every decorated hook must
+            be registered by its one decorator on a registrar (see
+            ``is_hook_registration``), every decorated after-request hook must
+            leave the body alone (see ``after_hook_is_header_only``), and every
+            before- and after-request hook must keep the helper's body rules (see
+            ``hook_body_is_exact``), so that the
+            call runs the analyzed definition with its own defaults and its return is
+            what Flask serves.  The view must be registered only by route decorators on
+            a Flask app or Blueprint the module constructs (see ``is_route_registration``),
+            return the call directly and define nothing nested, the view and the helper
+            must return a value on every exit (see
+            ``exits_return_values``), each imported presenter name the proof trusts must
+            be bound only by its import, to what that import names, and a value bound
+            in the caller must not be rebound on its way to the call.  The helper's own
+            body is held to ``own_body_is_exact``, and a return that hands off to
+            another call must satisfy ``delegate_is_exact``.  Returns the key under
+            which the helper is proven with exactly those parameters treated as
+            presenter callables, or ``None`` when the shape does not apply."""
+
+            fn = function_defs.get(candidate)
+            if module_has_dynamic_namespace_access or module_has_inexact_import or module_patches_trusted_names or module_raises_http_exceptions or module_alters_response_path():
+                return None
+            if fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
+                return None
+            if not isinstance(ast_parents.get(call), ast.Return) or not exits_return_values(fn) or not exits_return_values(function_defs[owner]) or not defines_nothing(function_defs[owner]):
+                return None
+            if any(module_binding_counts.get(name, 0) != 1 or exact_import_targets.get(name) != aliases.get(name) for name in presenter_trust_names):
+                return None
+            # The view is registered by its own decorators, each a route registration on
+            # a Flask app or Blueprint the module constructs (see
+            # ``is_route_registration``); its name is used nowhere else; and every
+            # enclosing function is undecorated. So what Flask serves for the route is
+            # the analyzed view's own return.
+            owner_fn = function_defs[owner]
+            if not owner_fn.decorator_list or any(
+                (isinstance(node, ast.Name) and node.id == owner_fn.name) or (isinstance(node, ast.Attribute) and node.attr == owner_fn.name)
+                for node in ast.walk(tree)
+            ):
+                return None
+            chain_scope: str | None = owner
+            while chain_scope is not None:
+                for deco in function_defs[chain_scope].decorator_list:
+                    if chain_scope != owner or not is_route_registration(deco, owner):
+                        return None
+                chain_scope = parent_function_by_key.get(chain_scope)
+            helper_name = call.func.id
+            if any(name_is_bound_in(stmt, helper_name) for stmt in tree.body if stmt is not fn):
+                return None
+            if any(
+                (isinstance(node, ast.Name) and node.id == helper_name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
+                or (isinstance(node, ast.Attribute) and node.attr == helper_name)
+                for node in ast.walk(tree)
+            ):
+                return None
+            scope: str | None = owner
+            while scope is not None:
+                scope_fn = function_defs[scope]
+                scope_params = scope_fn.args.posonlyargs + scope_fn.args.args + scope_fn.args.kwonlyargs
+                if any(param.arg == helper_name for param in scope_params) or any(name_is_bound_in(stmt, helper_name) for stmt in scope_fn.body):
+                    return None
+                scope = parent_function_by_key.get(scope)
+            if fn.args.vararg is not None or fn.args.kwarg is not None or _has_expanded_kwargs(call) or any(isinstance(arg, ast.Starred) for arg in call.args):
+                return None
+            positional = list(fn.args.posonlyargs) + list(fn.args.args)
+            if len(call.args) > len(positional):
+                return None
+            bound_args: dict[str, ast.AST] = {param.arg: arg for param, arg in zip(positional, call.args)}
+            keyword_params = {param.arg for param in fn.args.args + fn.args.kwonlyargs}
+            for keyword in call.keywords:
+                if keyword.arg not in keyword_params or keyword.arg in bound_args:
+                    return None
+                bound_args[keyword.arg] = keyword.value
+            defaults: dict[str, ast.AST] = dict(zip([param.arg for param in positional][len(positional) - len(fn.args.defaults) :], fn.args.defaults))
+            defaults.update({param.arg: default for param, default in zip(fn.args.kwonlyargs, fn.args.kw_defaults) if default is not None})
+            caller_presenter_names = presenter_callable_names_for(owner)
+            bound: set[str] = set()
+            for param in positional + list(fn.args.kwonlyargs):
+                if param.arg in bound_args:
+                    value = bound_args[param.arg]
+                    if isinstance(value, (ast.Name, ast.Attribute)) and is_pure_chain(value) and _is_sanctioned_presenter_call(_attribute_chain(value), aliases):
+                        bound.add(param.arg)
+                    elif isinstance(value, ast.Name) and value.id in caller_presenter_names:
+                        # Not bound in the view (parameters included), and bound at
+                        # most once in each enclosing function's body.
+                        owner_fn = function_defs[owner]
+                        if binding_site_counts([*ast.walk(owner_fn.args), *(node for stmt in owner_fn.body for node in ast.walk(stmt))]).get(value.id, 0):
+                            continue
+                        chain_scope = parent_function_by_key.get(owner)
+                        rebound = False
+                        while chain_scope is not None:
+                            if binding_site_counts(node for stmt in function_defs[chain_scope].body for node in ast.walk(stmt)).get(value.id, 0) > 1:
+                                rebound = True
+                                break
+                            chain_scope = parent_function_by_key.get(chain_scope)
+                        if not rebound:
+                            bound.add(param.arg)
+                elif param.arg in defaults:
+                    default = defaults[param.arg]
+                    if isinstance(default, (ast.Name, ast.Attribute)) and is_pure_chain(default) and _is_sanctioned_presenter_call(_attribute_chain(default), aliases):
+                        bound.add(param.arg)
+            if not bound or any(name_is_bound_in(stmt, name) for stmt in fn.body for name in bound):
+                return None
+            if not own_body_is_exact(fn, frozenset(bound)):
+                return None
+            for node in iter_body_nodes(fn):
+                if isinstance(node, ast.Return):
+                    handed_off = delegated_call(node, frozenset(bound))
+                    if handed_off is not None and not delegate_is_exact(handed_off, fn):
+                        return None
+            key = f"{candidate}#presenter_bound:{','.join(sorted(bound))}"
+            function_defs[key] = fn
+            presenter_bound_params_by_key[key] = frozenset(bound)
+            return key
 
         def helper_passthrough_params(name: str) -> set[str]:
             fn = function_defs.get(name)
@@ -2170,6 +2844,9 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                             if index < len(positional_params) and positional_params[index] in passthrough and value_has_presenter(arg, owner, assigned_good, seen):
                                 return True
                     if function_returns_presenter(candidate, seen):
+                        return True
+                    bound_key = presenter_bound_helper_key(value, owner, candidate)
+                    if bound_key is not None and function_returns_presenter(bound_key, seen):
                         return True
             return False
 

@@ -1,6 +1,21 @@
 name: epic-closeout-validation
 
+# Runs by itself on every pull request that changes a writer close pack, so a
+# close never waits on a manual dispatch (HDE-CRD-0002 CL-05, B-5). A pull
+# request that changes the close tooling (this workflow, the writer or its
+# source schemas) re-validates every committed writer close pack, so a merged
+# close pack keeps a hosted check (HDE-CRD-0002 CL-05, B-6). The dispatch entry
+# re-validates one exact commit; no process step depends on it.
 on:
+  pull_request:
+    paths:
+      - ".github/workflows/epic-closeout-validation.yml"
+      - "tools/qa/generate_epic_close_pack.py"
+      - "schemas/close_candidate_source.v*.json"
+      - "schemas/epic_close_candidate_source.v*.json"
+      - "audit/*_close_candidate_source.json"
+      - "audit/*_close_report.md"
+      - "audit/*_MANIFEST.json"
   workflow_dispatch:
     inputs:
       git_ref:
@@ -14,6 +29,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: epic-closeout-validation-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate-closeout-candidate:
@@ -29,54 +48,156 @@ jobs:
       PYTHONDONTWRITEBYTECODE: "1"
       GIT_OPTIONAL_LOCKS: "0"
       GIT_NO_LAZY_FETCH: "1"
+      SELECTED_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || inputs.git_ref }}
     steps:
       - name: Check out exact closeout candidate
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
-          ref: ${{ inputs.git_ref }}
+          ref: ${{ env.SELECTED_REF }}
 
-      - name: Validate bounded dispatch inputs and clean exact head
+      - name: Select the closeout candidates and validate the clean exact head
+        id: select
         shell: bash
         env:
-          SELECTED_REF: ${{ inputs.git_ref }}
-          CANDIDATE_SOURCE: ${{ inputs.candidate_source }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.event.pull_request.base.sha }}
+          DISPATCHED_SOURCE: ${{ inputs.candidate_source }}
         run: |
           set -euo pipefail
           [[ "$SELECTED_REF" =~ ^[0-9a-f]{40,64}$ ]]
           test "$(git rev-parse --verify HEAD)" = "$SELECTED_REF"
-          (( ${#CANDIDATE_SOURCE} >= 1 && ${#CANDIDATE_SOURCE} <= 512 ))
-          [[ "$CANDIDATE_SOURCE" =~ ^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$ ]]
-          case "$CANDIDATE_SOURCE" in
-            ""|/*|*\\*|*//*|.|..|./*|*/./*|*/.|../*|*/../*|*/..)
-              exit 1
-              ;;
-          esac
-          test "$(git ls-files --error-unmatch -- "$CANDIDATE_SOURCE")" = "$CANDIDATE_SOURCE"
-          test -f "$CANDIDATE_SOURCE"
-          test ! -L "$CANDIDATE_SOURCE"
           git diff --exit-code
           test -z "$(git status --short --untracked-files=all)"
+          candidates="$RUNNER_TEMP/closeout_candidates.txt"
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            # A pull request validates the candidate source of every writer
+            # close pack it adds or changes, on its exact head. One that
+            # changes the close tooling validates every committed one.
+            [[ "$BASE_REF" =~ ^[0-9a-f]{40,64}$ ]]
+            merge_base="$(git merge-base "$BASE_REF" HEAD)"
+            python3 -I - "$merge_base" > "$candidates" <<'SELECT_CLOSEOUT_CANDIDATES'
+          import json
+          import re
+          import subprocess
+          import sys
+
+          SOURCE_RE = re.compile(r"audit/[A-Za-z0-9_.-]+_close_candidate_source\.json")
+          OUTPUT_RE = re.compile(r"audit/([A-Za-z0-9_.-]+)_(?:close_report\.md|MANIFEST\.json)")
+          PATH_RE = re.compile(r"[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*")
+          TOOLING_RE = re.compile(
+              r"\.github/workflows/epic-closeout-validation\.yml"
+              r"|tools/qa/generate_epic_close_pack\.py"
+              r"|schemas/(?:epic_)?close_candidate_source\.v[^/]*\.json"
+          )
+          MANIFEST_RE = re.compile(r"audit/[A-Za-z0-9_.-]+_MANIFEST\.json")
+          WRITER_MANIFESTS = {"epic_close_candidate_manifest.v1", "close_candidate_manifest.v2"}
+
+
+          def git(*args):
+              return subprocess.run(["git", *args], check=True, stdout=subprocess.PIPE).stdout
+
+
+          def tracked_at_head(path):
+              probe = subprocess.run(
+                  ["git", "cat-file", "-e", f"HEAD:{path}"], stderr=subprocess.DEVNULL
+              )
+              return probe.returncode == 0
+
+
+          def bound_source(manifest_path):
+              if not tracked_at_head(manifest_path):
+                  sys.exit(f"CLOSEOUT_MANIFEST_ABSENT:{manifest_path}")
+              try:
+                  manifest = json.loads(git("cat-file", "blob", f"HEAD:{manifest_path}"))
+              except ValueError:
+                  sys.exit(f"CLOSEOUT_MANIFEST_INVALID:{manifest_path}")
+              if not isinstance(manifest, dict) or manifest.get("schema_version") not in WRITER_MANIFESTS:
+                  return None  # a close pack of an earlier epic-specific generator
+              inputs = manifest.get("inputs")
+              binding = inputs.get("candidate_source") if isinstance(inputs, dict) else None
+              source = binding.get("path") if isinstance(binding, dict) else None
+              if (
+                  not isinstance(source, str)
+                  or PATH_RE.fullmatch(source) is None
+                  or {".", ".."} & set(source.split("/"))
+              ):
+                  sys.exit(f"CLOSEOUT_CANDIDATE_SOURCE_UNBOUND:{manifest_path}")
+              return source
+
+
+          changed = list(filter(None, git(
+              "diff", "--name-only", "--no-renames", "--diff-filter=d", "-z", sys.argv[1], "HEAD", "--"
+          ).decode("utf-8").split("\0")))
+          manifests = set()
+          selected = set()
+          for path in changed:
+              if SOURCE_RE.fullmatch(path):
+                  selected.add(path)
+                  continue
+              match = OUTPUT_RE.fullmatch(path)
+              if match is not None:
+                  manifests.add(f"audit/{match.group(1)}_MANIFEST.json")
+          if any(TOOLING_RE.fullmatch(path) for path in changed):
+              tracked = git("ls-tree", "-r", "--name-only", "-z", "HEAD", "--", "audit/")
+              manifests.update(
+                  path for path in tracked.decode("utf-8").split("\0") if MANIFEST_RE.fullmatch(path)
+              )
+          for manifest_path in sorted(manifests):
+              source = bound_source(manifest_path)
+              if source is not None:
+                  selected.add(source)
+          for source in sorted(selected):
+              print(source)
+          SELECT_CLOSEOUT_CANDIDATES
+          else
+            [[ "$DISPATCHED_SOURCE" != *$'\n'* ]]
+            printf '%s\n' "$DISPATCHED_SOURCE" > "$candidates"
+          fi
+          mapfile -t sources < "$candidates"
+          for CANDIDATE_SOURCE in "${sources[@]}"; do
+            (( ${#CANDIDATE_SOURCE} >= 1 && ${#CANDIDATE_SOURCE} <= 512 ))
+            [[ "$CANDIDATE_SOURCE" =~ ^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$ ]]
+            case "$CANDIDATE_SOURCE" in
+              ""|/*|*\\*|*//*|.|..|./*|*/./*|*/.|../*|*/../*|*/..)
+                exit 1
+                ;;
+            esac
+            test "$(git ls-files --error-unmatch -- "$CANDIDATE_SOURCE")" = "$CANDIDATE_SOURCE"
+            test -f "$CANDIDATE_SOURCE"
+            test ! -L "$CANDIDATE_SOURCE"
+            echo "Closeout candidate: $CANDIDATE_SOURCE"
+          done
+          if (( ${#sources[@]} == 0 )); then
+            echo "No writer close pack changed; closeout validation does not apply."
+            echo "applies=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "applies=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Set up Python 3.12
+        if: steps.select.outputs.applies == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Install bounded validation dependency
-        run: python -m pip install 'jsonschema==4.23.0'
+      - name: Install the read-only checks' runtime requirements
+        if: steps.select.outputs.applies == 'true'
+        run: python -m pip install -r requirements.txt
 
       - name: Validate exact committed closeout candidate without writing
+        if: steps.select.outputs.applies == 'true'
         shell: bash
-        env:
-          CANDIDATE_SOURCE: ${{ inputs.candidate_source }}
-        run: >-
-          python tools/qa/generate_epic_close_pack.py
-          --source "$CANDIDATE_SOURCE"
-          --check
+        run: |
+          set -euo pipefail
+          mapfile -t sources < "$RUNNER_TEMP/closeout_candidates.txt"
+          for CANDIDATE_SOURCE in "${sources[@]}"; do
+            python tools/qa/generate_epic_close_pack.py --source "$CANDIDATE_SOURCE" --check
+          done
 
       - name: Run retained read-only evidence checks
+        if: steps.select.outputs.applies == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -89,8 +210,6 @@ jobs:
 
       - name: Verify validation left the exact checkout clean
         shell: bash
-        env:
-          SELECTED_REF: ${{ inputs.git_ref }}
         run: |
           set -euo pipefail
           test "$(git rev-parse --verify HEAD)" = "$SELECTED_REF"

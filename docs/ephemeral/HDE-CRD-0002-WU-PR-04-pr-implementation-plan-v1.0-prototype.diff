@@ -1,0 +1,1583 @@
+diff --git a/ci/checks/classify_ci_changes.py b/ci/checks/classify_ci_changes.py
+index 3f276e4..3be620c 100644
+--- a/ci/checks/classify_ci_changes.py
++++ b/ci/checks/classify_ci_changes.py
+@@ -577,6 +577,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
+         "tests/bodygraph/test_vendor_client.py",
+         "tests/bodygraph/test_bg_resolve_route_policy.py",
+     ),
++    # HDE-CRD-0002 WU-PR-04 (S14): the production vendor-override audit module.
++    "engine/bodygraph/vendor_audit.py": ("tests/bodygraph/test_vendor_prod_override.py",),
+     "scripts/cut_release_manifest.py": ("tests/scripts/test_cut_release_manifest.py",),
+     "scripts/dev_start_reader.sh": ("tests/scripts/test_dev_start_reader.py",),
+     "scripts/emit_env_guard_artifact.py": (
+@@ -651,6 +653,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
+     "tools/evidence/generate_hdapi_v2_contract_inventory.py": (
+         "tests/evidence/test_hdapi_v2_contract_inventory.py",
+     ),
++    # HDE-CRD-0002 WU-PR-04 (ID-8): its production scenario passes the override gate.
++    "tools/evidence/generate_v2_mapped_cache_evidence.py": (
++        "tests/evidence/test_v2_mapped_cache_evidence.py",
++    ),
+ }
+ _EVIDENCE_HELPER_OWNERSHIP_TEST = (
+     "tests/evidence/test_evidence_tool_ownership.py"
+diff --git a/docs/CLI_commands.md b/docs/CLI_commands.md
+index 6cc983f..818002f 100644
+--- a/docs/CLI_commands.md
++++ b/docs/CLI_commands.md
+@@ -13,10 +13,12 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
+   - `hdctl showcompat --conjunction` (reads one conjunction pair payload from stdin)
+ - `hdctl aux-preview --pair-file <compat.json> --category <slug> --band <band> --perspective <perspective> [--show-narrative] [--admin-out <ids.json>]`
+   - `<compat.json>` is a `magic10_compat_result.v1` document such as `hdctl showcompat` stdout; `--category` is a Magic-10 category id present in it.
+-- `hdctl bg:resolve --user <user> [--source auto|db|vendor] [--upsert] [--dry-run] [--birthdate YYYY-MM-DD --birthtime HH:MM --location <place>]`
++  - With `--pair-file`, an explicit `--band` replaces the band read from the file for the selected category; without it, the file's band is used. The category must still be present in the file.
++- `hdctl bg:resolve --user <user> [--source auto|db|vendor] [--upsert] [--dry-run] [--birthdate YYYY-MM-DD --birthtime HH:MM --location <place>] [--allow-prod-vendor <AUTHORIZATION_REF>]`
+   - Closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`) refuse vendor resolution before route-policy classification, client construction, request construction, fetch, ingest, DB, DNS, socket, or HTTP.
+   - Under explicitly open rails, configured v2 bases use the governed, version-neutral `charts` route plus the deterministic v2 ChartResult adapter. `--dry-run` maps without constructing a database target. A non-dry-run configured-v2 write requires explicit `--upsert`, a non-production-like requested and process environment, and an available sanctioned `DBAccess.for_current_env()` target. The resolver persists only the projected mapped-cache payload to `hde.body_graphs`, then verifies canonical read-back and idempotence.
+   - Missing `--upsert`, production-like environments, and failure to construct the sanctioned database target fail closed before the vendor request. This controlled path is not production-write authorization. Non-v2 configured bases preserve explicit legacy BodyGraph fallback.
++  - Production gate (HDE-CLI-API-Vendor-Ref §7.1.11). After the rails, `APP_ENV` (or `ENGINE_ENV` when `APP_ENV` is blank) must name a recognized environment, or vendor resolution refuses with `PROVIDER_CONFIG_INVALID`. In `prod`, `production` or `live`, vendor access requires `--allow-prod-vendor <AUTHORIZATION_REF>`, an audit reference of the approved work item and not a credential; without it the command refuses with `PROVIDER_PROD_OVERRIDE_REQUIRED`, and in a non-production environment the flag refuses with `PROVIDER_PROD_OVERRIDE_INVALID`. Each production-like invocation appends one keys-only event to the audit sink named by `HDE_VENDOR_OVERRIDE_AUDIT_PATH` (default `$XDG_STATE_HOME/glow-hdengine/vendor_prod_override.jsonl`, else `~/.local/state/glow-hdengine/vendor_prod_override.jsonl`); an unavailable actor or sink refuses with `PROVIDER_AUDIT_UNAVAILABLE`. The override permits one vendor read only: `--upsert` and every write refuse with `PROVIDER_WRITE_UNSUPPORTED`. A malformed, duplicated or misplaced flag, or the flag without `--source vendor`, is a usage error (exit 64).
+ - Dev-only sampler CLI (APP_ENV in `dev|test|local`, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
+ - Flags for QA sidecars: `--dump-reader <out.json> --dump-admin-dir <dir>`
+ 
+diff --git a/engine/bodygraph/resolver.py b/engine/bodygraph/resolver.py
+index b2bfe41..c3550c0 100644
+--- a/engine/bodygraph/resolver.py
++++ b/engine/bodygraph/resolver.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ import hashlib
+ import os
++import re
+ from dataclasses import dataclass, replace
+ from typing import Any, Callable, Mapping, MutableMapping, Optional
+ from uuid import UUID
+@@ -12,9 +13,12 @@ from engine.compat.error_tokens import CompatBoundaryError
+ from engine.db import DBAccess
+ from engine.db.errors import AdapterError
+ 
++from . import vendor_audit
+ from .ingest import (
++    RETRY_LOG,
+     IngestOutcome,
+     VendorInputs,
++    _client_config_env,
+     gather_inputs_from_env,
+     ingest_vendor_bodygraph,
+     resolve_db_user_id,
+@@ -31,6 +35,94 @@ from .projection import (
+ )
+ from .vendor_client import HdApiClient, VendorError, classify_bg_resolve_route_policy, route_auth_posture
+ 
++# HDE-CLI-API-Vendor-Ref §7.1.11a and §7.1.11b.
++AUTHORIZATION_REF_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}")
++_PRODUCTION_ENVIRONMENTS = frozenset({"prod", "production", "live"})
++_NON_PRODUCTION_ENVIRONMENTS = frozenset({"dev", "test", "local", "stage", "staging"})
++_ASCII_WHITESPACE = " \t\n\r\x0b\x0c"
++
++
++def is_valid_authorization_ref(value: object) -> bool:
++    """True when *value* is one §7.1.11a ``AUTHORIZATION_REF`` (1–128 ASCII characters)."""
++
++    return isinstance(value, str) and AUTHORIZATION_REF_PATTERN.fullmatch(value) is not None
++
++
++@dataclass(frozen=True)
++class VendorEnvironment:
++    label: str
++    production_like: bool
++
++
++@dataclass
++class _OverrideGate:
++    """Per-invocation state of an allowed production override (step 7)."""
++
++    outbound_attempted: bool = False
++    route_family: str | None = None
++    resource_path: str | None = None
++
++
++def _environment_value(view: Mapping[str, object], name: str) -> str | None:
++    raw = view.get(name)
++    if raw is None:
++        return None
++    value = str(raw).strip(_ASCII_WHITESPACE).lower()
++    return value or None
++
++
++def classify_vendor_environment(
++    view: Mapping[str, object],
++    process: Mapping[str, object] | None = None,
++) -> VendorEnvironment:
++    """Classify the effective environment exactly as §7.1.11b states.
++
++    *view* is the merged vendor configuration view. A production-like
++    ``APP_ENV`` or ``ENGINE_ENV`` in the process environment is never
++    downgraded to non-production by a caller-supplied mapping.
++    """
++
++    app_env = _environment_value(view, "APP_ENV")
++    engine_env = _environment_value(view, "ENGINE_ENV")
++    invalid = VendorError(
++        "PROVIDER_CONFIG_INVALID",
++        "vendor environment classification requires APP_ENV or ENGINE_ENV to name one recognized environment",
++        details={"outbound_attempted": False},
++    )
++    if app_env and engine_env and app_env != engine_env:
++        raise invalid
++    effective = app_env or engine_env
++    if effective in _PRODUCTION_ENVIRONMENTS:
++        return VendorEnvironment(label=effective, production_like=True)
++    if effective not in _NON_PRODUCTION_ENVIRONMENTS:
++        raise invalid
++    source = os.environ if process is None else process
++    for name in ("APP_ENV", "ENGINE_ENV"):
++        process_value = _environment_value(source, name)
++        if process_value in _PRODUCTION_ENVIRONMENTS:
++            return VendorEnvironment(label=process_value, production_like=True)
++    return VendorEnvironment(label=effective, production_like=False)
++
++
++def _override_refusal(code: str, message: str, resolver: Mapping[str, object]) -> "ResolveBodygraphResult":
++    return _vendor_error(VendorError(code, message, details={"outbound_attempted": False}), resolver)
++
++
++class _AttemptTrackingClient:
++    """Delegates to the legacy client and records that the fetch was entered."""
++
++    def __init__(self, client: HdApiClient, gate: _OverrideGate) -> None:
++        self._client = client
++        self._gate = gate
++
++    def build_request(self, **kwargs: Any) -> Any:
++        return self._client.build_request(**kwargs)
++
++    def fetch(self, request: Any) -> Any:
++        self._gate.outbound_attempted = True
++        return self._client.fetch(request)
++
++
+ def _truthy(value: object) -> bool:
+     if value is None:
+         return False
+@@ -66,8 +158,13 @@ def resolve_bodygraph(
+     birthdate: str | None = None,
+     birthtime: str | None = None,
+     location: str | None = None,
++    authorization_ref: str | None = None,
+ ) -> ResolveBodygraphResult:
+-    """Resolve BodyGraph data within the selected source and rail posture."""
++    """Resolve BodyGraph data within the selected source and rail posture.
++
++    *authorization_ref* is the §7.1.11a production override reference;
++    ``None`` means absent.
++    """
+ 
+     env = env or {}
+     requested_source = (source or "auto").lower()
+@@ -85,6 +182,13 @@ def resolve_bodygraph(
+         "allow_network": allow_network,
+     }
+ 
++    if authorization_ref is not None and (requested_source != "vendor" or not is_valid_authorization_ref(authorization_ref)):
++        return _override_refusal(
++            "PROVIDER_PROD_OVERRIDE_INVALID",
++            "production vendor override reference is malformed or inapplicable",
++            {**snapshot, "resolved_source": "vendor" if requested_source == "vendor" else "db"},
++        )
++
+     if requested_source == "vendor":
+         return _resolve_vendor(
+             user_id,
+@@ -95,6 +199,7 @@ def resolve_bodygraph(
+             birthdate=birthdate,
+             birthtime=birthtime,
+             location=location,
++            authorization_ref=authorization_ref,
+         )
+ 
+     # Phase S8a treats "auto" as "db" while avoiding real IO.
+@@ -119,6 +224,7 @@ def _resolve_vendor(
+     birthdate: str | None,
+     birthtime: str | None,
+     location: str | None,
++    authorization_ref: str | None = None,
+ ) -> ResolveBodygraphResult:
+     safe_mode_closed = bool(snapshot.get("safe_mode"))
+     allow_network = bool(snapshot.get("allow_network"))
+@@ -149,10 +255,153 @@ def _resolve_vendor(
+     # that the vendor configuration overlay intentionally treats as removal.
+     if env is not None:
+         database_env.update(env)
++    # Step 4 (§7.1.11d): the effective environment.
++    try:
++        environment = classify_vendor_environment(vendor_env)
++    except VendorError as exc:
++        return _vendor_error(exc, resolver_meta)
++    route_args = dict(
++        user_id=user_id,
++        resolver_meta=resolver_meta,
++        vendor_env=vendor_env,
++        database_env=database_env,
++        upsert=upsert,
++        dry_run=dry_run,
++        birthdate=birthdate,
++        birthtime=birthtime,
++        location=location,
++    )
++    # Step 5: the rail and flag matrix (§7.1.11c).
++    if not environment.production_like:
++        if authorization_ref is not None:
++            return _override_refusal(
++                "PROVIDER_PROD_OVERRIDE_INVALID",
++                "production vendor override is not accepted in a non-production environment",
++                resolver_meta,
++            )
++        return _resolve_vendor_route(**route_args, gate=None)
++    if authorization_ref is None:
++        _append_flag_absent_event(vendor_env, environment)
++        return _override_refusal(
++            "PROVIDER_PROD_OVERRIDE_REQUIRED",
++            "production-like vendor access requires --allow-prod-vendor",
++            resolver_meta,
++        )
++    # Step 6: actor identity and the durable pre-I/O audit event (§7.1.11e–f).
++    try:
++        actor = vendor_audit.resolve_actor_principal()
++        sink = vendor_audit.resolve_sink_path(vendor_env)
++        correlation_id = vendor_audit.new_correlation_id()
++        vendor_audit.append_event(
++            sink,
++            vendor_audit.build_event(
++                correlation_id=correlation_id,
++                actor_principal=actor,
++                authorization_ref=authorization_ref,
++                environment=environment.label,
++                outcome="allowed",
++                error_code=None,
++                outbound_attempted=False,
++            ),
++        )
++    except vendor_audit.AuditUnavailable:
++        return _override_refusal(
++            "PROVIDER_AUDIT_UNAVAILABLE",
++            "production vendor override audit is unavailable",
++            resolver_meta,
++        )
++    # Step 7, then one state event under the same correlation ID.
++    gate = _OverrideGate()
++    try:
++        result = _resolve_vendor_route(**route_args, gate=gate)
++    except BaseException:
++        _append_state_event(sink, correlation_id, actor, authorization_ref, environment, gate, None)
++        raise
++    _append_state_event(sink, correlation_id, actor, authorization_ref, environment, gate, result)
++    return result
++
++
++def _append_flag_absent_event(vendor_env: Mapping[str, object], environment: VendorEnvironment) -> None:
++    """Row 3 of §7.1.11c: the refusal stands whether or not its event persists."""
++
++    try:
++        vendor_audit.append_event(
++            vendor_audit.resolve_sink_path(vendor_env),
++            vendor_audit.build_event(
++                correlation_id=vendor_audit.new_correlation_id(),
++                actor_principal=vendor_audit.resolve_actor_principal(),
++                authorization_ref=None,
++                environment=environment.label,
++                outcome="refused",
++                error_code="PROVIDER_PROD_OVERRIDE_REQUIRED",
++                outbound_attempted=False,
++            ),
++        )
++    except vendor_audit.AuditUnavailable:
++        return
++
++
++def _append_state_event(
++    sink: Any,
++    correlation_id: str,
++    actor: str,
++    authorization_ref: str,
++    environment: VendorEnvironment,
++    gate: _OverrideGate,
++    result: "ResolveBodygraphResult | None",
++) -> None:
++    """Append the post-step-7 state event; a failure changes nothing and prints nothing."""
++
++    error_code: str | None = None
++    if result is not None and result.status == "ok":
++        outcome = "completed"
++    else:
++        outcome = "failed" if gate.outbound_attempted else "refused"
++        if result is not None:
++            error = result.payload.get("error")
++            if isinstance(error, Mapping) and isinstance(error.get("code"), str):
++                error_code = error["code"]
++    try:
++        vendor_audit.append_event(
++            sink,
++            vendor_audit.build_event(
++                correlation_id=correlation_id,
++                actor_principal=actor,
++                authorization_ref=authorization_ref,
++                environment=environment.label,
++                outcome=outcome,
++                error_code=error_code,
++                outbound_attempted=gate.outbound_attempted,
++                route_family=gate.route_family,
++                resource_path=gate.resource_path,
++            ),
++        )
++    except vendor_audit.AuditUnavailable:
++        return
++
++
++def _resolve_vendor_route(
++    *,
++    user_id: str,
++    resolver_meta: MutableMapping[str, object],
++    vendor_env: Mapping[str, object],
++    database_env: Mapping[str, object],
++    upsert: bool,
++    dry_run: bool,
++    birthdate: str | None,
++    birthtime: str | None,
++    location: str | None,
++    gate: _OverrideGate | None,
++) -> ResolveBodygraphResult:
++    """Step 7 (§7.1.11d): route, input, identity, write guards, client and fetch."""
++
+     try:
+         route_policy = _classify_env_route_policy(vendor_env)
+     except VendorError as exc:
+         return _vendor_error(exc, resolver_meta)
++    if gate is not None:
++        gate.route_family = str(route_policy["route_family"])
++        gate.resource_path = str(route_policy["resource_path"])
+     resolver_meta = {**resolver_meta, "route_policy": route_policy}
+     if not route_policy["supported"]:
+         error = VendorError(
+@@ -192,13 +441,30 @@ def _resolve_vendor(
+             upsert=upsert,
+             dry_run=dry_run,
+             route_policy=route_policy,
++            override_gate=gate,
+         )
+     try:
+-        outcome = ingest_vendor_bodygraph(
+-            vendor_inputs,
+-            env=database_env,
+-            dry_run=dry_run,
+-        )
++        if gate is None:
++            outcome = ingest_vendor_bodygraph(
++                vendor_inputs,
++                env=database_env,
++                dry_run=dry_run,
++            )
++        else:
++            # §7.1.11d: the override never authorizes production --upsert or a
++            # production database write (HDE-CRD-0002 WU-PR-04 ID-3).
++            if upsert or not dry_run:
++                return _vendor_error(
++                    VendorError("PROVIDER_WRITE_UNSUPPORTED", "BodyGraph persistence is refused in production-like environments"),
++                    resolver_meta,
++                )
++            client = HdApiClient.from_env(log_path=RETRY_LOG, env=_client_config_env(database_env))
++            outcome = ingest_vendor_bodygraph(
++                vendor_inputs,
++                env=database_env,
++                dry_run=dry_run,
++                client=_AttemptTrackingClient(client, gate),  # type: ignore[arg-type]
++            )
+     except VendorError as exc:
+         return _vendor_error(exc, resolver_meta)
+     ingest_section = {
+@@ -231,6 +497,7 @@ def _resolve_vendor_v2_chart(
+     upsert: bool,
+     dry_run: bool,
+     route_policy: Mapping[str, object],
++    override_gate: _OverrideGate | None = None,
+ ) -> ResolveBodygraphResult:
+     db: DBAccess | None = None
+     if not dry_run and not upsert:
+@@ -245,7 +512,11 @@ def _resolve_vendor_v2_chart(
+         return _vendor_error(error, resolver_meta)
+     requested_app_env = str(vendor_env.get("APP_ENV") or vendor_env.get("ENGINE_ENV") or "").strip().lower()
+     database_app_env = str(os.environ.get("APP_ENV") or os.environ.get("ENGINE_ENV") or "").strip().lower()
+-    if not dry_run and {requested_app_env, database_app_env} & {"prod", "production", "live"}:
++    production_like = bool({requested_app_env, database_app_env} & {"prod", "production", "live"})
++    if override_gate is not None:
++        # Only an allowed production override reaches here with a gate (ID-3).
++        production_like = True
++    if (not dry_run or (override_gate is not None and upsert)) and production_like:
+         return _vendor_error(
+             VendorError("PROVIDER_WRITE_UNSUPPORTED", "mapped-cache persistence is refused in production-like environments"),
+             resolver_meta,
+@@ -268,6 +539,8 @@ def _resolve_vendor_v2_chart(
+             birthtime=vendor_inputs.birthtime,
+             location=vendor_inputs.location,
+         )
++        if override_gate is not None:
++            override_gate.outbound_attempted = True
+         vendor_result = client.fetch(request)
+     except VendorError as exc:
+         return _vendor_error(exc, resolver_meta)
+diff --git a/engine/bodygraph/vendor_audit.py b/engine/bodygraph/vendor_audit.py
+new file mode 100644
+index 0000000..6b85574
+--- /dev/null
++++ b/engine/bodygraph/vendor_audit.py
+@@ -0,0 +1,178 @@
++"""Production vendor-override audit record (HDE-CLI-API-Vendor-Ref §7.1.11e–f).
++
++One append-only, locally durable, keys-only JSONL event per production-like
++``bg:resolve --source vendor`` invocation that reaches override evaluation.
++The actor, the sink, the clock and the correlation ID are module-level seams
++so tests can replace them; nothing here reads the subject, the configured URL,
++any header or key value, or raw provider data.
++"""
++
++from __future__ import annotations
++
++import os
++import stat
++import uuid
++from datetime import datetime, timezone
++from pathlib import Path
++from typing import Any, Mapping
++
++from engine.serializer.canon import sercanon
++
++VENDOR_PROD_OVERRIDE_AUDIT_SCHEMA_VERSION = "vendor_prod_override.v1"
++VENDOR_PROD_OVERRIDE_EVENT = "vendor_prod_override"
++VENDOR_OVERRIDE_AUDIT_PATH_KEY = "HDE_VENDOR_OVERRIDE_AUDIT_PATH"
++DEFAULT_AUDIT_SUBPATH = Path("glow-hdengine") / "vendor_prod_override.jsonl"
++AUDIT_OUTCOMES = frozenset({"refused", "allowed", "failed", "completed"})
++AUDIT_FIELDS = (
++    "actor_principal",
++    "authorization_ref",
++    "command",
++    "correlation_id",
++    "environment",
++    "error_code",
++    "event",
++    "network_open",
++    "occurred_at",
++    "outbound_attempted",
++    "outcome",
++    "resource_path",
++    "route_family",
++    "safe_mode_open",
++    "schema_version",
++    "source",
++)
++
++_REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
++
++
++class AuditUnavailable(Exception):
++    """The actor or the sink is unavailable; the reason is never surfaced."""
++
++
++def utc_now() -> datetime:
++    """Clock seam: the current UTC time."""
++
++    return datetime.now(timezone.utc)
++
++
++def new_correlation_id() -> str:
++    """Correlation seam: generated by the runtime, never taken from input."""
++
++    return str(uuid.uuid4())
++
++
++def resolve_actor_principal() -> str:
++    """Actor seam: the account name of the process's effective user ID.
++
++    Read from the system user database through the process's own credentials,
++    never from ``USER``, ``LOGNAME``, ``LNAME``, ``USERNAME`` or any other
++    caller-settable value. A UID without an account name is not a stable
++    authenticated identity.
++    """
++
++    try:
++        import pwd
++
++        name = pwd.getpwuid(os.geteuid()).pw_name
++    except (ImportError, AttributeError, KeyError, OSError):
++        raise AuditUnavailable() from None
++    principal = sanitize_field(name)
++    if not principal:
++        raise AuditUnavailable()
++    return principal
++
++
++def resolve_sink_path(env: Mapping[str, object]) -> Path:
++    """Sink seam: the operator key, else the operator's state directory."""
++
++    configured = env.get(VENDOR_OVERRIDE_AUDIT_PATH_KEY)
++    if isinstance(configured, str) and configured.strip():
++        candidate = Path(configured.strip())
++    else:
++        state_home = env.get("XDG_STATE_HOME")
++        if isinstance(state_home, str) and state_home.strip() and Path(state_home.strip()).is_absolute():
++            base = Path(state_home.strip())
++        else:
++            home = os.path.expanduser("~")
++            if home == "~" or not Path(home).is_absolute():
++                raise AuditUnavailable()
++            base = Path(home) / ".local" / "state"
++        candidate = base / DEFAULT_AUDIT_SUBPATH
++    if not candidate.is_absolute():
++        raise AuditUnavailable()
++    resolved = Path(os.path.realpath(candidate))
++    if resolved == _REPOSITORY_ROOT or _REPOSITORY_ROOT in resolved.parents:
++        raise AuditUnavailable()
++    return resolved
++
++
++def sanitize_field(value: str) -> str:
++    """Keep printable ASCII only, so no CR, LF, control or delimiter byte survives."""
++
++    return "".join(ch if " " <= ch <= "~" else "?" for ch in value)
++
++
++def build_event(
++    *,
++    correlation_id: str,
++    actor_principal: str,
++    authorization_ref: str | None,
++    environment: str,
++    outcome: str,
++    error_code: str | None,
++    outbound_attempted: bool,
++    route_family: str | None = None,
++    resource_path: str | None = None,
++) -> dict[str, Any]:
++    if outcome not in AUDIT_OUTCOMES:
++        raise ValueError("unsupported audit outcome")
++
++    def _optional(value: str | None) -> str | None:
++        return None if value is None else sanitize_field(str(value))
++
++    return {
++        "schema_version": VENDOR_PROD_OVERRIDE_AUDIT_SCHEMA_VERSION,
++        "event": VENDOR_PROD_OVERRIDE_EVENT,
++        "occurred_at": utc_now().astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
++        "correlation_id": sanitize_field(correlation_id),
++        "actor_principal": sanitize_field(actor_principal),
++        "authorization_ref": _optional(authorization_ref),
++        "command": "bg:resolve",
++        "source": "vendor",
++        "environment": sanitize_field(environment),
++        "safe_mode_open": True,
++        "network_open": True,
++        "route_family": _optional(route_family),
++        "resource_path": _optional(resource_path),
++        "outcome": outcome,
++        "error_code": _optional(error_code),
++        "outbound_attempted": bool(outbound_attempted),
++    }
++
++
++def append_event(sink: Path, event: Mapping[str, Any]) -> None:
++    """Append one canonical JSON line, then flush and fsync it.
++
++    A missing parent directory is created owner-only. The file is created
++    owner-only, opened for append, and must be a regular file. Any failure is
++    :class:`AuditUnavailable`.
++    """
++
++    line = sercanon(dict(event))
++    try:
++        sink.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
++        fd = os.open(sink, os.O_WRONLY | os.O_APPEND | os.O_CREAT | getattr(os, "O_CLOEXEC", 0), 0o600)
++    except OSError:
++        raise AuditUnavailable() from None
++    try:
++        if not stat.S_ISREG(os.fstat(fd).st_mode):
++            raise AuditUnavailable()
++        view = memoryview(line)
++        while view:
++            written = os.write(fd, view)
++            view = view[written:]
++        os.fsync(fd)
++    except OSError:
++        raise AuditUnavailable() from None
++    finally:
++        os.close(fd)
+diff --git a/engine/cli/main.py b/engine/cli/main.py
+index 58dc412..51ff3c2 100644
+--- a/engine/cli/main.py
++++ b/engine/cli/main.py
+@@ -12,7 +12,12 @@ from engine.bodygraph import resolve_bodygraph
+ from engine.bodygraph.ingest import resolve_db_user_id
+ from engine.bodygraph.mapped_cache import MappedBodyGraphRow, MappedCacheError, read_current_mapped_bodygraph
+ from engine.bodygraph.projection import BodyGraphProjectionError, canonical_uuid
+-from engine.bodygraph.resolver import ResolvedCompatChart, projection_refusal, resolve_compat_chart
++from engine.bodygraph.resolver import (
++    ResolvedCompatChart,
++    is_valid_authorization_ref,
++    projection_refusal,
++    resolve_compat_chart,
++)
+ from engine.compat.categories import CATEGORIES_ORDER_V1
+ from engine.compat.compute import (
+     EvaluationParty,
+@@ -42,6 +47,16 @@ from ._admin_dump import canon_dump
+ _PROJECTION_KEYS = ("bodygraph", "person", "person_uid", "source")
+ _IDENTITY_KEYS = ("user_id", "canonical_person_id")
+ _BIRTH_KEYS = ("birthdate", "birthtime", "location")
++# HDE-CLI-API-Vendor-Ref §7.1.11a and §7.1.11e: usage errors name the option and
++# never echo its value.
++_ALLOW_PROD_VENDOR = "--allow-prod-vendor"
++_ALLOW_PROD_VENDOR_COMMAND_USAGE = "hdctl: --allow-prod-vendor is accepted only by bg:resolve --source vendor"
++_ALLOW_PROD_VENDOR_DUPLICATE_USAGE = "hdctl bg:resolve: --allow-prod-vendor may be given only once"
++_ALLOW_PROD_VENDOR_VALUE_USAGE = (
++    "hdctl bg:resolve: --allow-prod-vendor requires one AUTHORIZATION_REF of 1 to 128 characters "
++    "matching ^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
++)
++_ALLOW_PROD_VENDOR_SOURCE_USAGE = "hdctl bg:resolve: --allow-prod-vendor is accepted only with --source vendor"
+ 
+ 
+ class CliError(Exception):
+@@ -160,6 +175,12 @@ def _build_parser() -> argparse.ArgumentParser:
+     bg.add_argument("--birthdate", help="Birthdate (YYYY-MM-DD) for vendor source")
+     bg.add_argument("--birthtime", help="Birth time (HH:MM) for vendor source")
+     bg.add_argument("--location", help="Location string for vendor source")
++    bg.add_argument(
++        _ALLOW_PROD_VENDOR,
++        dest="allow_prod_vendor",
++        metavar="AUTHORIZATION_REF",
++        help="Production-like environments only, with --source vendor: audit reference of the approved work item (not a credential)",
++    )
+     bg.set_defaults(handler=bg_resolve)
+ 
+     dev_sampler = sub.add_parser(
+@@ -207,7 +228,31 @@ def _load_viewer_prefs(path: str | None) -> Dict[str, Any]:
+     return normalize_viewer_prefs(data)
+ 
+ 
++def _allow_prod_vendor_usage_error(argv: Sequence[str]) -> str | None:
++    """Step 1 of §7.1.11d, run before argparse, which keeps the last value silently."""
++
++    values: list[tuple[int, str | None]] = []
++    for index, token in enumerate(argv):
++        if token == _ALLOW_PROD_VENDOR:
++            values.append((index, argv[index + 1] if index + 1 < len(argv) else None))
++        elif token.startswith(_ALLOW_PROD_VENDOR + "="):
++            values.append((index, token[len(_ALLOW_PROD_VENDOR) + 1 :]))
++    if not values:
++        return None
++    command_index = next((index for index, token in enumerate(argv) if not token.startswith("-")), None)
++    if command_index is None or argv[command_index] != "bg:resolve" or values[0][0] < command_index:
++        return _ALLOW_PROD_VENDOR_COMMAND_USAGE
++    if len(values) > 1:
++        return _ALLOW_PROD_VENDOR_DUPLICATE_USAGE
++    if not is_valid_authorization_ref(values[0][1]):
++        return _ALLOW_PROD_VENDOR_VALUE_USAGE
++    return None
++
++
+ def bg_resolve(args: argparse.Namespace) -> int:
++    authorization_ref = getattr(args, "allow_prod_vendor", None)
++    if authorization_ref is not None and args.source != "vendor":
++        raise CliError(_ALLOW_PROD_VENDOR_SOURCE_USAGE, exit_code=64)
+     if args.source == "vendor":
+         # PF-canon: vendor CLI invocations must supply the full birth tuple explicitly.
+         missing = [name for name in ("birthdate", "birthtime", "location") if not getattr(args, name, None)]
+@@ -222,6 +267,7 @@ def bg_resolve(args: argparse.Namespace) -> int:
+         birthdate=getattr(args, "birthdate", None),
+         birthtime=getattr(args, "birthtime", None),
+         location=getattr(args, "location", None),
++        authorization_ref=authorization_ref,
+     )
+     output = emitter.emit_public(result.payload).decode("utf-8")
+     sys.stdout.write(output)
+@@ -237,6 +283,11 @@ def cli(argv: list[str] | None = None) -> int:
+         sys.stderr.write("VERSION_FLAG_WITH_COMMAND\n")
+         return 64
+ 
++    usage_error = _allow_prod_vendor_usage_error(argv)
++    if usage_error is not None:
++        sys.stderr.write(f"{usage_error}\n")
++        return 64
++
+     parser = _build_parser()
+     try:
+         args = parser.parse_args(argv)
+@@ -554,6 +605,9 @@ def aux_preview(args: argparse.Namespace) -> int:
+         band = next((row.get("band") for row in categories if row.get("category_id") == category), None)
+         if not isinstance(category, str) or not isinstance(band, str):
+             raise CliError("MISSING_COMPAT_CATEGORY")
++        if args.band:
++            # S08: an explicit --band replaces only the band read from the file.
++            band = args.band
+         perspective = args.perspective or "shared"
+         release_id = compat.get("release_id") or identity_meta()["release_id"]
+         return category, band, perspective, release_id, data
+diff --git a/tests/bodygraph/test_bg_resolve_v2_mapped_cache.py b/tests/bodygraph/test_bg_resolve_v2_mapped_cache.py
+index fc53acf..dec90b5 100644
+--- a/tests/bodygraph/test_bg_resolve_v2_mapped_cache.py
++++ b/tests/bodygraph/test_bg_resolve_v2_mapped_cache.py
+@@ -16,6 +16,14 @@ ROOT = Path(__file__).resolve().parents[2]
+ CHART = json.loads((ROOT / "tests/fixtures/bodygraph/source_invariance/vendor_chart_result.v1.json").read_text())["payload"]
+ 
+ 
++@pytest.fixture(autouse=True)
++def _no_ambient_engine_env(monkeypatch):
++    # HDE-CRD-0002 WU-PR-04 ID-8: the vendor gate classifies APP_ENV with its ENGINE_ENV
++    # alias (HDE-CLI-API-Vendor-Ref §7.1.11b), so a leaked process ENGINE_ENV must not
++    # conflict with the APP_ENV these mappings set.
++    monkeypatch.delenv("ENGINE_ENV", raising=False)
++
++
+ def env(**changes):
+     value = {"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://vendor.test/v2", "HD_API_KEY": "set", "GEO_API_KEY": "set"}
+     value.update(changes)
+@@ -51,6 +59,12 @@ class MemoryDB:
+         return [[(1,)]] if inserted else [[]]
+ 
+ 
++def production_override(monkeypatch, tmp_path):
++    """HDE-CRD-0002 WU-PR-04 ID-8: a valid reference, a test actor and a temporary sink."""
++    monkeypatch.setattr("engine.bodygraph.vendor_audit.resolve_actor_principal", lambda: "test-operator")
++    return {"authorization_ref": "HDE-CRD-0002-TEST-1"}, {"HDE_VENDOR_OVERRIDE_AUDIT_PATH": str(tmp_path / "override_audit.jsonl")}
++
++
+ def install(monkeypatch, *, db=object()):
+     client = Client()
+     monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: client)
+@@ -75,18 +89,20 @@ def test_missing_upsert_refuses_before_vendor_and_db(monkeypatch):
+ 
+ 
+ @pytest.mark.parametrize("app_env", ["prod", "production", "live"])
+-def test_production_like_refuses_before_vendor_and_db(monkeypatch, app_env):
++def test_production_like_refuses_before_vendor_and_db(monkeypatch, tmp_path, app_env):
++    override, sink = production_override(monkeypatch, tmp_path)
+     monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: pytest.fail("vendor constructed"))
+     monkeypatch.setattr("engine.bodygraph.resolver.DBAccess.for_current_env", lambda **kwargs: pytest.fail("DB constructed"))
+-    result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(APP_ENV=app_env), birthdate="2000-01-01", birthtime="00:00", location="Fixture")
++    result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(APP_ENV=app_env, **sink), birthdate="2000-01-01", birthtime="00:00", location="Fixture", **override)
+     assert result.payload["error"]["code"] == "PROVIDER_WRITE_UNSUPPORTED"
+ 
+ 
+-def test_process_production_environment_cannot_be_overridden_for_database_write(monkeypatch):
++def test_process_production_environment_cannot_be_overridden_for_database_write(monkeypatch, tmp_path):
++    override, sink = production_override(monkeypatch, tmp_path)
+     monkeypatch.setenv("APP_ENV", "production")
+     monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: pytest.fail("vendor constructed"))
+     monkeypatch.setattr("engine.bodygraph.resolver.DBAccess.for_current_env", lambda **kwargs: pytest.fail("DB constructed"))
+-    result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(APP_ENV="test"), birthdate="2000-01-01", birthtime="00:00", location="Fixture")
++    result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(APP_ENV="test", **sink), birthdate="2000-01-01", birthtime="00:00", location="Fixture", **override)
+     assert result.payload["error"]["code"] == "PROVIDER_WRITE_UNSUPPORTED"
+ 
+ 
+diff --git a/tests/bodygraph/test_resolver_vendor.py b/tests/bodygraph/test_resolver_vendor.py
+index d1009d2..ff4bd53 100644
+--- a/tests/bodygraph/test_resolver_vendor.py
++++ b/tests/bodygraph/test_resolver_vendor.py
+@@ -1,5 +1,15 @@
++import pytest
++
+ from engine.bodygraph import resolver
+ from engine.bodygraph.ingest import IngestOutcome, VendorInputs
++from engine.bodygraph.vendor_client import VendorError
++
++
++@pytest.fixture(autouse=True)
++def _no_ambient_engine_env(monkeypatch):
++    # HDE-CRD-0002 WU-PR-04 ID-8: these mappings set APP_ENV explicitly; a leaked process
++    # ENGINE_ENV would conflict with it (HDE-CLI-API-Vendor-Ref §7.1.11b).
++    monkeypatch.delenv("ENGINE_ENV", raising=False)
+ 
+ 
+ def _make_outcome():
+@@ -41,7 +51,7 @@ def test_vendor_resolver_maps_synthetic_user(monkeypatch):
+         snapshot,
+         upsert=False,
+         dry_run=False,
+-        env={"HD_API_BASE_URL": "https://vendor.test/v1"},
++        env={"APP_ENV": "test", "HD_API_BASE_URL": "https://vendor.test/v1"},
+         birthdate=None,
+         birthtime=None,
+         location=None,
+@@ -71,7 +81,7 @@ def test_vendor_resolver_wraps_unexpected_normalization_errors(monkeypatch):
+         snapshot,
+         upsert=False,
+         dry_run=False,
+-        env={"HD_API_BASE_URL": "https://vendor.test/v1"},
++        env={"APP_ENV": "test", "HD_API_BASE_URL": "https://vendor.test/v1"},
+         birthdate=None,
+         birthtime=None,
+         location=None,
+@@ -119,3 +129,62 @@ def test_vendor_resolver_requires_open_network_exception_before_ingest(monkeypat
+ 
+     assert result.status == "error"
+     assert result.payload["error"]["code"] == "PROVIDER_NETWORK_BLOCKED"
++
++
++# HDE-CRD-0002 WU-PR-04 (S14): environment classification (HDE-CLI-API-Vendor-Ref §7.1.11b)
++# and the read-only production override on the legacy write path (ID-3).
++
++
++@pytest.mark.parametrize("view, process, expected", [
++    ({"APP_ENV": "prod"}, {}, ("prod", True)),
++    ({"APP_ENV": " Production "}, {}, ("production", True)),
++    ({"APP_ENV": "LIVE"}, {}, ("live", True)),
++    ({"APP_ENV": "dev"}, {}, ("dev", False)),
++    ({"APP_ENV": "staging"}, {}, ("staging", False)),
++    ({"APP_ENV": "  ", "ENGINE_ENV": "test"}, {}, ("test", False)),
++    ({"ENGINE_ENV": "live"}, {}, ("live", True)),
++    ({"APP_ENV": "test", "ENGINE_ENV": "TEST"}, {}, ("test", False)),
++    ({"APP_ENV": "test"}, {"APP_ENV": "production"}, ("production", True)),
++    ({"APP_ENV": "test"}, {"ENGINE_ENV": "prod"}, ("prod", True)),
++    ({"APP_ENV": "local"}, {"APP_ENV": "dev"}, ("local", False)),
++])
++def test_environment_classification(view, process, expected):
++    environment = resolver.classify_vendor_environment(view, process)
++    assert (environment.label, environment.production_like) == expected
++
++
++@pytest.mark.parametrize("view", [{}, {"APP_ENV": ""}, {"APP_ENV": "development"}, {"APP_ENV": "dev", "ENGINE_ENV": "prod"}, {"APP_ENV": "prod", "ENGINE_ENV": "live"}])
++def test_environment_classification_refuses_absent_unknown_or_conflicting(view):
++    with pytest.raises(VendorError) as excinfo:
++        resolver.classify_vendor_environment(view, {})
++    assert excinfo.value.code == "PROVIDER_CONFIG_INVALID"
++    assert excinfo.value.as_payload()["details"] == {"outbound_attempted": False}
++
++
++@pytest.mark.parametrize("dry_run, upsert", [(False, False), (False, True), (True, True)])
++def test_production_override_refuses_legacy_writes_before_ingest(monkeypatch, tmp_path, dry_run, upsert):
++    monkeypatch.setattr(resolver, "ingest_vendor_bodygraph", lambda *a, **k: pytest.fail("ingest reached"))
++    monkeypatch.setattr(resolver.HdApiClient, "from_env", classmethod(lambda cls, **_: pytest.fail("client constructed")))
++    monkeypatch.setattr("engine.bodygraph.vendor_audit.resolve_actor_principal", lambda: "test-operator")
++    result = resolver.resolve_bodygraph(
++        "user", source="vendor", upsert=upsert, dry_run=dry_run,
++        env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "prod", "HD_API_BASE_URL": "https://vendor.test/v1", "HDE_VENDOR_OVERRIDE_AUDIT_PATH": str(tmp_path / "a.jsonl")},
++        birthdate="1990-01-01", birthtime="12:00", location="Amsterdam", authorization_ref="PO-1",
++    )
++    assert result.payload["error"] == {"code": "PROVIDER_WRITE_UNSUPPORTED", "message": "BodyGraph persistence is refused in production-like environments"}
++
++
++def test_non_production_legacy_write_is_unchanged(monkeypatch):
++    seen = {}
++
++    def fake_ingest(inputs, env=None, dry_run=False, **kwargs):
++        seen.update(dry_run=dry_run, kwargs=kwargs)
++        return _make_outcome()
++
++    monkeypatch.setattr(resolver, "ingest_vendor_bodygraph", fake_ingest)
++    result = resolver.resolve_bodygraph(
++        "user", source="vendor", upsert=False, dry_run=False,
++        env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://vendor.test/v1"},
++        birthdate="1990-01-01", birthtime="12:00", location="Amsterdam",
++    )
++    assert result.status == "ok" and seen == {"dry_run": False, "kwargs": {}}
+diff --git a/tests/bodygraph/test_vendor_prod_override.py b/tests/bodygraph/test_vendor_prod_override.py
+new file mode 100644
+index 0000000..07d32b1
+--- /dev/null
++++ b/tests/bodygraph/test_vendor_prod_override.py
+@@ -0,0 +1,488 @@
++"""HDE-CRD-0002 WU-PR-04 (S14): production vendor override, HDE-CLI-API-Vendor-Ref §7.1.11.
++
++Tables M-1 to M-8 (§7.1.11c rows) and O-1 to O-7 (§7.1.11d steps), the audit
++record (§7.1.11f) and its seams. Every refusal runs with guards that fail the
++test on vendor-client or database construction, a urllib request, DNS or a
++socket. Every sink is a temporary path.
++"""
++
++from __future__ import annotations
++
++import json
++import os
++import socket
++import stat
++import urllib.request
++from datetime import datetime, timezone
++from pathlib import Path
++
++import pytest
++
++from engine.bodygraph import resolver, vendor_audit
++from engine.bodygraph.resolver import resolve_bodygraph
++from engine.bodygraph.vendor_client import HdApiClient, VendorError, VendorRequest, VendorResult
++from engine.cli.main import cli
++from engine.db import DBAccess
++
++ROOT = Path(__file__).resolve().parents[2]
++CHART = json.loads((ROOT / "tests/fixtures/bodygraph/source_invariance/vendor_chart_result.v1.json").read_text())["payload"]
++REF = "PO-HDE-CRD-0002/QA:live-1"
++BIRTH = {"birthdate": "1990-01-01", "birthtime": "07:41", "location": "Amsterdam, NL"}
++V2_BASE = "https://vendor.example.test/v2"
++V1_BASE = "https://vendor.example.test/v1"
++API_KEY = "api-key-value-not-for-output"
++GEO_KEY = "geo-key-value-not-for-output"
++FIXED_TIME = datetime(2026, 10, 18, 12, 0, 0, 123456, tzinfo=timezone.utc)
++IF2_FIELDS = {
++    "schema_version", "event", "occurred_at", "correlation_id", "actor_principal", "authorization_ref",
++    "command", "source", "environment", "safe_mode_open", "network_open", "route_family", "resource_path",
++    "outcome", "error_code", "outbound_attempted",
++}
++
++
++def _fail(name):
++    def _guard(*_args, **_kwargs):
++        raise AssertionError(f"forbidden I/O seam reached: {name}")
++
++    return _guard
++
++
++@pytest.fixture
++def no_io(monkeypatch):
++    """Fail on vendor-client or DB construction, urllib requests, DNS and sockets."""
++
++    monkeypatch.setattr(HdApiClient, "__init__", _fail("HdApiClient"))
++    monkeypatch.setattr(HdApiClient, "from_env", classmethod(lambda cls, **_: _fail("HdApiClient.from_env")()))
++    monkeypatch.setattr(DBAccess, "for_current_env", classmethod(lambda cls, **_: _fail("DBAccess")()))
++    monkeypatch.setattr(urllib.request, "Request", _fail("urllib.request.Request"))
++    monkeypatch.setattr(urllib.request, "urlopen", _fail("urllib.request.urlopen"))
++    monkeypatch.setattr(socket, "getaddrinfo", _fail("socket.getaddrinfo"))
++    monkeypatch.setattr(socket, "socket", _fail("socket.socket"))
++
++
++@pytest.fixture
++def seams(monkeypatch):
++    monkeypatch.setattr(vendor_audit, "utc_now", lambda: FIXED_TIME)
++    ids = iter(f"00000000-0000-4000-8000-{n:012d}" for n in range(1, 100))
++    monkeypatch.setattr(vendor_audit, "new_correlation_id", lambda: next(ids))
++    monkeypatch.setattr(vendor_audit, "resolve_actor_principal", lambda: "qa-operator")
++    for name in ("APP_ENV", "ENGINE_ENV", vendor_audit.VENDOR_OVERRIDE_AUDIT_PATH_KEY):
++        monkeypatch.delenv(name, raising=False)
++
++
++class FakeClient:
++    def __init__(self, error: VendorError | None = None):
++        self.fetches = 0
++        self.error = error
++
++    def build_contract_route_request(self, **_kwargs):
++        return VendorRequest(url=V2_BASE + "/charts", headers={"Authorization": "Bearer x"}, body_bytes=b"{}\n", input_fingerprint="a" * 64, route="vendor.hdapi.post:/charts")
++
++    def build_request(self, **_kwargs):
++        return VendorRequest(url=V1_BASE + "/bodygraphs", headers={"HD-Api-Key": "x"}, body_bytes=b"{}\n", input_fingerprint="b" * 64, route="vendor.hdapi.post:/bodygraphs")
++
++    def fetch(self, request):
++        self.fetches += 1
++        if self.error is not None:
++            raise self.error
++        if request.route.endswith("/charts"):
++            payload = {"timestamp": "2026-07-16T00:00:00Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": CHART}
++        else:
++            payload = {"bodygraph": {"type": "Generator"}}
++        return VendorResult(payload=payload, duration_ms=1.0, attempts=1)
++
++
++def _install_client(monkeypatch, client):
++    monkeypatch.setattr(HdApiClient, "from_env", classmethod(lambda cls, **_: client))
++    monkeypatch.setattr(DBAccess, "for_current_env", classmethod(lambda cls, **_: _fail("DBAccess")()))
++    return client
++
++
++def _env(tmp_path, *, app_env="prod", base=V2_BASE, safe="0", net="1", **extra):
++    env = {
++        "SAFE_MODE": safe,
++        "ALLOW_NETWORK": net,
++        "HD_API_BASE_URL": base,
++        "HD_API_KEY": API_KEY,
++        "GEO_API_KEY": GEO_KEY,
++        vendor_audit.VENDOR_OVERRIDE_AUDIT_PATH_KEY: str(tmp_path / "state" / "override.jsonl"),
++    }
++    if app_env is not None:
++        env["APP_ENV"] = app_env
++    env.update(extra)
++    return env
++
++
++def _sink_lines(tmp_path):
++    path = tmp_path / "state" / "override.jsonl"
++    if not path.exists():
++        return []
++    raw = path.read_bytes()
++    assert raw == b"" or raw.endswith(b"\n")
++    return [json.loads(line) for line in raw.decode("utf-8").splitlines()]
++
++
++def _resolve(env, *, ref=None, dry_run=True, upsert=False):
++    return resolve_bodygraph("operator-user", source="vendor", upsert=upsert, dry_run=dry_run, env=env, authorization_ref=ref, **BIRTH)
++
++
++def _code(result):
++    return result.payload["error"]["code"]
++
++
++def _assert_policy_refusal(result, code):
++    assert result.status == "error" and result.exit_code == 1
++    assert result.payload["error"]["code"] == code
++    assert result.payload["error"]["details"] == {"outbound_attempted": False}
++    assert set(result.payload) == {"status", "error", "resolver"}
++
++
++# --- M-1 to M-8: the §7.1.11c matrix --------------------------------------------------------
++
++
++@pytest.mark.parametrize("app_env", ["prod", "production", "live", "dev", "staging"])
++@pytest.mark.parametrize("ref", [None, REF])
++def test_m1_safe_mode_closed_refuses_with_existing_bytes(no_io, seams, tmp_path, app_env, ref):
++    result = _resolve(_env(tmp_path, app_env=app_env, safe="1", net="0"), ref=ref)
++    assert result.payload["error"] == {"code": "PROVIDER_REFUSED", "message": "Vendor source is refused under SAFE rails (SAFE_MODE=1)."}
++    assert _sink_lines(tmp_path) == []
++
++
++@pytest.mark.parametrize("app_env", ["prod", "live", "dev", "local"])
++@pytest.mark.parametrize("ref", [None, REF])
++def test_m2_network_closed_refuses_with_existing_bytes(no_io, seams, tmp_path, app_env, ref):
++    result = _resolve(_env(tmp_path, app_env=app_env, safe="0", net="0"), ref=ref)
++    assert result.payload["error"] == {"code": "PROVIDER_NETWORK_BLOCKED", "message": "Network disabled under current rails."}
++    assert _sink_lines(tmp_path) == []
++
++
++@pytest.mark.parametrize("app_env", ["prod", "production", "live", " PROD ", "Live"])
++@pytest.mark.parametrize("dry_run", [True, False])
++def test_m3_production_flag_absent_requires_override_and_records_refusal(no_io, seams, tmp_path, app_env, dry_run):
++    result = _resolve(_env(tmp_path, app_env=app_env), dry_run=dry_run)
++    _assert_policy_refusal(result, "PROVIDER_PROD_OVERRIDE_REQUIRED")
++    (event,) = _sink_lines(tmp_path)
++    assert event["outcome"] == "refused" and event["error_code"] == "PROVIDER_PROD_OVERRIDE_REQUIRED"
++    assert event["authorization_ref"] is None and event["outbound_attempted"] is False
++    assert event["route_family"] is None and event["resource_path"] is None
++    assert event["environment"] == app_env.strip().lower()
++
++
++def test_m3_flag_absent_result_stands_when_its_event_cannot_persist(no_io, seams, tmp_path, monkeypatch):
++    (tmp_path / "state").write_text("not a directory")
++    result = _resolve(_env(tmp_path))
++    _assert_policy_refusal(result, "PROVIDER_PROD_OVERRIDE_REQUIRED")
++    def _unavailable():
++        raise vendor_audit.AuditUnavailable()
++
++    monkeypatch.setattr(vendor_audit, "resolve_actor_principal", _unavailable)
++    result = _resolve(_env(tmp_path / "other"))
++    _assert_policy_refusal(result, "PROVIDER_PROD_OVERRIDE_REQUIRED")
++
++
++def test_m5_valid_flag_with_unavailable_sink_refuses_before_io(no_io, seams, tmp_path):
++    (tmp_path / "state").write_text("not a directory")
++    result = _resolve(_env(tmp_path), ref=REF)
++    _assert_policy_refusal(result, "PROVIDER_AUDIT_UNAVAILABLE")
++
++
++def test_m5_valid_flag_with_unavailable_actor_refuses_before_io(no_io, seams, tmp_path, monkeypatch):
++    def _unavailable():
++        raise vendor_audit.AuditUnavailable()
++
++    monkeypatch.setattr(vendor_audit, "resolve_actor_principal", _unavailable)
++    result = _resolve(_env(tmp_path), ref=REF)
++    _assert_policy_refusal(result, "PROVIDER_AUDIT_UNAVAILABLE")
++    assert _sink_lines(tmp_path) == []
++
++
++@pytest.mark.parametrize("base, family, resource", [(V2_BASE, "recommended_v2_chart", "charts"), (V1_BASE, "legacy_bodygraph", "bodygraphs")])
++def test_m6_valid_auditable_flag_allows_one_bounded_read(seams, tmp_path, monkeypatch, base, family, resource):
++    client = _install_client(monkeypatch, FakeClient())
++    monkeypatch.setattr("engine.bodygraph.ingest._append_jsonl", lambda *_a, **_k: None)
++    result = _resolve(_env(tmp_path, base=base), ref=REF)
++    assert result.status == "ok" and result.exit_code == 0
++    assert client.fetches == 1
++    allowed, state = _sink_lines(tmp_path)
++    assert allowed["outcome"] == "allowed" and allowed["outbound_attempted"] is False
++    assert allowed["route_family"] is None and allowed["resource_path"] is None and allowed["error_code"] is None
++    assert state["outcome"] == "completed" and state["outbound_attempted"] is True
++    assert state["route_family"] == family and state["resource_path"] == resource
++    assert state["correlation_id"] == allowed["correlation_id"]
++    assert allowed["authorization_ref"] == state["authorization_ref"] == REF
++
++
++@pytest.mark.parametrize("app_env", ["dev", "test", "local", "stage", "staging", " Dev "])
++def test_m7_non_production_without_flag_keeps_current_policy(seams, tmp_path, monkeypatch, app_env):
++    client = _install_client(monkeypatch, FakeClient())
++    result = _resolve(_env(tmp_path, app_env=app_env))
++    assert result.status == "ok" and client.fetches == 1
++    assert _sink_lines(tmp_path) == []
++
++
++@pytest.mark.parametrize("app_env", ["dev", "test", "local", "stage", "staging"])
++def test_m8_non_production_with_flag_is_invalid(no_io, seams, tmp_path, app_env):
++    result = _resolve(_env(tmp_path, app_env=app_env), ref=REF)
++    _assert_policy_refusal(result, "PROVIDER_PROD_OVERRIDE_INVALID")
++    assert _sink_lines(tmp_path) == []
++
++
++# --- O-1 to O-7: the §7.1.11d order ---------------------------------------------------------
++
++
++def _cli(*extra):
++    return ["bg:resolve", "--user", "operator-user", *extra]
++
++
++@pytest.mark.parametrize("argv", [
++    _cli("--source", "vendor", "--allow-prod-vendor", "bad value"),
++    _cli("--source", "vendor", "--allow-prod-vendor", REF, "--allow-prod-vendor", REF),
++])
++def test_o1_parse_errors_precede_rails_and_resolver(no_io, seams, monkeypatch, capsys, argv):
++    monkeypatch.setenv("SAFE_MODE", "1")
++    monkeypatch.setattr("engine.cli.main.resolve_bodygraph", _fail("resolver"))
++    assert cli(argv) == 64
++    captured = capsys.readouterr()
++    assert captured.out == "" and "bad value" not in captured.err and REF not in captured.err
++
++
++@pytest.mark.parametrize("source", [["--source", "db"], ["--source", "auto"], []])
++def test_o2_non_vendor_source_is_usage_before_rails(no_io, seams, monkeypatch, capsys, source):
++    monkeypatch.setattr("engine.cli.main.resolve_bodygraph", _fail("resolver"))
++    assert cli(_cli(*source, "--allow-prod-vendor", REF)) == 64
++    captured = capsys.readouterr()
++    assert captured.out == "" and REF not in captured.err
++
++
++def test_o3_rails_precede_environment_classification(no_io, seams, tmp_path, monkeypatch):
++    monkeypatch.setattr(resolver, "classify_vendor_environment", _fail("classification"))
++    assert _code(_resolve(_env(tmp_path, app_env="nonsense", safe="1"), ref=REF)) == "PROVIDER_REFUSED"
++    assert _code(_resolve(_env(tmp_path, app_env="nonsense", net="0"), ref=REF)) == "PROVIDER_NETWORK_BLOCKED"
++
++
++@pytest.mark.parametrize("extra", [
++    {"APP_ENV": None},
++    {"APP_ENV": "   "},
++    {"APP_ENV": "development"},
++    {"APP_ENV": "qa"},
++    {"APP_ENV": "dev", "ENGINE_ENV": "prod"},
++    {"APP_ENV": "prod", "ENGINE_ENV": "production"},
++    {"APP_ENV": "", "ENGINE_ENV": "unknown"},
++])
++@pytest.mark.parametrize("ref", [None, REF])
++def test_o4_environment_is_classified_before_the_matrix(no_io, seams, tmp_path, monkeypatch, extra, ref):
++    monkeypatch.setattr(resolver, "_classify_env_route_policy", _fail("route policy"))
++    env = _env(tmp_path, app_env=None)
++    env.update({k: v for k, v in extra.items()})
++    result = _resolve(env, ref=ref)
++    _assert_policy_refusal(result, "PROVIDER_CONFIG_INVALID")
++    assert _sink_lines(tmp_path) == []
++
++
++@pytest.mark.parametrize("extra", [{"APP_ENV": "", "ENGINE_ENV": "prod"}, {"APP_ENV": " ", "ENGINE_ENV": " LIVE "}, {"ENGINE_ENV": "production"}])
++def test_o4_engine_env_alias_applies_when_app_env_is_blank(no_io, seams, tmp_path, extra):
++    env = _env(tmp_path, app_env=None)
++    env.update(extra)
++    _assert_policy_refusal(_resolve(env), "PROVIDER_PROD_OVERRIDE_REQUIRED")
++
++
++def test_o4_process_production_environment_is_never_downgraded(no_io, seams, tmp_path, monkeypatch):
++    monkeypatch.setenv("APP_ENV", "production")
++    _assert_policy_refusal(_resolve(_env(tmp_path, app_env="test")), "PROVIDER_PROD_OVERRIDE_REQUIRED")
++    (event,) = _sink_lines(tmp_path)
++    assert event["environment"] == "production"
++    monkeypatch.setenv("APP_ENV", "dev")
++    monkeypatch.setenv("ENGINE_ENV", "live")
++    _assert_policy_refusal(_resolve(_env(tmp_path, app_env="test", ENGINE_ENV=None)), "PROVIDER_PROD_OVERRIDE_REQUIRED")
++
++
++def test_o5_matrix_precedes_actor_and_event(no_io, seams, tmp_path, monkeypatch):
++    monkeypatch.setattr(vendor_audit, "resolve_actor_principal", _fail("actor"))
++    monkeypatch.setattr(vendor_audit, "append_event", _fail("event"))
++    _assert_policy_refusal(_resolve(_env(tmp_path, app_env="dev"), ref=REF), "PROVIDER_PROD_OVERRIDE_INVALID")
++
++
++def test_o6_durable_event_precedes_step_seven(seams, tmp_path, monkeypatch):
++    seen = []
++
++    def _route_policy(env):
++        seen.append(_sink_lines(tmp_path))
++        raise VendorError("PROVIDER_CONFIG_MISSING", "missing vendor configuration")
++
++    monkeypatch.setattr(resolver, "_classify_env_route_policy", _route_policy)
++    result = _resolve(_env(tmp_path), ref=REF)
++    assert _code(result) == "PROVIDER_CONFIG_MISSING"
++    assert [event["outcome"] for event in seen[0]] == ["allowed"]
++    allowed, state = _sink_lines(tmp_path)
++    assert state["outcome"] == "refused" and state["error_code"] == "PROVIDER_CONFIG_MISSING"
++    assert state["outbound_attempted"] is False and state["route_family"] is None
++
++
++def test_o6_event_failure_blocks_step_seven(no_io, seams, tmp_path, monkeypatch):
++    monkeypatch.setattr(resolver, "_classify_env_route_policy", _fail("route policy"))
++
++    def _broken(*_a, **_k):
++        raise vendor_audit.AuditUnavailable()
++
++    monkeypatch.setattr(vendor_audit, "append_event", _broken)
++    _assert_policy_refusal(_resolve(_env(tmp_path), ref=REF), "PROVIDER_AUDIT_UNAVAILABLE")
++
++
++@pytest.mark.parametrize("base, dry_run, upsert, message", [
++    (V2_BASE, False, True, "mapped-cache persistence is refused in production-like environments"),
++    (V2_BASE, True, True, "mapped-cache persistence is refused in production-like environments"),
++    (V2_BASE, False, False, "v2 chart-backed mapped-cache persistence requires explicit upsert intent"),
++    (V1_BASE, False, False, "BodyGraph persistence is refused in production-like environments"),
++    (V1_BASE, False, True, "BodyGraph persistence is refused in production-like environments"),
++    (V1_BASE, True, True, "BodyGraph persistence is refused in production-like environments"),
++])
++def test_o7_production_override_is_read_only_on_both_write_paths(no_io, seams, tmp_path, monkeypatch, base, dry_run, upsert, message):
++    monkeypatch.setattr(resolver, "ingest_vendor_bodygraph", _fail("ingest"))
++    result = _resolve(_env(tmp_path, base=base), ref=REF, dry_run=dry_run, upsert=upsert)
++    assert result.payload["error"]["code"] == "PROVIDER_WRITE_UNSUPPORTED"
++    assert result.payload["error"]["message"] == message
++    allowed, state = _sink_lines(tmp_path)
++    assert state["outcome"] == "refused" and state["error_code"] == "PROVIDER_WRITE_UNSUPPORTED"
++    assert state["outbound_attempted"] is False and state["resource_path"] in {"charts", "bodygraphs"}
++
++
++def test_o7_vendor_failure_after_an_attempt_is_recorded_as_failed(seams, tmp_path, monkeypatch):
++    client = _install_client(monkeypatch, FakeClient(error=VendorError("PROVIDER_UNAVAILABLE", "vendor_error", details={"status": 503})))
++    result = _resolve(_env(tmp_path), ref=REF)
++    assert _code(result) == "PROVIDER_UNAVAILABLE" and client.fetches == 1
++    _allowed, state = _sink_lines(tmp_path)
++    assert state["outcome"] == "failed" and state["outbound_attempted"] is True and state["error_code"] == "PROVIDER_UNAVAILABLE"
++
++
++def test_o7_state_event_failure_changes_nothing(seams, tmp_path, monkeypatch, capsys):
++    _install_client(monkeypatch, FakeClient())
++    original = vendor_audit.append_event
++    calls = []
++
++    def _second_fails(sink, event):
++        calls.append(event["outcome"])
++        if len(calls) > 1:
++            raise vendor_audit.AuditUnavailable()
++        original(sink, event)
++
++    monkeypatch.setattr(vendor_audit, "append_event", _second_fails)
++    result = _resolve(_env(tmp_path), ref=REF)
++    assert result.status == "ok" and calls == ["allowed", "completed"]
++    assert capsys.readouterr() == ("", "")
++
++
++def test_production_dry_run_without_flag_refuses(no_io, seams, tmp_path):
++    _assert_policy_refusal(_resolve(_env(tmp_path), dry_run=True), "PROVIDER_PROD_OVERRIDE_REQUIRED")
++
++
++@pytest.mark.parametrize("ref, source", [("", "vendor"), ("bad value", "vendor"), ("-x", "vendor"), ("a" * 129, "vendor"), (123, "vendor"), (REF, "db"), (REF, "auto")])
++def test_library_reference_must_be_valid_and_applicable(no_io, seams, tmp_path, ref, source):
++    result = resolve_bodygraph("operator-user", source=source, upsert=False, dry_run=True, env=_env(tmp_path, safe="1"), authorization_ref=ref, **BIRTH)
++    _assert_policy_refusal(result, "PROVIDER_PROD_OVERRIDE_INVALID")
++    assert _sink_lines(tmp_path) == []
++
++
++# --- the audit record (§7.1.11f) -----------------------------------------------------------
++
++
++def test_record_has_exactly_the_if2_fields_and_canonical_lines(seams, tmp_path, monkeypatch):
++    _install_client(monkeypatch, FakeClient())
++    _resolve(_env(tmp_path), ref=REF)
++    raw = (tmp_path / "state" / "override.jsonl").read_bytes()
++    lines = raw.split(b"\n")
++    assert lines[-1] == b"" and len(lines) == 3
++    for line, event in zip(lines, _sink_lines(tmp_path)):
++        assert set(event) == IF2_FIELDS
++        assert line == json.dumps(event, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
++        assert event["schema_version"] == vendor_audit.VENDOR_PROD_OVERRIDE_AUDIT_SCHEMA_VERSION
++        assert event["event"] == "vendor_prod_override" and event["command"] == "bg:resolve" and event["source"] == "vendor"
++        assert event["safe_mode_open"] is True and event["network_open"] is True
++        assert event["occurred_at"] == "2026-10-18T12:00:00.123456Z"
++        assert event["actor_principal"] == "qa-operator" and event["environment"] == "prod"
++
++
++def test_record_and_streams_carry_no_subject_url_or_secret(seams, tmp_path, monkeypatch, capsys):
++    _install_client(monkeypatch, FakeClient())
++    monkeypatch.setenv("SAFE_MODE", "0")
++    monkeypatch.setenv("ALLOW_NETWORK", "1")
++    monkeypatch.setenv("APP_ENV", "prod")
++    for key, value in _env(tmp_path).items():
++        monkeypatch.setenv(key, value)
++    exit_code = cli(_cli("--source", "vendor", "--allow-prod-vendor", REF, "--dry-run", *[a for k, v in BIRTH.items() for a in (f"--{k}", v)]))
++    captured = capsys.readouterr()
++    assert exit_code == 0 and captured.err == ""
++    assert REF not in captured.out and "qa-operator" not in captured.out and str(tmp_path) not in captured.out
++    sink_text = (tmp_path / "state" / "override.jsonl").read_text()
++    for forbidden in ("operator-user", *BIRTH.values(), "vendor.example.test", API_KEY, GEO_KEY, "Bearer"):
++        assert forbidden not in sink_text
++
++
++def test_fields_are_sanitized_against_cr_lf_and_control_bytes(tmp_path):
++    event = vendor_audit.build_event(
++        correlation_id="c\r\nid", actor_principal="evil\r\n{\"x\":1}\x00 ", authorization_ref=REF,
++        environment="prod", outcome="refused", error_code="E\n", outbound_attempted=False,
++    )
++    sink = tmp_path / "s" / "audit.jsonl"
++    vendor_audit.append_event(sink, event)
++    raw = sink.read_bytes()
++    assert raw.count(b"\n") == 1 and b"\r" not in raw and b"\x00" not in raw
++    (parsed,) = [json.loads(raw)]
++    assert parsed["actor_principal"] == 'evil??{"x":1}??'
++    assert parsed["correlation_id"] == "c??id" and parsed["error_code"] == "E?"
++
++
++def test_sink_is_created_owner_only_and_appended(tmp_path):
++    sink = tmp_path / "new" / "dir" / "audit.jsonl"
++    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="refused", error_code="X", outbound_attempted=False)
++    vendor_audit.append_event(sink, event)
++    vendor_audit.append_event(sink, event)
++    assert stat.S_IMODE(sink.stat().st_mode) == 0o600
++    assert stat.S_IMODE(sink.parent.stat().st_mode) == 0o700
++    assert sink.read_bytes().count(b"\n") == 2
++
++
++@pytest.mark.parametrize("make_bad", ["parent_is_file", "sink_is_directory"])
++def test_unwritable_sink_is_unavailable(tmp_path, make_bad):
++    if make_bad == "parent_is_file":
++        (tmp_path / "p").write_text("x")
++        sink = tmp_path / "p" / "audit.jsonl"
++    else:
++        sink = tmp_path / "audit.jsonl"
++        sink.mkdir()
++    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="refused", error_code="X", outbound_attempted=False)
++    with pytest.raises(vendor_audit.AuditUnavailable):
++        vendor_audit.append_event(sink, event)
++
++
++def test_sink_path_rule(tmp_path, monkeypatch):
++    key = vendor_audit.VENDOR_OVERRIDE_AUDIT_PATH_KEY
++    assert vendor_audit.resolve_sink_path({key: str(tmp_path / "a.jsonl")}) == Path(os.path.realpath(tmp_path / "a.jsonl"))
++    assert vendor_audit.resolve_sink_path({"XDG_STATE_HOME": str(tmp_path / "xdg")}) == Path(os.path.realpath(tmp_path / "xdg" / "glow-hdengine" / "vendor_prod_override.jsonl"))
++    monkeypatch.setenv("HOME", str(tmp_path / "home"))
++    expected = Path(os.path.realpath(tmp_path / "home" / ".local" / "state" / "glow-hdengine" / "vendor_prod_override.jsonl"))
++    assert vendor_audit.resolve_sink_path({}) == expected
++    assert vendor_audit.resolve_sink_path({"XDG_STATE_HOME": "relative/dir"}) == expected
++    for bad in ("relative.jsonl", str(ROOT / "audit.jsonl"), str(ROOT / "artifacts" / "x.jsonl")):
++        with pytest.raises(vendor_audit.AuditUnavailable):
++            vendor_audit.resolve_sink_path({key: bad})
++
++
++def test_actor_comes_from_the_effective_uid_not_the_environment(monkeypatch):
++    import pwd
++
++    monkeypatch.setenv("USER", "attacker")
++    monkeypatch.setenv("LOGNAME", "attacker")
++    monkeypatch.setenv("USERNAME", "attacker")
++    assert vendor_audit.resolve_actor_principal() == pwd.getpwuid(os.geteuid()).pw_name
++
++    def _missing(_uid):
++        raise KeyError(_uid)
++
++    monkeypatch.setattr(pwd, "getpwuid", _missing)
++    with pytest.raises(vendor_audit.AuditUnavailable):
++        vendor_audit.resolve_actor_principal()
++
++
++def test_unknown_outcome_is_rejected():
++    with pytest.raises(ValueError):
++        vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="maybe", error_code=None, outbound_attempted=False)
+diff --git a/tests/cli/test_aux_preview.py b/tests/cli/test_aux_preview.py
+index 01733d3..5546cf8 100644
+--- a/tests/cli/test_aux_preview.py
++++ b/tests/cli/test_aux_preview.py
+@@ -115,3 +115,62 @@ def test_aux_preview_missing_mapping_is_silent(monkeypatch, capsys):
+     )
+     assert emission.suppressed
+     assert emission.body == b""
++
++
++# HDE-CRD-0002 WU-PR-04 (S08): --band applies to --pair-file input.
++
++
++def _pair_file(tmp_path: Path, band: str = "Cool") -> Path:
++    import json
++
++    path = tmp_path / "pair.json"
++    path.write_text(json.dumps({"categories": [{"category_id": "harmony", "band": band}], "release_id": "1" * 64}), encoding="utf-8")
++    return path
++
++
++def _expected(category: str, band: str, perspective: str = "shared"):
++    return emit_public_aux(
++        category=category, band=band, perspective=perspective, viewer_top=None, flags=None,
++        families_fired=(), release_id="1" * 64, pack_sha=get_pack().pack_sha,
++    )
++
++
++@pytest.mark.parametrize("band", ["Cool", "Open", "Warm", "Glow"])
++def test_aux_preview_pair_file_band_flag_selects_the_flagged_band(capsys, tmp_path, band):
++    pair = _pair_file(tmp_path, band="Cool")
++    admin = tmp_path / "admin.json"
++    exit_code = cli_main.cli(["aux-preview", "--pair-file", str(pair), "--category", "harmony", "--band", band, "--show-narrative", "--admin-out", str(admin)])
++    captured = capsys.readouterr()
++    assert exit_code == 0 and captured.err == ""
++    expected = _expected("harmony", band)
++    assert captured.out == expected.body.decode("utf-8")
++    import json
++
++    sidecar = json.loads(admin.read_text(encoding="utf-8"))
++    assert sidecar["key"] == expected.key and sidecar["release_id"] == "1" * 64
++
++
++def test_aux_preview_pair_file_without_band_flag_uses_the_file_band(capsys, tmp_path):
++    pair = _pair_file(tmp_path, band="Warm")
++    assert cli_main.cli(["aux-preview", "--pair-file", str(pair), "--show-narrative"]) == 0
++    assert capsys.readouterr().out == _expected("harmony", "Warm").body.decode("utf-8")
++
++
++def test_aux_preview_pair_file_band_flag_keeps_category_refusals(capsys, tmp_path):
++    pair = _pair_file(tmp_path)
++    assert cli_main.cli(["aux-preview", "--pair-file", str(pair), "--category", "balance", "--band", "Glow", "--show-narrative"]) == 64
++    assert capsys.readouterr() == ("", "MISSING_COMPAT_CATEGORY\n")
++    empty = tmp_path / "empty.json"
++    empty.write_text('{"categories": []}', encoding="utf-8")
++    assert cli_main.cli(["aux-preview", "--pair-file", str(empty), "--band", "Glow"]) == 64
++    assert capsys.readouterr() == ("", "MISSING_COMPAT_CATEGORY\n")
++    bad = tmp_path / "bad.json"
++    bad.write_text('{"conjunction": {"compat": 1}}', encoding="utf-8")
++    assert cli_main.cli(["aux-preview", "--pair-file", str(bad), "--band", "Glow"]) == 64
++    assert capsys.readouterr() == ("", "INVALID_COMPAT_INPUT\n")
++
++
++def test_aux_preview_pair_file_band_flag_without_show_narrative_emits_nothing(capsys, tmp_path):
++    pair = _pair_file(tmp_path)
++    assert cli_main.cli(["aux-preview", "--pair-file", str(pair), "--band", "Glow"]) == 0
++    assert capsys.readouterr() == ("", "")
+diff --git a/tests/cli/test_bg_resolve.py b/tests/cli/test_bg_resolve.py
+index 99063cd..6f4eab8 100644
+--- a/tests/cli/test_bg_resolve.py
++++ b/tests/cli/test_bg_resolve.py
+@@ -194,3 +194,112 @@ def test_bg_resolve_vendor_missing_inputs(
+         assert payload["status"] == "error"
+     else:
+         assert captured.err
++
++
++# HDE-CRD-0002 WU-PR-04 (S14): --allow-prod-vendor usage carrier (HDE-CLI-API-Vendor-Ref
++# §7.1.11a, §7.1.11d steps 1-2, §7.1.11e). Usage errors exit 64, keep stdout empty, print one
++# stderr line and never echo the value.
++
++_REF = "PO-HDE-CRD-0002/QA:live-1"
++_VENDOR_ARGS = ["--source", "vendor", "--birthdate", "1990-01-01", "--birthtime", "12:34", "--location", "Amsterdam, NL"]
++
++
++def _usage(argv, capsys, monkeypatch, *, forbidden=()):
++    monkeypatch.setattr("engine.cli.main.resolve_bodygraph", lambda *a, **k: pytest.fail("resolver reached"))
++    exit_code = cli(argv)
++    captured = capsys.readouterr()
++    assert exit_code == 64
++    assert captured.out == ""
++    assert captured.err.endswith("\n") and captured.err.count("\n") == 1
++    assert "--allow-prod-vendor" in captured.err
++    for value in forbidden:
++        assert value not in captured.err
++    return captured.err
++
++
++@pytest.mark.parametrize("flags", [
++    ["--allow-prod-vendor", _REF, "--allow-prod-vendor", _REF],
++    [f"--allow-prod-vendor={_REF}", f"--allow-prod-vendor={_REF}"],
++    ["--allow-prod-vendor", _REF, "--allow-prod-vendor=OTHER-REF"],
++])
++def test_allow_prod_vendor_duplicate_is_usage(monkeypatch, capsys, flags):
++    _usage(["bg:resolve", "--user", "u", *_VENDOR_ARGS, *flags], capsys, monkeypatch, forbidden=(_REF, "OTHER-REF"))
++
++
++@pytest.mark.parametrize("flags", [
++    ["--allow-prod-vendor="],
++    ["--allow-prod-vendor", ""],
++    ["--allow-prod-vendor"],
++    ["--allow-prod-vendor", "has space"],
++    ["--allow-prod-vendor", "tab\there"],
++    ["--allow-prod-vendor", "ctl\x01x"],
++    ["--allow-prod-vendor", "nul\x7fx"],
++    ["--allow-prod-vendor", "café"],
++    ["--allow-prod-vendor", "at@sign"],
++    ["--allow-prod-vendor", "semi;colon"],
++    ["--allow-prod-vendor=-leading-dash"],
++    ["--allow-prod-vendor", ".leading-dot"],
++    ["--allow-prod-vendor", "line\nbreak"],
++    ["--allow-prod-vendor", "a" * 129],
++])
++def test_allow_prod_vendor_invalid_value_is_usage(monkeypatch, capsys, flags):
++    value = flags[-1].split("=", 1)[-1] if flags[-1].startswith("--allow-prod-vendor=") else (flags[1] if len(flags) > 1 else "")
++    _usage(["bg:resolve", "--user", "u", *_VENDOR_ARGS, *flags], capsys, monkeypatch, forbidden=(value,) if value else ())
++
++
++@pytest.mark.parametrize("source", [["--source", "db"], ["--source", "auto"], []])
++def test_allow_prod_vendor_with_non_vendor_source_is_usage(monkeypatch, capsys, source):
++    err = _usage(["bg:resolve", "--user", "u", *source, "--allow-prod-vendor", _REF], capsys, monkeypatch, forbidden=(_REF,))
++    assert "--source vendor" in err
++
++
++@pytest.mark.parametrize("argv", [
++    ["showcompat", "--allow-prod-vendor", _REF],
++    ["aux-preview", "--allow-prod-vendor", _REF],
++    ["--allow-prod-vendor", _REF, "bg:resolve", "--user", "u", "--source", "vendor"],
++])
++def test_allow_prod_vendor_outside_bg_resolve_is_usage(monkeypatch, capsys, argv):
++    _usage(argv, capsys, monkeypatch, forbidden=(_REF,))
++
++
++@pytest.mark.parametrize("value", ["A", "a" * 128, "PO-1.2_3:x/y-z", "9abc"])
++def test_allow_prod_vendor_valid_value_reaches_the_resolver_once(monkeypatch, capsys, value):
++    _set_safe_rails(monkeypatch)
++    seen = []
++
++    def _fake(user_id, **kwargs):
++        seen.append(kwargs["authorization_ref"])
++        from engine.bodygraph.resolver import ResolveBodygraphResult
++
++        return ResolveBodygraphResult(status="error", payload={"status": "error", "error": {"code": "PROVIDER_REFUSED", "message": "m"}, "resolver": {}}, exit_code=1)
++
++    monkeypatch.setattr("engine.cli.main.resolve_bodygraph", _fake)
++    assert cli(["bg:resolve", "--user", "u", *_VENDOR_ARGS, "--allow-prod-vendor", value]) == 1
++    assert seen == [value]
++    assert value not in capsys.readouterr().out
++
++
++def test_allow_prod_vendor_keeps_missing_vendor_input_usage(monkeypatch, capsys):
++    _set_open_rails(monkeypatch)
++    monkeypatch.setattr("engine.cli.main.resolve_bodygraph", lambda *a, **k: pytest.fail("resolver reached"))
++    assert cli(["bg:resolve", "--user", "u", "--source", "vendor", "--allow-prod-vendor", _REF]) == 64
++    captured = capsys.readouterr()
++    assert captured.out == "" and captured.err == "MISSING_VENDOR_INPUT\n"
++
++
++def test_production_like_cli_without_flag_emits_the_override_refusal(monkeypatch, capsys, tmp_path):
++    _set_open_rails(monkeypatch)
++    monkeypatch.setenv("APP_ENV", "prod")
++    monkeypatch.delenv("ENGINE_ENV", raising=False)
++    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.test/v2")
++    monkeypatch.setenv("HDE_VENDOR_OVERRIDE_AUDIT_PATH", str(tmp_path / "audit.jsonl"))
++    monkeypatch.setattr("engine.bodygraph.vendor_audit.resolve_actor_principal", lambda: "test-operator")
++    monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: pytest.fail("vendor constructed"))
++    exit_code = cli(["bg:resolve", "--user", "open-rails", *_VENDOR_ARGS, "--dry-run"])
++    captured = capsys.readouterr()
++    assert exit_code == 1 and captured.err == ""
++    payload = _assert_canonical_output(captured.out)
++    assert payload["error"]["code"] == "PROVIDER_PROD_OVERRIDE_REQUIRED"
++    assert payload["error"]["details"] == {"outbound_attempted": False}
++    second = cli(["bg:resolve", "--user", "open-rails", *_VENDOR_ARGS, "--dry-run"])
++    assert second == 1 and capsys.readouterr().out == captured.out
+diff --git a/tools/evidence/generate_v2_mapped_cache_evidence.py b/tools/evidence/generate_v2_mapped_cache_evidence.py
+index c219bd4..3e39b19 100644
+--- a/tools/evidence/generate_v2_mapped_cache_evidence.py
++++ b/tools/evidence/generate_v2_mapped_cache_evidence.py
+@@ -250,10 +250,17 @@ def _exercise_resolver_policy(guard: HermeticGuard) -> tuple[dict[str, bool], di
+         "00000000-0000-4000-8000-000000000039", source="vendor", upsert=False,
+         dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
+     )
+-    production = resolve_bodygraph(
+-        "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
+-        dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "production", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
+-    )
++    # HDE-CRD-0002 WU-PR-04 ID-8: the production override gate (HDE-CLI-API-Vendor-Ref
++    # §7.1.11) needs a valid reference, an actor and an audit sink before the write guard.
++    with tempfile.TemporaryDirectory() as audit_dir, patch(
++        "engine.bodygraph.vendor_audit.resolve_actor_principal", lambda: "fixture-operator"
++    ):
++        production = resolve_bodygraph(
++            "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
++            dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "production", "HD_API_BASE_URL": "https://fixture.invalid/v2",
++            "HDE_VENDOR_OVERRIDE_AUDIT_PATH": str(Path(audit_dir) / "override_audit.jsonl")},
++            authorization_ref="HDE-CRD-0002-FIXTURE", **base,
++        )
+     with patch("engine.bodygraph.resolver.ingest_vendor_bodygraph", legacy_ingest):
+         legacy = resolve_bodygraph(
+             "00000000-0000-4000-8000-000000000039", source="vendor", upsert=False,

@@ -1,0 +1,17 @@
+WU-OPS-01 run v1.0 mode=EXECUTION attempt=1 started_at=2026-10-23T13:30:06Z
+script_sha256=960eabe59b6cc4abda69cf90320fb91abd3f10520830e2fb2fd346f2df7ad0d9
+candidate head=45f045ba4164c4e13fa5e807b10a4dc803c362e6 manifest release_id=77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e version=1.3.0 built_at_utc=2026-08-24T18:04:49Z members=45
+PREFLIGHT: PASS
+Binding presence: for each name, look at the variables of Railway project ample-illumination,
+service glow-hdengine-v2, environment production. Answer SET if a variable with exactly that
+name is listed, UNSET if it is not, NOT_OBSERVED if you cannot see the list. Do not reveal or type a value.
+presence: APP_ENV is SET
+presence: SAFE_MODE is SET
+presence: ALLOW_NETWORK is SET
+presence: HD_API_BASE_URL is SET
+presence: HD_API_KEY is SET
+presence: GEO_API_KEY is SET
+presence: DATABASE_URL is SET
+read 1 at 2026-10-23T13:30:06Z: http_status=200 curl_exit=0 class=MATCH release_id=77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e
+RESULT: PASS (exit 0): identity matched; all seven variables SET (environment validated)
+finished_at_utc=2026-10-23T13:30:06Z; checksum ledger follows as the last write

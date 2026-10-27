@@ -5,8 +5,10 @@ import hmac
 import http.client
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 from contextlib import ExitStack
 from pathlib import Path
 from unittest.mock import patch
@@ -67,6 +69,34 @@ def _repo_inventory() -> set[str]:
 
 def _stage_inventory() -> set[str]:
     return {path.name for path in ROOT.parent.glob("hde-epic038-pr05-*")}
+
+
+def _isolate_producer_writes(monkeypatch, root: Path) -> dict[Path, Path]:
+    """Route producer write mode into ``root``; check mode still reads the checkout."""
+
+    actual = generator.write_or_check
+    mapping = {path: root / path.relative_to(ROOT) for path in generator.build()}
+
+    def isolated(files, check):
+        if check:
+            return actual(files, check)
+        return actual({mapping[path]: data for path, data in files.items()}, check)
+
+    monkeypatch.setattr(generator, "write_or_check", isolated)
+    return mapping
+
+
+@pytest.fixture
+def isolated_root():
+    """An isolated output root beside the checkout.
+
+    The producer stages candidates in ``ROOT.parent`` and moves each into place with
+    ``os.replace``, which cannot cross filesystems. The isolated root therefore shares the
+    stage's filesystem; pytest's ``tmp_path`` may be on another one (a tmpfs ``/tmp``).
+    """
+
+    with tempfile.TemporaryDirectory(prefix="hde-v2-mapped-cache-test-", dir=ROOT.parent) as root:
+        yield Path(root)
 
 
 def _command_env(**changes: str) -> dict[str, str]:
@@ -385,9 +415,14 @@ def test_check_mode_drift_restores_environment_module_state_and_files(monkeypatc
     assert _governed_state() == governed
 
 
-def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch) -> None:
+def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch, isolated_root) -> None:
     paths = list(generator.build())
     before = _bytes_and_mtimes(paths)
+    isolated = _isolate_producer_writes(monkeypatch, isolated_root)
+    for source, destination in isolated.items():
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+    isolated_before = _bytes_and_mtimes(isolated.values())
     shared = _shared_log_state()
     governed = _governed_state()
     redaction_key = os.urandom(32)
@@ -406,6 +441,7 @@ def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch) -> None:
     monkeypatch.setattr(generator.os, "replace", fail_second)
     with pytest.raises(OSError, match="INJECTED_WRITE_FAILURE"):
         generator.run(check=False)
+    assert _bytes_and_mtimes(isolated.values()) == isolated_before
     assert _bytes_and_mtimes(paths) == before
     assert _shared_log_state() == shared
     assert _governed_state() == governed
@@ -413,43 +449,36 @@ def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch) -> None:
     assert _stage_inventory() == stages
 
 
-def test_command_fixed_point_check_nonmutation_and_no_repository_residue() -> None:
+def test_command_fixed_point_check_nonmutation_and_no_repository_residue(monkeypatch, isolated_root, capsys) -> None:
     shared = _shared_log_state()
     governed = _governed_state()
     inventory = _repo_inventory()
-    command = [sys.executable, str(generator.__file__)]
-    first_result = subprocess.run(
-        command,
-        cwd=ROOT,
-        env=_command_env(),
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    first = {path: path.read_bytes() for path in generator.build()}
-    second_result = subprocess.run(
-        command,
-        cwd=ROOT,
-        env=_command_env(),
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    second = {path: path.read_bytes() for path in first}
-    assert first == second
-    before_check = _bytes_and_mtimes(first)
+    tracked = _bytes_and_mtimes(generator.build())
+    # Write mode runs against an isolated output root; the checkout is never written.
+    isolated = _isolate_producer_writes(monkeypatch, isolated_root)
+    assert generator.main([]) == 0
+    first_out = capsys.readouterr()
+    first = {path: isolated[path].read_bytes() for path in tracked}
+    assert generator.main([]) == 0
+    second_out = capsys.readouterr()
+    second = {path: isolated[path].read_bytes() for path in tracked}
+    assert first == second == {path: data for path, (data, _mtime) in tracked.items()}
     check_result = subprocess.run(
-        command + ["--check"],
+        [sys.executable, str(generator.__file__), "--check"],
         cwd=ROOT,
         env=_command_env(),
         check=True,
         capture_output=True,
         text=True,
     )
-    assert _bytes_and_mtimes(first) == before_check
+    assert _bytes_and_mtimes(tracked) == tracked
     assert all(
-        result.stdout == "V2_MAPPED_CACHE_EVIDENCE_OK\n" and result.stderr == ""
-        for result in (first_result, second_result, check_result)
+        (out, err) == ("V2_MAPPED_CACHE_EVIDENCE_OK\n", "")
+        for out, err in (
+            (first_out.out, first_out.err),
+            (second_out.out, second_out.err),
+            (check_result.stdout, check_result.stderr),
+        )
     )
     assert _shared_log_state() == shared
     assert _governed_state() == governed

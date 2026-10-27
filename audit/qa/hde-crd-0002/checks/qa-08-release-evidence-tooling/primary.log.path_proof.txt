@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-08-release-evidence-tooling/primary.log
+size_bytes: 7264
+sha256: f1421a7e6412cedf3c7ea8031568e327eb17a0f266a8f9ea5a41538bc53ec5e3
+mtime_utc: 2026-10-24T23:58:52Z
+produced_at_utc: 2026-09-22T14:25:29Z

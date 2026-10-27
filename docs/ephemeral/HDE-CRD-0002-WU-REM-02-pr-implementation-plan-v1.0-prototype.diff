@@ -1,0 +1,269 @@
+diff --git a/README.md b/README.md
+index ab98a1b0..343550ed 100644
+--- a/README.md
++++ b/README.md
+@@ -180,7 +180,7 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/ci/prepush_check
+ - Reports, always run in this order: `lanes` (the CI lane classification for `--base` and `--head`, or, when `--path` is given, for those paths, from `ci/checks/classify_ci_changes.py`); `membership` (whether the given `--path` values are members of the admitted release roster; it needs at least one `--path`); `build-notes` (the one `docs/pfcanon/PF10-HDE-Build-Notes-v*.md` and its SHA-256); `sweep` (the tracked test files that no CI lane and no full-validation target reaches, run in a throwaway copy of the head; `--no-run` only lists them); `replay` (every step of the `test` job of `.github/workflows/ci.yml`, replayed in a throwaway copy of the head). `all` runs all five.
+ - Options: `--base` (default `origin/main`), `--head` (default `HEAD`), `--event {pull_request,push}` (default `pull_request`), `--path` (repeatable), `--full` (base equal to head: the classifier's full validation) and `--no-run`.
+ - Read-only: it refuses a dirty tree, acts on committed revisions only, resolves refs locally, opens no network connection, runs its children under closed rails, writes only under one owner-only temporary directory outside the repository, and checks afterwards that the repository is unchanged.
+-- Exit status: 0 when every requested report passes; 1 when a report fails; 2 for a usage error; 3 when it refuses to run (not the working tree's top level, a dirty tree, or a temporary directory inside the repository); 4 when the repository changed during the run.
++- Exit status: 0 when every requested report passes; 1 when a report fails; 2 for a usage error; 3 when it refuses to run (not the working tree's top level, a dirty tree, or a temporary directory inside the repository); 4 when the repository changed during the run, with the changed entries and the fields that moved named on stderr (paths and field names only; at most 20 lines and a count).
+ - Prerequisites: CI's install in the caller's environment (`python -m pip install 'setuptools>=68' wheel -r requirements.txt -r requirements-dev.txt -e .`), Python 3.12, and `ruby`, `bash` and `curl` on `PATH`.
+ - Limits:
+   - `replay` replays only the pinned `ci.yml`, whose SHA-256 is `REPLAY_WORKFLOW_SHA256` in the tool. Any change to `ci.yml` needs that value, and the replay's model, updated in the same pull request; otherwise the replay refuses.
+@@ -190,6 +190,7 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/ci/prepush_check
+   - Concurrent git activity in the checkout fails the read-only check.
+   - Children inherit only `HOME`, `LOGNAME`, `PATH`, `SHELL`, `TERM` and `USER`, and they are not sandboxed: `sweep` and `replay` run the candidate's own tests and workflow steps with the caller's file-system and network access. Run them only on code you trust.
+   - A shallow source makes the throwaway copies hold ref-reachable history only.
++  - The throwaway copies own their objects: each holds a copy of the source's object store, and a source that borrows objects from another repository (`--shared`, `--reference`) is dissociated in the copy, at the cost of a repack.
+ - Nonclaim: its result is not CI's result, not QA and not governed evidence.
+ 
+ ## Evidence & QA (HDE-EPIC039 + historical epics)
+diff --git a/tests/tools/test_prepush_check.py b/tests/tools/test_prepush_check.py
+index 8d2c0be3..d8526826 100644
+--- a/tests/tools/test_prepush_check.py
++++ b/tests/tools/test_prepush_check.py
+@@ -736,6 +736,93 @@ def test_repository_state_covers_ignored_files(tmp_path: Path) -> None:
+     assert tool.repository_state(repo).metadata != settled.metadata
+ 
+ 
++# A fixed past instant: a file set to it and then written or freshened has a changed mtime on any clock.
++PAST_NS = 1_600_000_000_000_000_000
++
++
++def _set_past(paths: list[Path]) -> None:
++    assert paths
++    for path in paths:
++        os.utime(path, ns=(PAST_NS, PAST_NS))
++
++
++def _write_existing_blob(repo: Path) -> None:
++    subprocess.run(["git", "-C", str(repo), "hash-object", "-w", "--stdin"], input=b"alpha\n", check=True,
++                   capture_output=True)
++
++
++@pytest.mark.parametrize("packed", [True, False], ids=["packed", "loose"])
++def test_a_copy_owns_its_objects_so_a_write_in_it_cannot_freshen_the_source(tmp_path: Path, packed: bool) -> None:
++    """QA110-F01: writing again an object that a reachable store already holds makes git freshen (re-time) the file
++    holding it, so a copy that borrowed the source's objects would change the source's pack or loose object."""
++    source = _synthetic(tmp_path / "source", {"a.txt": "alpha\n", "d/b.txt": "beta\n"})
++    if packed:
++        _git(source, "repack", "-a", "-d", "-q")
++        _git(source, "prune-packed", "-q")
++    head = _git(source, "rev-parse", "HEAD")
++    objects = source / ".git" / "objects"
++    blob = _git(source, "hash-object", "a.txt")
++    (held,) = sorted(objects.glob("pack/*.pack")) if packed else [objects / blob[:2] / blob[2:]]
++    _set_past([path for path in objects.rglob("*") if path.is_file()])
++    before = tool.repository_state(source)
++    copy = tool.make_copy(source, head, tmp_path / "copy")
++    assert not (copy / ".git" / "objects" / "info" / "alternates").exists()
++    assert tool.repository_state(source) == before
++    _write_existing_blob(copy)
++    assert tool.repository_state(source) == before
++    assert tool.state_changes(before, tool.repository_state(source)) == []
++    # Negative control: a borrowing copy shows the mechanism this test guards against, in git metadata only.
++    shared = tmp_path / "shared"
++    subprocess.run(["git", "clone", "--quiet", "--shared", "--no-checkout", "--", str(source), str(shared)],
++                   check=True, capture_output=True)
++    _git(shared, "-c", "advice.detachedHead=false", "checkout", "--quiet", "--detach", head)
++    assert tool.repository_state(source) == before
++    _write_existing_blob(shared)
++    freshened = tool.repository_state(source)
++    assert freshened.metadata != before.metadata
++    assert (freshened.head, freshened.status, freshened.tracked, freshened.ignored, freshened.directories) == \
++        (before.head, before.status, before.tracked, before.ignored, before.directories)
++    git_dir = tool.git_text(source, "rev-parse", "--absolute-git-dir")
++    assert tool.state_changes(before, freshened) == [
++        f"git metadata {git_dir}/{held.relative_to(source / '.git').as_posix()} (mtime, ctime)"]
++
++
++def test_a_copy_of_a_source_that_borrows_objects_borrows_none_itself(tmp_path: Path) -> None:
++    base = _synthetic(tmp_path / "base", {"a.txt": "alpha\n"})
++    _git(base, "repack", "-a", "-d", "-q")
++    source = tmp_path / "borrowing"
++    subprocess.run(["git", "clone", "--quiet", "--shared", "--", str(base), str(source)], check=True,
++                   capture_output=True)
++    assert (source / ".git" / "objects" / "info" / "alternates").exists()
++    head = _git(source, "rev-parse", "HEAD")
++    _set_past([path for path in (base / ".git" / "objects").rglob("*") if path.is_file()])
++    before_base, before_source = tool.repository_state(base), tool.repository_state(source)
++    copy = tool.make_copy(source, head, tmp_path / "copy")
++    assert not (copy / ".git" / "objects" / "info" / "alternates").exists()
++    _write_existing_blob(copy)
++    assert tool.repository_state(source) == before_source
++    assert tool.repository_state(base) == before_base
++
++
++def test_a_read_only_violation_names_the_changed_entries(tmp_path: Path) -> None:
++    repo = _synthetic(tmp_path / "named", {"README.txt": "fixture\n"})
++    config = repo / ".git" / "config"
++    _set_past([repo / "README.txt", config])
++    before = tool.repository_state(repo)
++    config.write_bytes(config.read_bytes())
++    (repo / "README.txt").write_text("fixture\n", encoding="utf-8")
++    after = tool.repository_state(repo)
++    changes = tool.state_changes(before, after)
++    git_dir = tool.git_text(repo, "rev-parse", "--absolute-git-dir")
++    assert [line.rsplit(" (", 1)[0] for line in changes] == ["tracked README.txt", f"git metadata {git_dir}/config"]
++    # Rewritten with the same bytes: only the times moved, and no content or digest is named.
++    for line in changes:
++        moved = set(line.rsplit(" (", 1)[1].removesuffix(")").split(", "))
++        assert "mtime" in moved and moved <= {"mtime", "ctime"}, line
++    assert all("fixture" not in line and not re.search(r"[0-9a-f]{40}", line) for line in changes)
++    assert tool.state_changes(before, after, limit=1) == [changes[0], "and 1 more"]
++
++
+ # --------------------------------------------------------------------------
+ # every report on the repository: read-only, and the expected answers
+ # --------------------------------------------------------------------------
+diff --git a/tools/ci/prepush_check.py b/tools/ci/prepush_check.py
+index 4dc09856..b0d5319c 100644
+--- a/tools/ci/prepush_check.py
++++ b/tools/ci/prepush_check.py
+@@ -265,32 +265,35 @@ def resolve_commit(repo: Path, ref: str) -> str:
+     return result.stdout.decode("ascii").strip()
+ 
+ 
+-def _metadata_digest(directory: Path) -> str:
+-    """Digest of git metadata: every file's lstat identity, its bytes outside objects/, and every directory's name.
++# The fields after the path in each kind of state entry, as a read-only violation names them.
++_FILE_FIELDS = ("mode", "size", "mtime", "ctime")
++_DIRECTORY_FIELDS = ("mode", "mtime", "ctime")
++_METADATA_FIELDS = ("mode", "size", "mtime", "ctime", "sha256")
++
++
++def _metadata_entries(directory: Path) -> tuple[tuple[str, int, int, int, int, str], ...]:
++    """Git metadata: every file's lstat identity, its bytes' SHA-256 outside objects/, and every directory's name.
+ 
+     Any write to a file changes its st_ctime_ns, which user space cannot set
+     back, so a rewrite with the same bytes is seen too; an object is therefore
+     not read.  An empty directory holds no file, so without its name its
+-    creation or removal would go unseen.
++    creation or removal would go unseen; a directory's entry is its name only.
++    Each entry is kept by name, so a violation can name the entries that changed.
+     """
+-    digest = hashlib.sha256()
++    entries = []
+     for path in sorted(directory.rglob("*")):
+         rel = path.relative_to(directory).as_posix()
+         if path.is_dir() and not path.is_symlink():
+-            digest.update(f"{rel}/\0".encode())
++            entries.append((f"{rel}/", -1, -1, -1, -1, ""))
+             continue
+         if not (path.is_file() or path.is_symlink()):
+             continue
+         info = path.lstat()
+-        digest.update(f"{rel}\0{info.st_mode}\0{info.st_size}\0{info.st_mtime_ns}\0{info.st_ctime_ns}\0".encode())
+-        if rel.startswith("objects/"):
+-            continue
+-        if path.is_symlink():
+-            digest.update(os.readlink(path).encode())
+-        else:
+-            digest.update(path.read_bytes())
+-        digest.update(b"\0")
+-    return digest.hexdigest()
++        content = ""
++        if not rel.startswith("objects/"):
++            content = hashlib.sha256(os.readlink(path).encode() if path.is_symlink() else path.read_bytes()).hexdigest()
++        entries.append((rel, info.st_mode, info.st_size, info.st_mtime_ns, info.st_ctime_ns, content))
++    return tuple(entries)
+ 
+ 
+ def _ignored_entries(repo: Path) -> tuple[tuple[str, int, int, int, int], ...]:
+@@ -347,7 +350,7 @@ class RepositoryState:
+     tracked: tuple[tuple[str, int, int, int, int], ...]
+     ignored: tuple[tuple[str, int, int, int, int], ...]
+     directories: tuple[tuple[str, int, int, int], ...]
+-    metadata: tuple[tuple[str, str], ...]
++    metadata: tuple[tuple[str, tuple[tuple[str, int, int, int, int, str], ...]], ...]
+ 
+ 
+ def repository_state(repo: Path) -> RepositoryState:
+@@ -357,15 +360,65 @@ def repository_state(repo: Path) -> RepositoryState:
+         Path(git_text(repo, "rev-parse", "--absolute-git-dir")),
+         (repo / git_text(repo, "rev-parse", "--git-common-dir")).resolve(),
+     }
+-    metadata = tuple(sorted((str(d), _metadata_digest(d)) for d in directories))
++    metadata = tuple(sorted((str(d), _metadata_entries(d)) for d in directories))
+     return RepositoryState(head=head, status=status, tracked=_tracked_entries(repo), ignored=_ignored_entries(repo),
+                            directories=_directory_entries(repo), metadata=metadata)
+ 
+ 
++def state_changes(before: RepositoryState, after: RepositoryState, limit: int = 20) -> list[str]:
++    """Each entry that differs between two states, with the fields that moved; at most ``limit`` lines and a count.
++
++    Paths and field names only: no file content, digest, commit or environment
++    value, so the read-only violation can say what changed and nothing else.
++    """
++    lines = []
++    if after.head != before.head:
++        lines.append("HEAD")
++    if after.status != before.status:
++        lines.append("git status")
++    lines += _entry_changes("tracked", before.tracked, after.tracked, _FILE_FIELDS)
++    lines += _entry_changes("ignored", before.ignored, after.ignored, _FILE_FIELDS)
++    lines += _entry_changes("directory", before.directories, after.directories, _DIRECTORY_FIELDS)
++    old_metadata, new_metadata = dict(before.metadata), dict(after.metadata)
++    for directory in sorted(old_metadata.keys() | new_metadata.keys()):
++        lines += _entry_changes("git metadata", old_metadata.get(directory, ()), new_metadata.get(directory, ()),
++                                _METADATA_FIELDS, prefix=f"{directory}/")
++    if len(lines) > limit:
++        lines = [*lines[:limit], f"and {len(lines) - limit} more"]
++    return lines
++
++
++def _entry_changes(kind: str, before: Iterable[tuple], after: Iterable[tuple], fields: tuple[str, ...],
++                   prefix: str = "") -> list[str]:
++    old, new = {entry[0]: entry[1:] for entry in before}, {entry[0]: entry[1:] for entry in after}
++    lines = []
++    for path in sorted(old.keys() | new.keys()):
++        if path not in new:
++            moved = "removed"
++        elif path not in old:
++            moved = "created"
++        elif old[path] != new[path]:
++            moved = ", ".join(name for name, was, now in zip(fields, old[path], new[path]) if was != now)
++        else:
++            continue
++        lines.append(f"{kind} {prefix}{path} ({moved})")
++    return lines
++
++
+ def make_copy(repo: Path, commit: str, destination: Path) -> Path:
+-    """Clone ``commit`` outside the repository; the source repository is only read."""
++    """Clone ``commit`` outside the repository; the source repository is only read.
++
++    The copy owns its objects.  Writing in a copy an object that the source
++    already holds makes git freshen (re-time) the file holding it, and a
++    ``--shared`` copy, or a clone of one, reaches the source's own files that
++    way (QA110-F01); a hardlinked ``--local`` copy changes their ctime at once.
++    ``--no-hardlinks`` copies the objects, and ``--dissociate`` drops any
++    alternates the source itself borrows from, so the copy reaches no other
++    repository; one that still does is refused.
++    """
+     result = subprocess.run(
+-        ["git", "clone", "--quiet", "--shared", "--no-checkout", "--", str(repo), str(destination)],
++        ["git", "clone", "--quiet", "--no-hardlinks", "--dissociate", "--no-checkout", "--", str(repo),
++         str(destination)],
+         env=_git_env(),
+         capture_output=True,
+         check=False,
+@@ -374,6 +427,8 @@ def make_copy(repo: Path, commit: str, destination: Path) -> Path:
+     if result.returncode != 0:
+         raise ToolingError("git clone into the temporary directory failed: "
+                            + result.stderr.decode("utf-8", errors="replace").strip())
++    if (destination / ".git" / "objects" / "info" / "alternates").exists():
++        raise ToolingError("the throwaway copy still borrows objects from another repository")
+     if git(destination, "cat-file", "-e", f"{commit}^{{commit}}", check=False).returncode != 0:
+         raise ToolingError(f"commit {commit} is not available to the throwaway copy")
+     git(destination, "-c", "advice.detachedHead=false", "checkout", "--quiet", "--detach", commit)
+@@ -1742,6 +1797,8 @@ def main(argv: Sequence[str] | None = None) -> int:
+     if after != before:
+         print("PREPUSH_CHECK_READ_ONLY_VIOLATION: the repository's tree, ignored files, directories, HEAD or git "
+               "metadata changed", file=sys.stderr)
++        for line in state_changes(before, after):
++            print(f"PREPUSH_CHECK_READ_ONLY_VIOLATION: changed: {line}", file=sys.stderr)
+         return EXIT_READ_ONLY_VIOLATION
+     overall = "PASS" if all(status == "PASS" for _n, status, _d in results) else "FAIL"
+     print("PREPUSH_CHECK_RESULT: " + overall + " "

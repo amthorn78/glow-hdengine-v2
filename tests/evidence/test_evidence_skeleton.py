@@ -524,6 +524,7 @@ def test_mirror_schema_and_parity():
         "size_bytes",
     }
     optional_fields = {
+        "crd_id",
         "epic_id",
         "notes",
         "record_type",

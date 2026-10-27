@@ -22,8 +22,9 @@ import stat
 import struct
 import sys
 import zlib
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -1848,14 +1849,14 @@ def _strict_json(payload: bytes, *, code: str) -> Any:
         raise _fail(code) from exc
 
 
-def _validate_schema(schema: Any) -> Mapping[str, Any]:
+def _validate_schema(schema: Any, *, schema_rel: str = SCHEMA_REL) -> Mapping[str, Any]:
     if Draft202012Validator is None:
         raise _fail("JSONSCHEMA_DEPENDENCY_UNAVAILABLE")
     if not isinstance(schema, dict):
         raise _fail("SCHEMA_INVALID")
     if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
         raise _fail("SCHEMA_INVALID")
-    if schema.get("$id") != SCHEMA_REL:
+    if schema.get("$id") != schema_rel:
         raise _fail("SCHEMA_INVALID")
     references: list[str] = []
     pending: list[tuple[Any, bool]] = [(schema, True)]
@@ -1992,6 +1993,8 @@ def _load_model(
 ) -> tuple[CandidateModel, tuple[FileSnapshot, ...]]:
     store = _GitObjectStore(context)
     tree = _tree_entries(context, store)
+    if _source_selects_v2(root, context, store, tree, source_rel):
+        return _load_model_v2(root, context, head, source_rel, store, tree)
     remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
     schema_input = _capture_input(
         root, context, store, tree, SCHEMA_REL, max_bytes=remaining_input_bytes
@@ -2096,7 +2099,9 @@ def _canonical_json(payload: object) -> bytes:
     ).encode("utf-8")
 
 
-def _render_candidate(model: CandidateModel) -> dict[str, bytes]:
+def _render_candidate(model: CandidateModel | CandidateModelV2) -> dict[str, bytes]:
+    if isinstance(model, CandidateModelV2):
+        return _render_candidate_v2(model)
     source = model.source
     lines = [
         f"# {source['epic_id']} Close Candidate",
@@ -2167,6 +2172,1085 @@ def _render_candidate(model: CandidateModel) -> dict[str, bytes]:
             },
         },
         "schema_version": MANIFEST_SCHEMA_VERSION,
+    }
+    return {
+        model.manifest_path: _canonical_json(manifest),
+        model.report_path: report,
+    }
+
+
+# --- close_candidate_source.v2 (HDE-CRD-0002 S21; IF-3) ---------------------
+# v2 is selected only by a source whose schema_version names it; every v1
+# source keeps the v1 model, refusals and output bytes above unchanged.
+# Requirement and acceptance text is bound by reference to a tracked
+# requirements document (its path and digest) and never copied into a causal
+# field, so the feedback-dependency refusal applies unchanged to every v2 value.
+SCHEMA_V2_REL = "schemas/close_candidate_source.v2.json"
+SOURCE_SCHEMA_VERSION_V2 = "close_candidate_source.v2"
+MANIFEST_SCHEMA_VERSION_V2 = "close_candidate_manifest.v2"
+CHANGE_RE = re.compile(r"HDE-(?:EPIC(?P<epic>[0-9]{3})|CRD-(?P<crd>[0-9]{4,}))\Z")
+QA_RAILS_HEADING = "QA Rails — Open/Close (Final PR)"
+# PO closeout is the Product Owner's own action, which a close pack supports but never performs
+# (Change Process Guide; PO-35-14). Nor can a close pack prove its own formal completion before
+# its close PR merges, so its decision is review-trace-only (PO-35-20).
+DECISION_POSTURE_TEXT = {
+    "review_trace_only": "review-trace-only",
+}
+# HDE Governance's "No over-claim rule": a close pack implies none of these (A9, PO-35-15).
+NONCLAIM_FIXED_V2 = (
+    "This close pack establishes no formal close-pack completion, merge provenance, board state, "
+    "PO closeout, Isis terminal closure decision or formal Ops action."
+)
+NONCLAIM_TEXT_V2 = {
+    "no_canon_drainage_or_register_movement": (
+        "No PF-Canon drainage and no PF09 or PF30 status movement is performed by "
+        "this close pack."
+    ),
+    "no_execution_by_writer": (
+        "The writer executes no check, QA step, deployment or merge; it derives "
+        "this pack from tracked inputs only."
+    ),
+    "no_hosted_feedback_inputs": (
+        "No hosted result, receipt, later-commit result or external attestation is "
+        "a causal input of this close pack."
+    ),
+    "no_unbound_claim": (
+        "This report claims nothing that its bound tracked inputs do not record."
+    ),
+}
+# Updater-owned outputs and the close-run family are never causal inputs, so no
+# byte the Index binds depends on the Index (Plan v1.1 WU-PR-07 (d)).
+PROHIBITED_CAUSAL_INPUTS = frozenset(
+    {
+        "artifacts/evidence_index.jsonl",
+        "artifacts/evidence_index.jsonl.sha256",
+        "audit/gates/topology/orientation_demo.txt",
+        "catalog/manifest.json",
+        "docs/evidence/index.json",
+        "docs/evidence/index.sha256",
+    }
+)
+CLOSE_RUN_INPUT_RE = re.compile(r"audit/qa/[^/]+/close(?:/|\Z)", re.IGNORECASE)
+# A check's QA primary under its change's QA root, as the canonical QA harness names it.
+QA_PRIMARY_INPUT_RE = re.compile(
+    r"audit/qa/(?P<directory>hde-(?:epic[0-9]{3}|crd-[0-9]{4,}))/checks/[a-z0-9][a-z0-9._-]*/primary\.log\Z"
+)
+# The pinned requirement-ID formats, one per change kind; a requirements document without its
+# change's format is refused. A CRD reads table rows as in HDE-CRD-0002's Specification
+# (| S01 | ... |); HDE-EPICNNN reads its own requirement paragraphs and acceptance rows as in
+# HDE-EPIC040's (**K040-REQ-001.** and | AC040-01 — ...).
+CRD_REQUIREMENT_RE = re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE)
+EPIC_REQUIREMENT_RE = rb"^\*\*(K%s-REQ-[0-9]{3})\.\*\*"
+EPIC_ACCEPTANCE_RE = rb"^\| (AC%s-[0-9]{2}) \xe2\x80\x94 "  # em dash
+PRIMARY_HEADER_SCHEMA = "pf27.step_log_header.v2"
+# The PF27 v2 header contract of tools/qa/qa_harness.py (_parse_primary_header, with
+# _parse_crd_primary's rules for a CRD), restated here because the writer imports only the
+# standard library and jsonschema (ID-10); tests pin the two to agree (CX7-12).
+PRIMARY_HEADER_FIELDS = frozenset(
+    {
+        "schema_version",
+        "timestamp_utc",
+        "check_id",
+        "check_name",
+        "status",
+        "status_reason",
+        "command",
+        "command_provenance",
+        "exit_code",
+        "evidence_artifacts",
+        "captured_env",
+        "pf_refs",
+        "intended_tokens",
+        "claimed_tokens",
+    }
+)
+PRIMARY_STATUSES = frozenset({"PASS", "FAIL_BEHAVIOR", "FAIL_TOOLING", "TOOLING_BLOCKED", "PARKED"})
+PRIMARY_CHECK_ID_RE = re.compile(r"[a-z0-9][a-z0-9._-]*\Z")
+PRIMARY_PF_TITLE_RE = re.compile(r"PF[0-9]{2}(?:\.[0-9]+)?-(?:Canon|Reference)-[A-Za-z0-9][A-Za-z0-9-]*\Z")
+PRIMARY_TIMESTAMP_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\Z")
+PRIMARY_ENV_KEYS = frozenset({"LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK", "APP_ENV"})
+PRIMARY_NONCLAIM = "token_claim_posture: intended tokens are recorded but not claimed by this PR-03 receipt"
+# The requirements source is the change's own current approved Specification (PF10 addendum 2.15).
+APPROVED_SPECIFICATION_RE = re.compile(
+    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
+    r"-specification-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)-approved\.md\Z"
+)
+# The QA plan is the change's own current QA plan, whose checks are its "### CHECK <n> `<id>`"
+# headings in plan order, as in HDE-EPIC040's (PO-35-18).
+QA_PLAN_RE = re.compile(
+    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
+    r"-QA50-qa-plan-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
+)
+QA_PLAN_CHECK_RE = re.compile(rb"^### CHECK ([0-9]+) `([a-z0-9][a-z0-9._-]*)`", re.MULTILINE)
+# Plan Templates gives each check a "Surface / D-goal mapping:" line naming the criteria it
+# proves; "A to B" names the IDs between A and B (PO-35-21).
+QA_PLAN_SECTION_END_RE = re.compile(rb"^#{1,3} ", re.MULTILINE)
+QA_PLAN_MAPPING_RE = re.compile(rb"^Surface / D-goal mapping:(.*)$", re.MULTILINE)
+QA_PLAN_RANGE_RE = re.compile(
+    rb"(?<![A-Za-z0-9.-])([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*) to ([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)"
+)
+# The authorized decision is the change's own current QA report, as HDE-EPIC040's QA-120 report
+# is: front matter with artifact_type QA_REPORT, the change's ID and a verdict (PO-35-20).
+QA_REPORT_RE = re.compile(
+    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
+    r"-QA120-qa-report-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
+)
+QA_REPORT_FIELD_RE = re.compile(rb"^(artifact_type|change_id|verdict): (.*?)[ \t]*$", re.MULTILINE)
+# HDE Governance's coverage statuses, from the QA ledger's PF27 statuses.
+COVERAGE_STATUS = {
+    "PASS": "PASS",
+    "FAIL_BEHAVIOR": "FAIL",
+    "FAIL_TOOLING": "FAIL",
+    "TOOLING_BLOCKED": "BLOCKED",
+    "PARKED": "BLOCKED",
+}
+# A deferral's drain target names a heading in the change kind's register (PO-35-17).
+EPIC_REGISTER_RE = re.compile(r"docs/pfcanon/PF09\.[0-9]+-Canon-HDE-Build-Checklist-[A-Za-z]+-v[0-9.]+\.md\Z")
+CRD_REGISTER_RE = re.compile(r"docs/pfcanon/PF30\.[0-9]+-Canon-HDE-CRD-Records-v[0-9.]+\.md\Z")
+# A PF title is a tracked PF-Canon file's name, after its PF number and kind and before its
+# version, hyphens read as spaces and "&" as "and" (PO-35-16). The tracked names separate those
+# parts with hyphens, spaces or both, and some carry no number or no version (CX7-19).
+PF_DOCUMENT_RE = re.compile(
+    r"docs/pfcanon/PF(?:[0-9]{2}(?:\.[0-9]+)?)?[- ]+(?:(?:Canon|Reference)[- ]+)?"
+    r"(?P<name>[A-Za-z0-9&'](?:[A-Za-z0-9&' -]*?[A-Za-z0-9&'])?)"
+    r"(?:[- ]?v[0-9]+(?:\.[0-9]+)*)?\.md\Z"
+)
+# The plan is the change's own current implementation plan (PO-35-9).
+IMPLEMENTATION_PLAN_RE = re.compile(
+    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
+    r"-implementation-plan-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
+)
+
+
+@dataclass(frozen=True)
+class CandidateModelV2:
+    source: Mapping[str, Any]
+    source_path: str
+    source_input: FileSnapshot
+    schema_input: FileSnapshot
+    plan_input: FileSnapshot
+    evidence_inputs: tuple[tuple[str, FileSnapshot], ...]
+    report_path: str
+    manifest_path: str
+    qa_primaries: tuple[FileSnapshot, ...] = ()
+
+
+def _derived_paths_v2(change_id: str) -> tuple[str, str]:
+    match = CHANGE_RE.fullmatch(change_id)
+    if match is None:
+        raise _fail("CHANGE_ID_INVALID")
+    prefix = f"EPIC-{match.group('epic')}" if match.group("epic") else change_id
+    return (f"audit/{prefix}_close_report.md", f"audit/{prefix}_MANIFEST.json")
+
+
+def _supporting_paths_v2(change_id: str) -> dict[str, str]:
+    if CHANGE_RE.fullmatch(change_id) is None:
+        raise _fail("CHANGE_ID_INVALID")
+    directory = change_id.lower()
+    return {
+        "doc_deltas": f"audit/docdeltas/{directory}_doc_deltas.md",
+        "drain_targets": f"audit/docdeltas/{directory}_drain_targets.md",
+        "qa_step_logs_manifest": f"audit/qa/{directory}/qa_step_logs_manifest.json",
+    }
+
+
+def _source_selects_v2(
+    root: Path,
+    context: GitContext,
+    store: _GitObjectStore,
+    tree: Mapping[str, GitTreeEntry],
+    source_rel: str,
+) -> bool:
+    # A source that cannot be read here falls through to the v1 path, which
+    # reports its own refusal exactly as before.
+    try:
+        snapshot = _capture_input(root, context, store, tree, source_rel)
+        document = _strict_json(snapshot.payload, code="SOURCE_JSON_INVALID")
+    except ClosePackError:
+        return False
+    return (
+        isinstance(document, dict)
+        and document.get("schema_version") == SOURCE_SCHEMA_VERSION_V2
+    )
+
+
+def _require_admitted_causal_input(rel: str) -> None:
+    folded = rel.casefold()
+    if (
+        folded in PROHIBITED_CAUSAL_INPUTS
+        or folded.endswith(".path_proof.txt")
+        or CLOSE_RUN_INPUT_RE.match(rel) is not None
+    ):
+        raise _fail("CAUSAL_INPUT_PROHIBITED")
+
+
+def _causal_strings_v2(source: Mapping[str, Any]) -> list[str]:
+    values: list[str] = []
+    pending: list[Any] = [
+        value for key, value in source.items() if key not in {"nonclaims", "schema_version"}
+    ]
+    while pending:
+        node = pending.pop()
+        if isinstance(node, str):
+            values.append(node)
+        elif isinstance(node, dict):
+            pending.extend(node.keys())
+            pending.extend(node.values())
+        elif isinstance(node, list):
+            pending.extend(node)
+    return values
+
+
+def _qa_primary_inputs_v2(source: Mapping[str, Any]) -> frozenset[str]:
+    # Evidence paths in the QA-primary form of the source's own change.
+    directory = str(source["change_id"]).lower()
+    return frozenset(
+        str(item["path"])
+        for item in source["evidence_inputs"]
+        if (match := QA_PRIMARY_INPUT_RE.fullmatch(str(item["path"])))
+        and match["directory"] == directory
+    )
+
+
+def _require_feedback_free_values_v2(
+    values: Sequence[str],
+    source_rel: str,
+    head: str,
+    qa_primaries: frozenset[str] = frozenset(),
+) -> None:
+    # A QA primary path names a check of the approved QA plan, not a hosted result, so the
+    # pattern does not read it; its ledger record is required once the ledger is read
+    # (HDE Build Notes 2.31, B-4). Every other value keeps the refusal unchanged.
+    for value in (source_rel, *values):
+        if (
+            value.casefold().startswith("catalog/manifest.json")
+            or head.casefold() in value.casefold()
+            or (
+                FEEDBACK_DEPENDENCY_RE.search(value) is not None
+                and not (value in qa_primaries and QA_PRIMARY_INPUT_RE.fullmatch(value))
+            )
+        ):
+            raise _fail("FEEDBACK_DEPENDENCY_PROHIBITED")
+
+
+def _token_occurs(identifier: str, payload: bytes) -> bool:
+    # A dot between alphanumerics continues an ID (HDE-FERM008.5); a trailing dot is punctuation.
+    pattern = (
+        rb"(?<![A-Za-z0-9-])(?<![A-Za-z0-9]\.)"
+        + re.escape(identifier.encode("ascii"))
+        + rb"(?![A-Za-z0-9-])(?!\.[A-Za-z0-9])"
+    )
+    return re.search(pattern, payload) is not None
+
+
+def _heading_occurs(heading: str, payload: bytes) -> bool:
+    pattern = rb"^#{1,6} " + re.escape(heading.encode("utf-8")) + rb"[ \t]*$"
+    return re.search(pattern, payload, re.MULTILINE) is not None
+
+
+def _pf_title_key(title: str) -> str:
+    return " ".join(title.replace("-", " ").split()).replace(" & ", " and ")
+
+
+def _pf_titles(tracked_paths: Iterable[str]) -> frozenset[str]:
+    return frozenset(
+        _pf_title_key(match["name"])
+        for rel in tracked_paths
+        if (match := PF_DOCUMENT_RE.fullmatch(rel))
+    )
+
+
+def _qa_plan_checks(payload: bytes) -> list[str]:
+    # Plan order; the numbers run 1, 2, 3, ... and each check ID appears once.
+    found = QA_PLAN_CHECK_RE.findall(payload)
+    checks = [check.decode("ascii") for _, check in found]
+    if (
+        not found
+        or [int(number) for number, _ in found] != list(range(1, len(found) + 1))
+        or len(checks) != len(set(checks))
+    ):
+        raise _fail("QA_PLAN_STEPS_ABSENT")
+    return checks
+
+
+def _qa_plan_mapping(payload: bytes, requirement_ids: frozenset[str]) -> dict[str, frozenset[str]]:
+    # Each planned check's criteria: the requirement IDs its section's first mapping line names,
+    # whole or inside an "A to B" range of one prefix and width.
+    headings = list(QA_PLAN_CHECK_RE.finditer(payload))
+    mapping: dict[str, frozenset[str]] = {}
+    for index, heading in enumerate(headings):
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(payload)
+        section_end = QA_PLAN_SECTION_END_RE.search(payload, heading.end(), end)
+        section = payload[heading.end() : section_end.start() if section_end else end]
+        found = QA_PLAN_MAPPING_RE.search(section)
+        line = found.group(1) if found else b""
+        named = {identifier for identifier in requirement_ids if _token_occurs(identifier, line)}
+        for low, high in QA_PLAN_RANGE_RE.findall(line):
+            start = re.fullmatch(rb"(.*?)([0-9]+)", low)
+            stop = re.fullmatch(rb"(.*?)([0-9]+)", high)
+            if start is None or stop is None or start[1] != stop[1] or len(start[2]) != len(stop[2]):
+                continue
+            for identifier in requirement_ids:
+                member = re.fullmatch(rb"(.*?)([0-9]+)", identifier.encode("ascii"))
+                if (
+                    member is not None
+                    and member[1] == start[1]
+                    and len(member[2]) == len(start[2])
+                    and int(start[2]) <= int(member[2]) <= int(stop[2])
+                ):
+                    named.add(identifier)
+        mapping[heading.group(2).decode("ascii")] = frozenset(named)
+    return mapping
+
+
+def _qa_report_verdict(payload: bytes, change_id: str) -> str:
+    # The QA report's front matter, between its opening "---" line and the next one, carries
+    # artifact_type QA_REPORT, the change's own ID and a verdict, each exactly once.
+    lines = payload.split(b"\n")
+    if not lines or lines[0].rstrip(b"\r") != b"---" or b"---" not in (
+        line.rstrip(b"\r") for line in lines[1:]
+    ):
+        raise _fail("QA_REPORT_INVALID")
+    front = b"\n".join(lines[1 : [line.rstrip(b"\r") for line in lines].index(b"---", 1)])
+    fields: dict[bytes, list[bytes]] = {}
+    for key, value in QA_REPORT_FIELD_RE.findall(front):
+        fields.setdefault(key, []).append(value)
+    if (
+        any(len(fields.get(key, [])) != 1 for key in (b"artifact_type", b"change_id", b"verdict"))
+        or fields[b"artifact_type"][0] != b"QA_REPORT"
+        or fields[b"change_id"][0] != change_id.encode("ascii")
+        or not fields[b"verdict"][0]
+    ):
+        raise _fail("QA_REPORT_INVALID")
+    return fields[b"verdict"][0].decode("ascii")
+
+
+def _qa_coverage_v2(
+    source: Mapping[str, Any], bindings: Mapping[str, FileSnapshot]
+) -> list[tuple[str, str, str]]:
+    # HDE Governance's coverage ledger: every planned check in plan order, its coverage status
+    # and its closeout impact (PO-35-18). A TOOLING_BLOCKED check is an accepted gap only when
+    # exactly one closure-override gap names it (PO-35-13).
+    change_id = str(source["change_id"])
+    supporting = _supporting_paths_v2(change_id)
+    ledger = _qa_ledger(
+        next(s.payload for s in bindings.values() if s.rel == supporting["qa_step_logs_manifest"]),
+        change_id.lower(),
+    )
+    planned = _qa_plan_checks(bindings[str(source["qa_plan_binding"])].payload)
+    if not set(ledger) <= set(planned):
+        raise _fail("QA_COVERAGE_INVALID")
+    gaps = [
+        str(gap["check_id"])
+        for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", [])
+    ]
+    if len(gaps) != len(set(gaps)) or any(
+        ledger.get(check, {}).get("status") != "TOOLING_BLOCKED" for check in gaps
+    ):
+        raise _fail("CLOSURE_OVERRIDE_INVALID")
+    coverage = []
+    for check in planned:
+        status = ledger[check]["status"] if check in ledger else None
+        if status == "PASS":
+            impact = "closure gate met"
+        elif check in gaps:
+            impact = "accepted gap under the closure override"
+        else:
+            impact = "blocks a SATISFIED decision"
+        coverage.append((check, COVERAGE_STATUS.get(str(status), "NOT_RUN"), impact))
+    return coverage
+
+
+def _states_line(payload: bytes, line: bytes) -> bool:
+    return any(raw.strip() == line for raw in payload.splitlines())
+
+
+def _lists_items(payload: bytes) -> bool:
+    return re.search(rb"^[ \t]*[-*+][ \t]+\S", payload, re.MULTILINE) is not None
+
+
+def _qa_ledger(payload: bytes, directory: str) -> dict[str, dict[str, str]]:
+    # The pinned ledger format, as the canonical QA harness writes it for every Epic and CRD on
+    # main: a nonempty mapping of check_id to exactly {check_id, log_path, status}, in the
+    # harness's own bytes (_manifest_content: sorted, compact, one final LF), so a duplicate or
+    # reordered key cannot stand (PO-35-10).
+    ledger = _strict_json(payload, code="QA_LEDGER_INVALID")
+    if (
+        not isinstance(ledger, dict)
+        or not ledger
+        or payload != (json.dumps(ledger, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+    ):
+        raise _fail("QA_LEDGER_INVALID")
+    for check_id, entry in ledger.items():
+        if (
+            not PRIMARY_CHECK_ID_RE.fullmatch(check_id)
+            or check_id in {".", ".."}
+            or not isinstance(entry, dict)
+            or set(entry) != {"check_id", "log_path", "status"}
+            or entry["check_id"] != check_id
+            or entry["log_path"] != f"audit/qa/{directory}/checks/{check_id}/primary.log"
+            or not isinstance(entry["status"], str)
+        ):
+            raise _fail("QA_LEDGER_INVALID")
+    return ledger
+
+
+def _qa_ledger_statuses(payload: bytes, directory: str) -> list[str]:
+    return [entry["status"] for entry in _qa_ledger(payload, directory).values()]
+
+
+def _current_version(pattern: re.Pattern[str], change_id: str, tracked_paths: Iterable[str]) -> str | None:
+    versions = {
+        (int(match["major"]), int(match["minor"])): rel
+        for rel in tracked_paths
+        if (match := pattern.match(rel)) and match["change"] == change_id
+    }
+    return versions[max(versions)] if versions else None
+
+
+def _primary_command_valid(command: object) -> bool:
+    if not isinstance(command, list):
+        return False
+    if command and all(isinstance(argv, list) for argv in command):
+        return all(argv and all(isinstance(part, str) and part for part in argv) for argv in command)
+    return all(isinstance(part, str) and part for part in command)
+
+
+def _primary_timestamp_valid(value: object) -> bool:
+    if not isinstance(value, str) or not PRIMARY_TIMESTAMP_RE.fullmatch(value):
+        return False
+    try:
+        datetime.fromisoformat(value.removesuffix("Z") + "+00:00")
+    except ValueError:
+        return False
+    return True
+
+
+def _primary_identity(payload: bytes, primary_rel: str, *, crd: bool) -> tuple[object, object] | None:
+    # The whole PF27 v2 header, not only its identity, so a PASS stands only with its causality.
+    if crd and (payload.startswith(b"\xef\xbb\xbf") or b"\r" in payload or not payload.endswith(b"\n")):
+        return None
+    try:
+        lines = payload.decode("utf-8").splitlines()
+        header = _strict_json(lines[0].encode("utf-8"), code="QA_LEDGER_INVALID") if lines else None
+    except (UnicodeDecodeError, ClosePackError):
+        return None
+    if (
+        not isinstance(header, dict)
+        or set(header) != PRIMARY_HEADER_FIELDS
+        or header["schema_version"] != PRIMARY_HEADER_SCHEMA
+    ):
+        return None
+    command = header["command"]
+    exit_code = header["exit_code"]
+    status = header["status"]
+    lists = [header[field] for field in ("evidence_artifacts", "pf_refs", "intended_tokens", "claimed_tokens")]
+    if (
+        not isinstance(header["check_id"], str)
+        or not PRIMARY_CHECK_ID_RE.fullmatch(header["check_id"])
+        or header["check_id"] in {".", ".."}
+        or not isinstance(header["check_name"], str)
+        or not header["check_name"]
+        or status not in PRIMARY_STATUSES
+        or not isinstance(header["status_reason"], str)
+        or not _primary_command_valid(command)
+        or not isinstance(header["command_provenance"], str)
+        or not header["command_provenance"]
+        or bool(command) == (header["command_provenance"] == "Not executed")
+        or (exit_code is not None and (not isinstance(exit_code, int) or isinstance(exit_code, bool)))
+        or bool(command) != (exit_code is not None)
+        or any(not isinstance(items, list) or any(not isinstance(item, str) or not item for item in items) for items in lists)
+        or any(not PRIMARY_PF_TITLE_RE.fullmatch(reference) for reference in header["pf_refs"])
+        or not header["evidence_artifacts"]
+        or primary_rel not in header["evidence_artifacts"]
+        or not isinstance(header["captured_env"], dict)
+        or any(key not in PRIMARY_ENV_KEYS or not isinstance(value, str) for key, value in header["captured_env"].items())
+        or not _primary_timestamp_valid(header["timestamp_utc"])
+        or (status == "PASS" and (exit_code != 0 or header["status_reason"]))
+        or (status != "PASS" and not header["status_reason"])
+        or header["claimed_tokens"] != []
+        or (status == "PASS" and header["intended_tokens"] and PRIMARY_NONCLAIM not in lines[1:])
+    ):
+        return None
+    if crd and (
+        lines[0] != json.dumps(header, sort_keys=True, separators=(",", ":"))
+        or (status == "PARKED" and command)
+        or (status == "FAIL_BEHAVIOR" and not command)
+    ):
+        return None
+    return header["check_id"], status
+
+
+def _requirement_ids(payload: bytes, change_id: str) -> frozenset[str]:
+    epic = CHANGE_RE.fullmatch(change_id).group("epic")  # type: ignore[union-attr]
+    patterns = (
+        (CRD_REQUIREMENT_RE,)
+        if epic is None
+        else tuple(
+            re.compile(template % epic.encode("ascii"), re.MULTILINE)
+            for template in (EPIC_REQUIREMENT_RE, EPIC_ACCEPTANCE_RE)
+        )
+    )
+    identifiers = frozenset(
+        match.decode("ascii") for pattern in patterns for match in pattern.findall(payload)
+    )
+    if not identifiers:
+        raise _fail("REQUIREMENTS_TABLE_ABSENT")
+    return identifiers
+
+
+def _require_v2_semantics(
+    source: Mapping[str, Any],
+    bindings: Mapping[str, FileSnapshot],
+    report_path: str,
+    manifest_path: str,
+    tracked_paths: Mapping[str, GitTreeEntry],
+) -> None:
+    change_id = str(source["change_id"])
+    supporting = _supporting_paths_v2(change_id)
+    required_outputs = {
+        "close_manifest": manifest_path,
+        "close_report": report_path,
+        **supporting,
+    }
+    key_outputs = source["key_outputs"]
+    if any(key_outputs.get(key) != value for key, value in required_outputs.items()):
+        raise _fail("OUTPUT_BINDING_MISMATCH")
+    evidence_paths = {snapshot.rel for snapshot in bindings.values()}
+    if any(
+        value not in evidence_paths
+        for key, value in key_outputs.items()
+        if key not in {"close_manifest", "close_report"}
+    ):
+        raise _fail("OUTPUT_BINDING_MISMATCH")
+    tracked = frozenset(tracked_paths)
+    crd = CHANGE_RE.fullmatch(change_id).group("crd") is not None  # type: ignore[union-attr]
+    close_run = f"audit/qa/{change_id.lower()}/close/"
+    pointers = set(source["pointers"])
+    required_pointers = set(supporting.values())
+    if crd:
+        required_pointers.add(close_run)
+    if not required_pointers <= pointers:
+        raise _fail("POINTER_MISSING")
+    # Every pointer names a tracked file or a directory holding one; a CRD's close-run
+    # directory is written after the verdict, so it may not exist yet.
+    if any(
+        not (crd and pointer == close_run)
+        and not (
+            any(rel.startswith(pointer) for rel in tracked)
+            if pointer.endswith("/")
+            else pointer in tracked
+        )
+        for pointer in pointers
+    ):
+        raise _fail("POINTER_UNRESOLVED")
+
+    referenced = [
+        str(source["requirements_binding"]),
+        str(source["qa_plan_binding"]),
+        str(source["qa_report_binding"]),
+    ]
+    referenced.extend(
+        item["drain_target"]["binding"] for item in source["deferrals"] if "drain_target" in item
+    )
+    for item in source["acceptance"]:
+        referenced.extend(item["evidence_bindings"])
+    for item in source["later_drain_statements"]:
+        referenced.extend(item["evidence_bindings"])
+    referenced.extend(item["binding"] for item in source["superseded"])
+    for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", []):
+        referenced.extend(gap["evidence_bindings"])
+    if "binding" in source["qa_rca"]:
+        referenced.append(source["qa_rca"]["binding"])
+    if any(binding not in bindings for binding in referenced):
+        raise _fail("BINDING_UNRESOLVED")
+
+    requirements = bindings[str(source["requirements_binding"])]
+    if requirements.rel != _current_version(APPROVED_SPECIFICATION_RE, change_id, tracked):
+        raise _fail("REQUIREMENTS_SOURCE_NOT_CURRENT")
+    if source["plan_path"] != _current_version(IMPLEMENTATION_PLAN_RE, change_id, tracked):
+        raise _fail("PLAN_SOURCE_NOT_CURRENT")
+    qa_plan = bindings[str(source["qa_plan_binding"])]
+    if qa_plan.rel != _current_version(QA_PLAN_RE, change_id, tracked):
+        raise _fail("QA_PLAN_NOT_CURRENT")
+    # The authorized decision is the change's current QA report (Change Process Guide 3.5.2.1;
+    # PO-35-20).
+    qa_report = bindings[str(source["qa_report_binding"])]
+    if qa_report.rel != _current_version(QA_REPORT_RE, change_id, tracked):
+        raise _fail("QA_REPORT_NOT_CURRENT")
+    verdict = _qa_report_verdict(qa_report.payload, change_id)
+    # A separate QA RCA uses the canonical audit/<prefix>_QA_RCA.md (Change Process Guide 0.4.1.2).
+    if "binding" in source["qa_rca"] and bindings[str(source["qa_rca"]["binding"])].rel != (
+        report_path.removesuffix("_close_report.md") + "_QA_RCA.md"
+    ):
+        raise _fail("QA_RCA_UNBOUND")
+    # Every PF title names a tracked PF-Canon document (Change Process Guide 3.5.4; PO-35-16).
+    titles = [
+        *(home for item in source["later_drain_statements"] for home in item["canon_homes"]),
+        *(
+            title
+            for decision in source["adr_block"]["decisions"]
+            for title in (*decision["bounding_canon"], *decision["doc_delta_targets"])
+        ),
+        *(
+            title
+            for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", [])
+            for title in gap["drain_targets"]
+        ),
+    ]
+    known_titles = _pf_titles(tracked)
+    if any(_pf_title_key(str(title)) not in known_titles for title in titles):
+        raise _fail("PF_TITLE_UNKNOWN")
+    # Every deliverable is allocated to the slice that closed it (HDE Governance; PO-35-19).
+    if set(source["deliverables"]) != {str(item["deliverable"]) for item in source["allocation"]}:
+        raise _fail("ALLOCATION_INCOMPLETE")
+    requirement_ids = _requirement_ids(requirements.payload, change_id)
+    criteria = [str(item["criterion_id"]) for item in source["acceptance"]]
+    if len(criteria) != len(set(criteria)):
+        raise _fail("ACCEPTANCE_AMBIGUOUS")
+    if any(criterion not in requirement_ids for criterion in criteria):
+        raise _fail("REQUIREMENT_ID_UNBOUND")
+    drain_targets = next(
+        snapshot.payload
+        for snapshot in bindings.values()
+        if snapshot.rel == supporting["drain_targets"]
+    )
+    for field, key in (("deferrals", "id"), ("tracked_issues", "id")):
+        identifiers = [str(item[key]) for item in source[field]]
+        if len(identifiers) != len(set(identifiers)):
+            raise _fail("DEFERRAL_AMBIGUOUS")
+    # The ledger names every deferral's ID, in both forms (PO-35-7).
+    if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["deferrals"]):
+        raise _fail("DEFERRAL_UNBOUND")
+    # A drain-target pointer names a heading in the change kind's register (PO-35-17).
+    register = CRD_REGISTER_RE if crd else EPIC_REGISTER_RE
+    if any(
+        "drain_target" in item
+        and (
+            register.match(bindings[str(item["drain_target"]["binding"])].rel) is None
+            or not _heading_occurs(
+                str(item["drain_target"]["heading"]),
+                bindings[str(item["drain_target"]["binding"])].payload,
+            )
+        )
+        for item in source["deferrals"]
+    ):
+        raise _fail("DEFERRAL_POINTER_UNBOUND")
+    # A TI item maps only through an ADR status whose ID the ledger names (PO-35-11).
+    if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["tracked_issues"]):
+        raise _fail("TRACKED_ISSUE_UNBOUND")
+    # The supporting ledgers' minimum content (PO-35-12). The doc-deltas ledger states exactly
+    # "Doc Deltas: None" or enumerates its deltas as list items, never both; the drain-targets
+    # ledger states "Drain Targets: None" exactly when nothing drains; a tracked QA-root copy of
+    # the doc deltas is byte-identical (HDE Schemas & Artifacts 1.2).
+    doc_deltas = next(
+        snapshot.payload for snapshot in bindings.values() if snapshot.rel == supporting["doc_deltas"]
+    )
+    if _states_line(doc_deltas, b"Doc Deltas: None") == _lists_items(doc_deltas):
+        raise _fail("DOC_DELTAS_INVALID")
+    qa_copy = f"audit/qa/{change_id.lower()}/00_meta/doc_deltas.md"
+    if qa_copy in tracked_paths and tracked_paths[qa_copy] != tracked_paths[supporting["doc_deltas"]]:
+        raise _fail("DOC_DELTAS_INVALID")
+    nothing_drains = not source["deferrals"] and not source["tracked_issues"]
+    if _states_line(drain_targets, b"Drain Targets: None") != nothing_drains:
+        raise _fail("DRAIN_TARGETS_INVALID")
+    coverage = _qa_coverage_v2(source, bindings)
+
+    decision = source["closure_decision"]["decision"]
+    if decision == "SATISFIED" and (
+        source["follow_ups"]
+        or verdict != "PASS"
+        or any(item["result"] != "MET" for item in source["acceptance"])
+        or any(impact == "blocks a SATISFIED decision" for _, _, impact in coverage)
+    ):
+        raise _fail("DECISION_CONTRADICTION")
+    if decision == "SATISFIED" and not requirement_ids <= set(criteria):
+        raise _fail("REQUIREMENT_COVERAGE_INCOMPLETE")
+    if decision == "NOT SATISFIED" and not source["follow_ups"]:
+        raise _fail("DECISION_CONTRADICTION")
+    # A MET criterion binds the primary of a check that the QA ledger records as PASS and whose
+    # plan mapping names the criterion (Change Process Guide 3.5.2.1; PO-35-21). An accepted gap
+    # is not PASS evidence (Change Process Guide 3.5.4, "No posture-only PASS").
+    mapping = _qa_plan_mapping(qa_plan.payload, requirement_ids)
+    passing = {
+        entry["log_path"]: check
+        for check, entry in _qa_ledger(
+            next(s.payload for s in bindings.values() if s.rel == supporting["qa_step_logs_manifest"]),
+            change_id.lower(),
+        ).items()
+        if entry["status"] == "PASS"
+    }
+    if any(
+        item["result"] == "MET"
+        and not any(
+            bindings[binding].rel in passing
+            and str(item["criterion_id"]) in mapping.get(passing[bindings[binding].rel], frozenset())
+            for binding in item["evidence_bindings"]
+        )
+        for item in source["acceptance"]
+    ):
+        raise _fail("ACCEPTANCE_EVIDENCE_UNBOUND")
+
+
+def _load_model_v2(
+    root: Path,
+    context: GitContext,
+    head: str,
+    source_rel: str,
+    store: _GitObjectStore,
+    tree: Mapping[str, GitTreeEntry],
+) -> tuple[CandidateModelV2, tuple[FileSnapshot, ...]]:
+    remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
+    _require_admitted_causal_input(source_rel)
+    schema_input = _capture_input(
+        root, context, store, tree, SCHEMA_V2_REL, max_bytes=remaining_input_bytes
+    )
+    remaining_input_bytes -= len(schema_input.payload)
+    source_input = _capture_input(
+        root, context, store, tree, source_rel, max_bytes=remaining_input_bytes
+    )
+    remaining_input_bytes -= len(source_input.payload)
+    schema = _validate_schema(
+        _strict_json(schema_input.payload, code="SCHEMA_JSON_INVALID"),
+        schema_rel=SCHEMA_V2_REL,
+    )
+    source = _validate_source(
+        _strict_json(source_input.payload, code="SOURCE_JSON_INVALID"), schema
+    )
+    if source.get("schema_version") != SOURCE_SCHEMA_VERSION_V2:
+        raise _fail("SOURCE_SCHEMA_INVALID")
+    causal_values = _causal_strings_v2(source)
+    qa_primary_inputs = _qa_primary_inputs_v2(source)
+    _require_feedback_free_values_v2(causal_values, source_rel, head, qa_primary_inputs)
+    if _report_body_structure_is_ambiguous(causal_values):
+        raise _fail("REPORT_SECTION_AMBIGUOUS")
+    if set(source["nonclaims"]) != set(NONCLAIM_TEXT_V2):
+        raise _fail("SOURCE_SCHEMA_INVALID")
+    report_path, manifest_path = _derived_paths_v2(str(source["change_id"]))
+
+    plan_rel = _canonical_relative_path(source["plan_path"])
+    _require_admitted_causal_input(plan_rel)
+    plan_input = _capture_input(
+        root, context, store, tree, plan_rel, max_bytes=remaining_input_bytes
+    )
+    remaining_input_bytes -= len(plan_input.payload)
+    evidence: list[tuple[str, FileSnapshot]] = []
+    bindings: dict[str, FileSnapshot] = {}
+    evidence_paths: set[str] = set()
+    for item in source["evidence_inputs"]:
+        binding = item["binding"]
+        rel = _canonical_relative_path(item["path"])
+        if binding in bindings or rel in evidence_paths:
+            raise _fail("EVIDENCE_BINDING_AMBIGUOUS")
+        _require_admitted_causal_input(rel)
+        snapshot = _capture_input(
+            root, context, store, tree, rel, max_bytes=remaining_input_bytes
+        )
+        remaining_input_bytes -= len(snapshot.payload)
+        bindings[binding] = snapshot
+        evidence_paths.add(rel)
+        evidence.append((binding, snapshot))
+
+    causal_paths = {SCHEMA_V2_REL, source_rel, plan_rel, *evidence_paths}
+    if len(causal_paths) != 3 + len(evidence):
+        raise _fail("INPUT_COLLISION")
+    if report_path in causal_paths or manifest_path in causal_paths:
+        raise _fail("OUTPUT_COLLISION")
+    _require_v2_semantics(source, bindings, report_path, manifest_path, tree)
+
+    # Each QA ledger entry's primary must be tracked and agree with the ledger (PO-35-5).
+    ledger_rel = _supporting_paths_v2(str(source["change_id"]))["qa_step_logs_manifest"]
+    ledger = _qa_ledger(
+        next(s for s in bindings.values() if s.rel == ledger_rel).payload, str(source["change_id"]).lower()
+    )
+    # A QA primary path the refusal would otherwise reject stands only as a primary the ledger
+    # records (HDE Build Notes 2.31, B-4).
+    recorded = {entry["log_path"] for entry in ledger.values()}
+    if any(
+        FEEDBACK_DEPENDENCY_RE.search(path) is not None and path not in recorded
+        for path in qa_primary_inputs
+    ):
+        raise _fail("FEEDBACK_DEPENDENCY_PROHIBITED")
+    crd = CHANGE_RE.fullmatch(str(source["change_id"])).group("crd") is not None  # type: ignore[union-attr]
+    qa_primaries: list[FileSnapshot] = []
+    for check_id, entry in sorted(ledger.items()):
+        primary_rel = entry["log_path"]
+        if primary_rel not in tree:
+            raise _fail("QA_LEDGER_INVALID")
+        _require_admitted_causal_input(primary_rel)
+        primary = _capture_input(
+            root, context, store, tree, primary_rel, max_bytes=remaining_input_bytes
+        )
+        remaining_input_bytes -= len(primary.payload)
+        if _primary_identity(primary.payload, primary_rel, crd=crd) != (check_id, entry["status"]):
+            raise _fail("QA_LEDGER_INVALID")
+        qa_primaries.append(primary)
+
+    if _head(context, store) != head:
+        raise _fail("GIT_HEAD_CHANGED")
+    model = CandidateModelV2(
+        source=source,
+        source_path=source_rel,
+        source_input=source_input,
+        schema_input=schema_input,
+        plan_input=plan_input,
+        evidence_inputs=tuple(sorted(evidence, key=lambda item: (item[0], item[1].rel))),
+        report_path=report_path,
+        manifest_path=manifest_path,
+        qa_primaries=tuple(qa_primaries),
+    )
+    snapshots = (
+        schema_input,
+        source_input,
+        plan_input,
+        *(snapshot for _, snapshot in model.evidence_inputs),
+        *model.qa_primaries,
+    )
+    return model, snapshots
+
+
+def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
+    source = model.source
+    bindings = dict(model.evidence_inputs)
+
+    # Each binding's digest is listed once under "Source bindings".
+    def bound(binding: str) -> str:
+        return f"`{binding}` (`{bindings[binding].rel}`)"
+
+    def section(heading: str, body: Sequence[str], empty: str) -> list[str]:
+        return ["", f"## {heading}", "", *(body or [f"- {empty}"])]
+
+    decision = source["closure_decision"]
+    lines = [
+        f"# {source['change_id']} Close Report",
+        "",
+        "This close report is derived only from exact tracked repository inputs.",
+        "",
+        f"## {QA_RAILS_HEADING}",
+        "",
+        "- Close mutation set rails: closed (`ALLOW_NETWORK=0`, `APP_ENV=dev`, "
+        "`LANG=C`, `LC_ALL=C`, `SAFE_MODE=1`, `TZ=UTC`); the writer refuses any "
+        "other posture.",
+        f"- Closure decision: {decision['decision']}",
+        f"- Decision posture: {DECISION_POSTURE_TEXT[decision['posture']]}",
+        "",
+        "## Acceptance and evidence pointers",
+        "",
+        *(f"- `{pointer}`" for pointer in source["pointers"]),
+        "",
+        "## Exact-source acceptance",
+        "",
+        f"Requirement source: {bound(str(source['requirements_binding']))}. Each "
+        "criterion is bound to that document by its ID, and the document by its "
+        "digest under Source bindings; criterion text is not copied.",
+        "",
+        f"Authorized decision: the QA report {bound(str(source['qa_report_binding']))}, verdict "
+        f"`{_qa_report_verdict(bindings[str(source['qa_report_binding'])].payload, str(source['change_id']))}`. "
+        "Each MET criterion binds the primary of a PASS check whose QA plan mapping names it.",
+        "",
+    ]
+    for item in source["acceptance"]:
+        evidence = ", ".join(bound(binding) for binding in item["evidence_bindings"])
+        lines.append(
+            f"- `{item['criterion_id']}`: {item['result']}; evidence {evidence}; "
+            f"limitation: {item['limitation']}"
+        )
+    lines.extend(
+        section(
+            "Coverage versus the QA plan",
+            [
+                f"QA plan: {bound(str(source['qa_plan_binding']))}. Each planned check, in plan "
+                "order, with its QA ledger status as a coverage status and its closeout impact.",
+                "",
+                *(
+                    f"- {number}. `{check}`: {status}; closeout impact: {impact}"
+                    for number, (check, status, impact) in enumerate(
+                        _qa_coverage_v2(source, bindings), start=1
+                    )
+                ),
+            ],
+            "None.",
+        )
+    )
+    lines.extend(
+        section(
+            "Delivered scope",
+            [f"- {item}" for item in source["deliverables"]],
+            "None.",
+        )
+    )
+    lines.extend(
+        section(
+            "PR-to-deliverable allocation",
+            [f"- `{item['slice']}`: {item['deliverable']}" for item in source["allocation"]],
+            "None.",
+        )
+    )
+    lines.extend(
+        section(
+            "Reuse boundary",
+            [f"- {item}" for item in source["reuse_boundary"]],
+            "None recorded.",
+        )
+    )
+    deferrals = []
+    for item in source["deferrals"]:
+        if "drain_target" in item:
+            deferrals.append(
+                f"- `{item['id']}`: drain target {bound(item['drain_target']['binding'])}, "
+                f"section {item['drain_target']['heading']}"
+            )
+        else:
+            deferrals.append(
+                f"- `{item['id']}`: ADR status {item['adr_status']}; rationale: "
+                f"{item['rationale']}"
+            )
+    lines.extend(section("Deferrals", deferrals, "None."))
+    statements = [
+        f"- Affected PF canon homes: {'; '.join(item['canon_homes'])}. Locators: "
+        f"{'; '.join(item['locators'])}. Current canon posture: "
+        f"{item['current_posture']}. Supported later-drain action: `{item['action']}`. "
+        f"Drain readiness: `{item['readiness']}`. Evidence basis: "
+        f"{', '.join(bound(binding) for binding in item['evidence_bindings'])}. "
+        f"Close expectation: {item['close_expectation']}"
+        for item in source["later_drain_statements"]
+    ]
+    lines.extend(section("Later-drain PF-canon update statements", statements, "None."))
+    lines.append(
+        "- Later-drain statements are support records for future canon maintenance; "
+        "they are not prerequisites, required checks, acceptance conditions or "
+        "blockers of this close."
+    )
+    # HDE Governance's literal `ADR status line:` field for a TI item (PO-35-11).
+    issues = [f"- {item['id']} ADR status line: {item['adr_status']}" for item in source["tracked_issues"]]
+    lines.extend(
+        section("Tracked-issue closeout mapping", issues, "No TI item is cited by this change.")
+    )
+    adr_lines: list[str] = []
+    for item in source["adr_block"]["decisions"]:
+        adr_lines.extend(
+            (
+                f"- ADR — {item['label']}: {item['statement']}",
+                f"  - Decision point: {item['decision_point']}",
+                *(
+                    [f"  - Options considered: {'; '.join(item['options_considered'])}"]
+                    if item["options_considered"]
+                    else []
+                ),
+                f"  - Bounding PF canon: {'; '.join(item['bounding_canon'])}",
+                f"  - Final decision: {item['final_decision']}",
+                "  - Future work: "
+                + ("canonical" if item["scope"] == "canonical" else "change-specific only"),
+                "  - Doc Delta targets: "
+                + ("; ".join(item["doc_delta_targets"]) or "None"),
+            )
+        )
+    override = source["adr_block"].get("closure_override")
+    if override is not None:
+        adr_lines.append(f"- ADR — Closure override: {override['label']}")
+        adr_lines.extend(
+            f"  - Accepted gap `{gap['check_id']}`: {gap['gap']}; evidence basis "
+            f"{', '.join(bound(binding) for binding in gap['evidence_bindings'])}; "
+            f"drain targets {'; '.join(gap['drain_targets'])}"
+            for gap in override["accepted_gaps"]
+        )
+    lines.extend(section("ADR block", adr_lines, "None."))
+    lines.extend(
+        section(
+            "Follow-ups",
+            [f"- {item}" for item in source["follow_ups"]],
+            "None; the decision is SATISFIED.",
+        )
+    )
+    lines.extend(
+        section(
+            "Superseded artifacts",
+            [
+                f"- {bound(item['binding'])}: {item['evidence_change']}"
+                for item in source["superseded"]
+            ],
+            "None.",
+        )
+    )
+    qa_rca = source["qa_rca"]
+    rca = (
+        [f"- External QA RCA: {bound(qa_rca['binding'])}"]
+        if "binding" in qa_rca
+        else [f"- {line}" for line in qa_rca["summary_lines"]]
+    )
+    lines.extend(section("QA RCA and Doc Delta summary", rca, "None."))
+    lines.extend(
+        (
+            "",
+            "## Key outputs",
+            "",
+            f"The close-pack manifest `{model.manifest_path}` `key_outputs` map is the "
+            "binding authority for primary artifacts and their canonical paths-of-record.",
+            "",
+            *(f"- `{key}`: `{value}`" for key, value in sorted(source["key_outputs"].items())),
+            "",
+            "## Close-pack verification",
+            "",
+            f"- The close report `{model.report_path}` and close manifest "
+            f"`{model.manifest_path}` are written at their canonical filenames; check "
+            "mode accepts them only as one committed pair equal to a fresh derivation "
+            "from the bound inputs.",
+            "",
+            "## Source bindings",
+            "",
+        )
+    )
+    for label, snapshot in (
+        ("Candidate source", model.source_input),
+        ("Candidate-source schema", model.schema_input),
+        ("Plan", model.plan_input),
+    ):
+        lines.append(
+            f"- {label}: `{snapshot.rel}` "
+            f"(`sha256={_sha256(snapshot.payload)}`, `size_bytes={len(snapshot.payload)}`)"
+        )
+    for binding, snapshot in model.evidence_inputs:
+        lines.append(
+            f"- Evidence `{binding}`: `{snapshot.rel}` "
+            f"(`sha256={_sha256(snapshot.payload)}`, `size_bytes={len(snapshot.payload)}`)"
+        )
+    for snapshot in model.qa_primaries:
+        lines.append(
+            f"- QA primary: `{snapshot.rel}` "
+            f"(`sha256={_sha256(snapshot.payload)}`, `size_bytes={len(snapshot.payload)}`)"
+        )
+    nonclaim_codes = sorted(source["nonclaims"])
+    lines.extend(("", "## Explicit nonclaims", ""))
+    lines.extend(f"- {NONCLAIM_TEXT_V2[code]}" for code in nonclaim_codes)
+    lines.append(f"- {NONCLAIM_FIXED_V2}")
+    report = ("\n".join(lines) + "\n").encode("utf-8")
+
+    manifest = {
+        "change_id": source["change_id"],
+        "closure_decision": dict(decision),
+        "inputs": {
+            "candidate_source": _binding(model.source_input),
+            "evidence": [
+                {"binding": binding, **_binding(snapshot)}
+                for binding, snapshot in model.evidence_inputs
+            ],
+            "plan": _binding(model.plan_input),
+            "qa_primaries": [_binding(snapshot) for snapshot in model.qa_primaries],
+            "schema": _binding(model.schema_input),
+        },
+        "key_outputs": dict(source["key_outputs"]),
+        "nonclaims": [
+            {"code": code, "statement": NONCLAIM_TEXT_V2[code]} for code in nonclaim_codes
+        ],
+        "outputs": {
+            "close_manifest": {"path": model.manifest_path},
+            "close_report": {
+                "path": model.report_path,
+                "sha256": _sha256(report),
+                "size_bytes": len(report),
+            },
+        },
+        "schema_version": MANIFEST_SCHEMA_VERSION_V2,
     }
     return {
         model.manifest_path: _canonical_json(manifest),
@@ -3087,12 +4171,19 @@ def _read_manifest_committed_pair(
         try:
             report_binding = document["outputs"]["close_report"]
             manifest_binding = document["outputs"]["close_manifest"]
-            epic_id = document["epic_id"]
+            schema_version = document.get("schema_version")
+            identity = document[
+                "change_id" if schema_version == MANIFEST_SCHEMA_VERSION_V2 else "epic_id"
+            ]
         except (KeyError, TypeError) as exc:
             raise _fail("MANIFEST_BINDING_MISMATCH") from exc
-        expected_report, expected_manifest = _derived_paths(str(epic_id))
+        expected_report, expected_manifest = (
+            _derived_paths_v2(str(identity))
+            if schema_version == MANIFEST_SCHEMA_VERSION_V2
+            else _derived_paths(str(identity))
+        )
         if (
-            document.get("schema_version") != MANIFEST_SCHEMA_VERSION
+            schema_version not in {MANIFEST_SCHEMA_VERSION, MANIFEST_SCHEMA_VERSION_V2}
             or expected_report != report_rel
             or expected_manifest != manifest_rel
             or report_binding

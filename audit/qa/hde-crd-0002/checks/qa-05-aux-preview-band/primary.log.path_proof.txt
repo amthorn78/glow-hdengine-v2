@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-05-aux-preview-band/primary.log
+size_bytes: 23571
+sha256: e06b99d39affdc48aac8674da54df21a9e64719bb5613a4f27b86c9139b7f8ee
+mtime_utc: 2026-10-24T23:47:40Z
+produced_at_utc: 2026-09-22T14:25:29Z

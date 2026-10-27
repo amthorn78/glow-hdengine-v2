@@ -381,14 +381,39 @@ def _check_closure() -> None:
     )
 
 
+def _is_within_root(origin: object) -> bool:
+    if not isinstance(origin, str):
+        return False
+    try:
+        Path(origin).resolve().relative_to(ROOT.resolve())
+    except ValueError:
+        return False
+    return True
+
+
+def _isolated_admission_owner():
+    """Import the admission owner from this copy's own sources, or fail closed."""
+
+    import importlib
+
+    if "engine" not in sys.modules and (not sys.path or sys.path[0] != str(ROOT)):
+        sys.path.insert(0, str(ROOT))
+    loader = importlib.import_module("engine.config.registry_loader")
+    if not all(
+        _is_within_root(getattr(sys.modules.get(name), "__file__", None))
+        for name in ("engine", "engine.config", "engine.config.registry_loader")
+    ):
+        raise SystemExit("IDENTITY_CLOSURE:ADMISSION_PROBE_NOT_ROOT_BOUND")
+    return loader
+
+
 def release_not_admitted_observed() -> bool:
     """Independent read-only admission probe: true only for ``INCOMPLETE_RELEASE_ROSTER``."""
 
-    from engine.config.registry_loader import SchemaValidationError, load_active_mechanics_bundle
-
+    loader = _isolated_admission_owner()
     try:
-        load_active_mechanics_bundle()
-    except SchemaValidationError as exc:
+        loader.load_active_mechanics_bundle()
+    except loader.SchemaValidationError as exc:
         return getattr(exc, "code", None) == RELEASE_NOT_ADMITTED_REFUSAL_CODE
     return False
 

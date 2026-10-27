@@ -30,7 +30,12 @@ TS=json.loads((ROOT/'catalog/manifest.json').read_text()).get('built_at_utc','20
 DOC=ROOT/'docs/ENDPOINTS_CATALOG.json'; DOCSHA=ROOT/'docs/ENDPOINTS_CATALOG.json.sha256'; AUD=ROOT/'artifacts/audit/ENDPOINTS_CATALOG.json'; AUDSHA=ROOT/'artifacts/audit/ENDPOINTS_CATALOG.json.sha256'; SNAP=ROOT/'artifacts/reader/endpoints_snapshot.json'
 PROOFS=[ROOT/'artifacts/proofs/endpoints_env_gate_proof.log',ROOT/'artifacts/proofs/success_get.txt',ROOT/'artifacts/proofs/success_head.txt',ROOT/'artifacts/proofs/success_304.txt',ROOT/'artifacts/proofs/success_writers_errors.txt',ROOT/'artifacts/proofs/success_encoding_invariance.txt',ROOT/'artifacts/proofs/reader_success_get_head_304.json']
 ALL=[DOC,DOCSHA,AUD,AUDSHA,SNAP,*PROOFS]
-CLASS={'internal_admin','dev_harness','internal_identity','public_reader'}
+# PF12 §8.8 closed class set, plus PF05 §5.6's projected public_aux (not yet PF12-registered; no conformance claim).
+CLASS={'public_reader','public_compat','internal_identity','internal_admin','ops','dev_harness','public_aux'}
+AUX_PATH='/aux/narrative'; AUX_ALIASES=['/api/aux/narrative']
+# PF02 §3.5 "Current repository discrepancy" and PF29 §1.1: checked-in routes canon marks
+# RETIRED/NONCANONICAL and excludes from the Endpoint Catalog (HDE-CRD-0002 AD-1).
+CANON_RETIRED_PATHS={'/ops/db/unavailable','/ops/probe/env','/ops/writer/diagnostic'}
 def sha(b): return hashlib.sha256(b).hexdigest()
 def cjson(o): return json.dumps(o,separators=(',',':'),sort_keys=True).encode()+b'\n'
 def catalog_obj():
@@ -44,7 +49,15 @@ def catalog_obj():
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'internal_identity','description':'Internal version endpoint for ops evidence','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/version','rails_profile':'ops-only no-store'},
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'internal_identity','description':'Internal version endpoint for ops evidence','env_gate':'operator-network-only','internal':True,'method':'HEAD','path':'/internal/version','rails_profile':'ops-only no-store'},
  {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Reader success route (dev-only governed A7 proof surface)','env_gate':'APP_ENV=dev','internal':True,'method':'GET','path':'/reader','rails_profile':'dev-harness reader a7'},
- {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Reader success route (dev-only governed A7 proof surface)','env_gate':'APP_ENV=dev','internal':True,'method':'HEAD','path':'/reader','rails_profile':'dev-harness reader a7'},]
+ {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Reader success route (dev-only governed A7 proof surface)','env_gate':'APP_ENV=dev','internal':True,'method':'HEAD','path':'/reader','rails_profile':'dev-harness reader a7'},
+ {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat ids-only probe (internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'GET','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
+ {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat HEAD (writer transport 405, Allow POST, OPTIONS; internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'HEAD','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
+ {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat OPTIONS (writer transport 204, Allow POST, OPTIONS; internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'OPTIONS','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
+ {'a7_eligible':False,'aliases':AUX_ALIASES,'blueprint_module':'adapter.http_reader','classification':'public_aux','description':'Aux narrative public bytes (text/plain)','env_gate':'not_applicable_public','internal':False,'method':'GET','path':AUX_PATH,'rails_profile':'public-read-only; vendor-network-disabled'},
+ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Rails-closed refusal diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/rails/refusal','rails_profile':'ops diagnostic no-io writer no-store'},
+ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Rails-closed refusal diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'POST','path':'/ops/rails/refusal','rails_profile':'ops diagnostic no-io writer no-store'},
+ {'a7_eligible':False,'blueprint_module':'adapter.wsgi','classification':'ops','description':'Liveness probe (adapter.wsgi factory only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/healthz','rails_profile':'ops-only no-store'},
+ {'a7_eligible':False,'blueprint_module':'adapter.wsgi','classification':'ops','description':'Readiness probe (adapter.wsgi factory only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/readyz','rails_profile':'ops-only no-store'},]
  return {'endpoints':eps,'generated_at_utc':TS,'success_endpoints':[{'method':'GET','path':'/reader'}]}
 def validate_catalog(cat):
  if set(cat)!={'endpoints','generated_at_utc','success_endpoints'}: raise ValueError('catalog top-level keys invalid')
@@ -54,19 +67,25 @@ def validate_catalog(cat):
  for e in cat['endpoints']:
   for k in ['a7_eligible','blueprint_module','classification','description','env_gate','internal','method','path','rails_profile']:
    if k not in e: raise ValueError(f'missing {k}')
-  if set(e)-{'a7_eligible','blueprint_module','classification','description','env_gate','internal','method','path','rails_profile','route_id'}: raise ValueError('unknown endpoint key')
+  if set(e)-{'a7_eligible','aliases','blueprint_module','classification','description','env_gate','internal','method','path','rails_profile','route_id'}: raise ValueError('unknown endpoint key')
   if not isinstance(e['method'],str) or e['method']!=e['method'].upper(): raise ValueError('method must be uppercase string')
   if not all(isinstance(e[k],str) for k in ['blueprint_module','classification','description','env_gate','path','rails_profile']): raise ValueError('endpoint string fields required')
   if not isinstance(e['internal'],bool): raise ValueError('internal boolean required')
   if not isinstance(e['a7_eligible'],bool): raise ValueError('a7_eligible boolean required')
   if e['classification'] not in CLASS: raise ValueError('invalid classification')
-  key=(e['method'],e['path'])
-  if key in seen: raise ValueError('duplicate method/path')
-  seen.add(key)
+  if 'aliases' in e and (not isinstance(e['aliases'],list) or not e['aliases'] or any(not isinstance(a,str) or not a.startswith('/') or '?' in a or a==e['path'] for a in e['aliases']) or len(set(e['aliases']))!=len(e['aliases'])): raise ValueError('aliases invalid')
+  for key in [(e['method'],p) for p in [e['path'],*e.get('aliases',[])]]:
+   if key in seen: raise ValueError('duplicate method/path')
+   seen.add(key)
   if 'writer' in e['path'] and e['path']=='/dev/writer/conjunction' and e.get('route_id')!='dev.writer.conjunction.v1': raise ValueError('writer route_id invalid')
  sampler=[e for e in cat['endpoints'] if e['path']=='/internal/dev/sampler']
  if len(sampler)!=1 or sampler[0]['method']!='POST' or sampler[0]['classification']!='dev_harness' or sampler[0]['internal'] is not True or sampler[0]['a7_eligible'] is not False or sampler[0]['env_gate']!='APP_ENV in {dev,test,local}': raise ValueError('internal dev sampler catalog invalid')
  if any(e['path']=='/internal/dev/sampler' and e['method']=='GET' for e in cat['endpoints']): raise ValueError('GET internal dev sampler must not be cataloged')
+ aux=[e for e in cat['endpoints'] if e['path']==AUX_PATH]
+ if len(aux)!=1 or aux[0]['classification']!='public_aux' or aux[0]['method']!='GET' or aux[0].get('aliases')!=AUX_ALIASES or aux[0]['internal'] is not False or aux[0]['a7_eligible'] is not False or aux[0]['env_gate']!='not_applicable_public': raise ValueError('aux narrative catalog invalid')
+ if any('aliases' in e for e in cat['endpoints'] if e['path']!=AUX_PATH): raise ValueError('aliases only on the aux record')
+ if any(p in CANON_RETIRED_PATHS for e in cat['endpoints'] for p in [e['path'],*e.get('aliases',[])]): raise ValueError('canon-retired route must not be cataloged')
+ if any(e['env_gate']=='not_applicable_public' and e['internal'] is not False for e in cat['endpoints']): raise ValueError('public env_gate sentinel on internal record')
  production=[e for e in cat['endpoints'] if e['path']==PRODUCTION_READER_PATH]
  if len(production)!=1 or production[0]['method']!='POST' or production[0]['classification']!='public_reader' or production[0]['internal'] is not False or production[0]['a7_eligible'] is not False: raise ValueError('production reader catalog invalid')
  des=cat['success_endpoints']

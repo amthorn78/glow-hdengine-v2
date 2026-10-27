@@ -111,6 +111,36 @@ def _snapshot(repo: Path) -> dict[str, tuple[bytes, int]]:
     }
 
 
+def _strip_from_copy(repo: Path, *relatives: str) -> None:
+    """Build an absent state in a copy: remove each path, its proof and its rows.
+
+    Each relative path is a file or a directory tree. Its Index rows (the path
+    itself or anything under it) leave the seed ledger too, because the updater
+    refuses a row whose file is absent. The real owner then regenerates the
+    complete coherent skeleton and validates that state.
+    """
+    for relative in relatives:
+        target = repo / relative
+        if target.is_dir() and not target.is_symlink():
+            shutil.rmtree(target)
+        else:
+            target.unlink(missing_ok=True)
+            (repo / (relative + ".path_proof.txt")).unlink(missing_ok=True)
+    index = repo / "docs/evidence/INDEX.json"
+    rows = json.loads(index.read_bytes())
+    rows = [
+        row for row in rows
+        if not any(
+            row["discovered_physical_path"] == relative
+            or row["discovered_physical_path"].startswith(relative + "/")
+            for relative in relatives
+        )
+    ]
+    index.write_text(json.dumps(rows, sort_keys=True, separators=(",", ":")) + "\n")
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    _success(_run(repo, "tools/evidence/update_evidence_index.py", "--check"))
+
+
 def test_orientation_compatibility_write_is_idempotent_after_updater(
     tmp_path: Path,
 ) -> None:
@@ -218,6 +248,13 @@ def test_manifest_only_release_cut_stays_outside_the_evidence_graph(
     assert _snapshot(repo) == skeleton_before
     assert historical_proof.read_bytes() == proof_before
 
+    # HDE-CRD-0002 S12: no capture owner has rerun, so the updater publishes no
+    # new-release label; every capture keeps the release that produced it.
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert _snapshot(repo) == skeleton_before
+    assert "release 1.0.1" not in (repo / "artifacts/evidence_index.jsonl").read_text(encoding="utf-8")
+    _checks(repo)
+
 
 def test_updater_recovers_complete_missing_state_in_one_write(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
@@ -312,28 +349,16 @@ def crd_repo(tmp_path: Path) -> Path:
     """Build the tests' coherent pre-first-publication state in a copy.
 
     The repository retains completed CRD evidence. That history must remain in
-    the real checkout, while these tests need an absent CRD family before they
-    exercise initial publication or deliberately construct an empty root.
+    the real checkout, while these tests need every admitted CRD family absent
+    before they exercise initial publication or deliberately construct an empty
+    root. The roots come from the updater's admission table, so a later
+    admitted CRD is covered without editing this fixture.
     """
+    from tools.evidence import update_evidence_index as writer
+
     repo = tmp_path / "repo"
     shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
-    retained_root = repo / CRD_ROOT
-    if retained_root.exists():
-        shutil.rmtree(retained_root)
-    index = repo / "docs/evidence/INDEX.json"
-    rows = json.loads(index.read_bytes())
-    rows = [
-        row for row in rows
-        if not (
-            row["discovered_physical_path"] == CRD_ROOT
-            or row["discovered_physical_path"].startswith(CRD_ROOT + "/")
-        )
-    ]
-    index.write_text(json.dumps(rows, sort_keys=True, separators=(",", ":")) + "\n")
-    # Fixture construction changes its seed ledger only. The real owner then
-    # regenerates the complete coherent skeleton and validates that state.
-    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
-    _success(_run(repo, "tools/evidence/update_evidence_index.py", "--check"))
+    _strip_from_copy(repo, *(root for root, _key in writer.ADMITTED_CRD_QA.values()))
     return repo
 
 
@@ -414,7 +439,7 @@ def test_crd_current_manifest_reconciles_supersession_without_history_conversion
     _success(_crd_program(crd_repo, '''
 qa.record_check(config, observed("replacement"), supersede_check_ids=("current",))
 (config.qa_root / "unlisted.log").write_text("not admitted by discovery\\n")
-other = writer.ROOT / "audit/qa/hde-crd-0002"
+other = writer.ROOT / "audit/qa/hde-crd-0003"
 other.mkdir()
 (other / "unlisted.log").write_text("no source-owned admission\\n")
 writer.main([])
@@ -425,7 +450,7 @@ writer.main([])
     assert f"{CRD_ROOT}/checks/current/primary.log" not in paths
     assert f"{CRD_ROOT}/checks/replacement/primary.log" in paths
     assert f"{CRD_ROOT}/unlisted.log" not in paths
-    assert "audit/qa/hde-crd-0002/unlisted.log" not in paths
+    assert "audit/qa/hde-crd-0003/unlisted.log" not in paths
     _checks(crd_repo)
 
 
@@ -486,7 +511,7 @@ def test_crd_publication_refuses_foreign_scope_and_invalid_inputs(crd_repo):
     before = _whole_tree_state(crd_repo, metadata=True)
     _success(_crd_program(crd_repo, '''
 cases = [
-    (qa.HarnessConfig(crd_id="HDE-CRD-0002", repo_root=writer.ROOT), (observed(),)),
+    (qa.HarnessConfig(crd_id="HDE-CRD-0003", repo_root=writer.ROOT), (observed(),)),
     (qa.HarnessConfig(crd_id="HDE-CRD-0001", repo_root=writer.ROOT / "tests"), (observed(),)),
     (config, ()), (config, (observed(), observed())), (config, (object(),)),
 ]
@@ -640,7 +665,8 @@ mirror = [json.loads(line) for line in writer.MIRROR_PATH.read_bytes().splitline
 expected = tuple(writer.CATALOG_VALIDATION_ENTRIES)
 for entry in expected:
     selected = [row for row in rows if row["artifact_key"] == entry["artifact_key"]]
-    assert selected == [entry]
+    assert [writer._strip_current_release_label(row) for row in selected] == [entry]
+    assert selected[0]["notes"].startswith("current-release capture: release ")
     selected_mirror, = [row for row in mirror if row["artifact_key"] == entry["artifact_key"]]
     path = writer.ROOT / entry["discovered_physical_path"]
     assert path.is_file() and path.read_bytes()
@@ -952,3 +978,437 @@ assert writer._STAGED_VIEW is None
         if path != external_relative and path not in protected_parents:
             assert after[path] == state, path
     assert set(after) == set(before)
+
+
+def test_admitted_crd_table_is_explicit_and_matches_the_harness_roots():
+    from tools.evidence import update_evidence_index as writer
+    from tools.qa import qa_harness as qa
+
+    assert dict(writer.ADMITTED_CRD_QA) == {
+        "HDE-CRD-0001": ("audit/qa/hde-crd-0001", "audit.qa.hde_crd_0001"),
+        "HDE-CRD-0002": ("audit/qa/hde-crd-0002", "audit.qa.hde_crd_0002"),
+    }
+    for crd_id, (root_rel, _key) in writer.ADMITTED_CRD_QA.items():
+        assert qa.HarnessConfig(crd_id=crd_id, repo_root=writer.ROOT).qa_root == writer.ROOT / root_rel
+
+
+def test_absent_admitted_crd_root_publishes_nothing(tmp_path: Path) -> None:
+    # Built in a copy, so it holds whether or not the real checkout holds the
+    # HDE-CRD-0002 root. Only that root leaves; other admitted families stay.
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    _strip_from_copy(repo, "audit/qa/hde-crd-0002")
+    assert not (repo / "audit/qa/hde-crd-0002").exists()
+    # The copy's own updater: an in-process import would read the real checkout.
+    _success(_crd_program(repo, '''
+_unrelated, current = writer._load_crd_qa_entries([])
+assert not [row for row in current if "hde-crd-0002" in row["discovered_physical_path"]], current
+'''))
+    index = json.loads((repo / "docs/evidence/INDEX.json").read_bytes())
+    assert not [row for row in index if row["discovered_physical_path"].startswith("audit/qa/hde-crd-0002")]
+
+
+SECOND_CRD = 'second = qa.HarnessConfig(crd_id="HDE-CRD-0002", repo_root=writer.ROOT)\n'
+
+
+def test_crd_0002_fixture_root_publishes_beside_crd_0001(crd_repo):
+    _success(_crd_program(crd_repo, SECOND_CRD + (
+        "logs, manifest = writer.publish_crd_check_family(second, (observed(),), captured_at_utc=timestamp)\n"
+        "assert manifest == writer.ROOT / 'audit/qa/hde-crd-0002/qa_step_logs_manifest.json'\n"
+        "publish()\n"
+        "qa.validate_crd_check_family(second)\n"
+        "qa.validate_crd_check_family(config)\n"
+    )))
+    entries = json.loads((crd_repo / "docs/evidence/INDEX.json").read_bytes())
+    for root, key in (("audit/qa/hde-crd-0001", "audit.qa.hde_crd_0001"), ("audit/qa/hde-crd-0002", "audit.qa.hde_crd_0002")):
+        selected = [entry for entry in entries if entry["artifact_key"].startswith(key + ".")]
+        assert {entry["discovered_physical_path"] for entry in selected} == {
+            f"{root}/qa_step_logs_manifest.json", f"{root}/checks/current/primary.log",
+        }
+        assert all(set(entry) == {"artifact_key", "discovered_physical_path", "role"} for entry in selected)
+    mirror = [json.loads(line) for line in (crd_repo / "artifacts/evidence_index.jsonl").read_bytes().splitlines()]
+    for row in mirror:
+        if row["discovered_physical_path"].startswith("audit/qa/hde-crd-"):
+            assert not {"tokens", "epic_id", "crd_id"} & set(row)
+    _checks(crd_repo)
+    after = _whole_tree_state(crd_repo)
+    _success(_crd_program(crd_repo, SECOND_CRD + (
+        "writer.publish_crd_check_family(second, (observed(),), captured_at_utc=timestamp)\n"
+    )))
+    assert _whole_tree_state(crd_repo) == after
+
+
+def test_crd_publication_refuses_an_unadmitted_id_by_name(crd_repo):
+    before = _whole_tree_state(crd_repo, metadata=True)
+    result = _crd_program(crd_repo, (
+        "writer.publish_crd_check_family(qa.HarnessConfig(crd_id='HDE-CRD-0003', repo_root=writer.ROOT), (observed(),))\n"
+    ))
+    assert result.returncode != 0
+    assert "admits only HDE-CRD-0001, HDE-CRD-0002; refused HDE-CRD-0003" in result.stderr
+    assert _whole_tree_state(crd_repo, metadata=True) == before
+
+
+@pytest.mark.parametrize("corruption", ["key-0002-path-0001", "key-0001-path-0002"])
+def test_crd_index_admission_rejects_cross_crd_rows(crd_repo, corruption):
+    _success(_crd_program(crd_repo, "publish()"))
+    index = crd_repo / "docs/evidence/INDEX.json"
+    entries = json.loads(index.read_bytes())
+    selected = next(entry for entry in entries if entry["artifact_key"] == CRD_KEY + ".qa_step_logs_manifest")
+    if corruption == "key-0002-path-0001":
+        selected["artifact_key"] = "audit.qa.hde_crd_0002.qa_step_logs_manifest"
+    else:
+        selected["discovered_physical_path"] = "audit/qa/hde-crd-0002/qa_step_logs_manifest.json"
+    index.write_bytes((json.dumps(entries, sort_keys=True, separators=(",", ":")) + "\n").encode())
+    before = _whole_tree_state(crd_repo, metadata=True)
+    result = _run(crd_repo, "tools/evidence/update_evidence_index.py")
+    assert result.returncode != 0
+    assert "CRD" in result.stderr
+    assert _whole_tree_state(crd_repo, metadata=True) == before
+
+
+def _write_minimal_mirror(root: Path, metadata: dict[str, object]) -> None:
+    stamp = "2026-01-01T00:00:00Z"
+
+    def proof(path: str, body: bytes, extra: str = "") -> None:
+        (root / f"{path}.path_proof.txt").write_text(
+            f"path: {path}\nsize_bytes: {len(body)}\nsha256: {hashlib.sha256(body).hexdigest()}\n"
+            f"mtime_utc: {stamp}\nproduced_at_utc: {stamp}\n{extra}"
+        )
+
+    (root / "artifacts").mkdir()
+    (root / "artifacts/fixture.txt").write_bytes(b"fixture\n")
+    proof("artifacts/fixture.txt", b"fixture\n")
+    record = {
+        "artifact_key": "fixture.crd_record", "discovered_physical_path": "artifacts/fixture.txt",
+        "produced_at_utc": stamp, "proof_anchor": "artifacts/fixture.txt.path_proof.txt", "role": "log",
+        "sha256": hashlib.sha256(b"fixture\n").hexdigest(), "size_bytes": 8, **metadata,
+    }
+    body = json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n"
+    self_record = {
+        "artifact_key": "index.machine_mirror", "discovered_physical_path": "artifacts/evidence_index.jsonl",
+        "produced_at_utc": stamp, "proof_anchor": "artifacts/evidence_index.jsonl.path_proof.txt",
+        "role": "self_record", "sha256": hashlib.sha256(body.encode()).hexdigest(), "size_bytes": 0,
+    }
+    while True:
+        lines = sorted([body, json.dumps(self_record, sort_keys=True, separators=(",", ":")) + "\n"])
+        size = len("".join(lines).encode())
+        if self_record["size_bytes"] == size:
+            break
+        self_record["size_bytes"] = size
+    mirror = "".join(lines).encode()
+    (root / "artifacts/evidence_index.jsonl").write_bytes(mirror)
+    proof("artifacts/evidence_index.jsonl", mirror, f"mirror_body_sha256: {self_record['sha256']}\n")
+
+
+@pytest.mark.parametrize(
+    "metadata,expected",
+    [({"crd_id": "HDE-CRD-0002"}, 0), ({"epic_id": "HDE-EPIC040"}, 0), ({"epic_id": "HDE-EPIC040", "crd_id": "HDE-CRD-0002"}, 1)],
+    ids=["crd_id", "epic_id", "both"],
+)
+def test_mirror_schema_accepts_crd_id_and_refuses_epic_and_crd_together(tmp_path, metadata, expected):
+    _write_minimal_mirror(tmp_path, metadata)
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "ci/checks/check_mirror_schema.sh")],
+        cwd=tmp_path, env=ENV, capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == expected, result.stderr
+    assert ("EPIC_CRD_EXCLUSIVE" in result.stderr) is bool(expected)
+
+
+def _release_label() -> str:
+    raw = (ROOT / "catalog/manifest.json").read_bytes()
+    version = json.loads(raw)["version"]
+    return f"current-release capture: release {version}, release_id {hashlib.sha256(raw).hexdigest()}"
+
+
+def test_current_release_capture_rows_are_labeled_and_frozen_rows_are_not():
+    from tools.evidence import update_evidence_index as writer
+
+    label = _release_label()
+    mirror = [json.loads(line) for line in (ROOT / "artifacts/evidence_index.jsonl").read_bytes().splitlines()]
+    index = {
+        (row["artifact_key"], row["discovered_physical_path"]): row
+        for row in json.loads((ROOT / "docs/evidence/INDEX.json").read_bytes())
+    }
+    labeled_paths = set()
+    for row in mirror:
+        notes = row.get("notes", "")
+        if row["discovered_physical_path"] in writer.CURRENT_RELEASE_CAPTURE_PATHS:
+            assert notes.endswith(label), row
+            labeled_paths.add(row["discovered_physical_path"])
+        else:
+            assert "current-release capture:" not in notes, row
+        if row["role"] != "self_record":
+            assert index[(row["artifact_key"], row["discovered_physical_path"])].get("notes") == row.get("notes")
+    assert labeled_paths == writer.CURRENT_RELEASE_CAPTURE_PATHS
+    frozen = [row for row in mirror if row["discovered_physical_path"].startswith(
+        ("artifacts/identity/", "artifacts/math/", "artifacts/cli/showcompat/", "artifacts/vendor/", "audit/ops/")
+    )]
+    assert frozen and all("current-release capture:" not in row.get("notes", "") for row in frozen)
+
+
+def test_release_label_strip_preserves_origin_notes():
+    from tools.evidence import update_evidence_index as writer
+
+    label = "current-release capture: release 1.3.0, release_id " + "a" * 64
+    assert writer._strip_current_release_label({"notes": "origin; " + label}) == {"notes": "origin"}
+    assert writer._strip_current_release_label({"notes": label, "role": "log"}) == {"role": "log"}
+    assert writer._strip_current_release_label({"notes": "origin"}) == {"notes": "origin"}
+
+
+NEXT_RELEASE_LABEL = "current-release capture: release 9.9.9, release_id " + "b" * 64
+NEXT_RELEASE_UPDATER = (
+    "from tools.evidence import update_evidence_index as writer\n"
+    f"writer._current_release_label = lambda: {NEXT_RELEASE_LABEL!r}\n"
+    "writer.main([])\n"
+)
+
+
+def test_release_labels_follow_regenerated_captures_through_the_updater_alone(tmp_path):
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    index = repo / "docs/evidence/INDEX.json"
+    original, skeleton = index.read_bytes(), _snapshot(repo)
+    label = _release_label()
+
+    def updater_for_next_release() -> None:
+        _success(subprocess.run(
+            [sys.executable, "-c", NEXT_RELEASE_UPDATER], cwd=repo, env=ENV, capture_output=True, text=True, check=False,
+        ))
+
+    # A release change alone relabels nothing: no capture has been regenerated.
+    updater_for_next_release()
+    assert _snapshot(repo) == skeleton
+
+    # The owner regenerates one capture (two rows): only its rows move, once.
+    capture = "artifacts/proofs/success_get.txt"
+    capture_bytes = (repo / capture).read_bytes()
+    (repo / capture).write_bytes(capture_bytes + b"regenerated=true\n")
+    updater_for_next_release()
+    rows = [row for row in json.loads(index.read_bytes()) if "current-release capture:" in row.get("notes", "")]
+    moved = [row for row in rows if row["discovered_physical_path"] == capture]
+    assert len(moved) == 2 and all(row["notes"].endswith(NEXT_RELEASE_LABEL) for row in moved)
+    assert all(row["notes"].endswith(label) for row in rows if row["discovered_physical_path"] != capture)
+    assert all(row["notes"].count("current-release capture:") == 1 for row in rows)
+    mirror = [json.loads(line) for line in (repo / "artifacts/evidence_index.jsonl").read_bytes().splitlines()]
+    assert {row["sha256"] for row in mirror if row["discovered_physical_path"] == capture} == {
+        hashlib.sha256((repo / capture).read_bytes()).hexdigest()
+    }
+
+    # Regenerated again under the admitted release, it takes that release back.
+    (repo / capture).write_bytes(capture_bytes)
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert index.read_bytes() == original
+    _checks(repo)
+
+
+def test_unlabeled_capture_rows_take_the_admitted_release_on_adoption(tmp_path):
+    from tools.evidence import update_evidence_index as writer
+
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    index = repo / "docs/evidence/INDEX.json"
+    original = index.read_bytes()
+    unlabeled = [writer._strip_current_release_label(row) for row in json.loads(original)]
+    index.write_bytes((json.dumps(unlabeled, separators=(",", ":"), sort_keys=True) + "\n").encode())
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert index.read_bytes() == original
+    _checks(repo)
+
+
+def test_incoherent_capture_labels_are_refused_before_any_write(tmp_path):
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    index = repo / "docs/evidence/INDEX.json"
+    rows = json.loads(index.read_bytes())
+    row = next(row for row in rows if row["artifact_key"] == "a7.success_get")
+    row["notes"] = NEXT_RELEASE_LABEL
+    index.write_bytes((json.dumps(rows, separators=(",", ":"), sort_keys=True) + "\n").encode())
+    before = _whole_tree_state(repo, metadata=True)
+    result = _run(repo, "tools/evidence/update_evidence_index.py")
+    assert result.returncode != 0
+    assert "CURRENT_RELEASE_LABEL_INCOHERENT:artifacts/proofs/success_get.txt" in result.stderr
+    assert _whole_tree_state(repo, metadata=True) == before
+
+
+def test_release_label_refuses_a_manifest_that_fails_full_validation(tmp_path):
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    member = repo / "migrations/005_identity.sql"
+    member.write_bytes(member.read_bytes() + b"-- member changed without a re-cut\n")
+    before = _whole_tree_state(repo, metadata=True)
+    for args in ((), ("--check",)):
+        result = _run(repo, "tools/evidence/update_evidence_index.py", *args)
+        assert result.returncode != 0
+        assert "CURRENT_RELEASE_LABEL_MANIFEST_INVALID" in result.stderr
+    assert _whole_tree_state(repo, metadata=True) == before
+
+
+def test_config_publication_lets_only_a_regenerated_capture_label_move():
+    from tools.evidence import update_evidence_index as writer
+
+    identity = ("catalog.catalog_schema_validation", "artifacts/catalog/catalog_schema_validation.log")
+    row = {"artifact_key": identity[0], "discovered_physical_path": identity[1], "record_type": "catalog_validation"}
+    before = {identity: {**row, "notes": _release_label()}}
+    after = {identity: {**row, "notes": NEXT_RELEASE_LABEL}}
+    writer._config_logical_delta(before, after, changed_primaries=frozenset({identity[1]}), mirror=False)
+    with pytest.raises(ValueError, match="CONFIG_PUBLICATION_UNRELATED_RECORD_DRIFT"):
+        writer._config_logical_delta(before, after, changed_primaries=frozenset(), mirror=False)
+    drifted = {identity: {**row, "record_type": "other", "notes": NEXT_RELEASE_LABEL}}
+    with pytest.raises(ValueError, match="CONFIG_PUBLICATION_UNRELATED_RECORD_DRIFT"):
+        writer._config_logical_delta(before, drifted, changed_primaries=frozenset({identity[1]}), mirror=False)
+
+
+def test_index_normalizer_keeps_crd_id_and_refuses_epic_and_crd_together():
+    from tools.evidence import update_evidence_index as writer
+
+    row = {"artifact_key": "fixture.crd", "discovered_physical_path": "audit/qa/hde-crd-0002/x.log"}
+    assert writer._normalize_index_entry({**row, "crd_id": "HDE-CRD-0002"})["crd_id"] == "HDE-CRD-0002"
+    assert writer._normalize_index_entry({**row, "epic_id": "HDE-EPIC040"})["epic_id"] == "HDE-EPIC040"
+    with pytest.raises(ValueError, match="both epic_id and crd_id"):
+        writer._normalize_index_entry({**row, "epic_id": "HDE-EPIC040", "crd_id": "HDE-CRD-0002"})
+
+
+# --- HDE-CRD-0002 S21: close-run family (IF-4) and CRD close-pack rows (M1) ---
+CLOSE_CRD = "HDE-CRD-0002"
+CLOSE_ROOT = "audit/qa/hde-crd-0002"
+CLOSE_PACK = ("audit/HDE-CRD-0002_close_report.md", "audit/HDE-CRD-0002_MANIFEST.json")
+CLOSE_SOURCE = "audit/HDE-CRD-0002_close_candidate_source.json"
+CLOSE_FIXTURE_PROGRAM = CRD_FIXTURE_PROGRAM.replace(
+    'crd_id="HDE-CRD-0001"', 'crd_id="HDE-CRD-0002"'
+) + '''
+def publish_close(check_ids=("close-pack-check", "evidence-index-check"), **kwargs):
+    return writer.publish_crd_close_run_family(
+        config, tuple(observed(check_id) for check_id in check_ids),
+        captured_at_utc=timestamp, **kwargs,
+    )
+'''
+
+
+def _close_program(repo: Path, program: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, "-c", CLOSE_FIXTURE_PROGRAM + "\n" + program],
+        cwd=repo, env=ENV, capture_output=True, text=True, check=False,
+    )
+
+
+@pytest.fixture
+def close_repo(tmp_path: Path) -> Path:
+    """Build HDE-CRD-0002's pre-close state in a copy, whatever the checkout holds.
+
+    The QA root (with its close-run family), the close pack and the close
+    candidate source leave the copy with their proofs and rows.
+    """
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    _strip_from_copy(repo, CLOSE_ROOT, *CLOSE_PACK, CLOSE_SOURCE)
+    assert not (repo / CLOSE_ROOT).exists()
+    return repo
+
+
+def _index_rows(repo: Path) -> dict[str, dict[str, object]]:
+    return {
+        str(row["discovered_physical_path"]): row
+        for row in json.loads((repo / "docs/evidence/INDEX.json").read_bytes())
+    }
+
+
+def test_crd_close_pack_rows_are_absent_tolerant(close_repo: Path) -> None:
+    before = _snapshot(close_repo)
+    _success(_run(close_repo, "tools/evidence/update_evidence_index.py", "--check"))
+    _success(_run(close_repo, "tools/evidence/update_evidence_index.py"))
+    assert _snapshot(close_repo) == before
+    assert not set(CLOSE_PACK) & set(_index_rows(close_repo))
+
+    report, manifest = (close_repo / rel for rel in CLOSE_PACK)
+    report.write_text("# HDE-CRD-0002 Close Report\n", encoding="utf-8")
+    one = _run(close_repo, "tools/evidence/update_evidence_index.py")
+    assert one.returncode != 0 and "CRD_CLOSE_PACK_INCOMPLETE:HDE-CRD-0002" in one.stderr
+    assert _snapshot(close_repo) == before
+
+    manifest.write_text("{}\n", encoding="utf-8")
+    _success(_run(close_repo, "tools/evidence/update_evidence_index.py"))
+    rows = _index_rows(close_repo)
+    assert rows[CLOSE_PACK[0]] == {
+        "artifact_key": "hde_crd_0002.close_report",
+        "crd_id": CLOSE_CRD,
+        "discovered_physical_path": CLOSE_PACK[0],
+    }
+    assert rows[CLOSE_PACK[1]]["artifact_key"] == "hde_crd_0002.manifest"
+    for rel in CLOSE_PACK:
+        assert (close_repo / f"{rel}.path_proof.txt").is_file()
+    _checks(close_repo)
+
+    report.unlink()
+    manifest.unlink()
+    gone = _run(close_repo, "tools/evidence/update_evidence_index.py", "--check")
+    assert gone.returncode != 0 and "CRD_CLOSE_PACK_INDEXED_BUT_ABSENT:HDE-CRD-0002" in gone.stderr
+
+
+def test_close_run_family_publishes_without_touching_the_qa_family(close_repo: Path) -> None:
+    _success(_close_program(close_repo, "publish()"))
+    qa_family = {
+        rel: ((close_repo / rel).read_bytes(), (close_repo / rel).stat().st_mtime_ns)
+        for rel in (f"{CLOSE_ROOT}/qa_step_logs_manifest.json", f"{CLOSE_ROOT}/checks/current/primary.log")
+    }
+    _success(_close_program(close_repo, "print(len(publish_close()))"))
+    rows = _index_rows(close_repo)
+    for check_id in ("close-pack-check", "evidence-index-check"):
+        rel = f"{CLOSE_ROOT}/close/{check_id}/primary.log"
+        assert rows[rel] == {
+            "artifact_key": f"audit.qa.hde_crd_0002.close.{check_id}.primary.log",
+            "discovered_physical_path": rel,
+            "role": "log",
+        }
+        header = json.loads((close_repo / rel).read_text(encoding="utf-8").splitlines()[0])
+        assert header["status"] == "PASS" and header["exit_code"] == 0 and header["command"]
+        assert (close_repo / f"{rel}.path_proof.txt").is_file()
+    assert {
+        rel: ((close_repo / rel).read_bytes(), (close_repo / rel).stat().st_mtime_ns)
+        for rel in qa_family
+    } == qa_family
+    manifest = json.loads((close_repo / f"{CLOSE_ROOT}/qa_step_logs_manifest.json").read_bytes())
+    assert set(manifest) == {"current"}
+    _checks(close_repo)
+
+    # The given results replace the whole family; a stale member leaves with its rows.
+    _success(_close_program(close_repo, 'publish_close(("close-pack-check",))'))
+    assert not (close_repo / f"{CLOSE_ROOT}/close/evidence-index-check").exists()
+    assert f"{CLOSE_ROOT}/close/evidence-index-check/primary.log" not in _index_rows(close_repo)
+    _checks(close_repo)
+
+
+def test_close_run_publication_refuses_scope_and_restores_on_failure(close_repo: Path) -> None:
+    before = _whole_tree_state(close_repo, metadata=True)
+    refused = _close_program(close_repo, "publish_close()")
+    assert refused.returncode != 0 and "CRD record is missing" in refused.stderr
+    assert _whole_tree_state(close_repo, metadata=True) == before
+    _success(_close_program(close_repo, "publish()"))
+    before = _whole_tree_state(close_repo, metadata=True)
+    _success(_close_program(close_repo, '''
+for selected in (qa.HarnessConfig(crd_id="HDE-CRD-0003", repo_root=writer.ROOT),):
+    try:
+        writer.publish_crd_close_run_family(selected, (observed(),))
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("unadmitted close-run publication was accepted")
+def broken():
+    raise RuntimeError("fixture verifier failure")
+try:
+    publish_close(coherence_verifier=broken)
+except RuntimeError as exc:
+    assert "fixture verifier failure" in str(exc)
+else:
+    raise AssertionError("verifier failure was not raised")
+'''))
+    assert _whole_tree_state(close_repo, metadata=True) == before
+
+
+def test_close_run_family_refuses_an_unexpected_member(close_repo: Path) -> None:
+    _success(_close_program(close_repo, "publish(); publish_close()"))
+    stray = close_repo / f"{CLOSE_ROOT}/close/close-pack-check/notes.txt"
+    stray.write_text("not a primary\n", encoding="utf-8")
+    result = _run(close_repo, "tools/evidence/update_evidence_index.py", "--check")
+    assert result.returncode != 0
+    assert "unexpected member" in result.stderr

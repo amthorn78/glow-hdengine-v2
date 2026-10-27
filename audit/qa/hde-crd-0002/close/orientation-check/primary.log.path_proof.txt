@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/close/orientation-check/primary.log
+size_bytes: 611
+sha256: 2b85626ebb761543154c9fffba07befee9c09c2b65c9e0b6510b1f0300474a6a
+mtime_utc: 2026-10-26T04:37:35Z
+produced_at_utc: 2026-09-22T14:25:29Z

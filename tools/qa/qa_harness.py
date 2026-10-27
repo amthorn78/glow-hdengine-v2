@@ -228,10 +228,11 @@ _MIRROR_REQUIRED_FIELDS = frozenset(
     }
 )
 _MIRROR_OPTIONAL_FIELDS = frozenset(
-    {"epic_id", "notes", "record_type", "schema_version", "tokens"}
+    {"crd_id", "epic_id", "notes", "record_type", "schema_version", "tokens"}
 )
 _HUMAN_INDEX_OPTIONAL_FIELDS = frozenset(
     {
+        "crd_id",
         "epic_id",
         "notes",
         "produced_at_utc",
@@ -1511,9 +1512,11 @@ def _primary_log_content(
     result: CheckResult,
     *,
     captured_at_utc: str | None = None,
+    family: str = "checks",
 ) -> tuple[Path, str]:
     validate_check_id(result.check_id)
-    path = config.qa_root / "checks" / result.check_id / "primary.log"
+    _require_primary_family(config, family)
+    path = config.qa_root / family / result.check_id / "primary.log"
     if config.crd_id is not None:
         _validate_crd_path(config, path)
         result.__post_init__()
@@ -1569,7 +1572,7 @@ def _primary_log_content(
     if body:
         content += body + "\n"
     if config.crd_id is not None:
-        _parse_crd_primary(config, result.check_id, content.encode("utf-8"))
+        _parse_crd_primary(config, result.check_id, content.encode("utf-8"), family=family)
     return path, content
 
 
@@ -1733,8 +1736,15 @@ def _crd_text(payload: bytes) -> str:
         raise ValueError("CRD record is not UTF-8") from exc
 
 
+def _require_primary_family(config: HarnessConfig, family: str) -> None:
+    # "close" is the post-verdict CRD close-run family (HDE-CRD-0002 IF-4); it
+    # is published only by the canonical updater and never enters the manifest.
+    if family != "checks" and not (family == "close" and config.crd_id is not None):
+        raise ValueError("primary family must be checks, or close for a CRD")
+
+
 def _parse_crd_primary(
-    config: HarnessConfig, check_id: str, payload: bytes
+    config: HarnessConfig, check_id: str, payload: bytes, *, family: str = "checks"
 ) -> dict[str, object]:
     text = _crd_text(payload)
     header = _parse_primary_header(text, allow_legacy_check_id=False)
@@ -1742,7 +1752,7 @@ def _parse_crd_primary(
         raise ValueError("CRD primary header must be compact sorted JSON")
     if header["check_id"] != check_id:
         raise ValueError("CRD primary identity disagrees with its manifest/path")
-    _require_v2_primary_self_binding(config, check_id, header)
+    _require_v2_primary_self_binding(config, check_id, header, family=family)
     if header["status"] == Status.PARKED.value and header["command"]:
         raise ValueError("CRD PARKED cannot describe executed commands")
     if header["status"] == Status.FAIL_BEHAVIOR.value and not header["command"]:
@@ -1838,11 +1848,14 @@ def _require_v2_primary_self_binding(
     config: HarnessConfig,
     check_id: str,
     header: Mapping[str, object],
+    *,
+    family: str = "checks",
 ) -> None:
     if header.get("schema_version") != "pf27.step_log_header.v2":
         return
+    _require_primary_family(config, family)
     expected = (
-        config.qa_root / "checks" / check_id / "primary.log"
+        config.qa_root / family / check_id / "primary.log"
     ).relative_to(config.repo_root).as_posix()
     evidence_artifacts = header.get("evidence_artifacts")
     if not isinstance(evidence_artifacts, list) or expected not in evidence_artifacts:

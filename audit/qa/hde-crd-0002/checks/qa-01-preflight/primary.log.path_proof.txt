@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-01-preflight/primary.log
+size_bytes: 290492
+sha256: 01df910157d7d96ec9d6b7cfeb18be22aa1c7f2f3d8b8e2437c77e1af80303e4
+mtime_utc: 2026-10-24T23:43:05Z
+produced_at_utc: 2026-09-22T14:25:29Z

@@ -1,31 +1,27 @@
 
 from __future__ import annotations
-import subprocess, sys, re, json
+import subprocess, sys, json
+from pathlib import Path
+
+from tests.support.pr04_fixtures import GATES_A, GATES_B, UUID_A, UUID_B, complete_chart
 
 def run_showcompat(*argv):
     p = subprocess.run([sys.executable, "scripts/hdctl.py", "showcompat", *argv],
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p.returncode, p.stdout, p.stderr
 
-def _argsA():
-    return ["--a-birthdate","1990-05-04","--a-birthtime","14:22","--a-place","Austin, US","--a-tz","Europe/Amsterdam",
-            "--b-birthdate","1992-07-19","--b-birthtime","08:05","--b-place","New York, US","--b-tz","Europe/Amsterdam"]
+def _pair(path: Path, left: dict, right: dict) -> str:
+    path.write_text(json.dumps({"left": left, "right": right}), encoding="utf-8")
+    return str(path)
 
-def _argsB():
-    return ["--a-birthdate","1992-07-19","--a-birthtime","08:05","--a-place","New York, US","--a-tz","Europe/Amsterdam",
-            "--b-birthdate","1990-05-04","--b-birthtime","14:22","--b-place","Austin, US","--b-tz","Europe/Amsterdam"]
-
-def test_ab_ba_parity_bytes_identical():
-    rc1, out1, err1 = run_showcompat(*_argsA())
-    rc2, out2, err2 = run_showcompat(*_argsB())
+def test_ab_ba_parity_bytes_identical(tmp_path: Path):
+    a, b = complete_chart(UUID_A, GATES_A), complete_chart(UUID_B, GATES_B)
+    rc1, out1, err1 = run_showcompat("--pair-file", _pair(tmp_path / "ab.json", a, b))
+    rc2, out2, err2 = run_showcompat("--pair-file", _pair(tmp_path / "ba.json", b, a))
     assert rc1 == rc2 == 0
     assert err1 == err2 == b""
     assert out1.endswith(b"\n") and out2.endswith(b"\n")
     assert out1 == out2
-    # public is numeric-free
+    # PF05 §4.1.3: stdout is the canonical magic10_compat_result.v1 document
     obj = json.loads(out1)
-    assert "band" in obj and "categories" in obj
-    s = out1.decode("utf-8")
-    # no raw numeric JSON values (digits only inside strings)
-    assert not re.search(r':\s*\d', s)
-
+    assert obj["schema"] == "magic10_compat_result.v1" and "categories" in obj

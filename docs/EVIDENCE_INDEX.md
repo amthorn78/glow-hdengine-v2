@@ -57,6 +57,12 @@ The direction-native narrative pack has 360 keys in `catalog/narratives/keys.jso
 - `.github/workflows/epic-closeout-validation.yml` is an isolated manual `workflow_dispatch` lane with read-only contents permission, exact-ref checkout, non-writing checks, clean-tree enforcement, no persisted credentials, no receipt or source writeback, and no automatic pull-request trigger. It complements rather than replaces ordinary `test` CI.
 - HDE-EPIC039 delivered reusable capability and companion evidence only. It did not create a real HDE-EPIC039 close candidate, close report, manifest, acceptance map, token matrix, or QA log and did not execute OPS, Live QA, acceptance, PF09 movement, deployment, Product Owner closeout, or epic closeout.
 
+## HDE-CRD-0002 evidence orientation (CRD admission, Mirror labels, close-run family)
+
+- CRD admission: `tools/evidence/update_evidence_index.py` holds the source-owned `ADMITTED_CRD_QA` table. It admits `HDE-CRD-0001` (QA root `audit/qa/hde-crd-0001`, key prefix `audit.qa.hde_crd_0001`) and `HDE-CRD-0002` (`audit/qa/hde-crd-0002`, `audit.qa.hde_crd_0002`). The governed CRD publishers `publish_crd_check_family` and `publish_crd_close_run_family` refuse any other CRD. The table is explicit, not discovery: another CRD needs its own row.
+- Mirror release labels: the Machine Mirror row of a current-release capture (a path listed in the updater's `CURRENT_RELEASE_CAPTURE_PATHS`) carries `current-release capture: release <version>, release_id <sha256>` in `notes`. A capture takes the label of the release in `catalog/manifest.json` only when its owner has regenerated it, so that its bytes differ from those the Mirror last recorded. A release change alone never relabels a capture, and frozen capture-time families are not listed and keep their labels. The label is not proof that an owner ran.
+- Close-run family: an admitted CRD's post-verdict close-run family is `audit/qa/<crd-dir>/close/<check_id>/primary.log` with its `primary.log.path_proof.txt` sibling, where `<crd-dir>` is the lower-case CRD ID (for example `hde-crd-0002`). Its members are exactly those validated primaries and path proofs; anything else under `close/` is refused. Each primary is rendered from one close-run check's captured command, exit code and output. Only the updater writes the family, through the Python API `publish_crd_close_run_family(config, results, *, captured_at_utc=None, coherence_verifier=None)`, inside one recoverable transaction: the given results replace the whole family, the CRD's recorded QA family must already exist, and the family never enters `qa_step_logs_manifest.json`. Index keys are `<key prefix>.close.<check_id>.primary.log`. No Epic close-run family is admitted, and no close-run family of any change exists yet.
+
 ## HDE-EPIC037 evidence navigation
 
 - PR-01 field sufficiency: `artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json`, `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract.snapshot.json`, `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json`, `audit/docdeltas/hde-epic037_doc_deltas.md`, and `audit/qa/hde-epic037/00_meta/doc_deltas.md`.
@@ -122,8 +128,8 @@ The direction-native narrative pack has 360 keys in `catalog/narratives/keys.jso
 * Success headers: `artifacts/proofs/success_get.txt`, `artifacts/proofs/success_head.txt`
 * 304 posture: `artifacts/proofs/success_304.txt`
 * Writer/error posture: `artifacts/proofs/success_writers_errors.txt`
-* Encoding invariance: `artifacts/proofs/encoding_invariance.txt`
-* Proof generator: `tests/http/test_reader_a7_transport.py` (set `HDE_WRITE_A7_PROOFS=1` to emit artifacts under `artifacts/proofs/`).
+* Encoding invariance: `artifacts/proofs/success_encoding_invariance.txt`
+* Proof generator: `tools/evidence/generate_a7_transport_proofs.py`, which writes the proofs and the Endpoint Catalog only when `HDE_WRITE_A7_PROOFS=1` is set; `--check` compares them without writing. `tests/http/test_reader_a7_transport.py` tests the transport and writes nothing.
 
 ## Conjunction CLI artifacts (EPIC026)
 * Pair fixtures and captures: `artifacts/audit/cli/pair.json`, `artifacts/audit/cli/pair_ba.json`, `artifacts/audit/cli/showcompat_ab.json`, `artifacts/audit/cli/showcompat_ba.json`

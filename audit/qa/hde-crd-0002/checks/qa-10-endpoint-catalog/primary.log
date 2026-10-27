@@ -1,0 +1,99 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-10-endpoint-catalog","check_name":"Every served pair catalogued or excluded with a reason","claimed_tokens":[],"command":[["python","-m","pytest","-q","-p","no:cacheprovider","tests/http/test_endpoint_catalog.py"],["python","tools/evidence/generate_a7_transport_proofs.py","--check"],["cmp","docs/ENDPOINTS_CATALOG.json","artifacts/audit/ENDPOINTS_CATALOG.json"],["python","-c","import json; print(len(json.load(open('docs/ENDPOINTS_CATALOG.json'))['endpoints']))"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.2 check 10; QA-90 task T10 attempt 1; normalizations: NZ-01 (scratch paths under the session scratchpad)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-10-endpoint-catalog/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref","PF12-Canon-HDE-Schemas-and-Artifacts"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-24T23:59:56Z"}
+=== CONTEXT ===
+check_id: qa-10-endpoint-catalog
+task: QA-90 task T10, attempt 1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.0.md); QA Plan v1.2 check 10 (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.2.md, blob 66f6016cc75bd1ab4ff9730ea89e5e25c7ec629c)
+tested_commit: 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; tested_tree: af5293473238c17d72c7d73013493739b9f32750
+environment_class: E-L; E-L clone /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el; venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv (NZ-01 scratch paths)
+interpreter: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state
+presence in the check shell: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session abab87ae-fdb9-4eb6-b2b9-de5380cee6cb, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+start_utc: 2026-10-24T23:59:43Z
+readiness reads (collection §4.5; Plan §7 rule A):
+--- command: ["git", "rev-parse", "HEAD"]
+started_utc: 2026-10-24T23:59:43Z; exit_code: 0
+stdout (41 bytes):
+2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+stderr (0 bytes):
+(empty)
+--- command: ["git", "rev-parse", "--is-shallow-repository"]
+started_utc: 2026-10-24T23:59:44Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-24T23:59:44Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["python", "--version"]
+started_utc: 2026-10-24T23:59:44Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "--version"]
+started_utc: 2026-10-24T23:59:44Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import engine; print(engine.__file__)"]
+started_utc: 2026-10-24T23:59:44Z; exit_code: 0
+stdout (143 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
+stderr (0 bytes):
+(empty)
+readiness result: PASS (HEAD=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 shallow=false status_empty=yes python='Python 3.12.15' engine=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py)
+end_utc: 2026-10-24T23:59:56Z
+=== COMMANDS ===
+--- command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/http/test_endpoint_catalog.py"]
+started_utc: 2026-10-24T23:59:45Z; exit_code: 0
+stdout (340 bytes):
+........................................................................ [ 29%]
+........................................................................ [ 58%]
+........................................................................ [ 87%]
+...............................                                          [100%]
+247 passed in 4.88s
+stderr (0 bytes):
+(empty)
+--- command: ["python", "tools/evidence/generate_a7_transport_proofs.py", "--check"]
+started_utc: 2026-10-24T23:59:50Z; exit_code: 0
+stdout (29 bytes):
+a7 transport proofs check ok
+stderr (0 bytes):
+(empty)
+--- command: ["cmp", "docs/ENDPOINTS_CATALOG.json", "artifacts/audit/ENDPOINTS_CATALOG.json"]
+started_utc: 2026-10-24T23:59:55Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import json; print(len(json.load(open('docs/ENDPOINTS_CATALOG.json'))['endpoints']))"]
+started_utc: 2026-10-24T23:59:56Z; exit_code: 0
+stdout (3 bytes):
+18
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-24T23:59:56Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness (collection §4.5) | observed: PASS | PASS
+- step 1: '247 passed' | observed: 247 passed in 4.88s (exit 0) | PASS
+- step 2: generate_a7_transport_proofs.py --check exits 0 | observed: exit 0 | PASS
+- step 3: cmp of the docs catalog and its audit mirror is silent | observed: exit 0; output (empty) | PASS
+- step 3: the catalog holds 18 records | observed: 18 (exit 0) | PASS
+- after the generator's --check: git status --porcelain empty (supporting read) | observed: (empty) | RECORDED
+=== NOTES ===
+- the final git status --porcelain is a supporting read added by the executor to show the generator's --check left the clone unchanged; it is not a Plan predicate, and exit_code is step 3's last decisive child.
+- nonclaims: catalog membership proves no reachability (HDE-CLI-API-Vendor-Ref §5.6).
+- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-L clone hde-crd-0002-el, venv hde-crd-0002-el-venv, XDG_STATE_HOME hde-crd-0002-xdg-state, evidence checkout hde-crd-0002-evidence, QA files hde-crd-0002-qa).
+- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 exports unset them in this check shell (presence table above); no value is recorded.

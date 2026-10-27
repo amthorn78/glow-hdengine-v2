@@ -4,7 +4,8 @@ import os
 import re
 import subprocess
 import sys
-from pathlib import Path
+import textwrap
+from pathlib import Path, PurePosixPath
 
 import pytest
 
@@ -186,16 +187,31 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     assert workflow_targets == fixed_targets
 
 
-def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> None:
+def test_closeout_validation_is_isolated_read_only_and_exact_head() -> None:
     manual_path = ROOT / ".github/workflows/epic-closeout-validation.yml"
     text = manual_path.read_text(encoding="utf-8")
     ordinary = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 
-    assert re.findall(r"(?m)^  [a-z_]+:\s*$", text.split("permissions:", 1)[0]) == [
-        "  workflow_dispatch:"
+    # A close never waits on a manual dispatch: the job runs by itself on a
+    # pull request that changes a writer close pack (HDE-CRD-0002 CL-05, B-5).
+    triggers = text.split("permissions:", 1)[0]
+    assert re.findall(r"(?m)^  [a-z_]+:\s*$", triggers) == [
+        "  pull_request:",
+        "  workflow_dispatch:",
+    ]
+    # A change to the close tooling re-validates every committed writer close
+    # pack (HDE-CRD-0002 CL-05, B-6).
+    assert re.findall(r'(?m)^      - "([^"]+)"$', triggers) == [
+        ".github/workflows/epic-closeout-validation.yml",
+        "tools/qa/generate_epic_close_pack.py",
+        "schemas/close_candidate_source.v*.json",
+        "schemas/epic_close_candidate_source.v*.json",
+        "audit/*_close_candidate_source.json",
+        "audit/*_close_report.md",
+        "audit/*_MANIFEST.json",
     ]
     for forbidden_trigger in (
-        "pull_request:",
+        "pull_request_target:",
         "push:",
         "workflow_run:",
         "repository_dispatch:",
@@ -203,6 +219,12 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
         "schedule:",
     ):
         assert forbidden_trigger not in text
+    assert text.count("pull_request:") == 1
+    assert (
+        "  group: epic-closeout-validation-"
+        "${{ github.event.pull_request.number || github.run_id }}\n"
+        "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}\n"
+    ) in text
     assert re.findall(r"(?m)^[ \t]*permissions:[ \t]*$", text) == ["permissions:"]
     assert re.findall(r"(?m)^[ \t]*contents:[ \t]+read[ \t]*$", text) == [
         "  contents: read"
@@ -216,8 +238,17 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
     assert text.count('GIT_NO_LAZY_FETCH: "1"') == 1
     assert text.count("actions/checkout@v4") == 1
     assert text.count("persist-credentials: false") == 1
-    assert "ref: ${{ inputs.git_ref }}" in text
-    assert "^[0-9a-f]{40,64}$" in text
+    assert (
+        "      SELECTED_REF: ${{ github.event_name == 'pull_request' && "
+        "github.event.pull_request.head.sha || inputs.git_ref }}\n"
+    ) in text
+    assert text.count("ref: ${{ env.SELECTED_REF }}") == 1
+    # The evidence checks import the Reader's transport validators, so the job
+    # installs the runtime requirements (HDE-CRD-0002 WU-PR-07 F-1).
+    assert text.count("python -m pip install") == 1
+    assert "run: python -m pip install -r requirements.txt\n" in text
+    assert text.count("^[0-9a-f]{40,64}$") == 2
+    assert '[[ "$DISPATCHED_SOURCE" != *$\'\\n\'* ]]' in text
     assert '${#CANDIDATE_SOURCE} <= 512' in text
     assert (
         '[[ "$CANDIDATE_SOURCE" =~ '
@@ -233,6 +264,11 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
     assert text.count('test "$(git rev-parse --verify HEAD)" = "$SELECTED_REF"') == 2
     assert text.count("git diff --exit-code") == 2
     assert text.count('git status --short --untracked-files=all') == 2
+    # Every step that installs or validates runs only where a candidate applies;
+    # the clean-checkout verification always runs.
+    assert text.count("        if: steps.select.outputs.applies == 'true'\n") == 4
+    final_step = text[text.index("      - name: Verify validation left the exact checkout clean") :]
+    assert "if:" not in final_step
     validation_step = text[
         text.index("      - name: Validate exact committed closeout candidate without writing") :
         text.index("      - name: Run retained read-only evidence checks")
@@ -262,11 +298,258 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
         "ALLOW_NETWORK=1",
     ):
         assert forbidden not in text
-
     assert ordinary.count("\n  test:\n") == 1
     assert ordinary.count("actions/checkout@v4") == 1
     assert "epic-closeout-validation" not in ordinary
     assert "workflow_dispatch:" not in ordinary
+
+
+def _closeout_selection_script() -> str:
+    text = (ROOT / ".github/workflows/epic-closeout-validation.yml").read_text(encoding="utf-8")
+    body = text.split("<<'SELECT_CLOSEOUT_CANDIDATES'\n", 1)[1]
+    body = body.split("\n          SELECT_CLOSEOUT_CANDIDATES\n", 1)[0]
+    return textwrap.dedent(body) + "\n"
+
+
+def _commit_all(repo: Path, message: str) -> str:
+    _git(repo, "add", "-A")
+    _git(repo, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-q", "-m", message)
+    return _git(repo, "rev-parse", "HEAD")
+
+
+@pytest.mark.parametrize(
+    ("files", "deleted", "expected"),
+    [
+        (
+            {
+                "audit/HDE-CRD-0003_close_candidate_source.json": "{}\n",
+                "audit/HDE-CRD-0003_close_report.md": "# close\n",
+                "audit/HDE-CRD-0003_MANIFEST.json": (
+                    '{"inputs":{"candidate_source":{"path":'
+                    '"audit/HDE-CRD-0003_close_candidate_source.json"}},'
+                    '"schema_version":"close_candidate_manifest.v2"}\n'
+                ),
+            },
+            (),
+            "audit/HDE-CRD-0003_close_candidate_source.json\n",
+        ),
+        (
+            {
+                "audit/EPIC-041_MANIFEST.json": (
+                    '{"inputs":{"candidate_source":{"path":"audit/sources/epic041.json"}},'
+                    '"schema_version":"epic_close_candidate_manifest.v1"}\n'
+                ),
+                "audit/sources/epic041.json": "{}\n",
+            },
+            (),
+            "audit/sources/epic041.json\n",
+        ),
+        ({"audit/EPIC-027_MANIFEST.json": '{"epic":"EPIC-027","rev":2}\n'}, (), ""),
+        ({"README.md": "changed\n"}, (), ""),
+        ({}, ("audit/EPIC-027_MANIFEST.json", "audit/EPIC-027_close_report.md"), ""),
+        (
+            {"audit/HDE-CRD-0004_MANIFEST.json": '{"schema_version":"close_candidate_manifest.v2"}\n'},
+            (),
+            "CLOSEOUT_CANDIDATE_SOURCE_UNBOUND:audit/HDE-CRD-0004_MANIFEST.json",
+        ),
+        (
+            {
+                "audit/HDE-CRD-0004_MANIFEST.json": (
+                    '{"inputs":{"candidate_source":{"path":"audit/../x.json"}},'
+                    '"schema_version":"close_candidate_manifest.v2"}\n'
+                )
+            },
+            (),
+            "CLOSEOUT_CANDIDATE_SOURCE_UNBOUND:audit/HDE-CRD-0004_MANIFEST.json",
+        ),
+        (
+            {"audit/HDE-CRD-0005_close_report.md": "# close\n"},
+            (),
+            "CLOSEOUT_MANIFEST_ABSENT:audit/HDE-CRD-0005_MANIFEST.json",
+        ),
+        (
+            {"audit/HDE-CRD-0006_MANIFEST.json": "{not json\n"},
+            (),
+            "CLOSEOUT_MANIFEST_INVALID:audit/HDE-CRD-0006_MANIFEST.json",
+        ),
+    ],
+    ids=[
+        "v2-pack",
+        "v1-pack-source-elsewhere",
+        "earlier-generator-manifest",
+        "unrelated-change",
+        "deleted-pack",
+        "unbound-source",
+        "dot-segment-source",
+        "manifest-absent",
+        "manifest-invalid",
+    ],
+)
+def test_closeout_validation_selects_each_changed_writer_close_pack(
+    tmp_path: Path, files: dict[str, str], deleted: tuple[str, ...], expected: str
+) -> None:
+    repo = tmp_path / "repo"
+    (repo / "audit").mkdir(parents=True)
+    (repo / "README.md").write_text("base\n", encoding="utf-8")
+    (repo / "audit/EPIC-027_MANIFEST.json").write_text('{"epic":"EPIC-027"}\n', encoding="utf-8")
+    (repo / "audit/EPIC-027_close_report.md").write_text("# EPIC-027\n", encoding="utf-8")
+    _git(repo, "init", "-q")
+    base = _commit_all(repo, "base")
+    for relative, content in files.items():
+        (repo / relative).parent.mkdir(parents=True, exist_ok=True)
+        (repo / relative).write_text(content, encoding="utf-8")
+    for relative in deleted:
+        (repo / relative).unlink()
+    _commit_all(repo, "change")
+
+    result = subprocess.run(
+        [sys.executable, "-I", "-", base],
+        cwd=repo,
+        input=_closeout_selection_script(),
+        text=True,
+        capture_output=True,
+    )
+
+    if expected.startswith("CLOSEOUT_"):
+        assert result.returncode != 0
+        assert result.stdout == ""
+        assert result.stderr.strip() == expected
+    else:
+        assert result.returncode == 0, result.stderr
+        assert result.stdout == expected
+
+
+_COMMITTED_WRITER_PACKS = {
+    "audit/HDE-CRD-0003_close_candidate_source.json": "{}\n",
+    "audit/HDE-CRD-0003_close_report.md": "# close\n",
+    "audit/HDE-CRD-0003_MANIFEST.json": (
+        '{"inputs":{"candidate_source":{"path":'
+        '"audit/HDE-CRD-0003_close_candidate_source.json"}},'
+        '"schema_version":"close_candidate_manifest.v2"}\n'
+    ),
+    "audit/EPIC-041_MANIFEST.json": (
+        '{"inputs":{"candidate_source":{"path":"audit/sources/epic041.json"}},'
+        '"schema_version":"epic_close_candidate_manifest.v1"}\n'
+    ),
+    "audit/sources/epic041.json": "{}\n",
+    "audit/history/EPIC-009_MANIFEST.json": "{not json\n",
+}
+_EVERY_COMMITTED_SOURCE = "audit/HDE-CRD-0003_close_candidate_source.json\naudit/sources/epic041.json\n"
+
+
+@pytest.mark.parametrize(
+    ("committed", "changed", "expected"),
+    [
+        (_COMMITTED_WRITER_PACKS, ".github/workflows/epic-closeout-validation.yml", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "tools/qa/generate_epic_close_pack.py", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "schemas/close_candidate_source.v2.json", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "schemas/epic_close_candidate_source.v1.json", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "schemas/close_candidate_source.v3.json", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "tests/qa/test_generate_epic_close_pack.py", ""),
+        (_COMMITTED_WRITER_PACKS, "tools/qa/qa_harness.py", ""),
+        (_COMMITTED_WRITER_PACKS, "schemas/hde_release_attestation.v1.json", ""),
+        ({}, "tools/qa/generate_epic_close_pack.py", ""),
+        (
+            {"audit/HDE-CRD-0004_MANIFEST.json": '{"schema_version":"close_candidate_manifest.v2"}\n'},
+            ".github/workflows/epic-closeout-validation.yml",
+            "CLOSEOUT_CANDIDATE_SOURCE_UNBOUND:audit/HDE-CRD-0004_MANIFEST.json",
+        ),
+        (
+            {"audit/HDE-CRD-0006_MANIFEST.json": "{not json\n"},
+            "tools/qa/generate_epic_close_pack.py",
+            "CLOSEOUT_MANIFEST_INVALID:audit/HDE-CRD-0006_MANIFEST.json",
+        ),
+    ],
+    ids=[
+        "workflow-change",
+        "writer-change",
+        "v2-schema-change",
+        "v1-schema-change",
+        "new-schema-version",
+        "writer-test-change",
+        "other-tool-change",
+        "other-schema-change",
+        "no-writer-pack-committed",
+        "committed-unbound-source",
+        "committed-manifest-invalid",
+    ],
+)
+def test_closeout_validation_revalidates_every_committed_writer_close_pack_on_a_tooling_change(
+    tmp_path: Path, committed: dict[str, str], changed: str, expected: str
+) -> None:
+    # A merged close pack keeps a hosted check: a pull request that changes the
+    # close tooling selects every committed writer close pack, unchanged or not
+    # (HDE-CRD-0002 CL-05, B-6).
+    repo = tmp_path / "repo"
+    files = {
+        "README.md": "base\n",
+        "audit/EPIC-027_MANIFEST.json": '{"epic":"EPIC-027"}\n',
+        "audit/EPIC-027_close_report.md": "# EPIC-027\n",
+        "audit/EPIC-012_close_report.md": "# EPIC-012, no manifest\n",
+        changed: "before\n",
+        **committed,
+    }
+    for relative, content in files.items():
+        (repo / relative).parent.mkdir(parents=True, exist_ok=True)
+        (repo / relative).write_text(content, encoding="utf-8")
+    _git(repo, "init", "-q")
+    base = _commit_all(repo, "base")
+    (repo / changed).write_text("after\n", encoding="utf-8")
+    _commit_all(repo, "change")
+
+    result = subprocess.run(
+        [sys.executable, "-I", "-", base],
+        cwd=repo,
+        input=_closeout_selection_script(),
+        text=True,
+        capture_output=True,
+    )
+
+    if expected.startswith("CLOSEOUT_"):
+        assert result.returncode != 0
+        assert result.stdout == ""
+        assert result.stderr.strip() == expected
+    else:
+        assert result.returncode == 0, result.stderr
+        assert result.stdout == expected
+
+
+def test_closeout_validation_path_filter_admits_exactly_the_paths_its_selection_reads() -> None:
+    text = (ROOT / ".github/workflows/epic-closeout-validation.yml").read_text(encoding="utf-8")
+    patterns = re.findall(r'(?m)^      - "([^"]+)"$', text.split("permissions:", 1)[0])
+    tracked = [
+        path
+        for path in subprocess.run(
+            ["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True, text=True
+        ).stdout.split("\0")
+        if path
+    ]
+    tooling = re.compile(
+        r"\.github/workflows/epic-closeout-validation\.yml"
+        r"|tools/qa/generate_epic_close_pack\.py"
+        r"|schemas/(?:epic_)?close_candidate_source\.v[^/]*\.json"
+    )
+    close_pack = re.compile(
+        r"audit/[A-Za-z0-9_.-]+_(?:close_candidate_source\.json|close_report\.md|MANIFEST\.json)"
+    )
+    selected = {path for path in tracked if _github_path_filter_selects(patterns, path)}
+    assert selected == {path for path in tracked if tooling.fullmatch(path) or close_pack.fullmatch(path)}
+    assert {
+        ".github/workflows/epic-closeout-validation.yml",
+        "tools/qa/generate_epic_close_pack.py",
+        "schemas/close_candidate_source.v2.json",
+        "schemas/epic_close_candidate_source.v1.json",
+        "audit/HDE-CRD-0002_close_candidate_source.json",
+        "audit/HDE-CRD-0002_MANIFEST.json",
+    } <= selected
+    # The selection script reads the same tooling paths as this test.
+    assert (
+        '          TOOLING_RE = re.compile(\n'
+        '              r"\\.github/workflows/epic-closeout-validation\\.yml"\n'
+        '              r"|tools/qa/generate_epic_close_pack\\.py"\n'
+        '              r"|schemas/(?:epic_)?close_candidate_source\\.v[^/]*\\.json"\n'
+        '          )\n'
+    ) in text
 
 
 @pytest.mark.parametrize(
@@ -664,9 +947,11 @@ def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
     ) == (
         "tests/adapter/test_dev_sampler_http.py",
         "tests/adapter/test_diagnostic_writer.py",
+        "tests/adapter/test_gate_auth.py",
         "tests/cli/test_aux_preview.py",
         "tests/compat/test_abba_parity.py",
         "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
+        "tests/evidence/test_hdapi_v2_contract_inventory.py",
         guard,
         "tests/http/test_dev_conjunction_http.py",
         "tests/http/test_endpoint_catalog.py",
@@ -805,7 +1090,7 @@ def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
         for path in (ROOT / "tools/qa").rglob("*")
         if path.is_file()
         and not path.is_symlink()
-        and path.suffix.lower() == ".py"
+        and path.suffix.lower() in classifier._UNKNOWN_SOURCE_SUFFIXES
     }
     assert (
         set(classifier._QA_TOOL_TEST_OWNERS)
@@ -873,6 +1158,16 @@ def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
         classifier.changed_test_targets(
             tmp_path / "repo", ("tools/qa/new_harness.PY",)
         )
+    for suffix in (".sh", ".sql", ".SH", ".SQL"):
+        unowned_source = unowned.with_suffix(suffix)
+        unowned_source.write_text("true\n", encoding="utf-8")
+        relative = unowned_source.relative_to(tmp_path / "repo").as_posix()
+        assert classifier.classify_paths((relative,)).flags["qa"]
+        with pytest.raises(ValueError, match="CI_QA_OWNER_TEST_MISSING"):
+            classifier.changed_test_targets(tmp_path / "repo", (relative,))
+    assert classifier._qa_tool_owner_targets(
+        ROOT, "tools/qa/fixtures/notes.md"
+    ) == ()
 
     with pytest.raises(ValueError, match="CI_REGISTERED_OWNER_TEST_DELETED"):
         classifier.changed_test_targets(
@@ -1144,6 +1439,25 @@ def test_full_validation_inputs_run_the_supplemental_behavioral_gap() -> None:
             classifier.changed_test_targets(ROOT, (path,))
 
 
+def test_inactive_test_refusal_rejects_a_synthetic_inactive_path(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The inactive set is empty, so the loop above asserts nothing. A
+    synthetic member proves that a direct change to an inactive test still
+    fails closed, alone and beside a full-validation input."""
+
+    synthetic = "tests/synthetic/test_inactive_disposition_probe.py"
+    assert not (ROOT / synthetic).exists()
+    assert synthetic not in classifier._FULL_VALIDATION_INACTIVE_TESTS
+    monkeypatch.setattr(
+        classifier, "_FULL_VALIDATION_INACTIVE_TESTS", {synthetic}
+    )
+    expected = f"^CI_INACTIVE_TEST_REQUIRES_DISPOSITION:{re.escape(synthetic)}$"
+    for paths in ((synthetic,), ("requirements.txt", synthetic)):
+        with pytest.raises(ValueError, match=expected):
+            classifier.changed_test_targets(ROOT, paths)
+
+
 def test_every_current_governed_primary_selects_evidence() -> None:
     governed = classifier._load_governed_primary_paths(ROOT)
     assert {
@@ -1320,7 +1634,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     }
     assert product.test_targets == ()
 
-    changed_test = repo / "tests/adapter/test_env_guard_prod_variants.py"
+    changed_test = repo / "tests/adapter/test_unlisted_adapter_regression.py"
     changed_test.parent.mkdir(parents=True, exist_ok=True)
     changed_test.write_text("def test_guard(): pass\n", encoding="utf-8")
     _git(repo, "add", changed_test.relative_to(repo).as_posix())
@@ -1336,7 +1650,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
         lane for lane in classifier.LANES if changed_test_result.flags[lane]
     } == {"product", "compat", "release"}
     assert changed_test_result.test_targets == (
-        "tests/adapter/test_env_guard_prod_variants.py",
+        "tests/adapter/test_unlisted_adapter_regression.py",
     )
 
     reader_consumer = repo / "tests/http/test_new_reader_case.py"
@@ -2003,3 +2317,104 @@ def test_pr03_missing_owner_still_fails_closed(tmp_path, source, owner, error):
     (tmp_path / owner).unlink()
     with pytest.raises(ValueError, match=error):
         classifier.changed_test_targets(tmp_path, (source,))
+
+
+def _workflow_path_filters(text: str) -> dict[str, list[str]]:
+    filters: dict[str, list[str]] = {}
+    for event in ("pull_request", "push"):
+        event_start = text.index(f"\n  {event}:\n")
+        block_start = text.index("\n    paths:\n", event_start) + len("\n    paths:\n")
+        patterns: list[str] = []
+        for line in text[block_start:].splitlines():
+            if not line.startswith("      - "):
+                break
+            value = line[len("      - "):].strip()
+            assert value.startswith("'") and value.endswith("'"), line
+            patterns.append(value[1:-1])
+        filters[event] = patterns
+    return filters
+
+
+def _github_path_filter_selects(patterns: list[str], path: str) -> bool:
+    """Model GitHub's ordered path filter: the last matching pattern decides."""
+    selected = False
+    for raw in patterns:
+        negated = raw.startswith("!")
+        pattern = raw[1:] if negated else raw
+        assert not set(pattern) & set("?[]+"), pattern
+        regex = "".join(
+            ".*" if token == "**" else "[^/]*" if token == "*" else re.escape(token)
+            for token in re.split(r"(\*\*|\*)", pattern)
+            if token
+        )
+        if re.fullmatch(regex, path):
+            selected = not negated
+    return selected
+
+
+def test_workflow_path_filter_skips_exactly_the_classifier_no_lane_documentation_paths() -> None:
+    text = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "paths-ignore:" not in text
+    governed = classifier._load_governed_primary_paths(ROOT)
+    governed_under_prefixes = sorted(
+        path for path in governed if path.startswith(classifier._DOCUMENTATION_PREFIXES)
+    )
+    assert governed_under_prefixes
+    expected = [
+        "**",
+        *(f"!{prefix}**" for prefix in classifier._DOCUMENTATION_PREFIXES),
+        "**.path_proof.txt",
+        *governed_under_prefixes,
+    ]
+    filters = _workflow_path_filters(text)
+    assert filters == {"pull_request": expected, "push": expected}
+
+    tracked = [
+        path
+        for path in subprocess.run(
+            ["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True, text=True
+        ).stdout.split("\0")
+        if path
+    ]
+    no_lane: list[str] = []
+    for path in tracked:
+        selected = _github_path_filter_selects(expected, path)
+        if not path.startswith(classifier._DOCUMENTATION_PREFIXES):
+            assert selected, path
+            continue
+        result = classifier.classify_paths((path,), governed_paths=governed)
+        lanes = {lane for lane in classifier.LANES if result.flags[lane]}
+        assert selected is bool(lanes), (path, sorted(lanes))
+        if not lanes:
+            no_lane.append(path)
+    assert no_lane
+    dry_run = classifier.classify_paths(no_lane, governed_paths=governed)
+    assert dry_run.reason == "documentation_only"
+    assert not any(dry_run.flags[lane] for lane in classifier.LANES)
+    assert dry_run.flags["needs_python"] is False
+
+
+def _ci_lane_test_tokens() -> set[str]:
+    text = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    return set(re.findall(r"tests/[A-Za-z0-9_./-]+", text))
+
+
+def _reached(path: str, roots: set[str]) -> bool:
+    return any(path == root or path.startswith(f"{root.rstrip('/')}/") for root in roots)
+
+
+def test_every_tracked_test_module_is_reached_by_a_lane_or_full_validation_target() -> None:
+    tracked = [
+        path
+        for path in subprocess.run(
+            ["git", "ls-files", "-z", "--", "tests"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.split("\0")
+        if path and PurePosixPath(path).name.startswith("test_") and path.endswith(".py")
+    ]
+    assert tracked
+    roots = _ci_lane_test_tokens() | set(classifier._full_validation_test_targets())
+    assert [path for path in tracked if not _reached(path, roots)] == []

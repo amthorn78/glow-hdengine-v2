@@ -1,7 +1,5 @@
 import hashlib
 import json
-import shutil
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -46,14 +44,12 @@ def _write_snapshot(path: Path, *, human_sha: str, mirror_sha: str, generated_at
 
 
 @pytest.fixture
-def repo_tmp_path() -> Path:
-    base = snapshot.ROOT / "tmp" / "pytest_evidence_index_snapshot"
-    base.mkdir(parents=True, exist_ok=True)
-    temp_dir = Path(tempfile.mkdtemp(dir=base))
-    try:
-        yield temp_dir
-    finally:
-        shutil.rmtree(temp_dir, ignore_errors=True)
+def repo_tmp_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    # Root both the snapshot tool and the updater's path-proof writer at
+    # tmp_path so no file is created inside the repository tree.
+    monkeypatch.setattr(snapshot, "ROOT", tmp_path)
+    monkeypatch.setattr(snapshot.update_evidence_index, "ROOT", tmp_path)
+    return tmp_path
 
 
 def test_snapshot_pass(repo_tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:

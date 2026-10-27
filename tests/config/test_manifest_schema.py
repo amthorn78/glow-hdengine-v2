@@ -7,6 +7,7 @@ from engine.config.registry_loader import (
     AdmittedMechanicsBundle,
     DuplicateIdError,
     SchemaValidationError,
+    _parse_manifest,
     load_manifest,
 )
 from tests.config.helpers import write_canonical
@@ -145,3 +146,34 @@ def test_generic_manifest_shape_does_not_claim_full_release_admission() -> None:
     # stays with load_active_mechanics_bundle.
     assert not isinstance(manifest, AdmittedMechanicsBundle)
     assert not hasattr(manifest, "release_id")
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F08): a member path with a control character (NUL, CR, LF, TAB, DEL) is
+# refused before any message names it (HDE Math Spec §5.4.3 forbids NUL; a refused path must not reach a
+# log line) -----------------------------------------------------------------------------------------
+
+_S19_CONTROL_PATHS = ["a\x00b.json", "a\nb.json", "a\rb.json", "a\tb.json", "a\x7fb.json", "catalog/x\n.json"]
+
+
+def _s19_manifest(path: str) -> dict:
+    return {
+        "root": "catalog/",
+        "version": "1.3.0",
+        "built_at_utc": "2026-08-24T18:04:49Z",
+        "files": [{"path": path, "sha256": "zz", "size": 0}],
+    }
+
+
+@pytest.mark.parametrize("path", _S19_CONTROL_PATHS, ids=repr)
+def test_s19_loader_refuses_a_member_path_with_a_control_character(path):
+    with pytest.raises(SchemaValidationError) as caught:
+        _parse_manifest(_s19_manifest(path))
+    assert caught.value.code == "INVALID_MANIFEST_PATH"
+    assert "\n" not in str(caught.value) and "\r" not in str(caught.value)
+
+
+def test_s19_loader_still_names_a_printable_path_in_its_message():
+    with pytest.raises(SchemaValidationError) as caught:
+        _parse_manifest(_s19_manifest("catalog/a b.json"))
+    assert caught.value.code == "INVALID_MANIFEST"
+    assert "catalog/a b.json" in str(caught.value)

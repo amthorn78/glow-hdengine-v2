@@ -2,6 +2,7 @@ import os, pathlib, stat
 from engine.config import provider_loader
 
 def test_engine_provider_casing_normalized(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)  # decision.txt is written relative to CWD; keep it out of the repo
     monkeypatch.setenv("ENGINE_SECRETS_DIR", str(tmp_path))  # empty secrets
     monkeypatch.setenv("ENGINE_PROVIDER", "FiXtUrEs")
     provider_loader.resolve_provider()
@@ -10,6 +11,7 @@ def test_engine_provider_casing_normalized(monkeypatch, tmp_path):
     assert p.read_text(encoding="utf-8") == "provider=fixtures source=env\n"
 
 def test_decision_perms_and_exactly_one_newline(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)  # decision.txt is written relative to CWD; keep it out of the repo
     monkeypatch.setenv("ENGINE_SECRETS_DIR", str(tmp_path))  # empty secrets
     monkeypatch.delenv("ENGINE_PROVIDER", raising=False)     # default path
     provider_loader.resolve_provider()

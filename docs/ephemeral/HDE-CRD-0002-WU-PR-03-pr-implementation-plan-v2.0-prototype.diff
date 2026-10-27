@@ -1,0 +1,302 @@
+# HDE-CRD-0002 WU-PR-03 PR implementation plan v2.0 companion: scratch prototype of the corrective hand-edited delta
+# (AD-1, AD-2, AD-3, AD-6) against main 79eac952edbed9e31c3c6ab98528196b81ae69a8. Never pushed as code. Owner-produced files
+# (catalog/manifest.json, FROZEN_OPEN_ABBA_SHA256 and every regenerated evidence family) are not included: PR-30 produces them with their owners.
+diff --git a/adapter/http_reader.py b/adapter/http_reader.py
+index 235bfa4..a26feb9 100644
+--- a/adapter/http_reader.py
++++ b/adapter/http_reader.py
+@@ -377,11 +377,11 @@ _READER_VERSIONS = {"1": "v1", "2": "v2"}
+ 
+ def _reader_dev_env_explicit() -> bool:
+     """Dev ``GET /reader`` gate (PF05 §5.4 and §5.6; PF12 §8.8): served only when
+-    ``APP_ENV`` is explicitly ``dev``.  Unset, empty, ``test``, ``local`` and
+-    every other value refuse; an unset environment is not development."""
++    ``APP_ENV`` is exactly ``dev``, with no trimming or case-folding.  Unset,
++    empty, ``test``, ``local`` and every other value refuse; an unset
++    environment is not development."""
+ 
+-    raw_app_env = os.environ.get("APP_ENV")
+-    return raw_app_env is not None and raw_app_env.strip().lower() == "dev"
++    return os.environ.get("APP_ENV") == "dev"
+ 
+ 
+ def _select_reader_version(allowed: tuple[str, ...]) -> str:
+@@ -1237,6 +1237,13 @@ def create_app():
+ app = create_app()
+ 
+ if __name__ == "__main__":
+-    # dev runner (Railway uses gunicorn via Procfile)
++    # dev runner (Railway uses gunicorn via Procfile): loopback only, debugger and
++    # reloader off (PF05 §5.4 "Gate"; PF14 §34 "Required local capture profile")
+     import os
+-    create_app().run(host="0.0.0.0", port=int(os.environ.get("PORT","8000")))
++    create_app().run(
++        host="127.0.0.1",
++        port=int(os.environ.get("PORT", "8000")),
++        debug=False,
++        use_debugger=False,
++        use_reloader=False,
++    )
+diff --git a/docs/server/reader_v1.md b/docs/server/reader_v1.md
+index 8200ee4..82f1a30 100644
+--- a/docs/server/reader_v1.md
++++ b/docs/server/reader_v1.md
+@@ -14,9 +14,9 @@ Everything below this section is retained history. Where it disagrees with this
+ 
+ - Production Reader: `POST /api/reader?v=1` (Reader v1) and `POST /api/reader?v=2` (Reader v2). The production blueprint (`get_reader_api_bp` in `adapter/http_reader.py`) is mounted under `/api` by every app factory: `adapter/factory.py`, `adapter/wsgi.py` and `adapter/http_reader.py::create_app`. Version selection, request body, lookup, transport and error rules are shared by both versions; see `docs/contracts/reader_v2_public_bytes.md`.
+ - Every method other than `POST` on `/api/reader` returns the governed 405 (`ERR_NOT_FOUND`, `Allow: POST`, `no-store`).
+-- Dev Reader: `GET /reader?v=1` (and `HEAD`) is Reader v1 only; any other `v` returns 400 `ERR_READER_INVALID_VERSION`. It is served only when `APP_ENV` is explicitly `dev` (surrounding whitespace and letter case ignored); unset, empty and every other value, including `test` and `local`, return 403 `ERR_READER_FORBIDDEN`. `a` and `b` are chart paths resolved against the server's working directory that must resolve inside `fixtures/charts/` (for example `fixtures/charts/alice.json`); `a_tz` and `b_tz` are required when a chart has no `tz`.
++- Dev Reader: `GET /reader?v=1` (and `HEAD`) is Reader v1 only; any other `v` returns 400 `ERR_READER_INVALID_VERSION`. It is served only when `APP_ENV` is exactly `dev` (no trimming or case-folding); unset, empty and every other value, including ` dev`, `Dev`, `DEV`, `test` and `local`, return 403 `ERR_READER_FORBIDDEN`. `a` and `b` are chart paths resolved against the server's working directory that must resolve inside `fixtures/charts/` (for example `fixtures/charts/alice.json`); `a_tz` and `b_tz` are required when a chart has no `tz`.
+ - `POST /reader` (unprefixed) is not the production Reader: it returns the governed 405 with `Allow: GET, HEAD`.
+-- Local start: `APP_ENV=dev scripts/dev_start_reader.sh`. The script propagates `APP_ENV` exactly as the caller supplies it (it never defaults it, so an unset or empty value starts a runner that refuses `/reader`) and runs `python -m adapter.http_reader`, which binds `0.0.0.0` on `PORT` (default `8000`). Run it from the repository root. `VERIFY.sh` starts the same runner and requires `APP_ENV=dev`: it never defaults `APP_ENV` and refuses with `VERIFY_APP_ENV_NOT_DEV` (exit 2) otherwise. The former dev Reader harness was removed in HDE-CRD-0002; this runner is the dev Reader harness.
++- Local start: `APP_ENV=dev scripts/dev_start_reader.sh`. The script propagates `APP_ENV` exactly as the caller supplies it (it never defaults it, so an unset or empty value starts a runner that refuses `/reader`) and runs `python -m adapter.http_reader`, which binds `127.0.0.1` only (loopback; debugger and reloader off; no CORS headers) on `PORT` (default `8000`). Run it from the repository root. `VERIFY.sh` starts the same runner and requires `APP_ENV=dev`: it never defaults `APP_ENV` and refuses with `VERIFY_APP_ENV_NOT_DEV` (exit 2) otherwise. The former dev Reader harness was removed in HDE-CRD-0002; this runner is the dev Reader harness.
+ - Unknown paths: a path that no route serves returns 404, and a method a route does not serve returns 405 with `Allow`, as the governed `ERR_NOT_FOUND` envelope (`no-store`, no ETag, `application/json; charset=utf-8`) from every app factory; `adapter/wsgi.py`'s 405 carries no `Allow`.
+ 
+ ---
+diff --git a/scripts/dev_start_reader.sh b/scripts/dev_start_reader.sh
+index 32afa34..6ddaa5d 100755
+--- a/scripts/dev_start_reader.sh
++++ b/scripts/dev_start_reader.sh
+@@ -20,7 +20,7 @@ fi
+ cat <<INFO
+ [dev-start] APP_ENV=${APP_ENV_DISPLAY} SAFE_MODE=${SAFE_MODE} ALLOW_NETWORK=${ALLOW_NETWORK}
+ [dev-start] LC_ALL=${LC_ALL} LANG=${LANG} TZ=${TZ}
+-[dev-start] Binding port ${PORT} via python -m adapter.http_reader (host=0.0.0.0)
++[dev-start] Binding port ${PORT} via python -m adapter.http_reader (host=127.0.0.1)
+ INFO
+ 
+ exec python -m adapter.http_reader
+diff --git a/tests/http/test_endpoint_catalog.py b/tests/http/test_endpoint_catalog.py
+index 9b461b1..3f94552 100644
+--- a/tests/http/test_endpoint_catalog.py
++++ b/tests/http/test_endpoint_catalog.py
+@@ -5,7 +5,7 @@ from pathlib import Path
+ import pytest
+ 
+ from adapter.http_reader import create_app
+-from tools.evidence.generate_a7_transport_proofs import catalog_obj, validate_catalog
++from tools.evidence.generate_a7_transport_proofs import CANON_RETIRED_PATHS, catalog_obj, validate_catalog
+ 
+ def _catalog():
+     return json.loads(Path("docs/ENDPOINTS_CATALOG.json").read_text(encoding="utf-8"))
+@@ -98,15 +98,21 @@ def test_production_reader_route_refuses_get_with_the_governed_405(monkeypatch):
+ # --- HDE-CRD-0002 S15 (IF-6; ID-1): the catalog covers every served pair ----------
+ #
+ # Every (method, path) a factory serves as endpoint behavior has exactly one
+-# catalog row.  The pairs below are excluded, each for one reason:
+-#   (a) governed refusal of a catalogued record (PF05 §5.4 "Production mount";
+-#       PF12 §8.8: the production route's other methods are part of its record);
+-#   (b) alias spelling of a canonical record, carried by its ``aliases`` (PF05 §5.6);
+-#   (c) a method Flask adds automatically (HEAD for a GET view; OPTIONS) whose
+-#       behavior neither PF05 §5.6 nor the route's own view defines.
++# catalog row, or is excluded in exactly one class whose canon basis is recorded
++# below (HDE-CRD-0002 AD-1 and AD-6).
+ _GOVERNED_REFUSAL = "a"
+ _ALIAS = "b"
+ _FRAMEWORK_IMPLICIT = "c"
++_CANON_RETIRED = "d"
++_EXCLUSION_BASIS = {
++    _GOVERNED_REFUSAL: 'governed refusal of a catalogued record: PF05 §5.4 "Production mount"; '
++    'PF12 §8.8 "Reader surface routes and distinct contracts"',
++    _ALIAS: 'alias spelling of a canonical record, carried by its aliases: PF05 §5.6',
++    _FRAMEWORK_IMPLICIT: "a method Flask adds automatically (HEAD for a GET view; OPTIONS) "
++    "whose behavior neither PF05 §5.6 nor the route's own view defines",
++    _CANON_RETIRED: 'canon-retired route, excluded from the Endpoint Catalog: PF02 §3.5 '
++    '"Current repository discrepancy"; PF29 §1.1 "Checked-in retired/noncanonical route drift"',
++}
+ _EXCLUDED_PAIRS = {
+     **{("/api/reader", m): _GOVERNED_REFUSAL for m in ("DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "PUT")},
+     ("/reader", "POST"): _GOVERNED_REFUSAL,
+@@ -124,12 +130,12 @@ _EXCLUDED_PAIRS = {
+             "/dev/writer/conjunction",
+             "/internal/healthz",
+             "/internal/readyz",
+-            "/ops/db/unavailable",
+-            "/ops/probe/env",
+             "/ops/rails/refusal",
+         )
+         for m in ("HEAD", "OPTIONS")
+     },
++    **{(path, m): _CANON_RETIRED for path in ("/ops/db/unavailable", "/ops/probe/env") for m in ("GET", "HEAD", "OPTIONS")},
++    **{("/ops/writer/diagnostic", m): _CANON_RETIRED for m in ("HEAD", "OPTIONS", "POST")},
+ }
+ 
+ 
+@@ -151,6 +157,11 @@ def test_every_served_pair_has_one_catalog_row_or_a_reasoned_exclusion(monkeypat
+     assert sorted(served - catalogued - excluded) == []  # an uncatalogued route fails
+     assert sorted(excluded - served) == []  # a stale exclusion fails
+     assert sorted(catalogued - served) == []  # no row for an unmounted route (PF12 §8.8)
++    assert len(served) == len(catalogued) + len(excluded)
++    assert all(_EXCLUSION_BASIS.get(why) for why in _EXCLUDED_PAIRS.values())  # every exclusion has a basis
++    retired = {pair for pair in served if pair[0] in CANON_RETIRED_PATHS}
++    assert retired == {pair for pair, why in _EXCLUDED_PAIRS.items() if why == _CANON_RETIRED}
++    assert {path for path, _ in catalogued} & CANON_RETIRED_PATHS == set()  # no record for a canon-retired route
+     aux = next(e for e in _catalog()["endpoints"] if e["path"] == "/aux/narrative")
+     assert [p for (p, m), why in _EXCLUDED_PAIRS.items() if why == _ALIAS and m == aux["method"]] == aux["aliases"]
+ 
+@@ -190,11 +201,22 @@ def test_validator_rejects_aliases_off_the_aux_record_and_alias_collisions():
+     with pytest.raises(ValueError):
+         validate_catalog(bad)
+     bad = copy.deepcopy(cat)
+-    next(e for e in bad["endpoints"] if e["path"] == "/ops/probe/env")["classification"] = "public_ops"
++    next(e for e in bad["endpoints"] if e["path"] == "/internal/healthz")["classification"] = "public_ops"
+     with pytest.raises(ValueError):
+         validate_catalog(bad)
+ 
+ 
++@pytest.mark.parametrize("path", sorted(CANON_RETIRED_PATHS))
++def test_validator_refuses_a_record_for_a_canon_retired_route(path):
++    # HDE-CRD-0002 AD-1 (PF02 §3.5; PF29 §1.1): fail closed on any record whose path canon retires.
++    cat = catalog_obj()
++    assert not any(e["path"] in CANON_RETIRED_PATHS for e in cat["endpoints"])
++    bad = copy.deepcopy(cat)
++    bad["endpoints"].append(dict(next(e for e in cat["endpoints"] if e["path"] == "/ops/rails/refusal"), path=path))
++    with pytest.raises(ValueError, match="canon-retired"):
++        validate_catalog(bad)
++
++
+ # --- HDE-CRD-0002 S02 (IF-11): unknown paths answer the governed envelope ----------
+ 
+ _NOT_FOUND_BODY = b'{"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"}\n'
+diff --git a/tests/http/test_reader_a7_transport.py b/tests/http/test_reader_a7_transport.py
+index b7ca86b..2f76c1c 100644
+--- a/tests/http/test_reader_a7_transport.py
++++ b/tests/http/test_reader_a7_transport.py
+@@ -1,6 +1,9 @@
+ import json
++import runpy
++import warnings
+ from pathlib import Path
+ 
++import flask
+ import pytest
+ 
+ from adapter import http_reader
+@@ -136,9 +139,9 @@ def test_reader_a7_transport_invariants(monkeypatch):
+     assert conditional_post.data == api_post.data
+ 
+ 
+-@pytest.mark.parametrize("app_env", ["dev", " DEV ", "Dev"])
++@pytest.mark.parametrize("app_env", ["dev"])
+ def test_dev_reader_is_served_only_for_explicit_dev(monkeypatch, app_env):
+-    # HDE-CRD-0002 S10 / IF-10 (PF05 §5.4, §5.6): explicit APP_ENV=dev serves.
++    # HDE-CRD-0002 S10 / IF-10 (PF05 §5.4, §5.6): only APP_ENV exactly "dev" serves (AD-2).
+     monkeypatch.setenv("APP_ENV", app_env)
+     client = _client()
+     params = _reader_query_params()
+@@ -147,10 +150,14 @@ def test_dev_reader_is_served_only_for_explicit_dev(monkeypatch, app_env):
+     assert head.status_code == 200 and head.data == b""
+ 
+ 
+-@pytest.mark.parametrize("app_env", [None, "", "  ", "test", "local", "prod", "production", "live", "staging", "development", "dev1"])
++@pytest.mark.parametrize(
++    "app_env",
++    [None, "", "  ", " dev", "dev ", " DEV ", "Dev", "DEV", "test", "local", "prod", "production", "live", "staging", "development", "dev1"],
++)
+ def test_dev_reader_refuses_every_other_environment(monkeypatch, app_env):
+-    # Unset, empty and every non-dev value refuse with ERR_READER_FORBIDDEN 403,
+-    # the governed error headers, and no ETag; HEAD carries no body.
++    # Unset, empty and every value other than exactly "dev" -- including padded
++    # and case variants (AD-2) -- refuse with ERR_READER_FORBIDDEN 403, the
++    # governed error headers, and no ETag; HEAD carries no body.
+     if app_env is None:
+         monkeypatch.delenv("APP_ENV", raising=False)
+     else:
+@@ -167,3 +174,49 @@ def test_dev_reader_refuses_every_other_environment(monkeypatch, app_env):
+     assert head.status_code == 403 and head.data == b""
+     # Version validation still precedes the environment gate.
+     assert json.loads(client.get("/reader", query_string={"v": "2"}).data)["code"] == "ERR_READER_INVALID_VERSION"
++
++
++# --- HDE-CRD-0002 AD-3: the canonical dev runner meets the required local capture profile ---
++# (PF05 §5.4 "Gate"; PF14 §34 "Required local capture profile"; Conjunction checklist HDE-CONJ001.1)
++
++
++@pytest.mark.parametrize(("port_env", "port"), [(None, 8000), ("8123", 8123)])
++def test_dev_runner_binds_loopback_with_debugger_and_reloader_off(monkeypatch, port_env, port):
++    calls = []
++    monkeypatch.setattr(flask.Flask, "run", lambda app, **kwargs: calls.append((app, kwargs)))
++    monkeypatch.setenv("APP_ENV", "dev")
++    if port_env is None:
++        monkeypatch.delenv("PORT", raising=False)
++    else:
++        monkeypatch.setenv("PORT", port_env)
++    with warnings.catch_warnings():
++        # runpy warns when the module is already imported; it re-executes it as __main__.
++        warnings.filterwarnings("ignore", message=".*found in sys.modules.*", category=RuntimeWarning)
++        runpy.run_module(http_reader.__name__, run_name="__main__")
++    assert len(calls) == 1
++    app, kwargs = calls[0]
++    assert kwargs == {"host": "127.0.0.1", "port": port, "debug": False, "use_debugger": False, "use_reloader": False}
++    assert "/reader" in {rule.rule for rule in app.url_map.iter_rules()}
++
++
++_CORS_ORIGIN = {"Origin": "https://cross-origin.invalid"}
++
++
++@pytest.mark.parametrize(
++    ("app_env", "method", "path", "query", "headers", "status"),
++    [
++        ("dev", "GET", "/reader", "reader", _CORS_ORIGIN, 200),
++        ("dev", "HEAD", "/reader", "reader", _CORS_ORIGIN, 200),
++        ("dev", "OPTIONS", "/reader", None, {**_CORS_ORIGIN, "Access-Control-Request-Method": "GET"}, 200),
++        ("prod", "GET", "/reader", "reader", _CORS_ORIGIN, 403),
++        ("dev", "GET", "/reader", {"v": "2"}, _CORS_ORIGIN, 400),
++        ("dev", "GET", "/no-such-route", None, _CORS_ORIGIN, 404),
++    ],
++)
++def test_dev_runner_emits_no_cors_headers(monkeypatch, app_env, method, path, query, headers, status):
++    # No cross-origin allow-list, wildcard, credentials or CORS response header (PF14 §34).
++    monkeypatch.setenv("APP_ENV", app_env)
++    query_string = _reader_query_params() if query == "reader" else query
++    resp = _client().open(path, method=method, query_string=query_string, headers=headers)
++    assert resp.status_code == status
++    assert [name for name in resp.headers.keys() if name.lower().startswith("access-control-")] == []
+diff --git a/tests/scripts/test_dev_start_reader.py b/tests/scripts/test_dev_start_reader.py
+index 56aedd4..c0e12c4 100644
+--- a/tests/scripts/test_dev_start_reader.py
++++ b/tests/scripts/test_dev_start_reader.py
+@@ -98,6 +98,7 @@ def _start_and_get(env: dict[str, str], port: int) -> tuple[str, int, bytes]:
+ def test_runner_with_explicit_dev_serves_reader(tmp_path: Path) -> None:
+     banner, status, body = _start_and_get(_env(tmp_path, APP_ENV="dev"), _free_port())
+     assert "[dev-start] APP_ENV=dev " in banner
++    assert "(host=127.0.0.1)" in banner  # loopback bind (HDE-CRD-0002 AD-3)
+     assert status == 200, body
+     assert body.endswith(b"\n")
+ 
+diff --git a/tools/evidence/generate_a7_transport_proofs.py b/tools/evidence/generate_a7_transport_proofs.py
+index 7641b60..b5f71b9 100755
+--- a/tools/evidence/generate_a7_transport_proofs.py
++++ b/tools/evidence/generate_a7_transport_proofs.py
+@@ -33,6 +33,9 @@ ALL=[DOC,DOCSHA,AUD,AUDSHA,SNAP,*PROOFS]
+ # PF12 §8.8 closed class set, plus PF05 §5.6's projected public_aux (not yet PF12-registered; no conformance claim).
+ CLASS={'public_reader','public_compat','internal_identity','internal_admin','ops','dev_harness','public_aux'}
+ AUX_PATH='/aux/narrative'; AUX_ALIASES=['/api/aux/narrative']
++# PF02 §3.5 "Current repository discrepancy" and PF29 §1.1: checked-in routes canon marks
++# RETIRED/NONCANONICAL and excludes from the Endpoint Catalog (HDE-CRD-0002 AD-1).
++CANON_RETIRED_PATHS={'/ops/db/unavailable','/ops/probe/env','/ops/writer/diagnostic'}
+ def sha(b): return hashlib.sha256(b).hexdigest()
+ def cjson(o): return json.dumps(o,separators=(',',':'),sort_keys=True).encode()+b'\n'
+ def catalog_obj():
+@@ -51,13 +54,8 @@ def catalog_obj():
+  {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat HEAD (writer transport 405, Allow POST, OPTIONS; internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'HEAD','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
+  {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat OPTIONS (writer transport 204, Allow POST, OPTIONS; internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'OPTIONS','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
+  {'a7_eligible':False,'aliases':AUX_ALIASES,'blueprint_module':'adapter.http_reader','classification':'public_aux','description':'Aux narrative public bytes (text/plain)','env_gate':'not_applicable_public','internal':False,'method':'GET','path':AUX_PATH,'rails_profile':'public-read-only; vendor-network-disabled'},
+- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Forced database-unavailable diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/db/unavailable','rails_profile':'ops diagnostic no-io writer no-store'},
+  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Rails-closed refusal diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/rails/refusal','rails_profile':'ops diagnostic no-io writer no-store'},
+  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Rails-closed refusal diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'POST','path':'/ops/rails/refusal','rails_profile':'ops diagnostic no-io writer no-store'},
+- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Process and rails-state probe (names-only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/probe/env','rails_profile':'ops probe no-store'},
+- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Diagnostic writer (admin bearer scope)','env_gate':'operator-network-only','internal':True,'method':'POST','path':'/ops/writer/diagnostic','rails_profile':'ops writer admin-scope no-store','route_id':'ops.writer.diagnostic.v1'},
+- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Diagnostic writer HEAD (writer transport 405, Allow POST, OPTIONS)','env_gate':'operator-network-only','internal':True,'method':'HEAD','path':'/ops/writer/diagnostic','rails_profile':'ops writer admin-scope no-store'},
+- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Diagnostic writer OPTIONS (writer transport 204, Allow POST, OPTIONS)','env_gate':'operator-network-only','internal':True,'method':'OPTIONS','path':'/ops/writer/diagnostic','rails_profile':'ops writer admin-scope no-store'},
+  {'a7_eligible':False,'blueprint_module':'adapter.wsgi','classification':'ops','description':'Liveness probe (adapter.wsgi factory only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/healthz','rails_profile':'ops-only no-store'},
+  {'a7_eligible':False,'blueprint_module':'adapter.wsgi','classification':'ops','description':'Readiness probe (adapter.wsgi factory only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/readyz','rails_profile':'ops-only no-store'},]
+  return {'endpoints':eps,'generated_at_utc':TS,'success_endpoints':[{'method':'GET','path':'/reader'}]}
+@@ -86,6 +84,7 @@ def validate_catalog(cat):
+  aux=[e for e in cat['endpoints'] if e['path']==AUX_PATH]
+  if len(aux)!=1 or aux[0]['classification']!='public_aux' or aux[0]['method']!='GET' or aux[0].get('aliases')!=AUX_ALIASES or aux[0]['internal'] is not False or aux[0]['a7_eligible'] is not False or aux[0]['env_gate']!='not_applicable_public': raise ValueError('aux narrative catalog invalid')
+  if any('aliases' in e for e in cat['endpoints'] if e['path']!=AUX_PATH): raise ValueError('aliases only on the aux record')
++ if any(p in CANON_RETIRED_PATHS for e in cat['endpoints'] for p in [e['path'],*e.get('aliases',[])]): raise ValueError('canon-retired route must not be cataloged')
+  if any(e['env_gate']=='not_applicable_public' and e['internal'] is not False for e in cat['endpoints']): raise ValueError('public env_gate sentinel on internal record')
+  production=[e for e in cat['endpoints'] if e['path']==PRODUCTION_READER_PATH]
+  if len(production)!=1 or production[0]['method']!='POST' or production[0]['classification']!='public_reader' or production[0]['internal'] is not False or production[0]['a7_eligible'] is not False: raise ValueError('production reader catalog invalid')

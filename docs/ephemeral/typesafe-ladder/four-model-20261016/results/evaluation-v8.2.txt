@@ -1,0 +1,54 @@
+Part A run 1: 14 of 16 meet every expectation (need 14); A5, A6, A9 Fable 5.1: True; Haiku 5.5 on 3 of A1, A13, A14 (need 2); Sonnet 5.5 on 2 of A15, A16 (need 1). Gate A PASS
+  pass  A1 Record given results: Haiku 5.5 at low (score 0.01; Fable 5.1 0.00, Opus 5.5 0.04, Sonnet 5.5 0.05, Haiku 5.5 0.91); run 2 same
+  pass  A2 One documented setting: Sonnet 5.5 at medium (score 0.94; Fable 5.1 0.00, Opus 5.5 0.39, Sonnet 5.5 0.53, Haiku 5.5 0.08); run 2 same
+  pass  A3 Listed repairs on a reviewed client: Opus 5.5 at high (score 1.86; Fable 5.1 0.00, Opus 5.5 1.00, Sonnet 5.5 0.00, Haiku 5.5 0.00); run 2 same
+  pass  A4 Check of a follow-up commit: Opus 5.5 at high (score 1.99; Fable 5.1 0.00, Opus 5.5 1.00, Sonnet 5.5 0.00, Haiku 5.5 0.00); run 2 same
+  pass  A5 First look at a large new system: Fable 5.1 at max (score 4.01; Fable 5.1 0.96, Opus 5.5 0.04, Sonnet 5.5 0.00, Haiku 5.5 0.00); run 2 same
+  pass  A6 First live run on real cards: Fable 5.1 at max (score 4.17; Fable 5.1 0.98, Opus 5.5 0.02, Sonnet 5.5 0.00, Haiku 5.5 0.00); run 2 same
+  pass  A7 Endpoint-by-endpoint check: Opus 5.5 at max (score 3.79; Fable 5.1 0.02, Opus 5.5 0.93, Sonnet 5.5 0.02, Haiku 5.5 0.02); run 2 same
+  FAIL  A8 Mechanical conversion of many modules: Opus 5.5 at high (score 1.92; Fable 5.1 0.01, Opus 5.5 0.91, Sonnet 5.5 0.08, Haiku 5.5 0.00); run 2 same; model Opus 5.5 (Fable 5.1 0.01, Opus 5.5 0.91, Sonnet 5.5 0.08, Haiku 5.5 0.00) not in ['Haiku 5.5', 'Sonnet 5.5']
+  pass  A9 Cause that two fixes missed: Fable 5.1 at max (score 3.94; Fable 5.1 0.99, Opus 5.5 0.01, Sonnet 5.5 0.00, Haiku 5.5 0.00); run 2 same
+  FAIL  A10 Licence survey of many packages: Opus 5.5 at extra high (score 3.31; Fable 5.1 0.01, Opus 5.5 0.69, Sonnet 5.5 0.03, Haiku 5.5 0.27); run 2 same; model Opus 5.5 (Fable 5.1 0.01, Opus 5.5 0.69, Sonnet 5.5 0.03, Haiku 5.5 0.27) not in ['Haiku 5.5', 'Sonnet 5.5']
+  pass  A11 Conflicting legal sources: Sonnet 5.5 at extra high (score 3.30; Fable 5.1 0.26, Opus 5.5 0.29, Sonnet 5.5 0.39, Haiku 5.5 0.06); run 2 same
+  pass  A12 Name suggestions: Sonnet 5.5 at low (score 0.14; Fable 5.1 0.01, Opus 5.5 0.09, Sonnet 5.5 0.54, Haiku 5.5 0.36); run 2 same
+  pass  A13 Locate definitions for a larger session: Haiku 5.5 at low (score 0.07; Fable 5.1 0.00, Opus 5.5 0.00, Sonnet 5.5 0.00, Haiku 5.5 1.00); run 2 same
+  pass  A14 Route support emails: Haiku 5.5 at medium (score 1.47; Fable 5.1 0.01, Opus 5.5 0.09, Sonnet 5.5 0.07, Haiku 5.5 0.83); run 2 same
+  pass  A15 Named date-picker bug: Sonnet 5.5 at medium (score 1.20; Fable 5.1 0.00, Opus 5.5 0.05, Sonnet 5.5 0.95, Haiku 5.5 0.00); run 2 same
+  pass  A16 Help article for a shipped feature: Sonnet 5.5 at medium (score 0.93; Fable 5.1 0.00, Opus 5.5 0.08, Sonnet 5.5 0.92, Haiku 5.5 0.00); run 2 same
+  Part C (reported): cells changed on 0 of 16; largest change in effort score 0.06; P(Fable 5.1) 0.02, P(Opus 5.5) 0.04, P(Sonnet 5.5) 0.03, P(Haiku 5.5) 0.05
+B_effort: rung equal to the pick on 25 of 31 (need 24), within one rung on 31 (need 30): PASS
+B_model: Fable 5.1 picks read Fable 5.1 on 6 of 9 (need 6); Opus 5.5 picks read Opus 5.5 or Sonnet 5.5 on 19 of 22 (need 18); Haiku 5.5 on 0 of 31 (at most 1): PASS
+B_report: of the 22 Opus 5.5 picks, 0 read Sonnet 5.5 and 19 read Opus 5.5
+  M02-C1 correction session (PR18 review findings): pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  M02-I1 implementation session (PR18): pick Opus 5.5 at extra high; v6 Opus 5.5 at high; v8 Opus 5.5 at high; override of v6
+  M02 delta review of PR18's final head (5e3fb2f against ccebd1b): pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  M02 exact-head code and security review (PR18 @ ccebd1b): pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  P06.1-I1 exact-head code and security review (code head 9ff600f): pick Opus 5.5 at max; v6 Fable 5.1 at max; v8 Fable 5.1 at max; override of v6
+  P06.1-I1 implementation session (Stream sandbox harness and bypass matrix): pick Opus 5.5 at extra high; v6 Fable 5.1 at max; v8 Fable 5.1 at max; override of v6
+  P06.1-I2a revocation and safety, live: pick Opus 5.5 at max; v6 Fable 5.1 at max; v8 Fable 5.1 at max; override of v6
+  P06.1-C2 second offline correction pass on the harness: pick Opus 5.5 at high; v6 Opus 5.5 at high; v8 Opus 5.5 at high
+  P06.1 flake fix exact-head review (code head 8b8b1bd): pick Opus 5.5 at high; v6 Opus 5.5 at high; v8 Opus 5.5 at high
+  P06.1-C3 third offline correction pass on the harness: pick Opus 5.5 at high; v6 Opus 5.5 at high; v8 Opus 5.5 at high
+  P06.1-C2 exact-head review (merge commit 63e922f): pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  P06.1-C3 exact-head review (merge commit 8c1a8c0): pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  P06.1-C1 offline correction pass on the I1 harness: pick Opus 5.5 at extra high; v6 Opus 5.5 at high; v8 Opus 5.5 at high; override of v6
+  P06.1-I2a exact-head review (merge commit 6a51dae): pick Fable 5.1 at extra high; v6 Fable 5.1 at max; v8 Fable 5.1 at max; override of v6
+  P06.1-C1 exact-head review (merge commit e85bba0): pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  P06.1-I2b implementation (revision 2; revision 1 read by DM-05): pick Fable 5.1 at extra high; v6 Fable 5.1 at max; v8 Fable 5.1 at max; override of v6
+  P06.1-I2b exact-head review (merge commit 55b2238): pick Fable 5.1 at max; v6 Fable 5.1 at max; v8 Opus 5.5 at max
+  App Manager 4 (manager session, created by App Manager 3): pick Fable 5.1 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high; override of v6
+  P06.1-C4 fourth offline correction pass on the harness: pick Opus 5.5 at high; v6 Opus 5.5 at high; v8 Opus 5.5 at high
+  P06.1-C5 fifth offline correction pass on the harness: pick Opus 5.5 at high; v6 Opus 5.5 at high; v8 Opus 5.5 at high
+  P06.1-C5 exact-head review (C5's head 1a5f58a): pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  P06.DB implementation (revision 1): pick Fable 5.1 at ultracode; v6 Fable 5.1 at max; v8 Fable 5.1 at max; override of v6
+  P06.DB exact-head review: pick Fable 5.1 at max; v6 Fable 5.1 at max; v8 Fable 5.1 at max
+  P06.DB-C1 correction pass: pick Opus 5.5 at high; v6 Opus 5.5 at high; v8 Opus 5.5 at high
+  P06.DB-C1 exact-head review, revision 2: pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  P06.DB-C2 exact-head review: pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  P06.2 Stage A implementation: pick Opus 5.5 at extra high; v6 Opus 5.5 at extra high; v8 Opus 5.5 at extra high
+  P06.2 Stage A exact-head review: pick Fable 5.1 at max; v6 Fable 5.1 at max; v8 Fable 5.1 at max
+  P06.2 Stage B1 implementation: pick Fable 5.1 at extra high; v6 Fable 5.1 at extra high; v8 Opus 5.5 at extra high
+  P06.2 Stage B1 exact-head review: pick Fable 5.1 at max; v6 Fable 5.1 at max; v8 Fable 5.1 at max
+  P06.2 Stage B1-C1 correction: pick Opus 5.5 at high; v6 Opus 5.5 at high; v8 Opus 5.5 at high
+
+Overall: ACCEPTED (v8)

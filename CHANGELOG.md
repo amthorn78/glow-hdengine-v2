@@ -1,5 +1,30 @@
 # CHANGELOG
 
+Unreleased — HDE-CRD-0002: repository corrections, CI coverage, pre-push check and close-pack writer (final repository documentation, WU-DOC-01)
+
+### Added
+- Read-only pre-push check `tools/ci/prepush_check.py` with the reports `lanes`, `membership`, `build-notes`, `sweep` and `replay` (S20; #660). Usage, exit status and limits: README, "Pre-push check (HDE-CRD-0002)".
+- Close-pack source schema `schemas/close_candidate_source.v2.json` for Epic and CRD identities, read by `tools/qa/generate_epic_close_pack.py` beside v1; the post-verdict CRD close-run family, published only by the updater's `publish_crd_close_run_family`; and the architecture decision record `docs/adr/hde/close_pack_writer_adr.md` (S21; #668). HDE-CRD-0002's own close pack, candidate source and close-run family are the only ones produced with it (HDE-CRD-0002 close mutation set).
+- CRD admission in the evidence updater: the source-owned `ADMITTED_CRD_QA` table admits HDE-CRD-0001 and HDE-CRD-0002 (S22; #634, #637).
+- Release labels in the Machine Mirror `notes` of current-release captures, applied only when a capture's owner regenerates it (S11, S12, S13; #634, #637).
+- `GEO_API_KEY` in `.env.example`, which CI now classifies (S16; #687).
+- The S19 code and security review record, with its fixes landed or routed (S19; #656).
+
+### Changed / Fixed
+- CI coverage: every tracked test file reaches a CI lane or a full-validation target, or is retired with its reason in `tests/retired_tests.md`; the workflow's skip list matches the classifier's documentation prefixes (S03, S04, S05; #627, #630).
+- The release attestation builds under a distribution-patched setuptools (S06; #634, #637).
+- Every app factory answers an unknown path with the JSON `ERR_NOT_FOUND` envelope (S02; #643).
+- `hdctl --help` describes showcompat's `magic10_compat_result.v1` output (S07; #643).
+- `aux-preview --band` applies to pair-file input (S08; #651).
+- The dev Reader harness `dev/reader_harness/app.py` is retired; `scripts/dev_start_reader.sh` is the dev Reader harness. `GET /reader` is served only when `APP_ENV` is exactly `dev`, and the runner binds `127.0.0.1` on `PORT`, default `8000` (S09, S10; #643, #646). The 2025-10-16 entry below that names the old harness is history.
+- `bg:resolve --source vendor` needs a recognized `APP_ENV`; production-like vendor access needs `--allow-prod-vendor` and writes keys-only audit events to the sink named by `HDE_VENDOR_OVERRIDE_AUDIT_PATH` (S14; #651).
+- The Endpoint Catalog matches the served routes; three canon-retired routes stay mounted but uncatalogued (S15; #643, #646).
+- `docs/ADAPTER_009.md` states `invalid_json` for a compat GET with a body (S18; #643), and its readiness and port statements are corrected (S17; #687).
+- Release `1.3.0` is refreshed in place, with no version cut: 45 members, `release_id` `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e` (#643, #646, #651, #656).
+- This documentation pass brings `README.md`, `AGENTS.md`, `docs/EVIDENCE_INDEX.md`, `docs/CLI_commands.md`, `docs/RUN.md`, `docs/ADAPTER_009.md`, `docs/qa_harness_pattern.md`, `docs/contracts/reader_v2_public_bytes.md` and `docs/acceptance/reader_a7_crib.md` to the delivered state (WU-DOC-01).
+- Not delivered: S01 (every release member in the wheel) was removed from the change; a wheel built from this tree still omits release members.
+- Nonclaims: no QA verdict, acceptance, Ops, deployment, activation, PF09 or PF30 movement, canon drainage or closure is claimed.
+
 Unreleased — HDE-EPIC040: Separation Pass 3 final repository documentation (README/CHANGELOG/AGENTS/docs/)
 
 ### Added

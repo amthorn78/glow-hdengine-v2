@@ -1,0 +1,113 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"prod","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"qa-19-deployed-reader-input","check_name":"Deeply nested JSON is a typed 422 in the deployed Reader","claimed_tokens":[],"command":[["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa19/q1.hdr","-o","/tmp/hde-crd-0002-qa19/q1.body","-w","%{http_code} %{http_version}\\n","-X","POST","-H","Content-Type: application/json; charset=utf-8","--data-binary","@/tmp/hde-crd-0002-qa19/b1.json","https://glow-hdengine-v2-production.up.railway.app/api/reader?v=1"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa19/q2.hdr","-o","/tmp/hde-crd-0002-qa19/q2.body","-w","%{http_code} %{http_version}\\n","-X","POST","-H","Content-Type: application/json; charset=utf-8","--data-binary","@/tmp/hde-crd-0002-qa19/b1.json","https://glow-hdengine-v2-production.up.railway.app/api/reader?v=2"],["curl","-sS","--http1.1","-D","/tmp/hde-crd-0002-qa19/q3.hdr","-o","/tmp/hde-crd-0002-qa19/q3.body","-w","%{http_code} %{http_version}\\n","-X","POST","-H","Content-Type: application/json; charset=utf-8","--data-binary","@/tmp/hde-crd-0002-qa19/b2.json","https://glow-hdengine-v2-production.up.railway.app/api/reader?v=1"]],"command_provenance":"QA Plan v1.3 check 19; QA-90 collection v1.2 task T19, attempt 1; normalizations: NZ-01, NZ-06, NZ-25; executed by Product Owner direction before collection v1.2 merged (PR 743)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-19-deployed-reader-input/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-25T23:24:24Z"}
+=== CONTEXT ===
+check: qa-19-deployed-reader-input (QA Plan v1.3 check 19; QA-90 collection v1.2 task T19; attempt 1); requirement(s) S19 (S19-F01)
+class: 1/2, internal (deployed); handled by QA outside the Product Owner's Live QA time (Glow QA Guide 3.5.6)
+target: https://glow-hdengine-v2-production.up.railway.app (Railway service glow-hdengine-v2, environment production)
+candidate: release_id 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e; dependency: check 16 qa-16-deployed-identity published PASS (evidence commit ee7b8d9c, captured_at_utc 2026-10-25T23:40:00Z)
+environment class: E-P (the Product Owner's workstation shell)
+actor: Kronos (Claude Code CLI session on the Product Owner's workstation, local session 5c9c7c47-41bd-437a-a9ee-63879dec618b), executor chosen by the Product Owner
+started_at_utc: 2026-10-25T23:23:42Z
+ended_at_utc: 2026-10-25T23:23:45Z
+readiness reads (Plan section 7 rule A, E-P):
+curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+Python 3.14.4
+SAFE_MODE=0
+ALLOW_NETWORK=1
+APP_ENV=prod
+LC_ALL=C
+LANG=C
+TZ=UTC
+HD_API_KEY=SET
+GEO_API_KEY=SET
+HD_API_BASE_URL=SET
+HDAPI_BASE_URL=UNSET
+DATABASE_URL=SET
+HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET
+ENGINE_ENV=UNSET
+nathan
+request bodies (QA-created scratch, not inline):
+32768 /tmp/hde-crd-0002-qa19/b1.json
+20008 /tmp/hde-crd-0002-qa19/b2.json
+52776 total
+a90ff70ad51360979071d268065d422fdea638d17ee71a1dd76d12f4e71578b1  /tmp/hde-crd-0002-qa19/b1.json
+cdf9cd5993ce58f7834953703ae6cbaafab44980601489b357435db76c6874d0  /tmp/hde-crd-0002-qa19/b2.json
+=== COMMANDS ===
+--- request q1 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa19/q1.hdr -o /tmp/hde-crd-0002-qa19/q1.body -w '%{http_code} %{http_version}\n' -X POST -H 'Content-Type: application/json; charset=utf-8' --data-binary @/tmp/hde-crd-0002-qa19/b1.json 'https://glow-hdengine-v2-production.up.railway.app/api/reader?v=1' 2>/tmp/hde-crd-0002-qa19/q1.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 422 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 422 Unprocessable Entity
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:45 GMT
+Server: railway-hikari
+x-railway-request-id: Ugr1oJs4T8yhJF-8YqdHTg
+Content-Length: 94
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+Connection: keep-alive
+body (94 bytes, sha256 c5eb83aec246444fe5d207f14e089b28d2cafc35c5d84ff49bc719b01c37b27a, final LF no):
+{"code":"ERR_READER_INVALID_INPUT","error":"invalid Reader request","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request q2 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa19/q2.hdr -o /tmp/hde-crd-0002-qa19/q2.body -w '%{http_code} %{http_version}\n' -X POST -H 'Content-Type: application/json; charset=utf-8' --data-binary @/tmp/hde-crd-0002-qa19/b1.json 'https://glow-hdengine-v2-production.up.railway.app/api/reader?v=2' 2>/tmp/hde-crd-0002-qa19/q2.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 422 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 422 Unprocessable Entity
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:45 GMT
+Server: railway-hikari
+x-railway-request-id: 0F4hZ_p4SJuv9FKmvEOTxA
+Content-Length: 94
+x-hikari-trace: jfk1.48ys
+x-railway-edge: jfk1
+Connection: keep-alive
+body (94 bytes, sha256 c5eb83aec246444fe5d207f14e089b28d2cafc35c5d84ff49bc719b01c37b27a, final LF no):
+{"code":"ERR_READER_INVALID_INPUT","error":"invalid Reader request","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+--- request q3 ---
+command: curl -sS --http1.1 -D /tmp/hde-crd-0002-qa19/q3.hdr -o /tmp/hde-crd-0002-qa19/q3.body -w '%{http_code} %{http_version}\n' -X POST -H 'Content-Type: application/json; charset=utf-8' --data-binary @/tmp/hde-crd-0002-qa19/b2.json 'https://glow-hdengine-v2-production.up.railway.app/api/reader?v=1' 2>/tmp/hde-crd-0002-qa19/q3.err
+curl exit: 0
+write-out (%{http_code} %{http_version}): 422 1.1
+headers (CRLF normalized to LF):
+HTTP/1.1 422 Unprocessable Entity
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Sun, 25 Oct 2026 23:23:45 GMT
+Server: railway-hikari
+x-railway-request-id: TK39aotnSjO6fdZps_GTAg
+Content-Length: 94
+x-hikari-trace: jfk1.pqzh
+x-railway-edge: jfk1
+Connection: keep-alive
+body (94 bytes, sha256 c5eb83aec246444fe5d207f14e089b28d2cafc35c5d84ff49bc719b01c37b27a, final LF no):
+{"code":"ERR_READER_INVALID_INPUT","error":"invalid Reader request","ok":false,"schema":"v1"}
+curl stderr (0 bytes):
+=== PREDICATES ===
+PASS | q1: status 422 | observed: 422
+PASS | q1: HTTP/1.1 | observed: 'HTTP/1.1 422 Unprocessable Entity', 1.1
+PASS | q1: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | q1: Cache-Control no-store | observed: no-store
+PASS | q1: no ETag | observed: None
+PASS | q1: body exactly {"code":"ERR_READER_INVALID_INPUT","error":"invalid Reader request","ok":false,"schema":"v1"} plus one LF | observed: 94 bytes, sha256 c5eb83aec246444fe5d207f14e089b28d2cafc35c5d84ff49bc719b01c37b27a
+PASS | q2: status 422 | observed: 422
+PASS | q2: HTTP/1.1 | observed: 'HTTP/1.1 422 Unprocessable Entity', 1.1
+PASS | q2: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | q2: Cache-Control no-store | observed: no-store
+PASS | q2: no ETag | observed: None
+PASS | q2: body exactly {"code":"ERR_READER_INVALID_INPUT","error":"invalid Reader request","ok":false,"schema":"v1"} plus one LF | observed: 94 bytes, sha256 c5eb83aec246444fe5d207f14e089b28d2cafc35c5d84ff49bc719b01c37b27a
+PASS | q3: status 422 | observed: 422
+PASS | q3: HTTP/1.1 | observed: 'HTTP/1.1 422 Unprocessable Entity', 1.1
+PASS | q3: Content-Type application/json; charset=utf-8 (not text/html) | observed: application/json; charset=utf-8
+PASS | q3: Cache-Control no-store | observed: no-store
+PASS | q3: no ETag | observed: None
+PASS | q3: body exactly {"code":"ERR_READER_INVALID_INPUT","error":"invalid Reader request","ok":false,"schema":"v1"} plus one LF | observed: 94 bytes, sha256 c5eb83aec246444fe5d207f14e089b28d2cafc35c5d84ff49bc719b01c37b27a
+=== NOTES ===
+attempt 1 of check 19 (Plan section 9); no earlier attempt.
+Each request was sent once, with no auth header and no redirect following (Plan check 16 protocol). Header captures: CRLF normalized to LF in this body; predicates were judged on the raw captured bytes. curl stderr captured apart from the headers (Glow QA Guide 3.5.10).
+For HEAD requests curl -I writes the response headers to its -o target, so that file is not a response body; the HEAD body is recorded as not observable, as check 16 records it.
+Normalizations: NZ-01 (scratch /tmp/hde-crd-0002-qa19), NZ-06 (publication helper), NZ-25 (the Plan's request lines written as curl --http1.1 commands; HEAD -I; OPTIONS/DELETE/POST -X; bodies --data-binary; --path-as-is for //reader).
+Inputs are attacker-suppliable through the public route, so real under HDE Build Notes 2.11 rule 4(c). Request bodies are recorded by length and SHA-256, not inline (Plan check 19 deliverable).

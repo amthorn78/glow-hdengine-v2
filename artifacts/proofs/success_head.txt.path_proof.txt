@@ -1,5 +1,5 @@
 path: artifacts/proofs/success_head.txt
 size_bytes: 268
-sha256: 5e47270f6eca52a2b46a051b3bc7bdeed405353b326f43a5957228f27e8bba8d
-mtime_utc: 2026-09-26T15:41:44Z
-produced_at_utc: 2026-09-26T15:41:44Z
+sha256: 61cec002db1ea5edbaa911573e1c29d6852b8d555e2784d9a20513890bbc3752
+mtime_utc: 2026-10-18T19:58:22Z
+produced_at_utc: 2026-10-18T19:58:22Z

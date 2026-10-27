@@ -2,11 +2,11 @@
 
 ## Rails
 - Pin determinism env: `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` (or call `engine.runtime.determinism_env.ensure_determinism_env`).
-- Disable auto-reload when capturing evidence. The dev Reader helper `scripts/dev_start_reader.sh` runs `python -m adapter.http_reader`, which binds `0.0.0.0` on `PORT` (default `8000`).
+- Disable auto-reload when capturing evidence. The dev Reader helper `scripts/dev_start_reader.sh` runs `python -m adapter.http_reader`, which binds `127.0.0.1` only, on `PORT` (default `8000`).
 
 ## Quick checks
 - Env pins: `python scripts/ensure_env.py` → expect `[ENV] OK` with rails above; CI mirrors this via `ci/checks/check_env_pins.sh`.
-- Serializer parity: `pytest -q tests/test_sercanon.py` (runs under pinned locale/timezone).
+- Serializer parity: `pytest -q tests/infra/test_sercanon_bytes.py` (runs under pinned locale/timezone).
 - Registry and configuration spot-check: `python tools/config/generate_config_artifacts.py --check` validates the committed registry report, `artifacts/thresholds/magic10_config.json` and `artifacts/thresholds/band_edges.json` without writing. `python tools/generate_registry_report.py` has no check mode; it writes the registry report.
 - Release input gate (closed rails): `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check-manifest-only`. It validates canonical `catalog/manifest.json` and its declared file hashes without writing.
 - Intentional release cut: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/cut_release_manifest.py --version <semver> --built-at-utc <YYYY-MM-DDTHH:MM:SSZ>`. This updates only the manifest; commit that input once. A new release version also changes `ADMITTED_RELEASE_VERSION` (and, where they change, `ADMITTED_RELEASE_BUILT_AT_UTC` and `ADMITTED_RELEASE_ROSTER`) in `engine/config/registry_loader.py` before the cut, because admission compares the manifest with those constants and that file is itself a release member.
@@ -63,7 +63,7 @@ The config acceptance map lives at `audit/EPIC-018_config_acceptance_map.json` (
 
 - HDE-EPIC037 is the current Fermentation Pass 8 repo-evidence slice for HDE-FERM008.7 through HDE-FERM008.12. It distinguishes historical EPIC036 pre-adapter route-policy evidence from current scoped dry-run resolver behavior; it is still not a public Reader, public route, payload, transport, app-side credential, AI, QA PASS, production deployment, PO closeout, board update, epic closeout, or broad HumanDesignAPI v2 platform-conformance expansion.
 - Historical EPIC036 evidence recorded configured v2 `hdctl bg:resolve --source vendor` as `unsupported_runtime_nonclaim` before any legacy `bodygraphs` request was built. Current EPIC037 resolver wiring supersedes that configured-v2 dry-run posture only for `bg:resolve --source vendor --dry-run`: configured v2 bases select the version-neutral `charts` route and deterministic v2 ChartResult adapter; non-v2 configured bases preserve explicit legacy BodyGraph fallback.
-- Generic BodyGraph ingest remains guarded from raw v2 ChartResult persistence. HDE-EPIC038 PR-05 now provides a controlled configured-v2 mapped-cache path: `hdctl bg:resolve --source vendor --upsert --user <uuid> --birthdate <YYYY-MM-DD> --birthtime <HH:MM> --location <place>`. It requires explicit open rails, a configured v2 base and credentials, a non-production-like requested and process environment, and an available sanctioned database target. The resolver projects before writing to `hde.body_graphs` and verifies canonical read-back and idempotence; `--dry-run` remains database-free.
+- Generic BodyGraph ingest remains guarded from raw v2 ChartResult persistence. HDE-EPIC038 PR-05 now provides a controlled configured-v2 mapped-cache path: `APP_ENV=dev hdctl bg:resolve --source vendor --upsert --user <uuid> --birthdate <YYYY-MM-DD> --birthtime <HH:MM> --location <place>`. It requires explicit open rails, a recognized `APP_ENV` (here `dev`, `test`, `local`, `stage` or `staging`; `ENGINE_ENV` stands in only when `APP_ENV` is blank, and when both are set they must match), a configured v2 base and credentials, a non-production-like requested and process environment, and an available sanctioned database target. The resolver projects before writing to `hde.body_graphs` and verifies canonical read-back and idempotence; `--dry-run` remains database-free.
 - The mapped-cache path is not production-write authorization. Missing `--upsert`, production-like environments, or failure to construct the sanctioned database target fail closed before the vendor request. OPS harnesses remain PO-only and must not be run as documentation or PR validation or treated as OPS completion.
 - Governed evidence anchors include PR-01 through PR-04 artifacts under `artifacts/vendor/hdapi_v2/`, PR-05 parent binding at `docs/acceptance_map_epic037.json`, `audit/qa/hde-epic037/token_evidence_matrix.md`, `audit/qa/hde-epic037/acceptance_map_viability.log`, `audit/qa/hde-epic037/parent_evidence_binding.log`, and PO-produced OPS-01 evidence under `audit/ops/hde-epic037/ops-hde-epic037-001/`.
 - Secret/config names are `HD_API_BASE_URL`, `HDAPI_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY`; document only names or redacted header shapes, never values. Current configured-v2 dry-run route evidence uses `Authorization: Bearer <redacted>` plus `HD-Geocode-Key: <redacted>` for `charts`, while legacy BodyGraph route metadata retains `HD-Api-Key: <redacted>` for non-v2 fallback.
@@ -79,7 +79,7 @@ For CLI conjunction flows, use `hdctl showcompat --conjunction` with either `--u
 Closed rails unless noted; APP_ENV gating applies for `/internal/dev/sampler`.
 
 ```bash
-# Start dev Reader helper (APP_ENV=dev by default; port override allowed)
+# Start dev Reader helper (the caller supplies APP_ENV=dev, which the script never defaults; port override allowed)
 LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PORT=8000 scripts/dev_start_reader.sh
 
 # Dev sampler healthcheck (closed rails, uses DEV_SAMPLER_URL from environment)

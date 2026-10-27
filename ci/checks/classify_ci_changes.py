@@ -39,7 +39,18 @@ _FULL_VALIDATION_PATHS = {
     "tests/evidence/test_rails_ci_workflow_integration.py",
 }
 _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
+    "tests/adapter/test_compat_writer_transport.py",
+    "tests/adapter/test_env_guard_forbidden_matrix.py",
+    "tests/adapter/test_env_guard_import.py",
+    "tests/adapter/test_env_guard_import_purity.py",
+    "tests/adapter/test_env_guard_prod_variants.py",
+    "tests/adapter/test_env_guard_silence_and_idempotence.py",
+    "tests/adapter/test_gate_auth.py",
+    "tests/adapter/test_headers_and_determinism.py",
+    "tests/arch/test_arch_guards.py",
+    "tests/bodygraph/test_bg_resolve_route_policy.py",
     "tests/bodygraph/test_gates.py",
+    "tests/bodygraph/test_resolver_vendor.py",
     "tests/categories/test_registry_and_purity.py",
     "tests/cli/test_aux_preview.py",
     "tests/cli/test_bg_resolve.py",
@@ -47,49 +58,101 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/cli/test_cli_install_help.py",
     "tests/cli/test_dev_sampler_cli.py",
     "tests/cli/test_showcompat_sources.py",
+    "tests/compat/test_thresholds_constants_pack.py",
+    "tests/compat/test_ts_import_no_io.py",
+    "tests/compliance/test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.py",
+    "tests/compliance/test_invocation_tag_accept_reject_and_roundtrip.py",
+    "tests/compliance/test_log_shape_snapshot.py",
+    "tests/compliance/test_reader_etag_and_conditional.py",
+    "tests/compliance/test_reader_etag_compression_invariance.py",
+    "tests/compliance/test_release_id_precedence_and_grep_guard.py",
     "tests/config/test_alias_policy_enforcement.py",
     "tests/config/test_config_artifacts.py",
     "tests/config/test_config_loader_unknown_ids_fail_closed.py",
     "tests/config/test_execution_coherence.py",
-    "tests/config/test_manifest_schema.py",
     "tests/config/test_magic10_contracts.py",
+    "tests/config/test_manifest_schema.py",
     "tests/config/test_production_admission.py",
     "tests/config/test_registry_catalog_contract.py",
     "tests/config/test_registry_report.py",
     "tests/config/test_registry_report_determinism.py",
     "tests/config/test_registry_report_indexing.py",
     "tests/config/test_typed_bundles.py",
+    "tests/epic003/test_error_message_map.py",
+    "tests/epic003/test_http_home_single_path.py",
+    "tests/epic003/test_legacy_imports_denied.py",
+    "tests/evidence/test_aux_preview_identity_parity.py",
+    "tests/evidence/test_cli_conformance_artifacts.py",
+    "tests/evidence/test_db_runtime_posture.py",
+    "tests/evidence/test_env_matrix_snapshot_v3.py",
+    "tests/evidence/test_epic030_pr01_pr03_fail_closed_evidence.py",
+    "tests/evidence/test_epic030_pr04_band_thresholds_evidence.py",
+    "tests/evidence/test_evidence_index_env.py",
+    "tests/evidence/test_evidence_index_snapshot.py",
+    "tests/evidence/test_evidence_index_token_sets.py",
     "tests/evidence/test_evidence_tool_ownership.py",
+    "tests/evidence/test_hdapi_v2_contract_inventory.py",
+    "tests/evidence/test_identity_provenance.py",
+    "tests/evidence/test_internal_version_manifest_captures.py",
+    "tests/evidence/test_presenter_evidence_ownership.py",
+    "tests/evidence/test_refresh_policy_snapshot.py",
+    "tests/evidence/test_release_bindings.py",
+    "tests/evidence/test_sanity_evidence_index.py",
+    "tests/evidence/test_v2_mapped_cache_evidence.py",
+    "tests/hdctl/test_cli_admin_sidecar_invariance.py",
+    "tests/hdctl/test_cli_showcompat_parity.py",
+    "tests/hdctl/test_cli_streams_and_exits.py",
+    "tests/hdctl/test_cli_two_run_identity.py",
+    "tests/infra/test_hash_coupling.py",
+    "tests/infra/test_sercanon_bytes.py",
+    "tests/integration/test_normalized_fixture.py",
     "tests/invariance/test_bytes_identity.py",
     "tests/invariance/test_determinism_env_helper.py",
     "tests/invariance/test_locale_tz.py",
+    "tests/loader/test_load_chart_fixture_only.py",
+    "tests/loader/test_loader_hdapi_ignores_tz.py",
+    "tests/loader/test_loader_logs_keys_only.py",
+    "tests/loader/test_pinned_lists_not_empty.py",
+    "tests/loader/test_validators_strict.py",
     "tests/m10/test_defs_order.py",
     "tests/m10/test_m10_symmetry_identity.py",
     "tests/m10/test_thresholds_rounding.py",
     "tests/mech/test_arrays_as_sets.py",
     "tests/mech/test_constants.py",
+    "tests/provider/test_hdapi_error_mapping.py",
+    "tests/provider/test_hdapi_json_headers.py",
+    "tests/provider/test_provider_interface_contract.py",
+    "tests/provider/test_prtest_precedence_and_artifact.py",
+    "tests/provider/test_resolve_log_correlation_id.py",
+    "tests/provider/test_secrets_dir_invalid.py",
+    "tests/provider/test_secrets_unknown_provider_is_misconfigured.py",
+    "tests/provider/test_startup_logging.py",
+    "tests/provider/test_vendor_and_prod_guard.py",
+    "tests/provider/test_vendor_and_prod_guard_min.py",
+    "tests/provider/test_vendor_call_rails_and_config.py",
+    "tests/provider/test_vendor_guard_min.py",
     "tests/qa/test_cli_admin_dumps.py",
     "tests/qa/test_cli_admin_parity.py",
+    "tests/qa/test_epic021_scaffolding.py",
     "tests/qa/test_epic023_acceptance_alignment.py",
     "tests/qa/test_epic024_bootstrap_status.py",
     "tests/qa/test_generate_epic_close_pack.py",
     "tests/qa/test_qa_tool_ownership.py",
+    "tests/scripts/test_dev_sampler_healthcheck.py",
     "tests/support/test_change_gates.py",
     "tests/transport/test_a7_transport_proofs.py",
     "tests/transport/test_aux_narrative.py",
     "tests/transport/test_ops_rails_refusal.py",
     "tests/transport/test_writers_errors_headers.py",
+    "tests/unit/test_narratives_composer.py",
+    "tests/unit/test_no_io_guard.py",
+    "tests/unit/test_sampler_core.py",
+    "tests/unit/test_viewer_prefs_normalization.py",
 )
-_FULL_VALIDATION_INACTIVE_TESTS = {
-    # Administrative or source-writing checks that are intentionally outside
-    # the current behavioral suite. Direct edits fail closed until a current
-    # consumer and safe execution owner are established.
-    "tests/cli/test_cli_env_pins_epic021.py",
-    "tests/config/test_config_acceptance_map.py",
-    "tests/qa/test_epic021_scaffolding.py",
-    "tests/qa/test_epic022_acceptance_scaffold.py",
-    "tests/qa/test_epic022_close_pack_ready.py",
-}
+_FULL_VALIDATION_INACTIVE_TESTS: set[str] = set()
+# HDE-CRD-0002 WU-PR-01 resolved the former inactive set: each file is either
+# in the supplemental roster above or retired (tests/retired_tests.md). A file
+# added here again fails closed on direct edit until it has a disposition.
 _HISTORICAL_PREFIXES = (
     ".audit_src/",
     "_archive/",
@@ -117,6 +180,9 @@ _DOCUMENTATION_PREFIXES = (
 )
 _DOCUMENT_SUFFIXES = {".adoc", ".md", ".rst"}
 _DOCUMENT_PATHS = {
+    # HDE-CRD-0002 WU-PR-08 (S16): the environment template; nothing in the
+    # repository reads it.
+    ".env.example",
     "LICENSE",
     "AcceptanceMap.md",
     "AGENTS.md",
@@ -193,6 +259,11 @@ _WORKFLOW_CONTROL_PATH_LANES = {
     "tools/cli/emitter_symbol_proof.py": {"compat"},
     "tools/cli/serializer_grep_guard.py": {"compat"},
     "tools/order/generate_ordering_artifacts.py": {"product"},
+    # HDE-CRD-0002 WU-PR-03 (S09): the operator verification script, which now
+    # drives the canonical dev runner, and the retired dev Reader harness.
+    "VERIFY.sh": {"product"},
+    "dev/reader_harness/__init__.py": {"product"},
+    "dev/reader_harness/app.py": {"product"},
 }
 _RAILS_MARKERS = (
     "open_rails",
@@ -285,11 +356,13 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/adapter/test_compat_http_parity.py",
     "tests/adapter/test_diagnostic_writer.py",
     "tests/adapter/test_dev_sampler_http.py",
+    "tests/adapter/test_gate_auth.py",
     "tests/cli/test_aux_preview.py",
     "tests/compat/test_abba_parity.py",
     "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
     "tests/db/test_conn_env_only.py",
     "tests/db/test_no_import_time_connect.py",
+    "tests/evidence/test_hdapi_v2_contract_inventory.py",
     _HTTP_READER_OWNERSHIP_GUARD,
     "tests/http/test_compat_endpoint_contract.py",
     "tests/http/test_dev_conjunction_http.py",
@@ -306,7 +379,9 @@ _HTTP_READER_TEST_OWNERS = (
 )
 _HTTP_READER_INDIRECT_TEST_OWNERS = {
     "tests/adapter/test_dev_sampler_http.py",
+    "tests/adapter/test_gate_auth.py",
     "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
+    "tests/evidence/test_hdapi_v2_contract_inventory.py",
     "tests/http/test_compat_endpoint_contract.py",
     "tests/transport/test_ops_rails_refusal.py",
 }
@@ -381,6 +456,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "engine/stable/sercanon.py": (
         "tests/cli/test_serializer_guards.py",
         "tests/config/test_execution_coherence.py",
+        "tests/infra/test_sercanon_bytes.py",
     ),
     "engine/categories/registry.py": (
         "tests/categories/test_registry_and_purity.py",
@@ -417,13 +493,20 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/http/test_reader_post_v1.py",
         "tests/http/test_reader_post_v2.py",
         "tests/http/test_endpoint_catalog.py",
+        "tests/evidence/test_hdapi_v2_contract_inventory.py",
     ),
     "adapter/wsgi.py": (
         "tests/http/test_reader_post_v1.py",
         "tests/http/test_reader_post_v2.py",
         "tests/http/test_endpoint_catalog.py",
+        "tests/adapter/test_compat_writer_transport.py",
+        "tests/adapter/test_headers_and_determinism.py",
+        "tests/evidence/test_hdapi_v2_contract_inventory.py",
     ),
     "schemas/epic_close_candidate_source.v1.json": (
+        "tests/qa/test_generate_epic_close_pack.py",
+    ),
+    "schemas/close_candidate_source.v2.json": (
         "tests/qa/test_generate_epic_close_pack.py",
     ),
     "adapter/http_reader.py": _HTTP_READER_TEST_OWNERS,
@@ -437,6 +520,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/bodygraph/test_resolve_compat_chart.py",
         "tests/cli/test_bg_resolve.py",
         "tests/bodygraph/test_bg_resolve_v2_mapped_cache.py",
+        "tests/bodygraph/test_resolver_vendor.py",
+        "tests/bodygraph/test_bg_resolve_route_policy.py",
     ),
     "engine/bodygraph/projection.py": (
         "tests/bodygraph/test_projection_gate_ingress.py",
@@ -480,6 +565,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/http/test_compat_endpoint_contract.py",
         "tests/adapter/test_compat_http_dev.py",
         "tests/adapter/test_compat_http_parity.py",
+        "tests/adapter/test_compat_writer_transport.py",
     ),
     "presenter/reader_v1/emitter.py": (
         "tests/reader_v1/test_goldens.py",
@@ -495,12 +581,18 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "engine/constants.py": ("tests/mech/test_constants.py",),
     "engine/bodygraph/vendor_client.py": (
         "tests/bodygraph/test_vendor_client.py",
+        "tests/bodygraph/test_bg_resolve_route_policy.py",
     ),
+    # HDE-CRD-0002 WU-PR-04 (S14): the production vendor-override audit module.
+    "engine/bodygraph/vendor_audit.py": ("tests/bodygraph/test_vendor_prod_override.py",),
     "scripts/cut_release_manifest.py": ("tests/scripts/test_cut_release_manifest.py",),
+    "scripts/dev_start_reader.sh": ("tests/scripts/test_dev_start_reader.py",),
     "scripts/emit_env_guard_artifact.py": (
         "tests/artifacts/test_env_guard_artifact_bytes.py",
     ),
     "scripts/ensure_env.py": ("tests/invariance/test_determinism_env_helper.py",),
+    # HDE-CRD-0002 WU-PR-05 (S19-F06): the S9 ingest runner passes its own log paths.
+    "scripts/ingest/run_vendor_ingest.py": ("tests/bodygraph/test_ingest.py",),
     "scripts/probe_internal_version.py": (
         "tests/transport/test_internal_version_contract.py",
     ),
@@ -558,12 +650,20 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     ),
     "tools/evidence/generate_bodygraph_policy_proofs.py": (
         "tests/evidence/test_bodygraph_policy_proofs.py",
+        "tests/evidence/test_refresh_policy_snapshot.py",
     ),
     "tools/evidence/generate_conjunction_writer_evidence.py": (
         "tests/evidence/test_dev_conjunction_identity.py",
     ),
     "tools/evidence/generate_a7_transport_proofs.py": (
         "tests/transport/test_a7_transport_proofs.py",
+    ),
+    "tools/evidence/generate_hdapi_v2_contract_inventory.py": (
+        "tests/evidence/test_hdapi_v2_contract_inventory.py",
+    ),
+    # HDE-CRD-0002 WU-PR-04 (ID-8): its production scenario passes the override gate.
+    "tools/evidence/generate_v2_mapped_cache_evidence.py": (
+        "tests/evidence/test_v2_mapped_cache_evidence.py",
     ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
@@ -598,6 +698,10 @@ _EVIDENCE_HELPER_TEST_OWNERS = {
         "tests/tools/test_epic020_bundle_tool.py",
         _EVIDENCE_HELPER_OWNERSHIP_TEST,
     ),
+    "tools/evidence/hdapi_v2_boundary_analyzer.py": (
+        "tests/evidence/test_hdapi_v2_contract_inventory.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
     "tools/evidence/hde_epic038_ops03.py": (
         "tests/ops/test_hde_epic038_ops03.py",
         _EVIDENCE_HELPER_OWNERSHIP_TEST,
@@ -616,6 +720,8 @@ _EVIDENCE_HELPER_TEST_OWNERS = {
     "tools/evidence/regenerate_identity_closure.py": (
         "tests/evidence/test_release_manifest_content_binding.py",
         _EVIDENCE_HELPER_OWNERSHIP_TEST,
+        "tests/evidence/test_internal_version_manifest_captures.py",
+        "tests/evidence/test_aux_preview_identity_parity.py",
     ),
     "tools/evidence/retained_evidence_safety.py": (
         "tests/evidence/test_retained_evidence_safety.py",
@@ -650,7 +756,6 @@ _EVIDENCE_HELPER_TEST_OWNERS = {
 _EVIDENCE_HELPERS_REQUIRING_OWNER = {
     # These helpers have no safe focused behavioral owner in the ordinary PR
     # environment. Changes fail closed until that ownership is established.
-    "tools/evidence/hdapi_v2_boundary_analyzer.py",
     "tools/evidence/run_cli_guardrail.py",
     "tools/evidence/run_env_pins_gate.py",
     "tools/evidence/run_sampler_evidence.py",
@@ -747,6 +852,13 @@ _BODYGRAPH_TOOL_TEST_OWNERS = {
     "tools/bodygraph/check_magic10_gate_readiness.py": (
         "tests/bodygraph/test_check_magic10_gate_readiness.py",
     ),
+}
+# HDE-CRD-0002 WU-PR-06 (S20): the read-only pre-push and pre-plan check.  No
+# workflow step runs the tool; its owner test is what CI runs on its change.
+_CI_TOOL_PREFIX = "tools/ci/"
+_CI_TOOL_LANES = frozenset({"product"})
+_CI_TOOL_TEST_OWNERS = {
+    "tools/ci/prepush_check.py": ("tests/tools/test_prepush_check.py",),
 }
 # Governed chart fixtures consumed by the dev GET /reader route and its tests.
 _FIXTURE_LANE_PREFIXES = (
@@ -979,6 +1091,8 @@ def _registered_owner_test_paths() -> set[str]:
         paths.update(targets)
     for targets in _BODYGRAPH_TOOL_TEST_OWNERS.values():
         paths.update(targets)
+    for targets in _CI_TOOL_TEST_OWNERS.values():
+        paths.update(targets)
     for targets in _TEST_SUPPORT_OWNER_PATHS.values():
         paths.update(targets)
     for _prefix, targets in _FIXTURE_TEST_OWNER_PREFIXES:
@@ -1183,7 +1297,7 @@ def _qa_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
     if (
         len(rel.parts) < 3
         or rel.parts[:2] != ("tools", "qa")
-        or rel.suffix.lower() != ".py"
+        or rel.suffix.lower() not in _UNKNOWN_SOURCE_SUFFIXES
     ):
         return ()
     targets = _QA_TOOL_TEST_OWNERS.get(path)
@@ -1225,6 +1339,22 @@ def _bodygraph_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]
         path,
         targets,
         error_code="CI_BODYGRAPH_TOOL_OWNER_TEST_INVALID",
+    )
+
+
+def _ci_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    """Resolve exact behavioral owners for repository CI tools (fail closed)."""
+    rel = PurePosixPath(path)
+    if not path.startswith(_CI_TOOL_PREFIX) or rel.suffix.lower() not in _UNKNOWN_SOURCE_SUFFIXES:
+        return ()
+    targets = _CI_TOOL_TEST_OWNERS.get(path)
+    if targets is None:
+        raise ValueError(f"CI_TOOL_OWNER_TEST_MISSING:{path}")
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_TOOL_OWNER_TEST_INVALID",
     )
 
 
@@ -1574,6 +1704,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
         )
         targets.update(_qa_tool_owner_targets(repo_root, path))
         targets.update(_bodygraph_tool_owner_targets(repo_root, path))
+        targets.update(_ci_tool_owner_targets(repo_root, path))
         targets.update(_promoted_member_owner_targets(repo_root, path))
         if (
             PurePosixPath(path).suffix.lower() in _UNKNOWN_SOURCE_SUFFIXES
@@ -1659,6 +1790,9 @@ def _lanes_for_path(path: str) -> set[str] | None:
 
     if path.startswith(_BODYGRAPH_TOOL_PREFIX):
         return set(_BODYGRAPH_TOOL_LANES)
+
+    if path.startswith(_CI_TOOL_PREFIX):
+        return set(_CI_TOOL_LANES)
 
     if path.startswith("tests/evidence/"):
         lanes = {"evidence"}

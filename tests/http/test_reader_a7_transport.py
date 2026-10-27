@@ -1,6 +1,9 @@
 import json
+import runpy
+import warnings
 from pathlib import Path
 
+import flask
 import pytest
 
 from adapter import http_reader
@@ -134,3 +137,86 @@ def test_reader_a7_transport_invariants(monkeypatch):
     conditional_post = client.post("/api/reader", query_string=params, headers={"If-None-Match": etag})
     assert conditional_post.status_code == 422
     assert conditional_post.data == api_post.data
+
+
+@pytest.mark.parametrize("app_env", ["dev"])
+def test_dev_reader_is_served_only_for_explicit_dev(monkeypatch, app_env):
+    # HDE-CRD-0002 S10 / IF-10 (PF05 §5.4, §5.6): only APP_ENV exactly "dev" serves (AD-2).
+    monkeypatch.setenv("APP_ENV", app_env)
+    client = _client()
+    params = _reader_query_params()
+    assert client.get("/reader", query_string=params).status_code == 200
+    head = client.head("/reader", query_string=params)
+    assert head.status_code == 200 and head.data == b""
+
+
+@pytest.mark.parametrize(
+    "app_env",
+    [None, "", "  ", " dev", "dev ", " DEV ", "Dev", "DEV", "test", "local", "prod", "production", "live", "staging", "development", "dev1"],
+)
+def test_dev_reader_refuses_every_other_environment(monkeypatch, app_env):
+    # Unset, empty and every value other than exactly "dev" -- including padded
+    # and case variants (AD-2) -- refuse with ERR_READER_FORBIDDEN 403, the
+    # governed error headers, and no ETag; HEAD carries no body.
+    if app_env is None:
+        monkeypatch.delenv("APP_ENV", raising=False)
+    else:
+        monkeypatch.setenv("APP_ENV", app_env)
+    client = _client()
+    params = _reader_query_params()
+    resp = client.get("/reader", query_string=params)
+    assert resp.status_code == 403
+    assert json.loads(resp.data)["code"] == "ERR_READER_FORBIDDEN"
+    assert resp.headers.get("Cache-Control") == "no-store"
+    assert resp.headers.get("Content-Type") == "application/json; charset=utf-8"
+    assert "ETag" not in resp.headers
+    head = client.head("/reader", query_string=params)
+    assert head.status_code == 403 and head.data == b""
+    # Version validation still precedes the environment gate.
+    assert json.loads(client.get("/reader", query_string={"v": "2"}).data)["code"] == "ERR_READER_INVALID_VERSION"
+
+
+# --- HDE-CRD-0002 AD-3: the canonical dev runner meets the required local capture profile ---
+# (PF05 §5.4 "Gate"; PF14 §34 "Required local capture profile"; Conjunction checklist HDE-CONJ001.1)
+
+
+@pytest.mark.parametrize(("port_env", "port"), [(None, 8000), ("8123", 8123)])
+def test_dev_runner_binds_loopback_with_debugger_and_reloader_off(monkeypatch, port_env, port):
+    calls = []
+    monkeypatch.setattr(flask.Flask, "run", lambda app, **kwargs: calls.append((app, kwargs)))
+    monkeypatch.setenv("APP_ENV", "dev")
+    if port_env is None:
+        monkeypatch.delenv("PORT", raising=False)
+    else:
+        monkeypatch.setenv("PORT", port_env)
+    with warnings.catch_warnings():
+        # runpy warns when the module is already imported; it re-executes it as __main__.
+        warnings.filterwarnings("ignore", message=".*found in sys.modules.*", category=RuntimeWarning)
+        runpy.run_module(http_reader.__name__, run_name="__main__")
+    assert len(calls) == 1
+    app, kwargs = calls[0]
+    assert kwargs == {"host": "127.0.0.1", "port": port, "debug": False, "use_debugger": False, "use_reloader": False}
+    assert "/reader" in {rule.rule for rule in app.url_map.iter_rules()}
+
+
+_CORS_ORIGIN = {"Origin": "https://cross-origin.invalid"}
+
+
+@pytest.mark.parametrize(
+    ("app_env", "method", "path", "query", "headers", "status"),
+    [
+        ("dev", "GET", "/reader", "reader", _CORS_ORIGIN, 200),
+        ("dev", "HEAD", "/reader", "reader", _CORS_ORIGIN, 200),
+        ("dev", "OPTIONS", "/reader", None, {**_CORS_ORIGIN, "Access-Control-Request-Method": "GET"}, 200),
+        ("prod", "GET", "/reader", "reader", _CORS_ORIGIN, 403),
+        ("dev", "GET", "/reader", {"v": "2"}, _CORS_ORIGIN, 400),
+        ("dev", "GET", "/no-such-route", None, _CORS_ORIGIN, 404),
+    ],
+)
+def test_dev_runner_emits_no_cors_headers(monkeypatch, app_env, method, path, query, headers, status):
+    # No cross-origin allow-list, wildcard, credentials or CORS response header (PF14 §34).
+    monkeypatch.setenv("APP_ENV", app_env)
+    query_string = _reader_query_params() if query == "reader" else query
+    resp = _client().open(path, method=method, query_string=query_string, headers=headers)
+    assert resp.status_code == status
+    assert [name for name in resp.headers.keys() if name.lower().startswith("access-control-")] == []

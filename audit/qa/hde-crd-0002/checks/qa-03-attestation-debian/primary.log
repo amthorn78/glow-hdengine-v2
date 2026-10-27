@@ -1,0 +1,340 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-03-attestation-debian","check_name":"Attestation builds under a distribution-patched setuptools","claimed_tokens":[],"command":[["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python","-c","import setuptools, importlib.util; print(setuptools.__version__, setuptools.__file__, importlib.util.find_spec('_distutils_system_mod'))"],["env","-i","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PATH=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin:/usr/bin:/bin","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python","tools/evidence/build_release_attestation.py","--output","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out","--require-clean"],["env","-i","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PATH=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin:/usr/bin:/bin","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python","tools/evidence/build_release_attestation.py","--verify","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out","--require-clean"],["wc","-c","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json"],["sha256sum","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json"],["python","-c","import json; a=json.load(open('/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json')); print(a.get('release_id'), a.get('validation_result'), a.get('release_admission'))"],["grep","-c","build_backend_compat=distribution_install_layout","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/build.log"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/evidence/test_release_attestation.py","-k","layout_compat or wheel_build_env"],["git","-C","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build","status","--porcelain"],["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python","-c","import setuptools, importlib.util; print(setuptools.__version__, setuptools.__file__, importlib.util.find_spec('_distutils_system_mod'))"],["env","-i","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PATH=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin:/usr/bin:/bin","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python","tools/evidence/build_release_attestation.py","--output","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out","--require-clean"],["env","-i","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PATH=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin:/usr/bin:/bin","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python","tools/evidence/build_release_attestation.py","--verify","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out","--require-clean"],["wc","-c","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json"],["sha256sum","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json"],["python","-c","import json; a=json.load(open('/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json')); print(a.get('release_id'), a.get('validation_result'), a.get('release_admission'))"],["grep","-c","build_backend_compat=distribution_install_layout","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/build.log"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/evidence/test_release_attestation.py","-k","layout_compat or wheel_build_env"],["git","-C","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build","status","--porcelain"]],"command_provenance":"QA Plan v1.2 check 3; QA-90 task T03 attempt 1 with a Product Owner-directed Moon Loop (Glow QA Guide \u00a73.4.8): E-D rewired outside the repository (uv CPython 3.13.17 venv importing the distribution-patched setuptools through a .pth path entry), rerun 2 decisive; normalizations: NZ-01 (scratch paths under the session scratchpad), NZ-07 (env -i allowlist unchanged)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-03-attestation-debian/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF12-Canon-HDE-Schemas-and-Artifacts","PF14-Canon-HDE-Mechanics-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-24T23:56:15Z"}
+=== CONTEXT ===
+check_id: qa-03-attestation-debian
+task: QA-90 task T03, attempt 1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.0.md); QA Plan v1.2 check 3 (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.2.md, blob 66f6016cc75bd1ab4ff9730ea89e5e25c7ec629c)
+tested_commit: 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; tested_tree: af5293473238c17d72c7d73013493739b9f32750
+environment_class: E-D (Moon Loop environment wiring; see NOTES) plus E-L for step 5; E-L clone /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el; venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv (NZ-01 scratch paths)
+interpreter: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state
+presence in the check shell: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session abab87ae-fdb9-4eb6-b2b9-de5380cee6cb, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+start_utc: 2026-10-24T23:51:39Z
+Moon Loop rerun directed by the Product Owner in this session (2026-10-24, after attempt 1 was published TOOLING_BLOCKED): 'We need to just run a moon loop and pass T03. I am not going to be blocked on a python version as long as the product functions'.
+readiness reads (collection §4.5; Plan §7 rule A):
+--- command: ["git", "rev-parse", "HEAD"]
+started_utc: 2026-10-24T23:51:39Z; exit_code: 0
+stdout (41 bytes):
+2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+stderr (0 bytes):
+(empty)
+--- command: ["git", "rev-parse", "--is-shallow-repository"]
+started_utc: 2026-10-24T23:51:39Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-24T23:51:39Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["python", "--version"]
+started_utc: 2026-10-24T23:51:40Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "--version"]
+started_utc: 2026-10-24T23:51:40Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import engine; print(engine.__file__)"]
+started_utc: 2026-10-24T23:51:40Z; exit_code: 0
+stdout (143 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
+stderr (0 bytes):
+(empty)
+readiness result: PASS (HEAD=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 shallow=false status_empty=yes python='Python 3.12.15' engine=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py)
+Moon Loop E-D setup (environment wiring outside every repository; not a check step; recorded):
+--- command: ["uv", "python", "install", "3.13"]
+started_utc: 2026-10-24T23:51:40Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (205 bytes):
+Downloading cpython-3.13.17-linux-x86_64-gnu (download) (33.7MiB)
+ Downloaded cpython-3.13.17-linux-x86_64-gnu (download)
+Installed Python 3.13.17 in 1.55s
+ + cpython-3.13.17-linux-x86_64-gnu (python3.13)
+uv python find 3.13 -> /home/nathan/.local/share/uv/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13 -> /home/nathan/.local/share/uv/python/cpython-3.13.17-linux-x86_64-gnu/bin/python3.13
+--- command: ["/home/nathan/.local/share/uv/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13", "--version"]
+started_utc: 2026-10-24T23:51:42Z; exit_code: 0
+stdout (15 bytes):
+Python 3.13.17
+stderr (0 bytes):
+(empty)
+--- command: ["/home/nathan/.local/share/uv/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13", "-c", "import importlib.util,sys; print(sys.version); print('_distutils_system_mod', importlib.util.find_spec('_distutils_system_mod')); print('setuptools', importlib.util.find_spec('setuptools'))"]
+started_utc: 2026-10-24T23:51:43Z; exit_code: 0
+stdout (97 bytes):
+3.13.17 (main, Oct 21 2026, 17:49:22) [Clang 23.1.3 ]
+_distutils_system_mod None
+setuptools None
+stderr (0 bytes):
+(empty)
+--- command: ["/home/nathan/.local/share/uv/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13", "-m", "venv", "--system-site-packages", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv"]
+started_utc: 2026-10-24T23:51:43Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+wrote /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/hde-crd-0002-distribution-setuptools.pth containing exactly '/usr/lib/python3/dist-packages' (sha256 442291ba22e04b8bee0cf1a2a7105672d708479c7d8a48ac7e4895f0719b584e); it appends the distribution's shared dist-packages, which holds python3-setuptools 78.1.1-0.1build1 and python3-wheel 0.46.3-2, to this venv's sys.path
+--- setup command: ["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "-m", "pip", "install", "-r", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/requirements.txt", "-r", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/requirements-dev.txt"]
+exit_code: 0; last 4 lines of pip output (full log outside the repository at /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/pip-moonloop.log, not evidence):
+  |     Not uninstalling jsonschema at /usr/lib/python3/dist-packages, outside environment /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv
+  |     Can't uninstall 'jsonschema'. No files were found to uninstall.
+  | 
+  | Successfully installed Flask-2.3.3 Werkzeug-3.1.9 coverage-7.17.0 gunicorn-21.2.0 iniconfig-2.3.1 itsdangerous-2.2.0 jsonschema-4.23.0 pluggy-1.7.0 psycopg-3.2.13 psycopg-binary-3.2.13 pytest-8.4.2 pytest-cov-4.1.0 pytest-mock-3.17.0
+--- command: ["git", "clone", "https://github.com/amthorn78/glow-hdengine-v2", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build"]
+started_utc: 2026-10-24T23:51:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (850 bytes):
+Cloning into '/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build'...
+Updating files:  81% (6718/8236)
+Updating files:  82% (6754/8236)
+Updating files:  83% (6836/8236)
+Updating files:  84% (6919/8236)
+Updating files:  85% (7001/8236)
+Updating files:  86% (7083/8236)
+Updating files:  87% (7166/8236)
+Updating files:  88% (7248/8236)
+Updating files:  89% (7331/8236)
+Updating files:  90% (7413/8236)
+Updating files:  91% (7495/8236)
+Updating files:  92% (7578/8236)
+Updating files:  93% (7660/8236)
+Updating files:  94% (7742/8236)
+Updating files:  95% (7825/8236)
+Updating files:  96% (7907/8236)
+Updating files:  97% (7989/8236)
+Updating files:  98% (8072/8236)
+Updating files:  99% (8154/8236)
+Updating files: 100% (8236/8236)
+Updating files: 100% (8236/8236), done.
+--- command: ["git", "-C", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build", "checkout", "--detach", "2e03a2686af87ab0607c6cfb9afb4ad79bcdb171"]
+started_utc: 2026-10-24T23:52:00Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (158 bytes):
+HEAD is now at 2e03a268 docs(ephemeral): HDE-CRD-0002 QA Plan v1.2 (QA-80) and QA-90 task collection v1.0 for checks 1 to 15 (TASK_READY; next QA-100) (#724)
+--- command: ["git", "-C", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build", "rev-parse", "HEAD"]
+started_utc: 2026-10-24T23:52:00Z; exit_code: 0
+stdout (41 bytes):
+2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+stderr (0 bytes):
+(empty)
+--- command: ["git", "-C", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build", "rev-parse", "--is-shallow-repository"]
+started_utc: 2026-10-24T23:52:00Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+end_utc: 2026-10-24T23:56:15Z
+=== COMMANDS ===
+--- command: ["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "-c", "import setuptools, importlib.util; print(setuptools.__version__, setuptools.__file__, importlib.util.find_spec('_distutils_system_mod'))"]
+started_utc: 2026-10-24T23:52:26Z; exit_code: 0
+stdout (66 bytes):
+78.1.1 /usr/lib/python3/dist-packages/setuptools/__init__.py None
+stderr (0 bytes):
+(empty)
+--- command: ["env", "-i", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PATH=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin:/usr/bin:/bin", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "tools/evidence/build_release_attestation.py", "--output", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out", "--require-clean"]
+started_utc: 2026-10-24T23:52:27Z; exit_code: 1
+stdout (0 bytes):
+(empty)
+stderr (1547 bytes):
+Traceback (most recent call last):
+  File "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build/tools/evidence/build_release_attestation.py", line 21, in <module>
+    from jsonschema import Draft202012Validator
+  File "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/jsonschema/__init__.py", line 13, in <module>
+    from jsonschema._format import FormatChecker
+  File "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/jsonschema/_format.py", line 11, in <module>
+    from jsonschema.exceptions import FormatError
+  File "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/jsonschema/exceptions.py", line 15, in <module>
+    from referencing.exceptions import Unresolvable as _Unresolvable
+  File "/usr/lib/python3/dist-packages/referencing/__init__.py", line 5, in <module>
+    from referencing._core import Anchor, Registry, Resource, Specification
+  File "/usr/lib/python3/dist-packages/referencing/_core.py", line 9, in <module>
+    from rpds import HashTrieMap, HashTrieSet, List
+  File "/usr/lib/python3/dist-packages/rpds/__init__.py", line 1, in <module>
+    from .rpds import *
+ModuleNotFoundError: No module named 'rpds.rpds'
+--- command: ["env", "-i", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PATH=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin:/usr/bin:/bin", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "tools/evidence/build_release_attestation.py", "--verify", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out", "--require-clean"]
+started_utc: 2026-10-24T23:52:28Z; exit_code: 1
+stdout (0 bytes):
+(empty)
+stderr (1547 bytes):
+Traceback (most recent call last):
+  File "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build/tools/evidence/build_release_attestation.py", line 21, in <module>
+    from jsonschema import Draft202012Validator
+  File "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/jsonschema/__init__.py", line 13, in <module>
+    from jsonschema._format import FormatChecker
+  File "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/jsonschema/_format.py", line 11, in <module>
+    from jsonschema.exceptions import FormatError
+  File "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/jsonschema/exceptions.py", line 15, in <module>
+    from referencing.exceptions import Unresolvable as _Unresolvable
+  File "/usr/lib/python3/dist-packages/referencing/__init__.py", line 5, in <module>
+    from referencing._core import Anchor, Registry, Resource, Specification
+  File "/usr/lib/python3/dist-packages/referencing/_core.py", line 9, in <module>
+    from rpds import HashTrieMap, HashTrieSet, List
+  File "/usr/lib/python3/dist-packages/rpds/__init__.py", line 1, in <module>
+    from .rpds import *
+ModuleNotFoundError: No module named 'rpds.rpds'
+--- command: ["wc", "-c", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json"]
+started_utc: 2026-10-24T23:52:29Z; exit_code: 1
+stdout (0 bytes):
+(empty)
+stderr (178 bytes):
+wc: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json: No such file or directory
+--- command: ["sha256sum", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json"]
+started_utc: 2026-10-24T23:52:29Z; exit_code: 1
+stdout (0 bytes):
+(empty)
+stderr (185 bytes):
+sha256sum: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json: No such file or directory
+--- command: ["python", "-c", "import json; a=json.load(open('/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json')); print(a.get('release_id'), a.get('validation_result'), a.get('release_admission'))"]
+started_utc: 2026-10-24T23:52:29Z; exit_code: 1
+stdout (0 bytes):
+(empty)
+stderr (279 bytes):
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json'
+--- command: ["grep", "-c", "build_backend_compat=distribution_install_layout", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/build.log"]
+started_utc: 2026-10-24T23:52:29Z; exit_code: 2
+stdout (0 bytes):
+(empty)
+stderr (183 bytes):
+ugrep: warning: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/build.log: No such file or directory
+--- command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/evidence/test_release_attestation.py", "-k", "layout_compat or wheel_build_env"]
+started_utc: 2026-10-24T23:52:29Z; exit_code: 0
+stdout (114 bytes):
+...........                                                              [100%]
+11 passed, 33 deselected in 0.62s
+stderr (0 bytes):
+(empty)
+--- command: ["git", "-C", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build", "status", "--porcelain"]
+started_utc: 2026-10-24T23:52:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+=== Moon Loop rerun 2: QA environment correction, then steps 1 to 6 again (rerun 1 above failed at builder import in the QA-created E-D venv; see NOTES) ===
+--- command: ["git", "-C", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build", "status", "--porcelain"]
+started_utc: 2026-10-24T23:53:12Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["rm", "-rf", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv"]
+started_utc: 2026-10-24T23:53:12Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["/home/nathan/.local/share/uv/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13", "-m", "venv", "--system-site-packages", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv"]
+started_utc: 2026-10-24T23:53:12Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- setup (not a check command): wrote /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/hde-crd-0002-distribution-setuptools.pth containing exactly /usr/lib/python3/dist-packages (sha256 442291ba22e04b8bee0cf1a2a7105672d708479c7d8a48ac7e4895f0719b584e)
+--- setup (not a check command): ["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "-m", "pip", "install", "--ignore-installed", "-r", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/requirements.txt", "-r", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/requirements-dev.txt"]
+exit_code: 0; last 2 lines (full log outside the repository at /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/pip-moonloop2.log, not evidence):
+  | 
+  | Successfully installed Flask-2.3.3 Jinja2-3.1.6 MarkupSafe-3.0.4 Werkzeug-3.1.9 attrs-26.1.0 blinker-1.9.0 click-8.5.0 coverage-7.17.0 gunicorn-21.2.0 iniconfig-2.3.1 itsdangerous-2.2.0 jsonschema-4.23.0 jsonschema-specifications-2025.9.1 packaging-26.3 pluggy-1.7.0 psycopg-3.2.13 psycopg-binary-3.2.13 pygments-2.21.0 pytest-8.4.2 pytest-cov-4.1.0 pytest-mock-3.17.0 referencing-0.37.0 rpds-py-2026.9.1
+--- command: ["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "-c", "import sys,importlib.util as u; [print(n, (u.find_spec(n).origin if u.find_spec(n) else None)) for n in ('setuptools','wheel','pkg_resources','jsonschema','referencing','rpds','flask','_distutils_system_mod')]"]
+started_utc: 2026-10-24T23:53:25Z; exit_code: 0
+stdout (974 bytes):
+setuptools /usr/lib/python3/dist-packages/setuptools/__init__.py
+wheel /usr/lib/python3/dist-packages/wheel/__init__.py
+pkg_resources /usr/lib/python3/dist-packages/pkg_resources/__init__.py
+jsonschema /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/jsonschema/__init__.py
+referencing /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/referencing/__init__.py
+rpds /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/rpds/__init__.py
+flask /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/flask/__init__.py
+_distutils_system_mod None
+stderr (0 bytes):
+(empty)
+--- command: ["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "-c", "import setuptools, importlib.util; print(setuptools.__version__, setuptools.__file__, importlib.util.find_spec('_distutils_system_mod'))"]
+started_utc: 2026-10-24T23:53:36Z; exit_code: 0
+stdout (66 bytes):
+78.1.1 /usr/lib/python3/dist-packages/setuptools/__init__.py None
+stderr (0 bytes):
+(empty)
+--- command: ["env", "-i", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PATH=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin:/usr/bin:/bin", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "tools/evidence/build_release_attestation.py", "--output", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out", "--require-clean"]
+started_utc: 2026-10-24T23:53:37Z; exit_code: 0
+stdout (147 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json
+stderr (0 bytes):
+(empty)
+--- command: ["env", "-i", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PATH=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin:/usr/bin:/bin", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "tools/evidence/build_release_attestation.py", "--verify", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out", "--require-clean"]
+started_utc: 2026-10-24T23:56:11Z; exit_code: 0
+stdout (147 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json
+stderr (0 bytes):
+(empty)
+--- command: ["wc", "-c", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json"]
+started_utc: 2026-10-24T23:56:12Z; exit_code: 0
+stdout (153 bytes):
+28163 /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json
+stderr (0 bytes):
+(empty)
+--- command: ["sha256sum", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json"]
+started_utc: 2026-10-24T23:56:12Z; exit_code: 0
+stdout (213 bytes):
+5fe81fd77dac66a47fdb464217026687497ba3549c3f4d40171015ff5b9d8ade  /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import json; a=json.load(open('/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json')); print(a.get('release_id'), a.get('validation_result'), a.get('release_admission'))"]
+started_utc: 2026-10-24T23:56:13Z; exit_code: 0
+stdout (89 bytes):
+77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e PASS PR06R_B_FINAL_PASS
+stderr (0 bytes):
+(empty)
+--- command: ["grep", "-c", "build_backend_compat=distribution_install_layout", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/build.log"]
+started_utc: 2026-10-24T23:56:13Z; exit_code: 0
+stdout (2 bytes):
+1
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/evidence/test_release_attestation.py", "-k", "layout_compat or wheel_build_env"]
+started_utc: 2026-10-24T23:56:13Z; exit_code: 0
+stdout (114 bytes):
+...........                                                              [100%]
+11 passed, 33 deselected in 0.65s
+stderr (0 bytes):
+(empty)
+--- command: ["git", "-C", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/build", "status", "--porcelain"]
+started_utc: 2026-10-24T23:56:14Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness for the E-L clone and venv (collection §4.5), read at the Moon Loop start | observed: PASS (context above) | PASS
+- step 1 (rerun 2): setuptools path under /usr/lib/python3/dist-packages | observed: 78.1.1 /usr/lib/python3/dist-packages/setuptools/__init__.py (exit 0) | PASS
+- step 1 (rerun 2): find_spec('_distutils_system_mod') is None | observed: None | PASS
+- step 2: build_release_attestation.py --output ... --require-clean exits 0 | observed: exit 0 | PASS
+- step 3: build_release_attestation.py --verify ... --require-clean exits 0 | observed: exit 0 | PASS
+- step 4: release_id 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e, validation_result PASS, release_admission PR06R_B_FINAL_PASS | observed: 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e PASS PR06R_B_FINAL_PASS; attestation.json 28163 bytes, sha256 5fe81fd77dac66a47fdb464217026687497ba3549c3f4d40171015ff5b9d8ade | PASS
+- step 4: grep -c build_backend_compat=distribution_install_layout build.log = 1 | observed: 1 | PASS
+- step 5 (E-L venv): '11 passed' | observed: 11 passed, 33 deselected in 0.65s (exit 0) | PASS
+- step 6: build clone git status --porcelain empty | observed: (empty) (exit 0) | PASS
+- Moon Loop rerun 1 (superseded; QA environment defect, not product behaviour) | observed: step 1 met E-D; steps 2 and 3 exit 1 at builder import (ModuleNotFoundError: No module named 'rpds.rpds'); no output directory | RECORDED
+=== NOTES ===
+- status: PASS on Moon Loop rerun 2. Every predicate of Plan check 3 and collection T03 is affirmatively met on the decisive rerun; no predicate, expected value, product file, test or generator was changed.
+- Moon Loop (Glow QA Guide §3.4.8, in-session remediation; Plan Templates 'Bounded step-level rerun posture'), directed by the Product Owner in this execution session after attempt 1 was published: 'We need to just run a moon loop and pass T03. I am not going to be blocked on a python version as long as the product functions'. This is attempt 1 with an in-session Moon Loop, not a Kronos-selected attempt 2; Kronos decides at QA-110 whether to accept it as a PASS-only Moon Loop deviation.
+- failure signature of the original attempt-1 receipt: status TOOLING_BLOCKED, 'No interpreter meets step 1 in this venue: /usr/bin/python3 (3.14.4) makes _distutils_system_mod importable; /usr/bin/python3.13, 3.12 and 3.11 are absent'; step 1 output for /usr/bin/python3: '78.1.1 /usr/lib/python3/dist-packages/setuptools/__init__.py ModuleSpec(name='_distutils_system_mod', ..., origin='/usr/lib/python3.14/_distutils_system_mod.py')'. That primary (12,380 bytes, SHA-256 f67c2274cb9288f464616b5db503846b36dacd6f245b03521af9b2e4872961e3, published 2026-10-24T23:46:03Z with captured_at_utc 2026-10-24T23:45:26Z) was never committed, because no evidence-only commit grant applies; this republication of qa-03-attestation-debian replaces it in the evidence checkout. Its exact bytes, path proof and assembly parts are kept outside the repository at /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa/qa-03-attestation-debian/attempt1-original/ for QA-110.
+- remediation note (what changed and why): only QA-created environment wiring outside every repository changed. The E-D venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv was made from uv-managed CPython 3.13.17 (/home/nathan/.local/share/uv/python/cpython-3.13.17-linux-x86_64-gnu/bin/python3.13; a non-distribution build without _distutils_system_mod) with --system-site-packages, plus the path file /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/lib/python3.13/site-packages/hde-crd-0002-distribution-setuptools.pth containing exactly /usr/lib/python3/dist-packages. The venv then imports the distribution-patched backend: python3-setuptools 78.1.1-0.1build1, whose setuptools/command/install_lib.py and install_egg_info.py carry the Ubuntu install_layout and prefix_option patch, and python3-wheel 0.46.3-2. That is the S06 causal condition WU-PR-02 F-1 names: a non-distribution interpreter importing the Ubuntu-patched setuptools without _distutils_system_mod. Why: this venue has no system interpreter meeting E-D (attempt 1).
+- rerun 1 failure signature and correction: with the first wiring, pip treated the distribution's referencing and rpds on the path-file entry as satisfying the requirements; rpds there is a C extension built for Python 3.14, so the builder failed at import ('ModuleNotFoundError: No module named 'rpds.rpds'', steps 2 and 3 exit 1, no output directory). Classified as a QA-created environment defect, not product behaviour: the builder never reached a stage. Correction: the venv was recreated and the requirements installed with pip install --ignore-installed -r requirements.txt -r requirements-dev.txt, so every requirement loads from the venv and the distribution path supplies only setuptools, pkg_resources and wheel (module-origin probe recorded in COMMANDS). Rerun 2 is decisive.
+- fidelity to E-D (Plan §3.2) and to WU-PR-02's E-DEB: step 1's two defining properties hold literally, and the builder's own probe (_distribution_layout_compat_required, run in the wheel child's clean environment) judged the condition present: build.log carries build_backend_compat=distribution_install_layout. Differences from E-DEB: interpreter uv CPython 3.13.17 instead of deadsnakes CPython 3.13.16; the distribution path is reached through a .pth path entry instead of the interpreter's own site configuration; setuptools 78.1.1-0.1build1 (Ubuntu 26.04) instead of 68.1.2-2ubuntu1.2 (Ubuntu 24.04); wheel 0.46.3 instead of 0.42.0. The Plan's literal 'made with /usr/bin/python3 -m venv --system-site-packages' (and NZ-02's system-interpreter candidate list) is departed from; the departure is this Moon Loop's environment wiring.
+- normalizations: NZ-01 (scratch paths under the session scratchpad: E-D venv hde-crd-0002-qa03/venv, build clone hde-crd-0002-qa03/build, output hde-crd-0002-qa03/out); NZ-07 (builder commands keep the Plan's env -i allowlist exactly; no variable added). The build clone is a fresh full-history clone detached at the tested commit; its status was empty before rerun 2 and after.
+- attestation output (scratch, outside the repository, not copied into it): /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/out/attestation.json, 28,163 bytes, SHA-256 5fe81fd77dac66a47fdb464217026687497ba3549c3f4d40171015ff5b9d8ade, source_commit 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; build.log, evidence/ and attestation.json.sha256 alongside.
+- nonclaims: no release cut, activation or deployment; hosted CI never exercises this path (FND-007); this proves the builder under the venue's distribution-patched backend as wired here, and makes no claim about other distributions or setuptools versions.
+- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-L clone hde-crd-0002-el, venv hde-crd-0002-el-venv, XDG_STATE_HOME hde-crd-0002-xdg-state, evidence checkout hde-crd-0002-evidence, QA files hde-crd-0002-qa).
+- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 exports unset them in this check shell (presence table above); no value is recorded.
+- CRLF normalized to LF; the remaining lone CR bytes (git progress separators) converted to LF (Plan §5.3 rule 1)

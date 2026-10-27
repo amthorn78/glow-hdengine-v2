@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-04-showcompat-help/primary.log
+size_bytes: 11443
+sha256: 3e8b5c5d74f654c31400b4fb2e29d0784c192de744531ade671084d01a92ef5d
+mtime_utc: 2026-10-24T23:46:43Z
+produced_at_utc: 2026-09-22T14:25:29Z

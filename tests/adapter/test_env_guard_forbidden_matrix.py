@@ -27,10 +27,9 @@ def test_whitespace_or_unset_is_ok():
     validate_or_fail(_prod_env({}))
 
 def test_sorted_keys_in_details():
-    try:
+    with pytest.raises(EnvGuardError) as e:
         validate_or_fail(_prod_env({"HD_ADMIN": "1", "ENGINE_PROVIDER": "x", "ALLOW_NETWORK": "0"}))
-    except EnvGuardError as e:
-        assert e.details["forbidden_keys"] == ["ENGINE_PROVIDER","HD_ADMIN"]
+    assert e.value.details["forbidden_keys"] == ["ENGINE_PROVIDER","HD_ADMIN"]
 
 def test_allowed_keys_do_not_raise_in_prod():
     validate_or_fail(_prod_env({
