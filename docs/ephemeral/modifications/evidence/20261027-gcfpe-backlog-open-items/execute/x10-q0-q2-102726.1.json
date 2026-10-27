@@ -1,0 +1,172 @@
+{
+ "Q0": {
+  "skills": [
+   {
+    "skill": "change-flow",
+    "expected": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+    "installed": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+    "build_copy": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+    "ok": true
+   },
+   {
+    "skill": "flowmaster-validate",
+    "expected": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+    "installed": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+    "build_copy": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+    "ok": true
+   },
+   {
+    "skill": "glow-hde-pr-development",
+    "expected": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+    "installed": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+    "build_copy": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+    "ok": true
+   },
+   {
+    "skill": "glow-graph-contract",
+    "expected": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+    "installed": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+    "build_copy": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+    "ok": true
+   },
+   {
+    "skill": "amthor-workspace-governance-audit",
+    "expected": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+    "installed": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+    "build_copy": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+    "ok": true
+   },
+   {
+    "skill": "session-relay-flowmaster",
+    "expected": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+    "installed": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+    "build_copy": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+    "ok": true
+   },
+   {
+    "skill": "glow-write-boundary",
+    "expected": "1 662f9647ccfd996aa72e3d80ac70edc3d06a4310805ef14207b1340c69e93fc4",
+    "installed": "1 662f9647ccfd996aa72e3d80ac70edc3d06a4310805ef14207b1340c69e93fc4",
+    "build_copy": "1 662f9647ccfd996aa72e3d80ac70edc3d06a4310805ef14207b1340c69e93fc4",
+    "ok": true
+   },
+   {
+    "skill": "typesafe-scoring",
+    "expected": "3 8e26b0554e3ff37c0ae6ae0fa4d5242d5823fc6fd1f7514ebe10137d27d25523",
+    "installed": "3 8e26b0554e3ff37c0ae6ae0fa4d5242d5823fc6fd1f7514ebe10137d27d25523",
+    "build_copy": "3 8e26b0554e3ff37c0ae6ae0fa4d5242d5823fc6fd1f7514ebe10137d27d25523",
+    "ok": true
+   },
+   {
+    "skill": "glow-merged-change-attribution-lock",
+    "expected": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+    "installed": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+    "build_copy": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+    "ok": true
+   }
+  ],
+  "skills_9_equal": true,
+  "graph_token": {
+   "nodes": 55,
+   "edges": 235,
+   "state_routes": 55,
+   "bytes": 593569,
+   "sha256": "43f84f29b9921c21f63ffbe21dd36a14bd846a89ae697ba3cf38746c2f887eb1",
+   "validation_pass": true
+  },
+  "d29_token": {
+   "nodes": 55,
+   "edges": 235,
+   "state_routes": 55,
+   "bytes": 593569,
+   "sha256_prefix": "43f84f29"
+  },
+  "graph_token_equals_d29": true,
+  "register_current_selection_ok_at_x9": true,
+  "register_read_as_of": "2026-10-27T15:35:32.914Z",
+  "ok": true
+ },
+ "Q1": {
+  "patch_exit": 0,
+  "recipe_exit": 0,
+  "equal_lines": 2,
+  "different_lines": 0,
+  "sha256": "cd291f17ac832cc0aad62b5cc7e554bd6d524e18de7aea7f2f4fec5a1651317f",
+  "bytes": 631061,
+  "ok": true
+ },
+ "Q2": {
+  "exit": 0,
+  "receipt": {
+   "matrix": {
+    "bytes": 7705,
+    "sha256": "088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a"
+   },
+   "oracle": {
+    "bytes": 55591,
+    "sha256": "f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d"
+   },
+   "runtime_map": {
+    "bytes": 48515,
+    "sha256": "4785525661444c26f2a4521a6409f5986d07f534a605f3d66737a5130c444add"
+   },
+   "row_digests": {
+    "GCF-14": "42db7a9e614ecf943f042a9c012112fd3934f12e504cd4b980f404735b9cfe6b",
+    "GCF-17": "6774529046ba5050b2e62b8cf01b024766c5e99d343d0fcfdd32b0367fb99602",
+    "GCF-17.LINEAGE": "73a133c18b13682cbc57d813b37caacda7ed15b183437515867166bcda70e83e",
+    "GCF-24": "66d4c41e3992a28f5550e1fd12865ac7a127de291d34f6dd676acc07a9ad2215",
+    "GCF-24.CLOSE": "9c0f70693dc21f0cbaef27c7804e645f33858d30fc52b89ae57854f7e2177453",
+    "GCF-25": "1b2ab0339aed2a04aff404864a1699605eb3904780c7e3b3ca25881c74ed5ee3"
+   },
+   "rows": 47,
+   "core_rows": 26,
+   "material_rows": 21,
+   "changed_row_fields_vs_20260923": [
+    [
+     "GCF-24",
+     "next"
+    ],
+    [
+     "GCF-24",
+     "source_row_sha256"
+    ],
+    [
+     "GCF-25",
+     "consumes"
+    ],
+    [
+     "GCF-25",
+     "failure_stop_condition"
+    ],
+    [
+     "GCF-25",
+     "next"
+    ],
+    [
+     "GCF-25",
+     "source_row_sha256"
+    ]
+   ],
+   "changed_top_level_keys_vs_20260923": [
+    "authority",
+    "coverage",
+    "profile_id",
+    "required_global_tokens",
+    "runtime_rows"
+   ],
+   "decision_record_match": true,
+   "decision_record_mismatches": {},
+   "written": [
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/0940370d-6cc4-5605-b6f0-1f6824e675b3/scratchpad/q/build/flowmaster-validate/references/r1-successor-source-20261027.md",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/r1-successor-source-20261027.md",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/0940370d-6cc4-5605-b6f0-1f6824e675b3/scratchpad/q/build/flowmaster-validate/references/glow-hde-canonical-change-flow-r1-20261027.json",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/0940370d-6cc4-5605-b6f0-1f6824e675b3/scratchpad/q/build/change-flow/references/glow-hde-canonical-change-flow-r1-runtime-map-20261027.json"
+   ],
+   "build_ok": true
+  },
+  "repo_matrix_byte_identical_to_flowmaster_validate": true,
+  "repo_matrix_sha256": "088b1c671e0718ce906c58995ced58bc42a35b5b199e48922d909cc667d1219a",
+  "ok": true
+ },
+ "ok": true
+}
