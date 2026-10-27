@@ -32,6 +32,11 @@ span, landing, guard and registry logic, with this Modification's edits.json and
   `_`, mentions unchanged), and so does every fixture; every operation's anchors, its landing check and the batch-safety
   check stay on the raw read, because update_content matches the fetch's own form. guard_count normalizes its input
   itself (normalize is idempotent), so no caller can run a guard on the raw form by omission.
+* AM-1 (Nathan, 2026-10-27, after EXECUTE's X2 stop): Notion remaps a duplicate's own references to the new page, so
+  a head self-mention operation (HEAD-<ID>-U) finds its start, the predecessor's own Notion URL mention, absent on a
+  real duplicate. In plan mode it counts as SATISFIED_BY_DUPLICATION, and is not sent, only when its start is absent,
+  its expanded replacement occurs exactly once, and that replacement names the page's own URL. check mode is
+  unchanged: its landing predicate already reads that state as LANDED.
 
   body_check.py selftest
   body_check.py plan  --successor-map F [--no-ops] [--prompts P ...] [--fetched-after T] [--with-conditional S ...]
@@ -250,6 +255,18 @@ def landed(text: str, op: dict, page_ops: list, shared=None) -> dict:
                 row[key] = occ(text, part) == want(part)
     row["landed"] = all(row.values())
     return row
+
+
+PAGE_URL = "https://app.notion.com/p/"
+
+
+def satisfied_by_duplication(text: str, op: dict, page_id: str, shared=None) -> bool:
+    """AM-1: a head self-mention operation whose work the duplication already did (see the module docstring)."""
+    if not (op.get("head") and "<mention url=" in op["start"]):
+        return False
+    new = expand(op["new"], shared)
+    return (occ(text, op["start"]) == 0 and bool(new) and occ(text, new) == 1
+            and (PAGE_URL + page_id.replace("-", "")) in new)
 
 
 def markup(s: str) -> bool:
@@ -713,6 +730,21 @@ def selftest() -> dict:
     finally:
         EDITS["ops"] = saved
     synth["standin_identity_counted"] = sinfo["binding_identity_under_stand_in"] == 1 and sinfo["binding_ops"] == 1
+    # AM-1: a real duplicate's self-mention already names the duplicate, so HEAD-<ID>-U's start is absent
+    hu = next(o for o in saved if o["id"] == "HEAD-PR-50-U")
+    ht = next(o for o in saved if o["id"] == "HEAD-PR-50-T")
+    dup_id = pm["members"]["PR-50"]["page_id"]
+    dup_mention = expand(hu["new"], pshared)
+    dup_body = head_body.replace(hu["start"], dup_mention)
+    synth.update({"am1_satisfied_by_duplication": satisfied_by_duplication(dup_body, hu, dup_id, pshared)
+                  and occ(dup_body, hu["start"]) == 0,
+                  "am1_neither_present_refused": not satisfied_by_duplication(dup_body.replace(dup_mention, ""), hu,
+                                                                              dup_id, pshared),
+                  "am1_new_twice_refused": not satisfied_by_duplication(dup_body + "\n" + dup_mention, hu, dup_id,
+                                                                        pshared),
+                  "am1_non_mention_head_never_qualifies": not satisfied_by_duplication(
+                      dup_body.replace(ht["start"], ""), ht, dup_id, pshared),
+                  "am1_start_present_not_satisfied": not satisfied_by_duplication(head_body, hu, dup_id, pshared)})
     ok &= all(v for k, v in synth.items() if k not in ("escape_rewritten_guards", "markdown_translated_guards",
                                                          "c16_exceptions"))
     return {"mode": "selftest", "guards": len(GUARDS["guards"]), "fixture_rows": len(rows),
@@ -755,13 +787,18 @@ def run(mode: str, prompts, no_ops: bool, root: str, session: str, since: int, f
             row["guards_before"] = {g["id"]: dict(zip(("count", "pass"), guard_pass(body, g)))
                                     for g in guards_for(prompt, guards)}
             text, op_rows = apply_all(body, ops)
+            for r, o in zip(op_rows, ops):   # AM-1
+                if not r["applied"] and satisfied_by_duplication(body, o, meta["page_id"]):
+                    r["satisfied_by_duplication"] = True
             row["batch_safe"] = batch_rows(body, text, op_rows, ops, smap)
             for r in op_rows:
                 if r["applied"] and not no_ops:
                     ops_payload.append({"id": r["id"], "page_id": meta["page_id"], "old_str": r["old_str"],
                                         "new_str": r["new_str"]})
             row["ops"] = [{k: v for k, v in r.items() if k not in ("old_str", "new_str")} for r in op_rows]
-            row["ops_not_applied"] = [r["id"] for r in op_rows if not r["applied"]]
+            row["ops_not_applied"] = [r["id"] for r in op_rows if not r["applied"]
+                                      and not r.get("satisfied_by_duplication")]
+            row["ops_satisfied_by_duplication"] = [r["id"] for r in op_rows if r.get("satisfied_by_duplication")]
             row["markup_spans_allowed"] = sum(1 for r in op_rows if r.get("span_has_markup"))
             row["markup_spans_refused"] = [r["id"] for r in op_rows if r.get("span_has_markup")
                                            and not r.get("markup_allowed")]
@@ -775,7 +812,8 @@ def run(mode: str, prompts, no_ops: bool, root: str, session: str, since: int, f
             regen = bp.generate(text, prompt, smap, covered=[])
             row["binding_current_after"] = (sum(1 for b in regen["ops"] if expand(b["new"]) != b["start"]) == 0
                                             and regen["unresolved"] == 0)
-            row["ok"] = (row["revision_matches_plan"] and all(r["applied"] for r in op_rows) and row["batch_safe"]
+            row["ok"] = (row["revision_matches_plan"]
+                         and all(r["applied"] or r.get("satisfied_by_duplication") for r in op_rows) and row["batch_safe"]
                          and not row["guards_failing_after"]
                          and all(v == "LANDED" for v in row["landed_state_after"].values())
                          and row["check_would_pass"] and info["binding_unresolved"] == 0

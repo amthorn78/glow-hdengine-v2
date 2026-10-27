@@ -895,3 +895,40 @@ EXECUTE stops at X2. The plan's normal path cannot be executed mechanically on a
 - That is well inside the 18–30 h and 16–26M re-price.
 
 **In one line, if you take the recommendations:** "AM-1 as described; keep the CF-C-10 duplicate; I merge #770 as the record pull request."
+
+### Nathan's decisions after X2 — 2026-10-27
+
+Nathan's words:
+
+> "AM-1 as described, with one addition: after CF-C-10, duplicate PE and CL-05 next, and run X4's plan check in memory on those three real duplicates before duplicating the rest. Keep the CF-C-10 duplicate. I have merged #770 as the record pull request; continue on a branch restarted from main, in a new pull request."
+
+**Applied.**
+
+- **The record pull request.** #770 merged as `5b3ccdc`, detected by files on `main` (D26-C):
+  - the X2 failure record, `execute/controls-pr-102726.1.json` and the v5.1.0 file are on `main`;
+  - `reviewer-prompt-template.md` is at 1.3;
+  - `main`'s tree equals the branch's (`50aa28c1…`).
+
+  The branch `claude/ecstatic-mccarthy-m9b2lz` was deleted at merge. It was restarted from `main` at `5b3ccdc` and pushed fresh, and the run continues in a new pull request. #770 also merged X1's controls, so C-12's precondition for X18 is met; X18 still verifies it by files.
+- **AM-1**, in [plan/body_check.py](evidence/20261027-gcfpe-backlog-open-items/plan/body_check.py), committed before any further Notion write.
+  - *The rule.* In `plan` mode, a head self-mention operation (`head: true`, its start a `<mention url=…>`) whose start is absent counts as `SATISFIED_BY_DUPLICATION`, and is not sent, when two things hold:
+    - its expanded replacement occurs exactly once;
+    - that replacement names the page's own URL.
+  - *What `plan` reports.* `ops_satisfied_by_duplication` lists them, `ops_not_applied` excludes them, and a page's `ok` accepts them.
+  - *Unchanged.* `check` mode, `apply_all`, the batch-safety check and the payload: an operation satisfied this way is never in `ops_payload_for_execute`.
+  - *Scope.* `edits.json` has exactly 54 operations whose start or end names their own page's 100926.1 id, all head self-mentions (`HEAD-<ID>-U`). PE's head (`HEAD-PE`, frontmatter) and CL-05's (`HEAD-CL-05`, on `Prompt ID: CL-05`) name none, so AM-1 reaches only those 54.
+  - *Self-test.* `body_check.py selftest`: `ok`; 118 guards; 377 fixture rows, none failing. Five AM-1 cases are added, each true:
+    - a duplicate whose self-mention already names the duplicate is satisfied;
+    - with neither the start nor the replacement present, it is refused;
+    - with the replacement present twice, it is refused;
+    - a head operation that is not a self-mention never qualifies;
+    - with the start still present, it is not satisfied.
+
+  The fifth case, beyond the three described, shows the rule never displaces an operation that can still apply. No other plan file changes, and `PLAN-20261027.md` is untouched (C-11, P-L14).
+- **The order of X2**, Nathan's addition:
+  1. retitle CF-C-10's duplicate `4064590a05eb811e821bc064f56de3a3`, which is kept;
+  2. duplicate PE, then CL-05, moving CL-05 under the HDE Change Flow hub;
+  3. read all three fresh and run X4's `body_check.py plan` on them in memory, with a scratch map that names the three real duplicates;
+  4. only if that passes, duplicate the remaining 53.
+
+  The scratch map is not the successor map: X3 writes that once, after all 56.
