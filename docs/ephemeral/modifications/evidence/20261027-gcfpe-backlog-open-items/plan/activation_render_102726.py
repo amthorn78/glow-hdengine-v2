@@ -31,6 +31,14 @@ docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/plan/act
         escaped anchor, a whole-line anchor that is only a prefix, an unsafe batch, a stale pin, a missing --pin, a
         rendered page that keeps a retired value and a catalog missing a member each fail.
 
+AM-3 (Nathan, 2026-10-27, after EXECUTE's X8 stop): every readback check here (the landing check of `check` and of a
+plan's earlier phases, and PART-17's guard rows) reads the page after control_check_102726.fold, which folds Notion's
+split bold (`</b><b><code>` and `</code></b><b>` around an inline code span) back to the written form. The real
+successor map is accepted with --standin-values for read-only runs (a plan without --emit, and selftest); with --emit
+it is refused, so no stand-in value reaches a write. `plan --chain --from-phase PH` starts the chain at PH on fresh
+reads: every earlier phase's listed operation must read LANDED (it is not applied again), a page already holding a
+child-page block is not given a second, and --pin gives each page the revision just read.
+
 The successor map is the only source of successor ids, titles and dispositions (W7 successor_page_map); with a
 stand-in map the ids are binding_pass.probe() synthetic ids, so retired predecessors and successors stay distinct,
 and every report says stand_in: true. Control-page text is read as a transient read of this session's harness
@@ -84,13 +92,14 @@ STANDIN_VALUES = {
 
 # --- map, parts, markers ---------------------------------------------------------------------------------------
 class Ctx:
-    def __init__(self, map_path: str, parts: str, values: dict, standin_fill: bool):
+    def __init__(self, map_path: str, parts: str, values: dict, standin_fill: bool, read_only: bool = False):
         self.raw = json.loads(Path(map_path).read_text(encoding="utf-8"))
         self.stand_in = bool(self.raw.get("stand_in"))
-        if standin_fill and not self.stand_in:
-            raise SystemExit("stand-in marker values are refused with a real successor map")
-        catalog = values.get("@CATALOG_PAGE_ID") or (C.probe_id("CATALOG") if self.stand_in else "")
-        entry = values.get("@REGISTER_ENTRY_PAGE_ID") or (C.probe_id("ENTRY") if self.stand_in else "")
+        if standin_fill and not self.stand_in and not read_only:
+            raise SystemExit("stand-in marker values are refused with a real successor map for a write (--emit)")
+        probe_new = self.stand_in or (standin_fill and read_only)   # AM-3: read-only runs on the real map
+        catalog = values.get("@CATALOG_PAGE_ID") or (C.probe_id("CATALOG") if probe_new else "")
+        entry = values.get("@REGISTER_ENTRY_PAGE_ID") or (C.probe_id("ENTRY") if probe_new else "")
         self.cc = C.context(map_path, catalog, entry)
         self.map = self.cc["map"]
         self.nodes = {}
@@ -257,11 +266,13 @@ def apply(text: str, ops: list, ctx: Ctx):
 
 def landed(text: str, op: dict, page_ops: list, ctx: Ctx) -> bool:
     """LANDED: the start anchor occurs only inside the replacements this page carries, and the replacement is
-    present (a deletion: the anchor gone). Raw and escaped forms are counted together."""
-    new = ctx.fill(op["new"]) or ""
+    present (a deletion: the anchor gone). Raw and escaped forms are counted together, on the page as read after
+    AM-3's fold of Notion's split bold."""
+    text = C.fold(text)
+    new = C.fold(ctx.fill(op["new"]) or "")
     if op.get("append"):
         return occ(text, new) + occ(text, esc(new)) >= 1
-    news = [ctx.fill(o["new"]) or "" for o in page_ops]
+    news = [C.fold(ctx.fill(o["new"]) or "") for o in page_ops]
     s, wl = op["start"], op.get("whole_line", False)
     n_text = occ(text, s, wl) + (occ(text, esc(s), wl) if esc(s) != s else 0)
     n_want = sum(occ(x, s, wl) + (occ(x, esc(s), wl) if esc(s) != s else 0) for x in news)
@@ -271,6 +282,13 @@ def landed(text: str, op: dict, page_ops: list, ctx: Ctx) -> bool:
 
 
 # --- generated families ----------------------------------------------------------------------------------------
+def add_child(text: str, page_id: str, title: str) -> str:
+    """Notion shows a created or duplicated page as a child-page block of its parent; once only (AM-3 chain)."""
+    if f'<page url="{URL}{page_id}' in text:
+        return text
+    return text + f'\n<page url="{URL}{page_id}">\n{title}\n</page>\n'
+
+
 def row_line(pid: str, title: str, lane: str, page_id: str) -> str:
     return f"| <code>{pid}</code> | {title} | <code>{lane}</code> | <code>{URL}{page_id}?pvs=204</code> |"
 
@@ -390,6 +408,7 @@ def part17_rows(key: str, text: str, state: str) -> dict:
     every guard passes, at W6's measured after counts)."""
     w6 = w6_part17()
     rows = {}
+    text = C.fold(text)  # AM-3
     for g in part17_guards(key):
         c, ok = BC.guard_pass(text, g)
         want = w6.get(g["id"], {})
@@ -434,7 +453,8 @@ def control(key: str, title: str, text: str, ctx: Ctx, phase: str) -> dict:
 def chain(a, ctx: Ctx) -> dict:
     root, session = os.path.expanduser("~/.claude/projects"), os.environ.get("CLAUDE_CODE_SESSION_ID")
     upto = PHASES.index(a.phase)
-    state, report, ok = {}, {"pages": {}, "phases": []}, True
+    start = PHASES.index(a.from_phase) if getattr(a, "from_phase", None) else 0   # AM-3
+    state, report, ok = {}, {"pages": {}, "phases": [], "from_phase": PHASES[start]}, True
     keys = [k for k in OPS["pages"] if not a.pages or k in a.pages or VIRTUAL.get(k) in a.pages]
     for key in keys:
         page = OPS["pages"][key]
@@ -460,7 +480,17 @@ def chain(a, ctx: Ctx) -> dict:
                                                 "revision_matches_pin": bool(old_cat) and old_cat[1] == OPS["pin_rule"]["plan_pins"][C.OLD_CATALOG]}}
     ok &= report["read_only_pins"][C.OLD_CATALOG]["revision_matches_pin"]
     totals = {"listed": 0, "generated": 0, "applied": 0, "refused": 0}
-    for ph in PHASES[: upto + 1]:
+    if start:   # AM-3: earlier phases already ran in Notion; their listed operations must read LANDED on the reads
+        prior = {}
+        for key in keys:
+            if key not in state:
+                continue
+            done = [o for o in OPS["pages"][key]["ops"] if PHASES.index(o["phase"]) < start]
+            nl = [o["id"] for o in done if not landed(state[key]["text"], o, done, ctx)]
+            prior[key] = {"listed": len(done), "not_landed": nl}
+            ok &= not nl
+        report["prior_phases_landed"] = prior
+    for ph in PHASES[start: upto + 1]:
         prow = {"phase": ph, "pages": {}}
         # what Notion does on its own before or at this phase
         if ph == "candidate":
@@ -468,16 +498,17 @@ def chain(a, ctx: Ctx) -> dict:
                 if r["disposition"] in ("SUCCESSOR", "ADDED"):
                     parent = C.registry_parents().get(pid, C.CF_HUB)
                     if parent in state:
-                        state[parent]["text"] += f'\n<page url="{URL}{r["page_id"]}">\n{r["title"]}\n</page>\n'
+                        state[parent]["text"] = add_child(state[parent]["text"], r["page_id"], r["title"])
             if C.TW_HUB in state:
-                state[C.TW_HUB]["text"] += f'\n<page url="{URL}{ctx.map["pe"]["page_id"]}">\n{ctx.map["pe"]["title"]}\n</page>\n'
+                state[C.TW_HUB]["text"] = add_child(state[C.TW_HUB]["text"], ctx.map["pe"]["page_id"], ctx.map["pe"]["title"])
             if "@CATALOG_PAGE_ID" in keys:
                 cat = catalog_text(ctx)
                 state["@CATALOG_PAGE_ID"] = {"text": as_fetched(cat), "title": OPS["new_pages"]["CATALOG"]["title"]}
                 report["new_pages"] = {"CATALOG": {"markers_left": len(MARKER.findall(cat)),
                                                    "rows": cat.count("\n| <code>"), "chars": len(cat)}}
                 if C.FLOW_INDEX in state:
-                    state[C.FLOW_INDEX]["text"] += f'\n<page url="{URL}{ctx.values["@CATALOG_PAGE_ID"]}">\n{OPS["new_pages"]["CATALOG"]["title"]}\n</page>\n'
+                    state[C.FLOW_INDEX]["text"] = add_child(state[C.FLOW_INDEX]["text"], ctx.values["@CATALOG_PAGE_ID"],
+                                                            OPS["new_pages"]["CATALOG"]["title"])
             if "@PE_PAGE_ID" in keys:
                 state["@PE_PAGE_ID"] = {"text": pe_head(ctx), "title": ctx.map["pe"]["title"]}
         if ph == "activation" and "@REGISTER_ENTRY_PAGE_ID" in keys:
@@ -485,7 +516,8 @@ def chain(a, ctx: Ctx) -> dict:
             state["@REGISTER_ENTRY_PAGE_ID"] = {"text": as_fetched(ent), "title": OPS["new_pages"]["REGISTER_ENTRY"]["title"]}
             report.setdefault("new_pages", {})["REGISTER_ENTRY"] = {"markers_left": len(MARKER.findall(ent))}
             if C.REGISTER in state:
-                state[C.REGISTER]["text"] += f'\n<page url="{URL}{ctx.values["@REGISTER_ENTRY_PAGE_ID"]}">\n{OPS["new_pages"]["REGISTER_ENTRY"]["title"]}\n</page>\n'
+                state[C.REGISTER]["text"] = add_child(state[C.REGISTER]["text"], ctx.values["@REGISTER_ENTRY_PAGE_ID"],
+                                                      OPS["new_pages"]["REGISTER_ENTRY"]["title"])
         if ph == "archived":
             gone = set(ctx.moves)
             for st in state.values():
@@ -540,7 +572,7 @@ def chain(a, ctx: Ctx) -> dict:
 def run_plan(a) -> dict:
     values = dict(x.split("=", 1) for x in a.set)
     REPORT_LINES["on"] = getattr(a, "report_lines", False)
-    ctx = Ctx(a.successor_map, a.parts, values, a.chain and a.standin_values)
+    ctx = Ctx(a.successor_map, a.parts, values, a.chain and a.standin_values, read_only=not a.emit)
     base = {"mode": "plan-chain" if a.chain else "plan", "phase": a.phase, "stand_in": ctx.stand_in,
             "stand_in_ids": "binding_pass.probe() synthetic ids" if ctx.stand_in else None,
             "stand_in_marker_values": ctx.standin_used, "map_parts_errors": ctx.errors}
@@ -647,7 +679,7 @@ def run_check(a) -> dict:
 
 # --- self-test --------------------------------------------------------------------------------------------------
 def selftest(a) -> dict:
-    ctx = Ctx(a.successor_map, a.parts, {}, True)
+    ctx = Ctx(a.successor_map, a.parts, {}, True, read_only=True)
     pid, pred, old_title, lane = next(r for r in ctx.tsv if r[0] == "PR-30")
     page = {"member_rows": True, "frontmatter_rule": True, "frontmatter_title": ['title: "X — old"', 'title: "X — new"']}
     base = ("---\n\nartifact\\_version: \"100926.1\"\n\ntitle: \"X — old\"\n\n---\n## Selected topology\n"
@@ -694,7 +726,9 @@ def selftest(a) -> dict:
                                          and repin_required("@REGISTER_ENTRY_PAGE_ID", "archived")
                                          and not repin_required(C.CHECKLIST, "candidate"),
         "move_list_is_archive_set": set(ctx.moves) == set(ctx.cc["archive_102726"]) and len(ctx.moves) == 57,
-        "standin_values_refused_with_real_map": _real_map_refuses(a),
+        "standin_values_refused_with_real_map_for_writes": _real_map_refuses(a),
+        "standin_values_accepted_with_real_map_read_only": _real_map_read_only(a),
+        **_am3_cases(ctx),
         **_part17_cases(ctx),
         **_c26_cases(a),
     }
@@ -738,6 +772,35 @@ def _c26_cases(a) -> dict:
             "c26_filled_controls_pr_lands": r1[0]["applied"] and "/pull/812)" in t1 and "#768" not in t1}
 
 
+def _am3_cases(ctx: Ctx) -> dict:
+    """AM-3: Notion's split bold around inline code reads as LANDED; a missing replacement still does not; a child
+    block is added once."""
+    op = {"id": "A3", "start": "read-only source checks:", "end": None,
+          "new": "read-only source checks, and for numbering by <code>PF06</code> §0.1A:"}
+    before = "<b>Superseded for GCFPE read-only source checks:</b>\n"
+    split = "<b>Superseded for GCFPE read-only source checks, and for numbering by </b><b><code>PF06</code></b><b> §0.1A:</b>\n"
+    once = add_child("T\n", "e" * 32, "X")
+    return {"am3_split_bold_replacement_lands": landed(split, op, [op], ctx),
+            "am3_unsplit_raw_check_would_miss_it": op["new"] not in split,
+            "am3_missing_replacement_not_landed": not landed(before, op, [op], ctx)
+                                                  and not landed("<b>Superseded.</b>\n", op, [op], ctx),
+            "am3_child_block_added_once": add_child(once, "e" * 32, "X") == once and once.count("<page url=") == 1}
+
+
+def _real_map_read_only(a) -> bool:
+    import tempfile
+    raw = json.loads(Path(a.successor_map).read_text(encoding="utf-8"))
+    raw["stand_in"] = False
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "real.json"
+        p.write_text(json.dumps(raw), encoding="utf-8")
+        try:
+            c = Ctx(str(p), a.parts, {}, True, read_only=True)
+        except SystemExit:
+            return False
+    return bool(c.standin_used) and c.values["@CATALOG_PAGE_ID"] == C.probe_id("CATALOG")
+
+
 def _real_map_refuses(a) -> bool:
     import tempfile
     raw = json.loads(Path(a.successor_map).read_text(encoding="utf-8"))
@@ -769,6 +832,7 @@ def main() -> int:
         if name == "plan":
             p.add_argument("--chain", action="store_true")
             p.add_argument("--standin-values", action="store_true")
+            p.add_argument("--from-phase", choices=PHASES, help="AM-3: chain from PH on fresh reads")
             p.add_argument("--report-lines", action="store_true", help="80-character excerpts, terminal only")
     s = sub.add_parser("selftest")
     s.add_argument("--successor-map", required=True)
