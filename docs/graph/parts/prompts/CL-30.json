@@ -127,8 +127,8 @@
   "id": "CL-30",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb816ea12febba885940e8?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81c1b64cfe813b3c0819?pvs=204",
+    "candidate_version": "102726.1",
     "id": "CL-30",
     "lane": "CL",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -137,11 +137,11 @@
       "ADR_CANDIDATE / NO_ADR_NEEDED"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb8190a444d8818e445c1d",
-      "release": "GCFPE-20260914.1",
-      "title": "CL-30 — Prepare Conditional Post-Change ADR Maintenance — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb816ea12febba885940e8",
+      "release": "GCFPE-20261009.1",
+      "title": "CL-30 — Prepare Conditional Post-Change ADR Maintenance — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb816ea12febba885940e8?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "CL-20",
@@ -155,7 +155,7 @@
     ],
     "sequence": 30,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "CL-30 — Prepare Conditional Post-Change ADR Maintenance — 100926.1"
+    "title": "CL-30 — Prepare Conditional Post-Change ADR Maintenance — 102726.1"
   },
   "state_route_order": [
     "adr_candidate_native_route",

@@ -1,8 +1,8 @@
 {
   "edge_indices": [
-    209,
-    210,
-    211
+    214,
+    215,
+    216
   ],
   "edges": [
     {
@@ -97,8 +97,8 @@
   "id": "RS-10",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81a588c9c82aa8a2d3f2?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81e3ab0de978fbd97b2f?pvs=204",
+    "candidate_version": "102726.1",
     "id": "RS-10",
     "lane": "RS",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -107,11 +107,11 @@
       "RESCOPE_PROPOSAL"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb811ca0cdc66e0d508ac4",
-      "release": "GCFPE-20260914.1",
-      "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81a588c9c82aa8a2d3f2",
+      "release": "GCFPE-20261009.1",
+      "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81a588c9c82aa8a2d3f2?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "RS-20"
@@ -123,7 +123,7 @@
     ],
     "sequence": 10,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 100926.1"
+    "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 102726.1"
   },
   "state_route_order": [
     "rescope_proposal_pending_review",

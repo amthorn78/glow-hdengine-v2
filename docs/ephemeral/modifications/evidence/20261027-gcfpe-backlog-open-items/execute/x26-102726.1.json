@@ -1,0 +1,242 @@
+{
+ "am11": {
+  "selftest_root_pre_x1": {
+   "am11_cases": {
+    "am11_approval_dates_where_approval": true,
+    "am11_changes_only_two_markers": true,
+    "am11_missing_approved_at_refused": true,
+    "am11_promotion_date_elsewhere": true
+   },
+   "ok": true,
+   "passed": 18,
+   "root": "git archive 229a4291 (the PLAN merge, before X1) of docs/prompt_ecosystem_management and v5.0.0",
+   "total": 18
+  },
+  "selftest_root_this_tree": {
+   "failing": [
+    "clean_x1_before_ok",
+    "clean_x1_apply_ok",
+    "clean_x1_after_ok"
+   ],
+   "passed": 15,
+   "total": 18,
+   "why": "X1 has landed on main, so its old strings are gone and the three clean_x1 cases fail by construction; every X26 and AM-11 case passes"
+  },
+  "tool": "plan/repo_edits_102726.py (AM11_SWAPS)"
+ },
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "ok": true,
+ "r1": {
+  "build": {
+   "edges": 240,
+   "embedded_json_bytes": 607994,
+   "nodes": 56,
+   "sha256": "2342744dc1d9de9d8bfad34bdc3d5edd244afbc7f428c8706cae3d56e90e1d41",
+   "state_routes": 56,
+   "validation": "PASS"
+  },
+  "check_flipped": {
+   "base": "origin/main's docs/graph/parts (git archive)",
+   "check_ok": true,
+   "errors": []
+  },
+  "equals_production_token": true,
+  "files": "56 modified, prompts/CL-05.json added",
+  "global_candidate_release": "GCFPE-20261027.1",
+  "what": "docs/graph/parts replaced by the production parts (execute/x11_graphs_102726.py's rerun at the stop, byte-identical to X11's)"
+ },
+ "r2": {
+  "build": "registry_assemble_102726.py build --stage selected, as at the stop (execute/x26-r1-r2-102726.1.json), @PROMOTION_APPROVAL_DATE=2026-10-27, the catalog record execute/notion-controls-102726.1.json",
+  "bytes": 1419602,
+  "check_selected": {
+   "deriver_drift": [],
+   "header_values_ok": true,
+   "ok": true,
+   "rows": 56,
+   "rows_active": 56,
+   "validator_errors": 0
+  },
+  "compare": {
+   "differing_paths": [
+    "approved_at",
+    "approved_by",
+    "status"
+   ],
+   "ok": true
+  },
+  "equals_x23_build": true,
+  "path": "docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+  "sha256": "51f2a0b6d4c2b4cad3cc6fedc18c724f2dfdf1d0497ffdb5236fc0cfeafcc8e3"
+ },
+ "r3_r4": {
+  "after": {
+   "earlier_entries_unchanged": true,
+   "edits_ok": true,
+   "guards_ok": true,
+   "mode": "check",
+   "ok": true,
+   "promotion_heading_count": 1,
+   "set": "X26",
+   "stand_in_values": false,
+   "state": "after",
+   "v500_equal_to_main": true
+  },
+  "after_edit_rows": [
+   {
+    "id": "RE-W7-03#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W7-04#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W7-05#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W7-06#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W7-07#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W7-08#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W7-09#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W7-10#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W7-10b#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W8-01#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W8-02#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W8-03#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W8-04#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W8-05#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W8-06#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W8-07#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W8-08#1",
+    "new_count_after": 1,
+    "ok": true,
+    "old_count_after": 0,
+    "old_only_in_own_new": true
+   },
+   {
+    "id": "RE-W7-11#1",
+    "new_count_after": 1,
+    "ok": true
+   }
+  ],
+  "apply": {
+   "ok": true,
+   "refusals": [],
+   "written": 3
+  },
+  "before": {
+   "edits": 18,
+   "files": 3,
+   "guards_ok": true,
+   "in_memory_apply": {
+    "after": {
+     "earlier_entries_unchanged": true,
+     "edits_ok": true,
+     "guards_ok": true,
+     "ok": true,
+     "promotion_heading_count": 1,
+     "v500_equal_to_main": true
+    },
+    "refusals": 0
+   },
+   "ok": true,
+   "rows_ok": true
+  },
+  "decision_record_on_main_is_byte_prefix": true
+ },
+ "record_type": "GCFPE_102726_X26",
+ "step": "X26, P7, R1 to R4 (after Nathan's decisions at X26)",
+ "values": {
+  "by": "execute/x26_values_102726.py",
+  "file": "execute/x26-values-102726.1.json",
+  "sources": "execute/x26-values-sources-102726.1.json"
+ }
+}

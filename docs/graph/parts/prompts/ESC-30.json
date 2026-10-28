@@ -1,8 +1,8 @@
 {
   "edge_indices": [
+    78,
     79,
-    80,
-    81
+    80
   ],
   "edges": [
     {
@@ -105,8 +105,8 @@
   "id": "ESC-30",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81e385dbd4fe337ad9d9?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb814284b9cd1450419bfb?pvs=204",
+    "candidate_version": "102726.1",
     "id": "ESC-30",
     "lane": "ESC",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -116,11 +116,11 @@
       "DISCOVERY_TASK"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb813e99b4e416bc7afdae",
-      "release": "GCFPE-20260914.1",
-      "title": "ESC-30 — Diagnose and Propose Bounded Remediation — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81e385dbd4fe337ad9d9",
+      "release": "GCFPE-20261009.1",
+      "title": "ESC-30 — Diagnose and Propose Bounded Remediation — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81e385dbd4fe337ad9d9?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "ESC-25",
@@ -135,7 +135,7 @@
     ],
     "sequence": 30,
     "session_class": "ROLE_CONTINUING",
-    "title": "ESC-30 — Diagnose and Propose Bounded Remediation — 100926.1"
+    "title": "ESC-30 — Diagnose and Propose Bounded Remediation — 102726.1"
   },
   "state_route_order": [
     "remediation_pending",

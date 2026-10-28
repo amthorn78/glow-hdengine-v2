@@ -1,0 +1,174 @@
+{
+  "edge_indices": [
+    123,
+    124,
+    126,
+    128
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-05",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "CLOSE_PR_READY"
+          ],
+          "branch_id": "close_pr_ready_crd",
+          "change_class": "CRD",
+          "condition": "CLOSE_PR_READY for a verified CRD: the close pull request's exact head passed the hosted test job, the closeout workflow passed on that head or on a byte-identical later head, and the Product Owner has merged it; the handoff states that merge as its manual prerequisite",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "required_artifacts": [
+            "CLOSE_MUTATION_SET_RESULT"
+          ],
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-05.md",
+            "section": "Mandatory single-block handoff"
+          },
+          "state": "CLOSE_PR_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "CLOSE_PR_READY"
+      ],
+      "to": "CL-C-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-05",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "CLOSE_PR_READY"
+          ],
+          "branch_id": "close_pr_ready_epic",
+          "change_class": "EPIC",
+          "condition": "CLOSE_PR_READY for a verified Epic whose close-run family is admitted: the close pull request's exact head passed the hosted test job, the closeout workflow passed on that head or on a byte-identical later head, and the Product Owner has merged it; the handoff states that merge as its manual prerequisite",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "required_artifacts": [
+            "CLOSE_MUTATION_SET_RESULT"
+          ],
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-05.md",
+            "section": "Mandatory single-block handoff"
+          },
+          "state": "CLOSE_PR_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "CLOSE_PR_READY"
+      ],
+      "to": "CL-E-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-05",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "close_blocked",
+          "condition": "a stop: an intake condition fails; approved QA evidence would have to change; a defect lies outside the close-tooling surface; a repair would contradict PF-Canon or an HDE Build Notes rule it may not narrow; the schema cannot express a required close-report element; CI fails for a reason the allowed changes cannot fix; an Epic close, whose close-run family is not admitted, after its rehearsal; or a decision only the Product Owner can make. The result record holds the blocker, evidence, owner and resume point; no continuation block",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-05.md",
+            "section": "Stops (terminal return to Nathan, no continuation block)"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-05",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "shared_source_authority_terminal",
+          "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-05.md",
+            "section": "Canonical sources"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "CL-05",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb814fba57ed387ee2cddd?pvs=204",
+    "candidate_version": "102726.1",
+    "id": "CL-05",
+    "lane": "CL",
+    "lifecycle": "SELECTED_PRODUCTION",
+    "native_function": "Execute Prepare and Publish the Close Mutation Set for the exact supplied change.",
+    "output_artifacts": [
+      "CLOSE_MUTATION_SET_RESULT"
+    ],
+    "predecessor": null,
+    "predecessor_union_destinations": [],
+    "r1_mapping": "GCF-24.CLOSE",
+    "receiving_role": "You are the Close Implementer for the exact supplied change.",
+    "result_states": [
+      "CLOSE_PR_READY",
+      "BLOCKED"
+    ],
+    "sequence": 5,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "CL-05 — Prepare and Publish the Close Mutation Set — 102726.1"
+  },
+  "state_route_order": [
+    "close_pr_ready_epic",
+    "close_pr_ready_crd",
+    "close_blocked",
+    "shared_source_authority_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

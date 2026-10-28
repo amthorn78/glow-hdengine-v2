@@ -1,10 +1,10 @@
 {
   "edge_indices": [
-    139,
-    140,
-    141,
-    142,
-    143
+    144,
+    145,
+    146,
+    147,
+    148
   ],
   "edges": [
     {
@@ -200,8 +200,8 @@
   "id": "OPS-30",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81ec8da3effc3b28cf97?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb813b8c9bdd5d92cd6cde?pvs=204",
+    "candidate_version": "102726.1",
     "id": "OPS-30",
     "lane": "OPS",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -210,11 +210,11 @@
       "OPS_TASK_RECEIPT"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb816f91c9c394f9c9fa57",
-      "release": "GCFPE-20260914.1",
-      "title": "OPS-30 — Review Ops Execution Receipt — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81ec8da3effc3b28cf97",
+      "release": "GCFPE-20261009.1",
+      "title": "OPS-30 — Review Ops Execution Receipt — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81ec8da3effc3b28cf97?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "OPS-10",
@@ -231,7 +231,7 @@
     ],
     "sequence": 30,
     "session_class": "CHANGE_LIFETIME",
-    "title": "OPS-30 — Review Ops Execution Receipt — 100926.1"
+    "title": "OPS-30 — Review Ops Execution Receipt — 102726.1"
   },
   "state_route_order": [
     "accept_native_consumer",

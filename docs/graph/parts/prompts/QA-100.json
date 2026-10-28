@@ -1,7 +1,7 @@
 {
   "edge_indices": [
-    173,
-    174
+    178,
+    179
   ],
   "edges": [
     {
@@ -140,8 +140,8 @@
   "id": "QA-100",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb8182a201f0e177dad431?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb8150bcfff1e25129b368?pvs=204",
+    "candidate_version": "102726.1",
     "id": "QA-100",
     "lane": "QA",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -150,11 +150,11 @@
       "QA_EXECUTION_RESULT"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb811a8d13c0bbbf77a848",
-      "release": "GCFPE-20260914.1",
-      "title": "QA-100 — Execute Bounded QA Task — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb8182a201f0e177dad431",
+      "release": "GCFPE-20261009.1",
+      "title": "QA-100 — Execute Bounded QA Task — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb8182a201f0e177dad431?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "QA-110",
@@ -173,7 +173,7 @@
     ],
     "sequence": 100,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "QA-100 — Execute Bounded QA Task — 100926.1"
+    "title": "QA-100 — Execute Bounded QA Task — 102726.1"
   },
   "state_route_order": [
     "complete",

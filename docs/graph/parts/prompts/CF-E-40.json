@@ -131,8 +131,8 @@
   "id": "CF-E-40",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81f1994df5f6ab3a7f32?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb8113a64dda1a380c1b96?pvs=204",
+    "candidate_version": "102726.1",
     "id": "CF-E-40",
     "lane": "CF-E",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -141,11 +141,11 @@
       "EPIC_SPECIFICATION / SPECIFICATION_DELTA"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb8101b655ed223b11a85e",
-      "release": "GCFPE-20260914.1",
-      "title": "CF-E-40 — Revise Epic Specification — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81f1994df5f6ab3a7f32",
+      "release": "GCFPE-20261009.1",
+      "title": "CF-E-40 — Revise Epic Specification — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81f1994df5f6ab3a7f32?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "CF-E-30"
@@ -157,7 +157,7 @@
     ],
     "sequence": 40,
     "session_class": "ROLE_CONTINUING",
-    "title": "CF-E-40 — Revise Epic Specification — 100926.1"
+    "title": "CF-E-40 — Revise Epic Specification — 102726.1"
   },
   "state_route_order": [
     "preapproval_revision",

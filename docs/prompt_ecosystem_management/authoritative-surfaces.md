@@ -3,8 +3,8 @@ artifact_type: PROMPT_ECOSYSTEM_AUTHORITATIVE_SURFACES
 artifact_version: "1.0"
 created_date: 2026-09-18
 status: BINDING
-authority: Product Owner instruction, 2026-09-18; release baseline updated by decision D17, 2026-09-21; repository baseline and graph proof token updated 2026-09-23 after D23 (close-out of MODIFICATION-20260923-alpha-feedback-open-entries); release baseline, Notion controls and graph proof token updated 2026-10-12 by decision D29 (MODIFICATION-20261011-gcfpe-mb008-to-promotion, X21); the Alpha Feedback and Modification Backlog rows updated 2026-10-25 by Product Owner instruction (GCFPE feedback consolidated on the Modification Backlog)
-baseline: main @ 3473b34, plus the selected surfaces this Modification's X21 writes
+authority: Product Owner instruction, 2026-09-18; release baseline updated by decision D17, 2026-09-21; repository baseline and graph proof token updated 2026-09-23 after D23 (close-out of MODIFICATION-20260923-alpha-feedback-open-entries); release baseline, Notion controls and graph proof token updated 2026-10-12 by decision D29 (MODIFICATION-20261011-gcfpe-mb008-to-promotion, X21) and 2026-10-28 by decision D31 (MODIFICATION-20261027-gcfpe-backlog-open-items, R3); the Alpha Feedback and Modification Backlog rows updated 2026-10-25 by Product Owner instruction (GCFPE feedback consolidated on the Modification Backlog)
+baseline: main @ a99de29, plus the selected surfaces MODIFICATION-20261027-gcfpe-backlog-open-items writes at R1 to R4
 ---
 
 # Authoritative surfaces
@@ -21,12 +21,12 @@ the repository wins and the Notion page is the thing to correct.
 
 | Field | Value |
 |---|---|
-| **Selected (live) release** | `GCFPE-20261009.1` / `100926.1` / **55 prompts** |
-| Selection status | `SELECTED` — promoted 2026-10-12 by Product Owner approval (`D29`); the register selects it from 14:23:57Z |
+| **Selected (live) release** | `GCFPE-20261027.1` / `102726.1` / **56 prompts** |
+| Selection status | `SELECTED` — promoted 2026-10-28 by Product Owner approval (`D31`); the register selects it from 2026-10-28 00:21:59Z |
 | Selection authority | The **GCFPE Membership and Release Register** in Notion, and nothing else. Every control page reads `REGISTER_CONTROLLED` and asserts no selection of its own |
-| Predecessor | `GCFPE-20260914.1` / `091426.1` / 55 — superseded, **archived intact** (57 pages moved 2026-10-12, never copied or rewritten). Before it, `GCFPE-20260913.1` / `091326.2` / 54, archived 2026-09-21 |
-| Repository baseline | `main` @ `3473b34`, plus the selected graph parts and registry written at X21 of `MODIFICATION-20261011-gcfpe-mb008-to-promotion` |
-| Graph proof token | `55 nodes · 235 edges · 55 state_routes · 593,569 bytes · sha256 43f84f29…`, the selected parts as built 2026-10-12 |
+| Predecessor | `GCFPE-20261009.1` / `100926.1` / 55 — superseded; the 57 pages it replaced were **archived intact** (moved 2026-10-28, never copied or rewritten), and its 1 unchanged members keep their pages in `102726.1` (`D23-G`). Before it, `GCFPE-20260914.1` / `091426.1` / 55, archived 2026-10-12, and `GCFPE-20260913.1` / `091326.2` / 54, archived 2026-09-21 |
+| Repository baseline | `main` @ `a99de29`, plus the selected graph parts and registry written at R1 and R2 of `MODIFICATION-20261027-gcfpe-backlog-open-items` |
+| Graph proof token | `56 nodes · 240 edges · 56 state_routes · 607,994 bytes · sha256 2342744d…`, the selected parts as built 2026-10-28 |
 
 The graph proof token is reproduced by building from the committed parts. A session that
 builds and gets the same token has proved agreement; nothing needs a stored copy.
@@ -56,11 +56,11 @@ never committed. **A session that cannot find the builder has not lost it — it
 |---|---|---|
 | `docs/prompt_ecosystem_management/README.md` | Architecture of this directory; what belongs here and what does not; validation posture | Current |
 | `docs/prompt_ecosystem_management/gcfpe.decision-record.md` | Product Owner rulings governing the ecosystem, with consequences. **Binding.** | Current |
-| `docs/prompt_ecosystem_management/project-prompt-contract-registry.md` | Approved machine-readable per-prompt contract registry `GCFPE-PCR-20261009.1`, all 55 prompts of `100926.1`, built by script from the parts and the members' revisions (never hand-edited) | `APPROVED` 2026-10-12 |
+| `docs/prompt_ecosystem_management/project-prompt-contract-registry.md` | Approved machine-readable per-prompt contract registry `GCFPE-PCR-20261027.1`, all 56 prompts of `102726.1`, built by script from the parts and the members' revisions (never hand-edited) | `APPROVED` 2026-10-27 |
 | `docs/prompt_ecosystem_management/authoritative-surfaces.md` | This page | Current |
 | `docs/prompt_ecosystem_management/pe-succession/` | Session succession records | Current |
 | `docs/graph/parts/global.json` | Shared graph contract — boundary nodes, vocabularies, PF10 addendum contract | Current |
-| `docs/graph/parts/prompts/*.json` | 55 per-prompt graph parts. **The graph source.** | Current |
+| `docs/graph/parts/prompts/*.json` | 56 per-prompt graph parts. **The graph source.** | Current |
 | `docs/pfcanon/` | PF Canon, controlled Markdown, **read-only** | Authority for canon |
 | `docs/ephemeral/` | Release-scoped run evidence, batch reports, ledgers | Working store |
 | `ci/checks/classify_ci_changes.py` | CI lane sorter. Must know every documentation path `ci.yml` ignores | Current |
@@ -80,20 +80,20 @@ never committed. **A session that cannot find the builder has not lost it — it
 
 | Page | ID | Role |
 |---|---|---|
-| Glow HDE Prompt Flow Index — GCFPE-20261009.1 — 100926.1 | `3db4590a05eb81de9736ea69bac61016` | Operational mapping index: families, actors, artifacts, lifecycle, selected topology. `REGISTER_CONTROLLED`. Updated in place at each promotion |
+| Glow HDE Prompt Flow Index — GCFPE-20261027.1 — 102726.1 | `3db4590a05eb81de9736ea69bac61016` | Operational mapping index: families, actors, artifacts, lifecycle, selected topology. `REGISTER_CONTROLLED`. Updated in place at each promotion |
 | GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1 | `3dc4590a05eb81a9adf1d8f800863937` | **Closed 2026-09-23** (Product Owner): historical repair plan and batch checklists. Parent of the Alpha Feedback page (`3df4590a05eb8111a6a5f67cb82f96f6`), which takes no new items from 2026-10-25 and keeps its closed entries as the record, and of the Modification Backlog |
 | GCFPE Modification Backlog | `3e54590a05eb81eb818fd0f42045167a` | Created 2026-09-24 (Product Owner). **The one list of GCFPE feedback from 2026-10-25** (Product Owner: "make sure that all the GCFPE feedback is consolidated in one place", merging the Alpha Feedback list into it). It holds both the defects a maintenance run or a review finds and the Product Owner's own feedback. Each entry has a severity S1–S4; a request rather than a defect is not rated. The Alpha list's open items moved here as MB-028 and MB-029. Written by `GCFPE-MGMT-10` runs under the maintenance destination rule, and by a flow session only on the Product Owner's explicit instruction |
 | GCFPE Membership and Release Register | `3d24590a05eb81ce942ad994cfca9fa1` | **Sole selection authority.** Selection is resolved only here |
-| Register entry — GCFPE-20261009.1 | `3f74590a05eb81b8b7bbcbfe0dcacea9` | The promotion transaction and its archival receipt. The 091426.1 entry, `3db4590a05eb816f925ef3b0659de3b8`, is its predecessor's record |
-| Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1 | `3f74590a05eb812db385c2544d7570f7` | The 55-member selected catalog. `REGISTER_CONTROLLED`. The 091426.1 catalog is archived |
-| GCFPE Alpha Establishment and Change Management Checklist — 100926.1 | `3db4590a05eb812f87caed515836687f` | Alpha establishment items |
+| Register entry — GCFPE-20261027.1 | `4074590a05eb81c68d03fa4614e1ac6f` | The promotion transaction and its archival receipt. The 20261009.1 entry, `3f74590a05eb81b8b7bbcbfe0dcacea9`, and the 091426.1 entry, `3db4590a05eb816f925ef3b0659de3b8`, are its predecessors' records |
+| Glow HDE Complete Prompt Set — GCFPE-20261027.1 — 102726.1 | `4064590a05eb8113ae7de73041631c00` | The 56-member selected catalog. `REGISTER_CONTROLLED`. The 100926.1 and 091426.1 catalogs are archived |
+| GCFPE Alpha Establishment and Change Management Checklist — 102726.1 | `3db4590a05eb812f87caed515836687f` | Alpha establishment items |
 | GCFPE Repair Completion Checklist — 20260914.1 | `3db4590a05eb8104b04cc01ed90ec39f` | Completion criteria of the 20260914.1 repair. History |
 | Glow HDE Prompt Repair Plan (parent) | `3cb4590a05eb81bdaeb3e6a097f0a3a6` | Historical append-only receipt log. Read as history, not instruction |
-| PE Metaprompt 100926.1 | `3f44590a05eb81f98b76c83465dc1960` | Prompt-authoring control. `REGISTER_CONTROLLED`. PE Metaprompt 091426.1 is archived |
+| PE Metaprompt 102726.1 | `4064590a05eb8173b2e7d37929e7fe4d` | Prompt-authoring control. `REGISTER_CONTROLLED`. PE Metaprompt 100926.1 and 091426.1 are archived |
 | 04 Archived Prompt Versions | `3c94590a05eb811cb145cd010e3b3fcf` | Where superseded prompts and controls are **moved** intact. Never a copy, never a rewrite |
 | Glow HDE Prompt Flow Index (un-versioned) | `3cc4590a05eb8101b5ded32c12616eb6` | Historical index, and the **parent of the release register** — never archive it |
 
-Lane hubs, all `100926.1` (updated in place) and all `REGISTER_CONTROLLED`: Change Flow `3db4590a05eb81d59059eb6b95ed5fcf` ·
+Lane hubs, all `102726.1` (updated in place) and all `REGISTER_CONTROLLED`: Change Flow `3db4590a05eb81d59059eb6b95ed5fcf` ·
 IA `3db4590a05eb8195a2ccf7c0959a8b6e` · QA `3db4590a05eb814d96d3dcfa8835f96d` ·
 Escalation `3db4590a05eb81cd938de84cfffead9c` · TW `3db4590a05eb811b9c14f2ae89c28df7`
 
@@ -103,7 +103,7 @@ release. The PE Metaprompt is the one exception: it is operative while the regis
 selected release's prompt-authoring control, and when unchanged it is bound again in the next
 release (`D23-G`, AF-012). If a page ever says `SELECTED` on its own, that is the defect, not the evidence.
 
-**The 55 prompt bodies live in Notion and are authored and revised there in place.** They
+**The 56 prompt bodies live in Notion and are authored and revised there in place.** They
 are never mirrored into the repository. The repository holds their *contracts* (registry)
 and their *machine-readable restatement* (graph parts), not their text.
 
