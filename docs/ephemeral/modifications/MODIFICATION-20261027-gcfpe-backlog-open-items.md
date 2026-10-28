@@ -1582,3 +1582,22 @@ EXECUTE stops before P0, with nothing of PART-25 written. The plan's own render 
 **Spend.** About 12 h of rule 4's 30 h (11:20Z to 23:20Z), before P0, so the limit still applies. About 0.2M subagent tokens since X18, for one read-only sweep.
 
 **In one line, if you take the recommendations:** "AM-10 as proposed, outside rule 4's count; my promotion approval of the 66108a38 snapshot stands, with the same opt-ins. I have merged #776 as the record pull request; continue on a branch restarted from main, in a new pull request."
+
+### Nathan's decisions before P0 — 2026-10-28
+
+Nathan's words:
+
+> "AM-10 as proposed, outside rule 4's count. My promotion approval of the 66108a38 snapshot stands, with the same opt-ins (PF-B W-4 and PF-A F-4; PF-A F-1 and F-2 stay listed; D24-B LISTED-2 to the backlog) and the same terms: rule 4's 30-hour limit applies only before P0 starts; once P0 has started, finish through X23, and stop after X23 if the limit has passed. At X22, deliver the four packages for installation and wait for my install report. I have merged #776 as the record pull request; continue on a branch restarted from main, in a new pull request."
+
+**Applied.**
+
+- **The record pull request.** #776 merged as `a99de293`. The merge was detected by files on `main` (D26-C): the before-P0 record and its receipts are there, and `main`'s tree equals the branch's (`61e61432…`). The branch was restarted from `main` at `a99de293` and pushed fresh, and the run continues in a new pull request.
+- **The promotion approval** stands as quoted in *Nathan's decisions after X18*, for the snapshot at `66108a38`, with the opt-ins PF-B W-4 and PF-A F-4. `@PROMOTION_APPROVED_AT` stays 2026-10-27, the date of that approval.
+- **AM-10**, in [plan/activation_render_102726.py](evidence/20261027-gcfpe-backlog-open-items/plan/activation_render_102726.py), committed before P0.
+  - `landed()` first judges the replacement as written (`landed_as_written`, AM-9's rule). If that fails, it judges the replacement in the form the page's later listed operations changed it to: each later operation is applied in order where its anchor resolves inside the replacement. That form takes the written one's place in the count. The module docstring records the change with Nathan's words.
+  - Six self-test cases cover it, each way (`am10_*`): an earlier operation reads landed after a later listed operation changed text inside it, which the as-written rule alone refuses; an earlier and a later operation both read landed. A missing replacement, a foreign edit inside it, a leftover anchor and an unrelated change each read not landed.
+  - `selftest` passes 59 of 59 on the real map and 59 of 59 on the stand-in map.
+- **Measured again, with AM-10 committed.**
+  - The probe of P1 to P6 on the before-P0 sweep's reads (after 23:10:22.492Z) passes: every phase, every page, both judgements, no refusal and no control finding ([execute/x19-transaction-probe-am10-102726.1.json](evidence/20261027-gcfpe-backlog-open-items/execute/x19-transaction-probe-am10-102726.1.json)). In this receipt, the `am9` key names the renderer as committed, which now includes AM-10.
+  - C4's check (`x18_record_102726.py check`) on the same reads is `ok`.
+- **Rule 4.** AM-10 is outside the count: 0 of the 2 storage-form amendments used. P0 had not started at 00:10Z, with about 12 h 50 min of the 30 h used.
