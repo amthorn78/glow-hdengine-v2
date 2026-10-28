@@ -15,6 +15,7 @@ from engine.serializer.canon import sercanon
 ROOT = Path(__file__).resolve().parents[2]
 CID = "CID-0123456789abcdef"
 CID_RE = re.compile(r"^CID-[a-f0-9]{16}$")
+TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 BIRTH = ("1990-01-01", "12:34", "Amsterdam, NL")
 TZ = "Europe/Amsterdam"
 KEYS = ("ts", "route", "provider", "source", "status", "duration_ms", "safe_mode", "correlation_id")
@@ -120,8 +121,11 @@ def test_log_line_is_keys_only():
     assert tuple(line) == KEYS
     assert (line["route"], line["provider"], line["source"]) == ("loader.load_chart", "fixtures", "default")
     assert type(line["duration_ms"]) is int and type(line["safe_mode"]) is bool
+    # ts is the clock: pinned to its shape and left out of the substring check (at 12:34 UTC it holds "12:34").
+    assert TS_RE.match(line["ts"])
+    rest = raw.replace(line["ts"], "", 1)
     for forbidden in ("birthdate", "birthtime", "location", "place", "Amsterdam", "NL", "1990-01-01", "12:34", TZ):
-        assert forbidden not in raw
+        assert forbidden not in rest
 
 
 def test_a_raising_sink_does_not_break_the_call():
