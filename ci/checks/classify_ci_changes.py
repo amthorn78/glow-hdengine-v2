@@ -599,6 +599,19 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "scripts/release_id_tools.py": (
         "tests/scripts/test_release_id_recompute.py",
     ),
+    # HDE-EPIC041 WU-PR-01 (HDE-SEPA006.1): the pure Engine chart interface and
+    # its Adapter-owned orchestration entry. WU-PR-02 removes the
+    # characterization owner together with engine/charts/loader.py.
+    "engine/charts/pure.py": (
+        "tests/charts/test_chart_pure_purity.py",
+        "tests/charts/test_chart_pure_interface.py",
+        "tests/adapter/test_chart_orchestration.py",
+        "tests/adapter/test_chart_orchestration_characterization.py",
+    ),
+    "adapter/chart_orchestration.py": (
+        "tests/adapter/test_chart_orchestration.py",
+        "tests/adapter/test_chart_orchestration_characterization.py",
+    ),
 }
 _PRODUCT_TEST_OWNER_PREFIXES = (
     ("catalog/narratives/", _NARRATIVE_TEST_OWNERS),
