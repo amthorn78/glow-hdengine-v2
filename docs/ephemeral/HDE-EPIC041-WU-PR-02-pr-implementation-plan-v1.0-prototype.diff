@@ -1,0 +1,572 @@
+diff --git a/ci/checks/classify_ci_changes.py b/ci/checks/classify_ci_changes.py
+index 4d5ff980..c63c375d 100644
+--- a/ci/checks/classify_ci_changes.py
++++ b/ci/checks/classify_ci_changes.py
+@@ -608,17 +608,18 @@ _PRODUCT_TEST_OWNER_PATHS = {
+         "tests/scripts/test_release_id_recompute.py",
+     ),
+     # HDE-EPIC041 WU-PR-01 (HDE-SEPA006.1): the pure Engine chart interface and
+-    # its Adapter-owned orchestration entry. WU-PR-02 removes the
+-    # characterization owner together with engine/charts/loader.py.
++    # its Adapter-owned orchestration entry.
+     "engine/charts/pure.py": (
+         "tests/charts/test_chart_pure_purity.py",
+         "tests/charts/test_chart_pure_interface.py",
+         "tests/adapter/test_chart_orchestration.py",
+-        "tests/adapter/test_chart_orchestration_characterization.py",
+     ),
+-    "adapter/chart_orchestration.py": (
+-        "tests/adapter/test_chart_orchestration.py",
+-        "tests/adapter/test_chart_orchestration_characterization.py",
++    "adapter/chart_orchestration.py": ("tests/adapter/test_chart_orchestration.py",),
++    # HDE-EPIC041 WU-PR-02 (HDE-SEPA006.2): engine/charts/loader.py is removed;
++    # the import guard owns its path, so restoring the module fails that guard.
++    "engine/charts/loader.py": ("tests/charts/test_chart_loader_import_guard.py",),
++    "scripts/make_compat_determinism_artifacts.py": (
++        "tests/scripts/test_make_compat_determinism_artifacts.py",
+     ),
+ }
+ _PRODUCT_TEST_OWNER_PREFIXES = (
+diff --git a/engine/charts/loader.py b/engine/charts/loader.py
+deleted file mode 100644
+index 8ea4dce2..00000000
+--- a/engine/charts/loader.py
++++ /dev/null
+@@ -1,173 +0,0 @@
+-from __future__ import annotations
+-
+-import datetime as _dt
+-import json as _json
+-import os as _os
+-import re
+-import time as _time
+-from pathlib import Path as _Path
+-from typing import Any, Dict, Optional
+-
+-from engine.util.input_validators import (
+-    parse_date_yyyy_mm_dd,
+-    parse_time_hh_mm,
+-    parse_place_city_cc,
+-    parse_tz_iana,
+-    ensure_cid,
+-)
+-
+-# Legacy provider resolve (kept for backward compatibility with old tests)
+-try:
+-    from engine.config.provider_loader import resolve_provider  # type: ignore
+-except Exception:  # pragma: no cover
+-    resolve_provider = None  # type: ignore
+-
+-
+-class LoaderInputError(Exception):
+-    def __init__(self, code: str, message: str, details: Optional[Dict[str, Any]] = None):
+-        super().__init__(message)
+-        self.code = code
+-        self.message = message
+-        self.details = details or {}
+-
+-
+-def _normalize_chart(obj: Dict[str, Any]) -> Dict[str, Any]:
+-    """Ensure gates are ints where possible; otherwise leave as-is."""
+-    out = dict(obj)
+-    gates = obj.get("gates", [])
+-    norm: list[int] = []
+-    for g in gates:
+-        if isinstance(g, int):
+-            norm.append(g)
+-        elif isinstance(g, str) and g.isdigit():
+-            norm.append(int(g))
+-    out["gates"] = norm
+-    return out
+-
+-
+-def _now_ts() -> str:
+-    return _dt.datetime.now(_dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+-
+-
+-def _safe_mode_flag() -> bool:
+-    # "1" => True, anything else => False
+-    return str(_os.getenv("SAFE_MODE", "0")).strip() == "1"
+-
+-
+-def _log_call(*, provider: str, source: str, status: str, duration_ms: int, safe_mode: bool, correlation_id: str) -> None:
+-    """Keys-only JSONL; no payloads or PII."""
+-    line = {
+-        "ts": _now_ts(),
+-        "route": "loader.load_chart",
+-        "provider": provider,
+-        "source": source,
+-        "status": status,                 # "ok" | "error"
+-        "duration_ms": int(duration_ms),
+-        "safe_mode": bool(safe_mode),
+-        "correlation_id": correlation_id,
+-    }
+-    d = _Path("artifacts/logs")
+-    d.mkdir(parents=True, exist_ok=True)
+-    f = d / "loader_call.jsonl"
+-    with f.open("ab") as fh:
+-        fh.write(_json.dumps(line, separators=(",", ":"), ensure_ascii=False).encode("utf-8") + b"\n")
+-
+-
+-def _call_legacy(user_id: str, correlation_id: Optional[str]) -> Dict[str, Any]:
+-    """Support the previous loader interface: load_chart(user_id, *, correlation_id=...)."""
+-    if resolve_provider is None:
+-        return {"gates": [1, 2, 3]}
+-    provider = resolve_provider()
+-    res = provider.get_chart(user_id, correlation_id=correlation_id)  # type: ignore[attr-defined]
+-    return _normalize_chart(res)
+-
+-
+-def load_chart(*args, **kwargs) -> Dict[str, Any]:
+-    """
+-    Dual-signature loader:
+-
+-      New (this card):
+-        load_chart(birthdate: str, birthtime: str, place: str, tz: str | None = None, *, correlation_id: str | None = None) -> dict
+-
+-      Legacy (back-compat for earlier tests/cards):
+-        load_chart(user_id: str, *, correlation_id: str | None = None) -> dict
+-    """
+-    started = _time.perf_counter()
+-    safe_mode = _safe_mode_flag()
+-    cid = ensure_cid(kwargs.get("correlation_id"))
+-    provider_name = "fixtures"
+-    source = "default"
+-    status = "error"
+-
+-    try:
+-        # --- New signature detection (positional 3 args matching date/time) ---
+-        if (
+-            len(args) >= 3
+-            and isinstance(args[0], str)
+-            and isinstance(args[1], str)
+-            and isinstance(args[2], str)
+-            and re.match(r"^\d{4}-\d{2}-\d{2}$", args[0])  # YYYY-MM-DD
+-            and re.match(r"^\d{2}:\d{2}$", args[1])        # HH:MM
+-        ):
+-            birthdate: str = args[0]
+-            birthtime: str = args[1]
+-            place: str = args[2]
+-            tz = kwargs.get("tz")
+-
+-            # Validate inputs, map failures to typed LoaderInputError
+-            try:
+-                parse_date_yyyy_mm_dd(birthdate)
+-            except Exception as e:
+-                raise LoaderInputError("READER_INVALID_INPUT", "invalid date", {"field": "date"}) from e
+-            try:
+-                parse_time_hh_mm(birthtime)
+-            except Exception as e:
+-                raise LoaderInputError("READER_INVALID_INPUT", "invalid time", {"field": "time"}) from e
+-            try:
+-                parse_place_city_cc(place)
+-            except Exception as e:
+-                raise LoaderInputError("READER_INVALID_INPUT", "invalid place", {"field": "place"}) from e
+-
+-            # For S2 internal/fixtures path we REQUIRE tz (hdapi path will IGNORE tz in S3)
+-            if tz is None:
+-                raise LoaderInputError("READER_INVALID_INPUT", "tz required on internal path", {"field": "tz"})
+-            try:
+-                parse_tz_iana(tz)
+-            except Exception as e:
+-                raise LoaderInputError("READER_INVALID_INPUT", "invalid tz", {"field": "tz"}) from e
+-
+-            # Minimal normalized fixtures result (no network here)
+-            chart = {
+-                "gates": [1, 2, 3],
+-                "channels_short": [],
+-                "centers": [],
+-                "type": "",
+-                "authority": "",
+-                "profile": "",
+-                "meta": {"provider": "fixtures", "source": "default"},
+-            }
+-            status = "ok"
+-            return chart
+-
+-        # --- Legacy signature path ---
+-        if len(args) >= 1 and isinstance(args[0], str) and not re.match(r"^\d{4}-\d{2}-\d{2}$", args[0]):
+-            user_id: str = args[0]
+-            provider_name = "legacy"
+-            res = _call_legacy(user_id, correlation_id=cid)
+-            status = "ok"
+-            return res
+-
+-        # --- kwargs form of new signature (birthdate/birthtime/place passed as kwargs) ---
+-        if {"birthdate", "birthtime", "place"} <= set(kwargs.keys()):
+-            res = load_chart(kwargs["birthdate"], kwargs["birthtime"], kwargs["place"], tz=kwargs.get("tz"), correlation_id=cid)
+-            status = "ok"
+-            return res
+-
+-        raise TypeError("Invalid arguments to load_chart")
+-    finally:
+-        duration_ms = int(round((_time.perf_counter() - started) * 1000.0))
+-        try:
+-            _log_call(provider=provider_name, source=source, status=status, duration_ms=duration_ms, safe_mode=safe_mode, correlation_id=cid)
+-        except Exception:
+-            # Logging must never break the call
+-            pass
+diff --git a/scripts/make_compat_determinism_artifacts.py b/scripts/make_compat_determinism_artifacts.py
+index b3879105..8d8fddcd 100755
+--- a/scripts/make_compat_determinism_artifacts.py
++++ b/scripts/make_compat_determinism_artifacts.py
+@@ -6,7 +6,7 @@ import importlib
+ import pathlib
+ import sys
+ 
+-from engine.charts.loader import load_chart
++from adapter.chart_orchestration import load_chart
+ from engine.compat.categories import CATEGORIES_ORDER_V1
+ from engine.stable.sercanon import serialize
+ 
+diff --git a/tests/adapter/test_chart_orchestration_characterization.py b/tests/adapter/test_chart_orchestration_characterization.py
+deleted file mode 100644
+index 7c76eecd..00000000
+--- a/tests/adapter/test_chart_orchestration_characterization.py
++++ /dev/null
+@@ -1,70 +0,0 @@
+-"""The new entry against today's engine/charts/loader.py (HDE-EPIC041 WU-PR-01).
+-
+-Proves equal results, errors and log fields for every call shape today's
+-supported path accepts. WU-PR-02 deletes this file with the loader. Only the
+-supported-path shapes are compared: a legacy-signature call would run the
+-provider resolver, which writes artifacts/provider/decision.txt.
+-"""
+-from __future__ import annotations
+-
+-import json
+-from pathlib import Path
+-
+-import pytest
+-
+-import adapter.chart_orchestration as entry
+-import engine.charts.loader as loader
+-from engine.charts.pure import normalize_chart
+-
+-ROOT = Path(__file__).resolve().parents[2]
+-CID = "CID-0123456789abcdef"
+-TZ = "Europe/Amsterdam"
+-GENERATOR = [
+-    {"birthdate": "1990-05-04", "birthtime": "14:22", "place": "Austin, US", "tz": TZ},
+-    {"birthdate": "1992-07-19", "birthtime": "08:05", "place": "New York, US", "tz": TZ},
+-]
+-SHAPES = [
+-    (("1990-01-01", "12:34", "Amsterdam, NL"), {"tz": TZ}),
+-    (("1990-01-01", "12:34", "Amsterdam, NL", TZ), {}),
+-    (("1990-02-30", "12:34", "Amsterdam, NL"), {"tz": TZ}),
+-    (("1990-01-01", "24:00", "Amsterdam, NL"), {"tz": TZ}),
+-    (("1990-01-01", "12:34", "Nowhere"), {"tz": TZ}),
+-    (("1990-01-01", "12:34", "Amsterdam, NL"), {}),
+-    (("1990-01-01", "12:34", "Amsterdam, NL"), {"tz": "Europe/NotARealCity"}),
+-    ((), GENERATOR[0]),
+-    ((), GENERATOR[1]),
+-    ((), {"birthdate": "1990-02-30", "birthtime": "12:34", "place": "Amsterdam, NL", "tz": TZ}),
+-    ((), {"birthdate": "1990-01-01", "birthtime": "12:34", "place": "Amsterdam, NL"}),
+-    ((), {}),
+-    (("1990-01-01",), {}),
+-]
+-
+-
+-def _outcome(fn, args, kwargs):
+-    try:
+-        return ("ok", fn(*args, correlation_id=CID, **kwargs))
+-    except TypeError as e:
+-        return ("TypeError", str(e))
+-    except Exception as e:
+-        return ("typed", e.code, e.details.get("field"), e.message)
+-
+-
+-@pytest.mark.parametrize("args,kwargs", SHAPES)
+-def test_entry_matches_todays_loader(monkeypatch, tmp_path, args, kwargs):
+-    monkeypatch.chdir(ROOT)  # today's validators read the pinned lists relative to the CWD
+-    monkeypatch.setattr(loader, "_Path", lambda p: tmp_path / p)
+-    lines: list[str] = []
+-    assert _outcome(entry.load_chart, args, dict(kwargs, log_sink=lines.append)) == _outcome(loader.load_chart, args, kwargs)
+-    # Today's keyword form writes a second line from its recursive call; its last line is the call's own.
+-    today = json.loads((tmp_path / "artifacts/logs/loader_call.jsonl").read_text(encoding="utf-8").splitlines()[-1])
+-    assert len(lines) == 1
+-    new = json.loads(lines[0])
+-    for key in ("ts", "duration_ms"):
+-        today.pop(key)
+-        new.pop(key)
+-    assert new == today
+-
+-
+-def test_normalize_chart_matches_todays_normalizer():
+-    fixture = entry._fixture_chart()
+-    assert normalize_chart(fixture) == loader._normalize_chart(fixture)
+diff --git a/tests/charts/test_chart_loader_import_guard.py b/tests/charts/test_chart_loader_import_guard.py
+new file mode 100644
+index 00000000..9a57943c
+--- /dev/null
++++ b/tests/charts/test_chart_loader_import_guard.py
+@@ -0,0 +1,143 @@
++"""engine/charts/loader.py stays removed (HDE-EPIC041 WU-PR-02, HDE-SEPA006.2).
++
++The mixed chart loader and its legacy load_chart(user_id) signature are
++retired. No tracked Python file outside the classifier's historical prefixes
++and the two planning and canon trees may import the module or reference its
++_call_legacy helper. Callers use adapter.chart_orchestration and
++engine.charts.pure.
++"""
++from __future__ import annotations
++
++import ast
++from pathlib import Path, PurePosixPath
++import re
++import subprocess
++
++from ci.checks import classify_ci_changes as classifier
++
++ROOT = Path(__file__).resolve().parents[2]
++SELF = Path(__file__).resolve().relative_to(ROOT).as_posix()
++RETIRED_PATH = "engine/charts/loader.py"
++MODULE = "engine.charts.loader"
++LEGACY = "_call_legacy"
++# A string that names the module, or an attribute or entry point in it, is a
++# dynamic-import form: importlib.import_module, __import__, mock.patch targets.
++MODULE_STRING = re.compile(r"engine\.charts\.loader(?:[.:][A-Za-z_]\w*)*")
++# A tracked .py file that is not Python (scripts/scratch.py holds Markdown
++# notes) is searched as text instead.
++TEXT = re.compile(r"engine\.charts\.loader|_call_legacy")
++EXCLUDED_PREFIXES = classifier._HISTORICAL_PREFIXES
++LIVE_CALLERS = (
++    "scripts/make_compat_determinism_artifacts.py",
++    "tests/loader/test_load_chart_fixture_only.py",
++    "tests/loader/test_loader_logs_keys_only.py",
++)
++
++
++def _absolute(node: ast.ImportFrom, path: str) -> str:
++    if not node.level:
++        return node.module or ""
++    package = PurePosixPath(path).parent.parts
++    base = package[: len(package) - node.level + 1]
++    return ".".join((*base, *([node.module] if node.module else [])))
++
++
++def findings(source: str, path: str) -> list[str]:
++    found = []
++    for node in ast.walk(ast.parse(source)):
++        if isinstance(node, ast.Import):
++            for alias in node.names:
++                if alias.name == MODULE or alias.name.startswith(MODULE + "."):
++                    found.append(f"import {alias.name}")
++        elif isinstance(node, ast.ImportFrom):
++            module = _absolute(node, path)
++            names = {alias.name for alias in node.names}
++            if module == MODULE or module.startswith(MODULE + "."):
++                found.append(f"from {module} import")
++            elif module == "engine.charts" and "loader" in names:
++                found.append("from engine.charts import loader")
++            if LEGACY in names:
++                found.append(f"from {module} import {LEGACY}")
++        elif isinstance(node, ast.Constant) and isinstance(node.value, str):
++            if MODULE_STRING.fullmatch(node.value) or node.value == LEGACY:
++                found.append(f"string {node.value!r}")
++        elif isinstance(node, ast.Name) and node.id == LEGACY:
++            found.append(f"name {LEGACY}")
++        elif isinstance(node, ast.Attribute) and node.attr == LEGACY:
++            found.append(f"attribute {LEGACY}")
++        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.name == LEGACY:
++            found.append(f"definition {LEGACY}")
++    return found
++
++
++def scan(source: str, path: str) -> list[str]:
++    try:
++        return findings(source, path)
++    except SyntaxError:
++        return [f"text {m.group(0)!r}" for m in TEXT.finditer(source)]
++
++
++def _tracked_python() -> list[str]:
++    out = subprocess.run(
++        ["git", "ls-files", "-z", "--", "*.py", ":(exclude)docs/ephemeral/", ":(exclude)docs/pfcanon/"],
++        cwd=ROOT, check=True, capture_output=True, text=True,
++    ).stdout
++    return [p for p in out.split("\0") if p]
++
++
++def test_no_tracked_python_file_imports_the_retired_loader():
++    tracked = _tracked_python()
++    scanned = [p for p in tracked if p != SELF and not p.startswith(EXCLUDED_PREFIXES)]
++    assert set(LIVE_CALLERS) <= set(scanned)
++    hits = {}
++    for path in scanned:
++        found = scan((ROOT / path).read_text(encoding="utf-8"), path)
++        if found:
++            hits[path] = found
++    assert hits == {}
++
++
++def test_the_retired_module_path_does_not_exist():
++    assert not (ROOT / RETIRED_PATH).exists()
++    assert RETIRED_PATH not in _tracked_python()
++
++
++def test_checker_flags_every_import_form():
++    planted = {
++        "import engine.charts.loader\n": "engine/x.py",
++        "import engine.charts.loader as L\n": "engine/x.py",
++        "from engine.charts.loader import load_chart\n": "engine/x.py",
++        "from engine.charts.loader import LoaderInputError as E\n": "engine/x.py",
++        "from engine.charts import loader\n": "engine/x.py",
++        "from engine.charts import pure, loader\n": "engine/x.py",
++        "from .loader import load_chart\n": "engine/charts/x.py",
++        "from . import loader\n": "engine/charts/x.py",
++        "from ..charts.loader import load_chart\n": "engine/charts/x.py",
++        "import importlib\nimportlib.import_module('engine.charts.loader')\n": "scripts/x.py",
++        "__import__('engine.charts.loader')\n": "scripts/x.py",
++        "monkeypatch.setattr('engine.charts.loader._Path', p)\n": "tests/x.py",
++        "mock.patch('engine.charts.loader:load_chart')\n": "tests/x.py",
++        "_call_legacy('u', None)\n": "tests/x.py",
++        "L._call_legacy('u', None)\n": "tests/x.py",
++        "def _call_legacy(user_id):\n    pass\n": "engine/x.py",
++        "from engine.x import _call_legacy\n": "tests/x.py",
++        "getattr(L, '_call_legacy')\n": "tests/x.py",
++    }
++    for source, path in planted.items():
++        assert scan(source, path), source
++    assert scan("- notes: run engine.charts.loader\n```bash\n", "scripts/x.py")
++
++
++def test_checker_ignores_text_that_is_not_an_import():
++    # Real forms on main: the purity test's planted source text, the
++    # classifier's owner-mapping key for the removed path, and comments.
++    for source, path in {
++        "SOURCES = ('from engine.charts.loader import load_chart\\n',)\n": "tests/charts/x.py",
++        "OWNERS = {'engine/charts/loader.py': ('tests/x.py',)}\n": "ci/checks/x.py",
++        "# engine.charts.loader was removed\nx = 1\n": "tests/x.py",
++        "from engine.charts.pure import normalize_chart\n": "adapter/x.py",
++        "from . import pure\n": "engine/charts/x.py",
++        "from .loader import x\n": "engine/narratives/x.py",
++    }.items():
++        assert scan(source, path) == [], source
++    assert scan("- notes: run adapter.chart_orchestration\n```bash\n", "scripts/x.py") == []
+diff --git a/tests/loader/test_load_chart_fixture_only.py b/tests/loader/test_load_chart_fixture_only.py
+index a97eadab..21d36bc6 100644
+--- a/tests/loader/test_load_chart_fixture_only.py
++++ b/tests/loader/test_load_chart_fixture_only.py
+@@ -1,23 +1,22 @@
+ 
+ from __future__ import annotations
+ import pytest
+-import engine.charts.loader as L
+-from engine.charts.loader import load_chart, LoaderInputError
+-
+-@pytest.fixture(autouse=True)
+-def _loader_log_to_tmp(monkeypatch, tmp_path):
+-    # engine/charts/loader.py:69 writes artifacts/logs/loader_call.jsonl relative to CWD; redirect it.
+-    monkeypatch.setattr(L, "_Path", lambda p: tmp_path / p)
++from adapter.chart_orchestration import load_chart
++from engine.charts.pure import ChartInputError
+ 
+ def test_fixture_path_requires_tz_and_returns_normalized_chart():
+-    out = load_chart("1990-01-01","12:34","Amsterdam, NL", tz="Europe/Amsterdam", correlation_id="CID-deadbeefdeadbeef")
++    lines: list[str] = []
++    out = load_chart("1990-01-01","12:34","Amsterdam, NL", tz="Europe/Amsterdam", correlation_id="CID-deadbeefdeadbeef", log_sink=lines.append)
+     assert isinstance(out, dict)
+     assert "gates" in out and all(isinstance(g, int) for g in out["gates"])
+-    assert out.get("meta", {}).get("provider") in {"fixtures", "legacy", "internal_engine", "fixtures"}
++    assert out.get("meta", {}).get("provider") == "fixtures"
++    assert len(lines) == 1
+ 
+ def test_fixture_path_missing_tz_raises_typed():
+-    with pytest.raises(LoaderInputError) as ei:
+-        load_chart("1990-01-01","12:34","Amsterdam, NL", correlation_id="CID-deadbeefdeadbeef")
++    lines: list[str] = []
++    with pytest.raises(ChartInputError) as ei:
++        load_chart("1990-01-01","12:34","Amsterdam, NL", correlation_id="CID-deadbeefdeadbeef", log_sink=lines.append)
+     err = ei.value
+     assert getattr(err, "code", "") == "READER_INVALID_INPUT"
+     assert getattr(err, "details", {}).get("field") == "tz"
++    assert len(lines) == 1
+diff --git a/tests/loader/test_loader_logs_keys_only.py b/tests/loader/test_loader_logs_keys_only.py
+index 758b5edf..27bd3d61 100644
+--- a/tests/loader/test_loader_logs_keys_only.py
++++ b/tests/loader/test_loader_logs_keys_only.py
+@@ -1,23 +1,19 @@
+ 
+ from __future__ import annotations
+-import json, os, re
+-from pathlib import Path
+-from engine.charts.loader import load_chart
++import json, re
++from adapter.chart_orchestration import load_chart
+ 
+ CID_RE = re.compile(r"^CID-[a-f0-9]{16}$")
++TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+ 
+-def test_loader_emits_keys_only_log(monkeypatch, tmp_path):
++def test_loader_emits_keys_only_log(monkeypatch):
+     # Ensure SAFE_MODE=1 so log shows safe_mode True
+     monkeypatch.setenv("SAFE_MODE", "1")
+-    import engine.charts.loader as L
+-    # engine/charts/loader.py:69 writes artifacts/logs/loader_call.jsonl relative to CWD; redirect it.
+-    monkeypatch.setattr(L, "_Path", lambda p: tmp_path / p)
+-    logf = tmp_path / "artifacts/logs/loader_call.jsonl"
++    data: list[str] = []
+ 
+-    load_chart("1990-01-01","12:34","Amsterdam, NL", tz="Europe/Amsterdam", correlation_id="CID-0123456789abcdef")
++    load_chart("1990-01-01","12:34","Amsterdam, NL", tz="Europe/Amsterdam", correlation_id="CID-0123456789abcdef", log_sink=data.append)
+ 
+-    data = logf.read_text(encoding="utf-8").strip().splitlines()
+-    assert data, "no log lines found"
++    assert len(data) == 1, data
+     last = json.loads(data[-1])
+     # Required keys present
+     for k in ("ts","route","provider","source","status","duration_ms","safe_mode","correlation_id"):
+@@ -28,7 +24,9 @@ def test_loader_emits_keys_only_log(monkeypatch, tmp_path):
+     assert isinstance(last["safe_mode"], bool) and last["safe_mode"] is True
+     assert CID_RE.match(last["correlation_id"])
+ 
+-    # Keys-only: ensure no inputs leaked
+-    raw = data[-1]
++    # Keys-only: ensure no inputs leaked. ts is the clock: pinned to its shape and
++    # left out of the substring check (at 12:34 UTC it holds "12:34").
++    assert TS_RE.match(last["ts"])
++    raw = data[-1].replace(last["ts"], "", 1)
+     for forbidden in ("birthdate","birthtime","location","place","Amsterdam","1990-01-01","12:34"):
+         assert forbidden not in raw
+diff --git a/tests/retired_tests.md b/tests/retired_tests.md
+index ea44b462..7e259dad 100644
+--- a/tests/retired_tests.md
++++ b/tests/retired_tests.md
+@@ -5,6 +5,7 @@ HDE-CRD-0002 WU-PR-01 (S03). Each row is a test file removed from the repository
+ | Path | Reason | Retired | Replacing coverage |
+ | :- | :- | :- | :- |
+ | `tests/adapter/test_cache_keys.py` | Tests adapter/cache_keys.py, which no code imports; the governed compat cache key lives in engine/compat/compute.py (PF01 §5.2). | 2026-10-13 | tests/compat/test_evaluate_pair_eligibility.py (test_cache_hit_* cases) |
++| `tests/adapter/test_chart_orchestration_characterization.py` | Compared adapter/chart_orchestration.py with engine/charts/loader.py, which HDE-EPIC041 WU-PR-02 removes together with its legacy load_chart(user_id) signature (Product Owner decision D-1); it cannot run without the removed module. | 2026-10-28 | tests/adapter/test_chart_orchestration.py (the fixture chart, its canonical bytes, and each error code, field and message, asserted as literal values) |
+ | `tests/adapter/test_etag_core.py` | Tests adapter/etag_core.py, a dead module whose rules contradict PF05 §5.3 (no-cache; HEAD and 304 Content-Length 0). | 2026-10-13 | tests/http/test_reader_a7_transport.py::test_reader_a7_transport_invariants |
+ | `tests/adapter/test_no_etag_on_writers_and_errors.py` | Builds its own Flask app around the dead adapter/etag_core.writer_headers. | 2026-10-13 | tests/transport/test_writers_errors_headers.py::test_writers_errors_headers |
+ | `tests/adapter/test_reader_parity.py` | Stale and redundant: omits v=1 (400 ERR_READER_INVALID_VERSION, PF05 §5.4), expects no-cache and HEAD Content-Length 0 against PF05 §5.3. | 2026-10-13 | tests/http/test_reader_a7_transport.py::test_reader_a7_transport_invariants; tests/compliance/test_reader_etag_and_conditional.py (fixed, wsgi factory) |
+diff --git a/tests/scripts/test_make_compat_determinism_artifacts.py b/tests/scripts/test_make_compat_determinism_artifacts.py
+new file mode 100644
+index 00000000..bfc054ce
+--- /dev/null
++++ b/tests/scripts/test_make_compat_determinism_artifacts.py
+@@ -0,0 +1,23 @@
++"""scripts/make_compat_determinism_artifacts.py after its chart-loader migration.
++
++HDE-EPIC041 WU-PR-02 changed only its import, to adapter.chart_orchestration.
++engine.compat.compute has no compat_public, so the script still stops before
++it loads a chart: exit 2, one stderr line, and nothing written.
++"""
++from __future__ import annotations
++
++import os
++from pathlib import Path
++import subprocess
++import sys
++
++ROOT = Path(__file__).resolve().parents[2]
++SCRIPT = ROOT / "scripts/make_compat_determinism_artifacts.py"
++
++
++def test_generator_exits_2_and_writes_nothing_from_any_working_directory(tmp_path):
++    env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
++    env["PYTHONPATH"] = os.pathsep.join(p for p in (str(ROOT), env.get("PYTHONPATH", "")) if p)
++    proc = subprocess.run([sys.executable, str(SCRIPT)], cwd=tmp_path, env=env, capture_output=True, text=True)
++    assert (proc.returncode, proc.stdout, proc.stderr) == (2, "", "compat_public not implemented\n")
++    assert list(tmp_path.iterdir()) == []
