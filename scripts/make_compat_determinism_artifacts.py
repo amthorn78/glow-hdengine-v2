@@ -6,7 +6,7 @@ import importlib
 import pathlib
 import sys
 
-from engine.charts.loader import load_chart
+from adapter.chart_orchestration import load_chart
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.stable.sercanon import serialize
 
