@@ -136,7 +136,6 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/qa/test_epic021_scaffolding.py",
     "tests/qa/test_epic023_acceptance_alignment.py",
     "tests/qa/test_epic024_bootstrap_status.py",
-    "tests/qa/test_generate_epic_close_pack.py",
     "tests/qa/test_qa_tool_ownership.py",
     "tests/scripts/test_dev_sampler_healthcheck.py",
     "tests/support/test_change_gates.py",
@@ -149,6 +148,15 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/unit/test_sampler_core.py",
     "tests/unit/test_viewer_prefs_normalization.py",
 )
+# Administrative closeout validation is not ordinary required PR CI (Plan Templates, "CI lane
+# classification and automated budget-control discipline"), and the close-pack writer runs only
+# at the close of a full work-unit cycle (HDE Build Notes). Its test therefore runs only when
+# the writer, a close-candidate schema, the closeout workflow or the test itself changes, never
+# as full validation.
+_CLOSE_STAGE_TESTS = ("tests/qa/test_generate_epic_close_pack.py",)
+_CLOSE_STAGE_TEST_OWNERS = {
+    ".github/workflows/epic-closeout-validation.yml": _CLOSE_STAGE_TESTS,
+}
 _FULL_VALIDATION_INACTIVE_TESTS: set[str] = set()
 # HDE-CRD-0002 WU-PR-01 resolved the former inactive set: each file is either
 # in the supplemental roster above or retired (tests/retired_tests.md). A file
@@ -1126,6 +1134,7 @@ def _full_validation_test_targets() -> tuple[str, ...]:
             target
             for target in _registered_owner_test_paths()
             if target not in _FULL_VALIDATION_INACTIVE_TESTS
+            and target not in _CLOSE_STAGE_TESTS
             and _fixed_lane_test_provider(target) is None
         )
     )
@@ -1162,6 +1171,15 @@ def _full_validation_owner_targets(repo_root: Path, path: str) -> tuple[str, ...
         path,
         _full_validation_test_targets(),
         error_code="CI_FULL_VALIDATION_TEST_INVALID",
+    )
+
+
+def _close_stage_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        _CLOSE_STAGE_TEST_OWNERS.get(path, ()),
+        error_code="CI_CLOSE_STAGE_TEST_INVALID",
     )
 
 
@@ -1598,6 +1616,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
         if _lanes_for_path(path) == set():
             continue
         targets.update(_full_validation_owner_targets(repo_root, path))
+        targets.update(_close_stage_owner_targets(repo_root, path))
         if rel.parts and rel.parts[0] == "tests":
             candidate = repo_root / path
             is_test_module = rel.suffix == ".py" and rel.name.startswith("test_")

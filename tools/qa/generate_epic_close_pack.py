@@ -1990,11 +1990,15 @@ def _load_model(
     context: GitContext,
     head: str,
     source_rel: str,
+    *,
+    verify_canon: bool = False,
 ) -> tuple[CandidateModel, tuple[FileSnapshot, ...]]:
     store = _GitObjectStore(context)
     tree = _tree_entries(context, store)
     if _source_selects_v2(root, context, store, tree, source_rel):
-        return _load_model_v2(root, context, head, source_rel, store, tree)
+        return _load_model_v2(
+            root, context, head, source_rel, store, tree, verify_canon=verify_canon
+        )
     remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
     schema_input = _capture_input(
         root, context, store, tree, SCHEMA_REL, max_bytes=remaining_input_bytes
@@ -2026,6 +2030,7 @@ def _load_model(
         raise _fail("OUTPUT_BINDING_MISMATCH")
 
     plan_rel = _canonical_relative_path(source["plan_path"])
+    _require_not_planning_or_canon(plan_rel)
     plan_input = _capture_input(
         root, context, store, tree, plan_rel, max_bytes=remaining_input_bytes
     )
@@ -2038,6 +2043,7 @@ def _load_model(
         rel = _canonical_relative_path(item["path"])
         if binding in bindings or rel in evidence_paths:
             raise _fail("EVIDENCE_BINDING_AMBIGUOUS")
+        _require_not_planning_or_canon(rel)
         bindings.add(binding)
         evidence_paths.add(rel)
         snapshot = _capture_input(
@@ -2235,13 +2241,10 @@ CLOSE_RUN_INPUT_RE = re.compile(r"audit/qa/[^/]+/close(?:/|\Z)", re.IGNORECASE)
 QA_PRIMARY_INPUT_RE = re.compile(
     r"audit/qa/(?P<directory>hde-(?:epic[0-9]{3}|crd-[0-9]{4,}))/checks/[a-z0-9][a-z0-9._-]*/primary\.log\Z"
 )
-# The pinned requirement-ID formats, one per change kind; a requirements document without its
-# change's format is refused. A CRD reads table rows as in HDE-CRD-0002's Specification
-# (| S01 | ... |); HDE-EPICNNN reads its own requirement paragraphs and acceptance rows as in
-# HDE-EPIC040's (**K040-REQ-001.** and | AC040-01 — ...).
-CRD_REQUIREMENT_RE = re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE)
-EPIC_REQUIREMENT_RE = rb"^\*\*(K%s-REQ-[0-9]{3})\.\*\*"
-EPIC_ACCEPTANCE_RE = rb"^\| (AC%s-[0-9]{2}) \xe2\x80\x94 "  # em dash
+# Planning documents live under docs/ephemeral/ only while a change is planned, and PF-Canon
+# under docs/pfcanon/ changes version at any time, so neither is ever a causal input, pointer or
+# output (HDE Build Notes). The v2 source records the facts the writer needs instead.
+PLANNING_OR_CANON_PATH_RE = re.compile(r"docs/(?:ephemeral|pfcanon)(?:/|\Z)", re.IGNORECASE)
 PRIMARY_HEADER_SCHEMA = "pf27.step_log_header.v2"
 # The PF27 v2 header contract of tools/qa/qa_harness.py (_parse_primary_header, with
 # _parse_crd_primary's rules for a CRD), restated here because the writer imports only the
@@ -2270,32 +2273,6 @@ PRIMARY_PF_TITLE_RE = re.compile(r"PF[0-9]{2}(?:\.[0-9]+)?-(?:Canon|Reference)-[
 PRIMARY_TIMESTAMP_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\Z")
 PRIMARY_ENV_KEYS = frozenset({"LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK", "APP_ENV"})
 PRIMARY_NONCLAIM = "token_claim_posture: intended tokens are recorded but not claimed by this PR-03 receipt"
-# The requirements source is the change's own current approved Specification (PF10 addendum 2.15).
-APPROVED_SPECIFICATION_RE = re.compile(
-    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
-    r"-specification-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)-approved\.md\Z"
-)
-# The QA plan is the change's own current QA plan, whose checks are its "### CHECK <n> `<id>`"
-# headings in plan order, as in HDE-EPIC040's (PO-35-18).
-QA_PLAN_RE = re.compile(
-    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
-    r"-QA50-qa-plan-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
-)
-QA_PLAN_CHECK_RE = re.compile(rb"^### CHECK ([0-9]+) `([a-z0-9][a-z0-9._-]*)`", re.MULTILINE)
-# Plan Templates gives each check a "Surface / D-goal mapping:" line naming the criteria it
-# proves; "A to B" names the IDs between A and B (PO-35-21).
-QA_PLAN_SECTION_END_RE = re.compile(rb"^#{1,3} ", re.MULTILINE)
-QA_PLAN_MAPPING_RE = re.compile(rb"^Surface / D-goal mapping:(.*)$", re.MULTILINE)
-QA_PLAN_RANGE_RE = re.compile(
-    rb"(?<![A-Za-z0-9.-])([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*) to ([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)"
-)
-# The authorized decision is the change's own current QA report, as HDE-EPIC040's QA-120 report
-# is: front matter with artifact_type QA_REPORT, the change's ID and a verdict (PO-35-20).
-QA_REPORT_RE = re.compile(
-    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
-    r"-QA120-qa-report-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
-)
-QA_REPORT_FIELD_RE = re.compile(rb"^(artifact_type|change_id|verdict): (.*?)[ \t]*$", re.MULTILINE)
 # HDE Governance's coverage statuses, from the QA ledger's PF27 statuses.
 COVERAGE_STATUS = {
     "PASS": "PASS",
@@ -2304,9 +2281,10 @@ COVERAGE_STATUS = {
     "TOOLING_BLOCKED": "BLOCKED",
     "PARKED": "BLOCKED",
 }
-# A deferral's drain target names a heading in the change kind's register (PO-35-17).
-EPIC_REGISTER_RE = re.compile(r"docs/pfcanon/PF09\.[0-9]+-Canon-HDE-Build-Checklist-[A-Za-z]+-v[0-9.]+\.md\Z")
-CRD_REGISTER_RE = re.compile(r"docs/pfcanon/PF30\.[0-9]+-Canon-HDE-CRD-Records-v[0-9.]+\.md\Z")
+# A deferral's drain target names a heading in the change kind's register (PO-35-17), by the
+# register's stable PF title, never by a versioned file name (HDE Build Notes).
+CRD_REGISTER_TITLE = "HDE CRD Records"
+EPIC_REGISTER_TITLE_PREFIX = "HDE Build Checklist "
 # A PF title is a tracked PF-Canon file's name, after its PF number and kind and before its
 # version, hyphens read as spaces and "&" as "and" (PO-35-16). The tracked names separate those
 # parts with hyphens, spaces or both, and some carry no number or no version (CX7-19).
@@ -2314,11 +2292,6 @@ PF_DOCUMENT_RE = re.compile(
     r"docs/pfcanon/PF(?:[0-9]{2}(?:\.[0-9]+)?)?[- ]+(?:(?:Canon|Reference)[- ]+)?"
     r"(?P<name>[A-Za-z0-9&'](?:[A-Za-z0-9&' -]*?[A-Za-z0-9&'])?)"
     r"(?:[- ]?v[0-9]+(?:\.[0-9]+)*)?\.md\Z"
-)
-# The plan is the change's own current implementation plan (PO-35-9).
-IMPLEMENTATION_PLAN_RE = re.compile(
-    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
-    r"-implementation-plan-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
 )
 
 
@@ -2328,7 +2301,6 @@ class CandidateModelV2:
     source_path: str
     source_input: FileSnapshot
     schema_input: FileSnapshot
-    plan_input: FileSnapshot
     evidence_inputs: tuple[tuple[str, FileSnapshot], ...]
     report_path: str
     manifest_path: str
@@ -2374,7 +2346,13 @@ def _source_selects_v2(
     )
 
 
+def _require_not_planning_or_canon(rel: str) -> None:
+    if PLANNING_OR_CANON_PATH_RE.match(rel) is not None:
+        raise _fail("PLANNING_OR_CANON_INPUT_PROHIBITED")
+
+
 def _require_admitted_causal_input(rel: str) -> None:
+    _require_not_planning_or_canon(rel)
     folded = rel.casefold()
     if (
         folded in PROHIBITED_CAUSAL_INPUTS
@@ -2417,10 +2395,13 @@ def _require_feedback_free_values_v2(
     source_rel: str,
     head: str,
     qa_primaries: frozenset[str] = frozenset(),
+    plan_checks: frozenset[str] = frozenset(),
 ) -> None:
     # A QA primary path names a check of the approved QA plan, not a hosted result, so the
     # pattern does not read it; its ledger record is required once the ledger is read
-    # (HDE Build Notes 2.31, B-4). Every other value keeps the refusal unchanged.
+    # (HDE Build Notes 2.31, B-4). The same holds for a value that is exactly one of the QA
+    # plan's check IDs the source records (HDE Build Notes). Every other value keeps the
+    # refusal unchanged.
     for value in (source_rel, *values):
         if (
             value.casefold().startswith("catalog/manifest.json")
@@ -2428,6 +2409,7 @@ def _require_feedback_free_values_v2(
             or (
                 FEEDBACK_DEPENDENCY_RE.search(value) is not None
                 and not (value in qa_primaries and QA_PRIMARY_INPUT_RE.fullmatch(value))
+                and not (value in plan_checks and PRIMARY_CHECK_ID_RE.fullmatch(value))
             )
         ):
             raise _fail("FEEDBACK_DEPENDENCY_PROHIBITED")
@@ -2460,69 +2442,21 @@ def _pf_titles(tracked_paths: Iterable[str]) -> frozenset[str]:
     )
 
 
-def _qa_plan_checks(payload: bytes) -> list[str]:
-    # Plan order; the numbers run 1, 2, 3, ... and each check ID appears once.
-    found = QA_PLAN_CHECK_RE.findall(payload)
-    checks = [check.decode("ascii") for _, check in found]
-    if (
-        not found
-        or [int(number) for number, _ in found] != list(range(1, len(found) + 1))
-        or len(checks) != len(set(checks))
-    ):
+def _qa_plan_checks(source: Mapping[str, Any]) -> list[str]:
+    # The change's QA plan checks in plan order, as the source records them; each check ID
+    # appears once (PO-35-18). The plan document itself is never read (HDE Build Notes).
+    checks = [str(item["check_id"]) for item in source["qa_checks"]]
+    if len(checks) != len(set(checks)):
         raise _fail("QA_PLAN_STEPS_ABSENT")
     return checks
 
 
-def _qa_plan_mapping(payload: bytes, requirement_ids: frozenset[str]) -> dict[str, frozenset[str]]:
-    # Each planned check's criteria: the requirement IDs its section's first mapping line names,
-    # whole or inside an "A to B" range of one prefix and width.
-    headings = list(QA_PLAN_CHECK_RE.finditer(payload))
-    mapping: dict[str, frozenset[str]] = {}
-    for index, heading in enumerate(headings):
-        end = headings[index + 1].start() if index + 1 < len(headings) else len(payload)
-        section_end = QA_PLAN_SECTION_END_RE.search(payload, heading.end(), end)
-        section = payload[heading.end() : section_end.start() if section_end else end]
-        found = QA_PLAN_MAPPING_RE.search(section)
-        line = found.group(1) if found else b""
-        named = {identifier for identifier in requirement_ids if _token_occurs(identifier, line)}
-        for low, high in QA_PLAN_RANGE_RE.findall(line):
-            start = re.fullmatch(rb"(.*?)([0-9]+)", low)
-            stop = re.fullmatch(rb"(.*?)([0-9]+)", high)
-            if start is None or stop is None or start[1] != stop[1] or len(start[2]) != len(stop[2]):
-                continue
-            for identifier in requirement_ids:
-                member = re.fullmatch(rb"(.*?)([0-9]+)", identifier.encode("ascii"))
-                if (
-                    member is not None
-                    and member[1] == start[1]
-                    and len(member[2]) == len(start[2])
-                    and int(start[2]) <= int(member[2]) <= int(stop[2])
-                ):
-                    named.add(identifier)
-        mapping[heading.group(2).decode("ascii")] = frozenset(named)
-    return mapping
-
-
-def _qa_report_verdict(payload: bytes, change_id: str) -> str:
-    # The QA report's front matter, between its opening "---" line and the next one, carries
-    # artifact_type QA_REPORT, the change's own ID and a verdict, each exactly once.
-    lines = payload.split(b"\n")
-    if not lines or lines[0].rstrip(b"\r") != b"---" or b"---" not in (
-        line.rstrip(b"\r") for line in lines[1:]
-    ):
-        raise _fail("QA_REPORT_INVALID")
-    front = b"\n".join(lines[1 : [line.rstrip(b"\r") for line in lines].index(b"---", 1)])
-    fields: dict[bytes, list[bytes]] = {}
-    for key, value in QA_REPORT_FIELD_RE.findall(front):
-        fields.setdefault(key, []).append(value)
-    if (
-        any(len(fields.get(key, [])) != 1 for key in (b"artifact_type", b"change_id", b"verdict"))
-        or fields[b"artifact_type"][0] != b"QA_REPORT"
-        or fields[b"change_id"][0] != change_id.encode("ascii")
-        or not fields[b"verdict"][0]
-    ):
-        raise _fail("QA_REPORT_INVALID")
-    return fields[b"verdict"][0].decode("ascii")
+def _qa_plan_mapping(source: Mapping[str, Any]) -> dict[str, frozenset[str]]:
+    # Each planned check's criteria, as the source records the QA plan's mapping (PO-35-21).
+    return {
+        str(item["check_id"]): frozenset(str(criterion) for criterion in item["criteria"])
+        for item in source["qa_checks"]
+    }
 
 
 def _qa_coverage_v2(
@@ -2537,7 +2471,7 @@ def _qa_coverage_v2(
         next(s.payload for s in bindings.values() if s.rel == supporting["qa_step_logs_manifest"]),
         change_id.lower(),
     )
-    planned = _qa_plan_checks(bindings[str(source["qa_plan_binding"])].payload)
+    planned = _qa_plan_checks(source)
     if not set(ledger) <= set(planned):
         raise _fail("QA_COVERAGE_INVALID")
     gaps = [
@@ -2597,15 +2531,6 @@ def _qa_ledger(payload: bytes, directory: str) -> dict[str, dict[str, str]]:
 
 def _qa_ledger_statuses(payload: bytes, directory: str) -> list[str]:
     return [entry["status"] for entry in _qa_ledger(payload, directory).values()]
-
-
-def _current_version(pattern: re.Pattern[str], change_id: str, tracked_paths: Iterable[str]) -> str | None:
-    versions = {
-        (int(match["major"]), int(match["minor"])): rel
-        for rel in tracked_paths
-        if (match := pattern.match(rel)) and match["change"] == change_id
-    }
-    return versions[max(versions)] if versions else None
 
 
 def _primary_command_valid(command: object) -> bool:
@@ -2681,24 +2606,6 @@ def _primary_identity(payload: bytes, primary_rel: str, *, crd: bool) -> tuple[o
     return header["check_id"], status
 
 
-def _requirement_ids(payload: bytes, change_id: str) -> frozenset[str]:
-    epic = CHANGE_RE.fullmatch(change_id).group("epic")  # type: ignore[union-attr]
-    patterns = (
-        (CRD_REQUIREMENT_RE,)
-        if epic is None
-        else tuple(
-            re.compile(template % epic.encode("ascii"), re.MULTILINE)
-            for template in (EPIC_REQUIREMENT_RE, EPIC_ACCEPTANCE_RE)
-        )
-    )
-    identifiers = frozenset(
-        match.decode("ascii") for pattern in patterns for match in pattern.findall(payload)
-    )
-    if not identifiers:
-        raise _fail("REQUIREMENTS_TABLE_ABSENT")
-    return identifiers
-
-
 def _require_v2_semantics(
     source: Mapping[str, Any],
     bindings: Mapping[str, FileSnapshot],
@@ -2745,19 +2652,12 @@ def _require_v2_semantics(
     ):
         raise _fail("POINTER_UNRESOLVED")
 
-    referenced = [
-        str(source["requirements_binding"]),
-        str(source["qa_plan_binding"]),
-        str(source["qa_report_binding"]),
-    ]
-    referenced.extend(
-        item["drain_target"]["binding"] for item in source["deferrals"] if "drain_target" in item
-    )
+    referenced: list[str] = []
     for item in source["acceptance"]:
         referenced.extend(item["evidence_bindings"])
     for item in source["later_drain_statements"]:
         referenced.extend(item["evidence_bindings"])
-    referenced.extend(item["binding"] for item in source["superseded"])
+    referenced.extend(item["binding"] for item in source["superseded"] if "binding" in item)
     for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", []):
         referenced.extend(gap["evidence_bindings"])
     if "binding" in source["qa_rca"]:
@@ -2765,50 +2665,27 @@ def _require_v2_semantics(
     if any(binding not in bindings for binding in referenced):
         raise _fail("BINDING_UNRESOLVED")
 
-    requirements = bindings[str(source["requirements_binding"])]
-    if requirements.rel != _current_version(APPROVED_SPECIFICATION_RE, change_id, tracked):
-        raise _fail("REQUIREMENTS_SOURCE_NOT_CURRENT")
-    if source["plan_path"] != _current_version(IMPLEMENTATION_PLAN_RE, change_id, tracked):
-        raise _fail("PLAN_SOURCE_NOT_CURRENT")
-    qa_plan = bindings[str(source["qa_plan_binding"])]
-    if qa_plan.rel != _current_version(QA_PLAN_RE, change_id, tracked):
-        raise _fail("QA_PLAN_NOT_CURRENT")
-    # The authorized decision is the change's current QA report (Change Process Guide 3.5.2.1;
-    # PO-35-20).
-    qa_report = bindings[str(source["qa_report_binding"])]
-    if qa_report.rel != _current_version(QA_REPORT_RE, change_id, tracked):
-        raise _fail("QA_REPORT_NOT_CURRENT")
-    verdict = _qa_report_verdict(qa_report.payload, change_id)
+    # The authorized decision is the verdict of the change's QA report (Change Process Guide
+    # 3.5.2.1; PO-35-20), as the source records it.
+    verdict = str(source["qa_verdict"])
     # A separate QA RCA uses the canonical audit/<prefix>_QA_RCA.md (Change Process Guide 0.4.1.2).
     if "binding" in source["qa_rca"] and bindings[str(source["qa_rca"]["binding"])].rel != (
         report_path.removesuffix("_close_report.md") + "_QA_RCA.md"
     ):
         raise _fail("QA_RCA_UNBOUND")
-    # Every PF title names a tracked PF-Canon document (Change Process Guide 3.5.4; PO-35-16).
-    titles = [
-        *(home for item in source["later_drain_statements"] for home in item["canon_homes"]),
-        *(
-            title
-            for decision in source["adr_block"]["decisions"]
-            for title in (*decision["bounding_canon"], *decision["doc_delta_targets"])
-        ),
-        *(
-            title
-            for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", [])
-            for title in gap["drain_targets"]
-        ),
-    ]
-    known_titles = _pf_titles(tracked)
-    if any(_pf_title_key(str(title)) not in known_titles for title in titles):
-        raise _fail("PF_TITLE_UNKNOWN")
     # Every deliverable is allocated to the slice that closed it (HDE Governance; PO-35-19).
     if set(source["deliverables"]) != {str(item["deliverable"]) for item in source["allocation"]}:
         raise _fail("ALLOCATION_INCOMPLETE")
-    requirement_ids = _requirement_ids(requirements.payload, change_id)
+    # The approved Specification's requirement IDs, as the source records them; every acceptance
+    # criterion and every QA plan mapping names one of them.
+    requirement_ids = frozenset(str(identifier) for identifier in source["requirement_ids"])
     criteria = [str(item["criterion_id"]) for item in source["acceptance"]]
     if len(criteria) != len(set(criteria)):
         raise _fail("ACCEPTANCE_AMBIGUOUS")
     if any(criterion not in requirement_ids for criterion in criteria):
+        raise _fail("REQUIREMENT_ID_UNBOUND")
+    mapping = _qa_plan_mapping(source)
+    if any(not named <= requirement_ids for named in mapping.values()):
         raise _fail("REQUIREMENT_ID_UNBOUND")
     drain_targets = next(
         snapshot.payload
@@ -2822,15 +2699,14 @@ def _require_v2_semantics(
     # The ledger names every deferral's ID, in both forms (PO-35-7).
     if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["deferrals"]):
         raise _fail("DEFERRAL_UNBOUND")
-    # A drain-target pointer names a heading in the change kind's register (PO-35-17).
-    register = CRD_REGISTER_RE if crd else EPIC_REGISTER_RE
+    # A drain-target pointer names the change kind's register by its PF title (PO-35-17).
     if any(
         "drain_target" in item
-        and (
-            register.match(bindings[str(item["drain_target"]["binding"])].rel) is None
-            or not _heading_occurs(
-                str(item["drain_target"]["heading"]),
-                bindings[str(item["drain_target"]["binding"])].payload,
+        and not (
+            _pf_title_key(str(item["drain_target"]["register"])) == CRD_REGISTER_TITLE
+            if crd
+            else _pf_title_key(str(item["drain_target"]["register"])).startswith(
+                EPIC_REGISTER_TITLE_PREFIX
             )
         )
         for item in source["deferrals"]
@@ -2871,7 +2747,6 @@ def _require_v2_semantics(
     # A MET criterion binds the primary of a check that the QA ledger records as PASS and whose
     # plan mapping names the criterion (Change Process Guide 3.5.2.1; PO-35-21). An accepted gap
     # is not PASS evidence (Change Process Guide 3.5.4, "No posture-only PASS").
-    mapping = _qa_plan_mapping(qa_plan.payload, requirement_ids)
     passing = {
         entry["log_path"]: check
         for check, entry in _qa_ledger(
@@ -2892,6 +2767,48 @@ def _require_v2_semantics(
         raise _fail("ACCEPTANCE_EVIDENCE_UNBOUND")
 
 
+def _require_canon_names_v2(
+    source: Mapping[str, Any],
+    context: GitContext,
+    store: _GitObjectStore,
+    tree: Mapping[str, GitTreeEntry],
+) -> None:
+    # Write time only. Every PF title names a tracked PF-Canon document (Change Process Guide
+    # 3.5.4; PO-35-16), and every drain-target heading occurs in the register its title names,
+    # each resolved by title to the version current at HEAD. PF-Canon is never a causal input, so
+    # a later canon version never invalidates a committed close pack (HDE Build Notes).
+    titles = [
+        *(home for item in source["later_drain_statements"] for home in item["canon_homes"]),
+        *(
+            title
+            for decision in source["adr_block"]["decisions"]
+            for title in (*decision["bounding_canon"], *decision["doc_delta_targets"])
+        ),
+        *(
+            title
+            for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", [])
+            for title in gap["drain_targets"]
+        ),
+    ]
+    known_titles = _pf_titles(tree)
+    if any(_pf_title_key(str(title)) not in known_titles for title in titles):
+        raise _fail("PF_TITLE_UNKNOWN")
+    for item in source["deferrals"]:
+        if "drain_target" not in item:
+            continue
+        title = _pf_title_key(str(item["drain_target"]["register"]))
+        registers = [
+            rel
+            for rel in tree
+            if (match := PF_DOCUMENT_RE.fullmatch(rel)) and _pf_title_key(match["name"]) == title
+        ]
+        if len(registers) != 1 or not _heading_occurs(
+            str(item["drain_target"]["heading"]),
+            _git_blob_payload(context, _require_tracked_regular(tree, registers[0]).object_id, store),
+        ):
+            raise _fail("DEFERRAL_POINTER_UNBOUND")
+
+
 def _load_model_v2(
     root: Path,
     context: GitContext,
@@ -2899,6 +2816,8 @@ def _load_model_v2(
     source_rel: str,
     store: _GitObjectStore,
     tree: Mapping[str, GitTreeEntry],
+    *,
+    verify_canon: bool,
 ) -> tuple[CandidateModelV2, tuple[FileSnapshot, ...]]:
     remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
     _require_admitted_causal_input(source_rel)
@@ -2921,19 +2840,16 @@ def _load_model_v2(
         raise _fail("SOURCE_SCHEMA_INVALID")
     causal_values = _causal_strings_v2(source)
     qa_primary_inputs = _qa_primary_inputs_v2(source)
-    _require_feedback_free_values_v2(causal_values, source_rel, head, qa_primary_inputs)
+    plan_checks = frozenset(str(item["check_id"]) for item in source["qa_checks"])
+    _require_feedback_free_values_v2(
+        causal_values, source_rel, head, qa_primary_inputs, plan_checks
+    )
     if _report_body_structure_is_ambiguous(causal_values):
         raise _fail("REPORT_SECTION_AMBIGUOUS")
     if set(source["nonclaims"]) != set(NONCLAIM_TEXT_V2):
         raise _fail("SOURCE_SCHEMA_INVALID")
     report_path, manifest_path = _derived_paths_v2(str(source["change_id"]))
 
-    plan_rel = _canonical_relative_path(source["plan_path"])
-    _require_admitted_causal_input(plan_rel)
-    plan_input = _capture_input(
-        root, context, store, tree, plan_rel, max_bytes=remaining_input_bytes
-    )
-    remaining_input_bytes -= len(plan_input.payload)
     evidence: list[tuple[str, FileSnapshot]] = []
     bindings: dict[str, FileSnapshot] = {}
     evidence_paths: set[str] = set()
@@ -2951,12 +2867,14 @@ def _load_model_v2(
         evidence_paths.add(rel)
         evidence.append((binding, snapshot))
 
-    causal_paths = {SCHEMA_V2_REL, source_rel, plan_rel, *evidence_paths}
-    if len(causal_paths) != 3 + len(evidence):
+    causal_paths = {SCHEMA_V2_REL, source_rel, *evidence_paths}
+    if len(causal_paths) != 2 + len(evidence):
         raise _fail("INPUT_COLLISION")
     if report_path in causal_paths or manifest_path in causal_paths:
         raise _fail("OUTPUT_COLLISION")
     _require_v2_semantics(source, bindings, report_path, manifest_path, tree)
+    if verify_canon:
+        _require_canon_names_v2(source, context, store, tree)
 
     # Each QA ledger entry's primary must be tracked and agree with the ledger (PO-35-5).
     ledger_rel = _supporting_paths_v2(str(source["change_id"]))["qa_step_logs_manifest"]
@@ -2993,7 +2911,6 @@ def _load_model_v2(
         source_path=source_rel,
         source_input=source_input,
         schema_input=schema_input,
-        plan_input=plan_input,
         evidence_inputs=tuple(sorted(evidence, key=lambda item: (item[0], item[1].rel))),
         report_path=report_path,
         manifest_path=manifest_path,
@@ -3002,7 +2919,6 @@ def _load_model_v2(
     snapshots = (
         schema_input,
         source_input,
-        plan_input,
         *(snapshot for _, snapshot in model.evidence_inputs),
         *model.qa_primaries,
     )
@@ -3020,7 +2936,16 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
     def section(heading: str, body: Sequence[str], empty: str) -> list[str]:
         return ["", f"## {heading}", "", *(body or [f"- {empty}"])]
 
+    def basis(item: Mapping[str, Any]) -> str:
+        return ", ".join(
+            [bound(binding) for binding in item["evidence_bindings"]]
+            + [f"record {record}" for record in item.get("evidence_records", [])]
+        )
+
+    criteria = {str(item["check_id"]): list(item["criteria"]) for item in source["qa_checks"]}
+
     decision = source["closure_decision"]
+    planning = source["planning_records"]
     lines = [
         f"# {source['change_id']} Close Report",
         "",
@@ -3040,13 +2965,16 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
         "",
         "## Exact-source acceptance",
         "",
-        f"Requirement source: {bound(str(source['requirements_binding']))}. Each "
-        "criterion is bound to that document by its ID, and the document by its "
-        "digest under Source bindings; criterion text is not copied.",
+        f"Requirement source: {planning['specification']}. Each criterion is one of "
+        "its requirement IDs, as the candidate source records them: "
+        + ", ".join(f"`{identifier}`" for identifier in source["requirement_ids"])
+        + "; criterion text is not copied.",
         "",
-        f"Authorized decision: the QA report {bound(str(source['qa_report_binding']))}, verdict "
-        f"`{_qa_report_verdict(bindings[str(source['qa_report_binding'])].payload, str(source['change_id']))}`. "
-        "Each MET criterion binds the primary of a PASS check whose QA plan mapping names it.",
+        f"Implementation plan: {planning['implementation_plan']}.",
+        "",
+        f"Authorized decision: the QA report {planning['qa_report']}, verdict "
+        f"`{source['qa_verdict']}`. Each MET criterion binds the primary of a PASS check "
+        "whose QA plan mapping names it.",
         "",
     ]
     for item in source["acceptance"]:
@@ -3059,11 +2987,14 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
         section(
             "Coverage versus the QA plan",
             [
-                f"QA plan: {bound(str(source['qa_plan_binding']))}. Each planned check, in plan "
-                "order, with its QA ledger status as a coverage status and its closeout impact.",
+                f"QA plan: {planning['qa_plan']}. Each planned check, in plan order, with "
+                "the criteria its mapping names, its QA ledger status as a coverage status "
+                "and its closeout impact.",
                 "",
                 *(
-                    f"- {number}. `{check}`: {status}; closeout impact: {impact}"
+                    f"- {number}. `{check}` ("
+                    + (", ".join(f"`{c}`" for c in criteria[check]) or "no criteria")
+                    + f"): {status}; closeout impact: {impact}"
                     for number, (check, status, impact) in enumerate(
                         _qa_coverage_v2(source, bindings), start=1
                     )
@@ -3097,7 +3028,7 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
     for item in source["deferrals"]:
         if "drain_target" in item:
             deferrals.append(
-                f"- `{item['id']}`: drain target {bound(item['drain_target']['binding'])}, "
+                f"- `{item['id']}`: drain target register {item['drain_target']['register']}, "
                 f"section {item['drain_target']['heading']}"
             )
         else:
@@ -3111,7 +3042,7 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
         f"{'; '.join(item['locators'])}. Current canon posture: "
         f"{item['current_posture']}. Supported later-drain action: `{item['action']}`. "
         f"Drain readiness: `{item['readiness']}`. Evidence basis: "
-        f"{', '.join(bound(binding) for binding in item['evidence_bindings'])}. "
+        f"{basis(item)}. "
         f"Close expectation: {item['close_expectation']}"
         for item in source["later_drain_statements"]
     ]
@@ -3166,7 +3097,8 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
         section(
             "Superseded artifacts",
             [
-                f"- {bound(item['binding'])}: {item['evidence_change']}"
+                f"- {bound(item['binding']) if 'binding' in item else item['record']}: "
+                f"{item['evidence_change']}"
                 for item in source["superseded"]
             ],
             "None.",
@@ -3203,7 +3135,6 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
     for label, snapshot in (
         ("Candidate source", model.source_input),
         ("Candidate-source schema", model.schema_input),
-        ("Plan", model.plan_input),
     ):
         lines.append(
             f"- {label}: `{snapshot.rel}` "
@@ -3234,7 +3165,6 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
                 {"binding": binding, **_binding(snapshot)}
                 for binding, snapshot in model.evidence_inputs
             ],
-            "plan": _binding(model.plan_input),
             "qa_primaries": [_binding(snapshot) for snapshot in model.qa_primaries],
             "schema": _binding(model.schema_input),
         },
@@ -4746,7 +4676,7 @@ def _run_write(
         raise _fail("GIT_CONTROL_STATE_CHANGED")
     if _head(context) != head:
         raise _fail("GIT_HEAD_CHANGED")
-    model, snapshots = _load_model(root, context, head, source_rel)
+    model, snapshots = _load_model(root, context, head, source_rel, verify_canon=True)
     outputs = _render_twice(model)
     _verify_snapshots(root, context, head, snapshots)
     tree = _tree_entries(context)

@@ -541,36 +541,8 @@
   ],
   "evidence_inputs": [
     {
-      "binding": "specification",
-      "path": "docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md"
-    },
-    {
-      "binding": "specification_delta_01",
-      "path": "docs/ephemeral/HDE-CRD-0002-specification-delta-v1.0.md"
-    },
-    {
-      "binding": "qa_plan",
-      "path": "docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.3.md"
-    },
-    {
-      "binding": "qa_report",
-      "path": "docs/ephemeral/HDE-CRD-0002-QA120-qa-report-v1.0.md"
-    },
-    {
-      "binding": "qa_rca_record",
-      "path": "docs/ephemeral/HDE-CRD-0002-QA120-qa-rca-v1.0.md"
-    },
-    {
-      "binding": "closure_decision",
-      "path": "docs/ephemeral/HDE-CRD-0002-CL-C-10-closure-decision-v1.0.md"
-    },
-    {
       "binding": "close_pack_adr",
       "path": "docs/adr/hde/close_pack_writer_adr.md"
-    },
-    {
-      "binding": "qa_readiness_v1_0",
-      "path": "docs/ephemeral/HDE-CRD-0002-QA10-qa-readiness-v1.0.md"
     },
     {
       "binding": "doc_deltas",
@@ -724,8 +696,10 @@
       "close_expectation": "after a separate canon-only drain step",
       "current_posture": "Names no close-run home beside checks and does not place the close mutation set before the closure decision",
       "evidence_bindings": [
-        "close_pack_adr",
-        "qa_rca_record"
+        "close_pack_adr"
+      ],
+      "evidence_records": [
+        "HDE-CRD-0002 QA RCA v1.0 (HDE-CRD-0002-QA120-QA-RCA, run verdict PASS; SHA-256 18eba71227cfe04a7f01011970303c8ebaba875e63c7a99fb2d2042796a55653)"
       ],
       "locators": [
         "3.1.3",
@@ -742,8 +716,10 @@
       "close_expectation": "after a separate canon-only drain step",
       "current_posture": "Names the Epic close-report prefix only and requires a business case for Epics only",
       "evidence_bindings": [
-        "close_pack_adr",
-        "closure_decision"
+        "close_pack_adr"
+      ],
+      "evidence_records": [
+        "HDE-CRD-0002 CRD Retrospective and Closure Decision v1.0 (HDE-CRD-0002-CL-C-10-CHANGE-CLOSURE-DECISION; SHA-256 bc3ce44442c271b3541a9823ae49e997dd4aea2dbadac26c7dd0c7036721c0a2)"
       ],
       "locators": [
         "2.0.19 Close report minimal content",
@@ -776,9 +752,10 @@
       ],
       "close_expectation": "after a separate canon-only drain step",
       "current_posture": "Carries no per-unit business case, no real-input and P1 disposition rules, no close-mutation-set task template and no CRD Step-0B rule",
-      "evidence_bindings": [
-        "closure_decision",
-        "qa_rca_record"
+      "evidence_bindings": [],
+      "evidence_records": [
+        "HDE-CRD-0002 CRD Retrospective and Closure Decision v1.0 (HDE-CRD-0002-CL-C-10-CHANGE-CLOSURE-DECISION; SHA-256 bc3ce44442c271b3541a9823ae49e997dd4aea2dbadac26c7dd0c7036721c0a2)",
+        "HDE-CRD-0002 QA RCA v1.0 (HDE-CRD-0002-QA120-QA-RCA, run verdict PASS; SHA-256 18eba71227cfe04a7f01011970303c8ebaba875e63c7a99fb2d2042796a55653)"
       ],
       "locators": [
         "Business Case (MUST)",
@@ -794,17 +771,153 @@
     "no_hosted_feedback_inputs",
     "no_unbound_claim"
   ],
-  "plan_path": "docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.1.md",
+  "planning_records": {
+    "implementation_plan": "HDE-CRD-0002 Implementation Plan v1.1 (HDE-CRD-0002-IMPLEMENTATION-PLAN; SHA-256 9747f0ffc084d3467ae876f24fa1f1f7a9db8f4a4bf5f62821cf8eb2b6ab486f)",
+    "qa_plan": "HDE-CRD-0002 QA Plan v1.3 (HDE-CRD-0002-QA50-QA-PLAN; SHA-256 30f4a83cfa62276523c6bad5222f521cdf361eed8ebe59408387b24e8c2ec35a)",
+    "qa_report": "HDE-CRD-0002 final QA Report v1.0 (HDE-CRD-0002-QA120-QA-REPORT; SHA-256 f31e2e077300ead2a7b89a84dda31fc235f3c28ae2d90f8c9b886f4f0fb09973)",
+    "specification": "HDE-CRD-0002 Specification v1.1 (HDE-CRD-0002-SPECIFICATION, SPECIFICATION_APPROVED; SHA-256 fb412f178fa0ecae527704b16ced4be2c28e42a84e663ccbebdbdb669b7382df) with Specification Delta 01 v1.0 (HDE-CRD-0002-SPECIFICATION-DELTA-01; SHA-256 59ef9a776c6b5615333cfe68ba4d8145a3d1fe1fdd194b12bb24cf71a233b636)"
+  },
   "pointers": [
     "audit/qa/hde-crd-0002/qa_step_logs_manifest.json",
     "audit/docdeltas/hde-crd-0002_doc_deltas.md",
     "audit/docdeltas/hde-crd-0002_drain_targets.md",
     "audit/qa/hde-crd-0002/close/"
   ],
-  "qa_plan_binding": "qa_plan",
+  "qa_checks": [
+    {
+      "check_id": "qa-01-preflight",
+      "criteria": []
+    },
+    {
+      "check_id": "qa-02-ci-coverage",
+      "criteria": [
+        "S03",
+        "S04",
+        "S05"
+      ]
+    },
+    {
+      "check_id": "qa-03-attestation-debian",
+      "criteria": [
+        "S06"
+      ]
+    },
+    {
+      "check_id": "qa-04-showcompat-help",
+      "criteria": [
+        "S07"
+      ]
+    },
+    {
+      "check_id": "qa-05-aux-preview-band",
+      "criteria": [
+        "S08"
+      ]
+    },
+    {
+      "check_id": "qa-06-dev-harness-retired",
+      "criteria": [
+        "S09"
+      ]
+    },
+    {
+      "check_id": "qa-07-dev-reader-gate",
+      "criteria": [
+        "S10"
+      ]
+    },
+    {
+      "check_id": "qa-08-release-evidence-tooling",
+      "criteria": [
+        "S11",
+        "S12",
+        "S13"
+      ]
+    },
+    {
+      "check_id": "qa-09-override-matrix",
+      "criteria": [
+        "S14"
+      ]
+    },
+    {
+      "check_id": "qa-10-endpoint-catalog",
+      "criteria": [
+        "S15"
+      ]
+    },
+    {
+      "check_id": "qa-11-template-and-documents",
+      "criteria": [
+        "S16",
+        "S17",
+        "S18"
+      ]
+    },
+    {
+      "check_id": "qa-12-security-review",
+      "criteria": [
+        "S19"
+      ]
+    },
+    {
+      "check_id": "qa-13-prepush-check",
+      "criteria": [
+        "S20"
+      ]
+    },
+    {
+      "check_id": "qa-14-close-pack-writer",
+      "criteria": [
+        "S21"
+      ]
+    },
+    {
+      "check_id": "qa-15-s01-removal",
+      "criteria": [
+        "S01"
+      ]
+    },
+    {
+      "check_id": "qa-16-deployed-identity",
+      "criteria": []
+    },
+    {
+      "check_id": "qa-17-deployed-not-found",
+      "criteria": [
+        "S02"
+      ]
+    },
+    {
+      "check_id": "qa-18-deployed-dev-surfaces",
+      "criteria": [
+        "S10",
+        "S19"
+      ]
+    },
+    {
+      "check_id": "qa-19-deployed-reader-input",
+      "criteria": [
+        "S19"
+      ]
+    },
+    {
+      "check_id": "qa-20-live-vendor-override",
+      "criteria": [
+        "S14",
+        "S19"
+      ]
+    },
+    {
+      "check_id": "qa-21-evidence-admission",
+      "criteria": [
+        "S22"
+      ]
+    }
+  ],
   "qa_rca": {
     "summary_lines": [
-      "QA RCA of record: docs/ephemeral/HDE-CRD-0002-QA120-qa-rca-v1.0.md (QA RCA v1.0, verdict PASS), summarized here; source posture as its section 3 states.",
+      "QA RCA of record: HDE-CRD-0002 QA RCA v1.0 (HDE-CRD-0002-QA120-QA-RCA, verdict PASS), summarized here; source posture as its section 3 states.",
       "What ran: all 21 checks of approved QA Plan v1.3; checks 1 to 12, 14 and 15 at state (a), check 13 attempt 1 at state (a) and RV-1 at state (b), checks 16 to 20 against the deployed service, check 21 on the published family.",
       "Outcome meaning: all 21 current statuses are PASS; check 13 attempt 1 was FAIL_BEHAVIOR (QA110-F01, a product defect); check 3 attempt 1 and check 21's first execution were TOOLING_BLOCKED readiness failures; no FAIL_TOOLING occurred.",
       "QA110-F01 cause, evidenced: the pre-push check's throwaway copies borrowed the source checkout's object store, so a write in a copy re-timed the source pack; remedied by WU-REM-02 and verified by RV-1 under git 2.53.0.",
@@ -824,8 +937,31 @@
       "Completion states: repo-supported QA completion holds; canon-drain completion, Product Owner closeout, board state and formal Ops action are not claimed."
     ]
   },
-  "qa_report_binding": "qa_report",
-  "requirements_binding": "specification",
+  "qa_verdict": "PASS",
+  "requirement_ids": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S08",
+    "S09",
+    "S10",
+    "S11",
+    "S12",
+    "S13",
+    "S14",
+    "S15",
+    "S16",
+    "S17",
+    "S18",
+    "S19",
+    "S20",
+    "S21",
+    "S22"
+  ],
   "reuse_boundary": [
     "Release 1.3.0 and its 45 members are inherited baseline, refreshed in place with no version cut (Specification delta 01).",
     "The canonical evidence-index updater, the QA harness and the CRD QA family are reused as delivered by WU-PR-02 and WU-PR-07; this close adds no tool."
@@ -833,8 +969,8 @@
   "schema_version": "close_candidate_source.v2",
   "superseded": [
     {
-      "binding": "qa_readiness_v1_0",
-      "evidence_change": "Its NOT_READY on FND-001 is superseded by QA-10 readiness v1.1 READY_FOR_QA after the accepted WU-REM-01 remedy (HDE Build Notes 2.23 to 2.26)."
+      "evidence_change": "Its NOT_READY on FND-001 is superseded by QA-10 readiness v1.1 READY_FOR_QA after the accepted WU-REM-01 remedy (HDE Build Notes 2.23 to 2.26).",
+      "record": "HDE-CRD-0002 QA-10 readiness v1.0 (HDE-CRD-0002-QA10-QA-READINESS, NOT_READY; SHA-256 a96097f17e71225ab97cb83864ff172da8c54438916150bb21ff2ece03c4cfa6)"
     }
   ],
   "tracked_issues": []
