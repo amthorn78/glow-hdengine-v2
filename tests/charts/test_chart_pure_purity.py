@@ -17,10 +17,9 @@ FORBIDDEN_MODULE_PARTS = {
     "compat", "cli", "http", "cache", "narratives", "db", "vendor", "runtime",
     "config", "provider", "providers", "loader",
 }
-# engine.util.input_validators also holds file and randomness readers; only this
-# pure helper may be imported from it.
+# engine.util.input_validators holds file and randomness readers and imports
+# secrets, which seeds random at import time, so nothing may be imported from it.
 VALIDATOR_MODULE = "engine.util.input_validators"
-ALLOWED_VALIDATOR_NAMES = {"parse_time_hh_mm"}
 FORBIDDEN_CALLS = {
     "open", "print", "eval", "exec", "compile", "__import__", "getenv", "read_text",
     "read_bytes", "write_text", "write_bytes", "getLogger", "ensure_cid",
@@ -40,7 +39,7 @@ def violations(source: str) -> list[str]:
             parts = (node.module or "").split(".")
             if parts[0] in FORBIDDEN_ROOTS or FORBIDDEN_MODULE_PARTS & set(parts):
                 found.append(f"from {node.module} import")
-            if node.module == VALIDATOR_MODULE and not {a.name for a in node.names} <= ALLOWED_VALIDATOR_NAMES:
+            if node.module == VALIDATOR_MODULE:
                 found.append(f"from {node.module} import {sorted(a.name for a in node.names)}")
         elif isinstance(node, ast.Call):
             name = node.func.id if isinstance(node.func, ast.Name) else (
@@ -62,6 +61,7 @@ def test_checker_flags_planted_violations():
         "import engine.util.input_validators\n",
         "from engine.util.input_validators import ensure_cid\n",
         "from engine.util.input_validators import parse_date_yyyy_mm_dd\n",
+        "from engine.util.input_validators import parse_time_hh_mm\n",
         "from engine.config.provider_loader import resolve_provider\n",
         "from engine.charts.loader import load_chart\n",
         "import logging\n",
@@ -71,10 +71,26 @@ def test_checker_flags_planted_violations():
         assert violations(planted), planted
 
 
-# Patches every time, randomness, environment, filesystem, logging, socket and
-# subprocess entry point, then imports the module fresh and calls it.
+# First imports the module cold and fails if that loads an operational module:
+# loading random or secrets, for one, seeds a generator from the clock or OS
+# entropy. Then patches every time, randomness, environment, filesystem,
+# logging, socket and subprocess entry point, imports the module again and
+# calls it.
 HARNESS = r'''
-import builtins, io, logging, os, pathlib, random, secrets, socket, subprocess, sys, time, uuid
+import sys
+name = sys.argv[1]
+assert name not in sys.modules and "engine.util.input_validators" not in sys.modules
+OPERATIONAL = {
+    "random", "secrets", "uuid", "socket", "subprocess", "logging", "datetime", "time",
+    "json", "pathlib", "tempfile", "locale", "hashlib", "hmac", "base64", "sqlite3",
+    "psycopg", "redis", "requests", "urllib", "http", "engine.util.input_validators",
+}
+before = set(sys.modules)
+__import__(name)
+loaded = sorted(m for m in set(sys.modules) - before if m in OPERATIONAL or m.split(".")[0] in OPERATIONAL)
+assert not loaded, f"external side effect: importing {name} loads {loaded}"
+del sys.modules[name]
+import builtins, io, logging, os, pathlib, random, secrets, socket, subprocess, time, uuid
 from contextlib import ExitStack
 from unittest.mock import patch
 def forbidden(*args, **kwargs):
@@ -94,8 +110,6 @@ def no_external_effects():
     ):
         guards.enter_context(patch.object(owner, name, forbidden))
     return guards
-name = sys.argv[1]
-assert name not in sys.modules and "engine.util.input_validators" not in sys.modules
 with no_external_effects():
     module = __import__(name, fromlist=["*"])
 if name == "engine.charts.pure":
@@ -135,3 +149,9 @@ def test_harness_flags_a_planted_side_effect(tmp_path):
     (tmp_path / "planted_effect.py").write_text("import os\nos.getenv('SAFE_MODE')\n", encoding="utf-8")
     result = _run("planted_effect", tmp_path)
     assert result.returncode != 0 and "external side effect" in result.stderr
+
+
+def test_harness_flags_a_planted_operational_import(tmp_path):
+    (tmp_path / "planted_import.py").write_text("import secrets\n", encoding="utf-8")
+    result = _run("planted_import", tmp_path)
+    assert result.returncode != 0 and "external side effect: importing planted_import loads" in result.stderr

@@ -10,8 +10,6 @@ import re
 import unicodedata
 from typing import Any, Container, Dict, NamedTuple, Optional, Tuple
 
-from engine.util.input_validators import parse_time_hh_mm
-
 _MONTH_DAYS = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
 
@@ -49,6 +47,17 @@ def _parse_date(s: Any) -> Tuple[int, int, int]:
     return year, month, day
 
 
+def _parse_time(s: Any) -> Tuple[int, int]:
+    # Same acceptance as engine.util.input_validators.parse_time_hh_mm, whose
+    # module imports secrets (and so seeds random) at import time.
+    if not isinstance(s, str) or not re.match(r"^[0-2]\d:[0-5]\d$", s):
+        raise ValueError("time must be HH:MM (24h)")
+    h, m = map(int, s.split(":"))
+    if h > 23:
+        raise ValueError("hour must be 00..23")
+    return h, m
+
+
 def validate_birth_inputs(
     birthdate: Any,
     birthtime: Any,
@@ -64,7 +73,7 @@ def validate_birth_inputs(
     except Exception as e:
         raise _invalid("date", "invalid date") from e
     try:
-        hm = parse_time_hh_mm(birthtime)
+        hm = _parse_time(birthtime)
     except Exception as e:
         raise _invalid("time", "invalid time") from e
     if not isinstance(place, str):
