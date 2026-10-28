@@ -1,10 +1,10 @@
 {
   "edge_indices": [
-    158,
-    159,
-    160,
-    161,
-    127
+    163,
+    164,
+    165,
+    166,
+    131
   ],
   "edges": [
     {
@@ -198,8 +198,8 @@
     "adds_work_unit": false,
     "adds_work_vehicle": false,
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb811ebf72e949b7b1572e?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb8108a9f5cececa4b3149?pvs=204",
+    "candidate_version": "102726.1",
     "cross_session_route": true,
     "id": "PR-35",
     "lane": "PR",
@@ -209,11 +209,11 @@
       "PR_IMPLEMENTATION_RESULT"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb8120b443ed2cb08b723c",
-      "release": "GCFPE-20260914.1",
-      "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb811ebf72e949b7b1572e",
+      "release": "GCFPE-20261009.1",
+      "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb811ebf72e949b7b1572e?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [],
     "r1_mapping": "GCF-17",
@@ -228,7 +228,7 @@
     ],
     "sequence": 35,
     "session_class": "DEDICATED_PR_REVIEW_SESSION",
-    "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 100926.1"
+    "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 102726.1"
   },
   "state_route_order": [
     "merge_pending",

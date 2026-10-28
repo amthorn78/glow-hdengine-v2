@@ -105,8 +105,8 @@
   "id": "CL-E-20",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb8186913fcb9f6b2a2f32?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb819f9a30f9d51249a91c?pvs=204",
+    "candidate_version": "102726.1",
     "id": "CL-E-20",
     "lane": "CL-E",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -115,11 +115,11 @@
       "PF09_REVALIDATION"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb81c2b5d5ff46126f9e45",
-      "release": "GCFPE-20260914.1",
-      "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb8186913fcb9f6b2a2f32",
+      "release": "GCFPE-20261009.1",
+      "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb8186913fcb9f6b2a2f32?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "CL-E-30"
@@ -133,7 +133,7 @@
     ],
     "sequence": 20,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 100926.1"
+    "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 102726.1"
   },
   "state_route_order": [
     "complete",

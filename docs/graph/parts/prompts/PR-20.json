@@ -1,10 +1,10 @@
 {
   "edge_indices": [
-    149,
-    150,
-    151,
-    152,
-    153
+    154,
+    155,
+    156,
+    157,
+    158
   ],
   "edges": [
     {
@@ -182,8 +182,8 @@
   "id": "PR-20",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb819fbea5dcd966a750ba?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb8141a25be9a48df6c2a9?pvs=204",
+    "candidate_version": "102726.1",
     "id": "PR-20",
     "lane": "PR",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -192,11 +192,11 @@
       "PR_IMPLEMENTATION_PLAN"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb8174abf8c04318ab04be",
-      "release": "GCFPE-20260914.1",
-      "title": "PR-20 — Create Detailed PR Implementation Plan — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb819fbea5dcd966a750ba",
+      "release": "GCFPE-20261009.1",
+      "title": "PR-20 — Create Detailed PR Implementation Plan — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb819fbea5dcd966a750ba?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "PR-30"
@@ -210,7 +210,7 @@
     ],
     "sequence": 20,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "PR-20 — Create Detailed PR Implementation Plan — 100926.1"
+    "title": "PR-20 — Create Detailed PR Implementation Plan — 102726.1"
   },
   "state_route_order": [
     "awaiting_po_proceed",

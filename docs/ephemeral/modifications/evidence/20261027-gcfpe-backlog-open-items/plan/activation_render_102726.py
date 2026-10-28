@@ -64,6 +64,12 @@ once per replacement the page carries up to the phase, so an operation anchored 
 replacement (C-FI-REV inside C-FI; P1d-FI-CAND-H and the five P1e-*-CAND) was expected twice where the page holds it
 once. It now counts the anchor in the operation's own replacement and in the other replacements still on the page
 whole, each once; no written content changes.
+AM-10 (Nathan, 2026-10-28, before P0: "AM-10 as proposed, outside rule 4's count"): landed() required an operation's
+replacement on the page as written, so an earlier operation whose replacement a later listed operation changed (C-FI
+after C-FI-REV, and after P1d-FI-CAND-H and P1d-FI-PFB-W4) read not landed in `plan`'s judgement of earlier phases.
+It now also reads the replacement present in the form the page's later listed operations changed it to, that form
+counted in the written one's place; a foreign edit inside it, a missing replacement and a leftover anchor still read
+not landed. No written content changes.
 
 The successor map is the only source of successor ids, titles and dispositions (W7 successor_page_map); with a
 stand-in map the ids are binding_pass.probe() synthetic ids, so retired predecessors and successors stay distinct,
@@ -302,7 +308,31 @@ def landed(text: str, op: dict, page_ops: list, ctx: Ctx) -> bool:
     """LANDED: the start anchor occurs only inside the replacements this page carries, and the replacement is
     present (a deletion: the anchor gone). Raw and escaped forms are counted together, on the page as read after
     AM-3's fold of Notion's split bold. AM-9: the anchor is counted only in the operation's own replacement and in
-    the other replacements still on the page whole, each once."""
+    the other replacements still on the page whole, each once. AM-10: the replacement is present as written, or in
+    the form the later operations of page_ops changed it to (each applied in order where its anchor resolves inside
+    it), and that form takes the written one's place in the count."""
+    if landed_as_written(text, op, page_ops, ctx):
+        return True
+    if op.get("append") or not op.get("new"):
+        return False
+    ids = [o["id"] for o in page_ops]
+    if op["id"] not in ids:
+        return False
+    written = ctx.fill(op["new"])
+    changed = written
+    for later in page_ops[ids.index(op["id"]) + 1:]:
+        if later.get("append") or not later.get("start"):
+            continue
+        t, rows = apply(changed, [later], ctx)
+        if rows and rows[0]["applied"]:
+            changed = t
+    if changed == written:
+        return False
+    op2 = {**op, "new": changed}
+    return landed_as_written(text, op2, [op2 if o["id"] == op["id"] else o for o in page_ops], ctx)
+
+
+def landed_as_written(text: str, op: dict, page_ops: list, ctx: Ctx) -> bool:
     text = C.fold(text)
     new = C.fold(ctx.fill(op["new"]) or "")
     if op.get("append"):
@@ -859,6 +889,7 @@ def selftest(a) -> dict:
         **_am5_cases(ctx),
         **_am6_am7_cases(ctx),
         **_am9_cases(ctx),
+        **_am10_cases(ctx),
         **_part17_cases(ctx),
         **_c26_cases(a),
     }
@@ -1044,6 +1075,26 @@ def _am9_cases(ctx: Ctx) -> dict:
         "am9_missing_replacement_not_landed": not landed(t_a, b, [a, b], ctx),
         "am9_leftover_anchor_not_landed": not landed(t_ab + "alpha beta.\n", b, [a, b], ctx),
         "am9_unapplied_op_not_landed": not landed(base, a, [a], ctx),
+    }
+
+
+def _am10_cases(ctx: Ctx) -> dict:
+    """AM-10: an earlier operation is landed after a later listed operation changed text inside its replacement
+    (before P0: C-FI after C-FI-REV); a missing replacement, a foreign edit inside it, a leftover anchor and an
+    unrelated change are not."""
+    a = {"id": "A", "start": "alpha beta.", "end": None, "new": "intro alpha beta. gamma end"}
+    b = {"id": "B", "start": "gamma", "end": None, "new": "gamma delta"}
+    base = "head\nalpha beta.\ntail\n"
+    t_a = base.replace("alpha beta.", a["new"])
+    t_ab = t_a.replace("gamma", b["new"])
+    return {
+        "am10_earlier_op_landed_after_later_op_changed_it": (landed(t_ab, a, [a, b], ctx)
+                                                              and not landed_as_written(t_ab, a, [a, b], ctx)),
+        "am10_earlier_and_later_op_landed": landed(t_a, a, [a, b], ctx) and landed(t_ab, b, [a, b], ctx),
+        "am10_earlier_op_missing_not_landed": not landed(base, a, [a, b], ctx),
+        "am10_foreign_edit_inside_replacement_not_landed": not landed(t_ab.replace("intro", "intra"), a, [a, b], ctx),
+        "am10_leftover_anchor_not_landed": not landed(t_ab + "alpha beta.\n", a, [a, b], ctx),
+        "am10_unrelated_change_not_landed": not landed(t_a.replace("gamma", "gamma omega"), a, [a, b], ctx),
     }
 
 

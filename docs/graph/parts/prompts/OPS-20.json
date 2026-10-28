@@ -1,10 +1,10 @@
 {
   "edge_indices": [
-    134,
-    135,
-    136,
-    137,
-    138
+    139,
+    140,
+    141,
+    142,
+    143
   ],
   "edges": [
     {
@@ -298,8 +298,8 @@
   "id": "OPS-20",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb8155aebacd56f469643e?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81c18158d838050befbc?pvs=204",
+    "candidate_version": "102726.1",
     "id": "OPS-20",
     "lane": "OPS",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -308,11 +308,11 @@
       "OPS_EXECUTION_RESULT"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb81858a9dd361d3689ce8",
-      "release": "GCFPE-20260914.1",
-      "title": "OPS-20 — Execute Bounded Ops Task — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb8155aebacd56f469643e",
+      "release": "GCFPE-20261009.1",
+      "title": "OPS-20 — Execute Bounded Ops Task — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb8155aebacd56f469643e?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "OPS-30"
@@ -329,7 +329,7 @@
     ],
     "sequence": 20,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "OPS-20 — Execute Bounded Ops Task — 100926.1"
+    "title": "OPS-20 — Execute Bounded Ops Task — 102726.1"
   },
   "state_route_order": [
     "result_complete",

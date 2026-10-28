@@ -1,9 +1,9 @@
 {
   "_epilogue": "```\n",
   "_other_edge_indices": [
+    119,
     120,
-    121,
-    122
+    121
   ],
   "_other_edges": [
     {
@@ -76,7 +76,7 @@
       }
     ]
   },
-  "_prologue": "# GCFPE-20261009.1 Candidate Graph Contract\n\n```yaml\nartifact_type: GCFPE_CANDIDATE_GRAPH_CONTRACT\nrelease: GCFPE-20261009.1\nprompt_version_family: '100926.1'\nselection_status: SELECTED_PRODUCTION\ncomplete_source_path: candidate/graph/GCFPE-20261009.1-Candidate-Graph-Contract.json\ncomplete_source_bytes: 0\ncomplete_source_sha256: 0\ncontent_status: COMPLETE\nsource_binding_revision: MODIFICATION-20261011-gcfpe-mb008-to-promotion\nvalidation_scope: QUALIFICATION_AND_POSTFLIGHT_RECORDED_IN_MODIFICATION-20261011-gcfpe-mb008-to-promotion\n```\n\n```json",
+  "_prologue": "# GCFPE-20261027.1 Candidate Graph Contract\n\n```yaml\nartifact_type: GCFPE_CANDIDATE_GRAPH_CONTRACT\nrelease: GCFPE-20261027.1\nprompt_version_family: '102726.1'\nselection_status: SELECTED_PRODUCTION\ncomplete_source_path: candidate/graph/GCFPE-20261027.1-Candidate-Graph-Contract.json\ncomplete_source_bytes: 0\ncomplete_source_sha256: 0\ncontent_status: COMPLETE\nsource_binding_revision: MODIFICATION-20261027-gcfpe-backlog-open-items\nvalidation_scope: QUALIFICATION_AND_POSTFLIGHT_RECORDED_IN_MODIFICATION-20261027-gcfpe-backlog-open-items\n```\n\n```json",
   "abort_contract": {
     "agent_skill_prompt_hub_inbound_edges": 0,
     "automatic_inbound_edges": 0,
@@ -152,7 +152,7 @@
         "state": "PLAN_PENDING"
       },
       "QA_PLAN_REVIEW": {
-        "after": "COMPLETE_PENDING_QA_PLAN_OR_EXPLICIT_APPROVED_BASE_DELTA",
+        "after": "COMPLETE_PENDING_QA_PLAN_OR_APPROVED_QA_PLAN_WITH_DELIVERED_CHANGE_OR_EXPLICIT_APPROVED_BASE_DELTA",
         "producer": "QA-70"
       },
       "QA_READINESS": {
@@ -191,6 +191,7 @@
       "CF-E-30": "FORMATION",
       "CF-E-40": "FORMATION",
       "CF-PO-10": "FORMATION",
+      "CL-05": "CLOSE_MUTATION_SET",
       "CL-20": "POST_CLOSURE",
       "CL-30": "POST_CLOSURE",
       "CL-40": "POST_CLOSURE",
@@ -247,8 +248,8 @@
   "baseline": {
     "member_count": 55,
     "registry": "docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
-    "release": "GCFPE-20260914.1",
-    "version_family": "091426.1"
+    "release": "GCFPE-20261009.1",
+    "version_family": "100926.1"
   },
   "boundary_nodes": {
     "ACTUAL_OWNER_TERMINAL_RETURN": {
@@ -306,10 +307,10 @@
     ]
   },
   "candidate": {
-    "member_count": 55,
-    "member_rule": "54 successor runtime members + the GCFPE-MGMT-10 successor (D20 three-mode body); no additions or removals",
-    "release": "GCFPE-20261009.1",
-    "version_family": "100926.1"
+    "member_count": 56,
+    "member_rule": "the 100926.1 members, each a 102726.1 successor page where its body changes and its 100926.1 page where it does not (D23-G), plus CL-05 — Prepare and Publish the Close Mutation Set, added (PF06 §3.5.1; DN-2); no removals",
+    "release": "GCFPE-20261027.1",
+    "version_family": "102726.1"
   },
   "candidate_member_count_excludes_boundaries": true,
   "canonical_source_contract": {
@@ -327,7 +328,7 @@
     "pfcanon_root": "docs/pfcanon",
     "source_failure_result": "SOURCE_RESOLUTION_ERROR"
   },
-  "contract_id": "GCFPE-20261009.1-CANDIDATE-GRAPH",
+  "contract_id": "GCFPE-20261027.1-CANDIDATE-GRAPH",
   "handoff_contract": {
     "actual_branch_only": true,
     "complete_paste_ready_prompt": true,
@@ -546,7 +547,7 @@
     "all_edge_endpoints_resolved": true,
     "baseline_ids_retained": true,
     "boundary_nodes_counted_as_members": false,
-    "candidate_node_count": 55,
+    "candidate_node_count": 56,
     "candidate_url_placeholder_count": 0,
     "observed_pf10_producers": [
       "CF-C-30",
@@ -558,26 +559,39 @@
     ],
     "pf10_producer_set_exact": true,
     "prompt_inbound_edges_to_PR-50": 0,
-    "sole_added_node": [],
+    "sole_added_node": [
+      "CL-05"
+    ],
     "unique_node_ids": true,
     "unresolved_edges": []
   },
   "protected_identities": {
     "flowmaster_primary_core_sha256": "4d8bb9bf1c9c85aeba8529995ee97b496d7938571d4b362f49c42aa9aa27d409",
     "r1_core_rows": 26,
-    "r1_material_rows": 20,
-    "r1_oracle_sha256": "ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52",
-    "r1_rows": 46
+    "r1_material_rows": 21,
+    "r1_oracle_sha256": "f1b221e91cd3c22ce9923d555671bce0e7af25335b69dabab60e097f3fa8d46d",
+    "r1_rows": 47
   },
   "qa_closure_contract": {
     "classification_source": "EXISTING_PRODUCT_OWNER_CLASSIFICATION_AND_APPROVED_SPECIFICATION",
+    "close_mutation_set_is_post_closure": false,
+    "close_mutation_set_precedes_closure": true,
+    "close_stage": "CL-05",
+    "close_stage_exit_receivers": {
+      "CRD": "CL-C-10",
+      "EPIC": "CL-E-10"
+    },
+    "close_stage_result": "CLOSE_MUTATION_SET_RESULT",
+    "close_tooling_repair_route": "CL-05_NOT_ESC",
     "closure_actor": "Isis",
     "closure_session": "RETAIN_EXISTING",
     "crd_strategy_card_required": false,
+    "do_not_close_close_mutation_set_route": "CL-05",
+    "epic_close_run_family_admitted": false,
     "epic_strategy_card": "EXISTING_APPROVED_SPECIFICATION_STRATEGY_CARD",
     "pass_receivers": {
-      "CRD": "CL-C-10",
-      "EPIC": "CL-E-10"
+      "CRD": "CL-05",
+      "EPIC": "CL-05"
     },
     "qa_pass_closes_change": false,
     "required_artifacts": [

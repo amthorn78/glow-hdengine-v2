@@ -32,6 +32,12 @@ Sets:
         missing required line, the note anchored as W1 stored it (before D30), an unfilled X26 marker, a changed
         v5.0.0, and an X26 entry that rewrites an earlier entry.
 
+AM-11 (Nathan, 2026-10-28, at X26: "AM-11 as proposed (option A), outside rule 4's count"): W7 used @PROMOTION_DATE
+for two dates, which D29's precedent had on one day: Nathan's approval and the transaction. In this set the two places
+that date the approval, RE-W7-08's registry `APPROVED` date and RE-W7-11's "Product Owner, ..." line, carry
+@PROMOTION_APPROVED_AT (the date of Nathan's exact promotion approval, W8's marker, as §E records it); every other
+@PROMOTION_DATE is the date the promotion took effect. No other written text changes (AM11_SWAPS).
+
 Repository files are not Notion reads, so normalization changes nothing on them unless they carry a literal `\\_` or
 inline tag; each guard row also reports whether the raw and normalized counts differ. The reports carry counts, ids
 and booleans only (D22). Run with PYTHONDONTWRITEBYTECODE=1. Never run apply on the real tree before X1 (C-12) or X26.
@@ -59,6 +65,8 @@ D30_HEAD = "## D30 — "
 D30_CLOSE = "**Until those land,\n`D30` is ruled but not applied.**\n"   # C-23: W1's note is anchored here
 MARKER = re.compile(r"@[A-Z][A-Z0-9_]+")
 X1_IDS = ("W6-RE-19", "W6-RE-20", "W6-RE-21", "W6-RE-28")
+AM11_SWAPS = {"RE-W7-08": ("`APPROVED` @PROMOTION_DATE", "`APPROVED` @PROMOTION_APPROVED_AT"),
+              "RE-W7-11": ("**Product Owner, @PROMOTION_DATE**", "**Product Owner, @PROMOTION_APPROVED_AT**")}
 X26_IDS = ("RE-W7-03", "RE-W7-04", "RE-W7-05", "RE-W7-06", "RE-W7-07", "RE-W7-08", "RE-W7-09", "RE-W7-10",
            "RE-W7-10b", "RE-W8-01", "RE-W8-02", "RE-W8-03", "RE-W8-04", "RE-W8-05", "RE-W8-06", "RE-W8-07",
            "RE-W8-08", "RE-W7-11")
@@ -101,13 +109,18 @@ def edit_set(name: str) -> list:
         out = []
         for i in X26_IDS:
             e = by[i]
+            new = e["new"]
+            if i in AM11_SWAPS:   # AM-11: the approval date where the text dates the approval
+                was, now = AM11_SWAPS[i]
+                assert new.count(was) == 1 and new.count("@PROMOTION_APPROVED_AT") == 0, f"AM-11 anchor {i}"
+                new = new.replace(was, now)
             if i == "RE-W7-11":
                 out.append({"id": i, "path": e["path"], "new_file": False, "content_from": None,
-                            "edits": [{"old": None, "new": e["new"], "count": None, "append": True}],
+                            "edits": [{"old": None, "new": new, "count": None, "append": True}],
                             "heading_pattern": r"(?m)^## (?:D\d+|@PROMOTION_D) — `GCFPE-20261027\.1 / 102726\.1 / 56` is promoted"})
             else:
                 out.append({"id": i, "path": e["path"], "new_file": False, "content_from": None,
-                            "edits": [{"old": e["old"], "new": e["new"], "count": e["count"]}]})
+                            "edits": [{"old": e["old"], "new": new, "count": e["count"]}]})
         return out
     raise SystemExit(f"unknown set {name}")
 
@@ -346,7 +359,7 @@ STANDIN_X26 = {"@PROMOTION_D": "D31", "@PROMOTION_DATE": "2026-10-28", "@REGISTE
                "@PROD_TOKEN": "56 nodes · 240 edges · 56 state_routes · STANDIN bytes · sha256 STANDIN…",
                "@POSTFLIGHT_VERDICT": "STANDIN", "@PROMOTION_APPROVAL_WORDS": "STANDIN",
                "@REGISTER_ENTRY_PAGE_ID": "e" * 32, "@CATALOG_PAGE_ID": "c" * 32, "@PE_PAGE_ID": "f" * 32,
-               "@ACTIVATION_DATE": "2026-10-28"}
+               "@ACTIVATION_DATE": "2026-10-28", "@PROMOTION_APPROVED_AT": "2026-10-27"}   # AM-11: two dates
 
 
 def _copy(root: Path, dst: Path) -> None:
@@ -384,6 +397,23 @@ def selftest(root: Path) -> dict:
                                                    for x in run_apply(d, "X26", {}, "main")["refusals"])
         a26 = run_apply(d, "X26", STANDIN_X26, "main")
         cases["x26_apply_with_values_ok"] = a26["ok"]
+        # AM-11, each way: the approval date only where the text dates the approval, the promotion date elsewhere
+        sv, dr = (d / "docs/prompt_ecosystem_management/authoritative-surfaces.md").read_text(encoding="utf-8"), (d / DR).read_text(encoding="utf-8")
+        d31 = dr[dr.find("\n## D31 — "):] if "\n## D31 — " in dr else ""   # earlier entries carry their own dates
+        cases["am11_approval_dates_where_approval"] = (occ(sv, "`APPROVED` 2026-10-27 |") == 1 and occ(d31, "**Product Owner, 2026-10-27**") == 1
+                                                       and occ(sv, "`APPROVED` 2026-10-28") == 0 and occ(d31, "**Product Owner, 2026-10-28**") == 0
+                                                       and occ(d31, "from 00:00:00Z") == 1)
+        cases["am11_promotion_date_elsewhere"] = (occ(sv, "moved 2026-10-28, never copied") == 1 and occ(sv, "as built 2026-10-28 |") == 1
+                                                  and occ(sv, "and 2026-10-28 by decision D31") == 1 and occ(sv, "promoted 2026-10-28 by Product Owner") == 1)
+        raw = {e["id"]: e["new"] for w in ("W7", "W8") for e in _repo_edits(w) if e.get("id") in X26_IDS}
+        cases["am11_changes_only_two_markers"] = all(
+            u["edits"][0]["new"] == (raw[u["id"]].replace(*AM11_SWAPS[u["id"]]) if u["id"] in AM11_SWAPS else raw[u["id"]])
+            and (u["id"] not in AM11_SWAPS or u["edits"][0]["new"] != raw[u["id"]]) for u in edit_set("X26"))
+        d2 = fresh("am11")
+        run_apply(d2, "X1", {}, "main")
+        miss = run_apply(d2, "X26", {k: v for k, v in STANDIN_X26.items() if k != "@PROMOTION_APPROVED_AT"}, "main")
+        cases["am11_missing_approved_at_refused"] = (not miss["ok"] and miss.get("written") == 0 and any(
+            "@PROMOTION_APPROVED_AT" in x.get("markers", []) for x in miss["refusals"]))
 
         d = fresh("missing")
         p = d / "docs/prompt_ecosystem_management/reviewer-prompt-template.md"

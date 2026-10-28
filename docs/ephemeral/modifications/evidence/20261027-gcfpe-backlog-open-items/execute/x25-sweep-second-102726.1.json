@@ -1,0 +1,381 @@
+{
+ "archived_ids": {
+  "errors": [],
+  "judged": {
+   "3e54590a05eb81eb818fd0f42045167a": "the GCFPE Modification Backlog mentions the CL-05 102626.2 candidate; its rows are the coordinator's closing writes (P6-SWEEP's starting list; X28)",
+   "3f44590a05eb8110aa69fe4189ad9abc": "GCFPE-20261009.1 — Alpha Feedback Candidate, a dated record (P6-SWEEP's starting list: banner only), mentions PE Metaprompt 100926.1; bannered at P6, its text kept"
+  },
+  "linking_pages": 57,
+  "linking_pages_outside_archive_set": {
+   "3e54590a05eb81eb818fd0f42045167a": [
+    "4054590a05eb8155b301e2cb6dec31d5"
+   ],
+   "3f44590a05eb8110aa69fe4189ad9abc": [
+    "3f44590a05eb81f98b76c83465dc1960"
+   ]
+  },
+  "no_control_or_member_page_links_an_archived_page": true,
+  "targets": 57,
+  "tool": "notion-list-page-backlinks on each of the 57 archived pages, page_size 100, every cursor followed, one read-only worker",
+  "truncated": []
+ },
+ "first_triage_dispositions": {
+  "left_as_written": {
+   "3c74590a05eb8176baf8cb59f1631f3c": "HDE TW: 'Current authored iteration — 100926.1' is GTWPE's own iteration, another ecosystem's version",
+   "3d14590a05eb81458dadf3fabd021b97": "Prompt and Session Control Error Log: dated error entries (OPS-PROMPT-ERR-20261012-026, -20261027-027), PE40's log; a dated record: its statements describe its own date, in dated sections; left as written",
+   "3db4590a05eb8104b04cc01ed90ec39f": "Repair Completion Checklist — 20260914.1: a dated record: its statements describe its own date, in dated sections; left as written",
+   "3db4590a05eb816f925ef3b0659de3b8": "Register Entry — GCFPE-20260914.1: a dated record: its statements describe its own date, in dated sections; left as written",
+   "3db4590a05eb81d49943dffdaaaeed7c": "PR Development Skill-Fit and Interoperability Decision — 20260914.1 (P6-SWEEP's starting list): a dated record: its statements describe its own date, in dated sections; left as written",
+   "3dc4590a05eb81a9adf1d8f800863937": "Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1: a dated record: its statements describe its own date, in dated sections; left as written",
+   "3dc4590a05eb81c0a0f3cefb0c679b40": "Batch 1 Repair Report v1.0 — 20260915: a dated record: its statements describe its own date, in dated sections; left as written",
+   "3e14590a05eb81c7ab79ef1106d5d73a": "TypeSafe Jev PoC — SF-05 screening plan — 20260920.1: its 55-body run of 2026-09; a dated record: its statements describe its own date, in dated sections; left as written",
+   "3e54590a05eb81eb818fd0f42045167a": "GCFPE Modification Backlog: P6-SWEEP's starting list says its rows are the coordinator's closing writes (X28)",
+   "3ea4590a05eb818c915bdfd3d150c44b": "GTWPE — Glow Technical Writing Prompt Ecosystem: another ecosystem's 100926.1",
+   "3f74590a05eb81b8b7bbcbfe0dcacea9": "Register Entry — GCFPE-20261009.1: that release's own transaction record; a dated record: its statements describe its own date, in dated sections; left as written"
+  },
+  "note": "the 17 pages the first triage (61 pages) reported with a finding or a 55-member statement; a selected member's page had none",
+  "noted": {
+   "3db4590a05eb8182ade0c1eb46c7e80f": "Epic Alpha Run Notes — HDE-EPIC040: its 'Not operative since 2026-10-12' note reads as current; a dated note before it",
+   "3df4590a05eb8111a6a5f67cb82f96f6": "Alpha Feedback — Deferred Items — 091426.1: '2026-10-12: GCFPE-20261009.1 / 100926.1 / 55 is selected' reads as current; a dated note before it",
+   "3df4590a05eb81e09144c1c36ffad28b": "Workflow Skill Repair — Round Tracking — 091426.1: its top-of-page historical note; a dated note before it",
+   "3e34590a05eb811b93d2da9b4ef8106d": "GCFPE-MGMT-10 PROPOSED BODY (D20 redesign): 'Promoted 2026-10-12.' at the top; a dated note before it",
+   "3e34590a05eb81e7927efe0541258916": "MGMT Change-Process Redesign — Tracking: '2026-10-12: promoted.' under 'Where things actually stand'; a dated note before it",
+   "3f44590a05eb8110aa69fe4189ad9abc": "GCFPE-20261009.1 — Alpha Feedback Candidate — 100926.1: P6-SWEEP's starting list, a dated record, banner only; a banner at the start"
+  }
+ },
+ "gate": "a second search finds no page asserting 100926.1 / 55 as current outside historical sections; GCFPE-MGMT-10's title is the only current 100926.1 name",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "notes": {
+  "as_sent": [
+   {
+    "anchor": "<b>Not operative since 2026-10-12.</b>",
+    "command": "update_content",
+    "id": "3db4590a05eb8182ade0c1eb46c7e80f",
+    "note": "<b>2026-10-28:</b> the register selects GCFPE-20261027.1 / 102726.1 / 56, and the superseded 100926.1 pages are archived (record <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>). The note below is dated 2026-10-12 and kept as written.",
+    "tool_use_id": "toolu_01ENdS1LasGwPDhAJsupnJHm"
+   },
+   {
+    "anchor": "<b>2026-10-12: GCFPE-20261009.1 / 100926.1 / 55 is selected</b>",
+    "command": "update_content",
+    "id": "3df4590a05eb8111a6a5f67cb82f96f6",
+    "note": "<b>2026-10-28: GCFPE-20261027.1 / 102726.1 / 56 is selected</b> (the register; record <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>). The 2026-10-12 line below is dated and kept as written.",
+    "tool_use_id": "toolu_01AwogWVdazve4ezHyiEAMR6"
+   },
+   {
+    "anchor": "<b>2026-10-12: promoted.</b>",
+    "command": "update_content",
+    "id": "3e34590a05eb81e7927efe0541258916",
+    "note": "<b>2026-10-28:</b> GCFPE-MGMT-10 is unchanged and keeps its 100926.1 page as a member of GCFPE-20261027.1 / 102726.1 / 56, which the register selects (record <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>). The note below is dated 2026-10-12 and kept as written.",
+    "tool_use_id": "toolu_01Xs82ijJTLcggbvyBJUAg29"
+   },
+   {
+    "anchor": "<b>Promoted 2026-10-12.</b>",
+    "command": "update_content",
+    "id": "3e34590a05eb811b93d2da9b4ef8106d",
+    "note": "<b>2026-10-28:</b> GCFPE-MGMT-10's 100926.1 page is unchanged and is a member of GCFPE-20261027.1 / 102726.1 / 56, which the register selects (record <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>). The note below is dated 2026-10-12 and kept as written.",
+    "tool_use_id": "toolu_01JXvyz2HQTRiGprC39Gvn52"
+   },
+   {
+    "anchor": "<b>Historical record.</b> This page tracks the 091426.1 skill-repair rounds",
+    "command": "update_content",
+    "id": "3df4590a05eb81e09144c1c36ffad28b",
+    "note": "<b>2026-10-28:</b> the register selects GCFPE-20261027.1 / 102726.1 / 56, and the superseded 100926.1 pages are archived (record <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>). The note below is dated 2026-10-12 and kept as written.",
+    "tool_use_id": "toolu_01EMCRyyG2xuLBXi3eEpHYVf"
+   },
+   {
+    "anchor": null,
+    "command": "insert_content",
+    "id": "3f44590a05eb8110aa69fe4189ad9abc",
+    "note": "<b>Historical record, 2026-10-28.</b> This candidate was promoted on 2026-10-12 as GCFPE-20261009.1 / 100926.1 / 55 and superseded on 2026-10-28 by GCFPE-20261027.1 / 102726.1 / 56, which the register selects. Its 100926.1 member pages, except GCFPE-MGMT-10's, and PE Metaprompt 100926.1 are archived (record <code>docs/ephemeral/modifications/MODIFICATION-20261027-gcfpe-backlog-open-items.md</code>). The text below is kept as written.",
+    "position": "start",
+    "tool_use_id": "toolu_0165LXQAoYrwwF2SJyQXy2Yz"
+   }
+  ],
+  "readback": {
+   "all_ok": true,
+   "fetched_after": "2026-10-28T01:10:30.419Z",
+   "notes": 6,
+   "rows": [
+    {
+     "anchor_count": 1,
+     "as_of": "2026-10-28T01:09:53.186Z",
+     "command": "update_content",
+     "id": "3db4590a05eb8182ade0c1eb46c7e80f",
+     "note_count": 1,
+     "note_then_anchor": 1,
+     "ok": true
+    },
+    {
+     "anchor_count": 1,
+     "as_of": "2026-10-28T01:09:55.286Z",
+     "command": "update_content",
+     "id": "3df4590a05eb8111a6a5f67cb82f96f6",
+     "note_count": 1,
+     "note_then_anchor": 1,
+     "ok": true
+    },
+    {
+     "anchor_count": 1,
+     "as_of": "2026-10-28T01:09:59.741Z",
+     "command": "update_content",
+     "id": "3e34590a05eb81e7927efe0541258916",
+     "note_count": 1,
+     "note_then_anchor": 1,
+     "ok": true
+    },
+    {
+     "anchor_count": 1,
+     "as_of": "2026-10-28T01:09:59.741Z",
+     "command": "update_content",
+     "id": "3e34590a05eb811b93d2da9b4ef8106d",
+     "note_count": 1,
+     "note_then_anchor": 1,
+     "ok": true
+    },
+    {
+     "anchor_count": 1,
+     "as_of": "2026-10-28T01:10:02.017Z",
+     "command": "update_content",
+     "id": "3df4590a05eb81e09144c1c36ffad28b",
+     "note_count": 1,
+     "note_then_anchor": 1,
+     "ok": true
+    },
+    {
+     "as_of": "2026-10-28T01:10:04.219Z",
+     "command": "insert_content",
+     "first_paragraph": true,
+     "id": "3f44590a05eb8110aa69fe4189ad9abc",
+     "note_count": 1,
+     "ok": true
+    }
+   ]
+  },
+  "what": "the six dated notes P6 wrote on record pages after the first triage (01:09:52Z to 01:10:04Z), each sent once; five update_content calls, each a note inserted before an anchor kept as written, and one insert_content at the start"
+ },
+ "ok": true,
+ "record_type": "GCFPE_102726_X25_SWEEP_SECOND",
+ "second_search": {
+  "classified": {
+   "archived_102726_or_archive_page": 34,
+   "control_page_written_and_checked": 13,
+   "other_ecosystem_gtwpe": 6,
+   "triaged_at_x25": 30,
+   "triaged_now": 10
+  },
+  "classified_ids": {
+   "archived_102726_or_archive_page": [
+    "3f74590a05eb812db385c2544d7570f7",
+    "3f44590a05eb81f98b76c83465dc1960",
+    "3f44590a05eb810aa299fbb05a34dece",
+    "3f44590a05eb81a7a944f19bd9a2e3de",
+    "3c94590a05eb811cb145cd010e3b3fcf",
+    "3f44590a05eb8148a538f5c80588db14",
+    "3f44590a05eb81f2af47fff48995f272",
+    "3f44590a05eb81458686cc39d8d98b2a",
+    "3f44590a05eb813cb9cbc61c225b88e2",
+    "3f44590a05eb81a4a3fbc0fae65d153e",
+    "3f44590a05eb818789e9ff3ffa9e06d8",
+    "3f44590a05eb81f1994df5f6ab3a7f32",
+    "3f44590a05eb81be834efe3faf7abb6f",
+    "3f44590a05eb81289c7be77f66bac909",
+    "3f44590a05eb81bea720f004a7e1a6d8",
+    "3f44590a05eb8182a201f0e177dad431",
+    "3f44590a05eb81be9566cd6397c9424c",
+    "3f44590a05eb81209128ea7c82938faf",
+    "3f44590a05eb81489053f72637577807",
+    "3f44590a05eb81949370e6d1b222b40b",
+    "3f44590a05eb813ea53ac959e7a4e597",
+    "3f44590a05eb81f9bf84f4585d9f7a2c",
+    "3f44590a05eb8155934dd1c4c2b5d1eb",
+    "3f44590a05eb81129b09cddebcc18458",
+    "3f44590a05eb810f83d4d539e5b0e588",
+    "3f44590a05eb81a8bf39f4b16cc61a5f",
+    "3f44590a05eb81d29748eb21df73b02c",
+    "3f44590a05eb81ee9a09e00af51f33cb",
+    "3f44590a05eb81cdab15c7e7f7094a64",
+    "3f44590a05eb81ce99b1d2ade30c572f",
+    "3f44590a05eb81d8a582eec0e93e6ee7",
+    "3f44590a05eb8101a264f9fa702b8a6e",
+    "3f44590a05eb81739b57da57c285f45d",
+    "3f44590a05eb815d89d3e602973d83ad"
+   ],
+   "control_page_written_and_checked": [
+    "3db4590a05eb811b9c14f2ae89c28df7",
+    "3db4590a05eb81cd938de84cfffead9c",
+    "3db4590a05eb814d96d3dcfa8835f96d",
+    "3db4590a05eb8195a2ccf7c0959a8b6e",
+    "3c74590a05eb811d8433e7022629e213",
+    "3db4590a05eb81d59059eb6b95ed5fcf",
+    "3db4590a05eb81de9736ea69bac61016",
+    "3d24590a05eb81ce942ad994cfca9fa1",
+    "4074590a05eb81c68d03fa4614e1ac6f",
+    "3db4590a05eb812f87caed515836687f",
+    "4064590a05eb8113ae7de73041631c00",
+    "3ce4590a05eb814f8892f88ff8539308",
+    "4064590a05eb8173b2e7d37929e7fe4d"
+   ],
+   "other_ecosystem_gtwpe": [
+    "3f44590a05eb81589a9af40e6317f82a",
+    "3f44590a05eb81d99807de73ac3057d8",
+    "3f44590a05eb81a4ad0dd4df2c6d401c",
+    "3f44590a05eb81eebff6e3afa3d9aa5b",
+    "3f44590a05eb81968215cd653f35f77e",
+    "3f44590a05eb81be8aacdd5b075d2605"
+   ],
+   "triaged_at_x25": [
+    "3f44590a05eb8110aa69fe4189ad9abc",
+    "3e54590a05eb81eb818fd0f42045167a",
+    "3f74590a05eb81b8b7bbcbfe0dcacea9",
+    "3db4590a05eb8182ade0c1eb46c7e80f",
+    "3db4590a05eb816f925ef3b0659de3b8",
+    "3e34590a05eb81e7927efe0541258916",
+    "3e34590a05eb811b93d2da9b4ef8106d",
+    "3df4590a05eb8111a6a5f67cb82f96f6",
+    "3cc4590a05eb8101b5ded32c12616eb6",
+    "3d94590a05eb81c6ab8fe343b9d2ae67",
+    "3dc4590a05eb81c0a0f3cefb0c679b40",
+    "3dc4590a05eb81a9adf1d8f800863937",
+    "3df4590a05eb81e09144c1c36ffad28b",
+    "3c74590a05eb8176baf8cb59f1631f3c",
+    "3de4590a05eb814895d3e859994eb6bc",
+    "4064590a05eb8157bcb9c79a43cefb08",
+    "3d24590a05eb8108864cc13216e91848",
+    "3da4590a05eb81cd856ee3d5dc28af9e",
+    "3d94590a05eb81f6824ff4bf507d474c",
+    "3d24590a05eb81a48eb6e54f7a45bf99",
+    "3d44590a05eb81cbb93ffe032b9aaa61",
+    "4064590a05eb819f949fd8f201e0a8b6",
+    "3e04590a05eb81d09363c87be87ca809",
+    "3d24590a05eb81059255fa60ed15ee7b",
+    "4064590a05eb81e58a4efd0845689472",
+    "4064590a05eb8141a25be9a48df6c2a9",
+    "4064590a05eb814fba57ed387ee2cddd",
+    "4064590a05eb810ca861ff615ddb7e79",
+    "4064590a05eb81c4b5fcde0e9e5a6fa9",
+    "3ea4590a05eb818c915bdfd3d150c44b"
+   ],
+   "triaged_now": [
+    "3db4590a05eb81738ef1d846e3c0df8c",
+    "3f74590a05eb81b69bd8c27106f7a59d",
+    "4064590a05eb81479a74fa542b90cadb",
+    "4064590a05eb81de9686f14e4693b315",
+    "3db4590a05eb81d1bb64ebcb3ca8eb54",
+    "3da4590a05eb81bcbc5deb2d2cec4f1f",
+    "4064590a05eb81fab31ef7c8921fc312",
+    "3d94590a05eb8123b758ed44e6fb1fc6",
+    "3d54590a05eb81d79c9cf85b69110239",
+    "3da4590a05eb8153a76dc11f3695eca1"
+   ]
+  },
+  "limit": "each query returned 50 results, the tool's page maximum, and no next-page cursor; a list may be cut off at 50",
+  "queries": [
+   "GCFPE-20261009.1 / 100926.1 / 55",
+   "selects GCFPE-20261009.1",
+   "100926.1 is selected"
+  ],
+  "results_per_query": {
+   "100926.1 is selected": 50,
+   "GCFPE-20261009.1 / 100926.1 / 55": 50,
+   "selects GCFPE-20261009.1": 50
+  },
+  "tool": "notion-search, one read-only worker, after the notes",
+  "unique_pages": 93
+ },
+ "step": "X25, P6",
+ "triaged_now": {
+  "fetched_after": "2026-10-28T01:14:42.151Z",
+  "judged": {
+   "3db4590a05eb81738ef1d846e3c0df8c": "the 091426.1 catalog, archived 2026-10-12 under 04 Archived Prompt Versions: an earlier release's archived record, left as written (its 2026-10-09 section and release rule are dated history)",
+   "others": "0 findings: GCFPE-MGMT-10 100926.1, PR-40, PR-10 and OPS-10 102726.1 (selected members, counts only); three earlier catalogs and GCFPE-MGMT-10 091426.1 under the archive; the 20260912.1 catalog under the un-versioned Flow Index; the 20260908 repair record under the register"
+  },
+  "member_pages_with_findings": [],
+  "pages": 10,
+  "pages_with_findings": [
+   "3db4590a05eb81738ef1d846e3c0df8c"
+  ],
+  "rows": [
+   {
+    "count_statements": 2,
+    "findings": 1,
+    "id": "3db4590a05eb81738ef1d846e3c0df8c",
+    "parent": "3c94590a05eb811cb145cd010e3b3fcf",
+    "selected_member": false,
+    "title": "Glow HDE Complete Prompt Set — GCFPE-20260914.1 — 091426.1"
+   },
+   {
+    "count_statements": 0,
+    "findings": 0,
+    "id": "3db4590a05eb81d1bb64ebcb3ca8eb54",
+    "parent": "3c94590a05eb811cb145cd010e3b3fcf",
+    "selected_member": false,
+    "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1"
+   },
+   {
+    "count_statements": 0,
+    "findings": 0,
+    "id": "3da4590a05eb81bcbc5deb2d2cec4f1f",
+    "parent": "3c94590a05eb811cb145cd010e3b3fcf",
+    "selected_member": false,
+    "title": "Glow HDE Complete Prompt Set — GCFPE-20260913.1 — 091326.2"
+   },
+   {
+    "count_statements": 0,
+    "findings": 0,
+    "id": "3d94590a05eb8123b758ed44e6fb1fc6",
+    "parent": "3cc4590a05eb8101b5ded32c12616eb6",
+    "selected_member": false,
+    "title": "Glow HDE Complete Prompt Set — GCFPE-20260912.1"
+   },
+   {
+    "count_statements": 0,
+    "findings": 0,
+    "id": "3d54590a05eb81d79c9cf85b69110239",
+    "parent": "3d24590a05eb81ce942ad994cfca9fa1",
+    "selected_member": false,
+    "title": "GCFPE-EPIC-ALPHA-REPAIR-20260908 — Implementation and Validation"
+   },
+   {
+    "count_statements": 0,
+    "findings": 0,
+    "id": "3da4590a05eb8153a76dc11f3695eca1",
+    "parent": "3c94590a05eb811cb145cd010e3b3fcf",
+    "selected_member": false,
+    "title": "Glow HDE Complete Prompt Set — GCFPE-20260913.1"
+   },
+   {
+    "count_statements": 0,
+    "findings": 0,
+    "id": "3f74590a05eb81b69bd8c27106f7a59d",
+    "parent": "3db4590a05eb81de9736ea69bac61016",
+    "selected_member": true,
+    "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926.1"
+   },
+   {
+    "count_statements": 0,
+    "findings": 0,
+    "id": "4064590a05eb81479a74fa542b90cadb",
+    "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+    "selected_member": true,
+    "title": "PR-40 — Review PR Work-Unit Lineage — 102726.1"
+   },
+   {
+    "count_statements": 0,
+    "findings": 0,
+    "id": "4064590a05eb81de9686f14e4693b315",
+    "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+    "selected_member": true,
+    "title": "PR-10 — Create PR Work-Unit Instructions — 102726.1"
+   },
+   {
+    "count_statements": 0,
+    "findings": 0,
+    "id": "4064590a05eb81fab31ef7c8921fc312",
+    "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+    "selected_member": true,
+    "title": "OPS-10 — Create Bounded Ops Task — 102726.1"
+   }
+  ],
+  "why": "second-search hits outside the first triage that are neither archived at X24, control pages nor GTWPE's"
+ }
+}

@@ -2032,3 +2032,25 @@ so it takes no D-number.
   security review, and `glow-hde-pr-development`'s validator forbids "Codex code and security
   reviews" and "Codex security review". Each is fired by an injected regression in the
   Modification's EXECUTE.
+
+## D31 — `GCFPE-20261027.1 / 102726.1 / 56` is promoted; the superseded 100926.1 pages are archived intact
+
+**Product Owner, 2026-10-27**, in `MODIFICATION-20261027-gcfpe-backlog-open-items`: *"Nathan approves promotion of GCFPE-20261027.1 / 102726.1 as the snapshot in execute/PROMOTION-PACKET.md at 66108a38 (sha256 15118262…), accepting the listed risks in its §6, with the opt-in corrections PF-B W-4 and PF-A F-4; PF-A F-1 and PF-A F-2 stay listed, and D24-B LISTED-2 goes to the backlog. Go on to PART-25."*
+
+The register's three predicates were met in order: complete behaviour validation of the pinned snapshot (Q6 to Q8, and the production validation after the install), the independent post-flight (Q10, `docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/REVIEW-POSTFLIGHT-A.md` (`PASS WITH WARNINGS`) and `docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/REVIEW-POSTFLIGHT-B.md` (`PASS WITH WARNINGS`), no mandatory finding), and Nathan's approval quoted above.
+
+### What became current
+
+- **The register selects `GCFPE-20261027.1` / `102726.1` / 56 from 2026-10-28 00:21:59Z**, written last, after the control pages and the new catalog were written and read back (`D17`'s order).
+- **Membership.** 54 members have 102726.1 successor pages; 1 unchanged members keep their 100926.1 pages (`D23-G`); `CL-05 — Prepare and Publish the Close Mutation Set` is added (PF06 §3.5.1; DN-2). The successor-page map is `docs/ephemeral/modifications/evidence/20261027-gcfpe-backlog-open-items/execute/successor-pages-102726.1.json`.
+- **Skills:** change-flow 3.5.0, flowmaster-validate 3.5.0, glow-hde-pr-development 1.5.0 and glow-graph-contract. Each installed tree measures its approved digest with `freeze.py`.
+- **Archival:** 57 pages, the superseded 100926.1 member pages, the 100926.1 catalog, PE Metaprompt 100926.1 and the CL-05 102626.2 candidate, were **moved** to *04 Archived Prompt Versions* and read back there.
+- **Repository:** `docs/graph/parts/` holds the selected 102726.1 parts (proof token `56 nodes · 240 edges · 56 state_routes · 607,994 bytes · sha256 2342744d…`) and `project-prompt-contract-registry.md` the approved `GCFPE-PCR-20261027.1`, both built by script.
+
+### What it does not change
+
+Alpha state, PF canon, the TW ecosystem and the TypeSafe uses table. The listed risks in the promotion packet and the Modification's §E stay listed; none is resolved by promotion.
+
+### The tested guard (`D14`)
+
+The activation and archived-phase control checks on every control page; the production validation with the installed skills over all 56 bodies, including `PROMPT_BINDING_SUPERSEDED`; and R7's rebuild of the parts and check of the registry from `main`. Each is in the Modification's evidence.

@@ -1,7 +1,7 @@
 {
   "edge_indices": [
-    77,
-    78
+    76,
+    77
   ],
   "edges": [
     {
@@ -108,8 +108,8 @@
   "id": "ESC-25",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81949370e6d1b222b40b?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb815ba64ef9ebfb75eb80?pvs=204",
+    "candidate_version": "102726.1",
     "id": "ESC-25",
     "lane": "ESC",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -118,11 +118,11 @@
       "DISCOVERY_RESULT"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb81bf9326e46a1017de38",
-      "release": "GCFPE-20260914.1",
-      "title": "ESC-25 — Execute Bounded Escalation Discovery — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81949370e6d1b222b40b",
+      "release": "GCFPE-20261009.1",
+      "title": "ESC-25 — Execute Bounded Escalation Discovery — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81949370e6d1b222b40b?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "ESC-30"
@@ -136,7 +136,7 @@
     ],
     "sequence": 25,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "ESC-25 — Execute Bounded Escalation Discovery — 100926.1"
+    "title": "ESC-25 — Execute Bounded Escalation Discovery — 102726.1"
   },
   "state_route_order": [
     "complete",

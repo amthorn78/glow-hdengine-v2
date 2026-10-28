@@ -1,11 +1,11 @@
 {
   "edge_indices": [
+    104,
     105,
     106,
     107,
     108,
-    109,
-    110
+    109
   ],
   "edges": [
     {
@@ -204,8 +204,8 @@
   "id": "IA-50",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb810aa299fbb05a34dece?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81d2b388fde42922edc7?pvs=204",
+    "candidate_version": "102726.1",
     "id": "IA-50",
     "lane": "IA",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -214,11 +214,11 @@
       "IA_RECOVERY_SEED"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb81d78eeae384e93dd697",
-      "release": "GCFPE-20260914.1",
-      "title": "IA-50 — IA Answer Seeder — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb810aa299fbb05a34dece",
+      "release": "GCFPE-20261009.1",
+      "title": "IA-50 — IA Answer Seeder — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb810aa299fbb05a34dece?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "IA-10",
@@ -235,7 +235,7 @@
     ],
     "sequence": 50,
     "session_class": "CHANGE_LIFETIME",
-    "title": "IA-50 — IA Answer Seeder — 100926.1"
+    "title": "IA-50 — IA Answer Seeder — 102726.1"
   },
   "state_route_order": [
     "seed_incomplete_audit",

@@ -1,10 +1,10 @@
 {
   "edge_indices": [
+    96,
     97,
     98,
     99,
-    100,
-    101
+    100
   ],
   "edges": [
     {
@@ -240,8 +240,8 @@
   "id": "IA-30",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb811db88dece791f1f60c?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81ebb110fb0202874d8c?pvs=204",
+    "candidate_version": "102726.1",
     "id": "IA-30",
     "lane": "IA",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -250,11 +250,11 @@
       "IMPLEMENTATION_PLAN_REVIEW / APPROVED_BASE_CHANGE_ASSESSMENT / PLAN_DELTA_REDLINE / MATERIAL_PLAN_DELTA_REVIEW"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb81c6bfb5f36f7df8f464",
-      "release": "GCFPE-20260914.1",
-      "title": "IA-30 — Review Whole-Change Implementation Plan — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb811db88dece791f1f60c",
+      "release": "GCFPE-20261009.1",
+      "title": "IA-30 — Review Whole-Change Implementation Plan — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb811db88dece791f1f60c?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "PR-10",
@@ -274,7 +274,7 @@
     ],
     "sequence": 30,
     "session_class": "ROLE_CONTINUING",
-    "title": "IA-30 — Review Whole-Change Implementation Plan — 100926.1"
+    "title": "IA-30 — Review Whole-Change Implementation Plan — 102726.1"
   },
   "state_route_order": [
     "initial_approve",
