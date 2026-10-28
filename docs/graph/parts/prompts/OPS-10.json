@@ -1,10 +1,10 @@
 {
   "edge_indices": [
-    129,
-    130,
-    131,
-    132,
-    133
+    134,
+    135,
+    136,
+    137,
+    138
   ],
   "edges": [
     {
@@ -170,8 +170,8 @@
   "id": "OPS-10",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81509957c43992c03625?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81fab31ef7c8921fc312?pvs=204",
+    "candidate_version": "102726.1",
     "id": "OPS-10",
     "lane": "OPS",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -180,11 +180,11 @@
       "OPS_TASK"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb81db98cce3e30a62bce5",
-      "release": "GCFPE-20260914.1",
-      "title": "OPS-10 — Create Bounded Ops Task — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81509957c43992c03625",
+      "release": "GCFPE-20261009.1",
+      "title": "OPS-10 — Create Bounded Ops Task — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81509957c43992c03625?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "OPS-20"
@@ -197,7 +197,7 @@
     ],
     "sequence": 10,
     "session_class": "CHANGE_LIFETIME",
-    "title": "OPS-10 — Create Bounded Ops Task — 100926.1"
+    "title": "OPS-10 — Create Bounded Ops Task — 102726.1"
   },
   "state_route_order": [
     "ready",

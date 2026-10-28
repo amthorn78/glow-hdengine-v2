@@ -1,8 +1,8 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
-artifact_version: "1.1"
+artifact_version: "1.2"
 created_date: 2026-09-21
-revised_date: 2026-10-12 — D28, a skill's name line reads the same quoted or plain
+revised_date: 2026-10-27 — the glow-merged-change-attribution-lock 1.2.0 of record (MB-005); 1.1, 2026-10-12: D28, a skill's name line reads the same quoted or plain
 status: BINDING
 authority: Product Owner direction 2026-09-21; derived from findings F2 (round 23), the wrong-package install, and the round-27 §10 review
 supersedes_location: docs/ephemeral/gcfpe.round23/freeze.py — the script previously lived there, which was the wrong home
@@ -126,6 +126,16 @@ told what to do. The command above is what to do.
 Rounds 28 and 29 remain separable only by tree hash. That cannot be repaired — both are published
 and both carry `SKILL_REPAIR_REQUIRED`, so confusing them costs nothing — but it is the shape of the
 damage, and it is permanent.
+
+**One revision, two trees: glow-merged-change-attribution-lock 1.2.0.** Recorded 2026-10-27 by
+`MODIFICATION-20261027-gcfpe-backlog-open-items` (MB-005). Two trees have advertised
+`MERGED_CHANGE_ATTRIBUTION_SKILL_REVISION: 1.2.0`: the installed tree, 10 files, freeze digest
+`c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f`, and an analysed tree, 11 files,
+`ee253cfaf844a5ce28da3646e469d3a926167ecb3898e5dc205b0365dc946a8e`, which is not held in this
+repository or in the installed skills. **The installed 10-file tree is the 1.2.0 of record:** sessions
+load it, and qualification binds it by digest (DN-E E1, `MODIFICATION-20261011-gcfpe-mb008-to-promotion`).
+Revision 1.2.0 is spent on it. Any other content of this skill, the 11-file tree included, is delivered
+again only under a revision that no package, verdict or install has used.
 
 ## Recording the values
 

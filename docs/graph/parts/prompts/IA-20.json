@@ -1,10 +1,10 @@
 {
   "edge_indices": [
+    91,
     92,
     93,
     94,
-    95,
-    96
+    95
   ],
   "edges": [
     {
@@ -171,8 +171,8 @@
   "id": "IA-20",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81a8bf39f4b16cc61a5f?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81db9c6befccd5e520f1?pvs=204",
+    "candidate_version": "102726.1",
     "id": "IA-20",
     "lane": "IA",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -181,11 +181,11 @@
       "IMPLEMENTATION_PLAN"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb81c4825df2ad0dec4750",
-      "release": "GCFPE-20260914.1",
-      "title": "IA-20 — Create Whole-Change Implementation Plan — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81a8bf39f4b16cc61a5f",
+      "release": "GCFPE-20261009.1",
+      "title": "IA-20 — Create Whole-Change Implementation Plan — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81a8bf39f4b16cc61a5f?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "IA-30"
@@ -198,7 +198,7 @@
     ],
     "sequence": 20,
     "session_class": "CHANGE_LIFETIME",
-    "title": "IA-20 — Create Whole-Change Implementation Plan — 100926.1"
+    "title": "IA-20 — Create Whole-Change Implementation Plan — 102726.1"
   },
   "state_route_order": [
     "plan_pending",

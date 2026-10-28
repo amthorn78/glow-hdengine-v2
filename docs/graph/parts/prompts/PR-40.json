@@ -1,18 +1,18 @@
 {
   "edge_indices": [
-    162,
-    163,
-    164,
-    165,
-    166,
     167,
-    228,
-    229,
-    230,
-    231,
-    232,
+    168,
+    169,
+    170,
+    171,
+    172,
     233,
-    234
+    234,
+    235,
+    236,
+    237,
+    238,
+    239
   ],
   "edges": [
     {
@@ -435,8 +435,8 @@
   "id": "PR-40",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81479a74fa542b90cadb?pvs=204",
+    "candidate_version": "102726.1",
     "id": "PR-40",
     "lane": "PR",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -445,11 +445,11 @@
       "PR_WORK_UNIT_LINEAGE_REVIEW"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb818786c5cb6051b4d634",
-      "release": "GCFPE-20260914.1",
-      "title": "PR-40 — Review PR Work-Unit Lineage — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81088487e918fd642a7f",
+      "release": "GCFPE-20261009.1",
+      "title": "PR-40 — Review PR Work-Unit Lineage — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "DOC-20",
@@ -468,7 +468,7 @@
     ],
     "sequence": 40,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "PR-40 — Review PR Work-Unit Lineage — 100926.1"
+    "title": "PR-40 — Review PR Work-Unit Lineage — 102726.1"
   },
   "state_route_order": [
     "accept_next_pr",

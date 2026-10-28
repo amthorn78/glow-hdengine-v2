@@ -1,12 +1,12 @@
 {
   "edge_indices": [
-    212,
-    213,
-    214,
-    215,
-    216,
     217,
-    124
+    218,
+    219,
+    220,
+    221,
+    222,
+    125
   ],
   "edges": [
     {
@@ -363,8 +363,8 @@
   "id": "RS-20",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81be9566cd6397c9424c?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81e3bcdddac78d3027da?pvs=204",
+    "candidate_version": "102726.1",
     "id": "RS-20",
     "lane": "RS",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -373,11 +373,11 @@
       "RESCOPE_REVIEW"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb81c183aac2ecb40b1497",
-      "release": "GCFPE-20260914.1",
-      "title": "RS-20 — Review Bounded Work-Unit Rescope — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81be9566cd6397c9424c",
+      "release": "GCFPE-20261009.1",
+      "title": "RS-20 — Review Bounded Work-Unit Rescope — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81be9566cd6397c9424c?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "PR-30",
@@ -396,7 +396,7 @@
     ],
     "sequence": 20,
     "session_class": "CHANGE_LIFETIME",
-    "title": "RS-20 — Review Bounded Work-Unit Rescope — 100926.1"
+    "title": "RS-20 — Review Bounded Work-Unit Rescope — 102726.1"
   },
   "state_route_order": [
     "rescope_pr20_preproceed",

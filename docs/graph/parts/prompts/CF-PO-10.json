@@ -101,8 +101,8 @@
   "id": "CF-PO-10",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3f44590a05eb81f9bf84f4585d9f7a2c?pvs=204",
-    "candidate_version": "100926.1",
+    "candidate_url": "https://app.notion.com/p/4064590a05eb81809a74c181d50922eb?pvs=204",
+    "candidate_version": "102726.1",
     "id": "CF-PO-10",
     "lane": "CF-PO",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -111,11 +111,11 @@
       "CHANGE_CLASS_SELECTION"
     ],
     "predecessor": {
-      "notion_page_id": "3db4590a05eb8161b4d7cb6d07f5101c",
-      "release": "GCFPE-20260914.1",
-      "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 091426.1",
-      "url": "https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c?pvs=204",
-      "version": "091426.1"
+      "notion_page_id": "3f44590a05eb81f9bf84f4585d9f7a2c",
+      "release": "GCFPE-20261009.1",
+      "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 100926.1",
+      "url": "https://app.notion.com/p/3f44590a05eb81f9bf84f4585d9f7a2c?pvs=204",
+      "version": "100926.1"
     },
     "predecessor_union_destinations": [
       "CF-E-10",
@@ -128,7 +128,7 @@
     ],
     "sequence": 10,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 100926.1"
+    "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 102726.1"
   },
   "state_route_order": [
     "class_selected_epic",

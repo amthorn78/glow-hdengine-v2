@@ -1,8 +1,8 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
-artifact_version: "1.2"
+artifact_version: "1.3"
 created_date: 2026-09-21
-revised_date: 2026-09-24 — D26, a second template for ANALYZE and PLAN reviews (1.1, 2026-09-23: D24, delivered to reviewer subagents rather than pasted by Nathan)
+revised_date: 2026-10-27 — both briefs name AGENTS.md and ask for a Canon relied on block (MB-006); 1.2, 2026-09-24: D26, a second template for ANALYZE and PLAN reviews (1.1, 2026-09-23: D24, delivered to reviewer subagents rather than pasted by Nathan)
 status: BINDING
 authority: Product Owner direction 2026-09-21 — persistent procedure lives in the repository, not in Notion
 migrated_from: Glow Operations Hub, *Standard skill reviewer prompt — canonical template — 2026-09-21*
@@ -51,7 +51,7 @@ find nothing.>
 main. <name the pull request the branch is expected to merge as, if it is open, so the reviewer can
 confirm rather than guess.>
 <each artifact by path: report, diff, digest recipe, predecessor records>
-Read <governing file, e.g. AGENTS.md> first. It governs.
+Read AGENTS.md first, and <any other governing file>. They govern.
 
 === 5. WHAT THE CHANGE CLAIMS, AS CLAIMS ===
 <C1..Cn, in the author's own words, phrased as claims to be tested rather than conclusions to be
@@ -102,6 +102,8 @@ explicitly to the digests in §1 and state that it is void for any other bytes. 
 the artifact, the exact defect, the evidence, and the smallest correction. Answer every §6 question
 explicitly; a question is not a finding.
 State which gates you actually ran and which you could not, plainly, rather than inferring a result.
+Add a Canon relied on block: the PF titles, versions and sections, and the in-flight documents, you
+actually read for this review (AGENTS.md canon-first rule).
 Write a successor record; do not correct an earlier dated record in place (AUTH-001).
 <On a re-review: the disposition of every prior finding — fixed, declined with reasoning, or
 deferred — and any defect found while fixing them.>
@@ -138,7 +140,8 @@ record path, and the repair diff you are reviewing against it.>
 Repository <OWNER/REPO>, branch <BRANCH>, commit <SHA>. Read that commit, not the branch head.
 The record: docs/ephemeral/modifications/<MODIFICATION_ID>.md, section <§A or §P>.
 Its evidence: <paths>. Its governing documents: docs/prompt_ecosystem_management/ — read
-gcfpe.decision-record.md D20-D26, modification-template.md and ecosystem-change-management.md.
+AGENTS.md (the canon-first rule), gcfpe.decision-record.md D20-D29, modification-template.md and
+ecosystem-change-management.md.
 The dry run that preceded you: <path to its output>, <its result, one line>.
 
 === 2. WHAT IT CLAIMS, AS CLAIMS ===
@@ -172,7 +175,8 @@ Write your record to <RECORD_PATH>. First line: the count of distinct confirmed 
 Then each REQUIRED finding: rubric class (R1-R4), the exact text or step, the evidence, the smallest
 correction, and whether it is in text the last repair added. Then each LISTED finding, one line
 each. On review 2: the disposition of every prior REQUIRED finding (fixed, not fixed, or fixed with
-a new defect), and the trend in the count.
+a new defect), and the trend in the count. Then a Canon relied on block: the PF titles, versions and
+sections, and the in-flight documents, you actually read for this review (AGENTS.md canon-first rule).
 Do not edit the record under review, merge, install, write to Notion, or edit a prompt body.
 Put your answer first and close with DECISION NEEDED, NOTHING NEEDED, or IN FLIGHT.
 ```

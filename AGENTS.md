@@ -131,7 +131,7 @@ These routes reduce duplicate bookkeeping while retaining evidence-availability 
 - Supported core: `engine/core/core.py::compute_core(member_a, member_b, mechanics_bundle, release_id)`; eligibility belongs to the caller. The Reader and `hdctl showcompat` reach it through `engine/compat/compute.py::evaluate_pair`.
 - Reader: production `POST /api/reader?v=1` and `?v=2` (Reader v1 and Reader v2); dev `GET /reader` is Reader v1. Both bodies stay bands-only and numeric-free.
 - Read-only tools: `python tools/config/generate_config_artifacts.py --compare-goldens <candidate-root>` and `python tools/bodygraph/check_magic10_gate_readiness.py`; both refuse outside closed rails, and neither modifies the repository, activates a release, acquires data or backfills (`--report` writes only outside the candidate root and the repository).
-- Canon: C040-06, C040-07 and C040-08 are decided and delivered. PF10 records them and governs until the permanent canon is revised.
+- Canon: C040-06, C040-07 and C040-08 are decided, delivered and drained into permanent canon.
 - Nonclaims: HDE-EPIC040 documentation establishes no QA verdict, acceptance, OPS01 attestation, deployment, activation, build-checklist movement or epic closure; OPS01 verifies the `1.3.0` release separately.
 
 ## HDE-EPIC039 current workflow posture

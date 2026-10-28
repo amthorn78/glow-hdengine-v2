@@ -7,7 +7,7 @@
   - Compat: `engine/compat/{compute.py,ordering.py,thresholds.py,constants.py}`
   - Validation: `engine/validation/viewer_prefs.py`
   - Emission: `engine/presenter/emitter.py::emit_public(envelope, *, sort_keys=True) -> bytes`; `emit_compact_json(envelope, *, sort_keys=True) -> tuple[bytes, dict]` is a compatibility alias of `emit_public_with_envelope`
-  - Serialization: `engine/serializer/canon.py::dumps(obj)->bytes` (UTF-8, sort_keys, compact, one trailing LF)
+  - Serialization: `engine/serializer/canon.py::sercanon(obj, *, sort_keys=True) -> bytes` (UTF-8, sorted keys by default, compact, exactly one trailing LF); `dumps` is a compatibility alias
   - Errors: `engine/compat/errors.py::error_envelope` builds the governed `error_v1` envelope with keys `schema` (`"v1"`), `ok` (`false`), `code` and `error`, adding `details` only when a caller passes one (the Reader routes never do); the Reader error branches are `$defs.error` of `schemas/reader.v1.schema.json` and `schemas/reader.v2.schema.json`.
   - HTTP handlers: `engine/http/*` (e.g., `compat_handler.py`)
 - **adapter/** — dev runner & route registration (the only app home)
@@ -22,7 +22,7 @@
 ## Emitter/serializer discipline
 - All service and CLI emission **must** call:
   - `engine.presenter.emitter.emit_public(envelope: dict, *, sort_keys: bool = True) -> bytes` (or `emit_public_with_envelope`, which returns `(bytes, envelope)`; `emit_compact_json` is its compatibility alias)
-  - `engine.serializer.canon.dumps(obj) -> bytes` (UTF-8, sort_keys=True, compact, exactly one trailing LF)
+  - `engine.serializer.canon.sercanon(obj, *, sort_keys=True) -> bytes` (UTF-8, sorted keys by default, compact, exactly one trailing LF); `dumps` is a compatibility alias
 - Forbidden in handlers/CLI: `json.dumps(` or `jsonify(`
 
 ## Routing and mounts
@@ -31,9 +31,10 @@
   - `adapter/wsgi.py::create_app` — adds `/internal/healthz` and `/internal/readyz`
   - `adapter/http_reader.py::create_app` — the dev runner (`python -m adapter.http_reader`, started by `scripts/dev_start_reader.sh`)
 - The route inventory is `docs/ENDPOINTS_CATALOG.json`, written by `tools/evidence/generate_a7_transport_proofs.py`
+- In a production-like posture, the dev/internal blueprint serves no dev-harness handler and no canon-retired route: each dev-harness route answers its canonical refusal and each retired `/ops` route the governed not-found, before any handler runs (`adapter/http_reader.py::_mount_for_production`; S19-F03)
 - Compat alpha endpoint (internal): `/api/compat/v1`
   - Success = **200 JSON**; errors include `Cache-Control: no-store`
-  - GET **ids-only** (`a_id`,`b_id`); any JSON body → **400**
+  - GET answers **200** `{"ok":true,"schema":"v1"}`; a GET with a body answers **400** with `code` `ERR_COMPAT_INVALID_JSON`
 
 ## Architecture capture (every epic)
 - At epic close, capture `_arch/<epic_id>_<ts>/` snapshots: routes, import scans (legacy trees), emitter/serializer guard, and a compact tree.

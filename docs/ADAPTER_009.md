@@ -46,7 +46,6 @@ It returns 200 with `{"ok":true,"schema":"v1"}` and the header set above, uncond
 ## Env vars
 `APP_ENV` selects the environment. `adapter/wsgi.py` (for the production-only `Strict-Transport-Security` header) and `adapter/env_guard.py` read `ENGINE_ENV` only when `APP_ENV` is blank.
 No code reads `ENGINE_SERVICE_TOKEN`, `TOGGLES_SHA`, `BUILD_COMMIT_SHORT` or `BUILD_TIMESTAMP_UTC`. The HTTP adapter reads neither `ENGINE_TAG` nor `RELEASE_ID` from the environment (`adapter/wsgi.py` sets them as app configuration defaults, `Isis6` and `rel_dev`, for its `X-Engine-Tag` and `X-Release-Id` headers and its log lines), but the vendor client (`engine/bodygraph/vendor_client.py`) reads `RELEASE_ID` from the environment for its `User-Agent: GlowHDEngine/<release_id>` header when no release identity is passed.
-New
 
 # Appendix-D — Evidence Index (EPIC-005)
 
@@ -186,10 +185,7 @@ Both forms are accepted by our docs and tools. **Do not rename** existing `_arch
 
 **Endpoint:** `GET /internal/version` (+ `HEAD`)
 
-**Body (200):** exactly:
-```json
-{"engine_tag","release_id","invocation_tag","build_commit","emitter_sha256"}
-```
+**Body (200):** exactly the six keys `engine_tag`, `build_commit`, `invocation_tag`, `invocation_sha256`, `emitter_sha256`, `release_id`, in that order.
 LF-terminated JSON; no extra fields.
 
 **Headers (200):**
@@ -206,7 +202,7 @@ LF-terminated JSON; no extra fields.
 
 **Conditionals:** `If-None-Match` ignored — still **200** (no 304)
 
-**Override (prod):** `X-Identity-Override` ⇒ **400** JSON; `no-store`; **no `ETag`**
+**Override:** `X-Identity-Override` ⇒ **400** JSON in every environment; `no-store`; **no `ETag`**
 
 **Evidence (repo-relative):**
 
@@ -220,7 +216,7 @@ LF-terminated JSON; no extra fields.
 - GET and HEAD both return **200** with header parity.
 - **Cache-Control: no-store**; **no ETag** on this route.
 - Conditional validators are **ignored** (conditional GET still returns 200).
-- Body is compact JSON with keys in order: `engine_tag, release_id, invocation_tag, build_commit, emitter_sha256`.
+- Body is compact JSON with keys in order: `engine_tag, build_commit, invocation_tag, invocation_sha256, emitter_sha256, release_id`.
 - This route must be **DB-decoupled** and always render without external dependencies.
 
 ### `/internal/version` invariants (enforced)
