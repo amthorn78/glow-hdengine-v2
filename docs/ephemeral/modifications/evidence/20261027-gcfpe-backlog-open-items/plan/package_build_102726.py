@@ -30,7 +30,9 @@ The four packages (W7-D2) are written to <out-dir>, which must not exist. In ord
   R   run_gcfpe_20261027_fixtures.py from the 100926.1 runner: release literals moved, revision 3.5.0, the QA closure
       contract cases retargeted to the close-mutation-set stage, and the new mutation cases (W5 QA closure, W1 DOC-20
       inbound, member version off the map, kept member at 102726.1, 55-member contract, merge-pending real-input P1,
-      old R1 pin, 2026-09-23 oracle not historical, PROMPT_BINDING_SUPERSEDED on synthetic text)
+      old R1 pin, 2026-09-23 oracle not historical, PROMPT_BINDING_SUPERSEDED on synthetic text); and, by AM-8, the
+      QA-120 source cases' anchors moved to the written body (the RCA intake sentence; the CRD class cell in either
+      table rendering)
   C   change-flow's validate_gcfpe_20261027.py from its 100926.1 sibling: every release pin measured
   I   flowmaster-validate's SKILL_TREE_SHA256 recomputed, last
 
@@ -204,7 +206,8 @@ def runner_subs(base_text: str) -> list:
          '"""Run the deterministic GCFPE-20261027.1 / 102726.1 fixtures and contract mutations.\n\n'
          'Derived from the 100926.1 runner by MODIFICATION-20261027-gcfpe-backlog-open-items (PLAN PART-24): the 54\n'
          'section-13 cases with their release fields moved; the QA closure cases retargeted to the close-mutation-set\n'
-         'stage CL-05 (PART-13); and mutation cases for every new contract check and PROMPT_BINDING_SUPERSEDED.\n"""', 1),
+         'stage CL-05 (PART-13); and mutation cases for every new contract check and PROMPT_BINDING_SUPERSEDED. AM-8\n'
+         'moved the QA-120 source-case anchors to the body PART-07 and PART-13 wrote, in either table rendering.\n"""', 1),
         ("R02 validator import", "from validate_gcfpe_20261009 import (\n",
          "from validate_gcfpe_20261027 import (\n    EXPECTED_MEMBER_VERSIONS,\n    SUPERSEDED_MEMBER_PAGES,\n"
          "    validate_prompt_bodies,\n", 1),
@@ -220,6 +223,47 @@ def runner_subs(base_text: str) -> list:
          '    epic["destinations"] = ["CL-C-10"]\n'
          '    edge = next(e for e in changed["route_edges"] if e.get("from") == "CL-05" and e.get("to") == "CL-E-10")\n', 1),
         ("R07 report revision", '        "validator_revision": "3.4.1",', '        "validator_revision": "3.5.0",', 1),
+        # AM-8 (Nathan's decision after X14): the QA-120 source cases anchor on the body PART-07 and PART-13 wrote,
+        # and on the class map in whichever table rendering the read carries
+        ("R08 AM-8 class-cell rendering",
+         '        cases.append({"name": "accept-live-source-class-specific-closure-intakes",\n'
+         '                      "passed": observed == [], "errors": observed})\n',
+         '        cases.append({"name": "accept-live-source-class-specific-closure-intakes",\n'
+         '                      "passed": observed == [], "errors": observed})\n'
+         "        # AM-8 (MODIFICATION-20261027): the class map's fetch rendering has moved both ways (pipe to HTML in\n"
+         "        # the 100926.1 precedent, HTML to pipe by 2026-10-27), so the CRD class cell is taken in the rendering\n"
+         "        # this read carries, as qa_pass_class_rows reads either.\n"
+         '        if "<td>`CRD`</td>" in bodies["QA-120"]:\n'
+         '            crd_cell = ("<td>`CRD`</td>", "")\n'
+         "        else:\n"
+         '            crd_cell = ("| `PASS` | `CRD` |", "| `PASS` |  |")\n', 1),
+        ("R09 AM-8 RCA anchor",
+         '            ("reject-source-missing-rca", "QA-120", "`QA_RCA_ID`", "`OMITTED_RCA`", "QA_PASS_BODY_INTAKE"),\n',
+         "            # AM-8: QA-120's PASS handoff names the separate `QA_REPORT` and `QA_RCA` with their IDs (PART-07's\n"
+         "            # HP-QA-120-01), the intake marker the validator reads; it no longer carries `QA_RCA_ID`.\n"
+         '            ("reject-source-missing-rca", "QA-120", "`QA_RCA` with their IDs", "`OMITTED_RCA` with their IDs",\n'
+         '             "QA_PASS_BODY_INTAKE"),\n', 1),
+        ("R10 AM-8 absent class branch, either rendering",
+         '            ("reject-source-absent-crd-class-branch", "QA-120", "<td>`CRD`</td>", "", "QA_PASS_BODY_CLASS_MAP"),\n',
+         '            ("reject-source-absent-crd-class-branch", "QA-120", *crd_cell, "QA_PASS_BODY_CLASS_MAP"),\n', 1),
+        ("R11 AM-8 duplicate class branch, either rendering",
+         '        anchor = producer_lines.index("<td>`CRD`</td>")\n'
+         '        start, end = anchor - 2, producer_lines.index("</tr>", anchor)\n'
+         '        if producer_lines[start] != "<tr>" or producer_lines[anchor - 1] != "<td>`PASS`</td>":\n'
+         '            raise ValueError("Mutation anchor absent: reject-source-duplicate-crd-class-branch")\n'
+         '        crd_row = "\\n".join(producer_lines[start:end + 1])\n',
+         '        if "<td>`CRD`</td>" in producer_lines:\n'
+         '            anchor = producer_lines.index("<td>`CRD`</td>")\n'
+         '            start, end = anchor - 2, producer_lines.index("</tr>", anchor)\n'
+         '            if producer_lines[start] != "<tr>" or producer_lines[anchor - 1] != "<td>`PASS`</td>":\n'
+         '                raise ValueError("Mutation anchor absent: reject-source-duplicate-crd-class-branch")\n'
+         '            crd_row = "\\n".join(producer_lines[start:end + 1])\n'
+         "        else:\n"
+         "            # AM-8: the pipe rendering holds the row on one line\n"
+         '            pipe_rows = [line for line in producer_lines if line.startswith("| `PASS` | `CRD` |")]\n'
+         "            if len(pipe_rows) != 1:\n"
+         '                raise ValueError("Mutation anchor absent: reject-source-duplicate-crd-class-branch")\n'
+         "            crd_row = pipe_rows[0]\n", 1),
         ("R90 contract ids", "GCFPE-20261009.1-100926.1-DIRECT-HANDOFF-", "GCFPE-20261027.1-102726.1-DIRECT-HANDOFF-", None),
         ("R91 release literal", "GCFPE-20261009.1", "GCFPE-20261027.1", None),
         ("R92 version literal", '100926.1"', '102726.1"', None),

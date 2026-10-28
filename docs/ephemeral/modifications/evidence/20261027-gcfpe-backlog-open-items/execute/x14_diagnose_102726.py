@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """X14 (Q7) and its failure diagnosis, for MODIFICATION-20261027-gcfpe-backlog-open-items.
 
-  x14_diagnose_102726.py <x13-dir> <fetched-after> <candidate-contract> <scratch> <out>
+  x14_diagnose_102726.py <x13-dir> <fetched-after> <candidate-contract> <scratch> <out> [--no-experiment]
 
 <x13-dir> holds X13's two skills roots, root-plain and root-quoted (D28). For each root, the plan's X14 command,
 plan/x12_qualify_102726.py run <root> <fetched-after> --successor-map execute/successor-pages-102726.1.json, with
@@ -12,7 +12,8 @@ execute/contracts/ holds only the filled release values). Then, read-only:
   anchors     how often each QA-closure mutation anchor of the shipped runner occurs in each QA-120 read this session
               holds: the 100926.1 page, the successor before its X6 write and the successor now (counts only)
   experiment  a scratch copy of root-plain's flowmaster-validate with the three stale anchors substituted, run with
-              the same bodies: a measurement for the return, never a package (the copy is deleted afterwards)
+              the same bodies: a measurement for the return, never a package (the copy is deleted afterwards);
+              --no-experiment skips it, for a build that already carries AM-8 (X14's run after AM-8)
 
 D22: bodies are read transiently from this session's fetch records, normalized in memory (C-15) and piped on stdin;
 the receipt carries flags, counts, ids, the runner's own anchor strings and error codes only.
@@ -130,6 +131,10 @@ def main(argv: list) -> int:
             del n, body
     rec["qa120_anchor_counts"] = reads
 
+    if "--no-experiment" in argv:
+        del bodies
+        rec["experiment"] = "not run: the built runner carries AM-8 (execute/am8_runner_check_102726.py checks it)"
+        return finish(rec, out, None, None)
     payload = Q.payload_of(bodies)
     del bodies
     text = json.dumps(payload)
@@ -154,14 +159,20 @@ def main(argv: list) -> int:
     rec["experiment"] = {"note": "scratch copy only, deleted after the run; not a package and not a fix",
                          "substitutions": [{"old": o, "new": n} for o, n in SUBS],
                          "shipped_runner": shipped, "anchors_substituted": patched}
-    rec["ok"] = all(r.get("ok") is True for r in runs.values())
+    return finish(rec, out, shipped, patched)
+
+
+def finish(rec: dict, out: Path, shipped: dict | None, patched: dict | None) -> int:
+    rec["ok"] = all(r.get("ok") is True for r in rec["runs"].values())
     rec["d22"] = ("member bodies read transiently from this session's fetch records, normalized in memory and piped "
                   "on stdin; counts, ids, the runner's own anchor strings and error codes only")
     out.write_text(json.dumps(rec, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"ok": rec["ok"], "roots_identical": rec["roots_identical"],
-                      "shipped_runner": shipped.get("error") or shipped.get("fixture_suite_ok"),
-                      "anchors_substituted": patched.get("fixture_suite_ok"), "case_count": patched.get("case_count"),
-                      "moved": rec["revisions"]["moved_since_landing_check"]}))
+    summary = {"ok": rec["ok"], "roots_identical": rec["roots_identical"],
+               "moved": rec["revisions"]["moved_since_landing_check"]}
+    if shipped is not None:
+        summary.update({"shipped_runner": shipped.get("error") or shipped.get("fixture_suite_ok"),
+                        "anchors_substituted": patched.get("fixture_suite_ok"), "case_count": patched.get("case_count")})
+    print(json.dumps(summary))
     return 0 if rec["ok"] else 1
 
 

@@ -1,0 +1,38 @@
+{
+ "built_root": "root-plain",
+ "d22": "member bodies read transiently from this session's fetch records, normalized and varied in memory, piped on stdin; flags, counts, case names and error lines only",
+ "fetched_after": "2026-10-27T15:45:58.638Z",
+ "members": 56,
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "ok": false,
+ "record_type": "GCFPE_102726_AM8_RUNNER_CHECK",
+ "rows": {
+  "pass_html": false,
+  "pass_pipe": false,
+  "stop_cell": false,
+  "stop_dup": false,
+  "stop_rca": true
+ },
+ "runs": {
+  "pass_html": {
+   "error": "ValueError: Mutation anchor absent: reject-source-missing-rca",
+   "exit": 1
+  },
+  "pass_pipe": {
+   "error": "ValueError: Mutation anchor absent: reject-source-missing-rca",
+   "exit": 1
+  },
+  "stop_cell": {
+   "error": "ValueError: Mutation anchor absent: reject-source-missing-rca",
+   "exit": 1
+  },
+  "stop_dup": {
+   "error": "ValueError: Mutation anchor absent: reject-source-missing-rca",
+   "exit": 1
+  },
+  "stop_rca": {
+   "error": "ValueError: Mutation anchor absent: reject-source-missing-rca",
+   "exit": 1
+  }
+ }
+}

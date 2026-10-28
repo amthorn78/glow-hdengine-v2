@@ -41,6 +41,12 @@ graph parts at render time.
             child pages (X9a: 929 stored mentions on 69 pages, no exception); the entry sits under the register, so
             the register is neither. The repair converts exactly that one mention.
 
+  Opt-ins   (EXECUTE, Nathan's promotion approval after X18, "with the opt-in corrections PF-B W-4 and PF-A F-4")
+            PF-B W-4 adds P1d-FI-PFB-W4 to the Flow Index's P1 batch: "qualification pending:" to "qualification
+            complete:" in the recovery-stage sentence C-FI wrote. PF-A F-4 changes P6-HUB-SEL's sentence on the
+            Hub's historical sections from "Historical … — 091426.1" written "for the predecessor" to "Historical …"
+            written "for earlier releases". Each is refused unless its source sentence occurs exactly once.
+
   make_activation_ops_102726.py build     write plan/activation-ops.json
   make_activation_ops_102726.py check     rebuild in memory and compare with the file on disk (exit 1 on drift)
   make_activation_ops_102726.py selftest  each C-22 check refuses its injected defect
@@ -174,6 +180,36 @@ def paragraph_form(o: dict) -> dict:
             "why": (o.get("why") or "") + " AM-4: each inserted line its own paragraph, the target page's stored form."}
 
 
+W4_OLD, W4_NEW = "qualification pending:", "qualification complete:"
+F4_OLD = '<b>Sections on this page headed "Historical … — 091426.1" were written for the predecessor</b>'
+F4_NEW = '<b>Sections on this page headed "Historical …" were written for earlier releases</b>'
+
+
+def optin_w4(cfi_new: str) -> dict:
+    """PF-B W-4: the candidate record's recovery-stage sentence, "qualification pending:" to "qualification
+    complete:", as C-FI wrote it; refused unless C-FI carries that sentence exactly once."""
+    hits = [ln for ln in cfi_new.split("\n") if W4_OLD in ln]
+    if len(hits) != 1 or cfi_new.count(W4_OLD) != 1:
+        raise SystemExit("PF-B W-4: C-FI does not carry the recovery-stage sentence exactly once")
+    start = hits[0][hits[0].index(W4_OLD):]
+    start = start[:start.index(". ") + 1] if ". " in start else start   # that sentence only
+    return {"id": "P1d-FI-PFB-W4", "phase": "activation", "source": "opt-in PF-B W-4 (Nathan, promotion approval)",
+            "part": "PART-25", "item": "ITEM-32", "start": start, "end": None,
+            "new": start.replace(W4_OLD, W4_NEW, 1),
+            "why": "PF-B W-4: the qualification C-FI recorded as pending is complete (the packet, X18); P1(d) makes "
+                   "the section historical, so the record keeps the true state."}
+
+
+def optin_f4(op: dict) -> dict:
+    """PF-A F-4: P6-HUB-SEL's historical-sections sentence names the predecessor 091426.1; it now says earlier
+    releases; refused unless the sentence occurs exactly once."""
+    if op["new"].count(F4_OLD) != 1:
+        raise SystemExit("PF-A F-4: P6-HUB-SEL does not carry the historical-sections sentence exactly once")
+    return {"new": op["new"].replace(F4_OLD, F4_NEW),
+            "why": (op.get("why") or "") + (" PF-A F-4 (Nathan, promotion approval): the historical sections were "
+                                            "written for earlier releases, not for one predecessor.")}
+
+
 def head_pe_text() -> str:
     edits = json.loads((HERE / "edits.json").read_text(encoding="utf-8"))
     return next(o for o in edits["ops"] if o["id"] == "HEAD-PE")["new"]
@@ -279,6 +315,13 @@ def build(head_pe: str | None = None) -> dict:
         page(key)["ops"] = [paragraph_form(o) if o["id"] in AM4_OPS else o for o in ops]
     if found != len(AM4_OPS):
         raise SystemExit(f"AM-4: expected the {len(AM4_OPS)} multi-line frontmatter inserts, found {found}")
+
+    # Opt-ins (Nathan's promotion approval, 2026-10-27): PF-B W-4 on the Flow Index at P1(d), PF-A F-4 in P6-HUB-SEL
+    fi_ops = page(FLOW_INDEX)["ops"]
+    cfi = next(o for o in fi_ops if o["id"] == "C-FI")
+    fi_ops.append(optin_w4(cfi["new"]))
+    hub_sel = next(o for o in page(OPS_HUB)["ops"] if o["id"] == "P6-HUB-SEL")
+    hub_sel.update(optin_f4(hub_sel))
 
     # D-W8-7 / CD-9: W6-BIND-1..3 carried verbatim in P2-REG-*; W6-BIND-4 folded into P1d-FI-BIND-P
     carried = []
@@ -448,6 +491,17 @@ def selftest() -> dict:
                                               and any('<mention url="https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1" />'
                                                       in x for x in entry["frontmatter"]))
     rows["am5_rejects_second_repair"] = refused(lambda: self_closing_mentions(entry["frontmatter"]))
+    # opt-ins PF-B W-4 and PF-A F-4: each written once; a source without its sentence, or with it twice, is refused
+    w4 = [o for o in built[FLOW_INDEX]["ops"] if o["id"] == "P1d-FI-PFB-W4"]
+    sel = next(o for o in built[OPS_HUB]["ops"] if o["id"] == "P6-HUB-SEL")
+    rows["optin_w4_one_op_at_activation"] = (len(w4) == 1 and w4[0]["phase"] == "activation"
+                                             and W4_OLD in w4[0]["start"] and W4_NEW in w4[0]["new"]
+                                             and W4_OLD not in w4[0]["new"])
+    rows["optin_w4_rejects_missing_or_doubled"] = (refused(lambda: optin_w4("no such sentence"))
+                                                   and refused(lambda: optin_w4(f"- {W4_OLD} a.\n- {W4_OLD} b.")))
+    rows["optin_f4_in_hub_sel"] = sel["new"].count(F4_NEW) == 1 and F4_OLD not in sel["new"]
+    rows["optin_f4_rejects_missing_or_doubled"] = (refused(lambda: optin_f4({"new": "x"}))
+                                                   and refused(lambda: optin_f4({"new": F4_OLD + F4_OLD})))
     return {"mode": "selftest", "rows": rows, "ok": all(rows.values())}
 
 

@@ -1,0 +1,111 @@
+{
+ "model": {
+  "after_equals_model": true,
+  "after_revision": "2026-10-27T22:40:18.010Z",
+  "applied": [
+   true
+  ],
+  "before_revision": "2026-10-27T15:35:09.250Z",
+  "lines_after": 374,
+  "lines_differing": 0,
+  "lines_model": 374
+ },
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "ok_model": true,
+ "record_type": "GCFPE_102726_X18_LANDED_PROBE",
+ "rule": [
+  {
+   "new_on_page": true,
+   "op": "C-FI-REV",
+   "page": "Flow Index",
+   "phase": "review",
+   "run_check_landed": false,
+   "start_in_replacements": 2,
+   "start_on_page": 1
+  },
+  {
+   "new_on_page": true,
+   "op": "P1d-FI-CAND-H",
+   "page": "Flow Index",
+   "phase": "activation",
+   "run_check_landed": false,
+   "start_in_replacements": 1,
+   "start_on_page": 0
+  },
+  {
+   "new_on_page": true,
+   "op": "P1e-HUB-CF-CAND",
+   "page": "hub HDE Change Flow",
+   "phase": "activation",
+   "run_check_landed": false,
+   "start_in_replacements": 1,
+   "start_on_page": 0
+  },
+  {
+   "new_on_page": true,
+   "op": "P1e-HUB-IA-CAND",
+   "page": "hub HDE IA",
+   "phase": "activation",
+   "run_check_landed": false,
+   "start_in_replacements": 1,
+   "start_on_page": 0
+  },
+  {
+   "new_on_page": true,
+   "op": "P1e-HUB-QA-CAND",
+   "page": "hub HDE QA",
+   "phase": "activation",
+   "run_check_landed": false,
+   "start_in_replacements": 1,
+   "start_on_page": 0
+  },
+  {
+   "new_on_page": true,
+   "op": "P1e-HUB-ESC-CAND",
+   "page": "hub Escalation",
+   "phase": "activation",
+   "run_check_landed": false,
+   "start_in_replacements": 1,
+   "start_on_page": 0
+  },
+  {
+   "new_on_page": true,
+   "op": "P1e-HUB-TW-CAND",
+   "page": "hub HDE TW",
+   "phase": "activation",
+   "run_check_landed": false,
+   "start_in_replacements": 1,
+   "start_on_page": 0
+  }
+ ],
+ "rule_false_not_landed": [
+  [
+   "activation",
+   "P1d-FI-CAND-H"
+  ],
+  [
+   "activation",
+   "P1e-HUB-CF-CAND"
+  ],
+  [
+   "activation",
+   "P1e-HUB-ESC-CAND"
+  ],
+  [
+   "activation",
+   "P1e-HUB-IA-CAND"
+  ],
+  [
+   "activation",
+   "P1e-HUB-QA-CAND"
+  ],
+  [
+   "activation",
+   "P1e-HUB-TW-CAND"
+  ],
+  [
+   "review",
+   "C-FI-REV"
+  ]
+ ]
+}
