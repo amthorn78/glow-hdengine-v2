@@ -1,0 +1,264 @@
+{
+ "c14_rows_present": {
+  "MB-045": "governance-audit lines (C-3)",
+  "MB-046": "QA-70's authorless delta mode (C-8)",
+  "MB-047": "W3a's continuing named-session line (D27)",
+  "MB-048": "the Hub's all-55 line",
+  "MB-049": "the pre-existing suite failure (C-21)",
+  "MB-050": "raw-render false failures (C-15)",
+  "MB-051": "binding by page URL (L-B6)"
+ },
+ "c14_rows_status": "each present once in the index and as a section, OPEN, on the readback",
+ "dispositions": [
+  {
+   "entry": "MB-001",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-01",
+   "kind": "APPLIED",
+   "parts": "ITEM-01 (PART-08)"
+  },
+  {
+   "entry": "MB-002",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-02",
+   "kind": "APPLIED",
+   "parts": "ITEM-02 (PART-06)"
+  },
+  {
+   "entry": "MB-004",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-03",
+   "kind": "APPLIED",
+   "parts": "ITEM-03 (PART-19)"
+  },
+  {
+   "entry": "MB-005",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-04",
+   "kind": "APPLIED",
+   "parts": "ITEM-04 (PART-20)"
+  },
+  {
+   "entry": "MB-006",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-05",
+   "kind": "APPLIED",
+   "parts": "ITEM-05 (PART-21)"
+  },
+  {
+   "entry": "MB-007",
+   "frontmatter": "NOT_APPLICABLE",
+   "items": "ITEM-06",
+   "kind": "NOT_APPLICABLE",
+   "parts": "ITEM-06 (PART-15)"
+  },
+  {
+   "entry": "MB-009",
+   "frontmatter": "NOT_APPLICABLE",
+   "items": "ITEM-07",
+   "kind": "WONT_DO",
+   "parts": "ITEM-07 (PART-16)"
+  },
+  {
+   "entry": "MB-010",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-08",
+   "kind": "APPLIED",
+   "parts": "ITEM-08 (PART-07)"
+  },
+  {
+   "entry": "MB-011",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-09",
+   "kind": "APPLIED",
+   "parts": "ITEM-09 (PART-14)"
+  },
+  {
+   "entry": "MB-012",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-10",
+   "kind": "APPLIED",
+   "parts": "ITEM-10 (PART-17)"
+  },
+  {
+   "entry": "MB-013",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-11",
+   "kind": "APPLIED",
+   "parts": "ITEM-11 (PART-01)"
+  },
+  {
+   "entry": "MB-014",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-12",
+   "kind": "APPLIED",
+   "parts": "ITEM-12 (PART-01)"
+  },
+  {
+   "entry": "MB-015",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-13",
+   "kind": "APPLIED",
+   "parts": "ITEM-13 (PART-03)"
+  },
+  {
+   "entry": "MB-016",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-14 and ITEM-15",
+   "kind": "APPLIED",
+   "parts": "ITEM-14 and ITEM-15 (PART-03 and PART-04)"
+  },
+  {
+   "entry": "MB-017",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-16 and ITEM-17",
+   "kind": "APPLIED",
+   "parts": "ITEM-16 and ITEM-17 (PART-03 and PART-04)"
+  },
+  {
+   "entry": "MB-018",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-18",
+   "kind": "APPLIED",
+   "parts": "ITEM-18 (PART-04)"
+  },
+  {
+   "entry": "MB-019",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-19",
+   "kind": "APPLIED",
+   "parts": "ITEM-19 (PART-05)"
+  },
+  {
+   "entry": "MB-020",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-20",
+   "kind": "APPLIED",
+   "parts": "ITEM-20 (PART-09)"
+  },
+  {
+   "entry": "MB-021",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-21",
+   "kind": "APPLIED",
+   "parts": "ITEM-21 (PART-10)"
+  },
+  {
+   "entry": "MB-022",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-22",
+   "kind": "APPLIED",
+   "parts": "ITEM-22 (PART-12)"
+  },
+  {
+   "entry": "MB-023",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-23",
+   "kind": "APPLIED",
+   "parts": "ITEM-23 (PART-01)"
+  },
+  {
+   "entry": "MB-024",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-24",
+   "kind": "APPLIED",
+   "parts": "ITEM-24 (PART-02)"
+  },
+  {
+   "entry": "MB-025",
+   "frontmatter": "NOT_APPLICABLE",
+   "items": "ITEM-25",
+   "kind": "NOT_APPLICABLE",
+   "parts": "ITEM-25 (PART-18)"
+  },
+  {
+   "entry": "MB-026",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-26",
+   "kind": "APPLIED",
+   "parts": "ITEM-26 (PART-11)"
+  },
+  {
+   "entry": "MB-027",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-27",
+   "kind": "APPLIED",
+   "parts": "ITEM-27 (PART-13)"
+  },
+  {
+   "entry": "MB-028",
+   "frontmatter": "NOT_APPLICABLE",
+   "items": "ITEM-28",
+   "kind": "NOT_APPLICABLE",
+   "parts": "ITEM-28 (PART-22)"
+  },
+  {
+   "entry": "MB-029",
+   "frontmatter": "VERIFIED",
+   "items": "ITEM-29",
+   "kind": "VERIFIED",
+   "parts": "ITEM-29 (PART-23)"
+  },
+  {
+   "entry": "MB-030",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-30",
+   "kind": "APPLIED",
+   "parts": "ITEM-30 (PART-13)"
+  },
+  {
+   "entry": "MB-042",
+   "frontmatter": "APPLIED",
+   "items": "ITEM-35",
+   "kind": "APPLIED",
+   "parts": "ITEM-35 (PART-28)"
+  }
+ ],
+ "headings_after": {
+  "CLOSED": 33,
+  "OPEN": 24,
+  "TAKEN": 0,
+  "WONT_DO": 1
+ },
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "ok": true,
+ "page": "3e54590a05eb81eb818fd0f42045167a",
+ "read_before_as_of": "2026-10-27T14:47:15.270Z",
+ "readback": {
+  "append_blocks": 32,
+  "append_blocks_ok": 32,
+  "as_of": "2026-10-28T02:04:33.923Z",
+  "fetched_after": "2026-10-28T02:04:41.119Z",
+  "headings_taken_left": [],
+  "new_entries_present": [
+   "MB-053",
+   "MB-054",
+   "MB-055",
+   "MB-056",
+   "MB-057",
+   "MB-058"
+  ],
+  "ok": true,
+  "operations": 88,
+  "operations_ok": 88
+ },
+ "record_type": "GCFPE_102726_X28_BACKLOG",
+ "step": "X28",
+ "taken_entries": 29,
+ "writes": {
+  "insert_content_end": 1,
+  "new_entries": [
+   "MB-053",
+   "MB-054",
+   "MB-055",
+   "MB-056",
+   "MB-057",
+   "MB-058"
+  ],
+  "operations": 88,
+  "sent_once": true,
+  "tool": "execute/x28_backlog_102726.py plan, from the read after 2026-10-28T01:50:17.171Z",
+  "update_content_calls": 3,
+  "warnings": 0
+ }
+}
