@@ -1,0 +1,688 @@
+diff --git a/adapter/chart_orchestration.py b/adapter/chart_orchestration.py
+new file mode 100644
+index 00000000..f8163fad
+--- /dev/null
++++ b/adapter/chart_orchestration.py
+@@ -0,0 +1,113 @@
++"""Adapter-owned chart orchestration entry (HDE-SEPA006.1).
++
++Owns the chart path's operational concerns: the SAFE_MODE read for the log
++field, both clocks, the correlation id, the pinned-list file reads (anchored to
++the repository root, not the working directory), fixture-chart acquisition and
++one keys-only log line per call. Validation and normalization are delegated to
++the pure ``engine.charts.pure``. It registers no route and writes no file.
++"""
++from __future__ import annotations
++
++import datetime as _dt
++import json as _json
++import logging
++import os as _os
++import re
++import time as _time
++from pathlib import Path
++from typing import Any, Callable, Dict, List, Optional
++
++from engine.charts.pure import normalize_chart, validate_birth_inputs
++from engine.util.input_validators import ensure_cid
++
++_LOG = logging.getLogger(__name__)
++_ROOT = Path(__file__).resolve().parents[1]
++_ISO_PATH = _ROOT / "artifacts/constants/iso_3166_1_alpha2.json"
++_IANA_PATH = _ROOT / "artifacts/constants/iana_tz_list.json"
++_DATE_SHAPE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
++_TIME_SHAPE = re.compile(r"^\d{2}:\d{2}$")
++
++
++def _load_list(path: Path) -> List[str]:
++    data = _json.loads(path.read_text(encoding="utf-8"))
++    if not isinstance(data, list) or not data:
++        raise RuntimeError(f"pinned list {path} invalid/empty")
++    return data
++
++
++def _birth_args(args: tuple) -> bool:
++    return (
++        len(args) >= 3
++        and all(isinstance(a, str) for a in args[:3])
++        and bool(_DATE_SHAPE.match(args[0]))
++        and bool(_TIME_SHAPE.match(args[1]))
++    )
++
++
++def _fixture_chart() -> Dict[str, Any]:
++    return {
++        "gates": [1, 2, 3],
++        "channels_short": [],
++        "centers": [],
++        "type": "",
++        "authority": "",
++        "profile": "",
++        "meta": {"provider": "fixtures", "source": "default"},
++    }
++
++
++def _emit(line: str, sink: Optional[Callable[[str], Any]]) -> None:
++    try:
++        if sink is None:
++            _LOG.info(line)
++        else:
++            sink(line)
++    except Exception:
++        # Logging must never break the call
++        pass
++
++
++def load_chart(*args, **kwargs) -> Dict[str, Any]:
++    """
++    load_chart(birthdate, birthtime, place, *, tz=None, correlation_id=None, log_sink=None) -> dict
++    load_chart(*, birthdate, birthtime, place, tz=None, correlation_id=None, log_sink=None) -> dict
++
++    Any other argument shape raises TypeError; the legacy ``load_chart(user_id)``
++    signature is retired.
++    """
++    started = _time.perf_counter()
++    safe_mode = str(_os.getenv("SAFE_MODE", "0")).strip() == "1"
++    cid = ensure_cid(kwargs.get("correlation_id"))
++    status = "error"
++    try:
++        if _birth_args(args):
++            birth = args[:3]
++        elif args and isinstance(args[0], str) and not _DATE_SHAPE.match(args[0]):
++            raise TypeError("Invalid arguments to load_chart")
++        elif {"birthdate", "birthtime", "place"} <= set(kwargs):
++            birth = (kwargs["birthdate"], kwargs["birthtime"], kwargs["place"])
++            if not _birth_args(birth):
++                raise TypeError("Invalid arguments to load_chart")
++        else:
++            raise TypeError("Invalid arguments to load_chart")
++        validate_birth_inputs(
++            *birth,
++            kwargs.get("tz"),
++            iso_codes=frozenset(_load_list(_ISO_PATH)),
++            iana_zones=frozenset(_load_list(_IANA_PATH)),
++        )
++        chart = normalize_chart(_fixture_chart())
++        status = "ok"
++        return chart
++    finally:
++        line = {
++            "ts": _dt.datetime.now(_dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
++            "route": "loader.load_chart",
++            "provider": "fixtures",
++            "source": "default",
++            "status": status,
++            "duration_ms": int(round((_time.perf_counter() - started) * 1000.0)),
++            "safe_mode": safe_mode,
++            "correlation_id": cid,
++        }
++        _emit(_json.dumps(line, separators=(",", ":"), ensure_ascii=False), kwargs.get("log_sink"))
+diff --git a/ci/checks/classify_ci_changes.py b/ci/checks/classify_ci_changes.py
+index cf5be0d2..618b600a 100644
+--- a/ci/checks/classify_ci_changes.py
++++ b/ci/checks/classify_ci_changes.py
+@@ -599,6 +599,19 @@ _PRODUCT_TEST_OWNER_PATHS = {
+     "scripts/release_id_tools.py": (
+         "tests/scripts/test_release_id_recompute.py",
+     ),
++    # HDE-EPIC041 WU-PR-01 (HDE-SEPA006.1): the pure Engine chart interface and
++    # its Adapter-owned orchestration entry. WU-PR-02 removes the
++    # characterization owner together with engine/charts/loader.py.
++    "engine/charts/pure.py": (
++        "tests/charts/test_chart_pure_purity.py",
++        "tests/charts/test_chart_pure_interface.py",
++        "tests/adapter/test_chart_orchestration.py",
++        "tests/adapter/test_chart_orchestration_characterization.py",
++    ),
++    "adapter/chart_orchestration.py": (
++        "tests/adapter/test_chart_orchestration.py",
++        "tests/adapter/test_chart_orchestration_characterization.py",
++    ),
+ }
+ _PRODUCT_TEST_OWNER_PREFIXES = (
+     ("catalog/narratives/", _NARRATIVE_TEST_OWNERS),
+diff --git a/engine/charts/pure.py b/engine/charts/pure.py
+new file mode 100644
+index 00000000..49ccfb58
+--- /dev/null
++++ b/engine/charts/pure.py
+@@ -0,0 +1,92 @@
++"""Pure chart validation and normalization (HDE-SEPA006.1).
++
++Data in, data out: no time, randomness, environment, network, provider,
++logging or filesystem access, at import or in any call. The pinned ISO-3166
++and IANA lists arrive as arguments; ``adapter.chart_orchestration`` reads them.
++"""
++from __future__ import annotations
++
++import re
++import unicodedata
++from typing import Any, Container, Dict, NamedTuple, Optional, Tuple
++
++from engine.util.input_validators import parse_time_hh_mm
++
++_MONTH_DAYS = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
++
++
++class ChartInputError(Exception):
++    def __init__(self, code: str, message: str, details: Optional[Dict[str, Any]] = None):
++        super().__init__(message)
++        self.code = code
++        self.message = message
++        self.details = details or {}
++
++
++class BirthInputs(NamedTuple):
++    date: Tuple[int, int, int]
++    time: Tuple[int, int]
++    city: str
++    country: str
++    tz: str
++
++
++def _invalid(field: str, message: str) -> ChartInputError:
++    return ChartInputError("READER_INVALID_INPUT", message, {"field": field})
++
++
++def _parse_date(s: Any) -> Tuple[int, int, int]:
++    # Same acceptance as datetime.strptime(s, "%Y-%m-%d") behind its YYYY-MM-DD
++    # shape check, without strptime's locale and TZ reads.
++    if not isinstance(s, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", s):
++        raise ValueError("date must be YYYY-MM-DD")
++    year, month, day = int(s[0:4]), int(s[5:7]), int(s[8:10])
++    if year < 1 or not 1 <= month <= 12:
++        raise ValueError("date is not a real calendar date")
++    leap = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
++    if not 1 <= day <= _MONTH_DAYS[month - 1] + (1 if month == 2 and leap else 0):
++        raise ValueError("date is not a real calendar date")
++    return year, month, day
++
++
++def validate_birth_inputs(
++    birthdate: Any,
++    birthtime: Any,
++    place: Any,
++    tz: Any,
++    *,
++    iso_codes: Container[str],
++    iana_zones: Container[str],
++) -> BirthInputs:
++    """Validate in the loader's order: date, time, place, tz presence, tz value."""
++    try:
++        date = _parse_date(birthdate)
++    except Exception as e:
++        raise _invalid("date", "invalid date") from e
++    try:
++        hm = parse_time_hh_mm(birthtime)
++    except Exception as e:
++        raise _invalid("time", "invalid time") from e
++    if not isinstance(place, str):
++        raise _invalid("place", "invalid place")
++    parts = [p.strip() for p in unicodedata.normalize("NFC", place).strip().split(",")]
++    if len(parts) != 2 or not parts[0] or not parts[1] or parts[1].upper() not in iso_codes:
++        raise _invalid("place", "invalid place")
++    if tz is None:
++        raise _invalid("tz", "tz required on internal path")
++    if not isinstance(tz, str) or not tz.strip() or tz not in iana_zones:
++        raise _invalid("tz", "invalid tz")
++    return BirthInputs(date, hm, parts[0], parts[1].upper(), tz)
++
++
++def normalize_chart(obj: Dict[str, Any]) -> Dict[str, Any]:
++    """Keep integer gates, convert digit-string gates to int, drop the rest."""
++    out = dict(obj)
++    norm: list[int] = []
++    for g in obj.get("gates", []):
++        if isinstance(g, int):
++            norm.append(g)
++        elif isinstance(g, str) and g.isdigit():
++            norm.append(int(g))
++    out["gates"] = norm
++    return out
+diff --git a/tests/adapter/test_chart_orchestration.py b/tests/adapter/test_chart_orchestration.py
+new file mode 100644
+index 00000000..99f4970b
+--- /dev/null
++++ b/tests/adapter/test_chart_orchestration.py
+@@ -0,0 +1,160 @@
++from __future__ import annotations
++
++import json
++import logging
++from pathlib import Path
++import re
++
++import pytest
++
++from adapter.chart_orchestration import load_chart
++from adapter.no_io_guard import NoIoGuard
++from engine.charts.pure import ChartInputError
++from engine.serializer.canon import sercanon
++
++ROOT = Path(__file__).resolve().parents[2]
++CID = "CID-0123456789abcdef"
++CID_RE = re.compile(r"^CID-[a-f0-9]{16}$")
++BIRTH = ("1990-01-01", "12:34", "Amsterdam, NL")
++TZ = "Europe/Amsterdam"
++KEYS = ("ts", "route", "provider", "source", "status", "duration_ms", "safe_mode", "correlation_id")
++FIXTURE_CHART = {
++    "gates": [1, 2, 3], "channels_short": [], "centers": [], "type": "", "authority": "",
++    "profile": "", "meta": {"provider": "fixtures", "source": "default"},
++}
++FIXTURE_CHART_BYTES = (
++    b'{"authority":"","centers":[],"channels_short":[],"gates":[1,2,3],'
++    b'"meta":{"provider":"fixtures","source":"default"},"profile":"","type":""}\n'
++)
++
++
++def _call(*args, **kwargs):
++    lines: list[str] = []
++    try:
++        out = load_chart(*args, log_sink=lines.append, **kwargs)
++    except Exception as e:
++        out = e
++    assert len(lines) == 1, lines
++    return out, json.loads(lines[0]), lines[0]
++
++
++def test_positional_and_keyword_forms_return_the_fixture_chart():
++    out, line, _ = _call(*BIRTH, tz=TZ, correlation_id=CID)
++    assert out == FIXTURE_CHART and list(out) == list(FIXTURE_CHART)
++    assert sercanon(out) == FIXTURE_CHART_BYTES
++    assert (line["status"], line["correlation_id"]) == ("ok", CID)
++    # The compat-determinism generator's call form and inputs.
++    for place in ("Austin, US", "New York, US"):
++        out, line, _ = _call(birthdate="1990-05-04", birthtime="14:22", place=place, tz=TZ)
++        assert sercanon(out) == FIXTURE_CHART_BYTES and line["status"] == "ok"
++
++
++def test_each_chart_is_a_fresh_dict():
++    first, _, _ = _call(*BIRTH, tz=TZ)
++    first["gates"].append(99)
++    first["meta"]["provider"] = "changed"
++    assert _call(*BIRTH, tz=TZ)[0] == FIXTURE_CHART
++
++
++@pytest.mark.parametrize(
++    "args,field,message",
++    [
++        (("1990-02-30", "12:34", "Amsterdam, NL"), "date", "invalid date"),
++        (("1990-01-01", "24:00", "Amsterdam, NL"), "time", "invalid time"),
++        (("1990-01-01", "12:34", "Nowhere"), "place", "invalid place"),
++    ],
++)
++def test_each_invalid_field_raises_the_typed_error_and_logs_one_error_line(args, field, message):
++    err, line, _ = _call(*args, tz=TZ)
++    assert isinstance(err, ChartInputError)
++    assert (err.code, err.details, err.message) == ("READER_INVALID_INPUT", {"field": field}, message)
++    assert line["status"] == "error"
++
++
++def test_tz_absent_and_tz_invalid():
++    for kwargs, message in (({}, "tz required on internal path"), ({"tz": "Europe/NotARealCity"}, "invalid tz")):
++        for args, extra in ((BIRTH, {}), ((), dict(zip(("birthdate", "birthtime", "place"), BIRTH)))):
++            err, line, _ = _call(*args, **extra, **kwargs)
++            assert (err.code, err.details, err.message) == ("READER_INVALID_INPUT", {"field": "tz"}, message)
++            assert line["status"] == "error"
++
++
++def test_a_fourth_positional_argument_is_ignored():
++    err, _, _ = _call(*BIRTH, TZ)
++    assert (err.details, err.message) == ({"field": "tz"}, "tz required on internal path")
++
++
++@pytest.mark.parametrize(
++    "args,kwargs",
++    [
++        ((), {}),
++        (("user-abc",), {"correlation_id": "CID-deadbeef"}),
++        ((), {"birthdate": "user-abc", "birthtime": "12:34", "place": "Amsterdam, NL", "tz": TZ}),
++        (("1990-01-01",), {}),
++    ],
++    ids=["no-arguments", "legacy-positional", "legacy-keyword", "date-only"],
++)
++def test_other_argument_shapes_raise_type_error_and_log_one_error_line(args, kwargs):
++    err, line, _ = _call(*args, **kwargs)
++    assert type(err) is TypeError and str(err) == "Invalid arguments to load_chart"
++    assert line["status"] == "error"
++
++
++@pytest.mark.parametrize("value,expected", [("1", True), ("0", False), (None, False)])
++def test_safe_mode_field(monkeypatch, value, expected):
++    if value is None:
++        monkeypatch.delenv("SAFE_MODE", raising=False)
++    else:
++        monkeypatch.setenv("SAFE_MODE", value)
++    assert _call(*BIRTH, tz=TZ)[1]["safe_mode"] is expected
++
++
++def test_correlation_id_is_passed_through_or_synthesized():
++    assert _call(*BIRTH, tz=TZ, correlation_id=CID)[1]["correlation_id"] == CID
++    for kwargs in ({}, {"correlation_id": "CID-deadbeef"}):
++        assert CID_RE.match(_call(*BIRTH, tz=TZ, **kwargs)[1]["correlation_id"])
++
++
++def test_log_line_is_keys_only():
++    _, line, raw = _call(*BIRTH, tz=TZ, correlation_id=CID)
++    assert tuple(line) == KEYS
++    assert (line["route"], line["provider"], line["source"]) == ("loader.load_chart", "fixtures", "default")
++    assert type(line["duration_ms"]) is int and type(line["safe_mode"]) is bool
++    for forbidden in ("birthdate", "birthtime", "location", "place", "Amsterdam", "NL", "1990-01-01", "12:34", TZ):
++        assert forbidden not in raw
++
++
++def test_a_raising_sink_does_not_break_the_call():
++    def sink(line):
++        raise RuntimeError("sink down")
++    assert load_chart(*BIRTH, tz=TZ, log_sink=sink) == FIXTURE_CHART
++    with pytest.raises(ChartInputError):
++        load_chart("1990-02-30", "12:34", "Amsterdam, NL", tz=TZ, log_sink=sink)
++
++
++def test_default_sink_is_the_module_logger_and_writes_no_file(monkeypatch, tmp_path, caplog):
++    monkeypatch.chdir(tmp_path)
++    with caplog.at_level(logging.INFO, logger="adapter.chart_orchestration"):
++        assert load_chart(*BIRTH, tz=TZ, correlation_id=CID) == FIXTURE_CHART
++    records = [r for r in caplog.records if r.name == "adapter.chart_orchestration"]
++    assert len(records) == 1 and json.loads(records[0].getMessage())["correlation_id"] == CID
++    assert list(tmp_path.iterdir()) == []
++
++
++def test_validation_does_not_depend_on_the_working_directory(monkeypatch, tmp_path):
++    results = []
++    for cwd in (ROOT, tmp_path):
++        monkeypatch.chdir(cwd)
++        results.append(_call(*BIRTH, tz=TZ)[0])
++        results.append(_call("1990-01-01", "12:34", "Nowhere", tz=TZ)[0].details)
++    assert results[0] == results[2] == FIXTURE_CHART
++    assert results[1] == results[3] == {"field": "place"}
++    assert list(tmp_path.iterdir()) == []
++
++
++def test_no_socket_attempts():
++    with NoIoGuard() as guard:
++        _call(*BIRTH, tz=TZ)
++        _call("1990-02-30", "12:34", "Amsterdam, NL", tz=TZ)
++        _call()
++    assert guard.attempts == 0
+diff --git a/tests/adapter/test_chart_orchestration_characterization.py b/tests/adapter/test_chart_orchestration_characterization.py
+new file mode 100644
+index 00000000..7c76eecd
+--- /dev/null
++++ b/tests/adapter/test_chart_orchestration_characterization.py
+@@ -0,0 +1,70 @@
++"""The new entry against today's engine/charts/loader.py (HDE-EPIC041 WU-PR-01).
++
++Proves equal results, errors and log fields for every call shape today's
++supported path accepts. WU-PR-02 deletes this file with the loader. Only the
++supported-path shapes are compared: a legacy-signature call would run the
++provider resolver, which writes artifacts/provider/decision.txt.
++"""
++from __future__ import annotations
++
++import json
++from pathlib import Path
++
++import pytest
++
++import adapter.chart_orchestration as entry
++import engine.charts.loader as loader
++from engine.charts.pure import normalize_chart
++
++ROOT = Path(__file__).resolve().parents[2]
++CID = "CID-0123456789abcdef"
++TZ = "Europe/Amsterdam"
++GENERATOR = [
++    {"birthdate": "1990-05-04", "birthtime": "14:22", "place": "Austin, US", "tz": TZ},
++    {"birthdate": "1992-07-19", "birthtime": "08:05", "place": "New York, US", "tz": TZ},
++]
++SHAPES = [
++    (("1990-01-01", "12:34", "Amsterdam, NL"), {"tz": TZ}),
++    (("1990-01-01", "12:34", "Amsterdam, NL", TZ), {}),
++    (("1990-02-30", "12:34", "Amsterdam, NL"), {"tz": TZ}),
++    (("1990-01-01", "24:00", "Amsterdam, NL"), {"tz": TZ}),
++    (("1990-01-01", "12:34", "Nowhere"), {"tz": TZ}),
++    (("1990-01-01", "12:34", "Amsterdam, NL"), {}),
++    (("1990-01-01", "12:34", "Amsterdam, NL"), {"tz": "Europe/NotARealCity"}),
++    ((), GENERATOR[0]),
++    ((), GENERATOR[1]),
++    ((), {"birthdate": "1990-02-30", "birthtime": "12:34", "place": "Amsterdam, NL", "tz": TZ}),
++    ((), {"birthdate": "1990-01-01", "birthtime": "12:34", "place": "Amsterdam, NL"}),
++    ((), {}),
++    (("1990-01-01",), {}),
++]
++
++
++def _outcome(fn, args, kwargs):
++    try:
++        return ("ok", fn(*args, correlation_id=CID, **kwargs))
++    except TypeError as e:
++        return ("TypeError", str(e))
++    except Exception as e:
++        return ("typed", e.code, e.details.get("field"), e.message)
++
++
++@pytest.mark.parametrize("args,kwargs", SHAPES)
++def test_entry_matches_todays_loader(monkeypatch, tmp_path, args, kwargs):
++    monkeypatch.chdir(ROOT)  # today's validators read the pinned lists relative to the CWD
++    monkeypatch.setattr(loader, "_Path", lambda p: tmp_path / p)
++    lines: list[str] = []
++    assert _outcome(entry.load_chart, args, dict(kwargs, log_sink=lines.append)) == _outcome(loader.load_chart, args, kwargs)
++    # Today's keyword form writes a second line from its recursive call; its last line is the call's own.
++    today = json.loads((tmp_path / "artifacts/logs/loader_call.jsonl").read_text(encoding="utf-8").splitlines()[-1])
++    assert len(lines) == 1
++    new = json.loads(lines[0])
++    for key in ("ts", "duration_ms"):
++        today.pop(key)
++        new.pop(key)
++    assert new == today
++
++
++def test_normalize_chart_matches_todays_normalizer():
++    fixture = entry._fixture_chart()
++    assert normalize_chart(fixture) == loader._normalize_chart(fixture)
+diff --git a/tests/charts/test_chart_pure_interface.py b/tests/charts/test_chart_pure_interface.py
+new file mode 100644
+index 00000000..c996cf4d
+--- /dev/null
++++ b/tests/charts/test_chart_pure_interface.py
+@@ -0,0 +1,56 @@
++from __future__ import annotations
++
++import pytest
++
++from engine.charts.pure import BirthInputs, ChartInputError, normalize_chart, validate_birth_inputs
++
++ISO = frozenset({"NL", "US"})
++IANA = frozenset({"Europe/Amsterdam"})
++FIXTURE_CHART = {
++    "gates": [1, 2, 3], "channels_short": [], "centers": [], "type": "", "authority": "",
++    "profile": "", "meta": {"provider": "fixtures", "source": "default"},
++}
++
++
++def _validate(birthdate="1990-01-01", birthtime="12:34", place="Amsterdam, NL", tz="Europe/Amsterdam"):
++    return validate_birth_inputs(birthdate, birthtime, place, tz, iso_codes=ISO, iana_zones=IANA)
++
++
++def _error(**kwargs):
++    with pytest.raises(ChartInputError) as ei:
++        _validate(**kwargs)
++    return ei.value.code, ei.value.details, ei.value.message
++
++
++def test_valid_inputs_return_the_parsed_values():
++    assert _validate() == BirthInputs((1990, 1, 1), (12, 34), "Amsterdam", "NL", "Europe/Amsterdam")
++    # The compat-determinism generator's two inputs.
++    assert _validate("1990-05-04", "14:22", "Austin, US") == BirthInputs((1990, 5, 4), (14, 22), "Austin", "US", "Europe/Amsterdam")
++    assert _validate("1992-07-19", "08:05", "New York, US") == BirthInputs((1992, 7, 19), (8, 5), "New York", "US", "Europe/Amsterdam")
++
++
++@pytest.mark.parametrize(
++    "kwargs,field,message",
++    [
++        ({"birthdate": "1990-02-30"}, "date", "invalid date"),
++        ({"birthtime": "24:00"}, "time", "invalid time"),
++        ({"place": "Nowhere"}, "place", "invalid place"),
++        ({"tz": None}, "tz", "tz required on internal path"),
++        ({"tz": "Europe/NotARealCity"}, "tz", "invalid tz"),
++    ],
++)
++def test_each_invalid_field_raises_the_typed_error(kwargs, field, message):
++    assert _error(**kwargs) == ("READER_INVALID_INPUT", {"field": field}, message)
++
++
++def test_checks_run_in_the_loaders_order():
++    assert _error(birthdate="1990-02-30", birthtime="24:00", place="Nowhere", tz=None)[1] == {"field": "date"}
++    assert _error(birthtime="24:00", place="Nowhere", tz=None)[1] == {"field": "time"}
++    assert _error(place="Nowhere", tz=None)[1] == {"field": "place"}
++
++
++def test_normalize_chart_returns_the_fixture_chart_unchanged_and_copies_it():
++    src = dict(FIXTURE_CHART)
++    out = normalize_chart(src)
++    assert out == FIXTURE_CHART and out is not src
++    assert list(out) == list(FIXTURE_CHART)
+diff --git a/tests/charts/test_chart_pure_purity.py b/tests/charts/test_chart_pure_purity.py
+new file mode 100644
+index 00000000..fe314b73
+--- /dev/null
++++ b/tests/charts/test_chart_pure_purity.py
+@@ -0,0 +1,137 @@
++from __future__ import annotations
++
++import ast
++import os
++from pathlib import Path
++import subprocess
++import sys
++
++ROOT = Path(__file__).resolve().parents[2]
++PURE_PATH = "engine/charts/pure.py"
++FORBIDDEN_ROOTS = {
++    "os", "time", "datetime", "random", "secrets", "uuid", "socket", "subprocess",
++    "pathlib", "io", "json", "logging", "decimal", "requests", "urllib", "http",
++    "locale", "sqlite3", "psycopg", "redis", "importlib", "adapter",
++}
++FORBIDDEN_MODULE_PARTS = {
++    "compat", "cli", "http", "cache", "narratives", "db", "vendor", "runtime",
++    "config", "provider", "providers", "loader",
++}
++# engine.util.input_validators also holds file and randomness readers; only this
++# pure helper may be imported from it.
++VALIDATOR_MODULE = "engine.util.input_validators"
++ALLOWED_VALIDATOR_NAMES = {"parse_time_hh_mm"}
++FORBIDDEN_CALLS = {
++    "open", "print", "eval", "exec", "compile", "__import__", "getenv", "read_text",
++    "read_bytes", "write_text", "write_bytes", "getLogger", "ensure_cid",
++    "parse_place_city_cc", "parse_tz_iana", "parse_date_yyyy_mm_dd", "_load_list",
++}
++
++
++def violations(source: str) -> list[str]:
++    found = []
++    for node in ast.walk(ast.parse(source)):
++        if isinstance(node, ast.Import):
++            for alias in node.names:
++                parts = alias.name.split(".")
++                if parts[0] in FORBIDDEN_ROOTS or FORBIDDEN_MODULE_PARTS & set(parts) or alias.name == VALIDATOR_MODULE:
++                    found.append(f"import {alias.name}")
++        elif isinstance(node, ast.ImportFrom):
++            parts = (node.module or "").split(".")
++            if parts[0] in FORBIDDEN_ROOTS or FORBIDDEN_MODULE_PARTS & set(parts):
++                found.append(f"from {node.module} import")
++            if node.module == VALIDATOR_MODULE and not {a.name for a in node.names} <= ALLOWED_VALIDATOR_NAMES:
++                found.append(f"from {node.module} import {sorted(a.name for a in node.names)}")
++        elif isinstance(node, ast.Call):
++            name = node.func.id if isinstance(node.func, ast.Name) else (
++                node.func.attr if isinstance(node.func, ast.Attribute) else ""
++            )
++            if name in FORBIDDEN_CALLS:
++                found.append(f"call {name}")
++    return found
++
++
++def test_pure_module_has_no_forbidden_dependency_or_call():
++    assert violations((ROOT / PURE_PATH).read_text(encoding="utf-8")) == []
++
++
++def test_checker_flags_planted_violations():
++    for planted in (
++        "import os\n",
++        "from datetime import datetime\n",
++        "import engine.util.input_validators\n",
++        "from engine.util.input_validators import ensure_cid\n",
++        "from engine.util.input_validators import parse_date_yyyy_mm_dd\n",
++        "from engine.config.provider_loader import resolve_provider\n",
++        "from engine.charts.loader import load_chart\n",
++        "import logging\n",
++        "open('artifacts/logs/x')\n",
++        "print('x')\n",
++    ):
++        assert violations(planted), planted
++
++
++# Patches every time, randomness, environment, filesystem, logging, socket and
++# subprocess entry point, then imports the module fresh and calls it.
++HARNESS = r'''
++import builtins, io, logging, os, pathlib, random, secrets, socket, subprocess, sys, time, uuid
++from contextlib import ExitStack
++from unittest.mock import patch
++def forbidden(*args, **kwargs):
++    raise AssertionError("external side effect")
++def no_external_effects():
++    guards = ExitStack()
++    for owner, name in (
++        (builtins, "open"), (io, "open"), (os, "open"), (pathlib.Path, "open"),
++        (pathlib.Path, "read_text"), (pathlib.Path, "read_bytes"), (pathlib.Path, "write_text"),
++        (pathlib.Path, "write_bytes"), (pathlib.Path, "mkdir"), (os, "getcwd"), (os, "getenv"),
++        (os._Environ, "__getitem__"), (os._Environ, "__setitem__"), (time, "time"),
++        (time, "time_ns"), (time, "monotonic"), (time, "perf_counter"), (time, "localtime"),
++        (time, "gmtime"), (time, "strftime"), (time, "tzset"), (random, "random"),
++        (random, "getrandbits"), (os, "urandom"), (secrets, "token_hex"), (uuid, "uuid4"),
++        (socket, "socket"), (socket, "getaddrinfo"), (socket, "create_connection"),
++        (subprocess, "Popen"), (logging.Logger, "_log"),
++    ):
++        guards.enter_context(patch.object(owner, name, forbidden))
++    return guards
++name = sys.argv[1]
++assert name not in sys.modules and "engine.util.input_validators" not in sys.modules
++with no_external_effects():
++    module = __import__(name, fromlist=["*"])
++if name == "engine.charts.pure":
++    with no_external_effects():
++        iso, iana = frozenset({"NL", "US"}), frozenset({"Europe/Amsterdam"})
++        ok = module.validate_birth_inputs("1990-01-01", "12:34", "Amsterdam, NL", "Europe/Amsterdam", iso_codes=iso, iana_zones=iana)
++        assert ok == ((1990, 1, 1), (12, 34), "Amsterdam", "NL", "Europe/Amsterdam"), ok
++        for bad in (
++            ("1990-02-30", "12:34", "Amsterdam, NL", "Europe/Amsterdam"),
++            ("1990-01-01", "24:00", "Amsterdam, NL", "Europe/Amsterdam"),
++            ("1990-01-01", "12:34", "Nowhere", "Europe/Amsterdam"),
++            ("1990-01-01", "12:34", "Amsterdam, NL", None),
++            ("1990-01-01", "12:34", "Amsterdam, NL", "Europe/NotARealCity"),
++        ):
++            try:
++                module.validate_birth_inputs(*bad, iso_codes=iso, iana_zones=iana)
++            except module.ChartInputError:
++                pass
++            else:
++                raise SystemExit(f"accepted {bad}")
++        assert module.normalize_chart({"gates": [1, "2", "x"], "type": ""}) == {"gates": [1, 2], "type": ""}
++'''
++
++
++def _run(name: str, extra_path: Path | None = None) -> subprocess.CompletedProcess:
++    path = str(ROOT) if extra_path is None else os.pathsep.join((str(extra_path), str(ROOT)))
++    env = dict(os.environ, PYTHONPATH=path, PYTHONDONTWRITEBYTECODE="1")
++    return subprocess.run([sys.executable, "-c", HARNESS, name], cwd=ROOT, env=env, text=True, capture_output=True)
++
++
++def test_fresh_import_and_calls_have_no_external_side_effects():
++    result = _run("engine.charts.pure")
++    assert result.returncode == 0, result.stderr
++
++
++def test_harness_flags_a_planted_side_effect(tmp_path):
++    (tmp_path / "planted_effect.py").write_text("import os\nos.getenv('SAFE_MODE')\n", encoding="utf-8")
++    result = _run("planted_effect", tmp_path)
++    assert result.returncode != 0 and "external side effect" in result.stderr
