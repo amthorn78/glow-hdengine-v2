@@ -1,0 +1,74 @@
+{
+ "installed_root": "/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502",
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "nine_equal": true,
+ "ok": true,
+ "packet_sha256": "1511826292a0574b64d806621f89aa7e8c30c33878b6b0afd28535cdbb2e2ef3",
+ "record_type": "GCFPE_102726_X22_INSTALL",
+ "skills": [
+  {
+   "installed": "29 672f3cbb133092bee896d157c62deff8bb559dae446687ae1fd15ebbb07f74e0",
+   "kind": "package",
+   "ok": true,
+   "packet": "29 672f3cbb133092bee896d157c62deff8bb559dae446687ae1fd15ebbb07f74e0",
+   "skill": "change-flow"
+  },
+  {
+   "installed": "45 72dbdbc673971d05d0b02bb05e57080e2a99368cde67cae51301303e3c2a85da",
+   "kind": "package",
+   "ok": true,
+   "packet": "45 72dbdbc673971d05d0b02bb05e57080e2a99368cde67cae51301303e3c2a85da",
+   "skill": "flowmaster-validate"
+  },
+  {
+   "installed": "4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee",
+   "kind": "package",
+   "ok": true,
+   "packet": "4 af32b2f146d9395b37f82c7db6a14296b159311f2b810f17b8cc90366e7bcbee",
+   "skill": "glow-hde-pr-development"
+  },
+  {
+   "installed": "9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1",
+   "kind": "package",
+   "ok": true,
+   "packet": "9 b0d012108b673ea7279bd75088947e65efb8440274a1703c2579b74bbfdfb3b1",
+   "skill": "glow-graph-contract"
+  },
+  {
+   "installed": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+   "kind": "unchanged",
+   "ok": true,
+   "packet": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+   "skill": "amthor-workspace-governance-audit"
+  },
+  {
+   "installed": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+   "kind": "unchanged",
+   "ok": true,
+   "packet": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+   "skill": "session-relay-flowmaster"
+  },
+  {
+   "installed": "1 662f9647ccfd996aa72e3d80ac70edc3d06a4310805ef14207b1340c69e93fc4",
+   "kind": "unchanged",
+   "ok": true,
+   "packet": "1 662f9647ccfd996aa72e3d80ac70edc3d06a4310805ef14207b1340c69e93fc4",
+   "skill": "glow-write-boundary"
+  },
+  {
+   "installed": "3 8e26b0554e3ff37c0ae6ae0fa4d5242d5823fc6fd1f7514ebe10137d27d25523",
+   "kind": "unchanged",
+   "ok": true,
+   "packet": "3 8e26b0554e3ff37c0ae6ae0fa4d5242d5823fc6fd1f7514ebe10137d27d25523",
+   "skill": "typesafe-scoring"
+  },
+  {
+   "installed": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+   "kind": "unchanged",
+   "ok": true,
+   "packet": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+   "skill": "glow-merged-change-attribution-lock"
+  }
+ ],
+ "step": "X22, P3"
+}
