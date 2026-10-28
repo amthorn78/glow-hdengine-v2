@@ -1,0 +1,536 @@
+{
+ "already_under_archive": [],
+ "archive_set": 57,
+ "fetched_after": "2026-10-28T00:46:40.725Z",
+ "missing": [],
+ "mode": "inspect",
+ "ok": true,
+ "pages_with_children": [],
+ "parents": {
+  "3db4590a05eb811b9c14f2ae89c28df7": 2,
+  "3db4590a05eb814d96d3dcfa8835f96d": 10,
+  "3db4590a05eb8195a2ccf7c0959a8b6e": 21,
+  "3db4590a05eb81cd938de84cfffead9c": 4,
+  "3db4590a05eb81d59059eb6b95ed5fcf": 18,
+  "3db4590a05eb81de9736ea69bac61016": 1,
+  "3e54590a05eb81eb818fd0f42045167a": 1
+ },
+ "read": 57,
+ "record_type": "GCFPE_102726_X24_PREMOVE",
+ "rows": [
+  {
+   "as_of": "2026-10-12T02:29:03.544Z",
+   "body_lines": 105,
+   "child_pages": 0,
+   "id": "3f44590a05eb810f83d4d539e5b0e588",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CF-C-10 — Prepare CRD Specification Kickoff Handoff — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:09.414Z",
+   "body_lines": 72,
+   "child_pages": 0,
+   "id": "3f44590a05eb81a7a944f19bd9a2e3de",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CF-C-20 — Create CRD Specification — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:05.619Z",
+   "body_lines": 106,
+   "child_pages": 0,
+   "id": "3f44590a05eb8121af3bf2249c6d6ca8",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CF-C-30 — Review and Approve CRD Specification — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:18.974Z",
+   "body_lines": 85,
+   "child_pages": 0,
+   "id": "3f44590a05eb81458686cc39d8d98b2a",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CF-C-40 — Revise CRD Specification — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:06.412Z",
+   "body_lines": 106,
+   "child_pages": 0,
+   "id": "3f44590a05eb81129b09cddebcc18458",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CF-E-10 — Prepare Epic Specification Kickoff Handoff — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:12.283Z",
+   "body_lines": 72,
+   "child_pages": 0,
+   "id": "3f44590a05eb813cb9cbc61c225b88e2",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CF-E-20 — Create Epic Specification — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:08.639Z",
+   "body_lines": 106,
+   "child_pages": 0,
+   "id": "3f44590a05eb8104824fe084354a0ef8",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CF-E-30 — Review and Approve Epic Specification — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:22.102Z",
+   "body_lines": 85,
+   "child_pages": 0,
+   "id": "3f44590a05eb81f1994df5f6ab3a7f32",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CF-E-40 — Revise Epic Specification — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:09.502Z",
+   "body_lines": 88,
+   "child_pages": 0,
+   "id": "3f44590a05eb81f9bf84f4585d9f7a2c",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:16.766Z",
+   "body_lines": 224,
+   "child_pages": 0,
+   "id": "3f44590a05eb81739b57da57c285f45d",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CL-20 — Prepare Closure Memo and Post-Closure Record — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:13.172Z",
+   "body_lines": 201,
+   "child_pages": 0,
+   "id": "3f44590a05eb816ea12febba885940e8",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CL-30 — Prepare Conditional Post-Change ADR Maintenance — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:26.600Z",
+   "body_lines": 224,
+   "child_pages": 0,
+   "id": "3f44590a05eb8155934dd1c4c2b5d1eb",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CL-40 — Scan for PF09 Gaps and CRD Candidates — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:13.994Z",
+   "body_lines": 229,
+   "child_pages": 0,
+   "id": "3f44590a05eb819b8022f2a4cdd3b022",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CL-C-10 — Perform CRD Retrospective and Decide Closure — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:21.313Z",
+   "body_lines": 232,
+   "child_pages": 0,
+   "id": "3f44590a05eb81248741f4679b050262",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:16.227Z",
+   "body_lines": 113,
+   "child_pages": 0,
+   "id": "3f44590a05eb8186913fcb9f6b2a2f32",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:29.629Z",
+   "body_lines": 117,
+   "child_pages": 0,
+   "id": "3f44590a05eb81be834efe3faf7abb6f",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CL-E-30 — Review Bounded PF09 Revalidation — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:17.029Z",
+   "body_lines": 117,
+   "child_pages": 0,
+   "id": "3f44590a05eb8101a264f9fa702b8a6e",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:24.131Z",
+   "body_lines": 151,
+   "child_pages": 0,
+   "id": "3f44590a05eb81ce99b1d2ade30c572f",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "DOC-10 — Create Final Repository Documentation PR Instructions — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:19.255Z",
+   "body_lines": 156,
+   "child_pages": 0,
+   "id": "3f44590a05eb81d8a582eec0e93e6ee7",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "DOC-20 — Verify Final Repository Documentation Completion — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:32.722Z",
+   "body_lines": 121,
+   "child_pages": 0,
+   "id": "3f44590a05eb81f2af47fff48995f272",
+   "parent": "3db4590a05eb81cd938de84cfffead9c",
+   "title": "ESC-10 — Create QA Escalation Report — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:20.067Z",
+   "body_lines": 123,
+   "child_pages": 0,
+   "id": "3f44590a05eb81949370e6d1b222b40b",
+   "parent": "3db4590a05eb81cd938de84cfffead9c",
+   "title": "ESC-25 — Execute Bounded Escalation Discovery — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:51.552Z",
+   "body_lines": 121,
+   "child_pages": 0,
+   "id": "3f44590a05eb81e385dbd4fe337ad9d9",
+   "parent": "3db4590a05eb81cd938de84cfffead9c",
+   "title": "ESC-30 — Diagnose and Propose Bounded Remediation — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:22.274Z",
+   "body_lines": 143,
+   "child_pages": 0,
+   "id": "3f44590a05eb8173905cc6d17a40457b",
+   "parent": "3db4590a05eb81cd938de84cfffead9c",
+   "title": "ESC-40 — Review and Return Approved Remediation — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:35.733Z",
+   "body_lines": 110,
+   "child_pages": 0,
+   "id": "3f44590a05eb813aa0ccd709ebd134d0",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "IA-10 — Create Whole-Change Implementation Audit and Plan — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:23.010Z",
+   "body_lines": 85,
+   "child_pages": 0,
+   "id": "3f44590a05eb81a8bf39f4b16cc61a5f",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "IA-20 — Create Whole-Change Implementation Plan — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:54.641Z",
+   "body_lines": 125,
+   "child_pages": 0,
+   "id": "3f44590a05eb811db88dece791f1f60c",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "IA-30 — Review Whole-Change Implementation Plan — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:25.413Z",
+   "body_lines": 82,
+   "child_pages": 0,
+   "id": "3f44590a05eb81ca83ecdac0960a6f16",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "IA-40 — Prepare or Revise Whole-Change Implementation Plan — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:38.746Z",
+   "body_lines": 74,
+   "child_pages": 0,
+   "id": "3f44590a05eb810aa299fbb05a34dece",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "IA-50 — IA Answer Seeder — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:00.331Z",
+   "body_lines": 74,
+   "child_pages": 0,
+   "id": "3f44590a05eb81cdab15c7e7f7094a64",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "IA-60 — Thoth Planning Research — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:57.710Z",
+   "body_lines": 76,
+   "child_pages": 0,
+   "id": "3f44590a05eb813ea53ac959e7a4e597",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "title": "MGR-10 — Coordinate the Complete Change Flow within Current Authority — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:29.013Z",
+   "body_lines": 278,
+   "child_pages": 0,
+   "id": "3f44590a05eb81509957c43992c03625",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "OPS-10 — Create Bounded Ops Task — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:42.649Z",
+   "body_lines": 270,
+   "child_pages": 0,
+   "id": "3f44590a05eb8155aebacd56f469643e",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "OPS-20 — Execute Bounded Ops Task — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:04.097Z",
+   "body_lines": 348,
+   "child_pages": 0,
+   "id": "3f44590a05eb81ec8da3effc3b28cf97",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "OPS-30 — Review Ops Execution Receipt — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:33.739Z",
+   "body_lines": 278,
+   "child_pages": 0,
+   "id": "3f44590a05eb815d97d5f3930c7d3e8a",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "PR-10 — Create PR Work-Unit Instructions — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:47.327Z",
+   "body_lines": 297,
+   "child_pages": 0,
+   "id": "3f44590a05eb819fbea5dcd966a750ba",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "PR-20 — Create Detailed PR Implementation Plan — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:08.672Z",
+   "body_lines": 227,
+   "child_pages": 0,
+   "id": "3f44590a05eb8148a538f5c80588db14",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "PR-30 — PR Implementation Proceed — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:15.569Z",
+   "body_lines": 193,
+   "child_pages": 0,
+   "id": "3f44590a05eb811ebf72e949b7b1572e",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:38.234Z",
+   "body_lines": 340,
+   "child_pages": 0,
+   "id": "3f44590a05eb81088487e918fd642a7f",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "PR-40 — Review PR Work-Unit Lineage — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:48.607Z",
+   "body_lines": 74,
+   "child_pages": 0,
+   "id": "3f44590a05eb81d29748eb21df73b02c",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "PR-50 — Abort PR and Escalate — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:12.398Z",
+   "body_lines": 462,
+   "child_pages": 0,
+   "id": "3f44590a05eb8134af92e7c85a48e67c",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-10 — Audit Implementation and Establish QA Readiness — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:45.204Z",
+   "body_lines": 110,
+   "child_pages": 0,
+   "id": "3f44590a05eb8182a201f0e177dad431",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-100 — Execute Bounded QA Task — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:41.377Z",
+   "body_lines": 121,
+   "child_pages": 0,
+   "id": "3f44590a05eb81ee9a09e00af51f33cb",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-110 — Review QA Evidence and Route the Next Action — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:51.614Z",
+   "body_lines": 119,
+   "child_pages": 0,
+   "id": "3f44590a05eb81a4a3fbc0fae65d153e",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-120 — Create Final QA Report and RCA — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:15.395Z",
+   "body_lines": 108,
+   "child_pages": 0,
+   "id": "3f44590a05eb81289c7be77f66bac909",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-20 — Create Live QA Guide — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:48.299Z",
+   "body_lines": 144,
+   "child_pages": 0,
+   "id": "3f44590a05eb815d89d3e602973d83ad",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-50 — Create Whole-Change QA Audit and Plan — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:44.410Z",
+   "body_lines": 117,
+   "child_pages": 0,
+   "id": "3f44590a05eb81489053f72637577807",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-60 — Create Whole-Change QA Plan — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:54.691Z",
+   "body_lines": 132,
+   "child_pages": 0,
+   "id": "3f44590a05eb81209128ea7c82938faf",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-70 — Review Whole-Change QA Plan — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:18.516Z",
+   "body_lines": 101,
+   "child_pages": 0,
+   "id": "3f44590a05eb818789e9ff3ffa9e06d8",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-80 — Revise Whole-Change QA Plan — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:51.327Z",
+   "body_lines": 114,
+   "child_pages": 0,
+   "id": "3f44590a05eb81bea720f004a7e1a6d8",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d",
+   "title": "QA-90 — Create Bounded QA Execution Task — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:47.386Z",
+   "body_lines": 101,
+   "child_pages": 0,
+   "id": "3f44590a05eb81a588c9c82aa8a2d3f2",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:57.795Z",
+   "body_lines": 130,
+   "child_pages": 0,
+   "id": "3f44590a05eb81be9566cd6397c9424c",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "RS-20 — Review Bounded Work-Unit Rescope — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:23.555Z",
+   "body_lines": 98,
+   "child_pages": 0,
+   "id": "3f44590a05eb8131bc61e346a46840e9",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "RS-30 — Revise Bounded Work-Unit Rescope Proposal — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:30:54.130Z",
+   "body_lines": 104,
+   "child_pages": 0,
+   "id": "3f44590a05eb813993beccaaf88523d4",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "title": "RS-40 — Approved Rescope — Resume PR Implementation — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T02:29:50.321Z",
+   "body_lines": 75,
+   "child_pages": 0,
+   "id": "3f44590a05eb81d997d1fd2b8d1b5042",
+   "parent": "3db4590a05eb811b9c14f2ae89c28df7",
+   "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T13:32:38.514Z",
+   "body_lines": 395,
+   "child_pages": 0,
+   "id": "3f44590a05eb81f98b76c83465dc1960",
+   "parent": "3db4590a05eb811b9c14f2ae89c28df7",
+   "title": "PE Metaprompt 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-12T13:28:07.573Z",
+   "body_lines": 125,
+   "child_pages": 0,
+   "id": "3f74590a05eb812db385c2544d7570f7",
+   "parent": "3db4590a05eb81de9736ea69bac61016",
+   "title": "Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1",
+   "title_ok": true
+  },
+  {
+   "as_of": "2026-10-26T11:45:19.630Z",
+   "body_lines": 272,
+   "child_pages": 0,
+   "id": "4054590a05eb8155b301e2cb6dec31d5",
+   "parent": "3e54590a05eb81eb818fd0f42045167a",
+   "title": "CL-05 — Prepare and Publish the Close Mutation Set — 102626.2 (candidate)",
+   "title_ok": true
+  }
+ ],
+ "titles_ok": 57
+}
