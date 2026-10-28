@@ -1,0 +1,72 @@
+{
+ "committed": false,
+ "modification": "MODIFICATION-20261027-gcfpe-backlog-open-items",
+ "ok": true,
+ "r1": {
+  "build": {
+   "command": "installed glow-graph-contract/scripts/graph_parts.py build docs/graph/parts <scratch>",
+   "edges": 240,
+   "embedded_json_bytes": 607994,
+   "equals_x11_production_token": true,
+   "nodes": 56,
+   "sha256": "2342744dc1d9de9d8bfad34bdc3d5edd244afbc7f428c8706cae3d56e90e1d41",
+   "state_routes": 56,
+   "validation": "PASS"
+  },
+  "check_flipped": {
+   "check_ok": true,
+   "command": "plan/graph_assemble_102726.py check docs/graph/parts <main's docs/graph/parts, git archive origin/main> execute/successor-pages-102726.1.json --flipped",
+   "errors": []
+  },
+  "files": "56 modified, 1 added (prompts/CL-05.json)",
+  "what": "docs/graph/parts replaced by the production parts: execute/x11_graphs_102726.py rerun on main's parts with the installed skills (X22's), its production parts byte-identical (diff -r) to X11's scratch production parts, then copied in",
+  "x11_rerun_candidate_token": {
+   "bytes": 608051,
+   "edges": 240,
+   "nodes": 56,
+   "sha256": "e17d4e6ad78f7c925a4207f764a941da6dd2c75690c38fdfa35b6c5baeb91b5a",
+   "state_routes": 56,
+   "validation_pass": true
+  },
+  "x11_rerun_ok": true,
+  "x11_rerun_production_token": {
+   "bytes": 607994,
+   "edges": 240,
+   "nodes": 56,
+   "sha256": "2342744dc1d9de9d8bfad34bdc3d5edd244afbc7f428c8706cae3d56e90e1d41",
+   "state_routes": 56,
+   "validation_pass": true
+  },
+  "x27_markers": {
+   "global_candidate_release": "GCFPE-20261027.1",
+   "prompts_CL-05_json": true
+  }
+ },
+ "r2": {
+  "bytes": 1419602,
+  "check_selected": {
+   "deriver_drift": [],
+   "header_values_ok": true,
+   "ok": true,
+   "rows": 56,
+   "rows_active": 56,
+   "validator_errors": 0
+  },
+  "compare_with_candidate": {
+   "differing_paths": [
+    "approved_at",
+    "approved_by",
+    "status"
+   ],
+   "ok": true
+  },
+  "equals_x23_build": true,
+  "path": "docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+  "sha256": "51f2a0b6d4c2b4cad3cc6fedc18c724f2dfdf1d0497ffdb5236fc0cfeafcc8e3",
+  "what": "plan/registry_assemble_102726.py build --stage selected, base main's GCFPE-PCR-20261009.1, the installed governance audit and graph contract (copied to scratch), the candidate parts, the successor map, X15's landing-check revisions, the catalog record execute/notion-controls-102726.1.json, @PROMOTION_APPROVAL_DATE=2026-10-27 (Nathan's approval date, \u00a7E)"
+ },
+ "r3_r4": "NOT_RUN: stopped before the values file (\u00a7E, Stop record \u2014 2026-10-28, X26)",
+ "record_type": "GCFPE_102726_X26_R1_R2",
+ "restored": "after the measurement, docs/graph/parts and docs/prompt_ecosystem_management/project-prompt-contract-registry.md were restored to origin/main's bytes (a99de293) before any commit: the stop at X26 takes D26-B's path, whose record pull request must not land the promotion's parts and registry without R3 and R4; X26 redoes R1 and R2 from these inputs after Nathan's decision",
+ "step": "X26, P7, R1 and R2"
+}

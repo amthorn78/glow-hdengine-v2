@@ -3,6 +3,7 @@
 sweep.P6-SWEEP).
 
   x25_sweep_102726.py triage --fetched-after T --pages ID ... --out R
+  x25_sweep_102726.py notes  --fetched-after T --notes N --out R
 
 On this session's newest read after T of each page: control_check_102726.py's sweep test (this release's 57 archive
 ids, 100926.1, GCFPE-(PCR-)20261009.1 and an unmarked v5.0.0 binding, outside historical sections and predecessor
@@ -10,7 +11,13 @@ markers, child-page blocks counted), plus the P6-SWEEP member-count statements (
 "exactly 55", "all 55") outside historical sections. A selected member's page (the successor map's 56) is reported
 by counts only and is a stop if it has a finding (P6-SWEEP: a selected member body is never edited here); every
 other page is reported with each finding's section and an 80-character excerpt (control and record pages, not
-prompt bodies, D22). Read-only; writes only R. Run with PYTHONDONTWRITEBYTECODE=1; CLAUDE_CODE_SESSION_ID set.
+prompt bodies, D22).
+
+`notes` checks the dated notes P6 wrote on record pages (N: {"rows": [{"id", "command", "note", "anchor"}]}, the
+notes as sent): on the newest read after T, each note occurs exactly once (as written or with Notion's underscore
+escaping), an update_content note's anchor occurs exactly once and directly follows its note after one blank line,
+and an insert_content note at the start is the body's first paragraph. Counts and booleans only. Read-only; writes
+only R. Run with PYTHONDONTWRITEBYTECODE=1; CLAUDE_CODE_SESSION_ID set.
 """
 from __future__ import annotations
 
@@ -26,6 +33,7 @@ HERE = Path(__file__).resolve().parent
 E = HERE.parent
 sys.path.insert(0, str(E / "plan"))
 sys.path.insert(0, str(HERE))
+import activation_render_102726 as R  # noqa: E402
 import control_check_102726 as C  # noqa: E402
 import page_facts_102726 as PF  # noqa: E402
 
@@ -33,14 +41,47 @@ MAP = HERE / "successor-pages-102726.1.json"
 COUNT = re.compile(r"(?<![\d.])55 members|55-member|exactly 55\b|all 55\b")
 
 
+def count(text: str, s: str) -> int:
+    return R.occ(text, s) + (R.occ(text, R.esc(s)) if R.esc(s) != s else 0)
+
+
+def notes(a, root: str, session: str) -> int:
+    rows = []
+    for n in json.loads(Path(a.notes).read_text(encoding="utf-8"))["rows"]:
+        got = PF.newest(n["id"], root, session, 900, a.fetched_after)
+        if not got:
+            rows.append({"id": n["id"], "error": "NO_FETCH_FOUND", "ok": False})
+            continue
+        m = PF.CONTENT.search(got[2])
+        text = m.group(1) if m else ""
+        row = {"id": n["id"], "as_of": got[1], "command": n["command"], "note_count": count(text, n["note"])}
+        if n["anchor"] is not None:
+            row["anchor_count"] = count(text, n["anchor"])
+            row["note_then_anchor"] = count(text, n["note"] + "\n\n" + n["anchor"])
+            row["ok"] = row["note_count"] == 1 and row["anchor_count"] == 1 and row["note_then_anchor"] == 1
+        else:
+            body = text.lstrip("\n")
+            row["first_paragraph"] = body.startswith(n["note"] + "\n") or body.startswith(R.esc(n["note"]) + "\n")
+            row["ok"] = row["note_count"] == 1 and row["first_paragraph"]
+        rows.append(row)
+    rec = {"record_type": "GCFPE_102726_X25_NOTES_READBACK", "fetched_after": a.fetched_after, "notes": len(rows),
+           "all_ok": len(rows) > 0 and all(r["ok"] for r in rows), "rows": rows}
+    Path(a.out).write_text(json.dumps(rec, indent=1, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(json.dumps(rec, indent=1, ensure_ascii=False))
+    return 0 if rec["all_ok"] else 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["triage"])
+    ap.add_argument("mode", choices=["triage", "notes"])
     ap.add_argument("--fetched-after", required=True)
-    ap.add_argument("--pages", nargs="+", required=True)
+    ap.add_argument("--pages", nargs="+")
+    ap.add_argument("--notes")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
     root, session = os.path.expanduser("~/.claude/projects"), os.environ["CLAUDE_CODE_SESSION_ID"]
+    if a.mode == "notes":
+        return notes(a, root, session)
     ctx = C.context(str(MAP))
     members = ctx["all_members"]
     rows = []
