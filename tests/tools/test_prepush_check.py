@@ -603,7 +603,7 @@ def test_coverage_matches_the_binding_definition_and_the_guard_on_the_repository
     listed = _git(ROOT, "ls-files", "--", "tests").splitlines()
     tracked = [p for p in listed if PurePosixPath(p).name.startswith("test_") and p.endswith(".py")]
     assert coverage["tracked"] == len(tracked)
-    roots = guard_tokens | set(classifier._full_validation_test_targets())
+    roots = guard_tokens | set(classifier._full_validation_test_targets()) | set(classifier._CLOSE_STAGE_TESTS)
     guard_uncovered = [p for p in tracked if not any(p == r or p.startswith(r.rstrip("/") + "/") for r in roots)]
     assert coverage["uncovered"] == guard_uncovered == []
     assert "tests/tools/test_prepush_check.py" in classifier._full_validation_test_targets()

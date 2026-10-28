@@ -754,8 +754,10 @@ def compute_coverage(root: Path) -> dict[str, object]:
     tracked = sorted(p for p in listed if p and PurePosixPath(p).name.startswith("test_") and p.endswith(".py"))
     text = (root / WORKFLOW_PATH).read_text(encoding="utf-8")
     command_tokens = pytest_command_tokens(text)
-    targets = tuple(load_classifier(root)._full_validation_test_targets())
-    roots = command_tokens | set(targets)
+    classifier = load_classifier(root)
+    targets = tuple(classifier._full_validation_test_targets())
+    # A close-stage test runs when its owners change, never as full validation.
+    roots = command_tokens | set(targets) | set(getattr(classifier, "_CLOSE_STAGE_TESTS", ()))
     return {
         "tracked": len(tracked),
         "pytest_command_tokens": sorted(command_tokens),

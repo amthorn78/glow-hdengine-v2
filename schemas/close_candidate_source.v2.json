@@ -1,7 +1,7 @@
 {
   "$id": "schemas/close_candidate_source.v2.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Closed causal-source contract (v2) for the feedback-free close pack of one Epic or CRD. Every causal value is a tracked path, a binding name, a fixed vocabulary value or a single neutral text line; requirement and acceptance text is bound by reference to a tracked requirements document, never copied. The writer adds runtime checks the schema cannot express (bindings resolve, IDs occur in the bound requirements document, decision consistency, prohibited causal inputs, and that an evidence path admitted only as a QA primary is one the bound QA step-logs manifest records for the source's own change).",
+  "description": "Closed causal-source contract (v2) for the feedback-free close pack of one Epic or CRD. Every causal value is a tracked path, a binding name, a fixed vocabulary value or a single neutral text line. No causal input lies under docs/ephemeral/ (planning only) or docs/pfcanon/ (versions change at any time): the change's requirement IDs, QA plan checks and their criteria, and QA verdict are recorded here, and its planning documents are named by provenance text only, never read. Requirement and acceptance text is never copied. The writer adds runtime checks the schema cannot express (bindings resolve, criteria are recorded requirement IDs, decision consistency, prohibited causal inputs, and that an evidence path admitted only as a QA primary is one the bound QA step-logs manifest records for the source's own change); at write time only, it also checks PF titles and register headings against the current tracked PF-Canon by stable identity.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -12,8 +12,71 @@
       "type": "string",
       "pattern": "^HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,})$"
     },
-    "plan_path": {
-      "$ref": "#/$defs/causal_repository_path"
+    "planning_records": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "specification": {
+          "$ref": "#/$defs/causal_text"
+        },
+        "implementation_plan": {
+          "$ref": "#/$defs/causal_text"
+        },
+        "qa_plan": {
+          "$ref": "#/$defs/causal_text"
+        },
+        "qa_report": {
+          "$ref": "#/$defs/causal_text"
+        }
+      },
+      "required": [
+        "implementation_plan",
+        "qa_plan",
+        "qa_report",
+        "specification"
+      ]
+    },
+    "requirement_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item_id"
+      },
+      "minItems": 1,
+      "maxItems": 512,
+      "uniqueItems": true
+    },
+    "qa_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "check_id": {
+            "$ref": "#/$defs/check_id"
+          },
+          "criteria": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/item_id"
+            },
+            "minItems": 0,
+            "maxItems": 512,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "check_id",
+          "criteria"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "qa_verdict": {
+      "type": "string",
+      "maxLength": 32,
+      "pattern": "^[A-Z][A-Z_]*$"
     },
     "evidence_inputs": {
       "type": "array",
@@ -43,15 +106,6 @@
       "minItems": 1,
       "maxItems": 256,
       "uniqueItems": true
-    },
-    "requirements_binding": {
-      "$ref": "#/$defs/causal_binding"
-    },
-    "qa_plan_binding": {
-      "$ref": "#/$defs/causal_binding"
-    },
-    "qa_report_binding": {
-      "$ref": "#/$defs/causal_binding"
     },
     "acceptance": {
       "type": "array",
@@ -149,16 +203,16 @@
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                  "binding": {
-                    "$ref": "#/$defs/causal_binding"
+                  "register": {
+                    "$ref": "#/$defs/pf_title"
                   },
                   "heading": {
                     "$ref": "#/$defs/causal_text"
                   }
                 },
                 "required": [
-                  "binding",
-                  "heading"
+                  "heading",
+                  "register"
                 ]
               }
             },
@@ -242,8 +296,17 @@
             "items": {
               "$ref": "#/$defs/causal_binding"
             },
-            "minItems": 1,
+            "minItems": 0,
             "maxItems": 32,
+            "uniqueItems": true
+          },
+          "evidence_records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/causal_text"
+            },
+            "minItems": 0,
+            "maxItems": 16,
             "uniqueItems": true
           },
           "close_expectation": {
@@ -262,6 +325,25 @@
           "evidence_bindings",
           "locators",
           "readiness"
+        ],
+        "anyOf": [
+          {
+            "properties": {
+              "evidence_bindings": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "required": [
+              "evidence_records"
+            ],
+            "properties": {
+              "evidence_records": {
+                "minItems": 1
+              }
+            }
+          }
         ]
       },
       "minItems": 0,
@@ -343,19 +425,39 @@
     "superseded": {
       "type": "array",
       "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "binding": {
-            "$ref": "#/$defs/causal_binding"
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/$defs/causal_binding"
+              },
+              "evidence_change": {
+                "$ref": "#/$defs/causal_text"
+              }
+            },
+            "required": [
+              "binding",
+              "evidence_change"
+            ]
           },
-          "evidence_change": {
-            "$ref": "#/$defs/causal_text"
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "record": {
+                "$ref": "#/$defs/causal_text"
+              },
+              "evidence_change": {
+                "$ref": "#/$defs/causal_text"
+              }
+            },
+            "required": [
+              "evidence_change",
+              "record"
+            ]
           }
-        },
-        "required": [
-          "binding",
-          "evidence_change"
         ]
       },
       "minItems": 0,
@@ -440,11 +542,11 @@
   "required": [
     "schema_version",
     "change_id",
-    "plan_path",
+    "planning_records",
+    "requirement_ids",
+    "qa_checks",
+    "qa_verdict",
     "evidence_inputs",
-    "requirements_binding",
-    "qa_plan_binding",
-    "qa_report_binding",
     "acceptance",
     "deliverables",
     "allocation",
@@ -489,6 +591,11 @@
         {
           "not": {
             "pattern": "^[Cc][Aa][Tt][Aa][Ll][Oo][Gg]/[Mm][Aa][Nn][Ii][Ff][Ee][Ss][Tt]\\.[Jj][Ss][Oo][Nn](?:$|[./])"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^[Dd][Oo][Cc][Ss]/(?:[Ee][Pp][Hh][Ee][Mm][Ee][Rr][Aa][Ll]|[Pp][Ff][Cc][Aa][Nn][Oo][Nn])(?:/|$)"
           }
         }
       ]
@@ -557,6 +664,11 @@
           "not": {
             "$ref": "#/$defs/feedback_dependency"
           }
+        },
+        {
+          "not": {
+            "pattern": "^[Dd][Oo][Cc][Ss]/(?:[Ee][Pp][Hh][Ee][Mm][Ee][Rr][Aa][Ll]|[Pp][Ff][Cc][Aa][Nn][Oo][Nn])(?:/|$)"
+          }
         }
       ]
     },
@@ -568,6 +680,11 @@
         {
           "not": {
             "$ref": "#/$defs/feedback_dependency"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^[Dd][Oo][Cc][Ss]/(?:[Ee][Pp][Hh][Ee][Mm][Ee][Rr][Aa][Ll]|[Pp][Ff][Cc][Aa][Nn][Oo][Nn])(?:/|$)"
           }
         }
       ]
