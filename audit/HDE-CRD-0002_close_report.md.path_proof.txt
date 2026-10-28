@@ -1,5 +1,5 @@
 path: audit/HDE-CRD-0002_close_report.md
-size_bytes: 40914
-sha256: 47d29b5c6da63df5b67fa90a8b3eb42933fd1df357908053eca92f10f4e412ee
+size_bytes: 40846
+sha256: c910e20fafd9bcd7ee262306ad7ba54c881cdad277d89579fd931810abed0153
 mtime_utc: 2026-10-26T04:37:07Z
 produced_at_utc: 2026-09-22T14:25:29Z
