@@ -1390,6 +1390,7 @@ def test_full_validation_roster_is_exhaustive_nonoverlapping_and_owned() -> None
     }
     supplemental = set(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
     inactive = classifier._FULL_VALIDATION_INACTIVE_TESTS
+    close_stage = set(classifier._CLOSE_STAGE_TESTS)
     registered = classifier._registered_owner_test_paths()
     full_targets = set(classifier._full_validation_test_targets())
     fixed_registered = {
@@ -1405,9 +1406,11 @@ def test_full_validation_roster_is_exhaustive_nonoverlapping_and_owned() -> None
     assert not fixed & supplemental
     assert not fixed & inactive
     assert not supplemental & inactive
-    assert configured == fixed | supplemental | inactive
+    assert not close_stage & (fixed | supplemental | inactive | full_targets)
+    assert close_stage <= registered
+    assert configured == fixed | supplemental | inactive | close_stage
     assert not fixed_registered & full_targets
-    assert registered == fixed_registered | full_targets
+    assert registered == fixed_registered | full_targets | close_stage
     assert non_file_registered == set(classifier._FIXED_LANE_TEST_DIRECTORIES)
     assert "tests/scripts/test_release_id_recompute.py" in full_targets
     assert classifier._HTTP_READER_OWNERSHIP_GUARD in full_targets
@@ -1437,6 +1440,30 @@ def test_full_validation_inputs_run_the_supplemental_behavioral_gap() -> None:
             ValueError, match="CI_INACTIVE_TEST_REQUIRES_DISPOSITION"
         ):
             classifier.changed_test_targets(ROOT, (path,))
+
+
+def test_close_pack_test_runs_only_at_the_close_stage() -> None:
+    # Administrative closeout validation is not ordinary required PR CI (Plan Templates, "CI lane
+    # classification and automated budget-control discipline"): full validation never selects the
+    # close-pack test; a change to the writer, a close-candidate schema, the closeout workflow or
+    # the test itself does.
+    close_pack_test = "tests/qa/test_generate_epic_close_pack.py"
+    assert classifier._CLOSE_STAGE_TESTS == (close_pack_test,)
+    assert close_pack_test not in classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS
+    assert close_pack_test not in classifier._full_validation_test_targets()
+    for path in ("requirements.txt", "pytest.ini", ".github/workflows/ci.yml", "ci/checks/classify_ci_changes.py"):
+        assert close_pack_test not in classifier.changed_test_targets(ROOT, (path,)), path
+    for path in (
+        ".github/workflows/epic-closeout-validation.yml",
+        "tools/qa/generate_epic_close_pack.py",
+        "schemas/close_candidate_source.v2.json",
+        "schemas/epic_close_candidate_source.v1.json",
+        close_pack_test,
+    ):
+        assert close_pack_test in classifier.changed_test_targets(ROOT, (path,)), path
+    assert classifier.changed_test_targets(
+        ROOT, (".github/workflows/epic-closeout-validation.yml",)
+    ) == tuple(sorted({*classifier._full_validation_test_targets(), close_pack_test}))
 
 
 def test_inactive_test_refusal_rejects_a_synthetic_inactive_path(
@@ -2416,5 +2443,9 @@ def test_every_tracked_test_module_is_reached_by_a_lane_or_full_validation_targe
         if path and PurePosixPath(path).name.startswith("test_") and path.endswith(".py")
     ]
     assert tracked
-    roots = _ci_lane_test_tokens() | set(classifier._full_validation_test_targets())
+    roots = (
+        _ci_lane_test_tokens()
+        | set(classifier._full_validation_test_targets())
+        | set(classifier._CLOSE_STAGE_TESTS)
+    )
     assert [path for path in tracked if not _reached(path, roots)] == []

@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.9**  
-Effective Date: 2026.10.27  
+**Version: v13.9.1**  
+Effective Date: 2026.10.28  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -183,7 +183,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 
 ## **1.1 Addendum Index**
 
-* 2.1 Canon policy for the S19 routed security findings: production vendor gate scope, vendor route selection, compat route gating, evidence-tool output roots and gate-row content
+* 2.1 Canon policy for the S19 routed security findings: production vendor gate scope, vendor route selection, compat route gating, evidence-tool output roots and gate-row content  
+* 2.2 Planning documents and PF-Canon versions are never inputs; the close-pack writer runs only at close
 
 # **2\) Numbered Addenda**
 
@@ -498,5 +499,77 @@ Left undecided. None in this decision.
 * Source review: docs/ephemeral/HDE-CRD-0002-S19-code-security-review-v1.0.md §4, §8 and §9, reviewed head 1e97ba9b.  
 * Repository: main at adbacfa2. The files and lines are cited under each decision.  
 * Prior record of item 9: HDE CRD Records, the HDE-CRD-0002 record, "Deferred or residual work" ("no disposition yet").
+
+## 2.2 Planning documents and PF-Canon versions are never inputs; the close-pack writer runs only at close
+
+Timestamp: 102826 06:25 (UTC). Details: Records the Product Owner's architecture direction of 2026-10-28 that planning documents serve planning only, that PF-Canon document versions may change at any time, and that the close-pack writer runs only at the end of a full work-unit cycle. It states three rules, the defect that prompted them, what was changed to conform, and the items that do not yet conform.
+
+### Decision and approval status
+
+* Decision. The Product Owner directed, on 2026-10-28, that it was an architecture mistake for anything to rely on ephemeral files or to pin anything to a PF version, that ephemeral files are only for planning, that PF document versions may change at any time, and that the close-pack generator runs only at the end of a full work-unit cycle. Rules R-1 to R-3 below state that direction as canon.  
+* Status. Proposed. The rules take effect as canon when this addendum is published in HDE Build Notes.  
+* Relation to other canon. HDE Governance keeps the role of in-flight documents in docs/ephemeral/ for the planning, authoring, review and decisions of their own change. This addendum governs what may depend on those documents and on PF-Canon file identities. Where HDE Governance, HDE Schemas & Artifacts, Change Process Guide, Glow QA Guide or HDE Mechanics Guide require a close pack, tool, test or record to read or bind a planning document, or to name a PF document by file name or version, this addendum supersedes that requirement for that scope.
+
+### The defect that prompted it
+
+* HDE-CRD-0002's close pack bound seven planning documents under docs/ephemeral/ and its implementation plan as causal inputs, and the close-pack writer re-read them in check mode. When those documents were archived out of the repository, the committed close pack could no longer be checked on main.  
+* The writer resolved the CRD register and the Build Checklist registers by versioned PF file name, and the writer's test copied two versioned PF files from the checkout. When the HDE CRD Records document changed version, the test failed on main for every pull request that ran it.  
+* The writer's test ran as part of full-validation CI, so a planning-document archive or a PF version change turned unrelated pull requests red.
+
+### R-1 — Planning documents serve planning only
+
+* A planning document is any change-process work product stored under docs/ephemeral/: Specifications, Plans, instructions, reviews, reports, RCAs, readiness records, dispositions, handoffs and result records.  
+* No code, test, tool, CI step, workflow, schema, governed evidence artifact, close pack, manifest, Index or Mirror row or path proof reads, binds, hashes, resolves or requires a path under docs/ephemeral/. A test builds any document it needs as its own fixture.  
+* A fact a later stage needs from a planning document is recorded where that stage reads it, when it is recorded: for a close pack, in the close-candidate source, as a record text naming the document's identity and SHA-256, and as the structured facts the writer checks (requirement IDs, QA plan checks and their mapped criteria, the QA verdict).  
+* A prose citation of a planning document in a permanent record is a reference only. Archiving or deleting the cited document invalidates nothing that depends on the record.
+
+### R-2 — PF-Canon is resolved by stable identity, never by version
+
+* PF-Canon document versions, and therefore file names, may change at any time.  
+* No code, test, tool, CI step, schema, governed artifact or committed record that must remain valid pins a PF document's file name, version or content digest, or requires its bytes to stay unchanged.  
+* A tool that needs current canon resolves the document at the time it runs, by PF identity and versionless title, to the one current file under docs/pfcanon/, and refuses when that resolution is not unique. Validation of an already committed artifact does not re-read canon.  
+* A citation of canon in code, a test, a tool, an ADR or a governed artifact names the PF document by title, and its section where needed. HDE Build Notes is cited by title alone, without an addendum number, because its addendum numbers restart with each base version.
+
+### R-3 — The close-pack writer runs only at close
+
+* The close-pack writer writes a close pack only at the close stage, at the end of a full work-unit cycle, after the authorized QA verdict and the closure decision exist.  
+* The writer's test is a close-stage test. CI selects it when the writer, a close-candidate source schema, the closeout validation workflow or the test itself changes. It is not part of full validation or of any other ordinary required pull-request CI (Plan Templates, "CI lane classification and automated budget-control discipline").
+
+### Changes delivered with this record
+
+These changes are carried by the pull request that carries this record. They are completed work, not further obligations.
+
+* Close-pack writer. A v2 close-candidate source records planning\_records (identity and SHA-256 of the Specification, implementation plan, QA plan and final QA report), requirement\_ids, qa\_checks and qa\_verdict, and has no plan path or planning-document binding. No path under docs/ephemeral/ or docs/pfcanon/ is a causal input, pointer or key output in either schema version (PLANNING\_OR\_CANON\_INPUT\_PROHIBITED). A deferral's drain target names its register by PF title. PF titles and register headings are resolved at write time only, by title, against the canon tracked at HEAD; check mode reads no PF-Canon file. A later-drain statement and a superseded artifact may name a planning document by record text.  
+* Close-pack test. Every v2 fixture is built in the test's own repository, including the PF-Canon file names and registers; no test reads the checkout's docs/ephemeral/ or docs/pfcanon/. Tests that parsed real planning documents are removed with the parsing they tested. New tests prove that check mode passes after the canon changes version or is removed, and that a planning or canon path is refused as an input or pointer.  
+* CI classification. The close-pack test is the one close-stage test. Full validation no longer selects it; a change to the writer, a close-candidate schema, the closeout validation workflow or the test does. The roster invariants and the pre-push coverage sweep count it as reached.  
+* ADR. The close-pack writer ADR is amended to record this direction and to reverse the earlier Product Owner decisions that bound the writer to planning documents and versioned PF file names.  
+* HDE-CRD-0002 close pack. The candidate source is rebuilt from the archived planning documents; their recovered bytes match the SHA-256 digests the earlier close pack recorded. The writer regenerated the close report and manifest, and the canonical evidence updater republished their Mirror rows and path proofs. The close-run family under audit/qa/hde-crd-0002/close/ is unchanged and remains the record of the close run of 2026-10-26.
+
+### Known nonconforming items
+
+Each item was found by a search of every tracked file outside docs/ that names docs/ephemeral, docs/pfcanon or a versioned PF file name. None is changed by this record. Each needs its owner's decision.
+
+* Narrative registry generator. tools/evidence/generate\_narrative\_registry\_diff.py pins the HDE Narrative Deliverables file name and its SHA-256, and its owner tests in tests/unit/test\_narratives\_loader.py read that file. A version change of HDE Narrative Deliverables fails the generator and those tests. Conforming would move the corpus the generator reads into a tracked non-canon source; that changes a governed evidence generator and is outside this record's scope.  
+* EPIC-026 close-pack generator. tools/qa/generate\_epic026\_close\_pack.py pins a Reality Audits file version that main no longer carries, so the tool fails if run. It is historical and deliberately fail-closed in the CI classifier, with no owner test. Its committed manifest audit/EPIC-026\_MANIFEST.json records that file name as frozen capture-time evidence.  
+* PF10 addendum numbers in existing comments. Code comments and committed records written before this record cite HDE Build Notes by addendum numbers of earlier base versions (for example in tools/qa/generate\_epic\_close\_pack.py and tools/ci/prepush\_check.py). They are references only and execute nothing; under R-2 a new citation names HDE Build Notes by title alone.
+
+Conforming uses found by the same search, which R-1 and R-2 permit: path exclusions of docs/ephemeral/ and docs/pfcanon/ in CI, the classifier and the pre-push check; tools and tests that resolve a PF document by identity at run time, such as the pre-push check's current HDE Build Notes and a test that reads the current HDE Governance by versionless pattern; tests that write synthetic PF or planning files in their own temporary repositories; and agent hooks that act on planning documents while a change is planned.
+
+### Scope, exclusions and nonclaims
+
+* Scope: what may depend on planning documents and PF-Canon file identities, and when the close-pack writer runs.  
+* Excluded: where planning documents are stored, which documents govern a change while it is planned, and the content of any PF document.  
+* Nonclaims: this record makes no QA verdict, acceptance, Ops, deployment, register movement, closure decision or canon drainage. Regenerating HDE-CRD-0002's close pack re-records that change's closure evidence in the corrected form; it is not a new closure decision.
+
+### Dependencies and unresolved obligations
+
+* Publication of this addendum in HDE Build Notes is the Product Owner's action.  
+* Drainage into permanent canon is unperformed. Its targets: HDE Governance §9.1.2 and §9.1.3 (R-1, R-2), Plan Templates "Canon precedence for template use" (R-2 citations) and "CI lane classification and automated budget-control discipline" (R-3), Change Process Guide §3.5.2.1 "Close-pack files" and HDE Schemas & Artifacts §1.2 "Close-pack artifacts" (the v2 source fields and the input refusal).  
+* The three known nonconforming items above remain open until their owners decide them.
+
+### Evidence
+
+* The defect, reproduced on 2026-10-28 in a clean clone of main at 455d39f1 under closed rails: tools/qa/generate\_epic\_close\_pack.py \--source audit/HDE-CRD-0002\_close\_candidate\_source.json \--check exits 1 with EPIC\_CLOSE\_PACK\_ERROR:INPUT\_UNTRACKED, because the planning documents the close pack binds were archived out of the repository; and the v2 tests of tests/qa/test\_generate\_epic\_close\_pack.py fail at fixture setup with FileNotFoundError, because the versioned HDE CRD Records file they copy is no longer tracked.  
+* The fix and its checks: the pull request that carries this record, with the local results it reports.
 
 \<eof\>

@@ -17,9 +17,11 @@ This close report is derived only from exact tracked repository inputs.
 
 ## Exact-source acceptance
 
-Requirement source: `specification` (`docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md`). Each criterion is bound to that document by its ID, and the document by its digest under Source bindings; criterion text is not copied.
+Requirement source: HDE-CRD-0002 Specification v1.1 (HDE-CRD-0002-SPECIFICATION, SPECIFICATION_APPROVED; SHA-256 fb412f178fa0ecae527704b16ced4be2c28e42a84e663ccbebdbdb669b7382df) with Specification Delta 01 v1.0 (HDE-CRD-0002-SPECIFICATION-DELTA-01; SHA-256 59ef9a776c6b5615333cfe68ba4d8145a3d1fe1fdd194b12bb24cf71a233b636). Each criterion is one of its requirement IDs, as the candidate source records them: `S01`, `S02`, `S03`, `S04`, `S05`, `S06`, `S07`, `S08`, `S09`, `S10`, `S11`, `S12`, `S13`, `S14`, `S15`, `S16`, `S17`, `S18`, `S19`, `S20`, `S21`, `S22`; criterion text is not copied.
 
-Authorized decision: the QA report `qa_report` (`docs/ephemeral/HDE-CRD-0002-QA120-qa-report-v1.0.md`), verdict `PASS`. Each MET criterion binds the primary of a PASS check whose QA plan mapping names it.
+Implementation plan: HDE-CRD-0002 Implementation Plan v1.1 (HDE-CRD-0002-IMPLEMENTATION-PLAN; SHA-256 9747f0ffc084d3467ae876f24fa1f1f7a9db8f4a4bf5f62821cf8eb2b6ab486f).
+
+Authorized decision: the QA report HDE-CRD-0002 final QA Report v1.0 (HDE-CRD-0002-QA120-QA-REPORT; SHA-256 f31e2e077300ead2a7b89a84dda31fc235f3c28ae2d90f8c9b886f4f0fb09973), verdict `PASS`. Each MET criterion binds the primary of a PASS check whose QA plan mapping names it.
 
 - `S01`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0002/qa_step_logs_manifest.json`), `qa_check_15` (`audit/qa/hde-crd-0002/checks/qa-15-s01-removal/primary.log`); limitation: Removed by Specification delta 01 (Product Owner OPTION 1, 2026-10-21). Check 15 proves the removal and its stated limit, not delivery: a regular wheel install outside a source checkout still does not admit the release.
 - `S02`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0002/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0002/checks/qa-17-deployed-not-found/primary.log`); limitation: Proven against the deployed service by check 17; the Reader's unknown-person 404 was excluded from QA (FND-004).
@@ -46,29 +48,29 @@ Authorized decision: the QA report `qa_report` (`docs/ephemeral/HDE-CRD-0002-QA1
 
 ## Coverage versus the QA plan
 
-QA plan: `qa_plan` (`docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.3.md`). Each planned check, in plan order, with its QA ledger status as a coverage status and its closeout impact.
+QA plan: HDE-CRD-0002 QA Plan v1.3 (HDE-CRD-0002-QA50-QA-PLAN; SHA-256 30f4a83cfa62276523c6bad5222f521cdf361eed8ebe59408387b24e8c2ec35a). Each planned check, in plan order, with the criteria its mapping names, its QA ledger status as a coverage status and its closeout impact.
 
-- 1. `qa-01-preflight`: PASS; closeout impact: closure gate met
-- 2. `qa-02-ci-coverage`: PASS; closeout impact: closure gate met
-- 3. `qa-03-attestation-debian`: PASS; closeout impact: closure gate met
-- 4. `qa-04-showcompat-help`: PASS; closeout impact: closure gate met
-- 5. `qa-05-aux-preview-band`: PASS; closeout impact: closure gate met
-- 6. `qa-06-dev-harness-retired`: PASS; closeout impact: closure gate met
-- 7. `qa-07-dev-reader-gate`: PASS; closeout impact: closure gate met
-- 8. `qa-08-release-evidence-tooling`: PASS; closeout impact: closure gate met
-- 9. `qa-09-override-matrix`: PASS; closeout impact: closure gate met
-- 10. `qa-10-endpoint-catalog`: PASS; closeout impact: closure gate met
-- 11. `qa-11-template-and-documents`: PASS; closeout impact: closure gate met
-- 12. `qa-12-security-review`: PASS; closeout impact: closure gate met
-- 13. `qa-13-prepush-check`: PASS; closeout impact: closure gate met
-- 14. `qa-14-close-pack-writer`: PASS; closeout impact: closure gate met
-- 15. `qa-15-s01-removal`: PASS; closeout impact: closure gate met
-- 16. `qa-16-deployed-identity`: PASS; closeout impact: closure gate met
-- 17. `qa-17-deployed-not-found`: PASS; closeout impact: closure gate met
-- 18. `qa-18-deployed-dev-surfaces`: PASS; closeout impact: closure gate met
-- 19. `qa-19-deployed-reader-input`: PASS; closeout impact: closure gate met
-- 20. `qa-20-live-vendor-override`: PASS; closeout impact: closure gate met
-- 21. `qa-21-evidence-admission`: PASS; closeout impact: closure gate met
+- 1. `qa-01-preflight` (no criteria): PASS; closeout impact: closure gate met
+- 2. `qa-02-ci-coverage` (`S03`, `S04`, `S05`): PASS; closeout impact: closure gate met
+- 3. `qa-03-attestation-debian` (`S06`): PASS; closeout impact: closure gate met
+- 4. `qa-04-showcompat-help` (`S07`): PASS; closeout impact: closure gate met
+- 5. `qa-05-aux-preview-band` (`S08`): PASS; closeout impact: closure gate met
+- 6. `qa-06-dev-harness-retired` (`S09`): PASS; closeout impact: closure gate met
+- 7. `qa-07-dev-reader-gate` (`S10`): PASS; closeout impact: closure gate met
+- 8. `qa-08-release-evidence-tooling` (`S11`, `S12`, `S13`): PASS; closeout impact: closure gate met
+- 9. `qa-09-override-matrix` (`S14`): PASS; closeout impact: closure gate met
+- 10. `qa-10-endpoint-catalog` (`S15`): PASS; closeout impact: closure gate met
+- 11. `qa-11-template-and-documents` (`S16`, `S17`, `S18`): PASS; closeout impact: closure gate met
+- 12. `qa-12-security-review` (`S19`): PASS; closeout impact: closure gate met
+- 13. `qa-13-prepush-check` (`S20`): PASS; closeout impact: closure gate met
+- 14. `qa-14-close-pack-writer` (`S21`): PASS; closeout impact: closure gate met
+- 15. `qa-15-s01-removal` (`S01`): PASS; closeout impact: closure gate met
+- 16. `qa-16-deployed-identity` (no criteria): PASS; closeout impact: closure gate met
+- 17. `qa-17-deployed-not-found` (`S02`): PASS; closeout impact: closure gate met
+- 18. `qa-18-deployed-dev-surfaces` (`S10`, `S19`): PASS; closeout impact: closure gate met
+- 19. `qa-19-deployed-reader-input` (`S19`): PASS; closeout impact: closure gate met
+- 20. `qa-20-live-vendor-override` (`S14`, `S19`): PASS; closeout impact: closure gate met
+- 21. `qa-21-evidence-admission` (`S22`): PASS; closeout impact: closure gate met
 
 ## Delivered scope
 
@@ -149,10 +151,10 @@ QA plan: `qa_plan` (`docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.3.md`). Each pl
 
 - Affected PF canon homes: Change Process Guide. Locators: 3.5.1 Requirement; 3.5.2 Close PR contents; 3.5.2.1 Close-pack files; 3.5.4 ADR block in the close-pack (all epics). Current canon posture: Names the Epic close-pack prefix only, no close-mutation-set stage, and no v2 writer or ADR-block rendering. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `close_pack_adr` (`docs/adr/hde/close_pack_writer_adr.md`), `qa_check_14` (`audit/qa/hde-crd-0002/checks/qa-14-close-pack-writer/primary.log`). Close expectation: after a separate canon-only drain step
 - Affected PF canon homes: HDE Schemas and Artifacts. Locators: 1.2 Close-pack artifacts; 8.3 Allowed top-level keys; 8.17 New standardized evidence families. Current canon posture: Records no v2 source or manifest minimum, no CRD close-run family and no crd_id key rule beside epic_id. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `close_pack_adr` (`docs/adr/hde/close_pack_writer_adr.md`), `qa_check_14` (`audit/qa/hde-crd-0002/checks/qa-14-close-pack-writer/primary.log`), `qa_check_21` (`audit/qa/hde-crd-0002/checks/qa-21-evidence-admission/primary.log`). Close expectation: after a separate canon-only drain step
-- Affected PF canon homes: Glow QA Guide. Locators: 3.1.3; 3.4.3 Evidence layout: current-state first; Close-pack truthfulness and same-run execution. Current canon posture: Names no close-run home beside checks and does not place the close mutation set before the closure decision. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `close_pack_adr` (`docs/adr/hde/close_pack_writer_adr.md`), `qa_rca_record` (`docs/ephemeral/HDE-CRD-0002-QA120-qa-rca-v1.0.md`). Close expectation: after a separate canon-only drain step
-- Affected PF canon homes: HDE Governance. Locators: 2.0.19 Close report minimal content; 9.7.7 Business Case. Current canon posture: Names the Epic close-report prefix only and requires a business case for Epics only. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `close_pack_adr` (`docs/adr/hde/close_pack_writer_adr.md`), `closure_decision` (`docs/ephemeral/HDE-CRD-0002-CL-C-10-closure-decision-v1.0.md`). Close expectation: after a separate canon-only drain step
+- Affected PF canon homes: Glow QA Guide. Locators: 3.1.3; 3.4.3 Evidence layout: current-state first; Close-pack truthfulness and same-run execution. Current canon posture: Names no close-run home beside checks and does not place the close mutation set before the closure decision. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `close_pack_adr` (`docs/adr/hde/close_pack_writer_adr.md`), record HDE-CRD-0002 QA RCA v1.0 (HDE-CRD-0002-QA120-QA-RCA, run verdict PASS; SHA-256 18eba71227cfe04a7f01011970303c8ebaba875e63c7a99fb2d2042796a55653). Close expectation: after a separate canon-only drain step
+- Affected PF canon homes: HDE Governance. Locators: 2.0.19 Close report minimal content; 9.7.7 Business Case. Current canon posture: Names the Epic close-report prefix only and requires a business case for Epics only. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `close_pack_adr` (`docs/adr/hde/close_pack_writer_adr.md`), record HDE-CRD-0002 CRD Retrospective and Closure Decision v1.0 (HDE-CRD-0002-CL-C-10-CHANGE-CLOSURE-DECISION; SHA-256 bc3ce44442c271b3541a9823ae49e997dd4aea2dbadac26c7dd0c7036721c0a2). Close expectation: after a separate canon-only drain step
 - Affected PF canon homes: HDE Mechanics Guide. Locators: 1.6.3 CRD admission; 37.2 Governance and homes; 37.3 key_outputs. Current canon posture: States admission for HDE-CRD-0001 only and names no generic v2 close-pack generator. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `close_pack_adr` (`docs/adr/hde/close_pack_writer_adr.md`), `qa_check_21` (`audit/qa/hde-crd-0002/checks/qa-21-evidence-admission/primary.log`). Close expectation: after a separate canon-only drain step
-- Affected PF canon homes: Plan Templates. Locators: Business Case (MUST); Source-bound review authority and exact-fix limits; Step-0B. Current canon posture: Carries no per-unit business case, no real-input and P1 disposition rules, no close-mutation-set task template and no CRD Step-0B rule. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `closure_decision` (`docs/ephemeral/HDE-CRD-0002-CL-C-10-closure-decision-v1.0.md`), `qa_rca_record` (`docs/ephemeral/HDE-CRD-0002-QA120-qa-rca-v1.0.md`). Close expectation: after a separate canon-only drain step
+- Affected PF canon homes: Plan Templates. Locators: Business Case (MUST); Source-bound review authority and exact-fix limits; Step-0B. Current canon posture: Carries no per-unit business case, no real-input and P1 disposition rules, no close-mutation-set task template and no CRD Step-0B rule. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: record HDE-CRD-0002 CRD Retrospective and Closure Decision v1.0 (HDE-CRD-0002-CL-C-10-CHANGE-CLOSURE-DECISION; SHA-256 bc3ce44442c271b3541a9823ae49e997dd4aea2dbadac26c7dd0c7036721c0a2), record HDE-CRD-0002 QA RCA v1.0 (HDE-CRD-0002-QA120-QA-RCA, run verdict PASS; SHA-256 18eba71227cfe04a7f01011970303c8ebaba875e63c7a99fb2d2042796a55653). Close expectation: after a separate canon-only drain step
 - Later-drain statements are support records for future canon maintenance; they are not prerequisites, required checks, acceptance conditions or blockers of this close.
 
 ## Tracked-issue closeout mapping
@@ -196,11 +198,11 @@ QA plan: `qa_plan` (`docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.3.md`). Each pl
 
 ## Superseded artifacts
 
-- `qa_readiness_v1_0` (`docs/ephemeral/HDE-CRD-0002-QA10-qa-readiness-v1.0.md`): Its NOT_READY on FND-001 is superseded by QA-10 readiness v1.1 READY_FOR_QA after the accepted WU-REM-01 remedy (HDE Build Notes 2.23 to 2.26).
+- HDE-CRD-0002 QA-10 readiness v1.0 (HDE-CRD-0002-QA10-QA-READINESS, NOT_READY; SHA-256 a96097f17e71225ab97cb83864ff172da8c54438916150bb21ff2ece03c4cfa6): Its NOT_READY on FND-001 is superseded by QA-10 readiness v1.1 READY_FOR_QA after the accepted WU-REM-01 remedy (HDE Build Notes 2.23 to 2.26).
 
 ## QA RCA and Doc Delta summary
 
-- QA RCA of record: docs/ephemeral/HDE-CRD-0002-QA120-qa-rca-v1.0.md (QA RCA v1.0, verdict PASS), summarized here; source posture as its section 3 states.
+- QA RCA of record: HDE-CRD-0002 QA RCA v1.0 (HDE-CRD-0002-QA120-QA-RCA, verdict PASS), summarized here; source posture as its section 3 states.
 - What ran: all 21 checks of approved QA Plan v1.3; checks 1 to 12, 14 and 15 at state (a), check 13 attempt 1 at state (a) and RV-1 at state (b), checks 16 to 20 against the deployed service, check 21 on the published family.
 - Outcome meaning: all 21 current statuses are PASS; check 13 attempt 1 was FAIL_BEHAVIOR (QA110-F01, a product defect); check 3 attempt 1 and check 21's first execution were TOOLING_BLOCKED readiness failures; no FAIL_TOOLING occurred.
 - QA110-F01 cause, evidenced: the pre-push check's throwaway copies borrowed the source checkout's object store, so a write in a copy re-timed the source pack; remedied by WU-REM-02 and verified by RV-1 under git 2.53.0.
@@ -235,11 +237,9 @@ The close-pack manifest `audit/HDE-CRD-0002_MANIFEST.json` `key_outputs` map is 
 
 ## Source bindings
 
-- Candidate source: `audit/HDE-CRD-0002_close_candidate_source.json` (`sha256=80ded0d233bf419e796058b2d07979c61a6004a67a7bb687d6ee1bc31d4737d7`, `size_bytes=33956`)
-- Candidate-source schema: `schemas/close_candidate_source.v2.json` (`sha256=d600feb1c61006dac0545a80aa4eb2d287ee5b8f2f62f6742fcddf7aa47220a2`, `size_bytes=19687`)
-- Plan: `docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.1.md` (`sha256=9747f0ffc084d3467ae876f24fa1f1f7a9db8f4a4bf5f62821cf8eb2b6ab486f`, `size_bytes=75920`)
-- Evidence `close_pack_adr`: `docs/adr/hde/close_pack_writer_adr.md` (`sha256=1422a27818bff10fe677eb0d2b2da0b6b06139f8a71593e10c8bf790b3d93805`, `size_bytes=25360`)
-- Evidence `closure_decision`: `docs/ephemeral/HDE-CRD-0002-CL-C-10-closure-decision-v1.0.md` (`sha256=bc3ce44442c271b3541a9823ae49e997dd4aea2dbadac26c7dd0c7036721c0a2`, `size_bytes=45031`)
+- Candidate source: `audit/HDE-CRD-0002_close_candidate_source.json` (`sha256=a59423c1763c62bf5f7805263c25d1056f1129f7c196b11918c2add9937ba780`, `size_bytes=37077`)
+- Candidate-source schema: `schemas/close_candidate_source.v2.json` (`sha256=cc606621dbdfef4078f624895ee98dd573c144da8c756d4ecff833e3e01fa843`, `size_bytes=22889`)
+- Evidence `close_pack_adr`: `docs/adr/hde/close_pack_writer_adr.md` (`sha256=c106278b4ba57c6e72aea899b371bfa2d4691c4fd4ac701bcc33148e5fdb4b78`, `size_bytes=27156`)
 - Evidence `doc_deltas`: `audit/docdeltas/hde-crd-0002_doc_deltas.md` (`sha256=aeb9b16b970d6f6c634489c63d4a42e230ba3e704260b17f7a7e9181ea0addb3`, `size_bytes=4443`)
 - Evidence `drain_targets`: `audit/docdeltas/hde-crd-0002_drain_targets.md` (`sha256=61282f685a700893edc6e28fb9977b43627a9da0917f1dd37b3014a6dbc435a9`, `size_bytes=3589`)
 - Evidence `qa_check_01`: `audit/qa/hde-crd-0002/checks/qa-01-preflight/primary.log` (`sha256=01df910157d7d96ec9d6b7cfeb18be22aa1c7f2f3d8b8e2437c77e1af80303e4`, `size_bytes=290492`)
@@ -264,12 +264,6 @@ The close-pack manifest `audit/HDE-CRD-0002_MANIFEST.json` `key_outputs` map is 
 - Evidence `qa_check_20`: `audit/qa/hde-crd-0002/checks/qa-20-live-vendor-override/primary.log` (`sha256=5e96be9bd026172770b15a691fe18de415e13fb8907442dc09aaa99882bf1ed1`, `size_bytes=26905`)
 - Evidence `qa_check_21`: `audit/qa/hde-crd-0002/checks/qa-21-evidence-admission/primary.log` (`sha256=e5b7ca127fed0d22895b020fd3e19a3d23ec4a28881853d4f9b9e2f36b662502`, `size_bytes=20604`)
 - Evidence `qa_manifest`: `audit/qa/hde-crd-0002/qa_step_logs_manifest.json` (`sha256=203b8ca18c061a918f9ca25df0e9f4596cd770a2134e305cb21f235c2aed9874`, `size_bytes=3323`)
-- Evidence `qa_plan`: `docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.3.md` (`sha256=30f4a83cfa62276523c6bad5222f521cdf361eed8ebe59408387b24e8c2ec35a`, `size_bytes=119368`)
-- Evidence `qa_rca_record`: `docs/ephemeral/HDE-CRD-0002-QA120-qa-rca-v1.0.md` (`sha256=18eba71227cfe04a7f01011970303c8ebaba875e63c7a99fb2d2042796a55653`, `size_bytes=36887`)
-- Evidence `qa_readiness_v1_0`: `docs/ephemeral/HDE-CRD-0002-QA10-qa-readiness-v1.0.md` (`sha256=a96097f17e71225ab97cb83864ff172da8c54438916150bb21ff2ece03c4cfa6`, `size_bytes=13523`)
-- Evidence `qa_report`: `docs/ephemeral/HDE-CRD-0002-QA120-qa-report-v1.0.md` (`sha256=f31e2e077300ead2a7b89a84dda31fc235f3c28ae2d90f8c9b886f4f0fb09973`, `size_bytes=41391`)
-- Evidence `specification`: `docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md` (`sha256=fb412f178fa0ecae527704b16ced4be2c28e42a84e663ccbebdbdb669b7382df`, `size_bytes=43151`)
-- Evidence `specification_delta_01`: `docs/ephemeral/HDE-CRD-0002-specification-delta-v1.0.md` (`sha256=59ef9a776c6b5615333cfe68ba4d8145a3d1fe1fdd194b12bb24cf71a233b636`, `size_bytes=21046`)
 - QA primary: `audit/qa/hde-crd-0002/checks/qa-01-preflight/primary.log` (`sha256=01df910157d7d96ec9d6b7cfeb18be22aa1c7f2f3d8b8e2437c77e1af80303e4`, `size_bytes=290492`)
 - QA primary: `audit/qa/hde-crd-0002/checks/qa-02-ci-coverage/primary.log` (`sha256=bc52ae603d33932cc634751f267d7e21b3f1c8438a0deebe294cfb70c1359eac`, `size_bytes=7990`)
 - QA primary: `audit/qa/hde-crd-0002/checks/qa-03-attestation-debian/primary.log` (`sha256=7dfc152a9f8e38450a1644437f692c6687998c30179b315834e0ffa854cf3094`, `size_bytes=39632`)
