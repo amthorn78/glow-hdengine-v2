@@ -1,5 +1,23 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC041: chart-loader boundary separation, final repository documentation (WU-PR-03)
+
+### Added
+- Adapter-owned chart entry `adapter/chart_orchestration.py::load_chart`, called as `load_chart(birthdate, birthtime, place, *, tz=None, correlation_id=None, log_sink=None)` or with the three birth arguments by keyword (HDE-SEPA006.1; WU-PR-01; #791). It owns the `SAFE_MODE` read for its log field, both clocks, the correlation id, the reads of the pinned ISO-3166 and IANA lists (anchored at the repository root, not the working directory), the fixture chart and one keys-only log line per call (`ts`, `route`, `provider`, `source`, `status`, `duration_ms`, `safe_mode`, `correlation_id`; `route` is `loader.load_chart`, `provider` is `fixtures`). The line goes to `log_sink` when given and to a module logger otherwise. The entry registers no route and writes no file.
+- Pure Engine chart module `engine/charts/pure.py` (HDE-SEPA006.1; WU-PR-01; #791): `validate_birth_inputs(birthdate, birthtime, place, tz, *, iso_codes, iana_zones)`, `normalize_chart(obj)` and `ChartInputError` (`code` `READER_INVALID_INPUT`; `details.field` is `date`, `time`, `place` or `tz`). It does no time, randomness, environment, network, provider, logging or filesystem access, at import or in a call.
+- Boundary checks: `tests/charts/test_chart_pure_interface.py` and `tests/charts/test_chart_pure_purity.py` for the pure module and `tests/adapter/test_chart_orchestration.py` for the entry (WU-PR-01; #791); `tests/charts/test_chart_loader_import_guard.py`, which fails if a tracked Python file outside the historical captures and the planning and canon trees imports `engine.charts.loader` or references `_call_legacy`, or if the module path exists; and `tests/scripts/test_make_compat_determinism_artifacts.py`, which pins the generator's exit 2 (HDE-SEPA006.2; WU-PR-02; #796).
+
+### Changed / Fixed
+- `engine/charts/loader.py` is removed (HDE-SEPA006.2; WU-PR-02; #796), with its legacy `load_chart(user_id)` signature, its provider-resolution path and its resolver-unavailable fallback chart. There is no compatibility shim, and `engine/charts/` holds only `pure.py`.
+- The one intended failure-behavior change, by Product Owner decision: an argument shape that only the legacy signature took, such as `load_chart(user_id)`, raises `TypeError("Invalid arguments to load_chart")` from the Adapter entry.
+- `scripts/make_compat_determinism_artifacts.py` imports the Adapter entry (#796). It still exits 2 with `compat_public not implemented` before its chart call and writes nothing.
+- `tests/adapter/test_chart_orchestration_characterization.py` is retired, with a `tests/retired_tests.md` row that names `tests/adapter/test_chart_orchestration.py` as its replacing coverage (#796).
+- No supported run of the chart path writes `artifacts/logs/loader_call.jsonl`; the tracked file is unchanged history.
+- No release member, route, flag, CLI option, schema, governed evidence family or public byte changed. The admitted release stays `1.3.0` with 45 members and `release_id` `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e`.
+- This documentation pass changes `CHANGELOG.md`, `ARCHITECTURE.md` and `AGENTS.md` (WU-PR-03).
+- Not delivered: the generator's compat computation is not restored; `engine/util/input_validators.py` still reads its pinned lists relative to the working directory and its date parser still reads `TZ`; `artifacts/architecture/architecture_snapshot.keys_only.json` is not regenerated and still names `engine/charts/loader.py`.
+- Nonclaims: no QA verdict, acceptance, Ops, deployment, release change, PF09 or board movement, canon drainage or closure is claimed.
+
 Unreleased — HDE-CRD-0002: repository corrections, CI coverage, pre-push check and close-pack writer (final repository documentation, WU-DOC-01)
 
 ### Added
