@@ -10,8 +10,10 @@
   - Serialization: `engine/serializer/canon.py::sercanon(obj, *, sort_keys=True) -> bytes` (UTF-8, sorted keys by default, compact, exactly one trailing LF); `dumps` is a compatibility alias
   - Errors: `engine/compat/errors.py::error_envelope` builds the governed `error_v1` envelope with keys `schema` (`"v1"`), `ok` (`false`), `code` and `error`, adding `details` only when a caller passes one (the Reader routes never do); the Reader error branches are `$defs.error` of `schemas/reader.v1.schema.json` and `schemas/reader.v2.schema.json`.
   - HTTP handlers: `engine/http/*` (e.g., `compat_handler.py`)
+  - Charts (pure): `engine/charts/pure.py` holds `validate_birth_inputs`, `normalize_chart` and `ChartInputError`; it does no time, randomness, environment, network, provider, logging or filesystem access, and the pinned ISO-3166 and IANA lists arrive as arguments
 - **adapter/** — dev runner & route registration (the only app home)
   - Registers blueprints/routes and imports handlers from `engine/http/*`
+  - Chart orchestration: `adapter/chart_orchestration.py::load_chart` is the non-HTTP chart entry; it owns the `SAFE_MODE` read for its log field, both clocks, the correlation id, the pinned-list reads, the fixture chart and one keys-only log line per call, and it registers no route and writes no file
 
 ## Providers
 - Place reusable helpers under `engine/providers/*`. Do **not** import from legacy `adapters/` paths.
