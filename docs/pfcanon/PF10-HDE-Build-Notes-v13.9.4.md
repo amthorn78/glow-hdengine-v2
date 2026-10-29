@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.9.3**  
-Effective Date: 2026.10.28  
+**Version: v13.9.4**  
+Effective Date: 2026.10.29  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -738,5 +738,135 @@ Timestamp: 102826 22:51 (UTC). Details: Records the PR-40 lineage review v1.0 of
 
 * Applies addendum 2.2 (R-1 and R-2 conformance, I-7) and addendum 2.3 (the deferred obligations OBS-4, AUD-CORR-1 and the 2.2 bearing, met by this unit); addendum 2.1 (the S19 routed security findings) is unengaged, since the landed change adds no vendor, route or evidence-tool surface. Supersedes nothing and amends no earlier addendum.  
 * Numbering: the current HDE Build Notes carries addenda 2.1 to 2.3 under a base version whose numbering restarted, so this addendum is 2.4. Per addendum 2.2, permanent PF-Canon documents are cited by title without file name, version or digest.
+
+## 2.5 HDE-EPIC041 QA-10 Change Audit Triage v1.0: 28-row coverage finds no approved objective unmet, confirms DELTA-001/-002 drainage, proposes candidate DELTA-003, and proposes CCR-5 on close-pack ordering for a Product Owner ruling before CL-05
+
+### Approval and source record
+
+* Record type: QA-10 Change Audit Triage (analytical/routing record; not an approval, QA verdict, canon change, or closure action). Source: `docs/ephemeral/HDE-EPIC041-QA10-change-audit-triage-v1.0.md`, artifact\_type CHANGE\_AUDIT\_TRIAGE v1.0, state COMPLETE.  
+* CHANGE\_ID: HDE-EPIC041 (epic\_name: Separation Pass 4). Producer: Isis, continuing Lead Developer and whole-change readiness decision owner. Prompt: QA-10 — Audit Implementation and Establish QA Readiness — 102726.1.  
+* Predecessor audit triaged: `docs/ephemeral/HDE-EPIC041-QA10-reality-audit-v1.0.md` (REALITY\_AUDIT v1.0, COMPLETE). Companion readiness record: `docs/ephemeral/HDE-EPIC041-QA10-qa-readiness-v1.0.md`.  
+* Approved bases: Specification v1.1 (Thoth, CF-E-30, INITIAL\_APPROVE) → Implementation Plan v1.1 (Isis, IA-30, INITIAL\_APPROVE).  
+* Reviewed state: repository `main` at `6a0f55f07607ddfea5590ed8ee080764e029b31a`. Triaged at 2026-10-29 (UTC).  
+* Audit summary: the delivered HDE-EPIC041 boundary matches the approved Specification and Plan at this head — one Adapter-owned chart entry, one pure Engine chart module, the mixed loader removed with a guard, callers migrated, outputs and failures preserved. No approved objective is shown to be unmet.  
+* Scale: 18 audit observations (QA10-OBS-01 to \-18), 78 PF23 comparison rows, one new canon-to-canon conflict found while reconciling readiness (\#28, CCR-5), organized into 28 coverage rows. Must-act-now: 2 (\#12, for QA-20/QA-50; \#28, for a Product Owner ruling before CL-05). Objective failures: none evidenced; none of the findings blocks readiness.
+
+### Retained decisions and requirements
+
+* Product Owner decision D-1 ("Retire it"; no shim kept) governs caller migration (\#3) and is confirmed delivered: no importer, no `_call_legacy`, legacy shapes raise `TypeError`.  
+* CCR-1 to CCR-4 are carried unchanged from prior review, all already adjudicated: CCR-1 APPROVED (Thoth, CF-E-30 review v1.1, Ruling R-A; confirmed by Isis IA-30 v1.1) — a close-pack matter for CL-05; CCR-2 APPROVED, no effect; CCR-3 APPROVED as conditional, not triggered; CCR-4 APPROVED, no effect.  
+* Specification §4 items 3 and 4 ("Implementation preservation") must be carried verbatim into every derived Plan, guide, or QA-prep artifact; the triage confirms neither open-rails binding condition is met at this head (\#7), so the mandatory bounded live vendor test does not attach on current evidence, but the two items still carry forward unchanged for QA to re-check.  
+* Specification §9's requirement that live QA is required for eventual close of the epic stands, independent of \#7's finding.  
+* Governing rule for the close-pack-ordering question (\#28): HDE Build Notes §2.2 R-3 governs as written, because PF10's own "Precedence, versioning, and scope" §1 ("PF10 authority") makes an applicable, active PF10 addendum the authoritative source for any topic it explicitly addresses, superseding conflicting permanent PF canon until drained; R-3 explicitly addresses when the close-pack writer runs. This triage changes nothing about that rule; it only records that it conflicts with three permanent canon documents (see Required canon drainage, CCR-5).
+
+### Epic, task, and status effects
+
+* PF09.3 Task HDE-SEPA006 and Subtasks .1–.3 read **Not done** at this head; the triage proposes no PF09 movement now (see PF09 row-closure record below).  
+* Of the 28 coverage rows, 26 carry **Primary action: No action / Later QA evidence / fully covered duplicate / external follow-up**, each assigned to its existing native owner (mainly Isis at QA-20 and Kronos at QA-50). No status change was performed by this triage anywhere.  
+* Must-act-now item \#12 (QA10-OBS-12): no governed evidence (Index/Mirror row, `audit/qa/hde-epic041/`, doc-delta file, close pack) exists yet for HDE-EPIC041. This answers Implementation Plan review v1.0 N-4 for readiness purposes — the approved Plan did not require the PR units to produce a governed evidence family, so its current absence is not an objective failure — but the underlying governed-evidence obligation (PF09.3 Task HDE-SEPA006, Subtask .3, §0.6) still lands on QA-20 (which must name the required boundary and caller-regression evidence to capture and index) and QA-50 (which must plan it), and on CL-05 (close mutation set). No earlier artifact plans this; the triage states this is a required action for those two dependent stages, not a performed one.  
+* Must-act-now item \#28 (close-stage ordering, CCR-5): no status change for HDE-EPIC041 follows from this item at QA-20 or QA-50 (QA writes no close pack). It bears on CL-05 only, which applies R-3 as written unless the Product Owner rules otherwise first.
+
+### PF09 row-closure record
+
+#### HDE-SEPA006 (parent task)
+
+* PF09 source: PF09.3 — HDE-Build-Checklist-Separation, §0.6 "Completion Standard," and the task's own row text.  
+* Row classification: Targeted for closure (parent task).  
+* Current recorded status: Not done.  
+* Closure predicate: Behavior implemented; dependencies met; tests pass on the identified state; required governed evidence complete; QA, Ops, acceptance decisions confirmed; limits disclosed; authorized PF09 update performed.  
+* Mapped requirements or obligations: Separate orchestration from pure Engine computation; migrate callers; retire the mixed boundary.  
+* Implementation or remediation delta: Behavior delivered and accepted per unit (pull requests \#791, \#796, \#800).  
+* Behavior proof: Exact-head CI for each unit passed (as recorded in the unit's lineage review).  
+* Artifact and governed-evidence proof: None — no Index or Mirror row, no `audit/qa/hde-epic041/` family, no doc-delta file, no close pack exist for HDE-EPIC041.  
+* Validation proof: None (no HDE-EPIC041 QA has run).  
+* Dependency and ordering proof: Not established by the source at the parent-row level (see child rows).  
+* Current-state and later-work posture: No Ops planned for this task; no acceptance or closure decision exists.  
+* Remaining closure gaps: QA verdict; governed evidence indexed; Isis closure; authorized post-closure PF09 update.  
+* Closure determination: Not made here — the triage makes no PF09 closure determination for this row.  
+* Manual PF10 or PF09 action remaining: Yes — an authorized post-closure PF09 update, owned by the Product Owner.
+
+#### HDE-SEPA006.1 (Adapter-owned acquisition and pure normalization)
+
+* PF09 source: PF09.3, as above (subtask of HDE-SEPA006).  
+* Row classification: Targeted for closure.  
+* Current recorded status: Not done.  
+* Closure predicate: As HDE-SEPA006's, for Adapter-owned acquisition and pure normalization.  
+* Mapped requirements or obligations: `adapter/chart_orchestration.py`, `engine/charts/pure.py`.  
+* Implementation or remediation delta: Findings QA10-OBS-01 (Adapter-owned orchestration delivered; resolver/ingest clause vacuous — no acquisition exists on the supported path) and QA10-OBS-02 (pure module imports only `re`, `unicodedata`, `typing`; AST deny-list and fresh-interpreter harness pass; three negative self-tests fail planted violations).  
+* Behavior proof: As cited in QA10-OBS-01/-02 (evidence ids E-018, E-019, N-004, N-005, E-013, E-014).  
+* Artifact and governed-evidence proof: None recorded for this subtask specifically; governed-evidence obligation is carried at the parent/QA-20-QA-50 level.  
+* Validation proof: Independent runtime verification of AC-01 and AC-02 is owed to QA; not yet performed.  
+* Dependency and ordering proof: Not established beyond the cited findings.  
+* Current-state and later-work posture: Same remaining obligations as HDE-SEPA006.  
+* Remaining closure gaps: QA verdict; governed evidence indexed; Isis closure; authorized post-closure PF09 update.  
+* Closure determination: Not made here.  
+* Manual PF10 or PF09 action remaining: Yes, as HDE-SEPA006.
+
+#### HDE-SEPA006.2 (supported-caller migration)
+
+* PF09 source: PF09.3, as above (subtask of HDE-SEPA006).  
+* Row classification: Targeted for closure.  
+* Current recorded status: Not done.  
+* Closure predicate: As HDE-SEPA006's, for supported-caller migration.  
+* Mapped requirements or obligations: C-1 to C-3; legacy retirement.  
+* Implementation or remediation delta: Findings QA10-OBS-03 (loader removed; guard's scan of 518 files finds no importer or `_call_legacy`; 69 inventory files each have a disposition; legacy shapes raise `TypeError`) and QA10-OBS-06 (the compat-determinism generator, C-1, still imports the entry; `main()` exits 2 with `compat_public not implemented` before any chart call; exit-2 behavior evidenced by the generator test in exact-head CI of \#796 and by the WU-PR-02 reviewer's local run; not independently reproduced in this triage because `jsonschema` is not installed locally).  
+* Behavior proof: Evidence ids E-012, E-019, E-030, N-001, N-003 (OBS-03); E-031, E-032, N-006 (OBS-06, attributable to byte-identical code).  
+* Artifact and governed-evidence proof: None recorded for this subtask specifically.  
+* Validation proof: QA must reproduce the C-1 exit-2 behavior with CI's install (no local reproduction performed in this audit, by the no-install boundary).  
+* Dependency and ordering proof: Not established beyond the cited findings.  
+* Current-state and later-work posture: Same remaining obligations as HDE-SEPA006.  
+* Remaining closure gaps: QA verdict; governed evidence indexed; Isis closure; authorized post-closure PF09 update.  
+* Closure determination: Not made here.  
+* Manual PF10 or PF09 action remaining: Yes, as HDE-SEPA006.
+
+#### HDE-SEPA006.3 (boundary and behavior verification, including required governed-evidence indexing)
+
+* PF09 source: PF09.3, as above; also cites the subtask's own added predicate, "required indexing through the existing governed writer."  
+* Row classification: Targeted for closure.  
+* Current recorded status: Not done.  
+* Closure predicate: As HDE-SEPA006's, plus "required indexing through the existing governed writer."  
+* Mapped requirements or obligations: Boundary and behavior verification.  
+* Implementation or remediation delta: Findings QA10-OBS-05 (five new or migrated test files plus the two loader tests exist and are owner-registered; each work unit's exact-head hosted CI passed; no HDE-EPIC041 QA has run) and QA10-OBS-12 (no governed evidence — Index/Mirror row, `audit/qa/hde-epic041/`, doc-delta file, close pack — exists for HDE-EPIC041).  
+* Behavior proof: Evidence ids E-029, E-031, E-033 (OBS-05); E-021 (OBS-12).  
+* Artifact and governed-evidence proof: None — explicitly absent per OBS-12.  
+* Validation proof: Independent verification of AC-04's "all pass, with … recorded" is QA's to perform; hosted CI was read through lineage reviews, not directly (no API access).  
+* Dependency and ordering proof: The governed-evidence obligation of PF09.3 lands in the QA lane (QA step logs and their indexing through `tools/evidence/update_evidence_index.py`, Step-0B doc-delta capture at the Specification §10 surfaces) and in the close mutation set (CL-05).  
+* Current-state and later-work posture: Must-act-now for the dependent passes — the QA-20 Guide must name the boundary and caller-regression evidence QA has to capture and index, and QA-50 must plan it, because no earlier artifact plans it.  
+* Remaining closure gaps: QA verdict; governed evidence indexed; Isis closure; authorized post-closure PF09 update; additionally, the indexing obligation identified by finding \#12.  
+* Closure determination: Not made here.  
+* Manual PF10 or PF09 action remaining: Yes, as HDE-SEPA006.
+
+### Required canon drainage
+
+* **DELTA-001** (existing). Target: HDE Architecture §1.1. Required change: after delivery and acceptance, replace "remains current repository reality until separately remediated" with the delivered boundary. Why: finding \#8 (QA10-OBS-08) confirms the canon sentence still describes a removed module at `6a0f55f0`. Affected identifier: HDE Architecture §1.1. Status effect: none — classified as drift of the necessary-reality-shift kind, not a conflict with an approved base, not a readiness gate. This triage found DELTA-001 fully covering; it is already recorded (Implementation Audit v1.0 §9; carried in PR \#800's description; HDE Build Notes 2.4). Drainage remains unperformed, owed to the Product Owner post-QA (Change Process Guide §3.5.2.8).  
+* **DELTA-002** (existing). Target: HDE Mechanics Guide §1.1. Required change: same pattern, for "The non-BodyGraph loader responsibility represented by `engine/charts/loader.py` is implementation drift." Why/evidence: finding \#9 (QA10-OBS-09), evidence ids E-012, E-018. Already recorded in HDE Build Notes 2.4; fully covering. Drainage remains unperformed, owed post-QA.  
+* **DELTA-003** (new candidate, proposed by this triage — not yet adopted). Target: HDE State of the Repository §2.2 (a reference document, not binding canon). Required change: after QA, record that HDE-SEPA006's boundary correction is delivered (the Adapter entry, the pure module, the removal and its guard), or retire §2.2 as a forward-looking item. Why: §2.2 describes a module ("still mixes input normalization with environment inspection, clocks, provider orchestration, and filesystem logging") that no longer exists. Affected identifiers: HDE State of the Repository §2.2. Status effect: none — not a gate. Evidence: E-012, N-003; PR \#796. Drainage remains unperformed, owed to the Product Owner post-QA.  
+* **CCR-5** (new, PROPOSED — open canon-reconciliation question, not a drainage instruction). Conflicting sources: HDE Build Notes v13.9.3 §2.2 R-3, first bullet ("…after the authorized QA verdict and the closure decision exist") versus three permanent canon documents that place the close mutation set (including the close pack) before the closure decision: Change Process Guide v2.5.5 §3.5.1 ("sits between the final QA Report and the closure decision"; Entries; Exit; "owns… the close pack"); Glow QA Guide v3.0.7 §3.1.3 ("The close mutation set is a closure prerequisite and precedes the closure decision"); Plan Templates v2.0.6 §3B, "Entries and exit (normative)." The permanent-canon stage text landed 2026-10-27 (`2d99bffc`, PR \#762); HDE Build Notes §2.2 landed 2026-10-28 (PR \#792). Governing rule meanwhile: R-3, as written, under PF10's own precedence rule (§1, "PF10 authority"); AGENTS.md's "PF10's authority in the canon" states the same. Affected requirements: Specification §10 and §6 D5; Plan v1.1 DL-04 (CL-05 after a QA PASS); not R-01 to R-04 or AC-01 to AC-05. Alternatives offered: (A) R-3 stands — the closure decision precedes the close-pack write for this change, and the three permanent documents are drained to match; (B) the Product Owner corrects R-3 in a later HDE Build Notes addendum so the writer runs after the final QA Report records PASS, or after a `DO_NOT_CLOSE` decision whose return work is the set, restoring the CL-05 entries and exit the three permanent documents already state. Recommended disposition (by the triage, not adopted): an explicit Product Owner ruling between (A) and (B) before CL-05 runs for HDE-EPIC041; the recorded Product Owner direction ("at the end of a full work-unit cycle") and the three permanent documents read most naturally as (B), but until a ruling exists R-3 governs as written. Permanent drainage target and owner, depending on the ruling: HDE Build Notes (a correcting addendum) under (B), or Change Process Guide §3.5.1, Glow QA Guide §3.1.3, and Plan Templates §3B under (A); owner Product Owner. Status: PROPOSED; not yet reviewed (no reviewer, session, decision time, or rationale recorded). Drainage is unperformed and the question itself is unresolved.
+
+### Deferred obligations and unresolved work
+
+* QA verdict, independent runtime verification of AC-01 through AC-05, and governed-evidence capture/indexing are owed to Isis (QA-20 Guide) and Kronos (QA-50 plan), per findings \#1–\#7 and \#12.  
+* CL-05's close mutation set and close pack ordering is unresolved pending the Product Owner's CCR-5 ruling; QA-20, QA-50, and QA execution are unaffected in the interim.  
+* Authorized post-closure PF09 update for HDE-SEPA006 and Subtasks .1–.3 remains outstanding, owned by the Product Owner (finding \#11; PF09 row-closure record above).  
+* Carried prior-stage items (owners unchanged): TI-07 / CCR-1 (acceptance map for tokenless work) — open, a close-pack matter for CL-05 and the Product Owner (possible canon change); TI-02 and Candidate CRD Items List items 9 and 10 — open, advisory, not engaged, Product Owner; OBS-9 (pre-push message about `documentation_only`) — open, Product Owner/CI tooling owner; PR35-LINK (a handoff linked the CL-30 page for PR-35) — reported, GCFPE management; OBS-D1 (close-PR docs sweep; architecture capture) — open, close-time, CL-05; OBS-6, OBS-7, OBS-8 (`scripts/scratch.py`; classifier error order; `ruby` path) — unchanged, Product Owner / record / later sessions' surface advice; OBS-2, OBS-5, OBS-10 (environment: `env -i`; shallow clones; the generator test needs `requirements.txt`) — unchanged, later sessions' surface advice (QA-20 records it); Plan review v1.1 N-5 — no effect; Plan review v1.0 N-4 (governed evidence) — answered for readiness by finding \#12, obligation carried to QA (Isis, Kronos); prompt-use repository persistence — PENDING, GCFPE management, non-gating.  
+* External follow-ups, none bearing on HDE-EPIC041 readiness: finding \#13 (`cline_skills/` unclassified by CI, hosted outcome bounded to that push run) — Product Owner; finding \#14 (GCFPE register's operating-procedure path absent on `main`) — GCFPE management (GCFPE-MGMT-10), no prompt or register edited by this triage; findings \#15–\#17 (duplicates of Audit FND-005, FND-006, FND-007; excluded scope) — CL-40 scan candidates, Product Owner; findings \#19–\#27 (historical PF23 comparison rows: Resolved, Changed, Unverifiable, Persistent, and bounded-not-re-compared rows) — non-gating, suitable for the Product Owner's manual PF23 update.
+
+### Scope boundaries and nonclaims
+
+* This record condenses a QA-10 Change Audit Triage. Consistent with the source, it proposes and routes; it approves nothing. It establishes no PF10 canonical adoption beyond recording what the triage itself classified and routed, no QA verdict, no readiness determination, no acceptance, no PF09 or board movement, and no closure. The readiness decision itself is made separately in the companion QA-readiness record, not here.  
+* DELTA-003 remains a candidate for its owner (the Product Owner) and is not adopted by this record. CCR-5 remains a proposal awaiting the Product Owner's decision between its stated alternatives; this record performs neither alternative.  
+* No HDE-EPIC041 objective failure is evidenced; the one new finding (CCR-5) is a canon-to-canon conflict discovered while reconciling readiness, not a repository observation, and decides nothing.  
+* This triage excludes and takes no position on the generator compat-computation exclusion (Plan §2) or the other excluded-scope items (findings \#15–\#17); those remain Audit findings FND-005/006/007 duplicates.
+
+### Evidence and traceability
+
+* Reviewed head: `main` at `6a0f55f07607ddfea5590ed8ee080764e029b31a`. PF10 read for this triage: `docs/pfcanon/PF10-HDE-Build-Notes-v13.9.3.md`, 741 lines, sha256 `6fa054b1e51cf76fd795e460cec039a51caf99cec16fe1521f0a00febff15f3c`, read in full.  
+* Pull-request lineage cited: \#791, \#796, \#800 (and \#762, \#792 for the CCR-5 canon-text dates).  
+* Key evidence identifiers cited across findings: E-004, E-008 to E-014, E-016, E-018, E-019, E-021, E-025 to E-027, E-029 to E-033, E-035, E-036; N-001 to N-007, N-010.  
+* Canon sections relied on (title and section only): HDE Architecture §1.1; HDE Mechanics Guide §1.1; HDE Build Checklist — Separation (PF09.3) §0.6, Task HDE-SEPA006 and its Subtasks; HDE Governance §9.1.5, §2.0.18; Glow QA Guide §3.1.1, §3.1.3, §3.2; Change Process Guide §2.2, §3.5.1, §3.5.2.8; HDE Build Notes "Precedence, versioning, and scope" §1 and §2.2 (R-1 to R-3), 2.3, 2.4; HDE State of the Repository §2.2; Plan Templates §3B.
+
+### Relationship to existing PF10 guidance
+
+* DELTA-001 and DELTA-002, confirmed fully covering by this triage (findings \#8 and \#9), are already recorded in HDE Build Notes addendum 2.4; this record does not restate them as new canon, only confirms their continued applicability and unperformed drainage status.
 
 \<eof\>
