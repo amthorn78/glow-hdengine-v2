@@ -29,6 +29,7 @@ Across 20,000 random pairs of synthetic people, scored by the real compat path a
   * 3,851 pairs (19.3%) are Cool in all ten categories.
   * 792 (4.0%) have any Warm or Glow at all.
   * 3 pairs have a Glow anywhere.
+* **What a Reader v2 user sees** (all ten bands, the main product view): see §6A. 96% of pairs show only Cool and Open.
 * **What a Reader v1 user sees.** Reader v1 shows only `harmony`: Cool 81.6%, Open 18.2%, Warm 21 pairs (0.10%), Glow 0.
 * **What this is not.** It is not a defect against canon. The HDE Math Spec governs no score or band distribution (no "category-distribution recipe is governed"). The band thresholds (inclusive maxima 24, 49, 74) and the reduction are the governed ones. Whether this mix is the intended product experience is a Product Owner question.
 
@@ -87,6 +88,44 @@ Across 20,000 random pairs of synthetic people, scored by the real compat path a
 * **Changing it means changing the HDE Math Spec.** The thresholds, signal weights or reduction would move. That is a math and product decision, not a fix.
 * **What this record does not do.** It makes no recommendation on that choice, and it changes nothing.
 
+## 6A. Supplementary measurements (added before merge, 2026-11-01)
+
+Same 2,000 people, same 20,000 pairs, same seed and release as §2. Scripts are in Appendices D to F. All ran under closed rails.
+
+**What the pair forms (Appendix D).**
+* Each synthetic person has a median of 20 of the 64 gates (range 14 to 25).
+* A pair forms a mean of **10.0 of the 36 channels** (median 10, p90 13, max 19). The other 26 are `none`, which counts 0 in every signal.
+* By state, the average pair has: dominance 3.44, electromagnetic 3.15, compromise 3.02, companionship 0.39.
+
+**What a Reader v2 user sees (Appendix E).** Reader v2 shows all ten bands, so it is the main product view.
+
+| Distinct bands shown in one pair's ten | Share of pairs |
+| :- | -: |
+| 1 (all Cool) | 19.3% |
+| 2 (Cool and Open) | 76.9% |
+| 3 | 3.9% |
+| 4 | 0.0% |
+
+* The most common ten-band profiles are 9 Cool and 1 Open (22.2%), 8 Cool and 2 Open (20.1%), all Cool (19.3%), 7 Cool and 3 Open (16.0%) and 6 Cool and 4 Open (10.1%).
+* The live production pair SYN-A and SYN-B (HDE-EPIC041-POSTCLOSE-OPS01) got 6 Cool and 4 Open, which is typical.
+
+**Narrative reach.**
+* The narrative pack holds 360 templates: 10 categories, 4 bands, 3 perspectives (`shared`, `a_to_b`, `b_to_a`) and 3 slots (HDE Narratives Guide).
+* The 180 Warm and Glow templates are reached by 0.43% and 0.0015% of category results. In practice, half the written copy is never shown.
+
+**Where scores sit, and what moving the band lines would do (Appendix F).** These are illustrations, not recommendations.
+* All 200,000 category scores: p25 8, p50 15, p75 22, p90 30, p95 35, p99 44.
+* `harmony`: p50 16, p75 22, p90 28, p95 32, p99 38.
+
+| Inclusive maxima (Cool / Open / Warm) | Cool | Open | Warm | Glow | `harmony` Glow |
+| :- | -: | -: | -: | -: | -: |
+| 24 / 49 / 74 (current, HDE Math Spec §5.3) | 78.5% | 21.0% | 0.4% | 0.0% | 0.0% |
+| 14 / 22 / 32 | 47.9% | 28.3% | 16.8% | 7.0% | 3.7% |
+| 12 / 20 / 30 | 37.4% | 33.2% | 20.2% | 9.2% | 6.5% |
+| 10 / 18 / 28 | 36.4% | 25.9% | 27.2% | 10.5% | 6.5% |
+
+The first row reproduces §1 exactly, which cross-checks the two runs.
+
 ## 7. Nonclaims
 
 This record:
@@ -103,6 +142,7 @@ Read on `main` at `58723d4d`.
   * §5 for the channel-state reduction, by its signal table.
 * **HDE Governance:** §12.1 `GATE:CORE-MATCH`, for the band thresholds as inclusive maxima.
 * **HDE Build Notes, addendum 2.15:** the live compat test and its synthetic people.
+* **HDE Narratives Guide:** the candidate registry, 360 templates keyed by category, band, perspective and slot (§6A).
 * **Code read:**
   * `engine/core/core.py` (`compute_core`, the band rule);
   * `engine/compat/compute.py` (`evaluate_pair`, `bundle_provider`);
@@ -347,3 +387,160 @@ print(json.dumps({k: summary[k] for k in ("people", "pairs", "chart_seconds", "p
 for r in rows:
     print(f"{r['category']:14} mean {r['mean']:5} p10 {r['p10']:3} med {r['median']:3} p90 {r['p90']:3} p99 {r['p99']:3} max {r['max']:3} zero {r['zero_share']:.3f} | Cool {r['cool_share']:.3f} Open {r['open_share']:.3f} Warm {r['warm_share']:.3f} Glow {r['glow_share']:.3f}")
 ```
+
+## Appendix D — `channel_states.py` (SHA-256 `d5804f47082a507b50a9f068285a00f81ee36f8508754e679deb95cc0f56b491`)
+
+Output on 2026-11-01:
+```text
+gates per person: median 20.0 min 14 max 25
+channels formed per pair (of 36): mean 10.0 median 10.0 p90 13 max 19
+average channels per pair by state: {'none': 26.0, 'dominance': 3.44, 'electromagnetic': 3.15, 'compromise': 3.02, 'companionship': 0.39}
+```
+
+```python
+"""How many of the 36 channels a random pair forms, by state (analysis only; same seed and charts)."""
+from __future__ import annotations
+
+import collections, datetime as dt, pathlib, random, statistics, sys
+
+HERE = pathlib.Path(__file__).resolve().parent; REPO = pathlib.Path(sys.argv[1])
+sys.path.insert(0, str(REPO)); sys.path.insert(0, str(HERE))
+from hdchart import gates_utc  # noqa: E402
+from engine.config.registry_loader import load_active_mechanics_bundle  # noqa: E402
+from engine.magic10.composite import _classify_channels  # noqa: E402
+
+bundle = load_active_mechanics_bundle(); channels = bundle.registry.channels
+rng = random.Random(20261101)
+start, span = dt.datetime(1950, 1, 1), (dt.datetime(2006, 1, 1) - dt.datetime(1950, 1, 1)).total_seconds()
+masks, ngates = [], []
+for _ in range(2000):
+    g = gates_utc(start + dt.timedelta(seconds=rng.random() * span), true_node=False)
+    masks.append(sum(1 << (x - 1) for x in g)); ngates.append(len(g))
+seen, pairs = set(), []
+while len(pairs) < 20000:
+    a, b = rng.sample(range(2000), 2); k = (min(a, b), max(a, b))
+    if k not in seen: seen.add(k); pairs.append(k)
+state_totals = collections.Counter(); formed = []
+for a, b in pairs:
+    cls = _classify_channels(masks[a], masks[b], channels)
+    states = collections.Counter(getattr(c, "state", None) or c[1] for c in cls)
+    state_totals.update(states); formed.append(36 - states["none"])
+n = len(pairs)
+print("gates per person: median", statistics.median(ngates), "min", min(ngates), "max", max(ngates))
+print("channels formed per pair (of 36): mean", round(statistics.mean(formed), 1), "median", statistics.median(formed), "p90", sorted(formed)[int(.9 * n)], "max", max(formed))
+print("average channels per pair by state:", {s: round(v / n, 2) for s, v in state_totals.most_common()})
+```
+
+## Appendix E — `v2_profile.py` (SHA-256 `4c3df1fff84744a4ac74aa3cab9383b60a478fae2e7272645c9ae42d532ed994`)
+
+Output on 2026-11-01:
+```text
+v2 pairs by number of non-Cool bands (of 10): {0: '19.3%', 1: '22.3%', 2: '20.5%', 3: '16.7%', 4: '11.1%', 5: '6.2%', 6: '2.5%', 7: '1.0%', 8: '0.4%', 9: '0.1%'}
+v2 pairs by number of distinct bands shown: {1: '19.3%', 2: '76.9%', 3: '3.9%', 4: '0.0%'}
+most common v2 band profiles (Cool,Open,Warm,Glow): [((9, 1, 0, 0), '22.2%'), ((8, 2, 0, 0), '20.1%'), ((10, 0, 0, 0), '19.3%'), ((7, 3, 0, 0), '16.0%'), ((6, 4, 0, 0), '10.1%'), ((5, 5, 0, 0), '5.3%')]
+```
+
+```python
+"""Where real scores sit, and the band mix under alternative global thresholds (analysis only).
+
+Same seed, people and pairs as distribution.py; scores from evaluate_pair at the admitted release.
+"""
+from __future__ import annotations
+
+import datetime as dt, pathlib, random, sys, uuid
+
+HERE = pathlib.Path(__file__).resolve().parent; REPO = pathlib.Path(sys.argv[1])
+sys.path.insert(0, str(REPO)); sys.path.insert(0, str(HERE))
+from hdchart import gates_utc  # noqa: E402
+from engine.bodygraph.resolver import ResolvedCompatChart  # noqa: E402
+from engine.compat.compute import evaluate_pair, evaluation_party  # noqa: E402
+from engine.config.registry_loader import load_active_mechanics_bundle  # noqa: E402
+from tests.support.pr04_fixtures import complete_chart  # noqa: E402
+
+B = load_active_mechanics_bundle(); SEED = 20261101; rng = random.Random(SEED)
+start, span = dt.datetime(1950, 1, 1), (dt.datetime(2006, 1, 1) - dt.datetime(1950, 1, 1)).total_seconds()
+people = []
+for i in range(2000):
+    when = start + dt.timedelta(seconds=rng.random() * span)
+    uid = str(uuid.uuid5(uuid.NAMESPACE_URL, f"scorerange-synthetic-{SEED}-{i}"))
+    g = gates_utc(when, true_node=False)
+    people.append(evaluation_party(ResolvedCompatChart(uid, complete_chart(uid, g), "resolved", None, None, None, None)))
+seen, pairs = set(), []
+while len(pairs) < 20000:
+    a, b = rng.sample(range(2000), 2); k = (min(a, b), max(a, b))
+    if k not in seen: seen.add(k); pairs.append((a, b))
+import collections
+prof = collections.Counter(); open_or_better = collections.Counter(); distinct = collections.Counter()
+for a, b in pairs:
+    r = evaluate_pair(people[a], people[b], bundle_provider=lambda: B)
+    bands = [c["band"] for c in r["categories"]]
+    k = sum(x != "Cool" for x in bands); open_or_better[k] += 1; distinct[len(set(bands))] += 1
+    prof[(bands.count("Cool"), bands.count("Open"), bands.count("Warm"), bands.count("Glow"))] += 1
+n = len(pairs)
+print("v2 pairs by number of non-Cool bands (of 10):", {k: f"{open_or_better[k]/n*100:.1f}%" for k in sorted(open_or_better)})
+print("v2 pairs by number of distinct bands shown:", {k: f"{distinct[k]/n*100:.1f}%" for k in sorted(distinct)})
+print("most common v2 band profiles (Cool,Open,Warm,Glow):", [(p, f"{c/n*100:.1f}%") for p, c in prof.most_common(6)])
+```
+
+## Appendix F — `thresholds_whatif.py` (SHA-256 `0b92206a30833e95da6f2952eea7199cd76ab4a8cc024e806d3280b3b4594ada`)
+
+Output on 2026-11-01:
+```text
+all scores  percentiles: {25: 8, 40: 13, 50: 15, 60: 18, 70: 20, 75: 22, 80: 25, 90: 30, 95: 35, 99: 44}
+harmony     percentiles: {25: 10, 40: 13, 50: 16, 60: 16, 70: 19, 75: 22, 80: 22, 90: 28, 95: 32, 99: 38}
+maxima (24, 49, 74): all {'Cool': 78.5, 'Open': 21.0, 'Warm': 0.4, 'Glow': 0.0} | harmony {'Cool': 81.6, 'Open': 18.2, 'Warm': 0.1, 'Glow': 0.0}
+maxima (12, 20, 30): all {'Cool': 37.4, 'Open': 33.2, 'Warm': 20.2, 'Glow': 9.2} | harmony {'Cool': 35.1, 'Open': 37.6, 'Warm': 20.7, 'Glow': 6.5}
+maxima (14, 22, 32): all {'Cool': 47.9, 'Open': 28.3, 'Warm': 16.8, 'Glow': 7.0} | harmony {'Cool': 48.1, 'Open': 33.5, 'Warm': 14.6, 'Glow': 3.7}
+maxima (10, 18, 28): all {'Cool': 36.4, 'Open': 25.9, 'Warm': 27.2, 'Glow': 10.5} | harmony {'Cool': 35.1, 'Open': 26.2, 'Warm': 32.2, 'Glow': 6.5}
+```
+
+```python
+"""Where real scores sit, and the band mix under alternative global thresholds (analysis only).
+
+Same seed, people and pairs as distribution.py; scores from evaluate_pair at the admitted release.
+"""
+from __future__ import annotations
+
+import datetime as dt, pathlib, random, sys, uuid
+
+HERE = pathlib.Path(__file__).resolve().parent; REPO = pathlib.Path(sys.argv[1])
+sys.path.insert(0, str(REPO)); sys.path.insert(0, str(HERE))
+from hdchart import gates_utc  # noqa: E402
+from engine.bodygraph.resolver import ResolvedCompatChart  # noqa: E402
+from engine.compat.compute import evaluate_pair, evaluation_party  # noqa: E402
+from engine.config.registry_loader import load_active_mechanics_bundle  # noqa: E402
+from tests.support.pr04_fixtures import complete_chart  # noqa: E402
+
+B = load_active_mechanics_bundle(); SEED = 20261101; rng = random.Random(SEED)
+start, span = dt.datetime(1950, 1, 1), (dt.datetime(2006, 1, 1) - dt.datetime(1950, 1, 1)).total_seconds()
+people = []
+for i in range(2000):
+    when = start + dt.timedelta(seconds=rng.random() * span)
+    uid = str(uuid.uuid5(uuid.NAMESPACE_URL, f"scorerange-synthetic-{SEED}-{i}"))
+    g = gates_utc(when, true_node=False)
+    people.append(evaluation_party(ResolvedCompatChart(uid, complete_chart(uid, g), "resolved", None, None, None, None)))
+seen, pairs = set(), []
+while len(pairs) < 20000:
+    a, b = rng.sample(range(2000), 2); k = (min(a, b), max(a, b))
+    if k not in seen: seen.add(k); pairs.append((a, b))
+allv, harm = [], []
+for a, b in pairs:
+    r = evaluate_pair(people[a], people[b], bundle_provider=lambda: B)
+    for c in r["categories"]:
+        allv.append(c["score"]); harm.append(c["score"]) if c["category_id"] == "harmony" else None
+allv.sort(); harm.sort()
+q = lambda v, p: v[min(len(v) - 1, int(p / 100 * len(v)))]
+print("all scores  percentiles:", {p: q(allv, p) for p in (25, 40, 50, 60, 70, 75, 80, 90, 95, 99)})
+print("harmony     percentiles:", {p: q(harm, p) for p in (25, 40, 50, 60, 70, 75, 80, 90, 95, 99)})
+
+
+def mix(v, maxima):
+    c1, c2, c3 = maxima; n = len(v)
+    cool = sum(x <= c1 for x in v); opn = sum(c1 < x <= c2 for x in v); warm = sum(c2 < x <= c3 for x in v)
+    return {"Cool": round(cool / n * 100, 1), "Open": round(opn / n * 100, 1), "Warm": round(warm / n * 100, 1), "Glow": round((n - cool - opn - warm) / n * 100, 1)}
+
+
+for maxima in ((24, 49, 74), (12, 20, 30), (14, 22, 32), (10, 18, 28)):
+    print(f"maxima {maxima}: all {mix(allv, maxima)} | harmony {mix(harm, maxima)}")
+```
+
