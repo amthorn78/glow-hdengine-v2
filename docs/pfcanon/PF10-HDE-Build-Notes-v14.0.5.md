@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v14.0.4**  
+**Version: v14.0.5**  
 Effective Date: 2026.11.01  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -197,9 +197,10 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.12 HDE-EPIC041 CL-E-20: the bounded PF09 revalidation v1.0 is COMPLETE and supports HDE-SEPA006 and Subtasks HDE-SEPA006.1 to .3 as Done from repository evidence, with the Phase III master status supportable to Done; the next stage is CL-E-30  
 * 2.13 HDE-EPIC041 CL-E-30: the independent review ACCEPTS the bounded PF09 revalidation v1.0 with no review items, supports HDE-SEPA006 and Subtasks HDE-SEPA006.1 to .3 as Done, treats the Phase III master status as a row-status summary only (constraint C-1), and the next stage is CL-E-40  
 * 2.14 HDE-EPIC041 CL-E-40: the post-Epic PF09 maintenance candidate v1.0 (twelve redlines plus one optional for HDE Build Checklist — Separation) is approved, including the Phase III master status as a row-status summary; application to PF09 is the Product Owner's manual action and is pending; the next stage is CL-40  
-* 
+* 2.15 Live QA means a live, open-rails test of the product: every Epic's QA runs the live compat test on synthetic data, only the Product Owner can waive any part of it, and HDE-EPIC041 closed without one  
+* 2.16 GATE:CORE-DET evidence is the real compat path: the compat-determinism generator and eight absent evidence entries are retired (FND-005), and addendum 2.15's synthetic-people and evidence-list items are closed
 
-# **2\) Nu2.15 Live QA means a live, open-rails test of the product: every Epic's QA runs the live compat test on synthetic data, only the Product Owner can waive any part of it, and HDE-EPIC041 closed without onembered Addenda**
+# **2\) Numbered Addenda**
 
 ## 2.1 Canon policy for the S19 routed security findings: production vendor gate scope, vendor route selection, compat route gating, evidence-tool output roots and gate-row content
 
@@ -1865,25 +1866,112 @@ None is changed by this record. Each needs its owner's action.
   * the production Reader resolves only stored rows in public.hde\_body\_graphs\_current, binding a stored chart's label to the UUID requested;  
   * the engine's production write refusal for BodyGraph rows is decided from APP\_ENV (or ENGINE\_ENV) alone.
 
----
+## 2.16 GATE:CORE-DET evidence is the real compat path: the compat-determinism generator and eight absent evidence entries are retired (FND-005), and addendum 2.15's synthetic-people and evidence-list items are closed
 
-## Canon relied on
+Timestamp: 110126 21:30 (UTC). Details:
 
-Read on main at 5a046cb2.
+* What this records. The Product Owner's decision of 2026-11-01 on FND-005. The compat-determinism generator is not needed for the product, and no code changes.  
+* What this decides. What counts as GATE:CORE-DET evidence (R-1); which listed entries are retired (R-2); and two facts that close items addendum 2.15 left open (R-3).
 
-* HDE Build Notes:  
-  * front matter and "Precedence, versioning, and scope" §1 to §9;  
-  * §1 template;  
-  * §1.1 index;  
-  * addendum 2.2 (form of a rule addendum);  
-  * addendum 2.1, D-1 and D-2.  
-* HDE Governance:  
-  * §3.4 "Open rails (controlled)", in full to "Controlled vendor-backed no-user validation";  
-  * §12.1, GATE:CORE-DET, GATE:CORE-READER and GATE:CORE-MATCH;  
-  * §12.2, B.2, D.1 and D.3.  
-* Change Process Guide: §3.5.2.8 "Live QA via harness (required for epic closeout)", in full.  
-* Glow QA Guide: §3.5.5 "PO Live QA sessions (vendor-first rails)", including "Production-affecting Live QA minimum".  
-* Glow Infrastructure: §2.2, §2.5, §2.6 and §2.7.  
-* HDE-EPIC041 records, as listed under "Evidence".
+### Decision and approval status
+
+* Decision.  
+  * The Product Owner asked: "what I care about is if the product works. I don't want dev changes. So what about FND-005, why do we not need this?"  
+  * After the answer, he directed that this statement be drafted: "We may as well do all three, yes."  
+  * R-1 to R-3 state that decision as canon.  
+* Status. Proposed. The rules take effect as canon when this addendum is published in HDE Build Notes.  
+* Relation to other canon.  
+  * The GATE:CORE-DET pass conditions in HDE Governance §12.1 are unchanged: the preimage recipe, AB↔BA and two-run identity, and no nondeterminism on public paths.  
+  * This addendum supersedes only the evidence entries R-2 names, in four places:  
+    * HDE Governance §12.2, "GATE:CORE-DET — Determinism and identity";  
+    * HDE Governance Appendix B.2, "CI jobs";  
+    * HDE Governance Appendix D.1, "Byte-compare scripts" and "Composite fingerprint" and "Integration set";  
+    * HDE Governance Appendix D.3, "Identity marker/logs" and "Recompute scripts".  
+  * Every other entry in those sections still governs.
+
+### The facts that prompted it
+
+All read on main at 58723d4d.
+
+* The generator never tested the real product.  
+  * scripts/make\_compat\_determinism\_artifacts.py was built to check compat\_public. That function scored each category from a hash of the pair's identity and never read the charts.  
+  * Until HDE-EPIC040 PR-04 ([\#467](https://github.com/amthorn78/glow-hdengine-v2/issues/467), 2026-09-22), that placeholder was what hdctl showcompat and the compat handler ran. [\#467](https://github.com/amthorn78/glow-hdengine-v2/issues/467) replaced it with the real calculation (evaluate\_pair, then compute\_core) and removed compat\_public.  
+  * The generator has exited 2, with compat\_public not implemented, ever since. Its stored outputs (artifacts/compat/AB.json, BA.json, identity\_hash.txt) are captures from the placeholder era.  
+* Eight more listed entries do not exist.  
+  * artifacts/cards/A3/IDENTITY\_OK.txt is not on main. A lower-case copy, artifacts/cards/a3/IDENTITY\_OK.txt, is a frozen marker last changed by HDE-EPIC024 (2026-01-22).  
+  * ci/jobs/preimage\_recompute\_and\_compare.yml, ci/jobs/ab\_ba\_parity\_bytecompare.yml and ci/jobs/two\_run\_identity\_bytecompare.yml never existed in the repository's history.  
+  * fixtures/composite/abba/, fixtures/composite/integration\_abba/, audit/gates/determinism/abba\_compare.log and audit/gates/determinism/abba\_compare\_integration.log never existed either, and no code refers to them.  
+* The Reader goldens are current, but prove the emitter only.  
+  * scripts/make\_reader\_v1\_goldens.py regenerates the committed goldens byte-identically, and their tests pass (37).  
+  * But the script feeds fixed, hand-written bands. Its AB↔BA golden emits two identical inputs. So it proves the emitter's canonical bytes and preimage hashing, not compat AB↔BA.  
+* The real compat path is proven.  
+  * CI owner tests, 148 passed on main (3 open-rails cases skip under closed rails):  
+    * tests/core/test\_engine\_core\_abba.py and tests/core/test\_engine\_core\_determinism.py, which CI selects whenever the core, signal, composite or calculator code changes;  
+    * tests/compat/test\_evaluate\_pair\_eligibility.py, selected when engine/compat/compute.py changes;  
+    * tests/compat/test\_compat\_public\_ab\_ba\_identity.py;  
+    * tests/cli/test\_showcompat\_parity\_and\_identity.py, which every compat-lane run executes.  
+  * The eligibility and showcompat tests recompute the idempotence hash from the preimage.  
+  * The live compat test of addendum 2.15, run as HDE-EPIC041-POSTCLOSE-OPS01, attempt 1, on 2026-11-01:  
+    * AB↔BA and two-run byte identity on live vendor charts;  
+    * production returned the same bytes as the CLI;  
+    * the preimage recipe holds on all nine live Reader bodies, four from production and five from the CLI.
+
+### R-1 — What GATE:CORE-DET evidence is
+
+GATE:CORE-DET evidence is the real compat path, in two parts:
+
+* Closed rails: the CI owner tests above, run as CI selects them. A change that removes or weakens one of them needs its owner's review, like any other gate test.  
+* Open rails: each run of the addendum 2.15 live compat test. That is Ops evidence, under HDE Governance §3.4.
+
+The Reader goldens remain evidence for canonical emission (GATE:CORE-CANON) and the Reader covenant (GATE:CORE-READER). They are not evidence of compat AB↔BA.
+
+### R-2 — Retired evidence entries
+
+These entries are no longer GATE:CORE-DET evidence. No record may cite them as current proof.
+
+* scripts/make\_compat\_determinism\_artifacts.py (HDE Governance §12.2, D.1, D.3);  
+* artifacts/cards/A3/IDENTITY\_OK.txt (§12.2, D.3);  
+* ci/jobs/preimage\_recompute\_and\_compare.yml, ci/jobs/ab\_ba\_parity\_bytecompare.yml and ci/jobs/two\_run\_identity\_bytecompare.yml (B.2);  
+* fixtures/composite/abba/\*.json, audit/gates/determinism/abba\_compare.log, fixtures/composite/integration\_abba/\*.json and audit/gates/determinism/abba\_compare\_integration.log (D.1).
+
+No code changes. The generator, its test that pins exit 2, the artifacts/compat/ captures and the lower-case a3 marker stay as they are, as history. Deleting them would be a development change, and the Product Owner directed none.  
+FND-005 is closed by this decision.
+
+### R-3 — Addendum 2.15 items closed
+
+* "The GATE:CORE-DET evidence list" in 2.15's "Known nonconforming items" is resolved by R-1 and R-2.  
+* SYN-A and SYN-B are stored. HDE-EPIC041-POSTCLOSE-OPS01 v1.1, Part W, stored both in production on 2026-11-01:  
+  * one row each, rows\_written=1, read\_back\_match true;  
+  * the production Reader then scored them in both orders, for v1 and v2.  
+* SYN-A and SYN-B are registered. Both are now in the EPIC011 test-identity record and the engine's synthetic identity map ([\#821](https://github.com/amthorn78/glow-hdengine-v2/issues/821)).  
+* 2.15's two "not yet" bullets about them are superseded by these facts.
+
+### Scope, exclusions and nonclaims
+
+* Scope: which evidence counts for GATE:CORE-DET, the retired entries, and the two 2.15 items above.  
+* Excluded:  
+  * the gate's pass conditions;  
+  * any code, test or artifact change;  
+  * whether the compat scores are right, which is a separate product question;  
+  * conjunction.  
+* Nonclaims. This record:  
+  * runs no test;  
+  * makes no QA verdict, acceptance, Ops result, deployment or PF09 movement;  
+  * drains no canon.
+
+### Dependencies and unresolved obligations
+
+* Publication. Publishing this addendum in HDE Build Notes is the Product Owner's action.  
+* Drainage into permanent canon has not been done. Its targets are HDE Governance §12.2, Appendix B.2, Appendix D.1 and Appendix D.3.
+
+### Evidence
+
+* Generator and placeholder: commit cd6f9e6c ([\#467](https://github.com/amthorn78/glow-hdengine-v2/issues/467)) removed compat\_public from engine/compat/compute.py. At its parent, engine/cli/main.py and engine/http/compat\_handler.py called compat\_public. tests/scripts/test\_make\_compat\_determinism\_artifacts.py pins exit 2\.  
+* Absent entries: git ls-tree on main and git log \--all for each path R-2 names.  
+* Reader goldens: regenerated in a throwaway clone of main at 58723d4d, with no byte changed; tests/reader\_v1/test\_goldens.py, test\_release\_pack.py and test\_emitter.py gave 37 passed.  
+* Owner tests: the five files named above, 148 passed and 3 skipped at 58723d4d under closed rails.  
+* Live run:  
+  * the evidence is under audit/ops/hde-epic041/postclose-ops01/ ([\#822](https://github.com/amthorn78/glow-hdengine-v2/issues/822)), with its execution result record;  
+  * the preimage recomputation used both the repository's emitter and an independent canonical form.
 
 \<eof\>
