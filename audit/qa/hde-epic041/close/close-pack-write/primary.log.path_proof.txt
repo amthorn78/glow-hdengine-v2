@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic041/close/close-pack-write/primary.log
+size_bytes: 749
+sha256: 7425caf2383bf7c4ff2de4df53eaf52a03e5106a28f7263e7b20a72845c44a40
+mtime_utc: 2026-11-01T15:33:28Z
+produced_at_utc: 2026-09-22T14:25:29Z

@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic041/close/evidence-index-hash/primary.log
+size_bytes: 600
+sha256: 8e5db34bdf26c3ae0783ecf5d61f4c382ef6ca92453f5e80cf2a2c17b3a2c189
+mtime_utc: 2026-11-01T15:33:28Z
+produced_at_utc: 2026-09-22T14:25:29Z
