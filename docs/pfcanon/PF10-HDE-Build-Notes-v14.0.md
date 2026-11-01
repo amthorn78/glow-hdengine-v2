@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.9.9**  
-Effective Date: 2026.11.02  
+**Version: v14.0**  
+Effective Date: 2026.11.01  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -192,7 +192,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.7 HDE-EPIC041 QA-120: the final QA Report records verdict PASS for the complete approved QA run (seven checks), the QA RCA records no failure and five contained friction patterns, and the next stage is CL-05  
 * 2.8 The close-pack writer ADR: one writer for Epic and CRD identities, its decisions and stated limits, the post-verdict close-run family, and the amendments through the HDE-EPIC041 close-tooling repair  
 * 2.9 HDE-EPIC041 CL-05: the close mutation set result is CLOSE\_PR\_READY on close pull request \#812, after the Product Owner's bounded CCR-5 ruling, the explicit Epic close-run admission and the close-tooling repair B-1 to B-4 in \#811; the next stage is CL-E-10  
-* 2.10 HDE-EPIC041 CL-E-10: Isis closes HDE-EPIC041, Separation Pass 4, with CLOSE / CHANGE\_CLOSED at 2026-11-01T16:39Z; the absent tokenless acceptance map is not a closure blocker; the next stage is CL-20
+* 2.10 HDE-EPIC041 CL-E-10: Isis closes HDE-EPIC041, Separation Pass 4, with CLOSE / CHANGE\_CLOSED at 2026-11-01T16:39Z; the absent tokenless acceptance map is not a closure blocker; the next stage is CL-20  
+* 2.11 HDE-EPIC041 CL-20: the post-closure record v1.0 confirms closure, reconciles PF10 with no addendum artifact outstanding, leaves manual actions M-0 to M-3 pending, selects no conditional branch, treats the HDE Phased Epics entry as optional, and the next stage is CL-40
 
 # **2\) Numbered Addenda**
 
@@ -1323,5 +1324,71 @@ Closure satisfies the closure gap that the QA-10 PF09 row-closure record (addend
 * This record makes the Isis closure decision for HDE-EPIC041 and nothing more. It performs no PF09, PF30 or board movement, memo delivery, canon drainage or PF10 publication, CCR-1, CCR-5 or CCR-6 canon disposition, Ops, deployment or release. It changes no approved base, QA evidence, close-pack byte, product code or PF-Canon, and edits no file outside docs/ephemeral/.  
 * The acceptance-map determination binds HDE-EPIC041's closure only; it settles no canon question for other changes.  
 * Merging this record preserves it and approves nothing further (D21-C).
+
+## 2.11 HDE-EPIC041 CL-20: the post-closure record v1.0 confirms closure, reconciles PF10 with no addendum artifact outstanding, leaves manual actions M-0 to M-3 pending, selects no conditional branch, treats the HDE Phased Epics entry as optional, and the next stage is CL-40
+
+Timestamp: 110126 17:31 (UTC). Details: Records the CL-20 post-closure record v1.0 of HDE-EPIC041 (Separation Pass 4), prepared by Isis after the closure decision CLOSE / CHANGE\_CLOSED (addendum 2.10). The closure is confirmed as landed; PF10 reconciliation finds no PF10\_BUILD\_NOTES\_ADDENDUM artifact for this change and reads addendum 2.10 back against the decision; the four post-closure manual actions M-0 to M-3 are all pending; CL-30 and the PF09 branch are not selected; the HDE Phased Epics entry is optional, separately authorized historical drainage, which clarifies item P-5 of the closure decision. CL-20 is a nonproducer. Establishes no memo delivery, board update, PF write, PF10 content, PF09 or PF30 movement, canon drainage or canonical adoption, and does not reopen the closure.
+
+### Approval and source record
+
+* Artifact: POST\_CLOSURE\_RECORD v1.0, HDE-EPIC041-CL-20-POST-CLOSURE-RECORD, docs/ephemeral/HDE-EPIC041-CL-20-post-closure-record-v1.0.md (blob 5581b4fb605d), recorded 2026-11-01T17:18Z, read from the head 889b2528 of open pull request [\#815](https://github.com/amthorn78/glow-hdengine-v2/pull/815) (branch claude/vigilant-cannon-kkjfv1, base 2ddf63dc); not yet on main at writing. Predecessor none (first CL-20 output for HDE-EPIC041). The same pull request carries the companion CLOSURE\_MEMO, docs/ephemeral/HDE-EPIC041-CL-20-closure-memo-v1.0.md, which this addendum does not condense. Change: EPIC HDE-EPIC041, "Separation Pass 4". Execution posture MANUAL\_PROMPT\_EXECUTION; authoring context: approved bases Specification v1.1, Implementation Plan v1.1 and QA Plan v1.0, no PF10 addendum overlay, nonproducer.  
+* Author: Isis (Isis-60), continuing Lead Developer and closure authority (https\://claude.ai/code/session\_01Q789tyhUaytmY7x273kwes). Prompt: CL-20 — Prepare Closure Memo and Post-Closure Record — 102726.1 (https\://app.notion.com/p/4064590a05eb81c28ac8ff12b072826b, page state 2026-10-27T13:15:06.100Z, read in full); R1 row GCF-26; release GCFPE-20261027.1 / 102726.1. Repository head read: origin/main 2ddf63dc68bdff0803a053d68c3cee0cfcca9998 (the Product Owner's HDE Build Notes v13.9.9 commit, after [\#814](https://github.com/amthorn78/glow-hdengine-v2/issues/814) e971d460). HDE Build Notes v13.9.9 (1,326 lines, 277,111 bytes, SHA-256 aed39401…9d6bb8) was read as provenance, not a gate; the diff from v13.9.8 adds only addendum 2.10 and its index line.  
+* Canon relied on (by title, per addendum 2.2): CL-20, CL-40 and CL-30 prompts of release 102726.1; HDE Governance §9.1.1 (including the row "Post-closure PF10 drainage, memo delivery and board maintenance" and "Historical drainage"), §9.1.2 (the board paragraph) and §9.1.5 (order and identities); Glow QA Guide §3.1.3 and §11.1 (Master Scrum row); Change Process Guide §0.2 (closure axes; the Notion HDE development board as operational metadata), §3.5.1, §3.5.2.1 and §6.8; Plan Templates §10, Preflight B and "Tracked Issues"; HDE Schemas and Artifacts "Optional token compatibility"; HDE Build Notes ("Precedence, versioning, and scope", the Addendum Index and addenda 2.2 to 2.10). Form precedent only: the HDE-CRD-0002 CL-20 memo and record. No addendum addresses closure memos or board maintenance, so permanent canon governs those topics; no formally approved bounded rescope applies.
+
+### Retained decisions and requirements
+
+* Closure confirmed. The decision is CLOSE / CHANGE\_CLOSED (Isis, 2026-11-01T16:39Z). [\#814](https://github.com/amthorn78/glow-hdengine-v2/issues/814) merged as e971d460 at 2026-11-01T16:56:33Z, parent 6e6bb46; its squash tree e8677186 equals the tree of the reviewed head d12e19bb, and the decision's blob on main is 5075f5ea. The handoff's manual prerequisite is met. Nothing in the record reopens the closure.  
+* PF10 reconciliation.  
+  * No PF10\_BUILD\_NOTES\_ADDENDUM artifact exists for HDE-EPIC041 under docs/ephemeral/. Every approval in the lineage was an initial approval (CF-E-30 INITIAL\_APPROVE, IA-30 INITIAL\_APPROVE, QA-70 initial APPROVE), so no producer emitted one. The HDE-EPIC041 entries 2.3 to 2.10 were published by the Product Owner as informational records of stage results; none is a qualifying approval of a delta, so none has a repository addendum artifact to reconcile. All are live in v13.9.9: 2.3 WU-PR-01 lineage review ACCEPT; 2.4 WU-PR-02 lineage review ACCEPT; 2.5 QA-10 Change Audit Triage with CCR-5 proposed; 2.6 QA-110 evidence review v1.1 ACCEPT; 2.7 QA-120 Report PASS and RCA; 2.8 close-pack writer ADR consolidation (general; covers the HDE-EPIC041 amendment); 2.9 CL-05 CLOSE\_PR\_READY; 2.10 CL-E-10 CLOSE / CHANGE\_CLOSED. Addenda 2.1 and 2.2 are general; 2.2 applies to this change and 2.1 is not engaged.  
+  * Readback of addendum 2.10 against the closure decision matches on the decision, its time and its reasons, the lineage and re-verification facts, the acceptance-map determination and its four bases, the post-closure table and the nonclaims. Two differences, neither a defect: 2.10 adds one nonclaim (the acceptance-map determination binds HDE-EPIC041's closure only and settles no canon question for other changes), consistent with the decision; and its TypeSafe line lists the strongest cells rather than all 24, which the decision §12 holds.  
+  * No addendum was drafted, reconstructed, combined, renumbered or edited, PF10 was not written, and nothing is drained.  
+* Canon conflict register. CCR-1 to CCR-6 carried unchanged from the closure decision §10 with their statuses and that stage's history additions; no entry is added or decided.  
+* Manual actions. HDE Governance §9.1.5 sets the order: PF10 drainage first, separate delivery of the complete closure memo to Thoth and Master Scrum, then the authorized board update after both deliveries and Master Scrum receipt. HDE Governance §9.1.1 assigns all four to the authorized manual operator and actual receiving owners.
+
+| \# | Action | State | Owner |
+| :---- | :---- | :---- | :---- |
+| M-0 | PF10 drainage of addenda 2.3 to 2.7, 2.9 and 2.10, and this change's share of 2.2 and 2.8, into permanent canon, with DELTA-001 to \-003 | Pending; nothing drained | Product Owner, through canon maintenance |
+| M-1 | Deliver the closure memo to Thoth | Pending; prepared, not delivered | Authorized manual operator |
+| M-2 | Deliver the closure memo to Master Scrum | Pending; prepared, not delivered | Authorized manual operator |
+| M-3 | Board update per the memo's instruction | Pending; follows M-1, M-2 and Master Scrum's receipt | Master Scrum / authorized manual operator |
+
+* Recipients, by role (prior session references are provenance only, not delivery requirements): the continuing Thoth reviewer for HDE-EPIC041, Thoth-20 (https\://claude.ai/code/session\_01Q789u24G3yiuVFFZofiVfx); Master Scrum, kickoff session Master Scrum 02C (https\://claude.ai/code/session\_01Q789tzPQvQrVkpkVk2LWhC).  
+* M-3 targets, resolved read-only on 2026-11-01: the board https\://app.notion.com/p/3d54590a05eb819dacccfcfbfee8666b; Board Cards has no HDE-EPIC041 card, so M-3 adds one (per the PR description: state DONE plus two Board History entries); Board History highest Sequence 078\.  
+* Post-closure branches.
+
+| Branch | Disposition |
+| :---- | :---- |
+| CL-30, conditional ADR | Not selected; no qualified condition. CL-30 requires an actual architecture decision worth a new record and explicit bounded maintenance authority, and states "No ADR is required merely because a change closed". The decisions (D-1 and the close-run admission in the close-pack ADR amendment, [\#811](https://github.com/amthorn78/glow-hdengine-v2/issues/811), addendum 2.8; all four in the close report's ADR block) are already recorded, and no maintenance authority was supplied |
+| CL-E-20, CL-E-30, CL-E-40, the PF09 branch | Not selected; no authorization supplied. The HDE-SEPA006 update ("change to Done", supportable from repo evidence, addendum 2.10) remains the Product Owner's separately authorized post-closure action, not a closure gate |
+| PF30 record | None; this is an Epic |
+| HDE Phased Epics entry | Optional, not required (clarification below) |
+| CL-40, final scan | Next managed step |
+
+* Clarification of closure-decision item P-5 (addendum 2.10). The decision listed the "HDE Phased Epics archived entry at epic close" as a Product Owner post-closure item, citing Change Process Guide §3.5.1. HDE Governance §9.1.1 bounds it: the active workflow "MUST NOT create, update or synchronize" HDE Phased Epics entries; "Only a separately authorized historical drainage action may add" one; "No PF20/PF30 entry or permanent drainage is required at … closure". P-5 is therefore optional, separately authorized historical drainage, not a required follow-up. The issued decision is not edited; the record carries the clarification.  
+* Unresolved observations carried to CL-40 (CL-40 reconciles them against PF09, PF10 and the Candidate CRD Items List; already owned and routed items are listed so CL-40 does not record them again unless its scan supports a genuinely new candidate):  
+  * Implementation Audit and lineage findings outside this change: FND-005 (compat generator's compat computation not restored); FND-006 (engine.util.input\_validators reads the working directory and TZ, OBS-1); FND-007 (stale architecture snapshot); OBS-6 (scripts/scratch.py, a tracked .py file holding Markdown); OBS-7 (the classifier's error order).  
+  * QA-10 triage items: \#13 cline\_skills/ unclassified by CI (the push runs on 6a0f55f0 "cline skills" and b67056ef "PF10" failed; QR-07 is the push-CI classification); \#14 the GCFPE register's operating-procedure path absent on main (GCFPE management); \#19 to \#27 historical HDE Reality Audits comparison rows, for the Product Owner's manual update.  
+  * Tracked issue TI-02: Candidate CRD Items List items 9 (the S19 routed security findings) and 10 (the main CI failure) stay the Product Owner's; HDE-EPIC041 touched none of their files; CL-40 re-reads their current list state.  
+  * Canon questions (Product Owner): CCR-1 (acceptance map for tokenless work); CCR-5 (the correcting HDE Build Notes addendum); CCR-6 (Change Process Guide §0.7 and §3.5.2.8); DELTA-001 to \-003.  
+  * Close-tooling observations (closure decision §6.6 and §6.7): each later Epic close needs its own ADMITTED\_EPIC\_CLOSE row; HDE-CRD-0002's close pack still binds the close-pack ADR and the v2 source schema by SHA-256, so any later amendment of either breaks its check again (lesson 3); no canonical tokenless acceptance-map writer exists (lesson 2).  
+  * Lessons 1 to 6 (closure decision §6.7); prompt defects PD-1 to PD-3 (CL-05) and PD-CLE10-1 (CL-E-10) for the GCFPE-MGMT-10 owner; prompt-use repository persistence pending, GCFPE management, non-gating.
+
+### Epic, task, and status effects
+
+* No status movement. HDE-EPIC041 stays CLOSE / CHANGE\_CLOSED as decided in addendum 2.10. M-0 to M-3 are pending and are separate manual actions in the order above; none is performed or claimed. No PF09, PF30, board, PF10 or canon state changes. CL-40 is the next managed step.
+
+### Deferred obligations
+
+* M-0 to M-3 as tabled above; the Product Owner's separately authorized HDE-SEPA006 PF09 update and the CCR-1, CCR-5 and CCR-6 dispositions; the optional, separately authorized HDE Phased Epics historical entry; CL-40 and the observations carried to it; GCFPE-MGMT-10 prompt-defect and prompt-use persistence items.
+
+### TypeSafe reading for CL-40 and surface advice
+
+* Reading (installed TypeSafe scoring skill, request v8.2; script run once before the record was saved; session kind review, label "HDE-EPIC041 CL-40 final scan after CL-20"; no Notion row written). Action sent: in the continuing closure-authority session, run the final post-closure scan for one closed Epic of four requirements and three work units; read the current build notes, every build-checklist phase inventory (seven documents) and the existing candidate list; reconcile about twenty open follow-ups and findings against them; classify only supported checklist gaps and new change candidates; record any genuinely new candidate in the existing Notion candidate list after re-reading it; write one scan result record in a documentation pull request; no code, test, canon or board change and no live provider run; last stage of the cycle, returning to the Product Owner with no later review. TypeSafe v8.2: Opus 5.5 at high (rung by rule: high, nearest to the score, halves up; model by rule: Opus 5.5, the most probable of the four options, a tie going to the higher-priced model). Effort score 2.21 (confidence 0.39); rung probabilities low 0.03, medium 0.27, high 0.22, extra high 0.42, max 0.06, ultracode 0.00; model probabilities Fable 5.1 0.00, Opus 5.5 0.93, Sonnet 5.5 0.06, Haiku 5.5 0.01 (confidence 0.91). Strongest cells: Opus 5.5 at extra high 0.391, medium 0.251, high 0.205, max 0.056, low 0.028; Sonnet 5.5 at extra high 0.025; all other cells at or below 0.016. Flag: boundary between medium and extra high. Sent 2026-11-01T17:18:07Z; HTTP 200 in 0.48 s; 5491 input and 71 output tokens; jev-1.13.0. Nathan picks the cell. Picks: none stated for CL-40 or for this CL-20 session (the closure decision's CL-20 reading is Opus 5.5 at high); none recorded.  
+* Surface advice (CL-40). The continuing Isis context for HDE-EPIC041, a top-level Claude Code cloud session on amthorn78/glow-hdengine-v2, entered with the handoff after Nathan merges this record's pull request. Read access: repository main (every HDE Build Checklist phase inventory and HDE Build Notes under docs/pfcanon/, the closure decision, this record and the memo) and Notion (the CL-40 page and the Candidate CRD Items List, https\://app.notion.com/p/3e54590a05eb813c8d89d065026f694d). Write access: Notion only that list, and only for a supported new candidate or a supported observation on an existing entry, after re-reading it; the repository, one docs/ephemeral/ branch and pull request. Not needed: code changes, test runs, open rails, or board, vendor, database, Railway or deployment access.
+
+### Nonclaims
+
+* No memo delivery, board change, PF write, PF10 content, PF09 or PF30 movement, or canonical adoption is claimed. Nothing here reopens the closure.  
+* Merging the pull request that carries the record and the memo preserves them and approves nothing (D21-C).
 
 \<eof\>
