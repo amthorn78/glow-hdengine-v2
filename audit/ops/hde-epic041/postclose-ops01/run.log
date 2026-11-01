@@ -1,0 +1,52 @@
+run_dir=/home/nathan/hde-compat-ops01-20261101T201118Z started_utc=2026-11-01T20:11:18Z
+HD_API_BASE_URL=SET
+HD_API_KEY=SET
+GEO_API_KEY=SET
+HDAPI_BASE_URL=UNSET
+DATABASE_URL=SET
+hd_api_base_terminal=v2
+main_sha=9de411bf699fe84dc8b492781380761652ed27d4
+pip_exit=0
+hdctl_version=hdctl 0.0.0 (hdengine@prod;77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e)
+release_check_exit=0
+local_release_id=77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e
+tree_clean=yes
+C0 exit=1
+C0 stdout_bytes=0 stderr=PROVIDER_REFUSED
+p1_ab_1 exit=0 stderr= acquisitions_so_far=2
+p1_ab_2 exit=0 stderr= acquisitions_so_far=4
+p1_ba exit=0 stderr= acquisitions_so_far=6
+p2_ab exit=0 stderr= acquisitions_so_far=8
+p2_ba exit=0 stderr= acquisitions_so_far=10
+V-run complete
+e1 exit=1 stderr=PROVIDER_ERROR  acquisitions_so_far=12
+E1 recorded rc=1
+vendor_acquisitions_upper_bound=12
+check_exit=0
+p1_ab_1 bands: harmony=Cool heat=Cool communication=Cool alignment=Open comfort=Cool consistency=Open expansion=Open creativity=Cool drive=Open balance=Cool
+p2_ab bands: harmony=Open heat=Cool communication=Cool alignment=Cool comfort=Cool consistency=Cool expansion=Cool creativity=Cool drive=Cool balance=Cool
+CHECK_FAILS=0
+w_probe_a http=404 body={"code":"ERR_M10_PERSON_UNRESOLVED","error":"BodyGraph not found","ok":false,"schema":"v1"}
+w_probe_b http=404 body={"code":"ERR_M10_PERSON_UNRESOLVED","error":"BodyGraph not found","ok":false,"schema":"v1"}
+w_store_a exit=0 stderr= acquisitions_so_far=13
+w_store_a status=ok adapter=mapped user_id=9cff60ae-6eb6-5618-aec5-8acaa4f290d2 rows_after=1 rows_written=1 read_back_match=True
+w_store_b exit=0 stderr= acquisitions_so_far=14
+w_store_b status=ok adapter=mapped user_id=57f0c055-ff09-5fdb-aedb-def880437e6f rows_after=1 rows_written=1 read_back_match=True
+d1_version http=200 body={"engine_tag":"hdengine@prod","build_commit":"9479d28","invocation_tag":"INV-f2ac55d77ce9aacc","invocation_sha256":"3f119e727a2a1f8a5332fe8f159321ea5274988e6a05633103fe0a5ae42c6e69","emitter_sha256":"c828effe645deae150593adbc90589f67141ab20fab1e719171cd8effad9bc19","release_id":"77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e"}
+d2_v1_ab http=200 body={"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,"idempotence_hash":"5aa45444bc60ad0a056b8814f1f5b7d2578f63045d6a891c61acb47e1d8114b8","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v1","release_id":"77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e"}
+d3_v1_ba http=200 body={"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,"idempotence_hash":"5aa45444bc60ad0a056b8814f1f5b7d2578f63045d6a891c61acb47e1d8114b8","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v1","release_id":"77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e"}
+d4_v2_ab http=200 body={"categories":[{"band":"Cool","id":"harmony"},{"band":"Cool","id":"heat"},{"band":"Cool","id":"communication"},{"band":"Open","id":"alignment"},{"band":"Cool","id":"comfort"},{"band":"Open","id":"consistency"},{"band":"Open","id":"expansion"},{"band":"Cool","id":"creativity"},{"band":"Open","id":"drive"},{"band":"Cool","id":"balance"}],"eligible":true,"idempotence_hash":"900724a0fa2459988afa491331
+d5_v2_ba http=200 body={"categories":[{"band":"Cool","id":"harmony"},{"band":"Cool","id":"heat"},{"band":"Cool","id":"communication"},{"band":"Open","id":"alignment"},{"band":"Cool","id":"comfort"},{"band":"Open","id":"consistency"},{"band":"Open","id":"expansion"},{"band":"Cool","id":"creativity"},{"band":"Open","id":"drive"},{"band":"Cool","id":"balance"}],"eligible":true,"idempotence_hash":"900724a0fa2459988afa491331
+d6_bad_version http=400 body={"code":"ERR_READER_INVALID_VERSION","error":"unsupported reader version","ok":false,"schema":"v1"}
+d7_bad_body http=422 body={"code":"ERR_READER_INVALID_INPUT","error":"invalid Reader request","ok":false,"schema":"v1"}
+production_requests=9
+check_d_exit=0
+deployed_release_id=77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e
+deployed_build_commit=9479d28
+deployed_v2 bands: heat=Cool harmony=Cool communication=Cool alignment=Open comfort=Cool consistency=Open expansion=Open creativity=Cool drive=Open balance=Cool
+reader_cli_parity=MATCH
+CHECK_D_FAILS=0
+HEADER_TEXT_FOUND
+secret_scan=LEAK
+sha256sums_digest=910f965ced2fdf5a6fc5caaa562741e891fdfd0f791168e78f4d4787ec8f8293
+finished_utc=2026-11-01T20:14:07Z

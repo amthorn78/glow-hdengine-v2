@@ -1,0 +1,3 @@
+p1_ab_1 bands: harmony=Cool heat=Cool communication=Cool alignment=Open comfort=Cool consistency=Open expansion=Open creativity=Cool drive=Open balance=Cool
+p2_ab bands: harmony=Open heat=Cool communication=Cool alignment=Cool comfort=Cool consistency=Cool expansion=Cool creativity=Cool drive=Cool balance=Cool
+CHECK_FAILS=0
