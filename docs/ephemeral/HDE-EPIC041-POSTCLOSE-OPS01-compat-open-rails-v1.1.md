@@ -117,7 +117,7 @@ Error case E1: party A is P1-A, and party B is 1985-07-15, 08:30, at the locatio
 | SYN-A | `hde-live-qa-synthetic-a` | `9cff60ae-6eb6-5618-aec5-8acaa4f290d2` | 1990-01-01 | 12:00 | Amsterdam, Netherlands |
 | SYN-B | `hde-live-qa-synthetic-b` | `57f0c055-ff09-5fdb-aedb-def880437e6f` | 1985-07-15 | 08:30 | London, United Kingdom |
 
-The stored rows are permanent QA fixtures. Do not delete them.
+The stored rows are permanent QA fixtures. Do not delete them. Both people are registered in `docs/run/EPIC011_TEST_IDENTITIES.md` ("Live QA synthetic stored people") and in `SYNTHETIC_USER_ID_MAP` in `engine/bodygraph/ingest.py`, by the pull request that carries this prompt.
 
 ## 6. Steps
 
@@ -445,7 +445,6 @@ Report these beside the result, as findings; they do not change it:
 
 * **Conjunction** (`hdctl showcompat --conjunction`). Its vendor path looks up the database first for user keys. The exact read-only command has not been established, so it is left out rather than guessed.
 * **The compat-determinism generator** (`scripts/make_compat_determinism_artifacts.py`). It has exited 2 since HDE-EPIC040 PR-04 (FND-005). This task replaces nothing it was meant to prove for the HDE Governance §12.2 `GATE:CORE-DET` evidence list.
-* **Registering SYN-A and SYN-B in the repository.** The repository's synthetic-identity home is `docs/run/EPIC011_TEST_IDENTITIES.md`, with `SYNTHETIC_USER_ID_MAP` in `engine/bodygraph/ingest.py`. Adding them there is a repository change for a pull request the Product Owner directs. Until then, this prompt is their record.
 
 ## 9. Report back to the Product Owner
 

@@ -196,7 +196,7 @@ None is changed by this record. Each needs its owner's action.
 * **The `GATE:CORE-DET` evidence list.** HDE Governance §12.2, D.1 and D.3 name `scripts/make_compat_determinism_artifacts.py`, which cannot run. Owner: the Product Owner, through FND-005: rewrite the script over the supported compat path, or retire it from those lists.
 * **SYN-A and SYN-B.**
   * They are not yet stored in production; OPS01 v1.1 Part W stores them.
-  * They are not yet registered in the repository's synthetic-identity home, the EPIC011 test-identity record and the engine's synthetic identity map. That registration is a repository change for a pull request the Product Owner directs.
+  * They are registered in the repository's synthetic-identity home (the EPIC011 test-identity record and the engine's synthetic identity map) by the pull request that carries this draft.
 * **A guard keyed on the environment label.** The engine refuses production BodyGraph writes by the environment label alone. Every environment shares one database instance (Glow Infrastructure §2.2), so a shell labeled `dev` writes to production. Part W relies on this, under explicit authorization. Owner: the Product Owner.
 * **CRDs.** This record does not decide whether a CRD that changes runtime code also runs the R-1 test. Owner: the Product Owner.
 
