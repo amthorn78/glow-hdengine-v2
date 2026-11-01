@@ -1,0 +1,21 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-closeout-deliverables","check_name":"QA closeout deliverables integrity","claimed_tokens":[],"command":["bash","-c","set -u\npython -c \"import tools.evidence.update_evidence_index\" || { echo \"REASON: the evidence writer module does not import\"; exit 3; }\npython -c \"import json, sys; m = json.load(open('audit/qa/hde-epic041/qa_step_logs_manifest.json')); need = ('d0-discovery', 'step-0b-doc-delta-capture', 'ac01-orchestration-entry', 'ac02-pure-module', 'ac03-caller-migration', 'ac05-tracked-files-unchanged'); [print('manifest:', k, m[k]['status'], m[k]['log_path']) for k in sorted(m)]; miss = [k for k in need if k not in m]; print('REASON: the manifest lacks ' + ' '.join(miss)) if miss else None; sys.exit(3 if miss else 0)\" || exit $?\npython -c \"import datetime, json; import tools.evidence.update_evidence_index as u; m = json.load(open('audit/qa/hde-epic041/qa_step_logs_manifest.json')); t = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'); ps = sorted({a for e in m.values() for a in json.loads(open(e['log_path'], encoding='utf-8').readline())['evidence_artifacts']} | {'audit/qa/hde-epic041/qa_step_logs_manifest.json', 'audit/docdeltas/hde-epic041_doc_deltas.md', 'audit/qa/hde-epic041/00_meta/doc_deltas.md'}); [u._refresh_path_proof(u.ROOT / p, default_produced_at=t, check=True) for p in ps]; [print('proof valid:', p) for p in ps]\" || { echo \"REASON: a path proof is missing or does not match its file\"; exit 1; }\ncmp audit/docdeltas/hde-epic041_doc_deltas.md audit/qa/hde-epic041/00_meta/doc_deltas.md || { echo \"REASON: the doc-delta pair differs\"; exit 1; }\nif grep -n -E 'docs/ephemeral|docs/pfcanon' audit/docdeltas/hde-epic041_doc_deltas.md; then echo \"REASON: the doc delta names a planning or canon path\"; exit 1; fi\necho \"closeout predicates hold\"\nexit 0\n"],"command_provenance":"HDE-EPIC041 QA Plan v1.0 script SC-CL as written; run and recorded by snippet CS-2","evidence_artifacts":["audit/qa/hde-epic041/checks/qa-closeout-deliverables/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF06-Canon-Change-Process-Guide","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-01T11:52:22Z"}
+manifest: ac01-orchestration-entry PASS audit/qa/hde-epic041/checks/ac01-orchestration-entry/primary.log
+manifest: ac02-pure-module PASS audit/qa/hde-epic041/checks/ac02-pure-module/primary.log
+manifest: ac03-caller-migration PASS audit/qa/hde-epic041/checks/ac03-caller-migration/primary.log
+manifest: ac05-tracked-files-unchanged PASS audit/qa/hde-epic041/checks/ac05-tracked-files-unchanged/primary.log
+manifest: d0-discovery PASS audit/qa/hde-epic041/checks/d0-discovery/primary.log
+manifest: step-0b-doc-delta-capture PASS audit/qa/hde-epic041/checks/step-0b-doc-delta-capture/primary.log
+proof valid: audit/docdeltas/hde-epic041_doc_deltas.md
+proof valid: audit/qa/hde-epic041/00_meta/doc_deltas.md
+proof valid: audit/qa/hde-epic041/checks/ac01-orchestration-entry/primary.log
+proof valid: audit/qa/hde-epic041/checks/ac02-pure-module/primary.log
+proof valid: audit/qa/hde-epic041/checks/ac03-caller-migration/primary.log
+proof valid: audit/qa/hde-epic041/checks/ac05-tracked-files-unchanged/primary.log
+proof valid: audit/qa/hde-epic041/checks/d0-discovery/d0-caller-set.txt
+proof valid: audit/qa/hde-epic041/checks/d0-discovery/d0-entrypoint-preflight.txt
+proof valid: audit/qa/hde-epic041/checks/d0-discovery/d0-env-rails.txt
+proof valid: audit/qa/hde-epic041/checks/d0-discovery/d0-gitignore-audit-qa.txt
+proof valid: audit/qa/hde-epic041/checks/d0-discovery/primary.log
+proof valid: audit/qa/hde-epic041/checks/step-0b-doc-delta-capture/primary.log
+proof valid: audit/qa/hde-epic041/qa_step_logs_manifest.json
+closeout predicates hold

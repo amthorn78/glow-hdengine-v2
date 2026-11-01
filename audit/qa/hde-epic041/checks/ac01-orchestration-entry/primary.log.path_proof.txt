@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic041/checks/ac01-orchestration-entry/primary.log
+size_bytes: 1262
+sha256: 87d0426f5f3449428e93954ba239985ca1ea16d5ff6d79d5c64684529ee19cd8
+mtime_utc: 2026-11-01T11:51:52Z
+produced_at_utc: 2026-11-01T11:51:52Z

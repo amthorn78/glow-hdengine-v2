@@ -1,0 +1,11 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"ac01-orchestration-entry","check_name":"Adapter-owned chart entry functional proof","claimed_tokens":[],"command":[["/tmp/hde-epic041-qa/venv/bin/python","-m","pytest","--version"],["/tmp/hde-epic041-qa/venv/bin/python","-m","pytest","tests/adapter/test_chart_orchestration.py","-p","no:cacheprovider"]],"command_provenance":"epic wrapper readiness and test commands; exact ordered argv","evidence_artifacts":["audit/qa/hde-epic041/checks/ac01-orchestration-entry/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-01T11:51:52Z"}
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/hde-epic041-qa/clone
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.17.0
+collected 20 items
+
+tests/adapter/test_chart_orchestration.py ....................           [100%]
+
+============================== 20 passed in 0.08s ==============================

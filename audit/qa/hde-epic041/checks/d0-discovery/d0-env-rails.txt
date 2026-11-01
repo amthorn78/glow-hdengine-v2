@@ -1,0 +1,44 @@
+environment names:
+ALLOW_NETWORK
+APP_ENV
+HOME
+LANG
+LC_ALL
+PATH
+PWD
+SAFE_MODE
+SHLVL
+TZ
+_
+rails: SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC
+Python 3.12.15
+pip 26.2.2 from /tmp/hde-epic041-qa/venv/lib/python3.12/site-packages/pip (python 3.12)
+attrs==26.1.0
+blinker==1.9.0
+click==8.5.0
+coverage==7.17.0
+Flask==2.3.3
+glow-hdengine==0.0.0
+gunicorn==21.2.0
+iniconfig==2.3.1
+itsdangerous==2.2.0
+Jinja2==3.1.6
+jsonschema==4.23.0
+jsonschema-specifications==2025.9.1
+MarkupSafe==3.0.4
+packaging==26.3
+pip==26.2.2
+pluggy==1.7.0
+psycopg==3.2.13
+psycopg-binary==3.2.13
+Pygments==2.21.0
+pytest==8.4.2
+pytest-cov==4.1.0
+pytest-mock==3.17.0
+referencing==0.37.0
+rpds-py==2026.9.1
+setuptools==84.2.1
+typing_extensions==4.16.0
+Werkzeug==3.1.9
+wheel==0.48.0
+pytest 8.4.2

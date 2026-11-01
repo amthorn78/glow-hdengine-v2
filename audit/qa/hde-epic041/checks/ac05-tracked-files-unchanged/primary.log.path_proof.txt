@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic041/checks/ac05-tracked-files-unchanged/primary.log
+size_bytes: 1750
+sha256: a40bbdcc352b8d2247661f26d5338d6c62d635e74a52a2b33d73efcaafcb1937
+mtime_utc: 2026-11-01T11:52:21Z
+produced_at_utc: 2026-11-01T11:52:21Z

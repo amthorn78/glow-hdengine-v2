@@ -1,0 +1,1 @@
+check_ignore_exit_code: 1

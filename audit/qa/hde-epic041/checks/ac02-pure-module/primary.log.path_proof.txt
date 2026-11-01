@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic041/checks/ac02-pure-module/primary.log
+size_bytes: 1370
+sha256: 1001c7e19a0743559560c937c6231188ae3ba08fc6216400f5530a9c1998375b
+mtime_utc: 2026-11-01T11:51:54Z
+produced_at_utc: 2026-11-01T11:51:54Z

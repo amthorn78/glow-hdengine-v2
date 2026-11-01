@@ -116,6 +116,61 @@ EPIC040_TARGETS = [
     ),
 ]
 
+EPIC041_CHECK_IDS = [
+    "ac01-orchestration-entry",
+    "ac02-pure-module",
+    "ac03-caller-migration",
+    "ac05-tracked-files-unchanged",
+    "d0-discovery",
+    "qa-closeout-deliverables",
+    "step-0b-doc-delta-capture",
+]
+
+EPIC041_TARGETS = [
+    (
+        "epic041.qa_step_logs_manifest",
+        "audit/qa/hde-epic041/qa_step_logs_manifest.json",
+    ),
+    (
+        "epic041.doc_deltas",
+        "audit/docdeltas/hde-epic041_doc_deltas.md",
+    ),
+    (
+        "audit.qa.hde_epic041.00_meta.doc_deltas.md",
+        "audit/qa/hde-epic041/00_meta/doc_deltas.md",
+    ),
+    (
+        "audit.qa.hde_epic041.checks.d0_discovery.primary.log",
+        "audit/qa/hde-epic041/checks/d0-discovery/primary.log",
+    ),
+    *(
+        (
+            f"audit.qa.hde_epic041.checks.d0_discovery.{name.replace('-', '_')}.txt",
+            f"audit/qa/hde-epic041/checks/d0-discovery/{name}.txt",
+        )
+        for name in (
+            "d0-env-rails",
+            "d0-entrypoint-preflight",
+            "d0-gitignore-audit-qa",
+            "d0-caller-set",
+        )
+    ),
+    *(
+        (
+            f"audit.qa.hde_epic041.checks.{check_id.replace('-', '_')}.primary.log",
+            f"audit/qa/hde-epic041/checks/{check_id}/primary.log",
+        )
+        for check_id in (
+            "step-0b-doc-delta-capture",
+            "ac01-orchestration-entry",
+            "ac02-pure-module",
+            "ac03-caller-migration",
+            "ac05-tracked-files-unchanged",
+            "qa-closeout-deliverables",
+        )
+    ),
+]
+
 EPIC027_TARGETS = [
     ("epic027.acceptance_map", "docs/acceptance_map_epic027.json"),
     (
@@ -352,6 +407,30 @@ def test_epic040_qa_roster_matches_canonical_bindings():
     assert [manifest[check_id]["log_path"] for check_id in EPIC040_CHECK_IDS] == [
         path for _, path in EPIC040_TARGETS[2:]
     ]
+
+
+def test_evidence_index_has_required_epic041_artifacts():
+    _assert_targets_present(EPIC041_TARGETS)
+
+
+def test_epic041_qa_roster_matches_canonical_bindings():
+    roster = update_evidence_index.EPIC041_QA_PRIMARY_ARTIFACTS
+    actual = [
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in roster
+    ]
+
+    assert actual == EPIC041_TARGETS
+    assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC041"}
+    assert len({key for key, _ in actual}) == len(actual)
+    assert len({path for _, path in actual}) == len(actual)
+    manifest = json.loads(
+        Path("audit/qa/hde-epic041/qa_step_logs_manifest.json").read_text(encoding="utf-8")
+    )
+    assert sorted(manifest) == EPIC041_CHECK_IDS
+    assert {manifest[check_id]["log_path"] for check_id in EPIC041_CHECK_IDS} == {
+        path for _, path in EPIC041_TARGETS if path.endswith("/primary.log")
+    }
 
 
 def test_epic027_primary_roster_matches_canonical_bindings():
