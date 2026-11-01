@@ -6,7 +6,8 @@ title: "Human Design Math Specialist: role definition and Magic10 v2 design brie
 status: "DRAFT for Product Owner review. The role does not exist until the Product Owner accepts this brief."
 requested_by: "Nathan (Product Owner), 2026-11-01"
 change_id: "None yet. The Product Owner assigns the change (CRD or Epic) that will carry an adopted design into canon and code."
-repository_head_read: "origin/main 43bac5f1 (HDE Build Notes v14.0.5; release 1.3.0, release_id 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e)"
+repository_head_read: "amthorn78/glow-hdengine-v2 origin/main 43bac5f1 (HDE Build Notes v14.0.5; release 1.3.0, release_id 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e); amthorn78/glow-docs edaa34c (docs/hd_refs, Human Design Reference Index v1.2.0)"
+revision_note: "Revised before merge, 2026-11-01, with the Product Owner's directions on glow-docs access and on sources for mathematics (§2.2, §2.4, §3)."
 recorded: "2026-11-01T22:51Z"
 producer: "Isis, continuing Lead Developer for HDE-EPIC041 (https://claude.ai/code/session_01Q789tyhUaytmY7x273kwes)"
 ---
@@ -15,8 +16,9 @@ producer: "Isis, continuing Lead Developer for HDE-EPIC041 (https://claude.ai/co
 
 **Model and reasoning setting**
 
-- **TypeSafe v8.2: Fable 5.1 at extra high.** Effort score 3.27 (confidence 0.61); rung probabilities low 0.00, medium 0.00, high 0.15, extra high 0.42, max 0.42, ultracode 0.01. Model probabilities Fable 5.1 0.53, Opus 5.5 0.44, Sonnet 5.5 0.03, Haiku 5.5 0.00 (confidence 0.37). Twenty-four cells, computed from the two answers: Fable 5.1 at low 0.000, Fable 5.1 at medium 0.000, Fable 5.1 at high 0.080, Fable 5.1 at extra high 0.223, Fable 5.1 at max 0.223, Fable 5.1 at ultracode 0.005, Opus 5.5 at low 0.000, Opus 5.5 at medium 0.000, Opus 5.5 at high 0.066, Opus 5.5 at extra high 0.185, Opus 5.5 at max 0.185, Opus 5.5 at ultracode 0.004, Sonnet 5.5 at low 0.000, Sonnet 5.5 at medium 0.000, Sonnet 5.5 at high 0.004, Sonnet 5.5 at extra high 0.013, Sonnet 5.5 at max 0.013, Sonnet 5.5 at ultracode 0.000, Haiku 5.5 at low 0.000, Haiku 5.5 at medium 0.000, Haiku 5.5 at high 0.000, Haiku 5.5 at extra high 0.000, Haiku 5.5 at max 0.000, Haiku 5.5 at ultracode 0.000. Flags: boundary between max and extra high; model near tie between Fable 5.1 and Opus 5.5. Sent 2026-11-01T22:53:12Z. Nathan picks the cell.
-- The action text sent said "about 480 lines"; the brief was 434 lines when scored. This is recorded here rather than re-scored, because the scoring skill allows one reading per text.
+- **TypeSafe v8.2 (revised brief): Fable 5.1 at extra high.** Effort score 3.32 (confidence 0.63); rung probabilities low 0.00, medium 0.00, high 0.11, extra high 0.46, max 0.42, ultracode 0.01. Model probabilities Fable 5.1 0.53, Opus 5.5 0.46, Sonnet 5.5 0.01, Haiku 5.5 0.00 (confidence 0.37). Twenty-four cells, computed from the two answers: Fable 5.1 at low 0.000, Fable 5.1 at medium 0.000, Fable 5.1 at high 0.058, Fable 5.1 at extra high 0.244, Fable 5.1 at max 0.223, Fable 5.1 at ultracode 0.005, Opus 5.5 at low 0.000, Opus 5.5 at medium 0.000, Opus 5.5 at high 0.051, Opus 5.5 at extra high 0.212, Opus 5.5 at max 0.193, Opus 5.5 at ultracode 0.005, Sonnet 5.5 at low 0.000, Sonnet 5.5 at medium 0.000, Sonnet 5.5 at high 0.001, Sonnet 5.5 at extra high 0.005, Sonnet 5.5 at max 0.004, Sonnet 5.5 at ultracode 0.000, Haiku 5.5 at low 0.000, Haiku 5.5 at medium 0.000, Haiku 5.5 at high 0.000, Haiku 5.5 at extra high 0.000, Haiku 5.5 at max 0.000, Haiku 5.5 at ultracode 0.000. Flags: boundary between max and extra high; model near tie between Fable 5.1 and Opus 5.5. Sent 2026-11-01T22:58:52Z. Nathan picks the cell.
+- **Nathan's pick: Fable 5.1 at extra high** (2026-11-01: "I will run this in fable extra high").
+- **Earlier reading,** of the text before its revision: Fable 5.1 at extra high, score 3.27, sent 2026-11-01T22:53:12Z. Its action text said "about 480 lines" when the brief was 434.
 
 Paste everything below the line into the session that will act in this role.
 
@@ -51,9 +53,10 @@ But it does not do what the product needs. You are asked to **design the updated
 ### 2.2 Authority and limits
 
 * **You propose; the Product Owner decides.** Once adopted, the math lives in the HDE Math Spec, which is its single home.
-* **You change nothing in the repository except your proposal.**
-  * You do not edit `docs/pfcanon/`, code, catalogs, tests, data or Notion.
-  * You write only your proposal record under `docs/ephemeral/`, through one pull request, plus any scratch analysis outside the repository.
+* **Your access.**
+  * `amthorn78/glow-hdengine-v2`: read canon, code, catalogs, evidence and the harness on `main`. Write only your proposal record under `docs/ephemeral/`, through one pull request.
+  * `amthorn78/glow-docs`: read the Human Design reference collection in `docs/hd_refs/`. Write nothing there.
+* **You change nothing else.** You do not edit `docs/pfcanon/`, code, catalogs, tests, data or Notion. Scratch analysis stays outside both repositories.
 * **You make no vendor calls and touch no production system.** All measurement uses the offline harness in §8.
 * **You do not decide** the change class or ID, the release, the schedule, or any process question. Name them as Product Owner decisions.
 
@@ -76,10 +79,19 @@ But it does not do what the product needs. You are asked to **design the updated
 ### 2.4 Working standards
 
 * **Cite a source for every Human Design rule.** Keep doctrine separate from Glow's own product choices. The v1 formula does this: it calls itself "Glow-authored Product synthesis grounded in Human Design composite Channel states", and says doctrine "supports distinguishing the five states but does not supply these fractions" (HDE Math Spec §5.2, §5.2.3).
-* **Canon's Human Design reference is incomplete for this task.**
-  * PF08 Human Design System is the original System text. It covers centers, channels, definition and composites.
-  * It contains no Type or aura doctrine.
-  * Cite any outside source by title and author, and say where doctrine is silent or disputed.
+* **Human Design doctrine comes only from the admitted reference collection.**
+  * The collection is `glow-docs/docs/hd_refs/`, routed and admitted by its `Human Design Reference Index.md` (v1.2.0).
+  * Start with *The Complete Guide to the Human Design System*, the central authority. It is a PDF only: `the-complete-guide-to-the-human-design.pdf`.
+  * Then use PF08 and PF11 within their actual scope, then the admitted specialist teaching the index routes to each domain.
+  * Keep to the index's authority tiers A0 to A5 and its routes. For this task those are mainly M01 to M06, M15 and M17.
+  * Do not use public web pages or outside summaries for Human Design doctrine.
+  * Record every doctrinal claim the way the index's §10 requires: source ID, locator, and claim status (source doctrine, provisional teaching, secondary interpretation, or analyst inference). Keep genuine disagreements visible.
+* **Outside sources are allowed for mathematics** (Product Owner, 2026-11-01). That covers scoring methods, normalization, saturation, calibration and statistics. Cite each one. They cannot supply Human Design doctrine.
+* **State a missing source as a gap, and do not fill it.** The index records two gaps that matter here (§9):
+  * "Relationship/composite teaching is partial": PF08's examples and Design Resonance Mapping "do not establish a general compatibility score";
+  * Type, Authority and Profile depth is not exhaustive.
+
+  Where the admitted sources do not support a rule you need, say so. Then either propose a rule clearly labelled as Glow product synthesis, or ask the Product Owner for a source.
 * **No invented doctrine, and no blank or example values presented as design.**
 * **Keep the v1 boundaries that still stand.** Make no claims about relationship quality or outcomes, and no medical, psychological, sexual, safety or destiny claims.
 * **Say plainly what you do not know.** List decisions for the Product Owner rather than assuming his answer.
@@ -92,6 +104,9 @@ Quoted from 2026-11-01:
 3. "we are supposed to have a multiband reader v2 working"
 4. "what I care about is if the product works."
 5. "Including the new ones I recommended. they need to design the updated math"
+6. "this role does not yet exist."
+7. "this particular agent will also have access to glow-docs where they can use a resource docs/hd_refs"
+8. "it may use outside sources for mathematics if it helps"
 
 The product canon (Glow Story) adds:
 * bands are "the user-visible signal";
@@ -208,7 +223,8 @@ For each requirement, the proposal must give:
   * Decide whether Manifesting Generator is its own Type or a kind of Generator.
 * **The pairing model.** A symmetric matrix of Type pairs, with integer contributions to the affected categories. Give the doctrine behind each cell, from the aura mechanics (for example, open and enveloping, or closed and repelling), and cite the source.
 * **Its limits.** State how much Type can move a score. It must not drown out the chart-specific mechanics.
-* **Canon has no Type or aura doctrine** (§2.4), so cite outside sources.
+* **Where the doctrine is.** PF08 has no Type or aura chapters. Route Type through the Complete Guide first (index route M03), then the admitted specialists the index names: HD-TYPE-01, the Generators' Course, for Generator and Manifesting Generator; and HD-SELF-01. Body-to-other resonance (M15, HD-SYN-02) "establishes no app compatibility score", so do not use it as one.
+* **If the admitted sources do not support a Type pairing,** state the gap. Then propose a labelled Glow product rule, or ask for a source (Q-3).
 
 ### D-4 Band calibration (after D-1 to D-3 are fixed)
 
@@ -329,6 +345,7 @@ One proposal: `docs/ephemeral/HDE-M10V2-mechanics-proposal-v1.0.md`, in one pull
 * **How to measure a candidate.**
   * Write it as a pure function of the two gate sets, and swap it in for `evaluate_pair`.
   * If you adopt planetary placement, extend `hdchart.py` to return each activation. It already computes every planet's longitude internally.
+* **Human Design references** (read only): `amthorn78/glow-docs`, `docs/hd_refs/`. There are 29 source works, Markdown companions where they exist, and the Reference Index. Some works, the Complete Guide among them, are PDF only, so read the PDF directly (`pdftotext` gives a searchable layer). Verify diagrams, quotations and numbers against the PDF page, as the index requires.
 * **Live evidence:**
   * `audit/ops/hde-epic041/postclose-ops01/`: the two live pairs, and the production Reader bodies for SYN-A with SYN-B;
   * `docs/ephemeral/HDE-EPIC041-POSTCLOSE-OPS01-ops-execution-result-v1.0.md`.
@@ -365,12 +382,26 @@ Steps 1 to 3 change no canon, code or data.
   * §8;
   * §9.5 (goldens).
 * **HDE Governance:** §12.1 (`GATE:CORE-MATCH`, `GATE:CORE-DET`), and the band tokens `BAND_MAX_INCLUSIVE_OK` and `BAND_EDGE_GOLDENS_OK`.
+* **`glow-docs/docs/hd_refs/Human Design Reference Index.md`:**
+  * §1 "Read this first";
+  * §3, authority tiers A0 to A5, with the Complete Guide, PF08 and PF11 scopes;
+  * §4, the routing table, especially M01 to M06, M15 and M17;
+  * §5, the source register entries you use;
+  * §9, open source gaps;
+  * §10, source-use rules.
+* ***The Complete Guide to the Human Design System*** (PDF), the central doctrine source, for Strategy and Authority, the nine centers, conditioning and openness.
 * **PF08 Human Design System:**
   * "The Centers";
   * "Channels";
   * "The Rave Charts", especially the Composite Rave and "where they connect";
   * "RAVE — Channel and Definition Analysis Graph".
 * **PF11 The Rave I Ching:** gate meanings, for the relevance mapping.
+* **Admitted specialists, as the index routes them:**
+  * HD-TYPE-01, the Generators' Course;
+  * HD-SELF-01, The Vehicle, the Passenger and the Driver;
+  * HD-FND-03, Fundamentals: Centers;
+  * HD-CIRCUIT-01 and HD-CIRCUIT-02, for circuitry;
+  * HD-SYN-01 and HD-SYN-02, read within their stated limits.
 * **HDE Narratives Guide:** the candidate registry, keyed by category, band, perspective and slot.
 * **Glow Story.**
 * **HDE Build Notes (current version):** addenda 2.15 and 2.16.
@@ -384,7 +415,8 @@ Steps 1 to 3 change no canon, code or data.
 * Do not invent doctrine. Do not leave values blank, and do not present examples as values.
 * Do not let one feature count twice.
 * Do not change a public shape, or expose numbers.
-* Do not rely on older HDE Build Notes base versions, or on files outside the repository, as authority.
+* Do not rely on older HDE Build Notes base versions, or on files outside the two repositories, as authority.
+* Do not use public web pages or outside summaries for Human Design doctrine. Outside sources are for mathematics only.
 
 ## 12. Decisions for the Product Owner
 
@@ -392,7 +424,10 @@ The specialist recommends; the Product Owner decides.
 
 1. **Q-1.** What "relevant placement" means: reading (a), (b), (c), or a combination (D-1).
 2. **Q-2.** Whether planetary activations may become an input. That is a data change: the vendor adapter, the stored chart, and re-acquiring already-stored people.
-3. **Q-3.** Which Type and aura doctrine sources to adopt, and whether Manifesting Generator is its own Type.
+3. **Q-3.** Three questions:
+   * whether the admitted references support an aura-type pairing model;
+   * if they don't, which the index records as a likely gap, whether to adopt a clearly labelled Glow product rule or to acquire a dedicated partnership or composite source into `docs/hd_refs/`;
+   * whether Manifesting Generator is its own Type.
 4. **Q-4.** How much Type may move a score.
 5. **Q-5.** Absolute or relative bands; global or per-category lines; the target mix.
 6. **Q-6.** Cutover. Canon allows one active mechanics configuration per release (§5.4.1), so v2 replaces v1 in the release that adopts it. Confirm that posture.
@@ -424,6 +459,8 @@ Read on `main` at `43bac5f1`.
   * the current-version rule;
   * addenda 2.15 and 2.16.
 * **History only, not authority:** `M10-CANON-001`, the v1 adoption record, in a superseded base version at commit `e6578b53`.
+
+**Other sources read** (`amthorn78/glow-docs` at `edaa34c`): `docs/hd_refs/Human Design Reference Index.md` v1.2.0, §1, §3, §4, §9 and §10; and the `docs/hd_refs/` file listing. The Reference Index is a source-routing record, not canon.
 
 ## Nonclaims
 
