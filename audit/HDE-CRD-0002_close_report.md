@@ -238,8 +238,8 @@ The close-pack manifest `audit/HDE-CRD-0002_MANIFEST.json` `key_outputs` map is 
 ## Source bindings
 
 - Candidate source: `audit/HDE-CRD-0002_close_candidate_source.json` (`sha256=a59423c1763c62bf5f7805263c25d1056f1129f7c196b11918c2add9937ba780`, `size_bytes=37077`)
-- Candidate-source schema: `schemas/close_candidate_source.v2.json` (`sha256=cc606621dbdfef4078f624895ee98dd573c144da8c756d4ecff833e3e01fa843`, `size_bytes=22889`)
-- Evidence `close_pack_adr`: `docs/adr/hde/close_pack_writer_adr.md` (`sha256=c106278b4ba57c6e72aea899b371bfa2d4691c4fd4ac701bcc33148e5fdb4b78`, `size_bytes=27156`)
+- Candidate-source schema: `schemas/close_candidate_source.v2.json` (`sha256=45d71575918238829e56d99d79709ea43dce3834425bb511d267b95503f9bce0`, `size_bytes=22925`)
+- Evidence `close_pack_adr`: `docs/adr/hde/close_pack_writer_adr.md` (`sha256=a6c310cd6aa67b232555f3d56a0a091484c6df4c125d8aa57a3c9462caa30978`, `size_bytes=30555`)
 - Evidence `doc_deltas`: `audit/docdeltas/hde-crd-0002_doc_deltas.md` (`sha256=aeb9b16b970d6f6c634489c63d4a42e230ba3e704260b17f7a7e9181ea0addb3`, `size_bytes=4443`)
 - Evidence `drain_targets`: `audit/docdeltas/hde-crd-0002_drain_targets.md` (`sha256=61282f685a700893edc6e28fb9977b43627a9da0917f1dd37b3014a6dbc435a9`, `size_bytes=3589`)
 - Evidence `qa_check_01`: `audit/qa/hde-crd-0002/checks/qa-01-preflight/primary.log` (`sha256=01df910157d7d96ec9d6b7cfeb18be22aa1c7f2f3d8b8e2437c77e1af80303e4`, `size_bytes=290492`)

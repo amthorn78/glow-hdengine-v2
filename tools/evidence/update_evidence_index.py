@@ -53,6 +53,16 @@ ADMITTED_CRD_QA: Mapping[str, tuple[str, str]] = {
     "HDE-CRD-0002": ("audit/qa/hde-crd-0002", "audit.qa.hde_crd_0002"),
 }
 
+# Source-owned admission table for Epic close mutation sets (HDE-EPIC041 CL-05,
+# close-tooling repair B-3 and B-4, by the Product Owner's explicit admission):
+# each admitted Epic maps to its QA root and key prefix. Admission registers the
+# Epic's writer close pack (absent-tolerant, as for a CRD) and its post-verdict
+# close-run family under <qa-root>/close/. It is not a check roster or directory
+# discovery rule; another Epic needs its own explicit row here.
+ADMITTED_EPIC_CLOSE: Mapping[str, tuple[str, str]] = {
+    "HDE-EPIC041": ("audit/qa/hde-epic041", "audit.qa.hde_epic041"),
+}
+
 # HDE-CRD-0002 IF-7: Mirror rows for primaries whose bytes the admitted release
 # determines carry a release label inside the PF12 §8.3 allowed key set (notes).
 # A capture takes the label of the release in catalog/manifest.json only when
@@ -4161,6 +4171,137 @@ def _crd_close_pack_entries(
     return unrelated, current
 
 
+def _epic_close_pack_pair(epic_id: str) -> tuple[str, str]:
+    number = epic_id.removeprefix("HDE-EPIC")
+    return f"audit/EPIC-{number}_close_report.md", f"audit/EPIC-{number}_MANIFEST.json"
+
+
+def _epic_close_run_entry(epic_id: str, check_id: str) -> dict[str, object]:
+    root_rel, key_prefix = ADMITTED_EPIC_CLOSE[epic_id]
+    qa_harness.validate_check_id(check_id)
+    return {
+        "artifact_key": f"{key_prefix}.close.{check_id}.primary.log",
+        "discovered_physical_path": f"{root_rel}/close/{check_id}/primary.log",
+        "epic_id": epic_id,
+        "role": "log",
+    }
+
+
+def _parse_epic_close_primary(epic_id: str, check_id: str, payload: bytes) -> dict[str, object]:
+    """Hold an Epic close-run primary to the CRD close-run primary's contract."""
+    text = qa_harness._crd_text(payload)
+    header = qa_harness._parse_primary_header(text, allow_legacy_check_id=False)
+    if text.split("\n", 1)[0] != json.dumps(header, sort_keys=True, separators=(",", ":")):
+        raise ValueError("Epic close-run primary header must be compact sorted JSON")
+    if header["check_id"] != check_id:
+        raise ValueError("Epic close-run primary identity disagrees with its path")
+    if header.get("schema_version") != "pf27.step_log_header.v2":
+        raise ValueError("Epic close-run primary must use the PF27 v2 step-log header")
+    own = _epic_close_run_entry(epic_id, check_id)["discovered_physical_path"]
+    evidence = header.get("evidence_artifacts")
+    if not isinstance(evidence, list) or own not in evidence:
+        raise ValueError("PF27 v2 evidence_artifacts omit the canonical own primary log")
+    if header["status"] == qa_harness.Status.PARKED.value and header["command"]:
+        raise ValueError("Epic close-run PARKED cannot describe executed commands")
+    if header["status"] == qa_harness.Status.FAIL_BEHAVIOR.value and not header["command"]:
+        raise ValueError("Epic close-run FAIL_BEHAVIOR requires exercised behavior")
+    return header
+
+
+def _epic_close_run_check_ids(epic_id: str) -> list[str]:
+    """Validate and list an admitted Epic's close-run family; any other member is refused."""
+    root_rel = ADMITTED_EPIC_CLOSE[epic_id][0]
+    qa_root = ROOT / root_rel
+    close_root = qa_root / "close"
+    for directory in (qa_root, close_root):
+        if directory.is_symlink() or (directory.exists() and not directory.is_dir()):
+            raise ValueError("Epic close-run root is aliased or not a directory")
+    if not close_root.exists():
+        return []
+    check_ids: list[str] = []
+    for name in sorted(os.listdir(close_root)):
+        member = close_root / name
+        if member.is_symlink() or not member.is_dir():
+            raise ValueError(f"Epic close-run family has an unexpected member: {name}")
+        check_id = qa_harness.validate_check_id(name)
+        if set(os.listdir(member)) - {"primary.log", "primary.log.path_proof.txt"}:
+            raise ValueError(f"Epic close-run family has an unexpected member: {name}")
+        primary = member / "primary.log"
+        if primary.is_symlink() or not primary.is_file():
+            raise ValueError(f"Epic close-run family has an unexpected member: {name}")
+        _parse_epic_close_primary(epic_id, check_id, _read_bytes(primary))
+        check_ids.append(check_id)
+    if not check_ids:
+        raise ValueError("Epic close-run root exists without a primary")
+    return check_ids
+
+
+def _epic_close_entries(
+    retained: Sequence[Mapping[str, object]],
+) -> tuple[list[Mapping[str, object]], list[dict[str, object]]]:
+    """Admitted Epics' close-pack rows (absent-tolerant) and close-run rows.
+
+    Close pack: neither file present, no rows; both present, one row each; one
+    present, or a row whose file is absent, refused. Close run: the rows are the
+    validated primaries on disk; a retained row of another shape is refused.
+    """
+    pack: dict[str, dict[str, object]] = {}
+    pairs: list[tuple[str, tuple[str, str]]] = []
+    for epic_id in sorted(ADMITTED_EPIC_CLOSE):
+        key = "epic" + epic_id.removeprefix("HDE-EPIC")
+        report, manifest = _epic_close_pack_pair(epic_id)
+        for suffix, rel in (("close_report", report), ("manifest", manifest)):
+            pack[rel] = {
+                "artifact_key": f"{key}.{suffix}",
+                "discovered_physical_path": rel,
+                "epic_id": epic_id,
+            }
+        pairs.append((epic_id, (report, manifest)))
+    pack_keys = {str(row["artifact_key"]) for row in pack.values()}
+    unrelated: list[Mapping[str, object]] = []
+    indexed: set[str] = set()
+    for entry in retained:
+        key = entry.get("artifact_key") or entry.get("title")
+        path = entry.get("discovered_physical_path") or entry.get("path")
+        normalized_path = os.path.normpath(path) if isinstance(path, str) else ""
+        run_claims = {
+            epic_id
+            for epic_id, (root_rel, key_prefix) in ADMITTED_EPIC_CLOSE.items()
+            if (isinstance(key, str) and key.startswith(f"{key_prefix}.close."))
+            or normalized_path.startswith(f"{root_rel}/close/")
+        }
+        if run_claims:
+            parts = path.split("/") if isinstance(path, str) else []
+            epic_id, = run_claims
+            root_rel = ADMITTED_EPIC_CLOSE[epic_id][0]
+            if (
+                len(parts) != 6
+                or "/".join(parts[:4]) != f"{root_rel}/close"
+                or parts[-1] != "primary.log"
+                or dict(entry) != _epic_close_run_entry(epic_id, parts[-2])
+            ):
+                raise ValueError("EPIC_CLOSE_RUN_REGISTRATION_COLLISION")
+            continue
+        if key not in pack_keys and normalized_path not in pack:
+            unrelated.append(entry)
+            continue
+        if normalized_path not in pack or dict(entry) != pack[normalized_path]:
+            raise ValueError("EPIC_CLOSE_PACK_REGISTRATION_COLLISION")
+        indexed.add(normalized_path)
+    current: list[dict[str, object]] = []
+    for epic_id, pair in pairs:
+        present = {rel for rel in pair if _path_exists(ROOT / rel)}
+        if present and present != set(pair):
+            raise ValueError(f"EPIC_CLOSE_PACK_INCOMPLETE:{epic_id}")
+        if indexed & set(pair) - present:
+            raise ValueError(f"EPIC_CLOSE_PACK_INDEXED_BUT_ABSENT:{epic_id}")
+        current.extend(pack[rel] for rel in pair if rel in present)
+        current.extend(
+            _epic_close_run_entry(epic_id, check_id) for check_id in _epic_close_run_check_ids(epic_id)
+        )
+    return unrelated, current
+
+
 # The two catalog reports are already required by PF12 §8.1. Their presence
 # admits this exact pair; no directory discovery or new evidence family exists.
 CATALOG_VALIDATION_ENTRIES: tuple[dict[str, object], ...] = tuple(
@@ -4218,6 +4359,7 @@ def _load_human_index() -> list[dict[str, object]]:
     catalog_entries = _catalog_validation_entries(payload)
     payload, crd_entries = _load_crd_qa_entries(payload)
     payload, crd_close_pack_entries = _crd_close_pack_entries(payload)
+    payload, epic_close_entries = _epic_close_entries(payload)
     payload = [
         entry
         for entry in payload
@@ -4256,6 +4398,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *payload,
             *crd_entries,
             *crd_close_pack_entries,
+            *epic_close_entries,
             *catalog_entries,
             *BASELINE_ENTRIES,
             *EPIC021_PRIMARY_ARTIFACTS,
@@ -5360,6 +5503,137 @@ def publish_crd_close_run_family(
         for path, content in planned:
             if path.read_text(encoding="utf-8") != content:
                 raise RuntimeError(f"CRD close-run primary changed during publication: {path}")
+        if coherence_verifier is not None:
+            coherence_verifier()
+        return tuple(path for path, _ in planned)
+
+
+def _epic_qa_family_snapshot(config: qa_harness.HarnessConfig) -> dict[str, bytes]:
+    """The recorded QA family of an admitted Epic: its manifest and every checks/ file."""
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    if manifest.is_symlink() or not manifest.is_file():
+        raise ValueError("Epic close-run publication requires a recorded QA step-logs manifest")
+    checks = qa_harness._loads_json_strict(_read_bytes(manifest).decode("utf-8"))
+    if not isinstance(checks, dict) or not checks:
+        raise ValueError("Epic QA step-logs manifest must be a nonempty flat mapping")
+    for check_id, entry in checks.items():
+        primary = config.qa_root / "checks" / qa_harness.validate_check_id(check_id) / "primary.log"
+        if (
+            not isinstance(entry, dict)
+            or entry.get("check_id") != check_id
+            or entry.get("log_path") != primary.relative_to(ROOT).as_posix()
+            or primary.is_symlink()
+            or not primary.is_file()
+        ):
+            raise ValueError(f"Epic QA step-logs manifest entry is not recorded: {check_id}")
+    family = {manifest.relative_to(ROOT).as_posix(): _read_bytes(manifest)}
+    for directory, _, names in os.walk(config.qa_root / "checks"):
+        for name in names:
+            path = Path(directory) / name
+            family[path.relative_to(ROOT).as_posix()] = _read_bytes(path)
+    return family
+
+
+def _epic_close_primary_content(
+    config: qa_harness.HarnessConfig,
+    result: qa_harness.CheckResult,
+    *,
+    captured_at_utc: str | None,
+) -> tuple[Path, str]:
+    """Render one Epic close-run primary through the QA harness's own renderer.
+
+    The harness renders the PF27 v2 header and body for the checks/ family; the
+    only difference is the family directory, so the own-primary evidence path is
+    moved from checks/ to close/ and the header re-serialized. Nothing else in
+    the harness's rendering or validation is bypassed.
+    """
+    checks_path, content = qa_harness._primary_log_content(
+        config, result, captured_at_utc=captured_at_utc
+    )
+    checks_rel = checks_path.relative_to(ROOT).as_posix()
+    close_entry = _epic_close_run_entry(str(config.epic_id), result.check_id)
+    close_rel = str(close_entry["discovered_physical_path"])
+    if checks_rel in result.evidence_artifacts or close_rel in result.evidence_artifacts:
+        raise ValueError("Epic close-run evidence must not name its own checks/ or close/ primary")
+    header_line, _, body = content.partition("\n")
+    header = json.loads(header_line)
+    if header["evidence_artifacts"][0] != checks_rel:
+        raise ValueError("Epic close-run primary rendering is inconsistent")
+    header["evidence_artifacts"][0] = close_rel
+    rendered = json.dumps(header, sort_keys=True, separators=(",", ":")) + "\n" + body
+    _parse_epic_close_primary(str(config.epic_id), result.check_id, rendered.encode("utf-8"))
+    return ROOT / close_rel, rendered
+
+
+def publish_epic_close_run_family(
+    config: qa_harness.HarnessConfig,
+    results: Sequence[qa_harness.CheckResult],
+    *,
+    captured_at_utc: str | None = None,
+    coherence_verifier: Callable[[], None] | None = None,
+) -> tuple[Path, ...]:
+    """Publish an admitted Epic's post-verdict close-run family with recovery.
+
+    The Epic counterpart of publish_crd_close_run_family (HDE-EPIC041 CL-05,
+    close-tooling repair B-4). Each primary is rendered only from its captured
+    command, exit code and output, under audit/qa/<epic-dir>/close/<check_id>/.
+    The given results replace the whole family. It requires the Epic's recorded
+    QA family, writes neither qa_step_logs_manifest.json nor any checks/ file,
+    and refuses if either changes during publication. Recovery has the same
+    bounds as publish_crd_close_run_family. No acceptance claim is inferred.
+    """
+    if not isinstance(config, qa_harness.HarnessConfig) or config.epic_id not in ADMITTED_EPIC_CLOSE:
+        refused = getattr(config, "epic_id", None)
+        raise ValueError(
+            "governed Epic close-run publication admits only "
+            + ", ".join(sorted(ADMITTED_EPIC_CLOSE))
+            + f"; refused {refused}"
+        )
+    if config.repo_root != ROOT:
+        raise ValueError("Epic config must select this updater's repository root")
+    if config.qa_root != ROOT / ADMITTED_EPIC_CLOSE[config.epic_id][0]:
+        raise ValueError("Epic config QA root differs from its admitted root")
+    if _ACTIVE_WRITE_TRANSACTION is not None or _STAGED_VIEW is not None:
+        raise RuntimeError("Epic close-run publication requires its own outer transaction")
+    ensure_determinism_env()
+    staged_results = tuple(results)
+    if not staged_results or not all(isinstance(result, qa_harness.CheckResult) for result in staged_results):
+        raise ValueError("Epic close-run publication requires a nonempty CheckResult family")
+    result_ids = [qa_harness.validate_check_id(result.check_id) for result in staged_results]
+    if len(result_ids) != len(set(result_ids)):
+        raise ValueError("Epic close-run publication contains duplicate check IDs")
+    planned = [
+        _epic_close_primary_content(config, result, captured_at_utc=captured_at_utc)
+        for result in staged_results
+    ]
+    # T0: the close-run family follows a recorded QA family. Refuse its
+    # absence, and any existing incoherence, before touching any byte.
+    qa_family = _epic_qa_family_snapshot(config)
+    stale = [
+        config.qa_root / "close" / check_id
+        for check_id in _epic_close_run_check_ids(config.epic_id)
+        if check_id not in result_ids
+    ]
+    _run_once(check=True)
+    with _WriteTransaction(ROOT) as transaction:
+        for path, _ in planned:
+            _assert_unaliased_write_path(path)
+            transaction.capture(path)
+        for directory in stale:
+            for name in ("primary.log", "primary.log.path_proof.txt"):
+                transaction.capture(directory / name)
+                (directory / name).unlink(missing_ok=True)
+            directory.rmdir()
+        for path, content in planned:
+            qa_harness._atomic_write(path, content)
+        _converge_and_publish()
+        if _epic_close_run_check_ids(config.epic_id) != sorted(result_ids):
+            raise RuntimeError("Epic close-run family differs from the published results")
+        for path, content in planned:
+            if path.read_text(encoding="utf-8") != content:
+                raise RuntimeError(f"Epic close-run primary changed during publication: {path}")
+        if _epic_qa_family_snapshot(config) != qa_family:
+            raise RuntimeError("Epic QA family changed during close-run publication")
         if coherence_verifier is not None:
             coherence_verifier()
         return tuple(path for path, _ in planned)

@@ -1412,3 +1412,201 @@ def test_close_run_family_refuses_an_unexpected_member(close_repo: Path) -> None
     result = _run(close_repo, "tools/evidence/update_evidence_index.py", "--check")
     assert result.returncode != 0
     assert "unexpected member" in result.stderr
+
+
+# --- HDE-EPIC041 CL-05 close-tooling repair: B-3 (Epic close-pack rows) and B-4 (Epic close-run family) ---
+EPIC_CLOSE = "HDE-EPIC041"
+EPIC_CLOSE_ROOT = "audit/qa/hde-epic041"
+EPIC_CLOSE_PACK = ("audit/EPIC-041_close_report.md", "audit/EPIC-041_MANIFEST.json")
+EPIC_CLOSE_FIXTURE_PROGRAM = CRD_FIXTURE_PROGRAM.replace(
+    'config = qa.HarnessConfig(crd_id="HDE-CRD-0001", repo_root=writer.ROOT)',
+    'config = qa.HarnessConfig("HDE-EPIC041", repo_root=writer.ROOT)',
+) + '''
+def publish_epic_close(check_ids=("close-pack-check", "evidence-index-check"), **kwargs):
+    return writer.publish_epic_close_run_family(
+        config, tuple(observed(check_id) for check_id in check_ids),
+        captured_at_utc=timestamp, **kwargs,
+    )
+'''
+assert 'config = qa.HarnessConfig("HDE-EPIC041", repo_root=writer.ROOT)' in EPIC_CLOSE_FIXTURE_PROGRAM
+
+
+def _epic_close_program(repo: Path, program: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, "-c", EPIC_CLOSE_FIXTURE_PROGRAM + "\n" + program],
+        cwd=repo, env=ENV, capture_output=True, text=True, check=False,
+    )
+
+
+@pytest.fixture
+def epic_close_repo(tmp_path: Path) -> Path:
+    """HDE-EPIC041's pre-close state in a copy: its QA family stays, its close outputs leave."""
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    _strip_from_copy(repo, f"{EPIC_CLOSE_ROOT}/close", *EPIC_CLOSE_PACK)
+    assert (repo / f"{EPIC_CLOSE_ROOT}/qa_step_logs_manifest.json").is_file()
+    return repo
+
+
+def _epic_qa_family(repo: Path) -> dict[str, tuple[bytes, int]]:
+    root = repo / EPIC_CLOSE_ROOT
+    paths = [root / "qa_step_logs_manifest.json", *sorted((root / "checks").rglob("*"))]
+    return {
+        path.relative_to(repo).as_posix(): (path.read_bytes(), path.stat().st_mtime_ns)
+        for path in paths
+        if path.is_file()
+    }
+
+
+def test_epic_close_pack_rows_are_absent_tolerant(epic_close_repo: Path) -> None:
+    repo = epic_close_repo
+    before = _snapshot(repo)
+    _success(_run(repo, "tools/evidence/update_evidence_index.py", "--check"))
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert _snapshot(repo) == before
+    assert not set(EPIC_CLOSE_PACK) & set(_index_rows(repo))
+
+    report, manifest = (repo / rel for rel in EPIC_CLOSE_PACK)
+    report.write_text("# HDE-EPIC041 Close Report\n", encoding="utf-8")
+    one = _run(repo, "tools/evidence/update_evidence_index.py")
+    assert one.returncode != 0 and "EPIC_CLOSE_PACK_INCOMPLETE:HDE-EPIC041" in one.stderr
+    assert _snapshot(repo) == before
+
+    manifest.write_text("{}\n", encoding="utf-8")
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    rows = _index_rows(repo)
+    assert rows[EPIC_CLOSE_PACK[0]] == {
+        "artifact_key": "epic041.close_report",
+        "discovered_physical_path": EPIC_CLOSE_PACK[0],
+        "epic_id": EPIC_CLOSE,
+    }
+    assert rows[EPIC_CLOSE_PACK[1]] == {
+        "artifact_key": "epic041.manifest",
+        "discovered_physical_path": EPIC_CLOSE_PACK[1],
+        "epic_id": EPIC_CLOSE,
+    }
+    for rel in EPIC_CLOSE_PACK:
+        assert (repo / f"{rel}.path_proof.txt").is_file()
+    _checks(repo)
+
+    report.unlink()
+    manifest.unlink()
+    gone = _run(repo, "tools/evidence/update_evidence_index.py", "--check")
+    assert gone.returncode != 0 and "EPIC_CLOSE_PACK_INDEXED_BUT_ABSENT:HDE-EPIC041" in gone.stderr
+
+
+def test_epic_close_pack_row_of_another_shape_is_refused(epic_close_repo: Path) -> None:
+    repo = epic_close_repo
+    for rel in EPIC_CLOSE_PACK:
+        (repo / rel).write_text("{}\n", encoding="utf-8")
+    index = repo / "docs/evidence/INDEX.json"
+    rows = json.loads(index.read_bytes())
+    rows.append({"artifact_key": "epic041.close_report", "discovered_physical_path": EPIC_CLOSE_PACK[0]})
+    index.write_text(json.dumps(rows, sort_keys=True, separators=(",", ":")) + "\n")
+    before = _whole_tree_state(repo, metadata=True)
+    result = _run(repo, "tools/evidence/update_evidence_index.py")
+    assert result.returncode != 0 and "EPIC_CLOSE_PACK_REGISTRATION_COLLISION" in result.stderr
+    assert _whole_tree_state(repo, metadata=True) == before
+
+
+def test_epic_close_run_family_publishes_without_touching_the_qa_family(epic_close_repo: Path) -> None:
+    repo = epic_close_repo
+    qa_family = _epic_qa_family(repo)
+    _success(_epic_close_program(repo, "print(len(publish_epic_close()))"))
+    rows = _index_rows(repo)
+    for check_id in ("close-pack-check", "evidence-index-check"):
+        rel = f"{EPIC_CLOSE_ROOT}/close/{check_id}/primary.log"
+        assert rows[rel] == {
+            "artifact_key": f"audit.qa.hde_epic041.close.{check_id}.primary.log",
+            "discovered_physical_path": rel,
+            "epic_id": EPIC_CLOSE,
+            "role": "log",
+        }
+        text = (repo / rel).read_text(encoding="utf-8")
+        header = json.loads(text.splitlines()[0])
+        assert header["status"] == "PASS" and header["exit_code"] == 0 and header["command"]
+        assert header["evidence_artifacts"] == [rel]
+        assert header["schema_version"] == "pf27.step_log_header.v2"
+        assert (repo / f"{rel}.path_proof.txt").is_file()
+    assert _epic_qa_family(repo) == qa_family
+    _checks(repo)
+
+    # The given results replace the whole family; a stale member leaves with its rows.
+    _success(_epic_close_program(repo, 'publish_epic_close(("close-pack-check",))'))
+    assert not (repo / f"{EPIC_CLOSE_ROOT}/close/evidence-index-check").exists()
+    assert f"{EPIC_CLOSE_ROOT}/close/evidence-index-check/primary.log" not in _index_rows(repo)
+    assert _epic_qa_family(repo) == qa_family
+    _checks(repo)
+
+
+def test_epic_close_run_publication_refuses_scope_and_restores_on_failure(epic_close_repo: Path) -> None:
+    repo = epic_close_repo
+    before = _whole_tree_state(repo, metadata=True)
+    _success(_epic_close_program(repo, '''
+for selected in (
+    qa.HarnessConfig("HDE-EPIC040", repo_root=writer.ROOT),
+    qa.HarnessConfig(crd_id="HDE-CRD-0002", repo_root=writer.ROOT),
+):
+    try:
+        writer.publish_epic_close_run_family(selected, (observed(),))
+    except ValueError as exc:
+        assert "admits only HDE-EPIC041" in str(exc)
+    else:
+        raise AssertionError("unadmitted close-run publication was accepted")
+try:
+    writer.publish_crd_close_run_family(config, (observed(),))
+except ValueError as exc:
+    assert "admits only HDE-CRD" in str(exc)
+else:
+    raise AssertionError("the CRD entrypoint accepted an Epic")
+try:
+    publish_epic_close(("close-pack-check", "close-pack-check"))
+except ValueError as exc:
+    assert "duplicate" in str(exc)
+else:
+    raise AssertionError("duplicate check IDs were accepted")
+cited = qa.CheckResult(
+    "close-pack-check", qa.Status.PASS, command=("true",), exit_code=0, output="ok",
+    command_provenance="fixture", evidence_artifacts=("audit/qa/hde-epic041/checks/close-pack-check/primary.log",),
+)
+try:
+    writer.publish_epic_close_run_family(config, (cited,), captured_at_utc=timestamp)
+except ValueError as exc:
+    assert "must not name its own checks/ or close/ primary" in str(exc)
+else:
+    raise AssertionError("a close-run result citing its own checks/ primary was accepted")
+def broken():
+    raise RuntimeError("fixture verifier failure")
+try:
+    publish_epic_close(coherence_verifier=broken)
+except RuntimeError as exc:
+    assert "fixture verifier failure" in str(exc)
+else:
+    raise AssertionError("verifier failure was not raised")
+'''))
+    assert _whole_tree_state(repo, metadata=True) == before
+
+
+def test_epic_close_run_publication_requires_the_recorded_qa_family(epic_close_repo: Path) -> None:
+    repo = epic_close_repo
+    (repo / f"{EPIC_CLOSE_ROOT}/qa_step_logs_manifest.json").unlink()
+    before = _whole_tree_state(repo, metadata=True)
+    refused = _epic_close_program(repo, "publish_epic_close()")
+    assert refused.returncode != 0
+    assert "requires a recorded QA step-logs manifest" in refused.stderr
+    assert _whole_tree_state(repo, metadata=True) == before
+
+
+def test_epic_close_run_family_refuses_an_unexpected_member(epic_close_repo: Path) -> None:
+    repo = epic_close_repo
+    _success(_epic_close_program(repo, "publish_epic_close()"))
+    stray = repo / f"{EPIC_CLOSE_ROOT}/close/close-pack-check/notes.txt"
+    stray.write_text("not a primary\n", encoding="utf-8")
+    result = _run(repo, "tools/evidence/update_evidence_index.py", "--check")
+    assert result.returncode != 0
+    assert "Epic close-run family has an unexpected member" in result.stderr
+    stray.unlink()
+    primary = repo / f"{EPIC_CLOSE_ROOT}/close/close-pack-check/primary.log"
+    primary.write_text(primary.read_text(encoding="utf-8").replace('"status":"PASS"', '"status":"PASS" '), encoding="utf-8")
+    result = _run(repo, "tools/evidence/update_evidence_index.py", "--check")
+    assert result.returncode != 0

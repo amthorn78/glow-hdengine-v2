@@ -6068,3 +6068,95 @@ def test_unknown_source_schema_version_keeps_the_v1_refusal(
     repo, source_rel = _init_v2_repo(tmp_path, source)
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:SOURCE_SCHEMA_INVALID"
+
+
+# --- HDE-EPIC041 CL-05 close-tooling repair: B-1 (Epic tracked-issue IDs) and B-2 (Epic close-run pointer) ---
+EPIC041_TI = "ISSUE-EPIC041-TI-01"
+
+
+def _epic041_with_ledger_ids(tmp_path: Path, source: dict[str, object], *ids: str) -> tuple[Path, str]:
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    drains = repo / _ledger_paths("HDE-EPIC041")["drain_targets"]
+    drains.write_text(drains.read_text(encoding="utf-8") + "".join(f"- {i}: tracked issue\n" for i in ids), encoding="utf-8")
+    _commit_all(repo, "name the tracked issues in the drain-targets ledger")
+    return repo, source_rel
+
+
+def test_b1_schema_admits_epic_scoped_tracked_issue_ids_and_keeps_the_ti_form() -> None:
+    schema = json.loads((ROOT / close_pack.SCHEMA_V2_REL).read_text(encoding="utf-8"))
+    validator = Draft202012Validator(schema)
+    for identifier, valid in (
+        ("TI-002", True),
+        (EPIC041_TI, True),
+        ("ISSUE-EPIC041-TI-07", True),
+        ("TI-01", False),
+        ("ISSUE-CRD-0002-TI-01", False),
+        ("ISSUE-EPIC41-TI-01", False),
+        ("ISSUE-EPIC041-TI-1", False),
+        ("ISSUE-EPIC041-TI-01-X", False),
+    ):
+        source = _v2_source("HDE-EPIC041")
+        source["tracked_issues"] = [{"id": identifier, "adr_status": "Completed under this epic"}]
+        assert validator.is_valid(source) is valid, identifier
+
+
+def test_b1_epic_scoped_tracked_issue_renders_as_an_adr_status_line(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = _v2_source("HDE-EPIC041")
+    source["tracked_issues"] = [{"id": EPIC041_TI, "adr_status": "Completed under this epic"}]
+    repo, source_rel = _epic041_with_ledger_ids(tmp_path, source, EPIC041_TI)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    report = (repo / "audit/EPIC-041_close_report.md").read_text(encoding="utf-8")
+    assert f"- {EPIC041_TI} ADR status line: Completed under this epic" in report
+    _commit_all(repo, "commit epic v2 close pack")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
+
+
+@pytest.mark.parametrize("identifier", ("ISSUE-EPIC040-TI-01", "ISSUE-EPIC042-TI-01"))
+def test_b1_epic_scoped_tracked_issue_of_another_epic_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], identifier: str
+) -> None:
+    source = _v2_source("HDE-EPIC041")
+    source["tracked_issues"] = [{"id": identifier, "adr_status": "Completed under this epic"}]
+    repo, source_rel = _epic041_with_ledger_ids(tmp_path, source, identifier)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:TRACKED_ISSUE_UNBOUND"
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+
+def test_b2_epic_may_point_to_its_own_close_run_directory_before_it_exists(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = _v2_source("HDE-EPIC041")
+    source["pointers"].append("audit/qa/hde-epic041/close/")
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert not (repo / "audit/qa/hde-epic041/close").exists()
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    report = (repo / "audit/EPIC-041_close_report.md").read_text(encoding="utf-8")
+    assert "- `audit/qa/hde-epic041/close/`" in report
+    _commit_all(repo, "commit epic v2 close pack")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
+
+
+@pytest.mark.parametrize(
+    "pointer", ("audit/qa/hde-epic040/close/", "audit/qa/hde-crd-0002/close/", "audit/qa/hde-epic041/closed/")
+)
+def test_b2_an_absent_close_run_directory_of_another_change_stays_unresolved(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], pointer: str
+) -> None:
+    source = _v2_source("HDE-EPIC041")
+    source["pointers"].append(pointer)
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:POINTER_UNRESOLVED"
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+
+def test_b2_an_epic_close_run_pointer_stays_optional(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = _v2_source("HDE-EPIC041")
+    assert "audit/qa/hde-epic041/close/" not in source["pointers"]
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
