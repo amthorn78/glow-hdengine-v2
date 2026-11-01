@@ -28,8 +28,17 @@ from .vendor_client import HdApiClient, VendorError, VendorRequest
 # long-term identity model and should be revisited once a proper user system is
 # available. The `user_id` here is purely an internal durability anchor for our
 # own database row; the vendor never sees this value.
+#
+# The two Live QA synthetic stored people, SYN-A and SYN-B, are registered here
+# so their identities have one home in code (docs/run/EPIC011_TEST_IDENTITIES.md,
+# "Live QA synthetic stored people"). Each UUID equals uuid5(NAMESPACE_URL,
+# alias), so these entries change no resolution result. Store and query them by
+# UUID, never by alias: a row stored under the alias carries an alias label that
+# the production Reader, which looks rows up by UUID, does not accept.
 SYNTHETIC_USER_ID_MAP = {
     "epic011-s10-invariance-1": "3fa85f64-5717-4562-b3fc-2c963f66afab",
+    "hde-live-qa-synthetic-a": "9cff60ae-6eb6-5618-aec5-8acaa4f290d2",
+    "hde-live-qa-synthetic-b": "57f0c055-ff09-5fdb-aedb-def880437e6f",
 }
 
 
