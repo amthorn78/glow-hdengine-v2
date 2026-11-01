@@ -267,3 +267,20 @@ def test_s19_vendor_ingest_runner_passes_its_own_logs(monkeypatch, tmp_path, cap
     assert [(k["retry_log"], k["success_log"]) for k in seen] == [(paths["RETRY_LOG"], paths["SUCCESS_LOG"])] * 2
     assert len(paths["SUCCESS_LOG"].read_text(encoding="utf-8").splitlines()) == 2
     assert json.loads(capsys.readouterr().out)["artifacts"]["ingest_success"] is True
+
+
+def test_live_qa_synthetic_people_are_registered_and_resolve_to_their_uuids():
+    import uuid
+
+    from engine.bodygraph.ingest import SYNTHETIC_USER_ID_MAP, resolve_db_user_id
+
+    syn = {
+        "hde-live-qa-synthetic-a": "9cff60ae-6eb6-5618-aec5-8acaa4f290d2",
+        "hde-live-qa-synthetic-b": "57f0c055-ff09-5fdb-aedb-def880437e6f",
+    }
+    assert SYNTHETIC_USER_ID_MAP == {"epic011-s10-invariance-1": "3fa85f64-5717-4562-b3fc-2c963f66afab", **syn}
+    for alias, pinned in syn.items():
+        # The pinned UUID equals the uuid5 fallback, so registration changes no result.
+        assert pinned == str(uuid.uuid5(uuid.NAMESPACE_URL, alias))
+        assert resolve_db_user_id(alias) == pinned
+        assert resolve_db_user_id(pinned) == pinned
