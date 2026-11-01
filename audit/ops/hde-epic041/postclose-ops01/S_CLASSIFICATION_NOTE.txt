@@ -1,0 +1,9 @@
+HDE-EPIC041-POSTCLOSE-OPS01 v1.1 - step S classification note (outside ev/, which stays as sealed by SHA256SUMS)
+recorded_utc: 2026-11-01T20:16Z; executor: Claude Code session (Opus 5.5, max effort), PO-delegated; authority: Product Owner, 2026-11-01, "just run with writes. override any nits with authority"
+Raw step S output (ev/run.log): HEADER_TEXT_FOUND, secret_scan=LEAK; no SECRET_FOUND line for HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL or DATABASE_URL.
+What matched: only ev/w_store_a.out and ev/w_store_b.out (hdctl bg:resolve JSON), 7 matches each, all in the engine's redacted header-shape fields
+  ("header_posture": "Authorization: Bearer <redacted>", "HD-Geocode-Key: <redacted>"; base_url "<redacted>"). Every header value is the literal <redacted>.
+Fragment scan (counts only): 0 hits across 36 ev files, console log and pip log for the DATABASE_URL value, password, username and host; the HD_API_BASE_URL value and host;
+  and the full value, first 12 and last 12 characters of HD_API_KEY and GEO_API_KEY.
+Classification: not secret-bearing. HDE Governance s3.4 permits "header names, redacted values, ... redacted header-shape posture" and makes FAIL_TOOLING conditional on
+  "secret-bearing output is persisted". Predicate S's literal LEAK outcome is overridden under the PO authority above; no file was deleted, edited or re-sealed.
