@@ -1,0 +1,12 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"ac02-pure-module","check_name":"Pure Engine chart module purity and interface","claimed_tokens":[],"command":[["/tmp/hde-epic041-qa/venv/bin/python","-m","pytest","--version"],["/tmp/hde-epic041-qa/venv/bin/python","-m","pytest","tests/charts/test_chart_pure_purity.py","tests/charts/test_chart_pure_interface.py","-p","no:cacheprovider"]],"command_provenance":"epic wrapper readiness and test commands; exact ordered argv","evidence_artifacts":["audit/qa/hde-epic041/checks/ac02-pure-module/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-01T11:51:54Z"}
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/hde-epic041-qa/clone
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.17.0
+collected 13 items
+
+tests/charts/test_chart_pure_purity.py .....                             [ 38%]
+tests/charts/test_chart_pure_interface.py ........                       [100%]
+
+============================== 13 passed in 0.43s ==============================

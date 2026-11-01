@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic041/checks/d0-discovery/d0-entrypoint-preflight.txt
+size_bytes: 5999
+sha256: e13214d259ad9df3869ac48cca97338f8d6c918360d4f864bdd28092b9d5a1e5
+mtime_utc: 2026-11-01T11:51:06Z
+produced_at_utc: 2026-11-01T11:51:14Z

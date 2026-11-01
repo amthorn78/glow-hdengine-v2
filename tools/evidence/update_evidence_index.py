@@ -3366,6 +3366,79 @@ EPIC040_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC041_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic041.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic041/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "epic041.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic041_doc_deltas.md",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.00_meta.doc_deltas.md",
+        "discovered_physical_path": "audit/qa/hde-epic041/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.d0_discovery.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/d0-discovery/primary.log",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.d0_discovery.d0_env_rails.txt",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/d0-discovery/d0-env-rails.txt",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.d0_discovery.d0_entrypoint_preflight.txt",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/d0-discovery/d0-entrypoint-preflight.txt",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.d0_discovery.d0_gitignore_audit_qa.txt",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/d0-discovery/d0-gitignore-audit-qa.txt",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.d0_discovery.d0_caller_set.txt",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/d0-discovery/d0-caller-set.txt",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.step_0b_doc_delta_capture.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/step-0b-doc-delta-capture/primary.log",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.ac01_orchestration_entry.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/ac01-orchestration-entry/primary.log",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.ac02_pure_module.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/ac02-pure-module/primary.log",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.ac03_caller_migration.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/ac03-caller-migration/primary.log",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.ac05_tracked_files_unchanged.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/ac05-tracked-files-unchanged/primary.log",
+        "epic_id": "HDE-EPIC041",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic041.checks.qa_closeout_deliverables.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic041/checks/qa-closeout-deliverables/primary.log",
+        "epic_id": "HDE-EPIC041",
+    },
+]
+
 CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
     {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
@@ -4230,6 +4303,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC039_PR01_PRIMARY_ARTIFACTS,
             *EPIC039_QA_PRIMARY_ARTIFACTS,
             *EPIC040_QA_PRIMARY_ARTIFACTS,
+            *EPIC041_QA_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

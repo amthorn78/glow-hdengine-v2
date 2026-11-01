@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic041/checks/d0-discovery/d0-gitignore-audit-qa.txt
+size_bytes: 26
+sha256: 6a1f9ebcbe8a73891b7f27859df9492cd81a844270fae701cee9c3dd6afb48a2
+mtime_utc: 2026-11-01T11:51:06Z
+produced_at_utc: 2026-11-01T11:51:14Z

@@ -1,0 +1,24 @@
+expected (QA Audit):
+adapter/chart_orchestration.py
+ci/checks/classify_ci_changes.py
+engine/charts/pure.py
+scripts/make_compat_determinism_artifacts.py
+tests/adapter/test_chart_orchestration.py
+tests/charts/test_chart_loader_import_guard.py
+tests/charts/test_chart_pure_interface.py
+tests/charts/test_chart_pure_purity.py
+tests/loader/test_load_chart_fixture_only.py
+tests/loader/test_loader_logs_keys_only.py
+tests/scripts/test_make_compat_determinism_artifacts.py
+observed:
+adapter/chart_orchestration.py
+ci/checks/classify_ci_changes.py
+engine/charts/pure.py
+scripts/make_compat_determinism_artifacts.py
+tests/adapter/test_chart_orchestration.py
+tests/charts/test_chart_loader_import_guard.py
+tests/charts/test_chart_pure_interface.py
+tests/charts/test_chart_pure_purity.py
+tests/loader/test_load_chart_fixture_only.py
+tests/loader/test_loader_logs_keys_only.py
+tests/scripts/test_make_compat_determinism_artifacts.py

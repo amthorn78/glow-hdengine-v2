@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic041/checks/d0-discovery/d0-caller-set.txt
+size_bytes: 921
+sha256: 4bf04d25487e0955177d308ee3430a6d6d6ef66138c198f3d4a777834bf89292
+mtime_utc: 2026-11-01T11:51:06Z
+produced_at_utc: 2026-11-01T11:51:14Z
