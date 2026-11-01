@@ -7,7 +7,7 @@ status: "DRAFT for Product Owner review. The role does not exist until the Produ
 requested_by: "Nathan (Product Owner), 2026-11-01"
 change_id: "None yet. The Product Owner assigns the change (CRD or Epic) that will carry an adopted design into canon and code."
 repository_head_read: "amthorn78/glow-hdengine-v2 origin/main 43bac5f1 (HDE Build Notes v14.0.5; release 1.3.0, release_id 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e); amthorn78/glow-docs edaa34c (docs/hd_refs, Human Design Reference Index v1.2.0)"
-revision_note: "Revised before merge, 2026-11-01, with the Product Owner's directions on glow-docs access and on sources for mathematics (§2.2, §2.4, §3)."
+revision_note: "Revised before merge, 2026-11-01, with the Product Owner's directions on glow-docs access, on sources for mathematics, and on the aura and composite source routes (§2.2, §2.4, §3, D-3, §11, Q-3)."
 recorded: "2026-11-01T22:51Z"
 producer: "Isis, continuing Lead Developer for HDE-EPIC041 (https://claude.ai/code/session_01Q789tyhUaytmY7x273kwes)"
 ---
@@ -16,9 +16,11 @@ producer: "Isis, continuing Lead Developer for HDE-EPIC041 (https://claude.ai/co
 
 **Model and reasoning setting**
 
-- **TypeSafe v8.2 (revised brief): Fable 5.1 at extra high.** Effort score 3.32 (confidence 0.63); rung probabilities low 0.00, medium 0.00, high 0.11, extra high 0.46, max 0.42, ultracode 0.01. Model probabilities Fable 5.1 0.53, Opus 5.5 0.46, Sonnet 5.5 0.01, Haiku 5.5 0.00 (confidence 0.37). Twenty-four cells, computed from the two answers: Fable 5.1 at low 0.000, Fable 5.1 at medium 0.000, Fable 5.1 at high 0.058, Fable 5.1 at extra high 0.244, Fable 5.1 at max 0.223, Fable 5.1 at ultracode 0.005, Opus 5.5 at low 0.000, Opus 5.5 at medium 0.000, Opus 5.5 at high 0.051, Opus 5.5 at extra high 0.212, Opus 5.5 at max 0.193, Opus 5.5 at ultracode 0.005, Sonnet 5.5 at low 0.000, Sonnet 5.5 at medium 0.000, Sonnet 5.5 at high 0.001, Sonnet 5.5 at extra high 0.005, Sonnet 5.5 at max 0.004, Sonnet 5.5 at ultracode 0.000, Haiku 5.5 at low 0.000, Haiku 5.5 at medium 0.000, Haiku 5.5 at high 0.000, Haiku 5.5 at extra high 0.000, Haiku 5.5 at max 0.000, Haiku 5.5 at ultracode 0.000. Flags: boundary between max and extra high; model near tie between Fable 5.1 and Opus 5.5. Sent 2026-11-01T22:58:52Z. Nathan picks the cell.
+- **TypeSafe v8.2 (current text): Fable 5.1 at extra high.** Effort score 3.30 (confidence 0.65); rung probabilities low 0.00, medium 0.00, high 0.10, extra high 0.49, max 0.40, ultracode 0.01. Model probabilities Fable 5.1 0.57, Opus 5.5 0.42, Sonnet 5.5 0.01, Haiku 5.5 0.00 (confidence 0.43). Twenty-four cells, computed from the two answers: Fable 5.1 at low 0.000, Fable 5.1 at medium 0.000, Fable 5.1 at high 0.057, Fable 5.1 at extra high 0.279, Fable 5.1 at max 0.228, Fable 5.1 at ultracode 0.006, Opus 5.5 at low 0.000, Opus 5.5 at medium 0.000, Opus 5.5 at high 0.042, Opus 5.5 at extra high 0.206, Opus 5.5 at max 0.168, Opus 5.5 at ultracode 0.004, Sonnet 5.5 at low 0.000, Sonnet 5.5 at medium 0.000, Sonnet 5.5 at high 0.001, Sonnet 5.5 at extra high 0.005, Sonnet 5.5 at max 0.004, Sonnet 5.5 at ultracode 0.000, Haiku 5.5 at low 0.000, Haiku 5.5 at medium 0.000, Haiku 5.5 at high 0.000, Haiku 5.5 at extra high 0.000, Haiku 5.5 at max 0.000, Haiku 5.5 at ultracode 0.000. Flags: boundary between max and extra high; model near tie between Fable 5.1 and Opus 5.5. Sent 2026-11-01T23:03:30Z. Nathan picks the cell.
 - **Nathan's pick: Fable 5.1 at extra high** (2026-11-01: "I will run this in fable extra high").
-- **Earlier reading,** of the text before its revision: Fable 5.1 at extra high, score 3.27, sent 2026-11-01T22:53:12Z. Its action text said "about 480 lines" when the brief was 434.
+- **Earlier readings,** of earlier texts of this brief, all Fable 5.1 at extra high:
+  * score 3.27, sent 2026-11-01T22:53:12Z. Its action text said "about 480 lines" when the brief was 434;
+  * score 3.32, sent 2026-11-01T22:58:52Z, after the glow-docs and mathematics-source revision.
 
 Paste everything below the line into the session that will act in this role.
 
@@ -91,7 +93,18 @@ But it does not do what the product needs. You are asked to **design the updated
   * "Relationship/composite teaching is partial": PF08's examples and Design Resonance Mapping "do not establish a general compatibility score";
   * Type, Authority and Profile depth is not exhaustive.
 
-  Where the admitted sources do not support a rule you need, say so. Then either propose a rule clearly labelled as Glow product synthesis, or ask the Product Owner for a source.
+  Where the admitted sources do not support a rule you need, say so first.
+* **For aura and composite (relationship) doctrine only, two further routes are open** when the admitted collection does not provide (Product Owner, 2026-11-01). They apply to D-1 and D-2 where they concern how two charts connect, and to D-3:
+  1. **Search for authoritative outside sources.**
+     * Prefer primary teaching: Ra Uru Hu, the International Human Design School or Jovian Archive material.
+     * For each one, record its title, author, publisher or course, edition, and the location or URL with its access date. Record the exact passage you relied on.
+     * Label each claim "outside source". An outside source never overrides an admitted one; record any conflict.
+  2. **Build a carefully reasoned solution of your own,** by inference from Human Design theory.
+     * Label each claim "analyst inference".
+     * Tie every step of the inference to cited admitted doctrine, and state the rule that results.
+     * Present the result as Glow product synthesis, not as Human Design doctrine, and give the alternatives you rejected.
+  * **Either way,** the independent review checks these rules specifically, and the Product Owner decides whether to adopt them.
+  * **Every other domain keeps the admitted-collection rule above.** Outside sources there remain limited to mathematics.
 * **No invented doctrine, and no blank or example values presented as design.**
 * **Keep the v1 boundaries that still stand.** Make no claims about relationship quality or outcomes, and no medical, psychological, sexual, safety or destiny claims.
 * **Say plainly what you do not know.** List decisions for the Product Owner rather than assuming his answer.
@@ -107,6 +120,7 @@ Quoted from 2026-11-01:
 6. "this role does not yet exist."
 7. "this particular agent will also have access to glow-docs where they can use a resource docs/hd_refs"
 8. "it may use outside sources for mathematics if it helps"
+9. On aura and composite sources, if none of the admitted sources provide, it may "search for authoritative outside sources" or "Create a carefully orchestrated solution of its own via inferences that is supported by HD theory".
 
 The product canon (Glow Story) adds:
 * bands are "the user-visible signal";
@@ -224,7 +238,7 @@ For each requirement, the proposal must give:
 * **The pairing model.** A symmetric matrix of Type pairs, with integer contributions to the affected categories. Give the doctrine behind each cell, from the aura mechanics (for example, open and enveloping, or closed and repelling), and cite the source.
 * **Its limits.** State how much Type can move a score. It must not drown out the chart-specific mechanics.
 * **Where the doctrine is.** PF08 has no Type or aura chapters. Route Type through the Complete Guide first (index route M03), then the admitted specialists the index names: HD-TYPE-01, the Generators' Course, for Generator and Manifesting Generator; and HD-SELF-01. Body-to-other resonance (M15, HD-SYN-02) "establishes no app compatibility score", so do not use it as one.
-* **If the admitted sources do not support a Type pairing,** state the gap. Then propose a labelled Glow product rule, or ask for a source (Q-3).
+* **If the admitted sources do not support a Type pairing,** state the gap. Then use one of the two routes in §2.4: an authoritative outside source, or your own inference grounded in Human Design theory, labelled as such. Q-3 records which you used.
 
 ### D-4 Band calibration (after D-1 to D-3 are fixed)
 
@@ -301,7 +315,7 @@ The design must satisfy all of these:
 
 One proposal: `docs/ephemeral/HDE-M10V2-mechanics-proposal-v1.0.md`, in one pull request. It contains:
 1. **A summary:** what changes and why, with a before-and-after table of the measures in §4.3.
-2. **Definitions and grounding** for D-1 to D-6, with citations, and doctrine marked separately from product choices.
+2. **Definitions and grounding** for D-1 to D-6, with citations. Mark each rule as admitted doctrine, outside source or analyst inference (§2.4), and keep it separate from product choices. List every outside-source and inferred rule together, so the reviewer can check them.
 3. **The complete formula:**
    * inputs, features, and any new catalogs (centers, Types, pairing matrix);
    * signals, reductions and weights;
@@ -416,7 +430,7 @@ Steps 1 to 3 change no canon, code or data.
 * Do not let one feature count twice.
 * Do not change a public shape, or expose numbers.
 * Do not rely on older HDE Build Notes base versions, or on files outside the two repositories, as authority.
-* Do not use public web pages or outside summaries for Human Design doctrine. Outside sources are for mathematics only.
+* Do not use public web pages or outside summaries for Human Design doctrine. The exceptions are mathematics, and the aura and composite gaps, which follow the routes in §2.4.
 
 ## 12. Decisions for the Product Owner
 
@@ -425,8 +439,8 @@ The specialist recommends; the Product Owner decides.
 1. **Q-1.** What "relevant placement" means: reading (a), (b), (c), or a combination (D-1).
 2. **Q-2.** Whether planetary activations may become an input. That is a data change: the vendor adapter, the stored chart, and re-acquiring already-stored people.
 3. **Q-3.** Three questions:
-   * whether the admitted references support an aura-type pairing model;
-   * if they don't, which the index records as a likely gap, whether to adopt a clearly labelled Glow product rule or to acquire a dedicated partnership or composite source into `docs/hd_refs/`;
+   * whether the admitted references support an aura-type pairing model and the composite rules;
+   * where they don't, which route you used (an authoritative outside source, or your own inference) and whether to adopt the resulting rules. You might also recommend adding a source to `docs/hd_refs/`;
    * whether Manifesting Generator is its own Type.
 4. **Q-4.** How much Type may move a score.
 5. **Q-5.** Absolute or relative bands; global or per-category lines; the target mix.
