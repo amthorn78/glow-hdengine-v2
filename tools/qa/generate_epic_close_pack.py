@@ -2639,10 +2639,12 @@ def _require_v2_semantics(
         required_pointers.add(close_run)
     if not required_pointers <= pointers:
         raise _fail("POINTER_MISSING")
-    # Every pointer names a tracked file or a directory holding one; a CRD's close-run
-    # directory is written after the verdict, so it may not exist yet.
+    # Every pointer names a tracked file or a directory holding one; the change's own
+    # close-run directory is written after the close pack, so it may not exist yet. A CRD
+    # must point to it; an Epic may, once the updater admits its close run (HDE-EPIC041
+    # CL-05, close-tooling repair B-2).
     if any(
-        not (crd and pointer == close_run)
+        pointer != close_run
         and not (
             any(rel.startswith(pointer) for rel in tracked)
             if pointer.endswith("/")
@@ -2712,8 +2714,16 @@ def _require_v2_semantics(
         for item in source["deferrals"]
     ):
         raise _fail("DEFERRAL_POINTER_UNBOUND")
-    # A TI item maps only through an ADR status whose ID the ledger names (PO-35-11).
+    # A TI item maps only through an ADR status whose ID the ledger names (PO-35-11). An
+    # Epic-scoped ID (ISSUE-EPIC<NNN>-TI-<nn>, Plan Templates "Tracked Issues") names the
+    # source's own Epic (HDE-EPIC041 CL-05, close-tooling repair B-1).
     if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["tracked_issues"]):
+        raise _fail("TRACKED_ISSUE_UNBOUND")
+    if any(
+        str(item["id"]).startswith("ISSUE-")
+        and not str(item["id"]).startswith(f"ISSUE-{change_id.removeprefix('HDE-')}-TI-")
+        for item in source["tracked_issues"]
+    ):
         raise _fail("TRACKED_ISSUE_UNBOUND")
     # The supporting ledgers' minimum content (PO-35-12). The doc-deltas ledger states exactly
     # "Doc Deltas: None" or enumerates its deltas as list items, never both; the drain-targets

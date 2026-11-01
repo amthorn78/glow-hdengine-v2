@@ -651,7 +651,7 @@
     "ti_id": {
       "type": "string",
       "maxLength": 32,
-      "pattern": "^TI-[0-9]{3,}$"
+      "pattern": "^(?:TI-[0-9]{3,}|ISSUE-EPIC[0-9]{3}-TI-[0-9]{2,})$"
     },
     "causal_pointer": {
       "allOf": [
