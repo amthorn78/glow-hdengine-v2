@@ -4,9 +4,9 @@
 
 | Field | Value |
 | :---- | :---- |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-07/prep-r2` |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-07/prep-r3` |
 | Preparation outcome | `READY` |
-| Revision | `prep-r2` supersedes `prep-r1`, which is the parent commit on the branch ("docs(ephemeral): add T-07 PF27 redlines and proof log (gtwpe-20261101-pf10-v14-0-5)") and was never given to TW-APPLY-10. The proof log records why. |
+| Revision | `prep-r3` supersedes `prep-r2` (commit `bf5bb084`, applied as `apply-r1` in commit `4a033d4b`) after the Product Owner ruled CCR-5 on 2026-11-02 that the close pack goes after the decision to close is confirmed; it adds RL-16 to RL-18 and revises RL-10. `prep-r2` superseded `prep-r1` (commit `7061dc8a`, never applied). The proof log records both corrections. |
 | Preparer | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1 (Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live at the start of this step; page last edited 2026-10-09T11:05:22Z), run in the Claude Code cloud session https://claude.ai/code/session_01Q789tyeqMDbVqbUtqxA64b, which Nathan started for document task T-07 on 2026-11-02 |
 | Target (original) | `docs/pfcanon/PF27-Canon-Plan-Templates-v2.0.6.md`; in-document title `PF27-Canon-Plan-Templates`; version v2.0.6; git blob `c21096d78b9865bf5aa0c531eee701e462d71a50`; SHA-256 `850dc1a3c8294a0e0521f02cb7300fb05233beccb1ecadf611b41e8ea9adfb00`; 323,765 bytes; 3,938 lines; LF line endings |
 | Target baseline commit | `origin/main` `e2b7427ff418ca8f08f05587c4a541308a76da56`. The target blob is unchanged at `origin/main` `84d6d1cf` (checked 2026-11-02). |
@@ -302,9 +302,9 @@ The close-pack writer writes a close pack only at the close stage, at the end of
 ## Redline RL-10
 
 * Redline number: RL-10
-* Ledger rows: C-26
-* Source items: HDE Build Notes v14.0.5, addendum 2.15, R-4 (line 1770 'the close mutation set result'; table row 'Close mutation set | Not close-PR-ready', line 1781)
-* Change type: NEW_CANON (template field; context drainage)
+* Ledger rows: C-26, C-09
+* Source items: HDE Build Notes v14.0.5, addendum 2.15, R-4 (line 1770 'the close mutation set result'; table row 'Close mutation set | Not close-PR-ready', line 1781); and, for the Exit field, HDE Build Notes v14.0.5, addendum 2.2, R-3 first bullet (line 549), drained into §3B under CCR-5 alternative (A) (addendum 2.5, line 856), which the Product Owner selected in this session on 2026-11-02: "close pack should go after the decision to close is confirmed"
+* Change type: NEW_CANON (template field; context drainage) with CONSISTENCY (Exit field under the CCR-5 ruling)
 * Operation: `REPLACE`
 * Target document: `PF27-Canon-Plan-Templates`
 * Section path: "# **A) Glow Plan and Runbook Templates**" > "## 3B) Close Mutation Set Task Record (Template)" > "### Record fields (required)"
@@ -312,17 +312,17 @@ The close-pack writer writes a close pack only at the close stage, at the end of
 * Action: `REPLACE ONCE` the OLD block with the NEW block
 * Expected occurrence of OLD in the whole original: 1
 * First boundary and last boundary: the single original line 2261, which is the whole OLD block
-* Rationale: R-4 requires the close mutation set result to carry the live-test line and makes it not close-PR-ready on MISSING. This template's record fields define that record, so the field is added after Exit. The held Entries and exit subsection (H-06) is not touched.
+* Rationale: R-4 requires the close mutation set result to carry the live-test line and makes it not close-PR-ready on MISSING. This template's record fields define that record, so the field is added after Exit. Under the Product Owner's CCR-5 ruling the closure decision comes before the close mutation set, so the Exit field no longer names the closure decision; it names the Product Owner's merge of the close pull request, which §3B 'Dev, not Ops' already makes the point where the task's work lands. RL-16 and RL-18 change the matching Entries and exit bullets and the Entry field.
 * OLD: 58 bytes, SHA-256 `978134d7eaac48d11fe1a5b8ce3593e1c4c4553aa4d94a75d08d2190da14176f`; lines ending with two spaces: line 1
 
 ````text
 * **Exit:** the closure decision that judges the result.  
 ````
 
-* NEW: 248 bytes, SHA-256 `71c0daf1ffc3b683905787ce052351b3ba2111ac19d0bc07937ccbec4c918125`; lines ending with two spaces: lines 1, 2
+* NEW: 256 bytes, SHA-256 `c246c4bce8cb2c55dd6c5254c405f620ce38d6e9262941316671283a1b23b6a3`; lines ending with two spaces: lines 1, 2
 
 ````text
-* **Exit:** the closure decision that judges the result.  
+* **Exit:** the Product Owner's merge of the close pull request.  
 * **Live test:** `RAN` (and its evidence references), `WAIVED` (and the Product Owner's quoted words and date), or `MISSING`. With `MISSING`, the close mutation set is not close-PR-ready.  
 ````
 
@@ -461,7 +461,89 @@ When no live test ran, the report's first line is `No live test ran.`, and the r
 * **Live test:** `RAN` (and its evidence references), `WAIVED` (and the Product Owner's quoted words and date), or `MISSING`. With `MISSING`, the closure decision is not CLOSE.  
 ````
 
+## Redline RL-16
+
+* Redline number: RL-16
+* Ledger rows: C-09
+* Source items: HDE Build Notes v14.0.5, addendum 2.2, R-3 first bullet (line 549), drained into §3B under CCR-5 alternative (A) (addendum 2.5, line 856), which the Product Owner selected in this session on 2026-11-02: "close pack should go after the decision to close is confirmed"
+* Change type: CONSISTENCY (CCR-5 alternative (A), Product Owner ruling)
+* Operation: `REPLACE`
+* Target document: `PF27-Canon-Plan-Templates`
+* Section path: "# **A) Glow Plan and Runbook Templates**" > "## 3B) Close Mutation Set Task Record (Template)" > "### Entries and exit (normative)"
+* Original location (informative): lines 2226–2227
+* Action: `REPLACE ONCE` the OLD block with the NEW block
+* Expected occurrence of OLD in the whole original: 1
+* First boundary: the complete original line 2226; last boundary: the complete original line 2227; the OLD block is that inclusive range
+* Rationale: R-3 places the close-pack write after the authorized QA verdict and the closure decision exist; these bullets placed the close mutation set before the closure decision. The Product Owner ruled CCR-5 for R-3 as written: the close pack goes after the decision to close is confirmed. The entry becomes a closure decision of CLOSE. The DO_NOT_CLOSE entry is removed because it existed only for a closure decision that judged a missing, incomplete or defective close mutation set, which the closure decision no longer does. The exit becomes the Product Owner's merge of the close pull request, where §3B 'Dev, not Ops' says the task's work lands. 'The task never reopens implementation, QA, or the closure decision' (line 2228) is unchanged.
+* OLD: 285 bytes, SHA-256 `715f045453f501807a6a718b557bedd3f7f0a845ad03a41f8b7bd4433b3bdc32`; lines ending with two spaces: lines 1, 2
+
+````text
+* **Entries:** the final QA Report with verdict PASS; or a closure decision of `DO_NOT_CLOSE` whose return work is the close mutation set, because the set is missing, incomplete, or defective.  
+* **Exit:** the closure decision, after the Product Owner merges the close pull request.  
+````
+
+* NEW: 232 bytes, SHA-256 `913870d4d494e0b788c7d751c91dd4909b41f9a20db8945921d414072395d4c7`; lines ending with two spaces: lines 1, 2
+
+````text
+* **Entry:** a closure decision of `CLOSE` for the change. The close mutation set, the close pack included, is written only after that decision confirms the close.  
+* **Exit:** the Product Owner's merge of the close pull request.  
+````
+
+## Redline RL-17
+
+* Redline number: RL-17
+* Ledger rows: C-09
+* Source items: HDE Build Notes v14.0.5, addendum 2.2, R-3 first bullet (line 549), drained into §3B under CCR-5 alternative (A) (addendum 2.5, line 856), which the Product Owner selected in this session on 2026-11-02: "close pack should go after the decision to close is confirmed"
+* Change type: CONSISTENCY (CCR-5 alternative (A), Product Owner ruling)
+* Operation: `REPLACE`
+* Target document: `PF27-Canon-Plan-Templates`
+* Section path: "# **A) Glow Plan and Runbook Templates**" > "## 3B) Close Mutation Set Task Record (Template)" > "### Authority and actor (normative)"
+* Original location (informative): line 2239
+* Action: `REPLACE ONCE` the OLD block with the NEW block
+* Expected occurrence of OLD in the whole original: 1
+* First boundary and last boundary: the single original line 2239, which is the whole OLD block
+* Rationale: With the closure decision before the close mutation set, the closure authority can no longer judge the task's result at the closure decision. The bullet now places the task after Isis's decision to close and keeps the Product Owner as the only merger.
+* OLD: 105 bytes, SHA-256 `99c86c6500b1c681d27ebd58999dce6689135395c2e1cb050a9453b99d103e83`; lines ending with two spaces: none
+
+````text
+* The closure authority (Isis) judges its result at the closure decision. The Product Owner alone merges.
+````
+
+* NEW: 161 bytes, SHA-256 `2224e9f3f9966da76351ce6a77e20932e452fad14d3474ee600c2dd48142b8e8`; lines ending with two spaces: none
+
+````text
+* The task starts only after the closure authority (Isis) has decided to close the change, and it does not revisit that decision. The Product Owner alone merges.
+````
+
+## Redline RL-18
+
+* Redline number: RL-18
+* Ledger rows: C-09
+* Source items: HDE Build Notes v14.0.5, addendum 2.2, R-3 first bullet (line 549), drained into §3B under CCR-5 alternative (A) (addendum 2.5, line 856), which the Product Owner selected in this session on 2026-11-02: "close pack should go after the decision to close is confirmed"
+* Change type: CONSISTENCY (CCR-5 alternative (A), Product Owner ruling)
+* Operation: `REPLACE`
+* Target document: `PF27-Canon-Plan-Templates`
+* Section path: "# **A) Glow Plan and Runbook Templates**" > "## 3B) Close Mutation Set Task Record (Template)" > "### Record fields (required)"
+* Original location (informative): line 2255
+* Action: `REPLACE ONCE` the OLD block with the NEW block
+* Expected occurrence of OLD in the whole original: 1
+* First boundary and last boundary: the single original line 2255, which is the whole OLD block
+* Rationale: The record's Entry field restates the task's entry, so it follows RL-16: the closure decision of CLOSE, by exact source.
+* OLD: 154 bytes, SHA-256 `bd3f2dfbee366f4b59302027e8f56b36dab41a991e23c1272dbb2be1068be2f6`; lines ending with two spaces: line 1
+
+````text
+* **Entry:** the final QA Report with verdict PASS, or the `DO_NOT_CLOSE` closure decision whose return work is the close mutation set, by exact source.  
+````
+
+* NEW: 79 bytes, SHA-256 `5d3357bb8f4d2e76afd81a81c149c7d8b2442d8f40cfc502d1729fcabf39583f`; lines ending with two spaces: line 1
+
+````text
+* **Entry:** the closure decision of `CLOSE` for the change, by exact source.  
+````
+
 ## Batch check
+
+Rows are in original-document order; redlines above are in ID order.
 
 | Redline | Original lines | OLD count (expected / observed) | Span start–end (character offsets in the original) |
 | :---- | :---- | :---- | :---- |
@@ -474,6 +556,9 @@ When no live test ran, the report's first line is `No live test ran.`, and the r
 | RL-07 | 1312 | 1 / 1 | 161547–162110 |
 | RL-08 | 1450–1453 | 1 / 1 | 176395–178345 |
 | RL-09 | 1459 | 1 / 1 | 180321–180705 |
+| RL-16 | 2226–2227 | 1 / 1 | 242168–242453 |
+| RL-17 | 2239 | 1 / 1 | 243383–243488 |
+| RL-18 | 2255 | 1 / 1 | 244786–244940 |
 | RL-10 | 2261 | 1 / 1 | 245520–245578 |
 | RL-11 | 3120 | 1 / 1 | 278628–278711 |
 | RL-12 | 3218 | 1 / 1 | 284474–284820 |
@@ -481,6 +566,6 @@ When no live test ran, the report's first line is `No live test ran.`, and the r
 | RL-14 | 3447 | 1 / 1 | 295485–295549 |
 | RL-15 | 3560 | 1 / 1 | 300089–300119 |
 
-No two spans intersect or share a boundary, no redline anchors on text another redline produces, and the 15 redlines apply in one pass against the unchanged original. The proof log records the validation and the one-pass simulation.
+No two spans intersect or share a boundary, no redline anchors on text another redline produces, and the 18 redlines apply in one pass against the unchanged original. The proof log records the validation and the one-pass simulation.
 
 END OF REDLINES
