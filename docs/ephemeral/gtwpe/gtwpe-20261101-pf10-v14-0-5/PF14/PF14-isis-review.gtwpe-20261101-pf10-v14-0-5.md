@@ -1,7 +1,7 @@
 ---
 artifact_type: REVIEW_RECORD
 artifact_id: HDE-GTWPE-T05-ISIS-REVIEW
-artifact_version: "1.0"
+artifact_version: "1.1"
 subject: Isis review of the T-05 brief's two items (the HDE Mechanics Guide §37.17 snapshot root, and the a3 marker and release-sanity stage 04 as GATE:CORE-DET evidence), with a draft HDE Build Notes addendum 2.1
 responds_to: HDE-GTWPE-T05-ISIS-REVIEW-BRIEF v1.0, docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF14/PF14-isis-review-brief.gtwpe-20261101-pf10-v14-0-5.md, branch claude/gtwpe-triage-authoring-j94ewf, commit f28c9e3
 requested_by: Nathan / Product Owner, 2026-11-02 ("Follow this, BUT i want the new addendum numbered 2.1. It will go in the next post drained PF10 document.")
@@ -10,11 +10,16 @@ decision_owner: Product Owner
 repository_head_read: origin/main 84d6d1cad95c67788336d174dc4b8922d9bb0cb2
 gtwpe_branch_head_read: 97938c448584533199d9d01638b1ea1ff986af59. The brief, the HDE Governance v2.8.10 draft and the HDE Mechanics Guide v3.5.10 draft are unchanged from f28c9e3. Later commits touch only PF07, the LEDGER and a T-01 follow-up redline for Appendix D.4
 created_at: 2026-11-02T03:17:00Z
+product_owner_decision: 2026-11-02, Nathan, "recommendations accepted" (Q-2b option A; Q-2a correct the fact and status; Q-1 option B with the currency condition)
+revision_note: v1.1 records the Product Owner's decision and fills the two decision fields of draft addendum 2.1. No recommendation, fact or rule text changed from v1.0
+updated_at: 2026-11-02T03:25:00Z
 ---
 
 # T-05 open items: Isis review
 
 ## 1. Result
+
+**Product Owner decision, 2026-11-02:** "recommendations accepted". All three recommendations below are decided. Addendum 2.1 (§7) is final text. It takes effect as canon when published in the next PF10 base version.
 
 | # | Question | Recommendation | Changes canon | Where the decision is recorded |
 | :- | :- | :- | :- | :- |
@@ -158,7 +163,7 @@ Nathan placed the addendum: number 2.1, in the next PF10 base version after v14.
 
 **Why no ADR.** Change Process Guide §1.0.5 requires an ADR for a CRD that changes canon. This is a Product Owner decision outside a CRD, as the earlier addendum was.
 
-**Two fields need the Product Owner's decision before publication.** The draft marks them `<…>`: the decision date and the decision quote. Everything else is final text.
+**The decision fields are filled.** v1.0 left two fields open, the decision date and the decision quote. v1.1 fills both from the Product Owner's decision of 2026-11-02.
 
 ## 7. Draft HDE Build Notes addendum 2.1
 
@@ -168,9 +173,9 @@ The text between the two rules below is the addendum, ready to paste into the ne
 
 ## 2.1 GATE:CORE-DET closed-rails evidence includes release-sanity stage 04, the lower-case a3 marker is a current checked output, and HDE Mechanics Guide §37.17 names the governed architecture snapshot
 
-Timestamp: 110226 03:17 (UTC). Details:
+Timestamp: 110226 03:25 (UTC). Details:
 
-* What this records. The Product Owner's decision of \<decision date\> on two items found while draining into HDE Mechanics Guide. No code, test or evidence changes.  
+* What this records. The Product Owner's decision of 2026-11-02 on two items found while draining into HDE Mechanics Guide. No code, test or evidence changes.  
 * What this decides.  
   * Release-sanity stage 04 is GATE:CORE-DET closed-rails evidence (R-1).  
   * The lower-case a3 marker's history is corrected, and so is its status (R-2).  
@@ -178,7 +183,7 @@ Timestamp: 110226 03:17 (UTC). Details:
 
 ### Decision and approval status
 
-* Decision. The Product Owner \<decision quote\>, adopting the recommendations of review record HDE-GTWPE-T05-ISIS-REVIEW v1.0: option A for stage 04 and the a3 marker, and option B with the currency condition for §37.17.  
+* Decision. The Product Owner answered "recommendations accepted" on 2026-11-02. This adopts the recommendations of review record HDE-GTWPE-T05-ISIS-REVIEW v1.1: option A for stage 04 and the a3 marker, and option B with the currency condition for §37.17.  
 * Status. Proposed. The rules take effect as canon when this addendum is published in HDE Build Notes.  
 * Relation to other canon.  
   * The GATE:CORE-DET pass conditions in HDE Governance §12.1 are unchanged.  
