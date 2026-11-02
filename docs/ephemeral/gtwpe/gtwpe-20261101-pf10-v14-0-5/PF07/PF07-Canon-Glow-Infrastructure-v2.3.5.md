@@ -836,7 +836,7 @@ PF07 records these paths as part of the HD Engine repo **inventory** only. It do
     
 * **HDE-Governance** and **HDE-Phased Epics** — acceptance tokens, EPIC-level goals, and remedial rails semantics.  
     
-  ---
+---
 
 ## **5.2 Glow Backend repo**
 
@@ -857,7 +857,6 @@ PF07 records these paths as part of the HD Engine repo **inventory** only. It do
   * **Production domain:** `glowme.io`  
   * **Preview domains:** **TBD**
 
->   
 > **Note:** Runtime endpoints (base URLs), databases, and schemas are recorded in **§4 Component maps** and **§7 Databases & Schemas** to avoid duplication.
 
 # 6\) Domains & DNS (names-only)
@@ -1161,7 +1160,7 @@ Recorded here to avoid drift; **not consumed by the Engine**. The Engine exposes
 * `ENGINE_DATA_MODE` — OPEN/TBD (dev: may be direct; prod: cached)  
 * `ENGINE_REFRESH_POLICY` — OPEN/TBD (scheduled | explicit | hybrid)  
     
-  ---
+---
 
 **BodyGraph and vendor tuning keys**
 
@@ -1173,7 +1172,7 @@ Recorded here to avoid drift; **not consumed by the Engine**. The Engine exposes
     
 * `CB_FAIL`, `CB_WINDOW_S`, `CB_COOLDOWN_S` — OPEN/TBD  
     
-  ---
+---
 
 **Notes**
 
@@ -1365,7 +1364,7 @@ The Notion board and pointers are operational metadata and navigation, not PF au
   * **Note:** HD Engine uses a **Railway app domain** (see §4.1), not a `glowme.io` subdomain.
 
 
-  ---
+---
 
 # **10\) Service start declarations**
 

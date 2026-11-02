@@ -1,19 +1,19 @@
-# PF07 application proof log — gtwpe-20261101-pf10-v14-0-5 — T-18 (apply-r2)
+# PF07 application proof log — gtwpe-20261101-pf10-v14-0-5 — T-18 (apply-r3)
 
 ## 1. Artifact and identity
 
 | Field | Value |
 | :---- | :---- |
-| Artifact produced | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF07/PF07-Canon-Glow-Infrastructure-v2.3.5.md`: the complete revised PF07, in-document title `PF07-Canon-Glow-Infrastructure`, v2.3.5, effective 2026-11-02, Last Update Gate `BN 14.0.5`; 101,233 bytes; 1,446 LF characters (1,447 lines; the last line has no final LF, as in the original); SHA-256 `b0ea03bb671f90c370d00e2796cc8fc8184475be36628e0c03909e3f8b091ebe` |
+| Artifact produced | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF07/PF07-Canon-Glow-Infrastructure-v2.3.5.md`: the complete revised PF07, in-document title `PF07-Canon-Glow-Infrastructure`, v2.3.5, effective 2026-11-02, Last Update Gate `BN 14.0.5`; 101,220 bytes; 1,445 LF characters (1,446 lines; the last line has no final LF, as in the original); SHA-256 `adbbf7ddf96b0604898367d36d94475691c8d703401758e9cbe12a3506de42b0` |
 | This proof log | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF07/PF07-Canon-Glow-Infrastructure-v2.3.5.proof-log.md` |
-| Package applied | `drain-r2`: `PF07-Canon-Glow-Infrastructure-v2.3.4.redlines.gtwpe-20261101-pf10-v14-0-5.r2.md` (blob `60e879806858`, SHA-256 `6b9fe687a715b69b7e0ace84f92ac342b2a54041d62918aab9af5cb4bb95443e`, 50,674 bytes) and its `.r2.proof-log.md` (blob `8ee07d25f95b`), at commit `286bc56`, read from the git object |
-| Supersedes | The apply-r1 output at commit `6cf30b8`: the same file name, blob `c6b91add8e8a`, SHA-256 `4768a06bef1483e618264c15ad8200db8bfbe978cf80348aaf717c9bf632a65e`, applied from package `drain-r1`, which held RL-01 to RL-04 only. That file and the apply-r1 proof log stay in git history at `6cf30b8`. The final file name is unchanged, because both runs derive v2.3.5 from v2.3.4. One writer, this session, owns both runs, as for T-08's r2 application. |
-| Why a second application | Nathan directed, on 2026-11-02 in this session, "you can fix the defects and discrepancies you noticed". The preparer issued `drain-r2` with RL-05 to RL-43 for observations O-1 to O-9, and this step validated the whole corrected package afresh against the unchanged original. |
+| Package applied | `drain-r3`: `PF07-Canon-Glow-Infrastructure-v2.3.4.redlines.gtwpe-20261101-pf10-v14-0-5.r3.md` (blob `079154dd1714`, SHA-256 `2f356457ec8abfbd5f4df4cb2c92a5cb762730be2889e9dfd9d9730e67ce0f3c`, 56,811 bytes) and its `.r3.proof-log.md` (blob `104e487ef059`), at commit `571d58c`, read from the git object |
+| Supersedes | The apply-r2 output at commit `ed56edb` (blob `bfea2c3b08e3`, SHA-256 `b0ea03bb671f90c370d00e2796cc8fc8184475be36628e0c03909e3f8b091ebe`, from `drain-r2`, RL-01 to RL-43), which itself superseded the apply-r1 output at `6cf30b8` (SHA-256 `4768a06bef1483e618264c15ad8200db8bfbe978cf80348aaf717c9bf632a65e`, from `drain-r1`, RL-01 to RL-04). Both files and their proof logs stay in git history at those commits. The final file name is unchanged, because every run derives v2.3.5 from v2.3.4. One writer, this session, owns all three runs, as for T-08's r2 application. |
+| Why a third application | Nathan directed, on 2026-11-02 in this session, "you can fix the defects and discrepancies you noticed" (drain-r2, RL-05 to RL-43) and then "yes fix those formatting lines" (drain-r3, RL-44 to RL-48). This step validated the whole r3 package afresh against the unchanged original. |
 | Applier | TW-APPLY-10 "Apply Validated Redlines", Prompt Version 100926.1, Notion page `3f44590a05eb81eebff6e3afa3d9aa5b` (last edited 2026-10-09T11:05:22Z), fetched live from Notion again when this step began |
 | Session | The Claude Code document session Nathan started for T-18 on 2026-11-02. No subagent, reviewer or other session was used. |
-| Apply run identity | `gtwpe-20261101-pf10-v14-0-5/T-18/apply-r2` |
-| Execution date | 2026-11-02 (UTC; application run at 2026-11-02T02:59Z) |
-| Outcome | Applied. Forty-six operations: forty-three content redlines and three derived document-control fields. |
+| Apply run identity | `gtwpe-20261101-pf10-v14-0-5/T-18/apply-r3` |
+| Execution date | 2026-11-02 (UTC; application run at 2026-11-02T03:08Z) |
+| Outcome | Applied. Fifty-one operations: forty-eight content redlines and three derived document-control fields. |
 | Publication | None. `docs/pfcanon/` is unchanged. The revised PF is not authoritative until Nathan transfers it. |
 
 ## 2. Inputs
@@ -21,17 +21,17 @@
 | Input | Identity |
 | :---- | :---- |
 | Original (application baseline) | `docs/pfcanon/PF07-Canon-Glow-Infrastructure-v2.3.4.md`, v2.3.4, git blob `60fd3f0b3feff007491dc7add29a9c4491cbdf95`, SHA-256 `9e00712a3af2c1b498b5dddf5ada35c72b44952293d3b73ec3915cbba586d790` (raw UTF-8 bytes), 99,393 bytes, 1,443 LF characters, no CR. Read from `origin/main` `84d6d1cad95c67788336d174dc4b8922d9bb0cb2` at application time, the same blob as the preparation baseline `e2b7427`. No drift. |
-| Preparer and run | TW-DRAIN-10 100926.1, run `gtwpe-20261101-pf10-v14-0-5/T-18/drain-r2`, this session |
-| Preparation and save outcome | `READY` / `COMPLETE_PACKAGE` (r2 proof log §10). No blocking dependency (§9 there). |
+| Preparer and run | TW-DRAIN-10 100926.1, run `gtwpe-20261101-pf10-v14-0-5/T-18/drain-r3`, this session |
+| Preparation and save outcome | `READY` / `COMPLETE_PACKAGE` (r3 proof log §7). No blocking dependency (§6 there). |
 | Source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, v14.0.5, git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`, SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`, unchanged at `84d6d1c` |
 | Selected units | 2.1 l.205–396 and l.491–516 (D-1 at l.225–276 added for O-1 by Nathan's direction); 2.8 l.1048–1145; 2.15 l.1650–1868 |
 | Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` at `a3632c0`; task T-18 (§8); rows C-02, C-03, C-17, C-18, C-26, and C-01 for O-1 |
-| Authorization for RL-05 to RL-43 | Nathan, 2026-11-02, this session: "you can fix the defects and discrepancies you noticed" |
+| Authorization for RL-05 to RL-48 | Nathan, 2026-11-02, this session: "you can fix the defects and discrepancies you noticed" (RL-05 to RL-43); "yes fix those formatting lines" (RL-44 to RL-48) |
 | Editorial standard | `docs/pfcanon/PF03-Reference-Technical-Writing-Best-Practices-v1.8.8.md`, v1.8.8, blob `504712df548a02f3aa4e7b8c37027385e46a3878` |
 
 ## 3. Applied operations and their basis
 
-Each content row states the preparer's source basis and rationale from the r2 redlines file. Where a redline's rationale reads "As RL-nn", the referenced rationale is written out.
+Each content row states the preparer's source basis and rationale from the r3 redlines file (RL-01 to RL-43 are byte-identical to r2). Where a redline's rationale reads "As RL-nn", the referenced rationale is written out.
 
 | ID | Original line(s) | Ledger row / observation | Basis and rationale |
 | :---- | :---- | :---- | :---- |
@@ -78,6 +78,11 @@ Each content row states the preparer's source basis and rationale from the r2 re
 | RL-41 | 1423 | None; Nathan-authorized fix (O-5) | PF03 §7 "Revision and retention rules" (formatting repair of indentation and malformed Markdown) and §8 (preserve heading hierarchy); Nathan's direction, 2026-11-02, in this session: "you can fix the defects and discrepancies you noticed". The two-space indent after a list item makes this heading part of that list item instead of a section heading. Removing it restores the heading. |
 | RL-42 | 1429 | None; Nathan-authorized fix (O-9) | PF06 in-document title `PF06-Canon-Change-Process-Guide`; PF03 §3 "Canonical ownership" (route by exact in-document title); Nathan's direction, 2026-11-02, in this session: "you can fix the defects and discrepancies you noticed". PF06's title is Change-Process-Guide; Epic-Process-Guide names no current document. Here: This mention uses the PF-numbered title form, so it takes PF06's full in-document title. |
 | RL-43 | 1438 | C-17 (QA roots); Nathan-authorized fix (O-8) | PF07 §0 "Intent & scope" (l.23: PF07 owns canonical root paths for QA trees); Nathan's direction, 2026-11-02, in this session: "you can fix the defects and discrepancies you noticed". §0 gives PF07 the canonical QA root paths, which §2.8 and §8.1 record, while §10.5 said PF07 owns no additional evidence root. §10.5 now names those patterns as the exception; layout, families and paths stay with their owners. |
+| RL-44 | 837-839 | None; Nathan-authorized fix (r2 proof log §7) | PF03 §7 "Revision and retention rules" (formatting repair of indentation and malformed Markdown when the complete source establishes the intended text); Nathan's direction, 2026-11-02, in this session: "yes fix those formatting lines". The horizontal rule is indented two spaces after a list item, so Markdown places it inside that list item instead of between sections. Removing the indent makes it a section separator like PF07's other rules. The line before it is blank, so the rule cannot become a setext heading underline. The OLD span takes the following lines because `  ---` occurs four times; those lines are unchanged. The heading `## **5.2 Glow Backend repo**` is reproduced unchanged. |
+| RL-45 | 858-859 | None; Nathan-authorized fix (r2 proof log §7) | PF03 §7 "Revision and retention rules" (formatting repair of indentation and malformed Markdown when the complete source establishes the intended text); Nathan's direction, 2026-11-02, in this session: "yes fix those formatting lines". The §5.3 note's blockquote opens with an empty quoted line (`>` and three spaces), which renders as a blank first line inside the quote. The empty line is removed; the note line itself is reproduced unchanged. |
+| RL-46 | 1161-1163 | None; Nathan-authorized fix (r2 proof log §7) | PF03 §7 "Revision and retention rules" (formatting repair of indentation and malformed Markdown when the complete source establishes the intended text); Nathan's direction, 2026-11-02, in this session: "yes fix those formatting lines". The horizontal rule is indented two spaces after a list item, so Markdown places it inside that list item instead of between sections. Removing the indent makes it a section separator like PF07's other rules. The line before it is blank, so the rule cannot become a setext heading underline. The OLD span takes the following lines because `  ---` occurs four times; those lines are unchanged. The label `**BodyGraph and vendor tuning keys**` is reproduced unchanged. |
+| RL-47 | 1173-1175 | None; Nathan-authorized fix (r2 proof log §7) | PF03 §7 "Revision and retention rules" (formatting repair of indentation and malformed Markdown when the complete source establishes the intended text); Nathan's direction, 2026-11-02, in this session: "yes fix those formatting lines". The horizontal rule is indented two spaces after a list item, so Markdown places it inside that list item instead of between sections. Removing the indent makes it a section separator like PF07's other rules. The line before it is blank, so the rule cannot become a setext heading underline. The OLD span takes the following lines because `  ---` occurs four times; those lines are unchanged. The label `**Notes**` is reproduced unchanged. |
+| RL-48 | 1365-1367 | None; Nathan-authorized fix (r2 proof log §7) | PF03 §7 "Revision and retention rules" (formatting repair of indentation and malformed Markdown when the complete source establishes the intended text); Nathan's direction, 2026-11-02, in this session: "yes fix those formatting lines". The horizontal rule is indented two spaces after a list item, so Markdown places it inside that list item instead of between sections. Removing the indent makes it a section separator like PF07's other rules. The line before it is blank, so the rule cannot become a setext heading underline. The OLD span takes the following lines because `  ---` occurs four times; those lines are unchanged. The heading `# **10\) Service start declarations**` is reproduced unchanged. |
 
 Derived document-control fields:
 
@@ -91,24 +96,25 @@ Unchanged header fields: Title `PF07-Canon-Glow-Infrastructure`; Status `Canon` 
 
 ## 4. Whole-batch validation (before any output byte was written)
 
-The saved r2 redlines file was parsed from the git object at `286bc56`. Each block's operation, expected count and two four-backtick literals were read from it, and all 43 content operations plus the three metadata edits were resolved against the unchanged original.
+The saved r3 redlines file was parsed from the git object at `571d58c`. Each block's operation, expected count and two four-backtick literals were read from it, and all 48 content operations plus the three metadata edits were resolved against the unchanged original.
 
-- All 46 OLD literals occur exactly once (expected 1, observed 1). Every operation is a `REPLACE` of whole original lines with a nonempty OLD and a NEW that differs. No `FIND_AND_REPLACE`, `INSERT` or `DELETE` is used, so the RL-045 preflight has nothing to reject.
-- The metadata spans are character offsets [68, 89), [110, 142) and [143, 176). The content spans match the r2 proof log §8 table exactly. All 46 spans are disjoint, and no content operation touches the header block (l.1–8).
+- All 51 OLD literals occur exactly once (expected 1, observed 1). Every operation is a `REPLACE` of whole original lines with a nonempty OLD and a NEW that differs. No `FIND_AND_REPLACE`, `INSERT` or `DELETE` is used, so the RL-045 preflight has nothing to reject.
+- The metadata spans are character offsets [68, 89), [110, 142) and [143, 176). The content spans match the r2 proof log §8 table and the r3 proof log §5 table exactly. All 51 spans are disjoint, and no content operation touches the header block (l.1–8).
 - Version, date and gate agree with one another and with the package's single recorded source.
 
 ## 5. Application and preservation
 
-- Applied once, in descending offset order, to the decoded original, without rematching changed text. UTF-8 in and out; LF line endings, no CR. Trailing double spaces, the two-space indents that are not redline targets, and the unterminated last line are all preserved.
-- Preservation: the output was rebuilt independently from the 47 untouched original intervals and the 46 payloads, and the two streams are identical. A walk of the output confirmed every untouched interval at its shifted offset: 90,895 of the original's 98,879 characters, all outside the 46 spans, are unchanged.
-- Cross-check with preparation: reverting the three header values in the output gives SHA-256 `642c5c1aff0a4c671120f58b82c3a68a400a311851d250ab6d5dbe35b7ea098a`, the one-pass result recorded in the r2 proof log §8. The content is therefore byte-identical to the validated package.
-- `git diff --no-index -U0` from the original to the saved output shows 48 hunks. That is 46 hunks for the 43 redlines (RL-04, RL-20 and RL-34 each make two, because an unchanged or added line separates their changes) plus two for the header (l.4; l.6–7). The diff was read in full, and nothing outside the planned edits differs.
+- Applied once, in descending offset order, to the decoded original, without rematching changed text. UTF-8 in and out; LF line endings, no CR. Trailing double spaces, the indentation of lines that are not redline targets, and the unterminated last line are all preserved.
+- Preservation: the output was rebuilt independently from the 52 untouched original intervals and the 51 payloads, and the two streams are identical. A walk of the output confirmed every untouched interval at its shifted offset: 90,596 of the original's 98,879 characters, all outside the 51 spans, are unchanged.
+- Cross-check with preparation: reverting the three header values in the output gives SHA-256 `01a97bb6023c0bdcc4f779a52f8ae6de1bb0d830b3da2d75e90d9965d532e8a0`, the one-pass result recorded in the r3 proof log §5. The content is therefore byte-identical to the validated package.
+- `git diff --no-index -U0` from the original to the saved output shows 53 hunks. That is 51 hunks for the 48 redlines (RL-04, RL-20 and RL-34 each make two, because an unchanged or added line separates their changes) plus two for the header (l.4; l.6–7). Against the verified apply-r2 output at `ed56edb`, the saved file differs in exactly five hunks: the four rules RL-44 and RL-46 to RL-48 dedent, and the empty quote line RL-45 removes. The apply-r2 diff against the original was read in full in that run, so together the two diffs account for every changed byte.
 - Post-application text checks:
   - each NEW occurs exactly once and no OLD survives;
   - `v2.3.4`, `2026-10-26` and `BN 13.8.8` are absent; `v2.3.5`, `2026-11-02` and `BN 14.0.5` each occur once;
   - ellipses: 0 ASCII three-period forms and 0 U+2026, against 8 and 1 in the original;
   - indented headings 0, and 82 section headings at the line start, against 68 in the original (the 14 restored). The r2 proof log's counts of 83 and 69 also counted the `#!/usr/bin/env bash` line inside the §10.1 code fence, which is not a heading;
   - code fence runs 6 / 6 and table rows 15 / 15 (original / output);
+  - lines that are exactly `  ---`: 0; empty quote lines: 0; top-level `---` rules: 24, against 20 in the original;
   - the output still ends `token names.` with no final LF.
 - Drafting-marker check: `TBD` 119 and `placeholder`/`Placeholder` 3, both as in the original; `TODO`, `FIXME`, `Draft`, `draft` and `Proposed` 0.
   - Every `TBD` and `OPEN/TBD` is the unconfirmed-fact value PF07's own rules require (PF07 §0 PF07-gap posture, §6.5 notes, §8 policy, §8.1 no-guess posture, §8.2.3 notes, §9 note).
@@ -123,11 +129,11 @@ These are text checks of the revised document, not product QA.
 - The revised PF is a working output under `docs/ephemeral/`. Apply does not edit `docs/pfcanon/` and publishes nothing.
 - Apply corrected nothing in the package. The two prompt roles stayed separate, in one session, as the handoff and Nathan's later direction allow.
 - The redlines change wording, routing, formatting and recorded inventory values only. They establish no implementation of 2.1 D-1, D-2 or D-3 (Candidate CRD Items List item 9 is open), no Live QA run, no QA verdict, acceptance, Ops, deployment or closure.
-- The r2 proof log §7 lists formatting items noticed during r2 that were left for Nathan: indented horizontal rules at l.837, l.1161, l.1173 and l.1365 of the original, and an empty blockquote line at l.858. Apply makes no change for them.
+- The formatting lines the r2 proof log §7 left open are fixed by RL-44 to RL-48. The two other §7 items, bold-wrapped headings and the "HDE-Schemas & Artifacts" title form, stay unchanged, as the r3 proof log §4 records.
 
 ## 7. Next manual action
 
-Nathan reviews the revised PF on draft PR amthorn78/glow-hdengine-v2#826 and, if he accepts it, transfers it into `docs/pfcanon/` himself. Nathan merges. No further prompt runs for T-18 unless Nathan directs a change to the items left in the r2 proof log §7.
+Nathan reviews the revised PF on draft PR amthorn78/glow-hdengine-v2#826 and, if he accepts it, transfers it into `docs/pfcanon/` himself. Nathan merges. No further prompt runs for T-18.
 
 ## 8. Save verification
 
@@ -135,7 +141,7 @@ Recorded after the revised PF was written and read back in full: whole-file SHA-
 
 | File | Bytes | SHA-256 | Read back |
 | :---- | :---- | :---- | :---- |
-| `PF07-Canon-Glow-Infrastructure-v2.3.5.md` | 101,233 | `b0ea03bb671f90c370d00e2796cc8fc8184475be36628e0c03909e3f8b091ebe` | Complete |
+| `PF07-Canon-Glow-Infrastructure-v2.3.5.md` | 101,220 | `adbbf7ddf96b0604898367d36d94475691c8d703401758e9cbe12a3506de42b0` | Complete |
 | This proof log | Not self-hashed | Not self-hashed | Complete, after this receipt was added |
 
 Save outcome: `COMPLETE_PACKAGE`.
