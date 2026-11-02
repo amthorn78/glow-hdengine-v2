@@ -1,5 +1,16 @@
 # GTWPE triage ledger — gtwpe-20261101-pf10-v14-0-5
 
+> ⚠️ **Corrected 2026-11-02.** The triage of 2026-11-01 (commit `142feb3`) gave no PF09 phase file a task.
+>
+> - It read addendum 2.14 U-3, a route statement about one artifact (the CL-E-40 candidate), as excluding all of PF09.
+> - It routed by named drain targets instead of by context and scope. That contradicts GTWPE-D3: "all pf docs should be updated based on context and scope, not whether or not the addenda specify a drain target".
+>
+> Nathan, 2026-11-02:
+>
+> > Why don't I have any session for PF09?? that is a SEVERE failure … Just because there is not routing in a sections is NOT grounds for exclusion. You are supposed to analyze by context.
+>
+> §8 records the contextual scan of every eligible document and the tasks it added (T-11 to T-18). H-01, H-02 and H-12 below are superseded or amended as marked. The original rows are kept as written.
+
 ## 1. Identity and coverage
 
 | Field | Value |
@@ -140,8 +151,8 @@ Completion fields. Each document session writes only its own task's block.
 
 | ID | Change (rows) | Disposition and evidence |
 | :---- | :---- | :---- |
-| H-01 | PF09.3 HDE-SEPA006 and .1 to .3 to Done; Phase III master status; R-01 to R-13 (C-14, C-23 to C-25) | No TW route. 2.14 U-3 (l.1593): "the Product Owner pastes the redlines manually … No Technical Writing flow route is authorized." Application is pending with the Product Owner. |
-| H-02 | PF09.4 optional Conjunction delivery note (C-23, C-24) | No change. 2.14 per-phase mapping (l.1612) records no change to HDE Build Checklist — Conjunction. |
+| H-01 | PF09.3 HDE-SEPA006 and .1 to .3 to Done; Phase III master status; R-01 to R-13 (C-14, C-23 to C-25) | **Superseded 2026-11-02; routed to T-13 (§8).** Original disposition, as written: No TW route. 2.14 U-3 (l.1593): "the Product Owner pastes the redlines manually … No Technical Writing flow route is authorized." Application is pending with the Product Owner. |
+| H-02 | PF09.4 optional Conjunction delivery note (C-23, C-24) | **Superseded 2026-11-02; routed to T-14 (§8).** Original disposition, as written: No change. 2.14 per-phase mapping (l.1612) records no change to HDE Build Checklist — Conjunction. |
 | H-03 | DELTA-003, HDE State of the Repository §2.2 (C-14, C-16, C-21) | No eligible TW home. PF31 is a Reference document other than PF03 and PF20, and 2.5 (l.855) calls the item a candidate that is not adopted. It is the Product Owner's. |
 | H-04 | HDE Reality Audits manual update for QA-10 #19 to #27 (C-14, C-21 P-6) | No TW task. It is a Product Owner manual action, and SUP-3 §4 records it as done by the Product Owner in Reality Audits v1.2.4. |
 | H-05 | AGENTS.md edits under D-1 and D-2 (C-01, C-02; l.266, l.324, l.507) | Not a PF target. It needs the Product Owner's explicit instruction. |
@@ -151,7 +162,7 @@ Completion fields. Each document session writes only its own task's block.
 | H-09 | PF05 §7.2.0 gap row under D-2 (C-02, l.322) | Held. It drains only "once the implementing change delivers", and item 9 is open. |
 | H-10 | Candidate CRD Items List item 9: its CRD identity and Specification (C-06) | Future authoring by the Product Owner. There is nothing to drain. |
 | H-11 | GCFPE prompt repair, MB-060 (C-28) | Owned by GCFPE management. It is not PF drainage. |
-| H-12 | HDE CRD Records (PF30.1) | Considered, with no task. 2.2 (l.576), 2.8 (l.1109) and 2.9 (l.1201) state no PF30 movement, and the HDE-CRD-0002 close-pack regeneration is not a new closure decision. |
+| H-12 | HDE CRD Records (PF30.1) | **Amended 2026-11-02.** No task, by Nathan's direction of 2026-11-02: "no, do NOT change historical CRD records". The contextual scan (§8) found the HDE-CRD-0002 record's residual-work text bearing on 2.1 (item 9, S19) and on HDE-SEPA006. Under that direction it is not changed. Original disposition, as written: Considered, with no task. 2.2 (l.576), 2.8 (l.1109) and 2.9 (l.1201) state no PF30 movement, and the HDE-CRD-0002 close-pack regeneration is not a new closure decision. |
 | H-13 | HD Engine Epics Map (PF16) | No task. It is deprecated and kept for history only, and no addendum names it. |
 | H-14 | M-1 to M-3 memo delivery and board update (C-22); 2.10 actionable lessons; A-1 to A-5; G-1 and G-2 | Not PF drainage. These are manual or process items with their recorded owners. |
 
@@ -176,3 +187,62 @@ Recorded as history for T-10, not as edits:
 | Continuation PR | pending |
 | Output root | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/` |
 | Concurrency rule | Fetch before every push. Rebase only your own unpushed commits onto the remote branch, then push. Never force-push, and never rewrite another session's commits. Write only inside your own task's subdirectory, and in this ledger only your own completion row (§4) and the continuation PR field. |
+
+## 8. Contextual scan and added tasks (2026-11-02)
+
+Basis:
+
+- GTWPE-D3 (`docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md`): every eligible document is updated on context and scope. No document is gated on a drain target, and a change is already represented only on a pass's verified finding.
+- Nathan's direction of 2026-11-02 (quoted above). Addendum 2.14 U-3 records how the CL-E-40 candidate was to be applied. It does not exclude PF09 from contextual drainage, and Nathan's direction routes PF09 to TW sessions.
+
+Method:
+
+- The baseline is unchanged. `main` moved to `84d6d1c`, but `docs/pfcanon/` is byte-identical to `e2b7427`. PF09.3 SHA-256 is still `4d3909e5…`, the CL-E-40 baseline.
+- Each eligible document was searched line by line for the identifiers, paths, error codes and terms that each addendum governs, for example:
+  - 2.1: `--allow-prod-vendor`, `PROVIDER_ROUTE_UNSUPPORTED`, "legacy BodyGraph fallback", `/api/compat/v1`, `build_release_attestation`, `json_gate`, S19;
+  - 2.2: `docs/ephemeral`, planning documents;
+  - 2.8 and 2.9: close-pack and close-run terms;
+  - 2.3 to 2.14: `engine/charts/loader`, `chart_orchestration`, `charts/pure`, HDE-SEPA006, HDE-EPIC041;
+  - 2.15: Live QA, open rails, `showcompat --source vendor`, synthetic people, `/internal/version`;
+  - 2.16: GATE:CORE-DET, `make_compat_determinism_artifacts`, `artifacts/cards/A3/IDENTITY_OK.txt`, `preimage_recompute`, AB/BA and two-run identity, `compat_public`.
+- The line numbers below are anchors from that search, against the baseline. The editor reads the whole target and decides every potentially affected row. These anchors are routing evidence, not a finding of what is already represented.
+
+| Task | Target (blob, bytes) | Rows | Context anchors in the target (baseline line numbers) | Uncertainty | Route | Expected final file |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| T-11 | `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.7.md` (`e8101489d5ba`, 141,980) | C-05, C-07, C-17, C-26, C-29; support C-30 | D-5 governed gate logs, `audit/gates/json_gate/canonical/` (440, 1557–1588); 2.2 (151); Live QA (593–679, 1164–1486, 2102); AB/BA, two-run identity, `artifacts/cli/preimage_recompute.log` (516, 821, 1915–2386) | Which identity-token rows rest on evidence that 2.16 R-2 retires | DRAIN-20, then APPLY-10 | `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.8.md` |
+| T-12 | `PF09.2-Canon-HDE-Build-Checklist-Dissolution-v1.2.4.md` (`1b4ff0a29d4a`, 93,651) | C-17, C-26, C-29; support C-30 | 2.16 R-1 CI owner test `tests/compat/test_compat_public_ab_ba_identity.py` and identity tokens (228–1629, 618, 624); Live QA and the PO-run `showcompat --source vendor` (176–1582, 1447); EPIC030 close-pack (174–180, 1588) | Identity-token rows and 2.16 R-1 | DRAIN-20, then APPLY-10 | `PF09.2-Canon-HDE-Build-Checklist-Dissolution-v1.2.5.md` |
+| T-13 | `PF09.3-Canon-HDE-Build-Checklist-Separation-v1.1.8.md` (`8b2dbf49081e`, 89,754) | C-12 to C-16, C-20 to C-25 (HDE-SEPA006 lineage); C-01 to C-06 (2.1); C-07 to C-11 (2.2); C-17, C-18; C-26; C-29; support SUP-4 (approved CL-E-40 candidate R-01 to R-13) | Phase III master status and notes (166, 172); HDE-SEPA005 (1159); HDE-SEPA006 and .1 to .3 (1280–1382); S19 findings "awaiting disposition" and `--allow-prod-vendor` (1167, 1170), which 2.1 disposes; 2.2 (1165–1175); Live QA (732–1270); close-pack (555, 827, 1169, 1316); identity tokens (531–1128) | The approved R-01 to R-13 (2.14) are source content to verify against the baseline and reuse, not a substitute for the six coverage duties. 2.14 U-2's Product-Owner-set document-control values give way to TW-APPLY-10's derivation under this route. | DRAIN-20, then APPLY-10 | `PF09.3-Canon-HDE-Build-Checklist-Separation-v1.1.9.md` |
+| T-14 | `PF09.4-Canon-HDE-Build-Checklist-Conjunction-v1.3.2.md` (`ce0431103ab7`, 112,798) | C-03, C-05, C-12 to C-25 (cross-references), C-17, C-18, C-26, C-29 | `/api/compat/v1` rows (479, 499, 533, 552) against D-3; governed gate families (1317–1361, 1887–1895); HDE-SEPA006 cross-references in the Phase IV notes, HDE-CONJ010 notes and the integration row (191, 2089, 2141), with the optional delivery note in 2.12 l.1441 and 2.13 O-3; close-pack (189, 1921–1996); Live QA (350–1809); `compat_public` and identity tokens (483–1891) | 2.14 l.1612 mapped no Conjunction change for the CL-E-40 candidate. That does not settle context-and-scope drainage. | DRAIN-20, then APPLY-10 | `PF09.4-Canon-HDE-Build-Checklist-Conjunction-v1.3.3.md` |
+| T-15 | `PF09.5-Canon-HDE-Build-Checklist-Fermentation-v1.6.1.md` (`9df823476491`, 201,483) | C-01, C-02, C-05, C-07, C-17, C-18, C-26, C-29 | Rows stating that non-v2 configured bases "preserve explicit legacy BodyGraph fallback", which D-2 supersedes (234–241, 2138–2164, 2442–2456, 2658–2717, 2787–2806, 2883); production vendor override (176, 1345, 1454–1455); gate rows (569); close-pack (198–248, 606–608, 2467); Live QA (167 onward, 88 lines); router identity tokens (891–2278) | Whether the router identity tokens are GATE:CORE-DET evidence | DRAIN-20, then APPLY-10 | `PF09.5-Canon-HDE-Build-Checklist-Fermentation-v1.6.2.md` |
+| T-16 | `PF09.6-Canon-HDE-Build-Checklist-Distillation-v1.1.9.md` (`ccac80507b5f`, 89,151) | C-01 to C-05, C-17, C-18, C-26, C-29; support C-30 | `artifacts/cards/A3/IDENTITY_OK.txt` (247), which 2.16 R-2 retires; PREIMAGE and identity tokens (219–247, 1569–1687); `/api/compat/v1` (1719–1721, 1794) against D-3; attestation builder (1068, 1985, 2011) against D-4; vendor override (951, 1722); route (725); gate rows (397, 1248); close-pack (173, 1074, 1796); Live QA (330–1718). 2.8 l.1095: three Distillation headings contain words that the feedback-dependency refusal rejects. | None beyond the ordinary row judgments | DRAIN-20, then APPLY-10 | `PF09.6-Canon-HDE-Build-Checklist-Distillation-v1.1.10.md` |
+| T-17 | `PF09.7-Canon-HDE-Build-Checklist-Coagulation-v1.1.9.md` (`a0334a379896`, 93,279) | C-01 to C-03, C-17, C-18, C-26, C-29 | HDE-COAG006.5 (1799); 2.1 l.373 says D-3 does not widen it. Vendor override (1468); route (701, 763, 1561, 1648, 1688; 1255 is a Magic10 "legacy fallback", a different meaning); HDE-COAG007.3 close-pack path-proof adjacency (1966–1992) against the 2.8 writer; Live QA and deployed checks (188–1904); identity tokens (353–1514) | A no-change outcome is plausible for some rows | DRAIN-20, then APPLY-10 | `PF09.7-Canon-HDE-Build-Checklist-Coagulation-v1.1.10.md` |
+| T-18 | `PF07-Canon-Glow-Infrastructure-v2.3.4.md` (`60fd3f0b3fef`, 99,393) | C-02, C-03, C-17, C-18, C-26 | `/api/compat/v1` posture (650) against D-3; EPIC036 route-policy history (504); `/internal/version` (215, 218, 647) against 2.15 R-1's deployed check; the canonical QA-tree roots that PF07 owns (§0) against 2.8's close-run family `audit/qa/<change-dir>/close/` | A NO_CHANGE result is plausible | DRAIN-10, then APPLY-10 | `PF07-Canon-Glow-Infrastructure-v2.3.5.md` |
+
+Prompt pages: TW-DRAIN-20 100926.1 is `3f44590a05eb815ebfd2cf992bec9862`. TW-DRAIN-10 and TW-APPLY-10 are as given in §4.
+
+Documents the scan found no bearing on:
+
+- PF01 HDE Math Spec: the only hit is a generic `/internal/version` mention (142).
+- PF03 Technical Writing Best Practices: a generic `docs/ephemeral` mention (202).
+- PF17 HDE Narratives Guide: generic A7 and `/internal/version` mentions (23, 106, 212, 841).
+
+They get no task.
+
+Documents with hits that keep no task:
+
+- PF23 Reality Audits holds Product Owner audit records (H-04).
+- PF30.1 has no task by Nathan's direction (H-12).
+- PF16 is deprecated (H-13).
+
+Completion fields for the added tasks. Each document session writes only its own row.
+
+| Task | Disposition | Outputs and proof logs | Commit(s) | Evidence or notes |
+| :---- | :---- | :---- | :---- | :---- |
+| T-11 | pending | pending | pending | pending |
+| T-12 | pending | pending | pending | pending |
+| T-13 | pending | pending | pending | pending |
+| T-14 | pending | pending | pending | pending |
+| T-15 | pending | pending | pending | pending |
+| T-16 | pending | pending | pending | pending |
+| T-17 | pending | pending | pending | pending |
+| T-18 | pending | pending | pending | pending |
