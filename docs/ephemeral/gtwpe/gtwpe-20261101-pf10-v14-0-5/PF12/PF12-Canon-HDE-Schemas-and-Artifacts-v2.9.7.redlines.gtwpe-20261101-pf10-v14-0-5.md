@@ -6,11 +6,11 @@
 | :---- | :---- |
 | Package | `PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.redlines.gtwpe-20261101-pf10-v14-0-5.md` |
 | Proof log | `PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md`, in the same directory |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5` / task T-04 / preparation revision r3. It supersedes r2 (commit `2a2325b`), which TW-APPLY-10 returned with the diagnostic `PF12-apply-diagnostic.gtwpe-20261101-pf10-v14-0-5.md` (commit `5716f60`), and r1 (commit `324de26`). The proof log records each correction. |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5` / task T-04 / preparation revision r4. It supersedes r3 (commit `4c859cc`), which TW-APPLY-10 applied (commit `5c10ee5`); r4 adds the corrections Nathan directed on 2026-11-02. r3 superseded r2 (commit `2a2325b`), which TW-APPLY-10 returned with the diagnostic `PF12-apply-diagnostic.gtwpe-20261101-pf10-v14-0-5.md` (commit `5716f60`), and r1 (commit `324de26`). The proof log records each correction. |
 | Prompt | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1 (Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live in this session) |
 | Preparer | One Claude Code session started by Nathan for T-04; no subagent, reviewer or other session took part |
 | Preparation outcome | `READY` |
-| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` at commit `142feb35144d8795f927e0c78b665ace52279064`; task T-04; rows C-04, C-05, C-10, C-17, C-18; uncertain C-07, C-29; supporting C-06, C-20 |
+| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` at commit `142feb35144d8795f927e0c78b665ace52279064`; task T-04; rows C-04, C-05, C-10, C-17, C-18; uncertain C-07, C-29; supporting C-06, C-20. Added by Nathan's direction of 2026-11-02: C-02, for PF12's own legacy-fallback wording |
 
 ## Original baseline (the only text these redlines bind to)
 
@@ -30,7 +30,7 @@
 | :---- | :---- |
 | Source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md` (HDE Build Notes), version v14.0.5 |
 | Identity | Git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`; SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`; 1,976 lines; read at `origin/main` `e2b7427` |
-| Selected units | 2.1 D-4 (lines 397–450), D-5 (451–490) and context (205–224, 491–516); 2.2 (517–561); 2.8 decisions and drainage table (1063–1106, 1111–1127); 2.16 status, R-1 and R-2 (1869–1939) |
+| Selected units | 2.1 D-2 (lines 277–344, added by Nathan's direction of 2026-11-02), D-4 (397–450), D-5 (451–490) and context (205–224, 491–516); 2.2 (517–561); 2.8 decisions and drainage table (1063–1106, 1111–1127); 2.16 status, R-1 and R-2 (1869–1939) |
 | Supporting reading only | 2.2 (562–588); 2.8 (1048–1062, 1107–1110, 1128–1145); 2.9 (1146–1229); 2.10 heading and first paragraph (1230–1232); 2.16 R-3 to end (1940–1976) |
 
 ## Document-control data for TW-APPLY-10
@@ -47,8 +47,8 @@ These redlines leave the header to TW-APPLY-10's derivation. The baseline header
 | Invocation tag | INV-f2ac55d77ce9aacc |
 
 - Version scheme: the third component increments once per revision (v2.9.5, v2.9.6, v2.9.7 in §§9.5 and 9.6). The expected derived version is v2.9.8.
-- Sources that justified this update, in source order: `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, version v14.0.5. No other source changed the target.
-- Revision-history entry: RL-11 adds §9.7 in PF12's own Doc-Delta record format, naming `document_version: "v2.9.8"` and `date: "2026-11-02"` (the preparation date). The record's `change_log_entry` also names `v2.9.8 / 2026-11-02`.
+- Sources that justified this update, in source order: `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, version v14.0.5. No other source file changed the target. Nathan's direction of 2026-11-02 authorizes RL-06, RL-07 and RL-09 as consistency and hygiene corrections; it is an authorization in this session, not a source file. HDE CRD Records was read in support of RL-07.
+- Revision-history entry: RL-17 adds §9.7 in PF12's own Doc-Delta record format, naming `document_version: "v2.9.8"` and `date: "2026-11-02"` (the preparation date). The record's `change_log_entry` also names `v2.9.8 / 2026-11-02`.
 - No redline below touches the header, the title, the status or the invocation tag.
 
 ## Literal-block convention
@@ -57,10 +57,11 @@ Each literal block below is fenced with five backticks and the info string `text
 
 ## Operations and application
 
-- Eleven redlines: nine `REPLACE` and two `INSERT`. No `DELETE` and no repeated-replacement operation.
+- Seventeen redlines: thirteen `REPLACE` and four `INSERT`. No `DELETE` and no repeated-replacement operation.
+- RL-06, RL-07 and RL-09 are consistency and hygiene corrections that Nathan directed on 2026-11-02 ("fix the defects and inconsistencies you noticed"); no other source justifies them.
 - Each `REPLACE` old block occurs exactly once in the original. Each `INSERT` gap is the single place where its BEFORE anchor is immediately followed by its AFTER anchor.
-- Resolve every locator against the unchanged original, then apply all eleven in one pass by original position. No redline's output is another redline's locator, and no two redlines touch or overlap.
-- RL-01 to RL-11 are listed in original-document order.
+- Resolve every locator against the unchanged original, then apply all seventeen in one pass by original position. No redline's output is another redline's locator, and no two redlines touch or overlap.
+- RL-01 to RL-17 are listed in original-document order.
 
 ## RL-01
 
@@ -199,6 +200,57 @@ Same-run close evidence for an admitted CRD or Epic (normative). For a CRD admit
 
 ## RL-06
 
+- Source rows: Product Owner direction 2026-11-02
+- Change type: CONSISTENCY
+- Operation: `REPLACE`
+- Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
+- Complete authored heading path (raw original heading lines, outermost first): `# **5\. Freeze-Pack Manifest (catalog/manifest.json) \[Required-Now\]**` > `## **5.3 Validation**` > `### **Current repository posture**`
+- Location within that section: the first paragraph under this heading
+- Original location: line 1959 (informative only; the exact old block below is the locator)
+- Expected occurrences of the exact old block in the original: 1 (observed: 1)
+
+Exact old block:
+
+`````text
+At the current inspected baseline, `catalog/manifest.json` is canonical JSON with `root: "catalog/"`, `version: "1.3.0"`, `built_at_utc: "2026-08-24T18:04:49Z"`, and exactly 45 unique ASCII-sorted members. Every row's recorded hash and size matches the baseline member bytes. The exact manifest digest and current `release_id` are `52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96`. This is a static byte-binding observation, not a new attestation, QA run, or deployment claim.
+`````
+
+Replacement block:
+
+`````text
+At the current inspected baseline, `catalog/manifest.json` is canonical JSON with `root: "catalog/"`, `version: "1.3.0"`, `built_at_utc: "2026-08-24T18:04:49Z"`, and exactly 45 unique ASCII-sorted members. Every row's recorded hash and size matches the baseline member bytes. The exact manifest digest and current `release_id` are `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e`. This is a static byte-binding observation, not a new attestation, QA run, or deployment claim.
+`````
+
+## RL-07
+
+- Source rows: Product Owner direction 2026-11-02
+- Change type: CONSISTENCY
+- Operation: `REPLACE`
+- Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
+- Complete authored heading path (raw original heading lines, outermost first): `# **5\. Freeze-Pack Manifest (catalog/manifest.json) \[Required-Now\]**` > `## **5.3 Validation**` > `### **Current repository posture**`
+- Location within that section: the table after "Historical cuts retain their original standing:"
+- Original location: lines 1968–1970 (informative only; the exact old block below is the locator)
+- Expected occurrences of the exact old block in the original: 1 (observed: 1)
+
+Exact old block:
+
+`````text
+| PR06 | Actual complete 44-member `1.1.0`, timestamp `2026-08-24T18:04:49Z` | Recorded identity prefix `988ed2a7…`; the source supplies a prefix, not a full digest. Complete actual admission ends the incomplete-roster interval |
+| PR06a | Actual 45-member `1.2.0`; adds the Reader v2 schema member | `9f962ce338c448c7a2312f05695d5fdab12b01fbc1a67d490465d9fc87edab3f`; existing Reader v1 error-schema issue subsequently corrected |
+| PR06b / current | Actual 45-member `1.3.0`; no new roster member, Reader v1 error-schema correction | `52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96` |
+`````
+
+Replacement block:
+
+`````text
+| PR06 | Actual complete 44-member `1.1.0`, timestamp `2026-08-24T18:04:49Z` | Recorded identity prefix `988ed2a7`; the source supplies only this prefix, not a full digest. Complete actual admission ends the incomplete-roster interval |
+| PR06a | Actual 45-member `1.2.0`; adds the Reader v2 schema member | `9f962ce338c448c7a2312f05695d5fdab12b01fbc1a67d490465d9fc87edab3f`; existing Reader v1 error-schema issue subsequently corrected |
+| PR06b | Actual 45-member `1.3.0`; no new roster member, Reader v1 error-schema correction | `52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96` |
+| HDE-CRD-0002 refreshes / current | Same 45-member `1.3.0`, timestamp `2026-08-24T18:04:49Z`; same-version refreshes at the WU-PR-03, WU-PR-04 and WU-PR-05 merges kept the version, build time and 45 members, with no version cut | Recorded identity prefixes `72fca4c3`, `d84d99e1` and `2f18a5eb` in turn, which HDE CRD Records supplies as prefixes only; current `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e` |
+`````
+
+## RL-08
+
 - Source rows: C-04
 - Change type: CANON_UPDATE
 - Operation: `REPLACE`
@@ -228,7 +280,30 @@ The builder owns its output root for the run:
 These rules state the required contract. They do not fix the mechanism of the exclusive claim, and this section does not assert that the current builder already enforces them.
 `````
 
-## RL-07
+## RL-09
+
+- Source rows: Product Owner direction 2026-11-02
+- Change type: DOC_HYGIENE
+- Operation: `REPLACE`
+- Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
+- Complete authored heading path (raw original heading lines, outermost first): `# **6\. Freeze-Pack Manifest → release\_id \[Required-Now\]**` > `## **6.4 Evidence and CI hooks**`
+- Location within that section: the paragraph that begins "`RELEASE_ID_RECOMPUTE_OK` remains a historical EPIC022 label.", the last paragraph before the heading "### **Acceptance hints**"
+- Original location: line 2144 (informative only; the exact old block below is the locator)
+- Expected occurrences of the exact old block in the original: 1 (observed: 1)
+
+Exact old block:
+
+`````text
+`RELEASE_ID_RECOMPUTE_OK` remains a historical EPIC022 label. Magic-10 MUST NOT emit, claim, redefine, or infer it as a current token. Its plan-local current-release condition is the exact external-attestation predicate stated above..
+`````
+
+Replacement block:
+
+`````text
+`RELEASE_ID_RECOMPUTE_OK` remains a historical EPIC022 label. Magic-10 MUST NOT emit, claim, redefine, or infer it as a current token. Its plan-local current-release condition is the exact external-attestation predicate stated above.
+`````
+
+## RL-10
 
 - Source rows: C-07, C-10
 - Change type: CLARIFY
@@ -251,7 +326,7 @@ Replacement block:
 Every evidence file referenced by the mirror MUST live under governed repo paths (for example, artifacts/, docs/). Transient generator paths (scratch/temp) are disallowed; mirror entries pointing to non-governed paths fail CI. No Machine Evidence Mirror record, Human Evidence Index row, or path proof binds a path under `docs/ephemeral/` or `docs/pfcanon/`: planning documents serve planning only, and a PF-Canon file's name and version may change at any time.
 `````
 
-## RL-08
+## RL-11
 
 - Source rows: C-05
 - Change type: CANON_UPDATE
@@ -259,7 +334,7 @@ Every evidence file referenced by the mirror MUST live under governed repo paths
 - Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
 - Complete authored heading path (raw original heading lines, outermost first): `# **8\. CI & Evidence \[Required-Now\]**` > `## **8.6 Evidence Index entries (titles/paths only) \[Required-Now\]**` > `### **8.6.3 Entries (authoritative list; titles/paths only)**` > `#### **8.6.3.2 Core pack, canonical JSON, topology, and deterministic order**` > `##### **Canonical JSON and topology**`
 - Location within that section: the artifact list under this heading
-- Original location: line 2971–2972 (informative only; the exact old block below is the locator)
+- Original location: lines 2971–2972 (informative only; the exact old block below is the locator)
 - Expected occurrences of the exact old block in the original: 1 (observed: 1)
 
 Exact old block:
@@ -276,7 +351,104 @@ Replacement block:
 * `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`: its rows follow §1.2 "Governed gate check row content".  
 `````
 
-## RL-09
+## RL-12
+
+- Source rows: C-29
+- Change type: CLARIFY
+- Operation: `INSERT`
+- Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
+- Complete authored heading path (raw original heading lines, outermost first): `# **8\. CI & Evidence \[Required-Now\]**` > `## **8.6 Evidence Index entries (titles/paths only) \[Required-Now\]**` > `### **8.6.3 Entries (authoritative list; titles/paths only)**` > `#### **8.6.3.3 Reader, CLI, compat, and conjunction evidence**` > `##### **Compat closure artifacts**`
+- Location within that section: the end of the section: after the bullet for `artifacts/compat/identity_hash.txt`, before the heading "##### **HDE-EPIC030 PR-01 normalization evidence**"
+- Gap location: immediately before original line 3066 (informative only; the anchors below are the locator)
+- Expected occurrences of BEFORE immediately followed by AFTER in the original: 1 (observed: 1)
+- The gap is the boundary between the end of BEFORE and the start of AFTER. Neither anchor is changed.
+
+BEFORE anchor (it ends with 2 newline characters):
+
+`````text
+* `artifacts/compat/identity_hash.txt`: primary governed compat-closure artifact for explicit conjunction identity-hash capture. Its bytes MUST match the canonical AB compat bytes for the same pair. Family-scoped compat closure checks MAY target artifacts/compat/identity\_hash.txt directly when a compat-only slice is being validated, but those targeted checks MUST NOT narrow or replace same-PR updates and validations for docs/evidence/INDEX.json, docs/evidence/INDEX.sha256, artifacts/evidence\_index.jsonl, artifacts/evidence\_index.jsonl.sha256, or the governed sibling .path\_proof.txt transcripts required elsewhere in PF12 when governed evidence bytes change.
+
+
+`````
+
+AFTER anchor (it ends with 1 newline character):
+
+`````text
+##### **HDE-EPIC030 PR-01 normalization evidence**
+
+`````
+
+Inserted text (it ends with 2 newline characters):
+
+`````text
+**Standing of the compat closure captures.**
+
+The three captures above date from the placeholder compat calculation that `hdctl showcompat` and the compat handler ran until HDE-EPIC040 PR-04 replaced it with the real calculation. Their generator, `scripts/make_compat_determinism_artifacts.py`, has exited with status 2 ever since. They remain governed bytes, kept as history, and are not evidence of the current compat calculation: GATE:CORE-DET evidence is the real compat path, as HDE-Governance and HDE Build Notes define it. The HDE-EPIC030 PR-03 compat evidence family below reuses `artifacts/compat/AB.json` and `artifacts/compat/BA.json` with the same standing.
+
+
+`````
+
+## RL-13
+
+- Source rows: C-02
+- Change type: CLARIFY
+- Operation: `INSERT`
+- Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
+- Complete authored heading path (raw original heading lines, outermost first): `# **8\. CI & Evidence \[Required-Now\]**` > `## **8.6 Evidence Index entries (titles/paths only) \[Required-Now\]**` > `### **8.6.3 Entries (authoritative list; titles/paths only)**` > `#### **8.6.3.10 HDAPI v2 vendor contract and adapter-conformance evidence**`
+- Location within that section: after the run-in list of required proof contents that ends with the bullet "the nonclaims preserved by the proof.", before the run-in label "**Current bounded configured-v2 mapped-cache persistence evidence family.**"
+- Gap location: immediately before original line 3752 (informative only; the anchors below are the locator)
+- Expected occurrences of BEFORE immediately followed by AFTER in the original: 1 (observed: 1)
+- The gap is the boundary between the end of BEFORE and the start of AFTER. Neither anchor is changed.
+
+BEFORE anchor (it ends with 2 newline characters):
+
+`````text
+* the nonclaims preserved by the proof. The evidence MUST distinguish simple route availability from full BodyGraph-detail resolution. A successful charts/simple observation MAY prove provider availability, auth posture, geocode-key posture, or route-family availability. It MUST NOT prove that bg:resolve \--source vendor resolves complete BodyGraph detail unless the route-policy and adapter/schema proof also establish the required internal contract. The evidence MUST NOT treat accidental /v2/bodygraphs composition, route-family mismatch, or a wrong-shape 404 as generic provider unavailability. It MUST classify route-shape mismatch separately from provider unavailability when that distinction is visible.
+
+
+`````
+
+AFTER anchor (it ends with 1 newline character):
+
+`````text
+**Current bounded configured-v2 mapped-cache persistence evidence family.**
+
+`````
+
+Inserted text (it ends with 2 newline characters):
+
+`````text
+**Legacy route reading (normative).**
+
+Vendor route selection belongs to HDE-CLI-API-Vendor-Ref. Only a configured base whose terminal API-version segment is exactly `v1` selects the legacy BodyGraph route, and it does so as retained legacy selection, not as a fallback; every other non-v2 base fails closed before credential projection or any external I/O. In this section, the wordings "explicit legacy fallback", "legacy fallback" and "non-v2 legacy BodyGraph fallback", the classification label `explicit_legacy_fallback`, and artifact names and keys containing `legacy_fallback` name that terminal-v1 legacy selection and make no fallback claim. Frozen HDE-EPIC036 and HDE-EPIC037 captures stay as history: they record the posture at capture time and are not rewritten. This section does not assert that the current route classifier already enforces the terminal-segment rule.
+
+
+`````
+
+## RL-14
+
+- Source rows: C-02
+- Change type: CLARIFY
+- Operation: `REPLACE`
+- Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
+- Complete authored heading path (raw original heading lines, outermost first): `# **8\. CI & Evidence \[Required-Now\]**` > `## **8.6 Evidence Index entries (titles/paths only) \[Required-Now\]**` > `### **8.6.3 Entries (authoritative list; titles/paths only)**` > `#### **8.6.3.10 HDAPI v2 vendor contract and adapter-conformance evidence**`
+- Location within that section: the paragraph that begins "The family MUST prove canonical write/read-back parity"
+- Original location: line 3772 (informative only; the exact old block below is the locator)
+- Expected occurrences of the exact old block in the original: 1 (observed: 1)
+
+Exact old block:
+
+`````text
+The family MUST prove canonical write/read-back parity, absence of raw vendor-envelope persistence, idempotence, closed-rails refusal, adapter-mapped payload use, cache-compatible identity types, and legacy non-v2 fallback preservation. It does not authorize production-like writes and does not create a public Reader change, new public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI ownership, raw secret or request/response persistence, AI scope, QA PASS, PF09 status movement, OPS completion, PO closeout, board update, production deployment, acceptance-token satisfaction, or epic closeout.
+`````
+
+Replacement block:
+
+`````text
+The family MUST prove canonical write/read-back parity, absence of raw vendor-envelope persistence, idempotence, closed-rails refusal, adapter-mapped payload use, cache-compatible identity types, and preservation of the terminal-v1 legacy selection, recorded under the existing names `legacy_fallback_preservation.log` and `explicit_legacy_fallback`. It does not authorize production-like writes and does not create a public Reader change, new public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI ownership, raw secret or request/response persistence, AI scope, QA PASS, PF09 status movement, OPS completion, PO closeout, board update, production deployment, acceptance-token satisfaction, or epic closeout.
+`````
+
+## RL-15
 
 - Source rows: C-18, C-17
 - Change type: CANON_UPDATE
@@ -284,7 +456,7 @@ Replacement block:
 - Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
 - Complete authored heading path (raw original heading lines, outermost first): `# **8\. CI & Evidence \[Required-Now\]**` > `## **8.17 Live QA evidence layout (audit/qa/\\/) \[Required-Now\]**`
 - Location within that section: run-in block "Close-run family exception (normative; admitted CRDs only).", after the run-in block "Current-state evidence (normative)."
-- Original location: line 5399–5408 (informative only; the exact old block below is the locator)
+- Original location: lines 5399–5408 (informative only; the exact old block below is the locator)
 - Expected occurrences of the exact old block in the original: 1 (observed: 1)
 
 Exact old block:
@@ -317,7 +489,7 @@ Close-run family exception (normative; admitted CRDs and Epics only).
 * Each primary has one Human Evidence Index row and one Machine Evidence Mirror record with artifact key `<key_prefix>.close.<check_id>.primary.log`, where `<key_prefix>` is the change's Index key prefix in its admission table, and Mirror role `log`. An Epic's rows also carry `epic_id`. HDE Build Notes introduced this family, and its extension to admitted Epics, under the rule for new standardized evidence families above.
 `````
 
-## RL-10
+## RL-16
 
 - Source rows: C-18, C-17
 - Change type: CANON_UPDATE
@@ -340,9 +512,9 @@ Replacement block:
 * close/ — only for a CRD in the canonical updater's CRD admission table or an Epic in its Epic close admission table, the post-verdict close-run family; written only by the canonical updater, never plan-owned (§8.17 "Close-run family exception").  
 `````
 
-## RL-11
+## RL-17
 
-- Source rows: C-04, C-05, C-07, C-10, C-17, C-18
+- Source rows: C-02, C-04, C-05, C-07, C-10, C-17, C-18, C-29, Product Owner direction 2026-11-02
 - Change type: NEW_CANON
 - Operation: `INSERT`
 - Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
@@ -373,7 +545,7 @@ Inserted text (it ends with 2 newline characters):
 `````text
 ## 9.7 Documentary drainage record — 2026-11-02
 
-This record drains into PF12 the Product Owner decisions on evidence-tool output roots and governed gate check rows; the rules that planning documents and PF-Canon file identities are never inputs, as they bear on the close-pack writer and on Human Evidence Index, Machine Evidence Mirror and path-proof records; and the close-pack writer decisions as amended for HDE-EPIC041's admitted close run, all recorded in HDE Build Notes. It changes PF text only. HDE-CRD-0002 and HDE-EPIC041 are closed; neither those closures nor this record establishes a QA verdict, acceptance, Ops, deployment, register movement, or implementation of a rule this record states as required.
+This record drains into PF12 the Product Owner decisions on evidence-tool output roots and governed gate check rows; the rules that planning documents and PF-Canon file identities are never inputs, as they bear on the close-pack writer and on Human Evidence Index, Machine Evidence Mirror and path-proof records; the close-pack writer decisions as amended for HDE-EPIC041's admitted close run; the terminal-v1 reading of vendor legacy route selection; and the standing of the compat closure captures as history, all recorded in HDE Build Notes. At the Product Owner's direction of 2026-11-02, it also brings §5.3's current `release_id` and historical cuts table up to the repository's actual release identity and corrects two punctuation defects. It changes PF text only. HDE-CRD-0002 and HDE-EPIC041 are closed; neither those closures nor this record establishes a QA verdict, acceptance, Ops, deployment, register movement, or implementation of a rule this record states as required.
 
 ```yaml
 doc_delta:
@@ -410,6 +582,14 @@ doc_delta:
         path: "tools/evidence/update_evidence_index.py"
       - title: "Epic close-run family"
         path: "audit/qa/<epic-id>/close/<check_id>/primary.log"
+      - title: "Release manifest"
+        path: "catalog/manifest.json"
+      - title: "Compat determinism generator"
+        path: "scripts/make_compat_determinism_artifacts.py"
+      - title: "Compat closure identity capture"
+        path: "artifacts/compat/identity_hash.txt"
+      - title: "Configured-v2 mapped-cache evidence generator"
+        path: "tools/evidence/generate_v2_mapped_cache_evidence.py"
   summary: |
     Add to the release attestation builder's contract the exclusive claim of
     its output root, the refusal of writes through symlinks, and cleanup
@@ -424,7 +604,14 @@ doc_delta:
     absent-tolerant close-pack Index rows, the close-run pointer exception,
     and the post-verdict close-run family to an Epic admitted in the
     canonical updater's Epic close admission table, which admits HDE-EPIC041
-    only.
+    only. Read the legacy-fallback wordings, labels and names of the HDAPI v2
+    evidence section as the retained terminal-v1 legacy selection, and state
+    the mapped-cache family's legacy predicate in those terms. Record that the
+    compat closure captures are placeholder-era history, not evidence of the
+    current compat calculation. Update the current release_id in §5.3 to the
+    digest of the current manifest, add the HDE-CRD-0002 same-version
+    refreshes to its historical cuts table, and correct an ellipsis and a
+    doubled period.
   domain_impact:
     current_domains_changed: []
     future_promotions: []
@@ -458,6 +645,18 @@ doc_delta:
       entrypoint: "python tools/evidence/update_evidence_index.py --check"
       result: "not-run by this documentary revision; implementation statically inspected"
       evidence_path: "tools/evidence/update_evidence_index.py"
+    - behavior: "current release_id and 1.3.0 release history recorded in §5.3"
+      entrypoint: "python scripts/release_id_recompute.py --check-manifest-only"
+      result: "passed under closed rails (exit 0) on catalog/manifest.json bytes equal to those at the source baseline commit; their SHA-256 is the computed_release_id above"
+      evidence_path: "catalog/manifest.json"
+    - behavior: "compat determinism generator exits with status 2 before any computation"
+      entrypoint: "python scripts/make_compat_determinism_artifacts.py"
+      result: "not-run; the retained generator was statically inspected"
+      evidence_path: "scripts/make_compat_determinism_artifacts.py"
+    - behavior: "mapped-cache legacy predicate computed from a terminal v1 base"
+      entrypoint: "python tools/evidence/generate_v2_mapped_cache_evidence.py --check"
+      result: "not-run by this documentary revision; the predicate's fixture base was statically inspected"
+      evidence_path: "tools/evidence/generate_v2_mapped_cache_evidence.py"
     - behavior: "complete exact original-bound PF redline preparation and application"
       entrypoint: "TW-DRAIN-10 then TW-APPLY-10, both 100926.1"
       result: "recorded in the evidence path; this record states no outcome in advance"
@@ -485,9 +684,12 @@ doc_delta:
     on evidence-tool output roots and governed gate check rows, and of the
     close-pack writer decisions as amended for HDE-EPIC041's admitted close
     run, into the release attestation, canonical JSON gate, close-pack,
-    Machine Evidence Mirror, and Live QA evidence layout homes above.
-    Canonical runtime and evidence bytes remain unchanged; the prior
-    release_id remains valid. Exact preparation and application evidence is
+    Machine Evidence Mirror, and Live QA evidence layout homes above; the
+    terminal-v1 legacy route reading and the compat closure captures'
+    standing into the Evidence Catalog; and, at the Product Owner's
+    direction, the current release identity into §5.3, with two punctuation
+    corrections. Canonical runtime and evidence bytes remain unchanged; the
+    prior release_id remains valid. Exact preparation and application evidence is
     retained in the document output proof logs.
 ```
 
