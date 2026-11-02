@@ -1,5 +1,7 @@
 # Proof log — PF06 redlines, gtwpe-20261101-pf10-v14-0-5
 
+> ⚠️ **Superseded 2026-11-02 by package r2.** Everything below is the original r1 record, preserved as written. Package r2 (`PF06-Canon-Change-Process-Guide-v2.5.5.redlines.gtwpe-20261101-pf10-v14-0-5.r2.md` and its `.proof-log.md`, beside this file) carries RL-01, RL-02, RL-04, RL-05 and RL-06 unchanged, extends RL-03, and adds RL-07 to RL-49. It was prepared on Nathan's instruction to fix the observations in section 8 below, under GTWPE-D3 and the Product Owner's CCR-5 ruling. r2, not r1, is the package applied to `PF06-Canon-Change-Process-Guide-v2.5.6.md`. r2 also corrects observation O-1 below: §0.6.4 does not tie the minimum live test to a production finding.
+
 This is the processing report for `PF06-Canon-Change-Process-Guide-v2.5.5.redlines.gtwpe-20261101-pf10-v14-0-5.md`, which sits beside it in `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF06/`. It records how that redlines file was prepared, from what, and what was verified.
 
 ## 1. Artifact and identity
