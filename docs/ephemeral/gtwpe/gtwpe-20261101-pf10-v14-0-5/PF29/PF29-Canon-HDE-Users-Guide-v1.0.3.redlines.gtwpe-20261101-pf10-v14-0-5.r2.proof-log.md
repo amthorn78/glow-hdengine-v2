@@ -7,6 +7,7 @@
 | Artifact this log documents | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF29/PF29-Canon-HDE-Users-Guide-v1.0.3.redlines.gtwpe-20261101-pf10-v14-0-5.r2.md`: seventeen `REPLACE` redlines, RL-01 to RL-17, ending `END OF REDLINES` |
 | Run identity | `gtwpe-20261101-pf10-v14-0-5/T-08/drain-r2`, the same in the redlines file |
 | Supersedes | `drain-r1`: `PF29-Canon-HDE-Users-Guide-v1.0.3.redlines.gtwpe-20261101-pf10-v14-0-5.md` and its `.proof-log.md`, at commit `285bc728eb3c39de37e6d4842292ea36b421f256`. Both are kept unchanged as history. |
+| Commit references | Updated after a rebase onto other sessions' commits, to the pushed hashes: r1 package `285bc728eb3c39de37e6d4842292ea36b421f256`, r1 application `550689fcbb40fb7c7eafa6f42fc9793078d6d5f7`, r2 package `e4506ee5fca18b0203fd81ee4698506aeb98ed4d`, r2 application `e37d0b5731762aaff783261631e3dc00b447e0fa`. The rebase changed no file content; the r2 redlines blob is still `c805c848b69067f06bfdec0e54d1b2034db35d59`. |
 | Producing prompt | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1, Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live on 2026-11-02 ("Prompt Version: 100926.1") |
 | Originating preparer | The Claude Code document session Nathan started for T-08, https://claude.ai/code/session_01Q789u3KLSaV6qHFgm3m8t4. It is the same session that prepared r1. No subagent, reviewer or other session took part. |
 | Preparation date | 2026-11-02 |
@@ -16,7 +17,7 @@
 
 ## 2. Why r2 exists
 
-The r1 package passed TW-APPLY-10 at local commit `a317684`, which is later pushed with this package as history. While I was recording the ledger row, the fetched ledger showed a correction dated 2026-11-02 and a new §8. Both cite GTWPE-D3 in `docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md`. That record has status `BINDING` and rests on Product Owner rulings from 2026-10-07. GTWPE-D3 states:
+The r1 package passed TW-APPLY-10 at commit `550689f`, which is kept in history. While I was recording the ledger row, the fetched ledger showed a correction dated 2026-11-02 and a new §8. Both cite GTWPE-D3 in `docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md`. That record has status `BINDING` and rests on Product Owner rulings from 2026-10-07. GTWPE-D3 states:
 
 > all pf docs should be updated based on context and scope, not whether or not the addenda specify a drain target.
 
@@ -203,4 +204,4 @@ These checks establish the package's editorial and mechanical condition only. Th
 
 ## 11. Next step
 
-TW-APPLY-10 100926.1 (page `3f44590a05eb81eebff6e3afa3d9aa5b`) runs next in this session, on this r2 package against the unchanged original at `e2b7427`. Its final output stays `PF29-Canon-HDE-Users-Guide-v1.0.4.md`, with its `.proof-log` beside it. It supersedes the r1 application output at commit `a317684`, which is kept in git history.
+TW-APPLY-10 100926.1 (page `3f44590a05eb81eebff6e3afa3d9aa5b`) runs next in this session, on this r2 package against the unchanged original at `e2b7427`. Its final output stays `PF29-Canon-HDE-Users-Guide-v1.0.4.md`, with its `.proof-log` beside it. It supersedes the r1 application output at commit `550689f`, which is kept in git history.

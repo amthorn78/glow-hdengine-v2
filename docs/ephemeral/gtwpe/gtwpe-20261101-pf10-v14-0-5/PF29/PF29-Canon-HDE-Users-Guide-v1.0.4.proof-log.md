@@ -5,8 +5,9 @@
 | Field | Value |
 | :---- | :---- |
 | Artifact this log documents | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF29/PF29-Canon-HDE-Users-Guide-v1.0.4.md`: the complete revised PF29-Canon-HDE-Users-Guide, v1.0.4. 83,852 bytes; 1,087 lines, LF-terminated; SHA-256 `3f7eca26b671224767c70ccb88bb70709fa337573ef44f3d3bcd04f0e19f1cad`; git blob `d3b41ae17381f22d5aa40cd6cbeff2c0eef8470c` |
-| Package applied | `drain-r2`: `PF29-Canon-HDE-Users-Guide-v1.0.3.redlines.gtwpe-20261101-pf10-v14-0-5.r2.md` and its `.r2.proof-log.md`, at package commit `4141598854d1a42c28366a36c29858e67b594506` |
-| Supersedes | The r1 application output at commit `a31768454eaf0890d2d09d6c46acef0ba7cfbb4c`: the same file name, blob `7a6f873a575e5f8972d9e204ce59ce315d374c6b`, SHA-256 `e3ba2c95135d1a78d20708059cc6d551602d68ac3d9b10111ecf622a9353a20e`, applied from package `drain-r1`. Its file and this proof log's r1 version stay in git history at that commit. Section 2 says why. |
+| Package applied | `drain-r2`: `PF29-Canon-HDE-Users-Guide-v1.0.3.redlines.gtwpe-20261101-pf10-v14-0-5.r2.md` and its `.r2.proof-log.md`, at package commit `e4506ee5fca18b0203fd81ee4698506aeb98ed4d` |
+| Supersedes | The r1 application output at commit `550689fcbb40fb7c7eafa6f42fc9793078d6d5f7`: the same file name, blob `7a6f873a575e5f8972d9e204ce59ce315d374c6b`, SHA-256 `e3ba2c95135d1a78d20708059cc6d551602d68ac3d9b10111ecf622a9353a20e`, applied from package `drain-r1`. Its file and this proof log's r1 version stay in git history at that commit. Section 2 says why. |
+| Commit references | Updated after a rebase onto other sessions' commits, to the pushed hashes: r1 package `285bc728eb3c39de37e6d4842292ea36b421f256`, r1 application `550689fcbb40fb7c7eafa6f42fc9793078d6d5f7`, r2 package `e4506ee5fca18b0203fd81ee4698506aeb98ed4d`, r2 application `e37d0b5731762aaff783261631e3dc00b447e0fa`. The rebase changed no file content; the r2 redlines blob is still `c805c848b69067f06bfdec0e54d1b2034db35d59`. |
 | Producing prompt | TW-APPLY-10 — Apply Validated Redlines — 100926.1, Notion page `3f44590a05eb81eebff6e3afa3d9aa5b`. Re-fetched live at the start of this application step on 2026-11-02; it still records "Prompt Version: 100926.1", last edited 2026-10-09T11:05:22Z. |
 | Applier | The same Claude Code document session that prepared the package, https://claude.ai/code/session_01Q789u3KLSaV6qHFgm3m8t4. Nathan's T-08 handoff authorizes preparation, application, and correction followed by fresh application in this session. No subagent, reviewer or other session took part. |
 | Execution date | 2026-11-02 (UTC; this application ran at about 2026-11-02T00:38Z) |
@@ -15,7 +16,7 @@
 
 ## 2. Why this output replaces the r1 application
 
-The r1 package (`drain-r1`, ten redlines) passed this prompt's validation and was applied at `a317684`. After that, the shared ledger, as fetched, showed a correction dated 2026-11-02. That correction applies GTWPE-D3, a binding Product Owner ruling recorded in `docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md`: every eligible document is updated on context and scope, not only at the drain targets an addendum names.
+The r1 package (`drain-r1`, ten redlines) passed this prompt's validation and was applied at `550689f`. After that, the shared ledger, as fetched, showed a correction dated 2026-11-02. That correction applies GTWPE-D3, a binding Product Owner ruling recorded in `docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md`: every eligible document is updated on context and scope, not only at the drain targets an addendum names.
 
 r1 had left several PF29 statements undrafted because D-1 and D-3 did not name them. So the preparer corrected its own package as `drain-r2`, under Nathan's handoff authority, and this step validated the corrected package afresh against the unchanged original. The final file name is unchanged, because both runs derive v1.0.4 from v1.0.3. One writer, this session, owns both runs. The r1 output is superseded, not deleted: it is kept in git history.
 
@@ -25,8 +26,8 @@ r1 had left several PF29 statements undrafted because D-1 and D-3 did not name t
 | :---- | :---- |
 | Exact original | `docs/pfcanon/PF29-Canon-HDE-Users-Guide-v1.0.3.md` at `e2b7427ff418ca8f08f05587c4a541308a76da56`, read from the git object. Blob `6730222d2f352221ddbe140a08c260380bbf5abc`; SHA-256 `2ef3b8a7bfabbc768bf0ae1799d29449fe3ecdc37b509a03dd7292f09f0c8301`; 76,613 bytes; 1,079 lines; no CR. |
 | Current authoritative copy | `origin/main` `84d6d1cad95c67788336d174dc4b8922d9bb0cb2`, fetched at 2026-11-02T00:37Z. Same blob, and the only PF29 file in `docs/pfcanon/`. No drift. |
-| Redlines (r2) | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF29/PF29-Canon-HDE-Users-Guide-v1.0.3.redlines.gtwpe-20261101-pf10-v14-0-5.r2.md` at `4141598`. Blob `c805c848b69067f06bfdec0e54d1b2034db35d59`; SHA-256 `bf546c175417fc12fd4c78cadf23a5363a27174634da9d8eb230685903f01197`. Read from the git object. |
-| Preparation proof log (r2) | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF29/PF29-Canon-HDE-Users-Guide-v1.0.3.redlines.gtwpe-20261101-pf10-v14-0-5.r2.proof-log.md` at `4141598` |
+| Redlines (r2) | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF29/PF29-Canon-HDE-Users-Guide-v1.0.3.redlines.gtwpe-20261101-pf10-v14-0-5.r2.md` at `e4506ee`. Blob `c805c848b69067f06bfdec0e54d1b2034db35d59`; SHA-256 `bf546c175417fc12fd4c78cadf23a5363a27174634da9d8eb230685903f01197`. Read from the git object. |
+| Preparation proof log (r2) | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF29/PF29-Canon-HDE-Users-Guide-v1.0.3.redlines.gtwpe-20261101-pf10-v14-0-5.r2.proof-log.md` at `e4506ee` |
 | Preparer and run | TW-DRAIN-10 100926.1, this session; run `gtwpe-20261101-pf10-v14-0-5/T-08/drain-r2`. The TW-DRAIN-10 page was fetched live at the start of preparation (r1) and was not fetched again for the r2 correction. Its pinned version 100926.1, last edited 2026-10-09, was used for both. |
 | Preparation and save outcome | `READY` / `COMPLETE_PACKAGE`; no blocking item. H-05 (AGENTS.md) is held and is not a PF target. |
 | Change source | PF10-HDE-Build-Notes v14.0.5, `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`. Blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`; SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`. |
