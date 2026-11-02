@@ -133,7 +133,7 @@ Completion fields. Each document session writes only its own task's block.
 | T-06 | pending | pending | pending | pending |
 | T-07 | pending | pending | pending | pending |
 | T-08 | pending | pending | pending | pending |
-| T-09 | pending | pending | pending | pending |
+| T-09 | Applied. TW-DRAIN-10: `READY` / `COMPLETE_PACKAGE`, one redline (RL-01, `REPLACE`, PF02 §1.1 line 198). TW-APPLY-10: applied; revised PF v2.4.8, effective 2026-11-02, Last Update Gate `BN 14.0.5`. Not published: `docs/pfcanon/` is unchanged. | `PF02/PF02-Canon-HDE-Architecture-v2.4.7.redlines.gtwpe-20261101-pf10-v14-0-5.md` and its `.proof-log.md`; `PF02/PF02-Canon-HDE-Architecture-v2.4.8.md` and `PF02/PF02-Canon-HDE-Architecture-v2.4.8.proof-log.md` | `a58b953f8f69bfef4102f7bb7a0f4eb752c43515` (redlines and proof log); `98f26b55ddad5a852bf8d52a6295158907498a3b` (revised PF and proof log) | C-13 and C-14 DELTA-001 drained by RL-01, the only PF02 text naming the chart loader (equivalence search: `engine/charts` and `chart_orchestration` occur only at line 198). DELTA-002 goes to T-05; WU-PR-02 and QA-10 history to T-10; DELTA-003 held (H-03, waits for the Product Owner's adoption decision); CCR-5, PF09 and PF23 parts held (H-06, H-01, H-04). Current-state text verified read-only at `e2b7427` and `84d6d1c`. Original blob `9a23eec6`, unchanged on `main`; output SHA-256 `a27880ab8934fe6e6e137a7874e99b20f6604643cb9c2c2fc1455540a7cfbe05`. |
 | T-10 | pending | pending | pending | pending |
 
 ## 5. Held, deferred and unroutable changes
