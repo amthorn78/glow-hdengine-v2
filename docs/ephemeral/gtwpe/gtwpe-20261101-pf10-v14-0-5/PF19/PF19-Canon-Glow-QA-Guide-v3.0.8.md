@@ -137,6 +137,10 @@ Live QA and bootstrap evidence is produced mechanically under the responsible go
 
 Change-process artifacts, including QA readiness, audit, triage, Guide, Plan, task, review, final Report, separate RCA and remediation work products, are stored in `docs/ephemeral/` and referenced by repository path. A document whose class is uncertain is stored there too. Scratch is transient preparation space. ChatGPT Library and Google Drive are neither destinations nor authorities for these documents; a specific Product Owner-directed Drive file remains non-authoritative. Notion may carry concise status and usable links, not a second artifact body; prompt bodies retain their single home in Notion. Repository-controlled code, tests, configuration and governed mechanical evidence remain at their established repository paths and writers. Existing historical artifacts and their provenance are not migrated automatically. Product Owner publication of PF10, PF23 or historical change records remains separately authorized administration.
 
+Planning documents serve planning only (HDE Build Notes). A planning document is any change-process work product stored under `docs/ephemeral/`, including the artifacts listed above. No code, test, tool, CI step, workflow, schema, QA harness, governed evidence artifact, step-logs manifest, close pack, manifest, Index or Mirror row or path proof reads, binds, hashes, resolves or requires a path under `docs/ephemeral/`; a test builds any document it needs as its own fixture. A fact a later stage needs from a planning document is recorded where that stage reads it, when it is recorded. A prose citation of a planning document in a permanent record is a reference only, so archiving or deleting the cited document invalidates nothing that depends on the record.
+
+PF-Canon is resolved by stable identity, never by version (HDE Build Notes). PF document versions, and so file names, may change at any time. No code, test, tool, CI step, schema, QA harness, governed artifact or committed record that must remain valid pins a PF document's file name, version or content digest, or requires its bytes to stay unchanged. A tool that needs current canon resolves the one current file under `docs/pfcanon/` when it runs, by PF identity and versionless title, and refuses when that resolution is not unique; validating an already committed artifact does not re-read canon. A citation of canon names the PF document by title, and its section where needed, and names HDE Build Notes by title alone. Recording the PF versions actually used, as §10.8 requires, is attribution, and nothing depends on those versions staying current.
+
 Actual prompt-use attribution belongs in the responsible actor's existing permitted artifact or handoff: actual role/stage, change and approved-source lineage, ecosystem and prompt identity/version, resolved source revision, capture or execution point, outputs and observed PR/commit references. Preserve multiple uses and corrections. Record unavailable history and its reason; recommended model settings are not observed settings. Read-only actors pass this metadata to the next authorized writer without acquiring repository write authority. The deferred provenance helper, schema and ledger implementation are not prerequisites for QA or closure, and this rule installs none of them.
 
 CI runs with rails closed by default. CI pipelines run with SAFE\_MODE=1 and ALLOW\_NETWORK=0 unless explicitly opened. Any job that opens rails must pin SAFE policy (timeouts/retries/backoff from closed domains, no jitter) as defined in governance, attach governed evidence, and update the Human Index and Machine Mirror in the same PR.
@@ -218,7 +222,7 @@ These pieces are cross-cutting. Some are HDE-specific in terms of contract, but 
   * Infra/ops ownership. For any internal/dev HTTP harness intended for QA or evidence:  
     * Infra/ops MUST provide and own:  
       * a canonical dev start command or service definition that runs the Reader process in dev/Codespaces with APP\_ENV=dev (and any determinism rails required by Mechanics), and  
-      * a corresponding base URL and port per environment (for example Codespaces vs local dev), from which concrete URLs such as DEV\_SAMPLER\_URL=[http://127.0.0.1](http://127.0.0.1/):\\/internal/dev/sampler can be derived.  
+      * a corresponding base URL and port per environment (for example Codespaces vs local dev), from which concrete URLs such as `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler` (§14.5.1) can be derived.  
     * These URLs MUST NOT be guessed by PO, QA, or doc agents. They MUST be derived from the actual Reader process wiring (ports and host binding) as configured by infra and captured in infra canon.  
     * Before handing any dev harness URL to QA (for curl, scripts, or external tools), Infra/ops MUST validate it locally with a simple HTTP/1.1 JSON POST under appropriate rails (at minimum APP\_ENV=dev and, where feasible, determinism env pins) and confirm that the response shape and headers match the internal/dev HTTP behavior specified by the owning PF docs (titles-only).  
   * QA consumption rule. QA and PO agents:  
@@ -404,6 +408,7 @@ An authorized authoring phase MAY run canonical writers to prepare governed arti
 * Classify automated controls by continuing product and delivery risk and by lane.  
   * Required PR CI MUST protect continuing product and delivery risk independently of epic administration.  
   * Release and security, QA and audit, and closeout validation are distinct lanes. Evidence generation, audit work, or closeout work MUST NOT substitute for ordinary required PR CI or become required PR CI solely because it was required during one epic.  
+  * The close-pack writer's test is a close-stage test (HDE Build Notes). CI selects it when the writer, a close-candidate source schema, the closeout validation workflow or the test itself changes; it is not part of full validation or of any other ordinary required pull-request CI (Plan Templates, “CI lane classification and automated budget-control discipline”).  
 * CI-budget control MUST be automated and durable. Manual push counts, agent promises, operator pause gates, exception narratives, transient reports, and documentation-only remediation MUST NOT serve as enforcement substitutes.  
   * Automated control MUST prevent or short-circuit duplicate, superseded, irrelevant, and unnecessarily repeated work while preserving every applicable protection.  
   * Applicability MUST be deterministic and truthful. A stable required-check conclusion may be green only when every applicable protection passed or the check deterministically established that it did not apply.  
@@ -416,6 +421,13 @@ PF19 defines the required sequence at the QA level. PF09 — HDE-Build Checklist
 ### **2.2.12 Engine serializer/composer determinism**
 
 Prove two-run identity and AB↔BA parity (where defined) for Engine serializer/composer behavior. Ban RNG/time/FS/network in pure paths; governed outputs follow canonical JSON rules. Tokens live in PF04/PF09; bytes in PF14/PF12.
+
+For compat, GATE:CORE-DET evidence is the real compat path (HDE Build Notes), in two parts:
+
+* Closed rails: the CI owner tests that exercise the real compat path, run as CI selects them: `tests/core/test_engine_core_abba.py`, `tests/core/test_engine_core_determinism.py`, `tests/compat/test_evaluate_pair_eligibility.py`, `tests/compat/test_compat_public_ab_ba_identity.py` and `tests/cli/test_showcompat_parity_and_identity.py`. A change that removes or weakens one of them needs its owner's review, like any other gate test.
+* Open rails: each run of the live compat test (§3.5.5), which is Ops evidence.
+
+The Reader goldens remain evidence for canonical emission and the Reader covenant; they are not evidence of compat AB↔BA. These entries are retired from GATE:CORE-DET evidence, and no QA record may cite them as current proof: `scripts/make_compat_determinism_artifacts.py`; `artifacts/cards/A3/IDENTITY_OK.txt`; `ci/jobs/preimage_recompute_and_compare.yml`, `ci/jobs/ab_ba_parity_bytecompare.yml` and `ci/jobs/two_run_identity_bytecompare.yml`; and `fixtures/composite/abba/*.json`, `audit/gates/determinism/abba_compare.log`, `fixtures/composite/integration_abba/*.json` and `audit/gates/determinism/abba_compare_integration.log`. The gate's pass conditions and evidence lists remain with HDE Governance.
 
 ### **2.2.13 Secrets & SCA/SAST/DAST**
 
@@ -537,7 +549,7 @@ No agent may override that block; only the Product Owner may waive the live comp
 
 “Live QA” name (normative; Epics). A Guide, Plan, task set, evidence branch, Report or verdict may carry the name “Live QA” only when it covers or records the live compat test or a recorded Product Owner waiver of it. Any other QA is called “closed-rails QA” in its title, branch name and verdict line. A QA Report without the live test says so in its first line, “No live test ran.”, and names the waiver or the missing test.
 
-Both rules are expressly scoped to Epics (§0.2); §3.5.5 records the open CRD question.
+Both rules are expressly scoped to Epics (§0.2), and §3.5.5 records the open CRD question. HDE Build Notes records the Product Owner's direction that sets them.
 
 ### **3.1.3 Permanent drainage and post-closure administration**
 
@@ -1101,7 +1113,7 @@ Reviewer hygiene rules (clarification):
 * Plans MAY include read-only PF checks, including Reality Audits, to confirm current guidance. Plans MUST express PF checks as consult-only and MUST NOT require turning the check result into a PF update.  
 * Existence confirmation inside plans MUST be expressed as either a read-only PF check or repo-local evidence capture. Plans MUST NOT require turning existence confirmation into a PF document edit.  
 * Ellipsis tokens are permitted inside code spans only when they represent a literal being discussed. Outside code spans, ellipsis tokens are prohibited and treated as truncation signals, not as content.  
-* Approved omission markers are `[SNIP: lines omitted]` and `[SNIP: paragraph omitted]`. Any other omission marker is treated as non-canon.  
+* Approved omission markers are `[SNIP: <n> lines omitted]` and `[SNIP: paragraph omitted]`. Any other omission marker is treated as non-canon.  
 * Approval binds to semantic command identity, not command syntax. Plans MAY include a command-snippets section as a de-duplication mechanism; the authoritative execution record is the exact command captured in governed evidence.  
 * If a plan uses JSON-carrying environment variables, quoting and escaping defects remain syntax-origin and non-blocking at approval time. The exact executed bytes MUST be captured before PASS is claimed.  
 * Template hygiene, formatting, inventory completeness, provenance-label phrasing, quote-block style, table formatting, heading style, punctuation, spacing, bold markers, presentation style, and inventory-row ordering are non-blocking. A separately proven source-authority, scope, PF09-mapping, token-truth, evidence-identity, evidence-trust, portability, authorization, safety, public/private-boundary, or closeout defect may be evaluated independently.  
@@ -1141,7 +1153,8 @@ Even under open rails:
 
 * Vendor/production write flows that resemble real user writes remain out of scope unless explicitly permitted by current product posture.  
 * Live QA must use dry-run or closed-rails stubs where the canon requires it.  
-  **3.4.12 Doc-alignment steps (mechanical, not narrative)**
+
+### **3.4.12 Doc-alignment steps (mechanical, not narrative)**
 
 For doc-alignment Live QA steps:
 
@@ -1234,7 +1247,7 @@ Prod is defined as follows: for Live QA, prod is the HD Engine service and DB de
 Codespaces / QA console is defined as follows: a Codespace attached to the engine repo is a QA console and artifact sink:
 
 * it runs CLI/HTTP commands from Codespaces to the Railway HD Engine prod service and DB (when rails allow)  
-* it stores each check’s QA artifacts under `audit/qa/<epic-id>/checks/<check_id>/` in the repo, where \\ is the lower-case epic identifier (for example `hde-epic018`) and the approved plan resolves the concrete \\
+* it stores each check’s QA artifacts under `audit/qa/<epic-id>/checks/<check_id>/` in the repo, where `<epic-id>` is the lower-case epic identifier (for example `hde-epic018`) and the approved plan resolves the concrete \\
 
 Any other terminal or shell that is configured (by infra canon) to reach the same Railway endpoints is an equivalent QA console. PF19’s CLI and admin-bundle playbooks apply equally to Codespaces and to such terminals.
 
@@ -1415,7 +1428,7 @@ Every Epic's QA Plan includes, and its QA run executes, the live compat test bel
 
 The live compat test is Ops evidence under HDE Governance, and the execution controls at the end of this subsection apply to it in full. Only the Product Owner may waive it or any part of it (§3.1.2). The production-affecting minimum below adds to this test for an Epic and does not replace it; no exemption, closed-rails substitution or live non-vendor step under that minimum exempts an Epic from it.
 
-This minimum, and the live test line and “Live QA” name rules in §3.1.2, are expressly scoped to Epics (§0.2). Whether a CRD that changes runtime code also runs the live compat test is a Product Owner decision that HDE Build Notes leaves open; this guide does not decide it.
+This minimum, and the live test line and “Live QA” name rules in §3.1.2, are expressly scoped to Epics (§0.2). Whether a CRD that changes runtime code also runs the live compat test is a Product Owner decision that HDE Build Notes leaves open; this guide does not decide it. HDE Build Notes records the Product Owner's direction that sets this minimum.
 
 Production-affecting Live QA minimum is as follows.
 
@@ -2231,7 +2244,9 @@ Scope is Catalog JSON success route only (the Catalog/A7 surface).
   * `LANG=C`  
   * `TZ=UTC`  
 * The current Endpoint Catalog entry (by title only) that identifies the route and its env-gate.  
-  **Steps**  
+
+### **Steps**
+
 * Probe the Catalog JSON success route.  
   * Send a GET request to the cataloged JSON success route.  
   * Confirm:  
@@ -2294,7 +2309,8 @@ These steps are normative proof requirements. At repository commit `4b7d57a91c43
   * docs/evidence/INDEX.json (plus docs/evidence/INDEX.sha256), and  
   * artifacts/evidence\_index.jsonl  
 * Index updates must be in the same PR that introduces or refreshes these artifacts.  
-  **Tokens (names-only)**
+
+### **Tokens (names-only)**
 
 The following tokens are typically used to gate A7 completion (definitions live in PF04/PF09):
 
@@ -2303,7 +2319,9 @@ The following tokens are typically used to gate A7 completion (definitions live 
 * `A7_304_OMITS_CT_CL_OK`  
 * `A7_VARY_AUTH_AE_OK`  
 * `A7_ENCODING_INVARIANCE_OK`  
-  **Failures to watch**  
+
+### **Failures to watch**
+
 * Catalog route not reachable or returns incorrect status (non-200) for GET.  
 * Missing or unquoted ETag, or ETag that changes with encoding.  
 * HEAD response that diverges from GET posture (wrong Content-Type or Content-Length).  
@@ -2311,7 +2329,9 @@ The following tokens are typically used to gate A7 completion (definitions live 
 * Missing or incorrect Vary: Authorization, Accept-Encoding.  
 * Composite proof JSON missing required fields or failing PF12 schema validation.  
 * Evidence captured but not indexed in both human and machine indices in the same PR.  
-  **Where it lives (titles-only)**  
+
+### **Where it lives (titles-only)**
+
 * Transport bytes and route contract: PF05 — HDE-CLI-API-Vendor-Ref  
 * A7 policy and governance details: PF04 — HDE-Governance  
 * Proof JSON schema, mirror schema, and evidence plumbing: PF12 — HDE-Schemas & Artifacts
@@ -2328,7 +2348,9 @@ This playbook is about:
 
 * a minimal but strict header posture for Aux, and  
 * ensuring the CLI uses the same emitter and cannot silently “suppress” narratives due to missing tuples or mis-wired composition.  
-  **Inputs**  
+
+### **Inputs**
+
 * A staging or prod-like environment where Aux can be invoked via BE/CLI.  
 * Env pins for all captures:  
   * `LC_ALL=C`  
@@ -2337,7 +2359,8 @@ This playbook is about:
 * A validated-tuple QA harness (CLI or script) that:  
   * calls the shared Aux emitter for a known test pair, and  
   * can emit header snapshots for text and suppression cases.  
-* **Scope**
+
+### **Scope**
 
 For EPIC-010, post-commit Aux QA covers two snapshots only:
 
@@ -2382,7 +2405,9 @@ Aux HEAD/304 are not part of A7; A7 remains Catalog-only.
     * docs/evidence/INDEX.json (plus docs/evidence/INDEX.sha256), and  
     * artifacts/evidence\_index.jsonl.  
 * Ensure these index updates occur in the same PR as the new or updated snapshots.  
-  **Evidence**  
+
+### **Evidence**
+
 * tests/transport/headers/aux\_text\_200.snap  
 * tests/transport/headers/aux\_suppression\_200.snap  
 * Optional CLI parity artifacts (e.g., artifacts/cli/aux\_preview.json) if defined in PF09/PF12.  
@@ -2390,7 +2415,8 @@ Aux HEAD/304 are not part of A7; A7 remains Catalog-only.
   * docs/evidence/INDEX.json (plus hash sentinel), and  
   * artifacts/evidence\_index.jsonl  
 * Index updates must be in the same PR as the snapshots.  
-  **Tokens (names-only)**
+
+### **Tokens (names-only)**
 
 Typical tokens used to gate Aux/CLI preview QA (definitions live in PF04/PF09):
 
@@ -2426,7 +2452,9 @@ This playbook focuses on:
 * pinning paths/versions for App BE endpoints  
 * capturing stable header/body snapshots  
 * enforcing the same evidence/index parity rules used elsewhere  
-  **Inputs**  
+
+### **Inputs**
+
 * A staging or prod-like environment exposing App BE public APIs.  
 * A list of App BE endpoints, tagged as:  
   * pure App (no HDE involvement), or  
@@ -2435,7 +2463,8 @@ This playbook focuses on:
   * `LC_ALL=C`  
   * `LANG=C`  
   * `TZ=UTC`  
-* **Scope**
+
+### **Scope**
 
 In scope:
 
@@ -2446,7 +2475,9 @@ Out of scope:
 
 * HDE service routes themselves (covered under §5.1 Catalog/A7 and §5.2 Aux).  
 * Internal-only service-to-service calls that are not part of any QA surface.  
-  **Steps**  
+
+### **Steps**
+
 * Pin path and version per endpoint.  
   * For each App BE endpoint under QA:  
     * record its canonical path (e.g., /api/app/matches/v1/\\)  
@@ -2485,7 +2516,8 @@ Out of scope:
     * fail on missing snapshots for declared App BE endpoints  
     * fail on non-canonical or non-LF-terminated governed artifacts  
     * enforce that the Human Index and mirror entries exist for all governed App BE evidence  
-* **Evidence**
+
+### **Evidence**
 
 Success headers/body snapshots for each App BE endpoint:
 
@@ -2550,7 +2582,8 @@ PF19 does not define FE tools or metrics. It only standardizes that FE QA runs p
   * routing sanity checks  
   * feature-flag smoke  
   * basic accessibility and performance probes  
-* **Scope**
+
+### **Scope**
 
 In scope:
 
@@ -2560,7 +2593,9 @@ Out of scope:
 
 * HD Engine routes and bytes (those live in HDE-titled PF docs).  
 * Detailed UX specs, design review, or full accessibility audits (these are owned by product and design documents).  
-  **Steps**  
+
+### **Steps**
+
 * Routing sanity run.  
   * Execute the FE routing test suite or script for the target environment.  
   * Confirm that key routes load successfully (home, onboarding, match view, settings, and similar).  
@@ -2585,7 +2620,9 @@ Out of scope:
   * docs/evidence/INDEX.json (plus docs/evidence/INDEX.sha256), and  
   * artifacts/evidence\_index.jsonl  
 * Use titles-only descriptions for FE QA artifacts in the human index; schemas and mirror rules remain in PF12.  
-  **Evidence**  
+
+### **Evidence**
+
 * FE routing smoke artifacts (for example artifacts/fe/routing\_smoke\_\\.json).  
 * Feature flags smoke artifacts (for example artifacts/fe/feature\_flags\_smoke\_\\.json).  
 * Accessibility and performance smoke artifacts (for example artifacts/fe/a11y\_perf\_smoke\_\\.json).  
@@ -2593,7 +2630,8 @@ Out of scope:
   * docs/evidence/INDEX.json (plus docs/evidence/INDEX.sha256), and  
   * artifacts/evidence\_index.jsonl,  
     with FE artifacts described by title only per PF12.  
-* **Tokens (names-only, FE pattern)**
+
+### **Tokens (names-only, FE pattern)**
 
 Concrete token names for FE QA live in FE governance or build docs. PF19 suggests patterns such as:
 
@@ -2602,12 +2640,14 @@ Concrete token names for FE QA live in FE governance or build docs. PF19 suggest
 * `APP_FE_A11Y_PERF_SMOKE_OK`  
 * `EVIDENCE_INDEX_UPDATED_OK`  
 * `MACHINE_MIRROR_UPDATED_OK`  
-  **Failures to watch**  
+
+### **Failures to watch**
+
 * Core routes not reachable or redirecting incorrectly in staging or prod-like environments.  
 * Feature flags enabled but not visible, or disabled but still rendering.  
 * Smoke accessibility or performance checks failing beyond agreed thresholds.  
 * FE QA artifacts stored outside governed paths (not under artifacts/\*\* or docs/\*\*).  
-* **FE QA artifacts added without corresponding updates to the human index and machine mirror in the same PR.**
+* FE QA artifacts added without corresponding updates to the human index and machine mirror in the same PR.
 
 ## **5.5 DB & Vendor ingest (authoring plane → DB / sealed pack)**
 
@@ -3058,8 +3098,8 @@ Out of scope:
 
 Typical governed evidence for this playbook includes:
 
-* artifacts/admin/cli\_bundle\_\\.json — CLI admin bundle.  
-* artifacts/admin/http\_bundle\_\\.json — HTTP admin bundle.  
+* `artifacts/admin/cli_bundle_<pair>.json` — CLI admin bundle.  
+* `artifacts/admin/http_bundle_<pair>.json` — HTTP admin bundle.  
 * artifacts/admin/bundle\_parity\_\\.json or equivalent small parity proof.  
 * artifacts/admin/auth\_negative\_cli\_\\.json and artifacts/admin/auth\_negative\_http\_\\.json — negative auth samples.  
 * Optional artifacts/admin/logs.sample — redacted operations log sample.  
@@ -3282,7 +3322,7 @@ Canonical QA evidence roots under audit/qa (including all per-epic trees such as
 
 Broad ignore patterns that match audit/qa/\*\* are forbidden unless they are explicitly paired with allow rules that keep every canonical per-epic QA evidence root (`audit/qa/<epic-id>/`) visible to git.
 
-When a new audit/qa/\\ tree is introduced, the build/infra owner MUST ensure that .gitignore has no entries that match audit/qa, unless explicit allow rules keep per-epic QA evidence trees visible to git while still allowing narrowly targeted ignores for non-evidence scratch files.
+When a new `audit/qa/<epic-id>/` tree is introduced, the build/infra owner MUST ensure that .gitignore has no entries that match audit/qa, unless explicit allow rules keep per-epic QA evidence trees visible to git while still allowing narrowly targeted ignores for non-evidence scratch files.
 
 Older ignore patterns for Audit/QA or audit/qa MUST be reviewed and removed or tightened if they conflict with the canonical `audit/qa/<epic-id>/` evidence-root convention.
 
@@ -3333,7 +3373,9 @@ PF19 preserves the names below for historical traceability and optional bounded 
 * `QA_PRECOMMIT_CHECKLIST_OK`  
 * `TWO_RUN_IDENTITY_OK`  
 * `COMPOSITE_ABBA_IDENTITY_OK`  
-  **9.1.2 Post-commit (general)**  
+
+### **9.1.2 Post-commit (general)**
+
 * `EVIDENCE_INDEX_UPDATED_OK`  
 * `EVIDENCE_INDEX_HASH_OK`  
 * `MACHINE_MIRROR_UPDATED_OK`  
@@ -3346,27 +3388,36 @@ PF19 preserves the names below for historical traceability and optional bounded 
 * `QA_BOOTSTRAP_TOOLING_FAIL`  
 * `QA_HARNESS_DISCIPLINE_OK`  
 * `QA_ACCEPTANCE_MAP_VIABILITY_OK`  
-  **9.1.3 Aux**  
+
+### **9.1.3 Aux**
+
 * `NARR_200_TEXT_OK`  
 * `NARR_SUPPRESSED_NO_ETAG_OK`  
 * `ENV_LC_ALL_C_OK`  
 * `NARR_VARY_AUTH_AE_OK`  
-  **9.1.4 Catalog/A7**  
+
+### **9.1.4 Catalog/A7**
+
 * `A7_GET_QUOTED_ETAG_OK`  
 * `A7_HEAD_PARITY_OK`  
 * `A7_304_OMITS_CT_CL_OK`  
 * `A7_VARY_AUTH_AE_OK`  
 * `A7_ENCODING_INVARIANCE_OK`  
-  **9.1.5 CLI/API & SDKs**  
+
+### **9.1.5 CLI/API & SDKs**
+
 * `CLI_AB_BA_PARITY_OK`  
 * `CLI_READER_EMITTER_PARITY_OK`  
 * `CLI_ADMIN_BUNDLE_PARITY_OK`  
 * `ADMIN_BUNDLE_FULL_PAYLOAD_OK`  
 * `ADMIN_AUTH_REQUIRED_OK`  
-  **9.1.6 Build/CI (PF09)**  
+
+### **9.1.6 Build/CI (PF09)**
+
 * `QA_HARNESS_DISCIPLINE_OK`  
 * `QA_HARNESS_ENTRYPOINT_SELFTEST_OK`  
-  **9.1.7 App FE/BE (App QA docs)**
+
+### **9.1.7 App FE/BE (App QA docs)**
 
 PF19 lists no App-layer acceptance-token name until the exact current App QA or security owner and its versioned semantics, assessed scope, verification method, evidence family, and claim rules are available. This unavailable owner proof is a documentation dependency, not a product PASS, FAIL, waiver, or extinction of accessibility, performance, or security responsibility.
 
@@ -3530,10 +3581,10 @@ Clarification (non-authoritative). Other env-pins snapshots may exist for other 
   * Meaning: The epic’s QA evidence is consolidated to current-state canonical logs, with a manifest that provides deterministic pointers from checks → primary logs.  
   * QA definition (strict):  
     * For each check required by the epic’s QA posture, there exists exactly one canonical primary log at `audit/qa/<epic-id>/checks/<check_id>/primary.log` (one per `check_id`), and it is referenced from the per-epic manifest by its full repository-relative `log_path`.  
-    * The manifest is current-state only. Any per-run retention logs under runs/\\/\\ are optional and non-canonical, and MUST NOT be referenced by log\_path.  
+    * The manifest is current-state only. Any per-run retention logs under `runs/<run_id>/<RUN_SUBPATH>` are optional and non-canonical, and MUST NOT be referenced by log\_path.  
     * The step-log header schema and status vocabulary used in primary logs follow Plan Templates (routed by §4.4.5).  
 * Evidence:  
-  * The epic maintains audit/qa/\\/qa\_step\_logs\_manifest.json as a per-epic index keyed by check\_id, mapping each required check to its canonical primary log via log\_path.  
+  * The epic maintains `audit/qa/<epic-id>/qa_step_logs_manifest.json` as a per-epic index keyed by check\_id, mapping each required check to its canonical primary log via log\_path.  
   * The manifest is deduplicated by check\_id (at most one entry per check\_id), and its log\_path values all point within the epic QA root.  
   * The acceptance map and token matrix bind required tokens to checks and reference the manifest \+ primary logs as the authoritative evidence surfaces.
 
@@ -3641,8 +3692,8 @@ Evidence is as follows:
 * QA definition: For a given match and admin credential, the CLI admin bundle command and the HTTP admin bundle route both call the canonical admin bundle builder and return byte-identical admin bundle JSON objects. No CLI-only or HTTP-only fields appear in the admin bundle payload, and any transport-level differences (for example HTTP headers) are outside the bundle JSON.  
 * Evidence:  
   * A pair of governed admin bundle artifacts for at least one test match:  
-    * artifacts/admin/cli\_bundle\_\\.json (CLI), and  
-    * artifacts/admin/http\_bundle\_\\.json (HTTP),  
+    * `artifacts/admin/cli_bundle_<pair>.json` (CLI), and  
+    * `artifacts/admin/http_bundle_<pair>.json` (HTTP),  
       produced under determinism env pins from the same QA console, both using a valid admin credential.  
 * A small parity artifact (for example artifacts/admin/bundle\_parity\_\\.json or an equivalent diff/proof) demonstrating structural and byte equality of the two JSON bundles after canonical re-serialization.  
 * Indexed entries for all three artifacts in docs/evidence/INDEX.json (plus docs/evidence/INDEX.sha256) and artifacts/evidence\_index.jsonl, each with a co-located path-proof and a Mirror record whose proof\_anchor points at that proof.
@@ -3658,7 +3709,7 @@ Evidence is as follows:
   * meta carries engine\_tag, release\_id, invocation\_tag or equivalent, and bundle source/rails metadata  
 * No required component may be silently omitted or replaced with a placeholder.  
 * Evidence:  
-  * At least one governed admin bundle artifact (for example artifacts/admin/cli\_bundle\_\\.json) per test match, produced via the canonical admin bundle builder under determinism env pins.  
+  * At least one governed admin bundle artifact (for example `artifacts/admin/cli_bundle_<pair>.json`) per test match, produced via the canonical admin bundle builder under determinism env pins.  
   * A QA harness or test that validates:  
     * presence of the required top-level keys (a\_bodygraph, b\_bodygraph, compat, narratives, meta)  
     * that narratives has length 3 and each element carries composition IDs and pack SHA  
@@ -3796,7 +3847,7 @@ These non-token conditions govern bounded live-vendor transport evidence, author
 * Meaning: The plan/harness adheres to governed evidence discipline: canonical primary logs, manifest pointers, and token claims that are names-only and evidence-backed.  
 * Evidence:  
   * The top-level epic QA output folder contains:  
-    * a consolidated step logs manifest (audit/qa/\\/qa\_step\_logs\_manifest.json)  
+    * a consolidated step logs manifest (`audit/qa/<epic-id>/qa_step_logs_manifest.json`)  
     * a canonical primary log per check\_id (as referenced by the manifest)  
     * an indexed evidence bundle via governed INDEX/Mirror (where applicable)  
 * Each invoked step’s primary log begins with a Plan Templates step-log header as routed by §4.4.5 and includes:  
@@ -3817,7 +3868,7 @@ Evidence (names-only; current posture) is as follows:
   * the current-state primary step log at `audit/qa/<epic-id>/checks/<check_id>/primary.log`, referenced by the manifest, and  
   * an entry in `audit/qa/<epic-id>/qa_step_logs_manifest.json` for the viability `check_id` whose `log_path` is that full repository-relative primary-log path.
 
-Note: Under current QA posture, the manifest is a current-state index keyed by check\_id. Optional per-run retention paths under audit/qa/\\/runs/\\/\\ may exist, but are not required for this token.
+Note: Under current QA posture, the manifest is a current-state index keyed by check\_id. Optional per-run retention paths under `audit/qa/<epic-id>/runs/<run_id>/<RUN_SUBPATH>` may exist, but are not required for this token.
 
 Relationships to other QA posture (names-only; no new scope). This token supports “don’t start Live QA until the scaffolding is runnable.” It complements baseline discovery context capture (D0 discovery / environment baseline) and rails posture discipline (closed-rails by default; open-rails only where explicitly required), by preventing “missing assets / non-runnable plan” failures before PO Live QA begins.
 
@@ -4517,7 +4568,7 @@ The decision-unit identifiers below preserve the refresh guide's traceability. T
 | 13.7 | SRC-0268 | L | Retain close-pack binding and lookup proof as reusable guidance. |
 | 13.8 | SRC-0274 | H | Retain the EPIC028 entry declaration as history. |
 | 13.8 | SRC-0287 | H | Retain the six-deliverable D0 PASS set as EPIC028-specific history. |
-| 13.8 | SRC-0292 | H | Retain the temporary PF10 clarification as historical; PF10-HDE-Build-Notes has no current addenda. |
+| 13.8 | SRC-0292 | H | Retain the temporary PF10 clarification as historical; current HDE Build Notes addenda govern where they speak. |
 | 13.8 | SRC-0296 | L | Retain single-home acceptance-binding guidance; the current plan and owner define the binding home. |
 | 13.9 | SRC-0312 | L | Retain the branch-truth and functional-anchor proof pattern as guidance. |
 | 13.9 | SRC-0316 | L | Retain the separation of runtime correctness, evidence coherence, and scope cleanliness. |
@@ -5272,8 +5323,6 @@ Durable QA learnings are as follows:
 
 Known non-goals: this entry does not redefine canonical JSON mechanics, arrays-as-sets semantics, evidence publication or Machine Mirror mechanics, exact repository paths, commands, tests, hashes, artifacts, PF09 row text or status, close-pack bytes, token semantics, workflow syntax, implementation state, deployment state, or current repository state. PF19 records the QA posture and review learnings only.
 
-Known non-goals: this entry does not redefine token semantics, A7 byte rules, transport bytes, public Reader posture, exact vendor endpoint bytes, exact auth header values, exact request-body fields, exact response-envelope bytes, exact credential values, exact evidence paths, exact tests, exact PF09.5 status rows, exact Live QA runbook bytes, final QA closeout report bytes, QA RCA bytes, AI runtime scope, public Reader changes, new HTTP homes, PF23 audit requirements, PF29 workflow text, mapped-cache implementation work, production upsert authorization, or concrete PF02, PF03, PF05, PF09.5, PF12, PF14, PF20, PF27, or PF29 doc deltas. PF19 records QA posture and review learnings only.
-
 ## **13.19 HDE-CRD-0001 — Accepted QA and closed-change record**
 
 **H — Supplied historical evidence.** HDE Build Notes Addendum 2.15, “HDE-CRD-0001 — QA Evidence Acceptance and Final Reporting Requirements,” records completed execution and independent evidence acceptance, with final reporting then owed. Addendum 2.16, “HDE-CRD-0001 — Record Closed Change and Pending Post-Closure Drainage,” records the later final Report/RCA and closure. This entry attributes those supplied records; it is not a new repository inspection, QA run, PR acceptance, merge or closure decision.
@@ -5636,7 +5685,8 @@ Profile ownership and future-definition gates are as follows:
 | App Back End | `BE Lead / App Backend owner`, with Infra/Ops for environment wiring | `Lead Developer` | Complete every required §14.5.2 fact from the owning App repository and infrastructure canon in one coordinated change. |
 | App Front End — Web | `FE Lead / App Frontend owner`, with Infra/Ops for environment wiring | `Lead Developer` | Complete every required §14.5.3 fact from the owning App repository and infrastructure canon in one coordinated change. |
 | App Front End — Mobile | `Mobile/App Frontend owner`, with Infra/Ops for environment wiring | `Lead Developer` | Establish whether Codespaces supports the required mobile surfaces and, if not, canonize the alternate QA console before completing §14.5.4. |
-| Update trigger(s) include: |  |  |  |
+
+Update trigger(s) include:
 
 * repo/toolchain change that affects QA steps  
 * Codespaces base image change  

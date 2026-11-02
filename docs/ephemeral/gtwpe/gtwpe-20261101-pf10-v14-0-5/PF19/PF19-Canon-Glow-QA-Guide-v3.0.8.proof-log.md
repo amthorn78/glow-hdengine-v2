@@ -1,91 +1,157 @@
 # Proof log — PF19-Canon-Glow-QA-Guide v3.0.8 (application) — gtwpe-20261101-pf10-v14-0-5 (T-06)
 
-This is the application report for `PF19-Canon-Glow-QA-Guide-v3.0.8.md`, in this directory. It records how that revised PF was made from the v3.0.7 baseline and the validated redlines package, what changed and on what basis, and what was verified. The revised PF is not an authoritative publication: `docs/pfcanon/` is unchanged.
+This is the application report for `PF19-Canon-Glow-QA-Guide-v3.0.8.md`, in this directory. It records how that revised PF was made from the v3.0.7 baseline and preparation revision 3 of the redlines package, what changed and on what basis, and what was verified. This application supersedes the earlier one from revision 2 (§8). The revised PF is not an authoritative publication: `docs/pfcanon/` is unchanged.
 
 ## 1. Artifact and outcome
 
 | Field | Value |
 | :---- | :---- |
 | Artifact | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF19/PF19-Canon-Glow-QA-Guide-v3.0.8.md` |
-| Artifact identity | 690,272 bytes; 5,674 lines; SHA-256 `5d44bfc0328f6e4dbd14f0d44499d4dd5731ed67bd29747336c022a92036cedd`; git blob `4aa22d07fe9b45e1850c16a12796f8be9c9f080d` |
+| Artifact identity | 693,191 bytes; 5,724 lines; SHA-256 `910a547a48cca507c6c254b16e62a0c0838c33e50853e8795e43b4d995baec53`; git blob `be69ef865460392079bdc92e1709bdcb053e76d4` |
 | In-document identity | Title PF19-Canon-Glow-QA-Guide; Status Canon; Version v3.0.8; Effective date 2026-11-02; Last Update Gate `BN 14.0.5`; Invocation tag `INV-f2ac55d77ce9aacc` |
-| Applier | TW-APPLY-10 — Apply Validated Redlines — 100926.1, Notion page `3f44590a05eb81eebff6e3afa3d9aa5b` (fetched live when this step began; page state 2026-10-09T11:05:22.207Z), run in the same Claude Code session Nathan started for T-06, after the TW-DRAIN-10 step, as his handoff authorizes. No subagent, reviewer or other session was used. |
-| Application outcome | Applied: ten content operations and a three-field metadata plan; zero rejected |
-| Execution date | 2026-11-02 (UTC; started 2026-11-02T00:37Z) |
+| Applier | TW-APPLY-10 — Apply Validated Redlines — 100926.1, Notion page `3f44590a05eb81eebff6e3afa3d9aa5b`. It was re-fetched live when this application step began, and the page state (2026-10-09T11:05:22.207Z) is unchanged. It ran in the Claude Code session Nathan started for T-06. No subagent, reviewer or other session was used. |
+| Application outcome | Applied: 52 content operations and a three-field metadata plan; none rejected |
+| Execution date | 2026-11-02 (UTC; this application started 2026-11-02T02:29Z) |
 
 ## 2. Inputs and identities
 
 | Role | Identity |
 | :---- | :---- |
-| Original baseline | `docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.7.md` on `origin/main` `84d6d1cad95c67788336d174dc4b8922d9bb0cb2`; v3.0.7; git blob `9af5e056608153aa8b279b5f170b6c7528e0e35b`; raw-byte SHA-256 `e745ef3a939f103ef1aeeaef17e6d04ff0c03ca7e8ecc0d95abf261a07c1b160`; 682,678 bytes; 5,622 lines. This is the preparer's recorded baseline, which is identical at the handoff baseline `e2b7427ff418ca8f08f05587c4a541308a76da56`. The fingerprint was compared byte for byte in the same raw representation. |
-| Redlines package | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF19/PF19-Canon-Glow-QA-Guide-v3.0.7.redlines.gtwpe-20261101-pf10-v14-0-5.md`, preparation revision 2, at commit `533841af` on `claude/gtwpe-triage-authoring-j94ewf`; SHA-256 `480d35dcbca1916e04208212103fb02dbe334a082285577997c85664150c83e2`, matching the preparer's proof log |
+| Original baseline | `docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.7.md` on `origin/main` `84d6d1cad95c67788336d174dc4b8922d9bb0cb2`; v3.0.7; git blob `9af5e056608153aa8b279b5f170b6c7528e0e35b`; raw-byte SHA-256 `e745ef3a939f103ef1aeeaef17e6d04ff0c03ca7e8ecc0d95abf261a07c1b160`; 682,678 bytes; 5,622 lines. It is the preparer's recorded baseline, compared byte for byte in the same raw representation. It is unchanged since the handoff baseline `e2b7427ff418ca8f08f05587c4a541308a76da56`. |
+| Redlines package | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF19/PF19-Canon-Glow-QA-Guide-v3.0.7.redlines.gtwpe-20261101-pf10-v14-0-5.md`, preparation revision 3, at commit `7b84281d7a740b972bf9d21801f0c3b231a8b202`; SHA-256 `b745bf6522b1e20c376335f55375478e8d10a4aae30740b9fac6eee031639156`, matching the preparer's proof log |
 | Preparation proof log | `PF19-Canon-Glow-QA-Guide-v3.0.7.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md`, same directory and commit |
-| Preparer | TW-DRAIN-10 100926.1, the preparation step of this same session; run `gtwpe-20261101-pf10-v14-0-5` T-06, preparation revision 2; outcome `READY` / `COMPLETE_PACKAGE`, with no unresolved or blocking item. Revision 1 (commit `137e98f`) was superseded by the preparer before any application. |
-| Change source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, v14.0.5, git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`, unchanged on `main`. Selected units: 2.8 lines 1063–1106 and 1111–1127; 2.15 lines 1650–1804; 2.2 lines 517–551; 2.16 lines 1869–1939. These match the handoff and the ledger. Supporting reading as the preparer records it. |
-| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md`, task T-06; rows C-17, C-18, C-26 (assigned), C-07, C-29 (uncertain), C-20, C-30 (supporting) |
+| Preparer | TW-DRAIN-10 100926.1, the preparation step of this same session; run `gtwpe-20261101-pf10-v14-0-5` T-06, preparation revision 3; outcome `READY` / `COMPLETE_PACKAGE`, with no unresolved or blocking item. The two held items (H-06, H-08) are left untouched, as recorded. |
+| Product Owner direction | Nathan, 2026-11-02: "fixed the defects and inconsistencies you noticed. And PF10 addenda should be referenced in any case". The preparer's proof log, §5.4, §5.5, §5.8 and §6, records how that direction is read. |
+| Change source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, v14.0.5, git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`, unchanged on `main`. Selected units: 2.8 lines 1063–1106 and 1111–1127; 2.15 lines 1650–1804; 2.2 lines 517–551; 2.16 lines 1869–1939. These match the handoff and the ledger. |
+| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md`, task T-06; rows C-17, C-18, C-26 (assigned), C-07, C-29 (uncertain, now drained), C-20, C-30 (supporting) |
 | Editorial standard | `docs/pfcanon/PF03-Reference-Technical-Writing-Best-Practices-v1.8.8.md`, read completely in this session |
 
-Intake verification. The complete original, the complete package and the complete preparation proof log were read. The preparation proof log records:
+Intake verification. The complete original, the complete revision-3 package and its complete preparation proof log were read. The proof log records:
 
 * complete target coverage, in eighteen windows that sum to 682,678 bytes;
 * complete selected-source coverage;
 * every change accounted for;
-* the held items H-06 and H-08, with what each waits for;
 * producer validation with a one-pass simulation;
 * `READY` / `COMPLETE_PACKAGE`.
 
-The original on `main` at application time is byte-identical to the preparer's baseline, so no drift needed reconciling.
+The original on `main` at application time is byte-identical to the preparer's baseline.
 
 ## 3. Operation ledger and basis
 
-Every content operation is a `REPLACE` of one whole baseline line, expected and observed exactly once. The rationale and source references below are the preparer's (its proof log §5.2 and §5.3).
+Every content operation is a `REPLACE` of one or more whole, contiguous baseline lines, expected and observed exactly once. The change type, source rows and rationale below are the preparer's, as the package and its proof log state them.
 
-| ID | Baseline line and location | Change type; source rows | Basis |
-| :---- | :---- | :---- | :---- |
-| RL-01 | 436, §2.3 first paragraph | CONSISTENCY; C-26 (R-1, R-2 context) | 2.15 R-1 (every Epic's QA runs the live compat test) and R-2 (only the Product Owner may waive it). Adds that, for an Epic, the Product Owner's rails posture always includes the open-rails live compat test unless he records a waiver, so §2.3 cannot be read as allowing a closed-rails-only acceptance without one. |
-| RL-02 | 503, §3.1.1 paragraph after the assessment table | NEW_CANON; C-26 (R-2) | 2.15 R-2: an agent's finding that the surfaces are not live, or that the test cannot run meaningfully, is a question put to the Product Owner as a named decision no later than QA-10 readiness, and the QA Plan is not approval-ready until he answers. Placed in §3.1.1, the QA-10 home. |
-| RL-03 | 511, end of §3.1.2 | NEW_CANON; C-26 (R-4, R-3, R-2 waiver form); support C-30 | 2.15 R-4: the `Live test:` line with `RAN`, `WAIVED` or `MISSING` in the eight listed records; the MISSING effects table; no agent override; prompts apply it. R-3: "Live QA" is reserved, other QA is "closed-rails QA", and a report without the test says "No live test ran." in its first line. R-2: only the Product Owner may waive; the waiver is written and change-specific, quotes his words with their date, and carries HDE Governance's exemption content; what is not a waiver. All of it is scoped to Epics, with the CRD question left open. |
-| RL-04 | 638, §3.4 introduction | NEW_CANON; C-26 (R-1, R-3, R-4 routing) | Routes §3.4's execution pattern to the §3.5.5 minimum and the §3.1.2 line and name rules, so that following the pattern cannot be taken to make a check live. |
-| RL-05 | 742, §3.4.3 path-grammar row | CANON_UPDATE; C-18; C-17 context; support C-20 | 2.8 decision 7 and the stated limit (an admitted Epic has the same close-run family; HDE-EPIC041 is the one Epic admitted; another Epic needs its own admission), and the 2026-11-01 amendment note (l.1127). Replaces the false "No Epic close-run family is admitted". Repository facts were inspected read-only (preparer's proof log §4). |
-| RL-06 | 782, §3.4.3 approved exception 5 | CANON_UPDATE; C-18; support C-20 | As RL-05: adds the admitted Epic's close-run family beside the CRD's. |
-| RL-07 | 1124, "Close-pack truthfulness and same-run execution" | CANON_UPDATE; C-18; C-17 context; support C-20 | As RL-05: the home of same-run close evidence for an admitted CRD or Epic. Replaces the false "No Epic close-run family is admitted". |
-| RL-08 | 1146, "Close report requirements" | CANON_UPDATE; C-18 (B-2); C-17 context; support C-20 | 2.8 stated limit (l.1100), B-2: an Epic's source may point to its own close-run directory before the close run writes it, and only a CRD must. The writer at `tools/qa/generate_epic_close_pack.py` lines 2635–2655 on `main` was inspected. |
-| RL-09 | 1369, §3.5.5, before "Production-affecting Live QA minimum" | NEW_CANON; C-26 (R-1, R-5, R-6 routing); support C-30 | 2.15 R-1, in full: live vendor compat and its pass predicates; the deployed-service check; SYN-A and SYN-B as Ops-stored synthetic fixtures, registered and stored per 2.16 R-3 (C-30); the Epic's own live surfaces; what does not satisfy the test. R-5: a test that cannot run is `TOOLING_BLOCKED` and never becomes a PASS, a waiver or a closure. R-6 is applied by routing to the subsection's existing execution controls. The production-affecting rules stay as additions, and the CRD question stays open. |
-| RL-10 | 3903, §9.2.15.6 required-elements checklist | CONSISTENCY; C-26 (R-4) | 2.15 R-4 requires the line in the final QA Report and RCA, so the closeout checklist confirms its presence and value. |
+| ID | Baseline lines | Location | Change type | Source rows and rationale | Bytes old → new |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| RL-01 | line 138 | §0.4.3, the paragraph beginning “Change-process artifacts, including QA readiness” (baseline line 138) | NEW_CANON | C-07 (2.2 R-1, R-2) | 946 → 2571 |
+| RL-02 | line 221 | §1.4, Infra/ops ownership, the base-URL sub-bullet (baseline line 221) | DOC_HYGIENE | Defect: export-damaged link with a lost placeholder | 227 → 219 |
+| RL-03 | line 406 | §2.2.11, sub-bullet beginning “Release and security, QA and audit, and closeout validation are distinct lanes.” (baseline line 406) | NEW_CANON | C-07 (2.2 R-3, second bullet; the first bullet is held with CCR-5, H-06) | 256 → 629 |
+| RL-04 | line 418 | §2.2.12, its only paragraph (baseline line 418) | NEW_CANON | C-29 (2.16 R-1, R-2); support C-30 | 229 → 1548 |
+| RL-05 | line 436 | §2.3, first paragraph, beginning “Every EPIC’s PO specifies what rails posture” (baseline line 436) | CONSISTENCY | C-26 (R-1, R-2 context) | 208 → 353 |
+| RL-06 | line 503 | §3.1.1, the paragraph after the assessment-state table, beginning “QA-10 is the readiness decision and remediation return point.” (baseline line 503) | NEW_CANON | C-26 (R-2, QA-10 question) | 346 → 701 |
+| RL-07 | line 511 | §3.1.2, the third and last paragraph, beginning “Ops remains implementation work:” (baseline line 511) | NEW_CANON | C-26 (R-4, R-3, R-2 waiver form); support C-30; HDE Build Notes source reference | 448 → 2659 |
+| RL-08 | line 638 | §3.4 introductory paragraph, before §3.4.1 (baseline line 638) | NEW_CANON | C-26 (R-1, R-3, R-4 routing) | 250 → 701 |
+| RL-09 | line 742 | Path-grammar table row “Post-verdict close-run evidence of an admitted CRD” (baseline line 742) | CANON_UPDATE | C-18 (Epic close-run family); C-17 context; support C-20 | 1317 → 1578 |
+| RL-10 | line 782 | Approved exceptions, item 5 (baseline line 782) | CANON_UPDATE | C-18 (Epic close-run family); support C-20 | 140 → 197 |
+| RL-11 | line 1073 | §3.4.10, Reviewer hygiene rules, the omission-marker bullet (baseline line 1073) | CONSISTENCY | Inconsistency: approved omission marker against §3.4.10 line 1017 and PF03 | 141 → 145 |
+| RL-12 | lines 1112–1113 | Baseline line 1113, after the §3.4.11 bullet list | DOC_HYGIENE | Defect: §3.4.12 heading flattened into the last §3.4.11 bullet | 140 → 143 |
+| RL-13 | line 1124 | Third paragraph of “Close-pack truthfulness and same-run execution (normative)”, beginning “For a CRD that the canonical evidence updater admits,” (baseline line 1124) | CANON_UPDATE | C-18 (Epic close-run family); C-17 context; support C-20 | 482 → 529 |
+| RL-14 | line 1146 | Last paragraph of “Close report requirements (validator-bound; mechanical)” before the operator-prose paragraph, beginning “The same requirements apply to a CRD close report” (baseline line 1146) | CANON_UPDATE | C-18 (Epic close-run pointer, B-2); C-17 context; support C-20 | 665 → 834 |
+| RL-15 | line 1206 | §3.5.1, second bullet (baseline line 1206) | DOC_HYGIENE | Defect: lost placeholder (first of two in the line; the second is not recoverable) | 216 → 225 |
+| RL-16 | line 1369 | The line “Production-affecting Live QA minimum is as follows.” (baseline line 1369) | NEW_CANON | C-26 (R-1, R-5, with the R-6 routing); support C-30; HDE Build Notes source reference | 51 → 4005 |
+| RL-17 | lines 2182–2183 | §5 playbook sub-heading “Steps” (baseline line 2183) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 112 → 114 |
+| RL-18 | lines 2245–2246 | §5 playbook sub-heading “Tokens (names-only)” (baseline line 2246) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 112 → 115 |
+| RL-19 | lines 2254–2255 | §5 playbook sub-heading “Failures to watch” (baseline line 2255) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 57 → 59 |
+| RL-20 | lines 2262–2263 | §5 playbook sub-heading “Where it lives (titles-only)” (baseline line 2263) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 124 → 126 |
+| RL-21 | lines 2279–2280 | §5 playbook sub-heading “Inputs” (baseline line 2280) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 151 → 153 |
+| RL-22 | lines 2288–2289 | §5 playbook sub-heading “Scope” (baseline line 2289) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 75 → 78 |
+| RL-23 | lines 2333–2334 | §5 playbook sub-heading “Evidence” (baseline line 2334) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 101 → 103 |
+| RL-24 | lines 2341–2342 | §5 playbook sub-heading “Tokens (names-only)” (baseline line 2342) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 84 → 87 |
+| RL-25 | lines 2377–2378 | §5 playbook sub-heading “Inputs” (baseline line 2378) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 80 → 82 |
+| RL-26 | lines 2386–2387 | §5 playbook sub-heading “Scope” (baseline line 2387) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 26 → 29 |
+| RL-27 | lines 2397–2398 | §5 playbook sub-heading “Steps” (baseline line 2398) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 93 → 95 |
+| RL-28 | lines 2436–2437 | §5 playbook sub-heading “Evidence” (baseline line 2437) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 109 → 112 |
+| RL-29 | lines 2501–2502 | §5 playbook sub-heading “Scope” (baseline line 2502) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 60 → 63 |
+| RL-30 | lines 2511–2512 | §5 playbook sub-heading “Steps” (baseline line 2512) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 131 → 133 |
+| RL-31 | lines 2536–2537 | §5 playbook sub-heading “Evidence” (baseline line 2537) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 130 → 132 |
+| RL-32 | lines 2544–2545 | §5 playbook sub-heading “Tokens (names-only, FE pattern)” (baseline line 2545) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 95 → 98 |
+| RL-33 | lines 2553–2554 | §5 playbook sub-heading “Failures to watch” (baseline line 2554) | DOC_HYGIENE | Defect: §5 playbook sub-heading flattened into a list (pattern stated at line 2157) | 57 → 59 |
+| RL-34 | line 2559 | §5.4, Failures to watch, last item (baseline line 2559) | DOC_HYGIENE | Defect: stray bold on one list item | 111 → 107 |
+| RL-35 | lines 3010–3011 | §5.8, Evidence, first two items (baseline lines 3010–3011) | DOC_HYGIENE | Defect: lost `<pair>` placeholder (form proved at lines 2971 and 2979) | 127 → 135 |
+| RL-36 | line 3234 | §8, Gitignore rails for QA roots (baseline line 3234) | DOC_HYGIENE | Defect: lost `<epic-id>` placeholder | 282 → 292 |
+| RL-37 | lines 3284–3285 | §9.1 sub-heading “9.1.2 Post-commit (general)” (baseline line 3285) | DOC_HYGIENE | Defect: §9.1 sub-heading flattened into the glossary list (§9.1.1 at line 3280 is a heading) | 68 → 70 |
+| RL-38 | lines 3297–3298 | §9.1 sub-heading “9.1.3 Aux” (baseline line 3298) | DOC_HYGIENE | Defect: §9.1 sub-heading flattened into the glossary list (§9.1.1 at line 3280 is a heading) | 54 → 56 |
+| RL-39 | lines 3302–3303 | §9.1 sub-heading “9.1.4 Catalog/A7” (baseline line 3303) | DOC_HYGIENE | Defect: §9.1 sub-heading flattened into the glossary list (§9.1.1 at line 3280 is a heading) | 51 → 53 |
+| RL-40 | lines 3308–3309 | §9.1 sub-heading “9.1.5 CLI/API & SDKs” (baseline line 3309) | DOC_HYGIENE | Defect: §9.1 sub-heading flattened into the glossary list (§9.1.1 at line 3280 is a heading) | 60 → 62 |
+| RL-41 | lines 3314–3315 | §9.1 sub-heading “9.1.6 Build/CI (PF09)” (baseline line 3315) | DOC_HYGIENE | Defect: §9.1 sub-heading flattened into the glossary list (§9.1.1 at line 3280 is a heading) | 58 → 60 |
+| RL-42 | lines 3317–3318 | §9.1 sub-heading “9.1.7 App FE/BE (App QA docs)” (baseline line 3318) | DOC_HYGIENE | Defect: §9.1 sub-heading flattened into the glossary list (§9.1.1 at line 3280 is a heading) | 75 → 78 |
+| RL-43 | line 3482 | §9.2.4, `QA_HARNESS_DISCIPLINE_OK` QA definition (baseline line 3482) | DOC_HYGIENE | Defect: lost placeholders (form proved at line 1952) | 160 → 179 |
+| RL-44 | line 3485 | §9.2.4, `QA_HARNESS_DISCIPLINE_OK` evidence (baseline line 3485) | DOC_HYGIENE | Defect: lost `<epic-id>` placeholder (canonical path at line 1933) | 178 → 184 |
+| RL-45 | lines 3593–3594 | §9.2.7, `CLI_ADMIN_BUNDLE_PARITY_OK` evidence (baseline lines 3593–3594) | DOC_HYGIENE | Defect: lost `<pair>` placeholder (form proved at lines 2971 and 2979) | 109 → 117 |
+| RL-46 | line 3610 | §9.2.7, `ADMIN_BUNDLE_FULL_PAYLOAD_OK` evidence (baseline line 3610) | DOC_HYGIENE | Defect: lost `<pair>` placeholder (form proved at line 2971) | 192 → 196 |
+| RL-47 | line 3748 | §9.2.13, `QA_HARNESS_DISCIPLINE_OK` evidence (baseline line 3748) | DOC_HYGIENE | Defect: lost `<epic-id>` placeholder (canonical path at line 1933) | 85 → 91 |
+| RL-48 | line 3769 | §9.2.13, the note after the viability evidence list (baseline line 3769) | DOC_HYGIENE | Defect: lost placeholders (form proved at lines 1933 and 1952) | 199 → 225 |
+| RL-49 | line 3903 | Required-elements checklist, the bullet “the completed final QA Report and separate RCA for every completed run” (baseline line 3903) | CONSISTENCY | C-26 (R-4 at the final QA Report and RCA) | 157 → 298 |
+| RL-50 | line 4468 | §13, Complete flagged-unit classification ledger, row SRC-0292 (baseline line 4468) | DOC_HYGIENE | Defect: false statement about HDE Build Notes; current addenda referenced | 125 → 137 |
+| RL-51 | lines 5221–5223 | §13.18, the second “Known non-goals” paragraph (baseline lines 5221–5223; line 5221 is kept) | DELETION | Defect: §13.18 repeats §13.17's non-goals paragraph (line 5223 equals line 5203) | 1103 → 408 |
+| RL-52 | line 5587 | §14.6, last row of the ownership table (baseline line 5587) | DOC_HYGIENE | Defect: list lead-in captured as a table row | 39 → 27 |
 
-Rows decided with no change, as the preparer records them:
+Basis, by group, as the preparer's proof log gives it:
 
-* C-17: already represented at baseline l.742, l.782, l.1124 and l.1146.
-* C-07: no PF19 requirement falls within the l.525 scope; the locations are in the preparer's proof log §5.4.
-* C-29: PF19 states no GATE:CORE-DET evidence; there are zero occurrences of the gate or the retired entries (preparer's proof log §5.5).
+* **C-07, HDE Build Notes 2.2 (RL-01, RL-03).**
+  * R-1: planning documents serve planning only. Nothing that executes, validates or is governed evidence binds a `docs/ephemeral/` path.
+  * R-2: PF-Canon is resolved by stable identity and cited by title. The §10.8 version record is attribution only.
+  * R-3's second bullet: the close-pack writer's test is a close-stage test.
+  * R-3's first bullet stays held with CCR-5 (H-06).
+  * PF19 is the home because its §0.4.3 rules on change-process artifacts and its §2.2.11 CI-lane rules bear on the same subject. The drain follows GTWPE-D3 and Nathan's 2026-11-02 direction.
+* **C-29, HDE Build Notes 2.16 (RL-04).**
+  * R-1: GATE:CORE-DET evidence is the real compat path, that is, the five CI owner tests and the live compat test. The Reader goldens prove emission only.
+  * R-2: the retired entries are not current proof.
+  * PF19's home is §2.2.12, its determinism and AB↔BA rule. The gate's lists stay with HDE Governance.
+* **C-26, HDE Build Notes 2.15 (RL-05 to RL-08, RL-16, RL-49).**
+  * R-1 to R-5, as applied in revision 2.
+  * RL-07 and RL-16 now also reference HDE Build Notes as the source of the Product Owner's direction.
+* **C-18, HDE Build Notes 2.8 amendment (RL-09, RL-10, RL-13, RL-14).** The Epic close-run family and the Epic pointer, as applied in revision 2.
+* **Defects and inconsistencies (RL-02, RL-11, RL-12, RL-15, RL-17 to RL-48, RL-50 to RL-52; 39 operations).** These are Nathan's 2026-11-02 direction. Each fix is proved by PF19's own text (preparer's proof log §5.8):
+  * 24 headings flattened by the export are restored (§3.4.12, seventeen §5 playbook sub-headings, §9.1.2 to §9.1.7);
+  * eleven lines with lost placeholders are restored, each proved by intact text elsewhere;
+  * the false SRC-0292 claim now references current HDE Build Notes addenda;
+  * the duplicated §13.18 paragraph is deleted;
+  * the stray §14.6 table row becomes a paragraph again;
+  * one stray bold is removed;
+  * the broken §1.4 example URL is replaced;
+  * the §3.4.10 omission marker is aligned.
+  * Placeholders PF19 cannot prove are left as they are and listed in the preparer's proof log §5.8.
 
-Held and not applied: H-06 (CCR-5, §3.1.3, unchanged) and H-08 (CCR-6, §3.4.3 and §3.4.8 tension).
+Rows decided with no change: C-17, already represented (baseline l.742, l.782, l.1124, l.1146). Held and not applied: H-06 (CCR-5) and H-08 (CCR-6).
 
 ## 4. Metadata plan (document control)
 
 | Field | Before | After | Derivation |
 | :---- | :---- | :---- | :---- |
-| Version | v3.0.7 | v3.0.8 | Final numeric component of the native dotted version incremented once; prefix and component count kept |
+| Version | v3.0.7 | v3.0.8 | Final numeric component of the native dotted version incremented once |
 | Effective date | 2026-10-26 | 2026-11-02 | Actual application execution date, native `YYYY-MM-DD` format |
-| Last Update Gate | `BN 13.8.8; HDE-CRD-0002-specification-v1.1-approved.md` | `BN 14.0.5` | The package records one source, `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, so the gate is `BN` and that file's version |
-| Status | Canon | Canon (unchanged) | Not stale: PF19's classification is Canon |
+| Last Update Gate | `BN 13.8.8; HDE-CRD-0002-specification-v1.1-approved.md` | `BN 14.0.5` | The package records one source file, `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`. The Product Owner's direction is not a source file. |
+| Status | Canon | Canon (unchanged) | Not stale |
 | Title, Invocation tag | unchanged | unchanged | Not authorized to change |
 
-The header's labels, order and the two trailing spaces on each line are preserved. A whole-file search found no internal restatement of the document's own version (`v3.0.7`) or date (`2026-10-26`) outside the header, so nothing else needed synchronizing. PF19 has no change-log or revision-history section, so no history entry is required, and the package carries none. The metadata spans (lines 7–9) do not overlap any content operation; the first content operation is at line 436.
+The header's labels, order and trailing spaces are preserved. No internal restatement of the document's own version or date exists outside the header. PF19 has no change-log section, so no history entry is required. The metadata spans (lines 7–9) do not overlap any content operation; the first content operation starts at line 138.
 
 ## 5. Validation and preservation
 
-Before any edit, the whole batch was validated against the unchanged original, independently of the preparer's tools: the package was parsed from the committed file, and each old block's count and span, the operation spellings, the payloads and the metadata spans were checked. The plan had no conflicts. Nothing was rejected, so the application went ahead.
+Before any edit, the whole batch and the metadata plan were validated against the unchanged original, independently of the preparer's tools. The package was parsed from the committed file, and each old block's count and span, the operation spellings, the payloads and the conflicts were checked. Nothing was rejected.
 
 The edits were applied by original offsets, in descending order, on raw UTF-8 with LF line endings, with no rematching against changed text.
 
 Preservation audit (offset-based, whole document):
 
-* 14 untouched original intervals totalling 677,289 bytes are byte-identical in the output at their shifted offsets. The 13 consumed spans total 4,181 bytes. Together they account for all 682,678 original bytes.
-* Each of the 13 payloads (10 content, 3 metadata) is present exactly at its planned output offset, and each content payload occurs exactly once in the output.
-* The heading set is unchanged (269 headings). Code-fence count is unchanged. Table lines rose from 204 to 213, which is the new nine-line `MISSING` table in RL-03. The final LF is preserved, and no CR was introduced.
-* Status and drafting markers: no `Draft` status language about the document, and no placeholder, TODO, drafting note or editorial comment was added (marker counts unchanged). No ASCII triple-dot or Unicode ellipsis was added.
-* Independent cross-check: the output with its original three header lines restored has SHA-256 `5ef9cfd6e957e438582177c8329d644499c4c2c7b7ef02050cdb63b4ef43cafb`, exactly the preparer's recorded one-pass simulation of the content redlines.
+* 56 untouched original intervals totalling 670,473 bytes are byte-identical in the output at their shifted offsets. The 55 consumed spans total 10,997 bytes. Together they account for all 682,678 original bytes.
+* Each of the 55 payloads (52 content, 3 metadata) is present exactly at its planned output offset.
+* Headings: the 269 original headings are preserved in order with their text and level. The only additions are the 24 planned restorations, for 293 in all.
+* Code-fence count is unchanged. Table lines went from 204 to 212: the new nine-line `MISSING` table in RL-07, less the stray §14.6 row (RL-52).
+* The final LF is preserved, and no CR was introduced.
+* No `Draft` status language about the document, placeholder marker, TODO, drafting note or editorial comment was added; the marker counts are unchanged. No ASCII triple-dot or Unicode ellipsis was added.
+* "No Epic close-run family is admitted" and "has no current addenda" no longer occur.
+* Independent cross-check: the output with its original three header lines restored has SHA-256 `2e5b3334fec64f80cb06a9da59ef7bd4fb52465757511741112f4655cce46fdc`, exactly the preparer's recorded simulation of revision 3.
 * The saved file was read back in full and compared byte for byte with the produced output: identical.
 
 These are text checks, not product QA.
@@ -93,10 +159,15 @@ These are text checks, not product QA.
 ## 6. Limitations and next action
 
 * The revised PF is a reviewable output under `docs/ephemeral/`, not canon. Publishing it to `docs/pfcanon/` is Nathan's manual action, and no `docs/pfcanon/` file was edited.
-* No QA, Ops or product test was run. The repository's pre-push check classifies this change as documentation-only, which starts no hosted CI run. Its result is not CI, QA or governed evidence.
-* Next manual action: Nathan reviews draft PR [amthorn78/glow-hdengine-v2#826](https://github.com/amthorn78/glow-hdengine-v2/pull/826), which carries this output, and decides whether to publish PF19 v3.0.8. Nathan merges.
+* PF19 still contains lost placeholders whose original text it does not prove. The preparer's proof log §5.8 lists them, and recovering them needs Nathan's original wording.
+* No QA, Ops or product test was run. The pre-push check classifies the change as documentation-only, which starts no hosted CI. Its result is not CI, QA or governed evidence.
+* Next manual action: Nathan reviews draft PR [amthorn78/glow-hdengine-v2#826](https://github.com/amthorn78/glow-hdengine-v2/pull/826) and decides whether to publish PF19 v3.0.8. Nathan merges.
 
 ## 7. Save verification
 
-* Revised PF: saved at the path in §1, read back completely, and identical to the verified output (SHA-256 above).
+* Revised PF: saved at the path in §1, read back completely, and identical to the verified output.
 * This proof log: saved beside it and read back. It records no hash of itself.
+
+## 8. Supersession
+
+This application replaces the earlier v3.0.8 output and its proof log, which were applied from preparation revision 2 at commit `e56a1833c1e175e9178eee7cde5558ebe3e10c8b` (SHA-256 `5d44bfc0328f6e4dbd14f0d44499d4dd5731ed67bd29747336c022a92036cedd`). Both belong to the same run, T-06, and keep the same file names. The earlier bytes remain in the branch history at that commit. The version is v3.0.8 in both, because each is one increment from the v3.0.7 baseline.
