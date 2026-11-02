@@ -4,15 +4,15 @@
 
 | Field | Value |
 | :---- | :---- |
-| Artifact this log documents | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF14/PF14-Canon-HDE-Mechanics-Guide-v3.5.9.redlines.gtwpe-20261101-pf10-v14-0-5.md` (27,268 bytes; SHA-256 `68f6083df1e1134fce4bfb7c29ffd010dd9dcec6f3a1dffb4c8a55d231150d21`) |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-05/prep-r1` |
+| Artifact this log documents | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF14/PF14-Canon-HDE-Mechanics-Guide-v3.5.9.redlines.gtwpe-20261101-pf10-v14-0-5.md` (r2: 30,050 bytes; SHA-256 `af0883ccc9366cbf7a23b0ca162c4a76df666d602f53978e848316b3f6346fff`) |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-05/prep-r2`. It supersedes `prep-r1` (redlines 27,268 bytes, SHA-256 `68f6083df1e1134fce4bfb7c29ffd010dd9dcec6f3a1dffb4c8a55d231150d21`, in commit `9de402f`); §12 records why |
 | Prompt | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1, Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live when the step began (page state 2026-10-09T11:05:22Z) |
 | Authorized sequence | Nathan's handoff authorizes TW-DRAIN-10, then TW-APPLY-10 100926.1 (page `3f44590a05eb81eebff6e3afa3d9aa5b`) in this one session, after a READY / COMPLETE_PACKAGE result |
 | Preparer | The T-05 document session Nathan started, Claude Code session `https://claude.ai/code/session_01Q789tzJUmD5Z4ev1Pg4q1z`. No subagent, reviewer or other session was used |
-| Prepared | 2026-11-02, redlines saved about 00:30Z |
+| Prepared | 2026-11-02: r1 saved about 00:30Z; r2 saved about 00:42Z |
 | Preparation outcome | `READY` |
 | Save state | `COMPLETE_PACKAGE`: both files saved and read back in full (§9) |
-| Correction route | An Apply diagnostic returns to TW-DRAIN-10 in this session, which issues a corrected package under a new run identity (`prep-r2`) |
+| Correction route | An Apply diagnostic returns to TW-DRAIN-10 in this session, which issues a corrected package under a new run identity. r2 is such a correction, made by the preparer itself before any application was pushed |
 
 ## 2. Sources and inputs
 
@@ -78,7 +78,7 @@ Not read: 2.1 D-3 (345–396), 2.6 (884–961) and 2.11 to 2.16 (1333–1976). T
 | C-13 | 2.4 WU-PR-02: loader removed with no shim; DELTA-002 recorded | Actionable: RL-01, RL-02 | 2.4 "Required canon drainage": §1.1 "the loader seam posture and remediation paragraph" describe `engine/charts/loader.py` as current reality |
 | C-14 | 2.5 QA-10 triage: DELTA-002 confirmed (l.854) | Actionable: RL-01, RL-02 (DELTA-002 wording). Its other items are not PF14's: DELTA-003 is H-03, the PF09 rows H-01, CCR-5 H-06, PF23 #19–#27 H-04 | 2.5 "Required canon drainage", DELTA-002: replace the drift sentence with the delivered boundary |
 | C-16 | 2.7 QA-120 PASS | Supporting | Verdict PASS (l.962–1000); DELTA-002 drains after all QA tasks and is never a close blocker ("Required canon drainage") |
-| C-17 | 2.8 close-pack writer ADR, decisions 1–9, stated limits, drainage table | Row 1, generator: already represented. Row 1, close-run API: CRD API already represented; the Epic API is RL-06 (with C-18). Row 2, CRD filename form: already represented. Row 2, v2 `key_outputs` minimum: already represented. Decisions 1–6, 8 and 9 and the other limits drain to other homes | Equivalence locations: §37.2 "Close-pack generator (mechanics; single-writer; normative)", line 5035 ("For a `close_candidate_source.v2` source, Epic or CRD, the generic close-pack generator is `tools/qa/generate_epic_close_pack.py`", with its single `--source`, `--write`/`--check`, tracked-input and manifest-last rules, beside the EPIC-025 entrypoint); §1.6.3 line 919 (`publish_crd_close_run_family(...)`, family membership, Index key form); §37.2 "CRD close-pack artifacts (canonical filenames)", line 5033; §37.3 lines 5130–5138 (the five-key v2 minimum and `OUTPUT_BINDING_MISMATCH`). The table routes the other decisions to Change Process Guide, HDE Schemas & Artifacts, Glow QA Guide and HDE Governance |
+| C-17 | 2.8 close-pack writer ADR, decisions 1–9, stated limits, drainage table | Row 1, generator: already represented. Row 1, close-run API: CRD API already represented; the Epic API is RL-06 (with C-18). Row 2, CRD filename form: partly represented; the conditional external QA RCA form is added by RL-09 (r2). Row 2, v2 `key_outputs` minimum: already represented. Decisions 1–6, 8 and 9 and the other limits drain to other homes | Equivalence locations: §37.2 "Close-pack generator (mechanics; single-writer; normative)", line 5035 ("For a `close_candidate_source.v2` source, Epic or CRD, the generic close-pack generator is `tools/qa/generate_epic_close_pack.py`", with its single `--source`, `--write`/`--check`, tracked-input and manifest-last rules, beside the EPIC-025 entrypoint); §1.6.3 line 919 (`publish_crd_close_run_family(...)`, family membership, Index key form); §37.2 "CRD close-pack artifacts (canonical filenames)", line 5033, which names the CRD close report, manifest, path proofs and doc-delta ledger but not the QA RCA (2.8 decision 4 and its stated limit bind a bound QA RCA to `audit/<prefix>_QA_RCA.md`); §37.3 lines 5130–5138 (the five-key v2 minimum and `OUTPUT_BINDING_MISMATCH`). The table routes the other decisions to Change Process Guide, HDE Schemas & Artifacts, Glow QA Guide and HDE Governance |
 | C-18 | 2.8 amendment of 2026-11-01: Epic close-run family; Epic tracked-issue ID form | Epic close-run family: actionable, RL-06. Epic tracked-issue ID form: not PF14's share | The amendment lists two canon consequences (l.1127). PF14 has no tracked-issue content: a bounded search for `TI-`, "tracked issue", `ISSUE-EPIC` and `close_candidate_source` finds only §1.6.3 and §37.2/§37.3 text unrelated to tracked issues. The ID form is a schema and close-pack-content rule, routed by PF14 to HDE-Schemas & Artifacts, and owned for close PR content by Change Process Guide §3.5.2.1 form (b) and Plan Templates "Tracked Issues". B-2 (pointer rule) and B-3 (Epic Index rows) are not among the listed consequences, and PF14 has no pointer or close-pack-row rule that they contradict |
 | C-20 | 2.9 CL-05: B-1 to B-4; CCR-5 bounded | Supporting for RL-06 | 2.9 B-4 row (`publish_epic_close_run_family` and Epic close-run discovery). CCR-5 is H-06 and not PF14's |
 | C-21 | 2.10 HDE-EPIC041 closure | Closure evidence for C-12 to C-16; supporting for RL-01 and RL-02 | `CLOSE / CHANGE_CLOSED`, 2026-11-01T16:39Z. PF09 row-closure table (l.1309–1321): DELTA-002, "No status change recommended (text drain only)", "Supportable from repo evidence", "after a separate canon-only drain step". PSR-001 to PSR-003 |
@@ -101,6 +101,7 @@ Held, not drafted:
 | RL-06 | §1.6.3: "No Epic close-run family is admitted." becomes a new bullet for Epic close-run admission (`ADMITTED_EPIC_CLOSE`, HDE-EPIC041 only) and `publish_epic_close_run_family` | 2.8 drainage table row and note, decision 7, stated limits; 2.9 B-4; repository inspection |
 | RL-07 | §27.3: new "Output-root ownership" rules for the attestation builder (exclusive claim, no writes through symlinks, scoped cleanup), with the unchanged interface and a nonclaim | 2.1 D-4 builder decision |
 | RL-08 | §27.5: new "Log-path bound" for `tools/evidence/run_sanity_pipeline.py --log-path`, with a nonclaim | 2.1 D-4 sanity-pipeline decision |
+| RL-09 | §37.2 "CRD close-pack artifacts (canonical filenames)": new sentence giving the CRD form of the conditional external QA RCA, `audit/HDE-CRD-<NNNN>_QA_RCA.md` | 2.8 drainage table row ("§37.2 epic-scoped close-pack filename list": add the CRD filename form); decision 3 (a CRD's ID is its prefix); decision 4 and the stated limit ("A bound QA RCA must be `audit/<prefix>_QA_RCA.md`, using the close report's own prefix") |
 
 C-02 and DELTA-002 in §1.1. The uncertainty was resolved by proving the spans disjoint (UTF-8 byte offsets in the original): RL-01 [15061, 15936), RL-02 [15938, 16486), RL-03 gap at 22698, RL-04 [23833, 23999), RL-05 [24811, 25020). No two touch, and no gap lies at or inside a replaced span. Combining them was unnecessary.
 
@@ -135,7 +136,7 @@ All checks are read-only, on `e2b7427`, with code paths unchanged at `origin/mai
 Two independent passes, both against the unchanged original, with scripts kept outside the repository.
 
 1. Batch validation and one-pass simulation from the edit specification: for each redline, the literal's exact count in the whole original (OLD 1 for each `REPLACE`; BEFORE 1, AFTER 1 and BEFORE+AFTER 1 for each `INSERT`); the containing heading chain at each span or gap; a pairwise check for overlapping spans, shared gaps and gaps at or inside a replaced span (none); one-pass application by original offset; after application, each NEW or INSERT text present exactly once and each OLD text absent; no ellipsis in any payload. Result: PASS.
-2. Re-parse of the saved redlines file without the specification: every literal extracted by the stated fence convention, its byte length, SHA-256 and final-LF flag checked against the values printed beside it, every count and the overlap check repeated, and the batch applied in one pass. Result: PASS, eight items, and a revised text byte-identical to pass 1.
+2. Re-parse of the saved redlines file without the specification: every literal extracted by the stated fence convention, its byte length, SHA-256 and final-LF flag checked against the values printed beside it, every count and the overlap check repeated, and the batch applied in one pass. Result: PASS, nine items, and a revised text byte-identical to pass 1. r1 and r2 were compared literal by literal: RL-01 to RL-08 have identical lengths and SHA-256 values, and RL-09's three literals are the only addition.
 
 | ID | Op | Count (expected 1) | Original lines | Section, by heading chain |
 | :---- | :---- | :---- | :---- | :---- |
@@ -147,8 +148,9 @@ Two independent passes, both against the unchanged original, with scripts kept o
 | RL-06 | `REPLACE` | OLD 1 | 919 | §1.6 > §1.6.3 |
 | RL-07 | `INSERT` | gap 1 (BEFORE 1, AFTER 1) | after 4443 | §27 > §27.3 |
 | RL-08 | `INSERT` | gap 1 (BEFORE 1, AFTER 1) | after 4489 | §27 > §27.5. The gap lies immediately before the nested heading at line 4490, so the inserted text belongs to §27.5 itself |
+| RL-09 | `INSERT` | gap 1 (BEFORE 1, AFTER 1) | inside 5033 | §37 > §37.2 |
 
-Simulated revision (body edits only; the header is left to TW-APPLY-10): 674,486 bytes, SHA-256 `9418462d18b20c295d19e8a278bed2a8c7dc853cfc4424d0b2b69e2bf93d4fe7`, 7,748 LF characters, still without a final LF.
+Simulated revision (body edits only; the header is left to TW-APPLY-10): 674,635 bytes, SHA-256 `6461608118cd62115abd309745e3061af7ee8656c6e375f74040b0b791990f52`, 7,748 LF characters, still without a final LF.
 
 ## 9. Save verification
 
@@ -176,3 +178,11 @@ Simulated revision (body edits only; the header is left to TW-APPLY-10): 674,486
 ## 11. Next step
 
 READY / COMPLETE_PACKAGE. Nathan's handoff authorizes TW-APPLY-10 100926.1 in this session, fetched live from Notion when that step begins. Its inputs: this original, the redlines file and this proof log; the same ledger rows and selected source boundaries; branch `claude/gtwpe-triage-authoring-j94ewf` (draft PR amthorn78/glow-hdengine-v2#826, open); the final file under the name TW-APPLY-10 derives (expected `PF14-Canon-HDE-Mechanics-Guide-v3.5.10.md`) with its `.proof-log` beside it; and, if needed, the diagnostic `PF14-apply-diagnostic.gtwpe-20261101-pf10-v14-0-5.md`, all in this directory.
+
+## 12. Revision r2
+
+* What changed. RL-09 was added. RL-01 to RL-08 are unchanged, byte for byte.
+* Why. After the r1 package was pushed (`9de402f`), the shared branch showed that the T-04 and T-06 document sessions had revised their own packages to apply GTWPE-D3, drain by context and scope, within their assigned rows. This session rechecked its own equivalence claims for T-05's assigned rows the same way. r1 had recorded C-17's "CRD filename form" row as already represented by §37.2 line 5033. That was only partly true: 2.8 decision 4 and its stated limit bind a CRD's external QA RCA to the close report's own prefix, and the paragraph omits it. The recheck widened nothing beyond T-05's rows; the anchors in §10's scope question remain outside them.
+* Other rows rechecked, no further change: C-02 (no other PF14 text keys route selection on a non-v2 base; §1.2, §17.10.1 and §32.2 name `HD_API_BASE_URL` consistently with D-2); C-04 (no other normative PF14 text covers the attestation builder's output root or `--log-path`; line 5972 is a records-only path list); C-13 and C-14 (the loader appears elsewhere only in the historical HDE-EPIC030 record at line 5697, kept as written); C-18 (no tracked-issue content); C-07 (as in §4).
+* Lineage. r1 was applied once in a local, unpushed commit. That commit was discarded before this revision and never reached the shared branch. No output of r1 exists on the branch.
+* Validation. Both passes in §8 were rerun on r2 and pass.

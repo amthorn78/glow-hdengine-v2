@@ -9,19 +9,23 @@
 | Source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`; HDE Build Notes v14.0.5; git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`; SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`; 1,976 lines; read at `e2b7427` |
 | Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` at `142feb35144d8795f927e0c78b665ace52279064`; task T-05; rows C-02, C-04, C-13, C-14, C-17, C-18; uncertain C-07; supporting C-06, C-12, C-16, C-20, C-21 |
 | Preparing prompt | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1 (Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live at step start) |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-05/prep-r1` |
-| Preparer | The T-05 document session that Nathan started, in Claude Code session `https://claude.ai/code/session_01Q789tzJUmD5Z4ev1Pg4q1z`; prepared 2026-11-02T00:26Z |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-05/prep-r2`. It supersedes `prep-r1` (commit `9de402f`) before any application of r1 was pushed; §"Revision r2" below gives the reason |
+| Preparer | The T-05 document session that Nathan started, in Claude Code session `https://claude.ai/code/session_01Q789tzJUmD5Z4ev1Pg4q1z`; r1 prepared 2026-11-02T00:26Z, r2 prepared 2026-11-02T00:40Z |
 | Preparation outcome | `READY` |
 | Proof log | `PF14-Canon-HDE-Mechanics-Guide-v3.5.9.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md`, beside this file |
 
 ## How to apply
 
-* Resolve every locator against the unchanged original target. Apply all eight redlines in one pass by original position. No redline's output is another redline's locator, and no two redlines touch the same span or gap.
+* Resolve every locator against the unchanged original target. Apply all nine redlines in one pass by original position. No redline's output is another redline's locator, and no two redlines touch the same span or gap.
 * Literal convention. Each literal is the exact UTF-8 text strictly between the LF that ends its opening fence line (` ````text `) and the LF immediately before its closing fence line (` ```` `). A literal that ends with a line ending therefore shows an empty line before its closing fence. Trailing spaces inside a literal are part of it. Each literal's byte length and SHA-256 are stated beside it; the fence and info string are not part of the literal.
 * `REPLACE`: OLD occurs exactly once in the whole original. Replace that one span with NEW.
 * `INSERT`: BEFORE immediately followed by AFTER occurs exactly once in the whole original. Insert at the boundary between them. Neither anchor is changed.
 * No `FIND_AND_REPLACE` or `DELETE` operation is used.
 * The original's last line has no trailing LF. No redline touches the end of the document.
+
+## Revision r2
+
+r1 recorded C-17's "CRD filename form" drainage row as already represented by §37.2's paragraph "CRD close-pack artifacts (canonical filenames)". A context-and-scope recheck of the selected rows found that the paragraph omits the conditional external QA RCA, which HDE Build Notes 2.8 binds to the close report's own prefix (`audit/<prefix>_QA_RCA.md`). r2 adds RL-09 for it. RL-01 to RL-08 are unchanged, byte for byte. r1 was never applied to a pushed output.
 
 ## Document control (reserved for TW-APPLY-10)
 
@@ -48,6 +52,7 @@ Source that justifies this update, in source order: `docs/pfcanon/PF10-HDE-Build
 | RL-06 | `REPLACE` | §1.6.3, Epic close-run family and publication API | C-17, C-18 |
 | RL-07 | `INSERT` | §27.3, attestation builder output-root ownership | C-04 (D-4) |
 | RL-08 | `INSERT` | §27.5, the `--log-path` bound | C-04 (D-4) |
+| RL-09 | `INSERT` | §37.2, the CRD form of the conditional external QA RCA | C-17 |
 
 C-02 and DELTA-002 both change §1.1. Their spans are disjoint: DELTA-002 covers original lines 179 and 181, and C-02 covers the gap after line 214 and lines 222 and 226. The proof log gives the byte offsets.
 
@@ -272,6 +277,37 @@ INSERT (580 bytes; SHA-256 `f4547191846b1a0a6e832d6c560917f872fb76042aca3d0c45ed
 Log-path bound (normative). `tools/evidence/run_sanity_pipeline.py --log-path` accepts, inside the repository, only the canonical log `audit/gates/sanity_pipeline/sanity_pipeline.log`. Outside the repository it accepts a target only when the target is not a symlink and no component of its path is a symlink, its parent directory exists, and it names a regular file or no existing file. A refused target fails with a typed, numeric-free error before any step runs or any byte is written. This bound states required behavior; it does not claim that the current pipeline conforms.
 
 
+````
+
+## RL-09
+
+* Operation: `INSERT`
+* Change type: CANON_UPDATE
+* Ledger rows: C-17 (2.8 drainage table, CRD filename form; decision 4 and the QA RCA stated limit)
+* Heading path (raw original heading lines): line 4984 `# **37\) Documentation Artifacts and Registry \[Required-Now\]**` > line 4996 `  ## **37.2 Governance & homes**`
+* Location: Paragraph "CRD close-pack artifacts (canonical filenames)" (original line 5033): new sentence after the doc-delta ledger sentence
+* Controlling basis: HDE Build Notes v14.0.5 addendum 2.8, "Required canon drainage" row HDE Mechanics Guide ("§37.2 epic-scoped close-pack filename list": add the CRD filename form); decision 3 (a CRD uses its ID as the prefix); decision 4 (the QA RCA, embedded or bound as `audit/<prefix>_QA_RCA.md`); stated limit ("A bound QA RCA must be `audit/<prefix>_QA_RCA.md`, using the close report's own prefix").
+* Rationale: The CRD filename paragraph names the close report, manifest and doc-delta ledger but not the conditional external QA RCA, so the CRD filename form was only partly represented; preparation r1 recorded it as fully represented.
+* Expected occurrence of the BEFORE+AFTER gap in the whole original: 1. Observed: 1 (BEFORE alone: 1; AFTER alone: 1). Original UTF-8 byte offset of the gap: 431037, inside original line 5033. Neither anchor is changed.
+
+BEFORE (74 bytes; SHA-256 `e731315d9c3c835d64c8bf7def597cdba6d28cfc6cea286eef3d73ae44fe203f`; ends with LF: no):
+
+````text
+so its doc-delta ledger is `audit/docdeltas/hde-crd-<NNNN>_doc_deltas.md`.
+````
+
+AFTER (105 bytes; SHA-256 `9304555caca8291d838a13cdc76ab574137fe94cd254539129fb1bea8dabb475`; ends with LF: no):
+
+````text
+ These are governed artifacts and must not be duplicated under alternate spellings.
+
+Close-pack generator
+````
+
+INSERT (149 bytes; SHA-256 `0cffc4b4f9745df1e7f4e36062a4c89b6d8555043b67db373fff1b81cd4cb71d`; ends with LF: no):
+
+````text
+ When its QA RCA summary is not embedded in the close report, the conditional external QA RCA uses the same prefix, `audit/HDE-CRD-<NNNN>_QA_RCA.md`.
 ````
 
 END OF REDLINES
