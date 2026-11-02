@@ -4,10 +4,10 @@
 
 | Field | Value |
 | :---- | :---- |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5` task T-06, preparation revision 1 |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5` task T-06, preparation revision 2 (supersedes revision 1, see the proof log §11) |
 | Target (original baseline) | `docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.7.md`, in-document title PF19-Canon-Glow-QA-Guide, v3.0.7, read at `origin/main` `e2b7427ff418ca8f08f05587c4a541308a76da56`; git blob `9af5e056608153aa8b279b5f170b6c7528e0e35b`; SHA-256 `e745ef3a939f103ef1aeeaef17e6d04ff0c03ca7e8ecc0d95abf261a07c1b160`; 682,678 bytes; 5,622 lines |
 | Source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, v14.0.5; git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`; SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`; selected units 2.8 (lines 1063–1106, 1111–1127), 2.15 (lines 1650–1804), 2.2 (lines 517–551) and 2.16 (lines 1869–1939) |
-| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` at `142feb35144d8795f927e0c78b665ace52279064`; task T-06; rows C-17, C-18, C-26 (assigned), C-07, C-29 (uncertain), C-20, C-30 (supporting) |
+| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` at `142feb35144d8795f927e0c78b665ace52279064` (the handoff's identity), re-read at `aef3266a0cd180405db363465f69ec2efdb1417b`, where the T-06 rows are unchanged and the 2026-11-02 correction and §8 apply; task T-06; rows C-17, C-18, C-26 (assigned), C-07, C-29 (uncertain), C-20, C-30 (supporting) |
 | Preparer | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1, run in the Claude Code session Nathan started for T-06 on 2026-11-02 |
 | Preparation outcome | `READY` |
 | Proof log | `PF19-Canon-Glow-QA-Guide-v3.0.7.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md`, in this directory |
@@ -17,8 +17,8 @@
 * Every payload is fenced with `~~~~~~`. The literal is every byte between the line after the opening fence and the line before the closing fence, lines joined by LF, with no trailing LF. The fence lines and the labels around them are not part of the literal.
 * Every old block is one complete baseline line without its terminating LF. Each old block occurs exactly once in the whole original baseline (expected and observed count 1).
 * Each replacement replaces only its old block. The baseline LF that follows the old block stays in place, so no neighbouring blank line, heading or table row is consumed.
-* All seven redlines resolve independently against the unchanged original. Their spans do not overlap and no redline's output is another's locator.
-* Trailing spaces are literal. RL-04's old block and its replacement each end with two U+0020 spaces, as the baseline list item does.
+* All ten redlines resolve independently against the unchanged original. Their spans do not overlap and no redline's output is another's locator.
+* Trailing spaces are literal. RL-06's old block and replacement, and each line of RL-10's old block and replacement, end with two U+0020 spaces, as the baseline list items do.
 
 ## Document-control fields for TW-APPLY-10
 
@@ -40,8 +40,50 @@ Sources that justify this update, in source order: `docs/pfcanon/PF10-HDE-Build-
 ### RL-01
 
 * Operation: `REPLACE`
+* Change type: CONSISTENCY
+* Source rows: C-26 (R-1, R-2 context)
+* Heading path (literal baseline heading lines, outermost first): `# **2\. Pre-commit QA (local/CI)**` > `## **2.3 Rails & environment posture — PO/epic mandated rails**`
+* Location: §2.3, first paragraph, beginning “Every EPIC’s PO specifies what rails posture” (baseline line 436)
+* Expected occurrence of the old block in the whole baseline: 1
+
+Old block:
+
+~~~~~~
+Every EPIC’s PO specifies what rails posture must be used to accept the epic (open rails vs closed rails). This posture is non-negotiable: it informs which tests must be run and how results are interpreted.
+~~~~~~
+
+Replacement:
+
+~~~~~~
+Every EPIC’s PO specifies what rails posture must be used to accept the epic (open rails vs closed rails). This posture is non-negotiable: it informs which tests must be run and how results are interpreted. For an Epic, that posture always includes the open-rails live compat test of §3.5.5, unless the Product Owner records a waiver of it (§3.1.2).
+~~~~~~
+
+### RL-02
+
+* Operation: `REPLACE`
 * Change type: NEW_CANON
-* Source rows: C-26 (R-4, R-3); support C-30
+* Source rows: C-26 (R-2, QA-10 question)
+* Heading path (literal baseline heading lines, outermost first): `# **3\. Post-commit QA (staging/prod)**` > `## **3.1 Intent**` > `### **3.1.1 Integrated implementation audit and readiness**`
+* Location: §3.1.1, the paragraph after the assessment-state table, beginning “QA-10 is the readiness decision and remediation return point.” (baseline line 503)
+* Expected occurrence of the old block in the whole baseline: 1
+
+Old block:
+
+~~~~~~
+QA-10 is the readiness decision and remediation return point. There is no separate mandatory QA-15 stage, and neither Guide authoring nor QA Plan authoring acquires another readiness gate. PF23/PF10 publication of informational proposals is manual Product Owner work and does not gate progression. Actual scope and approval decisions still apply.
+~~~~~~
+
+Replacement:
+
+~~~~~~
+QA-10 is the readiness decision and remediation return point. There is no separate mandatory QA-15 stage, and neither Guide authoring nor QA Plan authoring acquires another readiness gate. PF23/PF10 publication of informational proposals is manual Product Owner work and does not gate progression. Actual scope and approval decisions still apply. For an Epic, a finding that the Epic's surfaces are not on a live path, or that the live compat test of §3.5.5 cannot run meaningfully, is put to the Product Owner as a named decision no later than QA-10's readiness decision. Such a finding is a question, not a waiver, and the QA Plan is not approval-ready until the Product Owner answers it (§3.1.2).
+~~~~~~
+
+### RL-03
+
+* Operation: `REPLACE`
+* Change type: NEW_CANON
+* Source rows: C-26 (R-4, R-3, R-2 waiver form); support C-30
 * Heading path (literal baseline heading lines, outermost first): `# **3\. Post-commit QA (staging/prod)**` > `## **3.1 Intent**` > `### **3.1.2 Independent QA, reporting and closure**`
 * Location: §3.1.2, the third and last paragraph, beginning “Ops remains implementation work:” (baseline line 511)
 * Expected occurrence of the old block in the whole baseline: 1
@@ -68,7 +110,7 @@ Live test line (normative; Epics). For an Epic, each of these records carries a 
 * the close mutation set result; and
 * the closure decision.
 
-`WAIVED` needs the Product Owner's own written waiver for the change. Silence, reviewer agreement, convenience, closed-rails success and an agent's finding that the test does not apply are not waivers. `MISSING` blocks each stage:
+Only the Product Owner may decide that the live compat test, or any part of it, does not apply to an Epic. `WAIVED` needs the Product Owner's own written waiver, specific to the change, that quotes the Product Owner's words with their date and carries the exemption content HDE Governance requires. Silence, reviewer agreement, convenience, closed-rails success and an agent's finding that the test does not apply are not waivers; without a recorded waiver, the live compat test applies in full. `MISSING` blocks each stage:
 
 | Stage | Effect of `MISSING` |
 | :---- | :---- |
@@ -87,7 +129,7 @@ No agent may override that block; only the Product Owner may waive the live comp
 Both rules are expressly scoped to Epics (§0.2); §3.5.5 records the open CRD question.
 ~~~~~~
 
-### RL-02
+### RL-04
 
 * Operation: `REPLACE`
 * Change type: NEW_CANON
@@ -110,7 +152,7 @@ This section describes a manual Live QA execution pattern that is generalized ac
 For an Epic, Live QA always includes the live compat test of §3.5.5; only QA that covers or records that test, or a recorded Product Owner waiver of it, carries the name “Live QA”, and each QA record carries the live test line of §3.1.2. This pattern governs how a Live QA check is run and evidenced. Following it does not make a check live: a QA run whose checks all ran under closed rails is closed-rails QA, whatever its records are titled.
 ~~~~~~
 
-### RL-03
+### RL-05
 
 * Operation: `REPLACE`
 * Change type: CANON_UPDATE
@@ -131,7 +173,7 @@ Replacement:
 | Post-verdict close-run evidence of an admitted CRD or Epic | `audit/qa/<crd-id>/close/<check_id>/primary.log` for a CRD, or `audit/qa/<epic-id>/close/<check_id>/primary.log` for an Epic, each with its sibling `primary.log.path_proof.txt` | Introduced by HDE Build Notes for a CRD that the canonical evidence updater admits and extended to an Epic whose close run it admits; `<crd-id>` is the CRD's lower-case directory form, for example `hde-crd-0002`, and `<epic-id>` is the Epic's, for example `hde-epic041`. Each close-run check has one primary holding same-run mechanical evidence of the change's close workflow, rendered from that check's captured command, exit code and output as a Plan Templates v2 step-log header, with the PASS, FAIL or BLOCKED posture that “Close-pack truthfulness and same-run execution” requires. Only the canonical evidence updater writes the family, after the final QA verdict; it neither reopens nor adds to `qa_step_logs_manifest.json` or any `checks/` primary. Its members are the validated primaries and path proofs under `close/`, and anything else there is refused. This membership rule is a scoped exception, for `close/` only, to the rule against inferring state by enumerating subdirectories (§4.4.2); that rule continues to govern `checks/` and every other part of the QA root, where `qa_step_logs_manifest.json` stays the authoritative index. An Epic has the family only after its own explicit admission; HDE-EPIC041 is the first Epic admitted. HDE Schemas & Artifacts and HDE Build Notes govern the family's artifact contract. |
 ~~~~~~
 
-### RL-04
+### RL-06
 
 * Operation: `REPLACE`
 * Change type: CANON_UPDATE
@@ -152,7 +194,7 @@ Replacement:
 5. exact owner-defined closeout surfaces, including the post-verdict close-run family of an admitted CRD under `audit/qa/<crd-id>/close/` or of an admitted Epic under `audit/qa/<epic-id>/close/`;  
 ~~~~~~
 
-### RL-05
+### RL-07
 
 * Operation: `REPLACE`
 * Change type: CANON_UPDATE
@@ -173,7 +215,7 @@ Replacement:
 For a CRD or an Epic that the canonical evidence updater admits, the home of that same-run close evidence is the post-verdict close-run family under `audit/qa/<crd-id>/close/` or `audit/qa/<epic-id>/close/` (§3.4.3): one primary log per close-run check, each with its sibling path proof, published after the final QA verdict without reopening or adding to the change's approved QA step-logs manifest or any `checks/` primary. An Epic has that family only after its own explicit admission; HDE-EPIC041 is the first Epic admitted.
 ~~~~~~
 
-### RL-06
+### RL-08
 
 * Operation: `REPLACE`
 * Change type: CANON_UPDATE
@@ -194,11 +236,11 @@ Replacement:
 The same requirements apply to a CRD close report, for example `audit/HDE-CRD-0002_close_report.md`. The generic close-pack writer renders both elements from a `close_candidate_source.v2` source, for an Epic or a CRD: the heading `QA Rails — Open/Close (Final PR)` verbatim, and the “Acceptance and evidence pointers” list with one entry for each pointer the source records. For a CRD, the change's close-run family root, `audit/qa/<crd-id>/close/`, is a required pointer, and the writer refuses a source that omits it. An Epic's source may record its own close-run family root, `audit/qa/<epic-id>/close/`, as a pointer before the close run writes that directory, but is not required to. HDE Mechanics Guide, HDE Schemas & Artifacts and Change Process Guide own the writer, its source schema and the close-pack paths of record.
 ~~~~~~
 
-### RL-07
+### RL-09
 
 * Operation: `REPLACE`
 * Change type: NEW_CANON
-* Source rows: C-26 (R-1, with the R-6 routing); support C-30
+* Source rows: C-26 (R-1, R-5, with the R-6 routing); support C-30
 * Heading path (literal baseline heading lines, outermost first): `# **3\. Post-commit QA (staging/prod)**` > `## **3.5 Live QA via Codespaces → Railway (cross-epic crib)**` > `### **3.5.5 PO Live QA sessions (vendor-first rails)**`
 * Location: The line “Production-affecting Live QA minimum is as follows.” (baseline line 1369)
 * Expected occurrence of the old block in the whole baseline: 1
@@ -224,6 +266,7 @@ Every Epic's QA Plan includes, and its QA run executes, the live compat test bel
   * the two pairs produce different results.
 * Deployed-service check. Compare the production HD Engine's `/internal/version` release identity with the release on `main`, and have the production Reader, for each Reader version, score the two synthetic stored people SYN-A and SYN-B in both orders. Each answer must be eligible and bands-only, and AB and BA must be byte-identical. Report as findings with the QA result any mismatch between the deployed release and `main`, and any difference between the deployed bands and the CLI bands for the same birth data.
 * SYN-A and SYN-B. The production Reader scores only people whose charts are stored in the production database, so two synthetic people are kept there as permanent QA fixtures under fixed UUIDs: SYN-A, `9cff60ae-6eb6-5618-aec5-8acaa4f290d2`, born 1990-01-01 at 12:00 in Amsterdam, Netherlands; and SYN-B, `57f0c055-ff09-5fdb-aedb-def880437e6f`, born 1985-07-15 at 08:30 in London, United Kingdom. Their identities are registered in the EPIC011 test-identity record and the engine's synthetic identity map. They are synthetic fixtures stored through the engine's own write path under the Product Owner's write authorization, not app users; QA does not create or store them, and the §3.3 prohibition on QA-created user records stands. If either is missing when a QA run starts, the deployed-service check is `TOOLING_BLOCKED` until it is stored again.
+* A live test that cannot run. A live compat test that cannot run, for missing credentials, missing target facts, an unavailable vendor or a missing authorization, is `TOOLING_BLOCKED` under HDE Governance. The Epic waits: a blocked live test never becomes a PASS, a waiver or a closure, and the Product Owner decides how to proceed.
 * The Epic's own live surfaces. When the Epic's own surfaces are on a production or vendor path, the QA Plan also includes at least one open-rails step that exercises those surfaces live, under the production-affecting minimum below and HDE Governance.
 * What does not satisfy the test: closed-rails tests, fixture replay, mocks, static analysis, governed evidence artifacts, review approval and an unrun procedure.
 
@@ -232,6 +275,28 @@ The live compat test is Ops evidence under HDE Governance, and the execution con
 This minimum, and the live test line and “Live QA” name rules in §3.1.2, are expressly scoped to Epics (§0.2). Whether a CRD that changes runtime code also runs the live compat test is a Product Owner decision that HDE Build Notes leaves open; this guide does not decide it.
 
 Production-affecting Live QA minimum is as follows.
+~~~~~~
+
+### RL-10
+
+* Operation: `REPLACE`
+* Change type: CONSISTENCY
+* Source rows: C-26 (R-4 at the final QA Report and RCA)
+* Heading path (literal baseline heading lines, outermost first): `# **9\. Legacy QA acceptance-token compatibility**` > `## **9.2 Legacy QA Acceptance Token Library (optional compatibility)**` > `### **9.2.15 Review rails for optional legacy token metadata**` > `#### **9.2.15.6 Final QA closeout review required elements (required; closeout gate)**`
+* Location: Required-elements checklist, the bullet “the completed final QA Report and separate RCA for every completed run” (baseline line 3903)
+* Expected occurrence of the old block in the whole baseline: 1
+
+Old block:
+
+~~~~~~
+* the completed final QA Report and separate RCA for every completed run, including all-PASS, with actual doc-delta and failure/causal limitations retained  
+~~~~~~
+
+Replacement:
+
+~~~~~~
+* the completed final QA Report and separate RCA for every completed run, including all-PASS, with actual doc-delta and failure/causal limitations retained  
+* for an Epic, the live test line of §3.1.2 in the final QA Report and RCA, with its value and the evidence references or waiver it cites  
 ~~~~~~
 
 END OF REDLINES
