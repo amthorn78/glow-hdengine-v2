@@ -20,7 +20,7 @@ A single, canonical infrastructure map for Glow that records **where things live
     
 * Canonical environment and config key names (for example, `DATABASE_URL`, `HDE_BASE_URL`, `DEV_SAMPLER_URL`).  
     
-* Canonical root paths for governed evidence and QA trees (for example, `audit/qa/<epic-id>/...`).
+* Canonical root paths for governed evidence and QA trees (for example, `audit/qa/<epic-id>/` and `audit/qa/<crd-id>/`).
 
 PF07 does **not** define operations policy, runbooks, transport rules, byte contracts, token semantics, or detailed schema fields. Those live in other PF docs. PF07 may pin concrete reference values (hostnames, base URLs, ports, directory roots, key names) where there is no other single home for that information.
 
@@ -39,7 +39,7 @@ PF07 is an infrastructure inventory. Behavioral semantics, contracts, tokens, an
     
 * **Jobs/guards and evidence procedures** → the relevant product’s **Mechanics/operations** guide (titles-only).  
     
-* **Process & PR workflow** (PR-first; human index \+ machine mirror updated in the same PR) → **Epic-Process-Guide** (titles-only).
+* **Process & PR workflow** (PR-first; human index \+ machine mirror updated in the same PR) → **Change-Process-Guide** (titles-only).
 
 Where a single shared canonical home exists for a given capability across multiple products, PF07 may name that document by title. Where products differ, PF07 records only the infra names/locations and routes semantics to each product’s owning canonical docs.
 
@@ -84,7 +84,7 @@ PF07 routes semantics to each product’s owning canonical documents. The curren
     
 * **PF01 — HDE-Math-Spec**  
     
-* **PF06 — Epic-Process-Guide**  
+* **PF06 — Change-Process-Guide**  
     
 * **PF12 — HDE-Schemas & Artifacts**
 
@@ -105,7 +105,7 @@ The **canonical infrastructure inventory and reference** for Glow. PF07 owns:
     
 * Database instances and schemas (for example, `ample-illumination/production/postgres`, schema `hde`).  
     
-* Canonical key names and high-level locations for infra configuration (for example, `DEV_SAMPLER_URL`, `DATABASE_URL`, canonical QA roots such as `audit/qa/<epic-id>/...`).
+* Canonical key names and high-level locations for infra configuration (for example, `DEV_SAMPLER_URL`, `DATABASE_URL`, canonical QA roots such as `audit/qa/<epic-id>/` and `audit/qa/<crd-id>/`).
 
 Where an infra fact must be pinned (like a production base URL or shared DB instance), PF07 is the single home for that reference.
 
@@ -132,7 +132,7 @@ For the **HD Engine** surfaces recorded in this document, the currently referenc
     
 * **PF02 — HDE Architecture** (system design and topology)  
     
-* **PF06 — Epic-Process-Guide** (process and change control)
+* **PF06 — Change-Process-Guide** (process and change control)
 
 Names and pinned infra reference values in PF07 are authoritative for infrastructure. Semantics, tokens, and procedures are routed by title to their single homes above.
 
@@ -212,12 +212,12 @@ A7 invariants for proofs on a cataloged JSON success route are defined by title 
 
 ### **2.3.3 Ops-only identity**
 
-`/internal/version` is **operator-only** and **not A7-eligible**. Its transport posture (cache behavior, validator/HEAD handling, and conditional semantics) is defined by title in the owning governance/contract documents. PF07 records only the infra fact that this surface is ops-only and where its governed evidence bundle lives (see §10.5).
+`/internal/version` is **operator-only** and **not A7-eligible**. Its transport posture (cache behavior, validator/HEAD handling, and conditional semantics) is defined by title in the owning governance/contract documents. PF07 records only the infra fact that this surface is ops-only. Its governed evidence families and paths are owned by **HDE-Schemas & Artifacts** (§10.5).
 
 **Auth posture (non-invention; routing-only).**  
 PF canon does not yet canonize `/internal/version` auth posture (public vs operator-network gated vs auth-header required) or the expected failure mode for missing/invalid access. Until canonized, remediation guides and operational tooling MUST NOT state auth requirements as canon, and MUST NOT treat an auth header as required input for plan execution.
 
-If a run uses an auth header (for example, `Authorization: Bearer …`), it is **optional until canonized** and MUST be treated as **Observed Evidence** only. Runbooks/plans that include an auth header MUST state the header’s source as a concrete input (presence-only; never the value) or they risk creating a false “ops gap” blocker.
+If a run uses an auth header (for example, `Authorization: Bearer {redacted}`), it is **optional until canonized** and MUST be treated as **Observed Evidence** only. Runbooks/plans that include an auth header MUST state the header’s source as a concrete input (presence-only; never the value) or they risk creating a false “ops gap” blocker.
 
 Any statement about auth posture MUST be explicitly labeled as **Observed Evidence** (non-PF) and MUST be supported by secret-free status-line \+ headers captures for both conditions:
 
@@ -225,7 +225,7 @@ Any statement about auth posture MUST be explicitly labeled as **Observed Eviden
     
 * **Auth header present** *(presence-only noted; value redacted)*.
 
-Store the captured evidence in-repo under a lowercase audit path (see the Ops/QA audit roots in §10.5).
+Store the captured evidence in-repo under a lowercase `audit/` path. PF07 records the QA evidence root patterns (§2.8, §8.1); other governed evidence roots and paths are owned by **HDE-Schemas & Artifacts** (§10.5).
 
 ---
 
@@ -291,7 +291,7 @@ Source-selection snapshots and refresh-policy snapshots are stored under governe
     
 * `TZ=UTC`
 
-  ### **Development — OpenAI Codex**
+### **Development — OpenAI Codex**
 
 * `ALLOW_NETWORK=0`  
     
@@ -317,7 +317,7 @@ Source-selection snapshots and refresh-policy snapshots are stored under governe
     
 * `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`
 
-  ### **QA — GitHub Codespaces**
+### **QA — GitHub Codespaces**
 
 * `ALLOW_NETWORK=0`  
     
@@ -325,7 +325,7 @@ Source-selection snapshots and refresh-policy snapshots are stored under governe
     
 * `DATABASE_URL=postgresql://postgres:REDACTED@metro.proxy.rlwy.net:52353/railway`  
     
-* `DB_BRIDGE_URL=https://illustrious-freedom-production.up.railway.app`  
+* `DB_BRIDGE_URL` — retired HDE database-transport key with no active PF07 mapping (§7.0, §8.1). If it is present, it is configuration drift: report the key name only, never its value.  
     
 * `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`  
     
@@ -345,7 +345,7 @@ Source-selection snapshots and refresh-policy snapshots are stored under governe
     
 * `SAFE_MODE` is listed in OPS-01 documented environment bindings, but the source matrix does not provide a general QA default value. Do not infer a default value in PF07 from an OPS-02 open-rails task.
 
-  ### **Key-spelling and downgrade rules**
+### **Key-spelling and downgrade rules**
 
 * `HD_API_BASE_URL` is the canonical HumanDesignAPI base URL environment variable.  
     
@@ -458,9 +458,9 @@ Within this document:
 
 * “Prod” refers to the Railway HD Engine service and shared DB named above, reached via HTTP/admin surfaces defined in other PF documents.  
     
-* “Codespaces” is treated as a **console and artifact sink**: a place to store and inspect QA evidence under `audit/qa/<epic-id>/...` and to run offline checks against those artifacts.
+* “Codespaces” is treated as a **console and artifact sink**: a place to store and inspect QA evidence under the change's QA evidence root (`audit/qa/<epic-id>/` or `audit/qa/<crd-id>/`) and to run offline checks against those artifacts.
 
-PF07 does **not** decide where behavior tests that satisfy D-goals are executed; those decisions (for example, which admin terminal or GUI exercises compat, narratives, vendor, or admin bundle behavior) are specified in **Epic-Process-Guide** and **Glow QA Guide** by title. PF07 names only the providers, projects, services, repositories, and canonical QA evidence roots that those documents rely on.
+PF07 does **not** decide where behavior tests that satisfy D-goals are executed; those decisions (for example, which admin terminal or GUI exercises compat, narratives, vendor, or admin bundle behavior) are specified in **Change-Process-Guide** and **Glow QA Guide** by title. PF07 names only the providers, projects, services, repositories, and canonical QA evidence roots that those documents rely on.
 
 ## **2.7 Terminal CLI access as admin surface (names-only, pre-Glow)**
 
@@ -506,7 +506,7 @@ Any shell that can reach this base URL and/or connect to this DB instance with t
 * HDE-EPIC036 is historical for the route-policy transition: configured v2 bases selected `unsupported_runtime_nonclaim`, non-v2 bases preserved explicit legacy BodyGraph fallback, and dual-route behavior was not implemented.  
 * HDE-EPIC037 later records a bounded BodyGraph-detail evidence chain for HDE-FERM008: field sufficiency, pure v2 ChartResult adapter mapping, resolver route policy, compatibility proof, PO-produced runtime smoke evidence, and parent binding.  
 * HDE-EPIC037 OPS-01 evidence records v2 `charts` request posture, `ADAPTER_MAPPED`, `ChartResult`, mapped-no-raw-vendor-payload cache posture, accepted compatibility path summary, exit code 0, and explicit safety/nonclaim boundaries.  
-* Current PF07 posture remains names-only: PF07 records the target names, key names, roots, and evidence locations. Command behavior, route bytes, adapter semantics, provider behavior, QA predicates, OPS execution rules, token semantics, and PF09 status remain owned by the HDE CLI/API, Mechanics, Governance, QA, Schemas and Artifacts, Epic Process, and Build Checklist homes by title.  
+* Current PF07 posture remains names-only: PF07 records the target names, key names, roots, and evidence locations. Command behavior, route bytes, adapter semantics, provider behavior, QA predicates, OPS execution rules, token semantics, and PF09 status remain owned by the HDE CLI/API, Mechanics, Governance, QA, Schemas and Artifacts, Change Process, and Build Checklist homes by title.  
 * Plans, implementation guides, QA plans, reviews, and closeout artifacts MUST NOT claim mapped-cache write persistence, production deployment, broad HumanDesignAPI v2 platform conformance, public Reader expansion, public route or payload expansion, app-side HumanDesignAPI ownership, raw secret or raw vendor payload persistence, PF09 status movement, QA PASS, PO closeout, board update, merge action, epic closeout, or AI scope from PF07 inventory text.
 
 **Codespaces as canonical QA console.**
@@ -596,9 +596,9 @@ PF07 remains the single home for provider/project/service names, stable base URL
     
 * Live QA connectivity checks described in **Glow QA Guide** (for example, curl or CLI commands that prove reachability to production HD Engine or Backend services, or to the shared Postgres instance listed in §2.2/§7.1) are expected to rely on the names in this section; authentication, rails posture (SAFE\_MODE/ALLOW\_NETWORK, APP\_ENV, credentials), and acceptance semantics are governed by **HDE-Governance**, **Glow QA Guide**, **HDE-Build Checklist**, and **HDE-Mechanics Guide** (titles-only).
 
-* ## PF07 does **not** define how connectivity tests are run or which D-goals or QA tokens they satisfy; it records only the provider, project, service, base-URL, and instance names that those tests and tokens depend on.
+* PF07 does **not** define how connectivity tests are run or which D-goals or QA tokens they satisfy; it records only the provider, project, service, base-URL, and instance names that those tests and tokens depend on.
 
-  ## **3.2 Vercel**
+## **3.2 Vercel**
 
 * **Team / org:** **TBD**  
     
@@ -647,7 +647,7 @@ PF07 remains the single home for provider/project/service names, stable base URL
 * **External surfaces (titles-only):**  
   * **Endpoint Catalog (JSON success)** — discovery/proofs live in **HDE-CLI-API-Vendor-Ref** (A7 success routes); Catalog is **internal-only** and **env-gated**; capture headers-only **env-gate** proof (routing only).  
   * **Ops identity** — `/internal/version` (ops-only; posture in **HDE-Governance**).  
-  * **Reader v1 route posture (names-only):** The canonical production target is `POST /api/reader?v=1`. The checked-in `GET /reader?v=1` file-path surface remains development-only and non-authoritative; when the Reader blueprint is mounted under `/api`, `/api/reader` is the mounted form rather than a separate contract. There is no `/api/reader-proof/v1` route and it MUST NOT be referenced. The Endpoint Catalog remains internal-only and env-gated, and catalog-driven proofs use the cataloged success route for the configured mount. Route bytes, request/response shapes, projection, A7 policy, and invariants live in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance**.  
+  * **Reader route posture (names-only):** The canonical production targets are `POST /api/reader?v=1` (Reader v1) and `POST /api/reader?v=2` (Reader v2). The checked-in `GET /reader?v=1` file-path surface remains development-only and non-authoritative; when the Reader blueprint is mounted under `/api`, `/api/reader` is the mounted form rather than a separate contract. There is no `/api/reader-proof/v1` route and it MUST NOT be referenced. The Endpoint Catalog remains internal-only and env-gated, and catalog-driven proofs use the cataloged success route for the configured mount. Route bytes, request/response shapes, projection, A7 policy, and invariants live in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance**.  
   * Aux narrative surface (names-only): /aux/narrative (served from the same adapter HTTP surface family as Reader).  
   * **Compat HTTP surface (internal/admin; names-only):** `/api/compat/v1` (cataloged as internal/admin and env-gated; contract details live by title in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance**).  
   * Dev-only conjunction endpoints (names-only; dev/test/local only):  
@@ -722,15 +722,15 @@ These top-level roots are part of the HD Engine repo inventory and are infra- an
     
 * `migrations/` — database migration files for the HD Engine schema (canonical DDL and evidence rules live in **HDE-Schemas & Artifacts**).  
     
-* `audit/` — QA and audit logs, including trees rooted at `audit/qa/<epic-id>/...` referenced by title in QA guides.
+* `audit/` — QA and audit logs, including QA trees rooted at `audit/qa/<epic-id>/` and `audit/qa/<crd-id>/` referenced by title in QA guides.
 
-PF07 records this repo structure as an infra inventory only. Transport behavior, governance, QA policy, schemas, and evidence acceptance are routed by title to their owning PF documents (for example, **HDE-Governance**, **HDE-CLI API Vendor Ref**, **HDE-Schemas & Artifacts**, **Glow QA Guide**, **HDE-Mechanics Guide**).
+PF07 records this repo structure as an infra inventory only. Transport behavior, governance, QA policy, schemas, and evidence acceptance are routed by title to their owning PF documents (for example, **HDE-Governance**, **HDE-CLI-API-Vendor-Ref**, **HDE-Schemas & Artifacts**, **Glow QA Guide**, **HDE-Mechanics Guide**).
 
 **Directory naming (repo-wide; names-only).**
 
 All directories in the repository and application codebase MUST use **lowercase ASCII** names. Mixed-case or upper-case directory names are non-conforming and must not be introduced. If mixed-case directories exist, treat them as legacy drift and normalize them to lowercase rather than copying them forward. Uppercase characters in filename segments are allowed and MUST NOT be treated as a lowercase-rule violation. Identifier classes explicitly defined as lowercase-only elsewhere (for example check IDs and test IDs) remain lowercase-only.
 
-This applies to all governed roots listed above (for example, `docs/`, `artifacts/`, `audit/`, `catalog/`, `schemas/`, and per-epic QA trees under `audit/qa/<epic-id>/...`).
+This applies to all governed roots listed above (for example, `docs/`, `artifacts/`, `audit/`, `catalog/`, `schemas/`, and per-change QA trees under `audit/qa/<epic-id>/` and `audit/qa/<crd-id>/`).
 
 ---
 
@@ -784,7 +784,7 @@ On-wire behavior, endpoint contracts, evidence shapes, and acceptance tokens for
     
 * **Railway service:** `glow-hdengine-v2`
 
-  ### **5.1.5 EPIC-019 D6 vendor Live QA harness (names-only)**
+### **5.1.5 EPIC-019 D6 vendor Live QA harness (names-only)**
 
 These paths are infra-relevant assets in the HD Engine repo for **EPIC-019 D6**. Only names are recorded here; behavior, schemas, acceptance tokens, and QA procedures are routed by title.
 
@@ -807,7 +807,7 @@ PF07 records these paths as part of the HD Engine repo **inventory**. It does no
     
 * **HDE-Governance** and **HDE-Phased Epics** — token semantics and EPIC-level acceptance.
 
-  ### **5.1.6 EPIC-019 D3 sampler QA harnesses & remedial docs (names-only)**
+### **5.1.6 EPIC-019 D3 sampler QA harnesses & remedial docs (names-only)**
 
 These paths are infra-relevant assets in the HD Engine repo for **EPIC-019** remedial work on the sampler (Cards C1–C3). Only names are recorded here; behavior, schemas, acceptance tokens, and QA procedures are routed by title.
 
@@ -815,10 +815,10 @@ These paths are infra-relevant assets in the HD Engine repo for **EPIC-019** rem
   Dev-only sampler healthcheck harness used to prove that the internal/dev sampler HTTP surface is reachable and behaving as expected under closed rails. Routes, status expectations, and acceptance tokens are governed by title in **Glow QA Guide**, **HDE-Governance**, **HDE-Mechanics Guide**, and **HDE-Phased Epics**.  
     
 * `scripts/qa/dev_sampler_live_qa.py`  
-  Dev-only sampler Live QA harness for EPIC-019 D3. Exercises `DEV_SAMPLER_URL` and related APP\_ENV permutations under closed rails, writing governed logs under the EPIC019 sampler QA evidence root. Classification semantics and token bindings (for example, ENV rails tokens) are owned by **Glow QA Guide**, **HDE-Governance**, and **HDE-Phased Epics**.  
+  Dev-only closed-rails sampler QA harness for EPIC-019 D3. Its file name keeps the historical "live" label, but its runs are closed-rails QA, not Live QA. It exercises `DEV_SAMPLER_URL` and related APP\_ENV permutations under closed rails, writing governed logs under the EPIC019 sampler QA evidence root. Classification semantics and token bindings (for example, ENV rails tokens) are owned by **Glow QA Guide**, **HDE-Governance**, and **HDE-Phased Epics**.  
     
 * `audit/qa/hde-epic019/dev_sampler_http/`  
-  QA evidence root for EPIC-019 sampler QA (healthcheck and Live QA). Contains governed logs produced by the sampler QA harnesses for D3 under closed rails. Artifact schemas, indexing rules, and Machine Mirror records live in **HDE-Schemas & Artifacts**; QA usage and sample runs live in **Glow QA Guide**.  
+  QA evidence root for EPIC-019 sampler QA (healthcheck and closed-rails sampler QA). Contains governed logs produced by the sampler QA harnesses for D3 under closed rails. Artifact schemas, indexing rules, and Machine Mirror records live in **HDE-Schemas & Artifacts**; QA usage and sample runs live in **Glow QA Guide**.  
     
 * `docs/evidence/EPIC019_evidence.md`  
   Evidence overview for EPIC-019, summarizing evidence layers (Index, Mirror, path-proofs, orientation demo) and the D3/D6 QA families, including sampler HTTP QA under `audit/qa/hde-epic019/dev_sampler_http/` and vendor Live QA under `audit/qa/hde-epic019/d6-vendor-live-qa/`. This is a governed evidence doc; semantics and acceptance remain owned by **Glow QA Guide** and **HDE-Governance**.  
@@ -845,7 +845,7 @@ PF07 records these paths as part of the HD Engine repo **inventory** only. It do
 * **Service mapping (names-only):**  
   * **Railway project:** `ample-illumination`
 
-  * ## **Railway service:** `glow-backend-v4`
+  * **Railway service:** `glow-backend-v4`
 
 ## **5.3 Glow Frontend repo**
 
@@ -904,7 +904,7 @@ This section lists **domain names and DNS roles in use across Glow**. It is **na
     
 * TXT *(verification, if required — OPEN/TBD)*
 
-  ## **6.5 Routing (titles-only)**
+## **6.5 Routing (titles-only)**
 
 * **Transport & A7 policy / acceptance:** owned by the relevant product’s governance and transport policy documents (titles-only).  
     
@@ -985,7 +985,7 @@ Production runs on one Postgres instance; staging/dev connect to the same physic
       
   * Version floor: ≥ 14
 
-  ## **7.2 Application schema map (per application)**
+## **7.2 Application schema map (per application)**
 
 Inventory-only. List schema names and key objects per application. No DDL, types, or data/PII. Schema ownership and validation live in HDE-Schemas & Artifacts; governance/retention policy lives in HDE-Governance (titles-only).
 
@@ -1008,7 +1008,7 @@ Inventory-only. List schema names and key objects per application. No DDL, types
   * **HDE\_APP\_ROLE** — `USAGE` on `hde`; `SELECT` on `hde.meta`; `SELECT/INSERT/DELETE` on `hde.public_results`  
   * **HDE\_MIGRATOR\_ROLE** — DDL on `hde` *(no runtime data access)*
 
-  ### **7.2.2 Backend schema — TBD \[Speculative\]**
+### **7.2.2 Backend schema — TBD \[Speculative\]**
 
 * **Schema name.** **TBD** *(may differ from `hde`; record once confirmed)*  
     
@@ -1179,7 +1179,7 @@ Recorded here to avoid drift; **not consumed by the Engine**. The Engine exposes
 
 * **Connection binding:** see §7.0 — the active HDE binding for every environment is `DATABASE_URL` with direct psycopg only; missing or unavailable direct access fails closed without bridge or alternate-provider fallback.
 
-* ## **Historical evidence:** `artifacts/runtime/env_connectivity.snapshot.json` is retained as a governed bridge-era record only. It is not a current fallback requirement or evidence target.
+* **Historical evidence:** `artifacts/runtime/env_connectivity.snapshot.json` is retained as a governed bridge-era record only. It is not a current fallback requirement or evidence target.
 
 **Admin writer credentials** (names-only; no values here)
 
@@ -1198,9 +1198,9 @@ Recorded here to avoid drift; **not consumed by the Engine**. The Engine exposes
     
 * **No-guess binding posture for PF07-owned environments.** QA and Live QA documents MUST NOT guess or redefine PF07-owned bindings. When PF07 still records a needed binding as **OPEN/TBD**, including the local-dev sampler binding, the document MUST treat that requirement as a PF07-gap blocker and name the missing fact explicitly. It MUST NOT invent host, port, base URL, or external placeholder ownership for that binding. This applies to `DEV_SAMPLER_URL`, `HDE_BASE_URL`, `DATABASE_URL`, production service base URLs, environment-specific host and port bindings, and canonical QA-root patterns.
 
-  ## **8.2 Component-specific keys**
+## **8.2 Component-specific keys**
 
-  ### **8.2.1 HD Engine**
+### **8.2.1 HD Engine**
 
 **Port**  
 • Dev (CodEx): `scripts/dev_start_reader.sh` defaults to 8000; `run_flask.py` and `run_flask_dev.sh` default to 5000 unless overridden. • QA (Codespaces): 8000  
@@ -1239,11 +1239,11 @@ In the HD Engine GitHub Codespaces environment for `amthorn78/glow-hdengine-v2`:
 * The **canonical home** for the DEV\_SAMPLER\_URL binding is the devcontainer configuration. `.devcontainer/devcontainer.json` MUST define:  
   `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`  
   under a container environment block (for example, `containerEnv`), so that every shell in the Codespace sees the same value without manual export.  
-* Shell-level `export DEV_SAMPLER_URL=...` MAY be used for one-off debugging, but the devcontainer environment is the **authoritative infra binding** for this environment.
+* Shell-level `export DEV_SAMPLER_URL=<url>` MAY be used for one-off debugging, but the devcontainer environment is the **authoritative infra binding** for this environment.
 
 **Harness expectations (routing-only).**
 
-* Dev sampler HTTP QA tools in this repo (for example, healthcheck and D3 Live QA harnesses) are expected to **read DEV\_SAMPLER\_URL from the environment** and treat it as a required input; they MUST NOT hardcode host/port or recompute `<base_url>` internally.  
+* Dev sampler HTTP QA tools in this repo (for example, the healthcheck and D3 closed-rails sampler QA harnesses) are expected to **read DEV\_SAMPLER\_URL from the environment** and treat it as a required input; they MUST NOT hardcode host/port or recompute `<base_url>` internally.  
 * Missing or mismatched DEV\_SAMPLER\_URL for a given environment is classified here as an **infra/tooling misconfiguration** for dev sampler HTTP harnesses, not as an HD Engine behavior failure. Detailed classification (for example, FAIL\_TOOLING vs behavior), preconditions, and token semantics live by title in **Glow QA Guide**, **HDE-Governance**, **HDE-Mechanics Guide**, and **HDE-Build Checklist**.
 
 PF07 records the **key name**, the **per-environment binding locations**, and the **URL pattern** as infrastructure facts. It does **not** define HTTP behavior, header/body contracts, or acceptance tokens for the dev sampler HTTP harness; those remain owned by **HDE-CLI-API-Vendor-Ref**, **HDE-Mechanics Guide**, **Glow QA Guide**, **HDE-Governance**, and **HDE-Build Checklist** (titles-only).
@@ -1278,7 +1278,7 @@ PF07 records the **key name**, the **per-environment binding locations**, and th
 
 **`HDE_VENDOR_OVERRIDE_AUDIT_PATH` — production vendor-override audit sink (names-only)**
 
-* **Key.** Names the local file to which `hdctl bg:resolve --source vendor` appends its production vendor-override audit events. The value is a filesystem path, not a secret. Per-environment bindings are **OPEN/TBD**.  
+* **Key.** Names the local file to which the production vendor override appends its audit events. **HDE-CLI-API-Vendor-Ref** owns which commands the override covers; in the checked-in code, only `hdctl bg:resolve --source vendor` writes these events. The value is a filesystem path, not a secret. Per-environment bindings are **OPEN/TBD**.  
 * **Checked-in code (routing-only):** `engine/bodygraph/vendor_audit.py` reads this key. When the key is unset or blank, the code uses `glow-hdengine/vendor_prod_override.jsonl` under `XDG_STATE_HOME` when that value is an absolute path, and otherwise under `~/.local/state`. The code does not use a path that is not absolute or that resolves inside the repository checkout.  
 * The override flag, the audit event and its fields, its durability, and the refusal when no sink is available are owned by **HDE-CLI-API-Vendor-Ref**. PF07 records only the key name and the sink locations the checked-in code uses.
 
@@ -1336,7 +1336,7 @@ PF07 records the **key name**, the **per-environment binding locations**, and th
 ### **9.2.1 Object storage (narratives pack store)**
 
 • **Provider:** TBD  
-• **Bucket / prefix:** TBD (immutable path pattern `/narratives/<pack_sha>/...`)  
+• **Bucket / prefix:** TBD (immutable path prefix `/narratives/<pack_sha>/`)  
 • **Used by:** HD Engine loader (file-backed runtime)
 
 *Note (narratives):* The loader fetches and verifies pack files from object storage by **PACK\_SHA** (see §8.2.1). Policy, identity, and canonicalization live by title in **HDE-Schemas & Artifacts** and **Narratives Guide**.
@@ -1356,7 +1356,7 @@ PF07 records the **key name**, the **per-environment binding locations**, and th
 
 The Notion board and pointers are operational metadata and navigation, not PF authority or independent implementation, QA, acceptance or closure proof. Google Drive and ChatGPT Library are neither PF authority nor change-process document destinations; existing files there retain their historical provenance. Governed evidence keeps its established homes and writers. Operating-procedure placement that remains undecided is not assigned a new home here.
 
-  ## **9.4 Domains**
+## **9.4 Domains**
 
 * **Root:** `glowme.io`  
     
@@ -1415,7 +1415,7 @@ These declarations differ in interpreter selection, dependency installation, and
     
 - **Bootstrap.** Only `validation/service_cmd.txt` installs runtime dependencies from `requirements.txt` before invoking Gunicorn.
 
-  ## **10.3 Environment prerequisites (names-only)**
+## **10.3 Environment prerequisites (names-only)**
 
 - `PORT`: `validation/service_cmd.txt` and `Procfile` reference `$PORT` without a fallback; `scripts/start_web.sh` substitutes `8000` when `PORT` is absent.  
     
@@ -1423,13 +1423,13 @@ These declarations differ in interpreter selection, dependency installation, and
     
 - **Environment pins (names-only):** `LC_ALL`, `LANG`, and `TZ` remain inventoried in §8 with values OPEN/TBD unless confirmed; none of the three declarations assigns them.
 
-  ## **10.4 Change control (minimal)**
+## **10.4 Change control (minimal)**
 
 - Treat the three declarations as distinct checked-in surfaces. Their presence does not establish deployment or a normative production command.  
     
 - If a declaration changes, update this section and any checked-in description or validation artifact that claims to mirror it in the same change.  
     
-- Governed evidence synchronization is owned by `PF12-Canon-HDE-Schemas-and-Artifacts`. PR workflow is owned by `PF06-Canon-Epic-Process-Guide`. PF07 does not restate either contract.
+- Governed evidence synchronization is owned by `PF12-Canon-HDE-Schemas-and-Artifacts`. PR workflow is owned by `PF06-Canon-Change-Process-Guide`. PF07 does not restate either contract.
 
 ## **10.5 Evidence index locations and ownership**
 
@@ -1438,7 +1438,7 @@ PF07 records two stable repository locations used to discover governed evidence:
 - Human Evidence Index: `docs/evidence/INDEX.json`  
 - Machine Evidence Mirror: `artifacts/evidence_index.jsonl`
 
-PF07 owns no additional evidence root, index, schema, record shape, artifact-path catalog, QA layout, run-history policy, or snapshot policy. Governed evidence families, record shapes, artifact paths, companion proofs, checksums, root classification, and index/mirror contracts are owned by `PF12-Canon-HDE-Schemas-and-Artifacts`. Live QA layout, current-state evidence posture, historical-run treatment, and the optional Codespaces snapshot posture are owned by `PF19-Canon-Glow-QA-Guide`.
+Beyond these two locations and the canonical QA evidence root patterns in §2.8 and §8.1, PF07 owns no evidence root, index, schema, record shape, artifact-path catalog, QA layout, run-history policy, or snapshot policy. Governed evidence families, record shapes, artifact paths, companion proofs, checksums, root classification, and index/mirror contracts are owned by `PF12-Canon-HDE-Schemas-and-Artifacts`. Live QA layout, current-state evidence posture, historical-run treatment, and the optional Codespaces snapshot posture are owned by `PF19-Canon-Glow-QA-Guide`.
 
 ---
 
