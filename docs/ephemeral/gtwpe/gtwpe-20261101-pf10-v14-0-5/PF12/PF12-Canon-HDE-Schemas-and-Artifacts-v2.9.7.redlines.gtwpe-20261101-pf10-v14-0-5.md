@@ -6,7 +6,7 @@
 | :---- | :---- |
 | Package | `PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.redlines.gtwpe-20261101-pf10-v14-0-5.md` |
 | Proof log | `PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md`, in the same directory |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5` / task T-04 / preparation revision r2. It supersedes r1 (commit `324de26`), which TW-APPLY-10 never received; the proof log records the correction. |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5` / task T-04 / preparation revision r3. It supersedes r2 (commit `2a2325b`), which TW-APPLY-10 returned with the diagnostic `PF12-apply-diagnostic.gtwpe-20261101-pf10-v14-0-5.md` (commit `5716f60`), and r1 (commit `324de26`). The proof log records each correction. |
 | Prompt | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1 (Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live in this session) |
 | Preparer | One Claude Code session started by Nathan for T-04; no subagent, reviewer or other session took part |
 | Preparation outcome | `READY` |
@@ -22,7 +22,7 @@
 | Commit | `origin/main` `e2b7427ff418ca8f08f05587c4a541308a76da56` (unchanged on `origin/main` `84d6d1c` when this package was prepared) |
 | Git blob | `d5bc01f83078bebe04f0854385317b47c1cd2de3` |
 | SHA-256 | `54d8c4ad2c1a629de6e80b44de14d11e154de6169a8fb048090e30a33d4516cc` |
-| Size | 640,642 bytes; 6,264 lines; ends with one LF |
+| Size | 640,642 bytes; 6,264 LF characters; the last line is empty, so the file ends with two LF bytes |
 
 ## Change source
 

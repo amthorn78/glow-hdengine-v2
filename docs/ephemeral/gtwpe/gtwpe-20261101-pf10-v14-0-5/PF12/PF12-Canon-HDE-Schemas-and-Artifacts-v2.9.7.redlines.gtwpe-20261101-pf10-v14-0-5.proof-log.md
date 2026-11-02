@@ -5,9 +5,9 @@
 | Field | Value |
 | :---- | :---- |
 | Artifact produced | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF12/PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.redlines.gtwpe-20261101-pf10-v14-0-5.md` |
-| Artifact identity | Revision r2: 38,021 bytes; 497 lines; SHA-256 `f8909c9cf6957030cb4e8318bbd94e2f6f70a3158bf2e3e2ab1b83584b8515e0`; ends with `END OF REDLINES` |
+| Artifact identity | Revision r3: 38,187 bytes; 497 lines; SHA-256 `b9c38a823fa5aa3223e8c32a4ccdb33ee65895f12d8ac721a5f48fe8db9861b3`; ends with `END OF REDLINES` |
 | This proof log | `PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md`, beside the artifact. It does not record its own hash. |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5` / task T-04 / preparation revision r2. r2 supersedes r1 (commit `324de26`); §11 records why. |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5` / task T-04 / preparation revision r3. r3 supersedes r2 (commit `2a2325b`, returned by the TW-APPLY-10 diagnostic at commit `5716f60`) and r1 (commit `324de26`); §11 records why. |
 | Prompt | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1. Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live at the start of this step; the page states "Prompt Version: 100926.1" and was last edited 2026-10-09T11:05:22Z. |
 | Originating preparer | One Claude Code session that Nathan started for T-04 on 2026-11-02, with the handoff "GTWPE document session — T-04 — HDE Schemas and Artifacts (drain, then apply)". No subagent, reviewer or other session took part. |
 | Authorized next step | TW-APPLY-10 100926.1 in the same session (the handoff authorizes both steps in order). |
@@ -28,7 +28,7 @@ Canon was read from `docs/pfcanon/` at `origin/main` `e2b7427`. `origin/main` ha
 
 | Role | Identity |
 | :---- | :---- |
-| Target (original baseline) | `docs/pfcanon/PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.md`, in-document title PF12-Canon-HDE-Schemas-and-Artifacts, v2.9.7, Status Canon, effective 2026-10-26; Git blob `d5bc01f83078bebe04f0854385317b47c1cd2de3`; SHA-256 `54d8c4ad2c1a629de6e80b44de14d11e154de6169a8fb048090e30a33d4516cc`; 640,642 bytes; 6,264 lines; one final LF |
+| Target (original baseline) | `docs/pfcanon/PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.md`, in-document title PF12-Canon-HDE-Schemas-and-Artifacts, v2.9.7, Status Canon, effective 2026-10-26; Git blob `d5bc01f83078bebe04f0854385317b47c1cd2de3`; SHA-256 `54d8c4ad2c1a629de6e80b44de14d11e154de6169a8fb048090e30a33d4516cc`; 640,642 bytes; 6,264 LF characters; the last line is empty, so the file ends with two LF bytes |
 | Change source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, HDE Build Notes v14.0.5; Git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`; SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`; 385,734 bytes; 1,976 lines |
 | Editorial standard | `docs/pfcanon/PF03-Reference-Technical-Writing-Best-Practices-v1.8.8.md` |
 | Routing ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` at `142feb35144d8795f927e0c78b665ace52279064` (22,735 bytes), read in full; planning and provenance only. The later ledger commit `a3632c0` (another session, 2026-11-02) adds a correction banner, §8 (T-11 to T-18) and amended holds H-01, H-02 and H-12. It leaves T-04's row and selections unchanged. |
@@ -210,7 +210,7 @@ All at `e2b7427ff418ca8f08f05587c4a541308a76da56`, with `git show`, `git grep` a
 
 These observations support the drafted wording only. They are not QA, not a test run, not governed evidence and not proof of behaviour. `tools/evidence/build_release_attestation.py` and `tools/evidence/run_canonical_json_gate.py` were not inspected; RL-06 and RL-01 assert nothing about their current behaviour.
 
-## 9. Redline summary (r2)
+## 9. Redline summary (r3; operations unchanged from r2)
 
 | ID | Operation | Original location | Rows | Change |
 | :---- | :---- | :---- | :---- | :---- |
@@ -250,16 +250,17 @@ A local script resolved every operation against the unchanged original (decoded 
 - Operation dialects: only `REPLACE` and `INSERT`. No repeated-replacement operation, so the RL-045 rule does not arise.
 - Post-simulation: each replacement or insertion text occurs exactly once in the output. Each replaced old block occurs 0 times, except RL-07's, which occurs once as the unchanged opening of its own replacement; RL-07 appends one sentence.
 - Simulated output: 653,542 bytes; 6,402 lines; ends with LF; SHA-256 `07331ff4e0c41b1acb75fafb2718624d9d692a8adfaac38b1da71dc34ffe83f1`. This is a preparation-time simulation, not the final PF; TW-APPLY-10 also derives the header.
-- Saved-file revalidation: a separate script parsed the saved r2 file by its literal-block convention, re-resolved all eleven operations against the original (each count 1), re-simulated, and reproduced SHA-256 `07331ff4e0c41b1acb75fafb2718624d9d692a8adfaac38b1da71dc34ffe83f1` exactly.
+- Saved-file revalidation: a separate script parsed the saved r3 file by its literal-block convention, re-resolved all eleven operations against the original (each count 1), re-simulated, and reproduced SHA-256 `07331ff4e0c41b1acb75fafb2718624d9d692a8adfaac38b1da71dc34ffe83f1` exactly.
 - Editorial checks on the new text: no ASCII three-period or Unicode ellipsis; no `Draft`, TODO, placeholder or drafting note; HDE Build Notes cited by title only; no PF version or addendum number in new prose; MUST and MAY used only for normative requirements.
 - Hygiene scan of the original for markers TW-DRAIN-10 requires removed (Draft status language, TODO, unresolved drafting note): none found. `SCHEMA-DRAFT`, `Draft-07` and `[OPEN]` are canon names or conventions.
 
 ## 11. Corrections made during preparation
 
-All before READY was handed to TW-APPLY-10; Apply has received only r2.
+Each correction was made by this preparer before the corrected package went to TW-APPLY-10. Apply received r2 and returned it; it now receives r3.
 
 1. Within r1: the heading paths were first written by hand. RL-01's wrongly began at §0, and the §8.17 paths quoted the heading inexactly. The builder now derives every heading path from the raw original headings, outside code fences. Payloads were unchanged, and the package was rebuilt and revalidated.
 2. r1 to r2. r1 was committed and pushed as `324de26`. Before Apply, the ledger commit `a3632c0` brought GTWPE-D3 to this session's attention ("all pf docs should be updated based on context and scope, not whether or not the addenda specify a drain target"). r1 had read C-07 only through l.525's "require" test and found nothing to change. Re-examined by context, R-1 and R-2 bear on PF12's own Mirror path rules (§8.3), so r2 adds RL-07. The same review added two supported precision points inside sections already being edited: RL-02 states that a tracked issue maps only through an ADR status, and RL-03 that a deferral's register pointer gives a heading. RL-11's text and rows were updated to match, and the D-4 `--log-path` disposition now rests on single-home ownership (HDE Governance §4.1.8). r2 was fully revalidated (§10). r1 remains in Git history at `324de26`; nothing was deleted to hide it.
+3. r2 to r3, on a returned Apply diagnostic. TW-APPLY-10 validated r2 at `2a2325b` and found all eleven operations and the derived header plan valid. It stopped with zero edits because the package's baseline byte shape was wrong (`PF12-apply-diagnostic.gtwpe-20261101-pf10-v14-0-5.md`, commit `5716f60`): the redlines file (line 25) and this log (§3) said the original "ends with one LF", but its last two bytes are LF LF, with a final empty line. The diagnostic was checked against the original's raw bytes and is correct. r3 corrects that statement in both files and records the new revision identity. No operation, payload, anchor or count changed. The saved r3 file reproduces the r2 simulation `07331ff4e0c41b1acb75fafb2718624d9d692a8adfaac38b1da71dc34ffe83f1` exactly. The unchanged PF was not edited during the returned attempt.
 
 ## 12. Constraints, assumptions and interpretations
 
@@ -286,9 +287,9 @@ Version scheme: v2.9.5, v2.9.6, v2.9.7 (§§9.5, 9.6); expected derived version 
 
 ## 15. Save verification and completion receipt
 
-Save outcome for r2: `COMPLETE_PACKAGE`. Both required files are in `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF12/`, and both were read back completely from disk before this receipt was written:
+Save outcome for r3: `COMPLETE_PACKAGE`. Both required files are in `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF12/` and were verified from disk before this receipt was written:
 
-- the redlines file (r2): 38,021 bytes; 497 lines; SHA-256 `f8909c9cf6957030cb4e8318bbd94e2f6f70a3158bf2e3e2ab1b83584b8515e0`; ends with `END OF REDLINES`. Its parsed operations re-simulate to `07331ff4e0c41b1acb75fafb2718624d9d692a8adfaac38b1da71dc34ffe83f1`.
-- this proof log: read back in full; after that, only this receipt was added, and it was read back too.
+- the redlines file (r3): 38,187 bytes; 497 lines; SHA-256 `b9c38a823fa5aa3223e8c32a4ccdb33ee65895f12d8ac721a5f48fe8db9861b3`; ends with `END OF REDLINES`. Its parsed operations re-simulate to `07331ff4e0c41b1acb75fafb2718624d9d692a8adfaac38b1da71dc34ffe83f1`. Against the r2 file, read in full earlier in this session, it differs only in lines 9 and 25 (`git diff`).
+- this proof log: against the r2 log, read in full earlier, it differs only in the lines `git diff` shows (§§1, 3, 9, 10, 11 and this receipt), which were read back. After that, only this receipt was added, and it was read back too.
 
-The two files agree on the original and source identities, the run identity and revision, the preparer and the `READY` outcome. The package is ready for TW-APPLY-10. Apply's inputs are the exact original, these two files, ledger rows C-04, C-05, C-07, C-10, C-17 and C-18, the selected source units in §4, branch `claude/gtwpe-triage-authoring-j94ewf`, and the output directory above. The commit that holds r2 is reported in the session's final response and in the ledger's T-04 row; this log does not carry its own commit.
+The two files agree on the original and source identities, the run identity and revision, the preparer and the `READY` outcome. The package is ready for fresh validation by TW-APPLY-10. Apply's inputs are the exact original, these two files, ledger rows C-04, C-05, C-07, C-10, C-17 and C-18, the selected source units in §4, branch `claude/gtwpe-triage-authoring-j94ewf`, and the output directory above. The commit that holds r3 is reported in the session's final response and in the ledger's T-04 row; this log does not carry its own commit.
