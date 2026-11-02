@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
-**Version:** v2.4.7
+**Version:** v2.4.8
 
 **Status:** Canon  
-**Effective date:** 2026-10-26
+**Effective date:** 2026-11-02
 
-**Last Update Gate:** BN 13.8.8
+**Last Update Gate:** BN 14.0.5
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -195,7 +195,11 @@ Purity rule (normative). Any module designated as deterministic compute (includi
 
 BodyGraph seam carve-out (normative). BodyGraph resolution and ingest MAY perform vendor and DB I/O through the DB abstraction as a sanctioned seam, including when implemented under `engine/bodygraph/`. This carve-out does not relax purity requirements for deterministic compute modules.
 
-**Non-BodyGraph chart loader classification \[Required-Now\].** At repository commit `5ef911fec556a6c24bda8196b085f43c2da02150`, `engine/charts/loader.py` is implementation drift, not a sanctioned Engine I/O seam. Environment and rails evaluation, provider selection, chart acquisition, clocks, correlation context, operational logging, and filesystem writes belong to Adapter-owned application or infrastructure orchestration and must use the existing sanctioned BodyGraph resolver/ingest boundary where vendor or database acquisition is required. Pure chart validation or normalization may remain under Engine ownership only as explicit data-in/data-out computation with no time, randomness, environment, network, provider, logging, or filesystem side effects. The checked-in loader remains current repository reality until separately remediated; this classification does not claim that relocation, caller migration, or removal has occurred. The BodyGraph seam carve-out does not relax purity for Engine Core, sampler core, or other deterministic compute modules.
+**Non-BodyGraph chart loader classification \[Required-Now\].** Non-BodyGraph chart loading is not a sanctioned Engine I/O seam. Environment and rails evaluation, provider selection, chart acquisition, clocks, correlation context, operational logging, and filesystem writes belong to Adapter-owned application or infrastructure orchestration and must use the existing sanctioned BodyGraph resolver/ingest boundary where vendor or database acquisition is required. Pure chart validation or normalization may remain under Engine ownership only as explicit data-in/data-out computation with no time, randomness, environment, network, provider, logging, or filesystem side effects. The BodyGraph seam carve-out does not relax purity for Engine Core, sampler core, or other deterministic compute modules.
+
+**Current repository behavior \[Implemented\].** At repository commit `e2b7427ff418ca8f08f05587c4a541308a76da56`, `adapter/chart_orchestration.py` is the Adapter-owned chart orchestration entry. It owns the `SAFE_MODE` read, both clocks, the correlation identifier, the repository-root-anchored pinned-list reads, fixture chart acquisition, and one keys-only log line per call to an injectable sink; it writes no file and delegates validation and normalization to the pure Engine interface. `engine/charts/pure.py`, the only tracked file under `engine/charts/`, holds that interface. `engine/charts/loader.py`, which this classification identified as implementation drift at repository commit `5ef911fec556a6c24bda8196b085f43c2da02150`, is removed with no compatibility shim. A tracked import-guard test is written to fail if that module path or an import of it returns; guard and purity-test mechanics are owned by **HDE-Mechanics Guide**. The supported chart path acquires only a fixture chart, so it makes no vendor or database acquisition and does not engage the BodyGraph resolver/ingest boundary.
+
+**Static inspection cannot establish.** Static repository bytes do not establish runtime reachability, test passage, deployment, or production enablement for the chart path.
 
 Within `engine/`, the sampler core module and Engine Core module are single homes for their behaviors:
 
