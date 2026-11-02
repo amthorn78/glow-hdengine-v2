@@ -3,10 +3,10 @@
 ## **0.1 Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.5.9  
+**Version:** v3.5.10  
 **Status:** Canon  
-**Effective date:** 2026-10-26  
-**Last Update Gate:** BN 13.8.8  
+**Effective date:** 2026-11-02  
+**Last Update Gate:** BN 14.0.5  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -176,9 +176,9 @@ What it does not do
 
 Audit classification for I/O-bearing engine seams. Mechanics audits MUST classify modules by sanctioned seam responsibilities, not by a blanket “engine is pure compute” rule. Pure-compute obligations apply to Engine Core and sampler core modules. Resolver, ingest, vendor, catalog, and loader-style modules under `engine/` may be I/O-bearing only when HDE Architecture or this guide explicitly authorizes that responsibility.
 
-BodyGraph and loader seam posture. BodyGraph resolution and ingest remain the sanctioned BodyGraph I/O seam described in §19.1. The non-BodyGraph loader responsibility represented by `engine/charts/loader.py` is implementation drift, not a sanctioned Engine I/O seam; HDE Architecture §1.1 owns this classification and HDE-Build Notes records the required correction. Environment/SAFE-rails evaluation, provider selection, chart acquisition, clocks, correlation context, operational logging and filesystem writes belong in Adapter-owned application/infrastructure orchestration. Vendor and database acquisition must use the existing sanctioned BodyGraph resolver/ingest boundary. Only explicit data-in/data-out chart validation or normalization may remain under Engine ownership, with no time, randomness, environment, network, provider, logging or filesystem side effects.
+BodyGraph and loader seam posture. BodyGraph resolution and ingest remain the sanctioned BodyGraph I/O seam described in §19.1. Non-BodyGraph chart loading is split between the Adapter-owned chart entry `adapter/chart_orchestration.py::load_chart` and the pure Engine module `engine/charts/pure.py`; HDE Architecture §1.1 owns this classification, and HDE-Build Notes records the delivered correction. The former `engine/charts/loader.py`, which mixed those responsibilities as implementation drift, is removed with no shim, and its legacy `load_chart(user_id)` signature is retired: the Adapter entry raises `TypeError` for any other argument shape. Environment/SAFE-rails evaluation, provider selection, chart acquisition, clocks, correlation context, operational logging and filesystem writes belong in Adapter-owned application/infrastructure orchestration. Vendor and database acquisition must use the existing sanctioned BodyGraph resolver/ingest boundary. Only explicit data-in/data-out chart validation or normalization may remain under Engine ownership, with no time, randomness, environment, network, provider, logging or filesystem side effects.
 
-Remediation must migrate active callers, including compatibility/determinism and generator callers, to that orchestration and provide meaningful boundary tests. It must preserve existing canonical outputs and public/vendor contracts; it does not authorize fallback behavior, an Engine Core I/O exception or a second resolver. This is a required mechanics disposition, not a claim that relocation, caller migration or removal has occurred. The source proposes phased PF09 coverage separately; PF14 neither allocates its row/ID nor claims its status.
+Callers of the chart path use the Adapter entry or the pure interface. The compatibility/determinism generator `scripts/make_compat_determinism_artifacts.py` imports the Adapter entry; its compat computation is not restored, and it still exits 2 with `compat_public not implemented` before its chart call. The generator is retired as GATE:CORE-DET evidence; it and its test that pins exit 2 stay as history, and no record may cite it as current proof. Do not restore `engine/charts/loader.py`, add a shim for it, or put time, environment, filesystem, provider or logging access under `engine/charts/`. `tests/charts/test_chart_loader_import_guard.py` fails if the removed module path or a tracked import of it returns, and `tests/charts/test_chart_pure_purity.py` fails if `engine/charts/pure.py` gains a forbidden dependency or side effect. The boundary preserves existing canonical outputs and public/vendor contracts; it does not authorize fallback behavior, an Engine Core I/O exception or a second resolver. The route string `loader.load_chart` in the entry's log line is a label, not a module. PF14 neither allocates the related HDE-Build Checklist row nor claims its status.
 
 Non-task posture. This audit-classification note creates no new token, no new HDE-Build Checklist task, and no remediation plan by itself.
 
@@ -212,6 +212,7 @@ HDAPI v2 request-shaping and response-mapping mechanics. The repo MUST provide d
 * If temporary compatibility fallback is implemented, resolve base URL configuration canonical-first: read `HD_API_BASE_URL`; read deprecated `HDAPI_BASE_URL` only when the canonical key is absent; use the canonical value when both exist and match; fail closed with configuration ambiguity when both exist and differ.  
 * Treat `HD_API_BASE_URL` as owning the vendor API version and any configured path prefix. Runtime request construction MUST preserve the configured prefix and append only version-neutral resource identifiers.  
 * Runtime request construction MUST NOT hardcode `/v1` or `/v2` as active route-construction constants, append versioned vendor paths to `HD_API_BASE_URL`, double-prefix configured versions, normalize away configured prefixes, or infer runtime behavior from vendor API version path strings.  
+* The single permitted reading of a version from the configured base is the route-selection classification governed by HDE-CLI-API-Vendor-Ref §7.1.10, for every resolver-selected vendor acquisition: `bg:resolve --source vendor` and compat chart acquisition by `hdctl showcompat` and conjunction. It is one exact, case-sensitive comparison of the validated terminal path segment against the two allow-listed values `v1` and `v2`, made once, before any route is built. The selected route's resource, payload family and credential projection then come from that route's contract metadata. The prohibitions in this list govern everything else: nothing may hardcode `/v1` or `/v2` as a route-construction constant, append or normalize a version, select auth by path prefix, or key any other runtime behavior on a version string. This states required behavior; it does not claim that the current classifier conforms.  
 * Versioned vendor endpoint strings MAY remain as source inventory, contract provenance, historical evidence, artifact-family naming, test input, or non-driving legacy labels. They MUST NOT drive active runtime URL construction.  
 * Route-family auth selection MUST be represented as route metadata or contract metadata. It MUST NOT be inferred by checking whether a path starts with `/v1` or `/v2`.  
 * Evidence generators and tests for this mechanics family MUST prove configured-base path preservation, no double-version prefix, route-metadata auth, and no-live-vendor or no-public-Reader-change posture where the proof family claims those predicates.  
@@ -219,11 +220,11 @@ HDAPI v2 request-shaping and response-mapping mechanics. The repo MUST provide d
 * Project `HD_API_KEY` into `Authorization` Bearer auth for HumanDesignAPI v2 chart routes.  
 * Project `HD_API_KEY` into `HD-Api-Key` auth for legacy HumanDesignAPI v1 BodyGraph routes.  
 * Project `GEO_API_KEY` into `HD-Geocode-Key` only where the governed route requires geocoding.  
-* Preserve v1 BodyGraph behavior as explicit legacy behavior until the owning architecture and byte-contract homes decide whether v1 remains a fallback or is retired.  
+* Preserve v1 BodyGraph behavior as retained legacy selection, not fallback, for a configured base ending in exactly `v1`. Retirement of the v1 legacy route requires the separately versioned decision that HDE-CLI-API-Vendor-Ref §7.1.10 requires.  
 * BodyGraph resolver route-policy classification. `bg:resolve --source vendor` is a BodyGraph resolver workflow, not the canonical v2 chart/geokey validation path.  
 * For configured v2 vendor bases, `bg:resolve --source vendor --dry-run` MAY use the version-neutral `charts` route and deterministic v2 ChartResult adapter to produce mapped HDE BodyGraph/person/cache/compat evidence without writing DB rows.  
 * For configured v2 vendor bases, a non-dry-run mapped-cache write MAY proceed only through the bounded persistence path. The caller MUST provide explicit `--upsert` intent, rails MUST be open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`), and both the requested environment and process environment MUST be non-production. `prod`, `production`, and `live` MUST fail closed before vendor or database I/O.  
-* Non-v2 configured bases MAY preserve explicit legacy BodyGraph fallback only as a legacy route-family posture with `HD-Api-Key` auth, governed geokey handling, and no v2 BodyGraph-detail compatibility claim.  
+* A configured base ending in exactly `v1` keeps the legacy BodyGraph route-family posture, with `HD-Api-Key` auth, governed geokey handling, and no v2 BodyGraph-detail compatibility claim. No other non-v2 configured base selects a route, and no non-v2 base reaches `bodygraphs` by fallback; HDE-CLI-API-Vendor-Ref §7.1.10 governs that refusal and the configured-base boundary. The emitted classification label `explicit_legacy_fallback` for a terminal `v1` base stays an existing wire value in governed evidence; it names the retained v1 legacy selection and makes no fallback claim.  
 * Dual-route behavior is not implemented by this mechanics posture. Any future dual-route, v2 chart-backed BodyGraph-detail, or v2-to-internal BodyGraph/person/cache mapping behavior requires a future ADR or owning-canon decision before PF14 may treat it as a supported mechanic.  
 * Keep source-selection and response-mapping mechanics from collapsing v1 and v2 auth behavior, route-family identity, or evidence posture into a generic vendor-auth path.  
 * Map the standard v2 response envelope into HDE internal structures only after the mapping is proven.  
@@ -254,7 +255,7 @@ Narrow implementation-PR exception. One PR-specific open-rails vendor developmen
 * grants no recurring, inferred, or general agent authority for later open-rails execution; and  
 * makes no QA PASS, OPS-completion, acceptance-token, PF09-status, deployment, production-conformance, or epic-closeout claim.
 
-Production/user-surface open-rails proof posture. Every Epic or QA plan that touches a feature, component or function the HD Engine will use in production MUST include at least one bounded, intentional, secret-safe, evidence-recorded live vendor test of the affected runtime behavior, with `SAFE_MODE=0` and `ALLOW_NETWORK=1` for that step. Closed-rails fixtures, source inspection, DB or service checks, or an explicit exemption do not discharge that test. Closed-rails control-flow proof remains separate. Restore the applicable rails posture after the step; the Product Owner authorizes the identified executor under the controls above. PF14 records the mechanical proof distinction only; QA planning, acceptance, gates and closeout remain in their single homes. An OPS smoke is not planned QA merely because it calls the vendor.
+Production/user-surface open-rails proof posture. Every Epic's QA plan includes, and its QA run executes, the live compat test, whatever the Epic changed and whether or not its own surfaces are on a production path: `hdctl showcompat --source vendor` with `SAFE_MODE=0` and `ALLOW_NETWORK=1` for that step only, on synthetic birth data only, and the deployed-service check of the production HD Engine, which compares its `/internal/version` release identity with the release on `main` and has the production Reader score the two synthetic Live QA fixtures of §17.10 in both orders. Every Epic or QA plan that touches a feature, component or function the HD Engine will use in production MUST also include at least one bounded, intentional, secret-safe, evidence-recorded live vendor test of the affected runtime behavior, with `SAFE_MODE=0` and `ALLOW_NETWORK=1` for that step. Only a recorded Product Owner waiver sets aside either test or any part of it. Closed-rails fixtures, fixture replay, mocks, source inspection, DB or service checks, governed evidence artifacts, review approval, an unrun procedure, or an agent's finding that a test does not apply do not discharge it. A live test that cannot run is `TOOLING_BLOCKED`; it never becomes a PASS, a waiver or a closure. QA without the live compat test is closed-rails QA, not Live QA. Closed-rails control-flow proof remains separate. Restore the applicable rails posture after the step; the Product Owner authorizes the identified executor under the controls above. PF14 records the mechanical proof distinction only. The live compat test's pass predicates, waiver form, naming and stage enforcement are owned by HDE-Governance, the Glow QA Guide and HDE-Build Notes, and QA planning, acceptance, gates and closeout remain in their single homes. An OPS smoke is not planned QA merely because it calls the vendor.
 
 Selected-route behavior proof. For BodyGraph/vendor mechanics, the proof family MUST show the actual selected runtime route behavior and preserve nonclaims for any route family, payload family, adapter/schema mapping, public surface, OPS execution, runtime conformance, durable cache-write behavior, or production posture not proven by that evidence.
 
@@ -916,7 +917,8 @@ Current-family validation and publication:
 * The updater remains the single writer described in §§1.3.1–1.3.2. Its extracted rendering/convergence publishes manifest/primary proofs, Human Index/Mirror rows, checksums, orientation and self-proof relationships. Preserve the extracted `_run_once` body and six-pass convergence behavior. Do not create a second writer, closed-schema extension, new status/identity key requirement, or optional empty-token fields in these rows.  
 * One outer `_WriteTransaction` captures planned QA preimages, performs local recording and the extracted updater convergence, then completes final validation and any coherence verifier before leaving the transaction. A handled failure restores the bounded fixture's prior bytes, modes, mtimes and newly absent parents and clears transaction state. If rollback itself fails, retain the original failure cause in the diagnostic rather than presenting recovery as successful.  
 * The recovery guarantee is bounded to handled exceptions and a single writer. It is not process-crash durability, cross-process locking, a global freeze, or simultaneous atomic visibility of all files to readers. Stable reads detect observed changes; they do not supply those stronger guarantees.  
-* The post-verdict close-run family of an admitted CRD is published only through `tools.evidence.update_evidence_index.publish_crd_close_run_family(config, results, *, captured_at_utc=None, coherence_verifier=None)`, a Python API in the same updater module as `publish_crd_check_family`; HDE-Build Notes introduces the family. Each member directory holds `audit/qa/<change-dir>/close/<check_id>/primary.log` and its sibling `primary.log.path_proof.txt`, and each primary is a full-v2 step-log header rendered from the captured command, exit code and output of one close-run check. The entrypoint requires a nonempty result family. Before writing, it refuses when the CRD's recorded QA family is absent or fails validation, or when the existing integrity graph is incoherent. It replaces the whole family inside one outer recovery transaction, with the bounds stated for `publish_crd_check_family`. It writes neither `qa_step_logs_manifest.json` nor any `checks/` primary, and that manifest never lists the family. The family's members are its validated primaries and their path proofs; anything else under `close/` is refused. This `close/`-only exception to manifest-listed membership leaves the current manifest the authoritative index of `checks/`. Human Index keys are `<prefix>.close.<check_id>.primary.log`. No Epic close-run family is admitted.  
+* The post-verdict close-run family of an admitted CRD is published only through `tools.evidence.update_evidence_index.publish_crd_close_run_family(config, results, *, captured_at_utc=None, coherence_verifier=None)`, a Python API in the same updater module as `publish_crd_check_family`; HDE-Build Notes introduces the family. Each member directory holds `audit/qa/<change-dir>/close/<check_id>/primary.log` and its sibling `primary.log.path_proof.txt`, and each primary is a full-v2 step-log header rendered from the captured command, exit code and output of one close-run check. The entrypoint requires a nonempty result family. Before writing, it refuses when the CRD's recorded QA family is absent or fails validation, or when the existing integrity graph is incoherent. It replaces the whole family inside one outer recovery transaction, with the bounds stated for `publish_crd_check_family`. It writes neither `qa_step_logs_manifest.json` nor any `checks/` primary, and that manifest never lists the family. The family's members are its validated primaries and their path proofs; anything else under `close/` is refused. This `close/`-only exception to manifest-listed membership leaves the current manifest the authoritative index of `checks/`. Human Index keys are `<prefix>.close.<check_id>.primary.log`.  
+* An Epic close run needs its own explicit admission. Source-owned updater admission for Epic close runs is the `ADMITTED_EPIC_CLOSE` table in `tools/evidence/update_evidence_index.py`. It admits `HDE-EPIC041` only, with QA root `audit/qa/hde-epic041/` and Human Index key prefix `audit.qa.hde_epic041`; another Epic needs its own row. An admitted Epic has the same post-verdict close-run family, `audit/qa/<epic-dir>/close/<check_id>/primary.log` with its sibling `primary.log.path_proof.txt`, published only through `tools.evidence.update_evidence_index.publish_epic_close_run_family(config, results, *, captured_at_utc=None, coherence_verifier=None)` for an Epic `HarnessConfig`, a Python API in the same updater module. It requires a nonempty result family, renders each primary through the QA harness's own renderer with the own-primary path under `close/`, requires the Epic's recorded QA step-logs manifest and primaries, writes neither `qa_step_logs_manifest.json` nor any `checks/` file, refuses if either changes during publication, and replaces the whole family inside one outer recovery transaction with the bounds stated for `publish_crd_check_family`. Membership and the Human Index key form are as for a CRD, and each row carries `epic_id`.  
 * Step-0B for a CRD: the canonical writer indexes no `00_meta/` capture under a CRD root. A CRD's Step-0B capture is therefore recorded in the indexed primary of the QA plan check that performs it. That capture applies Step-0B's rules from Plan Templates in full, including its no-deltas determination and preservation rules, to both doc-delta surfaces: the draft ledger `audit/docdeltas/<change-dir>_doc_deltas.md` and any `00_meta/doc_deltas.md` surface. The draft ledger is a close-stage causal input of the CRD's close pack that another owner authors; the QA run does not write it. A `00_meta/doc_deltas.md` file left beside the family stays unindexed and is not admitted as evidence.  
 * An authorized verification/check publication must not claim a future final graph. The source's later two-stage QA use first verified the existing check family, then recorded that completed verification and used a final receipt for the final graph. Auxiliary verification output does not become a primary or indexed family merely by being present. Physical coherence remains distinct from domain QA PASS.
 
@@ -1157,7 +1159,7 @@ Rerun and generated-artifact posture:
 Closed-rails regression responsibilities:
 
 * Exercise the real generic producer in isolated temporary roots/copied repositories, including actual same-interpreter child pytest success and failure, and assert the selected root, nonempty primaries, unique current manifest entries and matching paths/statuses.  
-* Cover both existing Epic behavior and CRD local recording; valid CRD widths at 9999, 10000 and 123456; all five statuses and tokenless full-v2 output; explicit-claim shape/subset safety; strict current-family byte/path/identity/status/own-log checks; optional absence versus selected incompleteness; rejection before deduplication; and governed admission limited to the `ADMITTED_CRD_QA` set, with an unadmitted CRD refused by name by both the check-family and the close-run publication entrypoints.  
+* Cover both existing Epic behavior and CRD local recording; valid CRD widths at 9999, 10000 and 123456; all five statuses and tokenless full-v2 output; explicit-claim shape/subset safety; strict current-family byte/path/identity/status/own-log checks; optional absence versus selected incompleteness; rejection before deduplication; and governed admission limited to the `ADMITTED_CRD_QA` set, with an unadmitted CRD refused by name by both the check-family and the close-run publication entrypoints; and governed Epic close-run admission limited to the `ADMITTED_EPIC_CLOSE` set, with an unadmitted Epic or a CRD configuration refused by the Epic close-run publication entrypoint, which names the admitted set.  
 * Exercise the actual canonical writer and independent validators for coherent publication, repetition/current replacement, callbacks inside the outer transaction, failures after actual integrity writes, restoration of bounded preimages/metadata/parents, and original-cause diagnostics if rollback fails.  
 * Preserve strict legacy Epic viability and refusal of CRD viability/migration before Epic-only access. Preserve historical evidence bytes; isolated capability tests do not create live QA results or claim domain/closure acceptance.  
 * Codespaces snapshot files remain optional and non-gating. Do not require a Step-0A snapshot or uninvoked Epic scaffold merely for the self-test. The source's Plan-specific CI exception does not remove these substantive regression obligations or change a failed hosted run into PASS.
@@ -1740,7 +1742,7 @@ The example runner shown elsewhere in this guide (for example, a local python \-
 
 Base URLs and DEV\_SAMPLER\_URL (env wiring). Infra/ops MUST derive and publish, for each such environment, a concrete base URL for the dev Reader process (for example, [http://127.0.0.1](http://127.0.0.1/):\\ in local dev or the appropriate forwarded port in Codespaces), and from that base URL define a concrete sampler harness URL:
 
-* DEV\_SAMPLER\_URL \\= \\/internal/dev/sampler
+* DEV\_SAMPLER\_URL = \<base\_url\>/internal/dev/sampler
 
 DEV\_SAMPLER\_URL MUST be treated as an infra-owned configuration value:
 
@@ -2272,7 +2274,7 @@ Route. POST /api/compat/v1 (pair) — internal/admin surface (not public).
 
 Probe-only route. GET /api/compat/v1 — fixed OK payload for local health probing; rejects request bodies; does not compute compatibility.
 
-Prod gate (hard). If APP\_ENV=prod, /api/compat/v1 MUST return 404 (Not Found).
+Environment gate (hard; dev/admin surface). The compat namespace, `/api/compat/v1` and its descendants, is a dev/admin-only surface. On every method, before any compat computation, database read or vendor call: a production-like posture (`prod`, `production` or `live`, read from trimmed, case-folded nonempty `APP_ENV`, otherwise `ENGINE_ENV`) MUST return 404 (Not Found) with `ERR_NOT_FOUND`; any other request MUST be served only when `APP_ENV` is exactly `dev`, `test` or `local`, with no trimming, case-folding or default, and is otherwise refused with 403 `ERR_WRITER_FORBIDDEN`; `ENGINE_ENV` never admits the surface. No credential is required while the surface is admitted only under that `APP_ENV` rule; before it is served in any other environment, a later decision must require an admin credential and its logging rules. Response bytes, headers and method rules are owned by HDE-CLI-API-Vendor-Ref §5.5, and the dev/admin allow-list by HDE-Governance §4.1.4. Implementation not claimed: current code refuses only the production-like posture, and the 403 refusal belongs to an implementing change that has not landed.
 
 Input validation (POST; required). The compat handler MUST validate the provided pair IDs (a\_id/b\_id) against UID\_RE (compat handler UID regex) before resolution, and MUST return a typed 400 (Bad Request) on invalid or empty IDs (no 500 on empty IDs).
 
@@ -2905,7 +2907,7 @@ Purpose:
 Pack identity (routing):
 
 * Identity is manifest-driven: pack\_sha \\= sha256(canonical manifest bytes).  
-* Files are uploaded to immutable object storage at /narratives/\\/\\.  
+* Files are uploaded to immutable object storage at /narratives/\<pack\_sha\>/\<PACK\_MEMBER\>.  
 * Exporter/loader procedures and coverage policy are routed by title. Mechanics does not restate bytes here.
 
 Registry diff and identity evidence mechanics (required).
@@ -3163,12 +3165,12 @@ Until the stateless JSON QA mode is implemented and drained into the relevant PF
 
   ## **17.10 Interim no-user QA mode (pre-Glow prod)**
 
-Status (normative). This section is normative for pre-Glow production environments where there is no app-level user model and no persistent user-bound BodyGraph rows configured in the database. It constrains how existing mechanics are exercised in Live QA. It does not change the long-term semantics of DB-backed flows, which will be re-opened in a future epic once the Glow App is integrated (see HDE Phased Epics and Glow QA Guide by title).
+Status (normative). This section is normative for pre-Glow production environments where there is no app-level user model and no persistent user-bound BodyGraph rows configured in the database other than the two synthetic Live QA fixtures named below. It constrains how existing mechanics are exercised in Live QA. It does not change the long-term semantics of DB-backed flows, which will be re-opened in a future epic once the Glow App is integrated (see HDE Phased Epics and Glow QA Guide by title).
 
 Assumptions (pre-Glow prod).
 
 * No app-level user IDs exist in production.  
-* No persistent user-bound BodyGraphs exist in production.  
+* No persistent user-bound BodyGraphs exist in production other than the two synthetic Live QA fixtures, SYN-A (`9cff60ae-6eb6-5618-aec5-8acaa4f290d2`) and SYN-B (`57f0c055-ff09-5fdb-aedb-def880437e6f`). They are permanent QA fixtures, not app users or app-like user records. They are stored, and stored again if missing, only through the engine's own write path under the Product Owner's write authorization, as Ops work, not as a QA or mechanics step. The deployed-service check of the live compat test (§1.1) reads only these two, and it is `TOOLING_BLOCKED` while either is missing.  
 * Mechanics and QA MUST NOT create app-like user records in production ahead of Glow App integration.
 
   ### **17.10.1 Compat & Reader (prod QA)**
@@ -3404,7 +3406,7 @@ Once the Glow App and user model are integrated, a future epic recorded in HDE P
 * use real app user IDs to exercise DB-backed showcompat and bg:resolve \--source=vendor \--upsert in prod or stage  
 * close out any acceptance tokens that currently depend on DB-backed user flows (routing by title to HDE-Governance and HDE Phased Epics)
 
-Until that epic is live, QA requirements that assume “existing users in prod” MUST be treated as blocked by environment and satisfied instead using the no-user QA mode described in this section.
+Until that epic is live, QA requirements that assume “existing users in prod” MUST be treated as blocked by environment and satisfied instead using the no-user QA mode described in this section. The live compat test of §1.1, including its deployed-service check of the two synthetic Live QA fixtures, is not such a requirement and is not blocked by this mode.
 
 ## **17.11 Admin QA bundle surfaces (full product payload)**
 
@@ -3690,9 +3692,10 @@ Domain catalogs & prefs schema: PF12-Canon-HDE-Schemas-and-Artifacts / HDE-Math-
 Policy (env-aware).
 
 * Prod. Source of truth is the database. Vendor APIs run only on explicit triggers or scheduled refresh; never inline on the request path.  
-* Pre-Glow prod (no users). When there is no app-level user model integrated with the HD Engine and no persistent user-bound BodyGraph rows configured in production:  
+* Pre-Glow prod (no users). When there is no app-level user model integrated with the HD Engine and no persistent user-bound BodyGraph rows configured in production other than the two synthetic Live QA fixtures of §17.10:  
   * Mechanics and QA MUST NOT create app-like user records in prod via CLI or vendor ingest.  
   * bg:resolve \--source=vendor \--upsert MUST NOT be invoked in prod; QA and ops flows in this environment MAY use only DB/auto stub behavior and vendor dry-run semantics as described below.  
+  * These two prohibitions do not cover storing the two synthetic Live QA fixtures of §17.10, or storing either again if it is missing. That is Ops work on the engine's own write path under the Product Owner's write authorization, not a QA or mechanics step.  
 * Dev. Direct vendor calls are allowed; on success, ingest MUST upsert the BodyGraph to DB for repeatability.  
 * SAFE rails. SAFE rails apply in all environments; rails posture and acceptance tokens are owned by HDE-Governance (titles-only).
 
@@ -4088,6 +4091,7 @@ Refuse outbound/vendor work unless explicitly enabled. Provide open/close hooks 
 * Logging. Keys-only; no payloads, header values, or secrets.  
 * Evidence. Posture check log (rails closed) and at least one refusal fixture (typed, numeric-free).  
 * Policy, SAFE-rails tokens, and vendor transport matrices remain single-homed in HDE-Governance and HDE-CLI-API-Vendor-Ref (titles-only).
+* Production vendor override. In a production-like environment, `hdctl bg:resolve --source vendor`, `hdctl showcompat --source vendor`, and `hdctl showcompat --conjunction` whenever the invocation selects vendor acquisition for either party, acquire from the vendor only under the production vendor override `--allow-prod-vendor <AUTHORIZATION_REF>`, and each such invocation that reaches override evaluation writes one audit event before any I/O. The flag is accepted by those three paths and by no other command. One valid flag authorizes at most one acquisition per party and opens no closed rail, and every refusal makes zero outbound attempts. The flag, environment classification, matrix, order, audit event and error carrier are owned by HDE-CLI-API-Vendor-Ref §7.1.11. Implementation not claimed: current code accepts the flag only on `hdctl bg:resolve --source vendor`, and extending the gate to showcompat and conjunction belongs to an implementing change that has not landed.
 
 Conjunction resolution surfaces (SAFE rails; required). A higher-level conjunction surface (conjunction\_public\_resolved) MAY accept unresolved inputs and MUST resolve them to person\_uid-bearing records before delegating to conjunction\_public.
 
@@ -4441,6 +4445,16 @@ The builder MUST:
 * restrict generated writes to the governed isolated evidence roots; and  
 * leave the source checkout byte-stable.
 
+Output-root ownership. The documented `--output <external-empty-directory>` interface is unchanged: the builder creates an absent output root and accepts an existing, empty, non-symlinked directory outside the source repository. Within that interface the builder MUST:
+
+* claim the output root exclusively for the run before any other write, by an atomic create that fails if another run holds the root;  
+* refuse a root it cannot claim with a typed failure code before any write;  
+* add no member to a successful bundle beyond the `hde.release_attestation.v1` contract through that claim;  
+* write below the output root only to paths this run created, and refuse, not follow, a pre-existing or substituted symlink anywhere below the root; and  
+* on failure, remove only the files and directories this run created, then write its failure receipt, and never remove a path it did not create.
+
+The mechanism of the exclusive claim belongs to the implementing change. The refusals above, the isolated build, the byte-stable checkout and the success and failure contracts below are unchanged. These rules state required behavior; they do not claim that the current builder conforms.
+
 Direct source-tree execution of the write-capable identity closure is prohibited. It is internal to the isolated attestation build only.
 
 The success contract is `hde.release_attestation.v1`. The failure contract is `hde.release_attestation.failure.v1`.
@@ -4486,6 +4500,8 @@ Routing (titles-only). Manifest shape, canonical JSON rules, historical evidence
 ## **27.5 Sanity pipeline (release & provenance)**
 
 Current generic gate (bounded baseline observation). The accepted EPIC040 release path uses the fifteen-stage generic chain implemented by `tools/evidence/run_sanity_pipeline.py`, with its gate wrapper and external attestation owner. It preserves closed rails, source cleanliness, current byte/evidence integrity and fail-closed admission. A non-admitted release is reported explicitly as `RELEASE_NOT_ADMITTED`/`NOT_ADMITTED`, never as PASS or an ordinary behavior failure; successful admission ends that temporary interval, rather than authorizing a permanent skip or frozen-byte success substitute. The accepted complete cut and synthetic OPS verification are scoped records, not a current execution receipt.
+
+Log-path bound (normative). `tools/evidence/run_sanity_pipeline.py --log-path` accepts, inside the repository, only the canonical log `audit/gates/sanity_pipeline/sanity_pipeline.log`. Outside the repository it accepts a target only when the target is not a symlink and no component of its path is a symlink, its parent directory exists, and it names a regular file or no existing file. A refused target fails with a typed, numeric-free error before any step runs or any byte is written. This bound states required behavior; it does not claim that the current pipeline conforms.
 
 ### Historical EPIC038 nineteen-stage family (records-only)
 
@@ -5013,24 +5029,24 @@ Some governed artifacts are epic-scoped and must use canonical, non-ambiguous fi
 
 Close-pack artifacts (epic-scoped; canonical filenames):
 
-* audit/EPIC-\\\_close\_report.md  
-* audit/EPIC-\\\_MANIFEST.json  
-* audit/docdeltas/hde-epic\\\_doc\_deltas.md
+* audit/EPIC-\<NNN\>\_close\_report.md  
+* audit/EPIC-\<NNN\>\_MANIFEST.json  
+* audit/docdeltas/hde-epic\<NNN\>\_doc\_deltas.md
 
 Conditional external QA RCA artifact (only when the QA RCA summary is not embedded in the close report):
 
-* audit/EPIC-\\\_QA\_RCA.md
+* audit/EPIC-\<NNN\>\_QA\_RCA.md
 
 Close-pack path-proof transcripts (minimum required):
 
-* audit/EPIC-\\\_close\_report.md.path\_proof.txt  
-* audit/EPIC-\\\_MANIFEST.json.path\_proof.txt
+* audit/EPIC-\<NNN\>\_close\_report.md.path\_proof.txt  
+* audit/EPIC-\<NNN\>\_MANIFEST.json.path\_proof.txt
 
 These path-proof siblings MUST be produced alongside the close-pack artifacts above and are treated as placement transcripts (CI-safe scaffold checks), not as primary evidence.
 
-Where \\ is a zero-padded 3-digit epic number (example: 022). These are governed artifacts and must not be duplicated under alternate spellings.
+Where \<NNN\> is a zero-padded 3-digit epic number (example: 022). These are governed artifacts and must not be duplicated under alternate spellings.
 
-CRD close-pack artifacts (canonical filenames): a CRD close pack uses the CRD ID as its prefix, `audit/HDE-CRD-<NNNN>_close_report.md` and `audit/HDE-CRD-<NNNN>_MANIFEST.json`, where `<NNNN>` is the CRD number of four or more digits. Each has a sibling `.path_proof.txt` transcript that the canonical updater writes. The CRD's lower-case ID is its directory form (for example `hde-crd-0002`), so its doc-delta ledger is `audit/docdeltas/hde-crd-<NNNN>_doc_deltas.md`. These are governed artifacts and must not be duplicated under alternate spellings.
+CRD close-pack artifacts (canonical filenames): a CRD close pack uses the CRD ID as its prefix, `audit/HDE-CRD-<NNNN>_close_report.md` and `audit/HDE-CRD-<NNNN>_MANIFEST.json`, where `<NNNN>` is the CRD number of four or more digits. Each has a sibling `.path_proof.txt` transcript that the canonical updater writes. The CRD's lower-case ID is its directory form (for example `hde-crd-0002`), so its doc-delta ledger is `audit/docdeltas/hde-crd-<NNNN>_doc_deltas.md`. When its QA RCA summary is not embedded in the close report, the conditional external QA RCA uses the same prefix, `audit/HDE-CRD-<NNNN>_QA_RCA.md`. These are governed artifacts and must not be duplicated under alternate spellings.
 
 Close-pack generator (mechanics; single-writer; normative): A deterministic generator entrypoint MUST exist to write the close-pack artifacts above (and any required path proofs) at their canonical paths. For EPIC-025, the close-pack generator entrypoint is `tools/qa/generate_epic025_close_pack.py`. For a `close_candidate_source.v2` source, Epic or CRD, the generic close-pack generator is `tools/qa/generate_epic_close_pack.py`. It takes exactly one `--source` and exactly one of `--write` or `--check`, renders the close report and manifest only from tracked inputs, publishes the manifest last and writes nothing in `--check` mode; a v1 source keeps the v1 model and output bytes. The canonical updater, not this generator, writes the pair's path proofs and Human Index rows.
 
@@ -5068,8 +5084,8 @@ Undrained delta posture (mechanics-only). When repo evidence supports a later ca
 
 Acceptance scaffolds (epic-scoped; canonical locations):
 
-* audit/qa/hde-epic\\/token\_evidence\_matrix.md  
-* docs/acceptance\_map\_epic\\.json
+* audit/qa/hde-epic\<NNN\>/token\_evidence\_matrix.md  
+* docs/acceptance\_map\_epic\<NNN\>.json
 
 These are governed artifacts. PF14 does not define token semantics; it requires only that these artifacts exist, remain parseable, and do not introduce ambiguous duplicate rows or placeholder bindings once concrete evidence exists.
 
@@ -5124,7 +5140,7 @@ Machine Mirror (single home):
 
 Close-pack manifest key\_outputs is a named binding map (normative):
 
-* audit/EPIC-\\\_MANIFEST.json MUST include key\_outputs as a JSON object (map) where each key is a stable pointer name (string) and each value is a repo-relative artifact path (string).  
+* audit/EPIC-\<NNN\>\_MANIFEST.json MUST include key\_outputs as a JSON object (map) where each key is a stable pointer name (string) and each value is a repo-relative artifact path (string).  
 * key\_outputs MUST NOT be a list.
 
 For a `close_candidate_source.v2` close pack, Epic or CRD, `key_outputs` MUST include at least these bindings, each value a repo-relative path string. `<prefix>` is `EPIC-<NNN>` for an Epic and the CRD ID for a CRD, and `<change-dir>` is the change's lower-case ID:
@@ -7075,9 +7091,9 @@ Parity summary:
 
 * artifacts/cli/summary.json — canonical JSON with: attempted commands, sha256 of AB/BA, ab\_ba\_equal: true.
 
-Two-run marker:
+Two-run marker (not GATE:CORE-DET evidence):
 
-* artifacts/cards/a3/IDENTITY\_OK.txt
+* artifacts/cards/a3/IDENTITY\_OK.txt is kept, but it is not GATE:CORE-DET evidence, and no record may cite it as current two-run identity proof. GATE:CORE-DET evidence, which covers AB↔BA and two-run identity, is the CI owner tests of the real compat path and each run of the live compat test (§1.1), as HDE-Governance and HDE-Build Notes define it.
 
 Canonical compare:
 
@@ -7535,7 +7551,7 @@ QA gate-log capture (required). The EPIC027 close-pack workflow MUST persist sam
 
 Generator (normative). Generate with: python tools/evidence/generate\_evidence\_index\_snapshot.py. Plans and QA docs MUST NOT reference run\_evidence\_index\_snapshot.py for this gate-family.
 
-Non-canonical epic-local variant (normative). audit/qa/hde-epic\\/evidence\_index\_snapshot.json is non-authoritative and MUST NOT be required by future plans as a closure deliverable.
+Non-canonical epic-local variant (normative). audit/qa/hde-epic\<NNN\>/evidence\_index\_snapshot.json is non-authoritative and MUST NOT be required by future plans as a closure deliverable.
 
 ### **37.18.2 EPIC028 close-pack baseline and OPS closeout evidence**
 

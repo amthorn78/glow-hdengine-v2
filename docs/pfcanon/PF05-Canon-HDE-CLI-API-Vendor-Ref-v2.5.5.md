@@ -3,10 +3,10 @@
 ## **0.1 Header**
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref  
-**Version:** v2.5.4  
+**Version:** v2.5.5  
 **Status:** Canon  
-**Effective date:** 2026-10-26  
-**Last Update Gate:** BN 13.8.8; HDE-CRD-0002-specification-v1.1-approved.md; HDE-CRD-0002_close_report.md   
+**Effective date:** 2026-11-02  
+**Last Update Gate:** BN 14.0.5   
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -116,7 +116,7 @@
 
   ## **Vendor ingest (HDAPI)**
 
-* **Legacy BodyGraph fallback and bounded HumanDesignAPI v2 chart path — implemented with remaining PF05 gaps.** **HDE Build Checklist — Fermentation** records HDE-FERM006 through HDE-FERM008 Done for the bounded HDE BodyGraph-detail scope. At `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, configured v2 bases use the version-neutral `charts` resource, Bearer auth, and the deterministic `ChartResult` adapter; non-v2 bases retain an explicit legacy `bodygraphs` fallback. This does not claim broad HumanDesignAPI v2 platform conformance, public Reader expansion, production deployment, production DB-hot-path completion, or complete conformance to every §7.2/§7.3 byte requirement. See §§7.1.10, 7.2, and 7.4.  
+* **Retained legacy BodyGraph selection and bounded HumanDesignAPI v2 chart path — implemented with remaining PF05 gaps.** **HDE Build Checklist — Fermentation** records HDE-FERM006 through HDE-FERM008 Done for the bounded HDE BodyGraph-detail scope. At `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, configured v2 bases use the version-neutral `charts` resource, Bearer auth, and the deterministic `ChartResult` adapter. A terminal `v1` base selects the retained legacy `bodygraphs` route under §7.1.10, which is legacy selection, not fallback. Legacy selection by any other non-v2 base at that pin is the material gap recorded in §7.2.0, not a retained capability. This does not claim broad HumanDesignAPI v2 platform conformance, public Reader expansion, production deployment, production DB-hot-path completion, or complete conformance to every §7.2/§7.3 byte requirement. See §§7.1.10, 7.2, and 7.4.  
     
 * **HumanDesignAPI v2 pending route set — Required-Now.** The pending v2 conformance work must reconcile `POST /v2/charts`, `POST /v2/charts/simple`, and `POST /v2/charts/coordinates` as the recommended v2 chart routes, and `POST /v1/bodygraphs` and `POST /v1/bodygraphs/simple` as legacy v1 routes. The suspect `api-reference/openapi.json` artifact MUST be quarantined until domain, title, server, and path-family validation prove it is a HumanDesignAPI artifact.  
     
@@ -953,7 +953,7 @@ Implementation gap. No invocable contract is adopted; the command remains Specul
     
   * `db` — resolve from DB only (no vendor I/O).  
   * `vendor` — resolve from vendor only; vendor HTTP calls are allowed **only** when SAFE rails are open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`). Shaping and error mapping follow §7.1/§7.2/§7.3 and the policies in **HDE-Governance** and the **HDE-Mechanics Guide** (titles-only).  
-  * `bg:resolve --source vendor` configured-v2 route-policy boundary — configured v2 bases use the version-neutral `charts` resource path, route-metadata `Authorization: Bearer` auth posture, geocode posture, and deterministic v2 `ChartResult` adapter. `--dry-run` performs no DB write. Non-dry-run configured-v2 mapped-cache persistence requires explicit `--upsert`, open rails, non-production posture in both the requested and process environments, an available sanctioned `DBAccess` target, and a successful adapter mapping. Missing upsert intent or production-like posture fails closed with `PROVIDER_WRITE_UNSUPPORTED`. The bounded write stores only adapter-mapped HDE BodyGraph/cache data, verifies canonical write/read-back parity, one-row identity, and idempotence, and never persists raw vendor envelopes or secret-bearing material. Generic legacy BodyGraph ingest is guarded from v2 chart routing and MUST NOT compose legacy `bodygraphs` resource paths against a configured v2 base. Non-v2 configured bases MAY preserve the legacy BodyGraph route only as explicit legacy fallback. This route policy preserves HD Engine ownership of vendor acquisition and BodyGraph resolution, keeps secrets and raw payloads out of evidence, and preserves nonclaims for broad HumanDesignAPI v2 platform conformance, public Reader changes, public routes, public payload changes, new HTTP homes, app-side vendor credential ownership, raw payload persistence, and AI scope.  
+  * `bg:resolve --source vendor` configured-v2 route-policy boundary — configured v2 bases use the version-neutral `charts` resource path, route-metadata `Authorization: Bearer` auth posture, geocode posture, and deterministic v2 `ChartResult` adapter. `--dry-run` performs no DB write. Non-dry-run configured-v2 mapped-cache persistence requires explicit `--upsert`, open rails, non-production posture in both the requested and process environments, an available sanctioned `DBAccess` target, and a successful adapter mapping. Missing upsert intent or production-like posture fails closed with `PROVIDER_WRITE_UNSUPPORTED`. The bounded write stores only adapter-mapped HDE BodyGraph/cache data, verifies canonical write/read-back parity, one-row identity, and idempotence, and never persists raw vendor envelopes or secret-bearing material. Generic legacy BodyGraph ingest is guarded from v2 chart routing and MUST NOT compose legacy `bodygraphs` resource paths against a configured v2 base. A terminal `v1` configured base selects the retained legacy BodyGraph route under §7.1.10; that is legacy selection, not fallback, and every other non-v2 base fails with `PROVIDER_ROUTE_UNSUPPORTED` before credential projection or any external I/O. This route policy preserves HD Engine ownership of vendor acquisition and BodyGraph resolution, keeps secrets and raw payloads out of evidence, and preserves nonclaims for broad HumanDesignAPI v2 platform conformance, public Reader changes, public routes, public payload changes, new HTTP homes, app-side vendor credential ownership, raw payload persistence, and AI scope.  
   * `auto` — DB-only; vendor fallback is prohibited. Current repository behavior treats `auto` as the no-I/O DB stub. When the DB path performs direct PostgreSQL access, an absent, invalid, unavailable, or unauthorized direct endpoint MUST fail closed without vendor or alternate-transport selection, and retired bridge keys MUST fail before provider construction or I/O (HDE-Mechanics Guide; titles-only).
 
 
@@ -2490,7 +2490,11 @@ These transport bytes are owned here; PF05 owns **Reader bytes only** and keeps 
 * **Validation and environment gating.**  
   * Reject invalid or empty `a_id`/`b_id` before any person resolution; do not allow empty strings to propagate into server errors.  
   * The compatibility namespace is exactly `/api/compat/v1` and its descendants and MUST NOT match unrelated prefixes such as `/api/compat/v10`. Resolve production posture by trimming and case-folding a nonempty `APP_ENV` first and otherwise `ENGINE_ENV`; `prod`, `production`, and `live` resolve to production-like posture. In any resolved production-like posture, every method on the exact namespace or any descendant MUST fail closed with status `404`, presenter-backed `error_v1` `code=ERR_NOT_FOUND`, and `Cache-Control: no-store`; `HEAD` carries no body. This guard applies before compatibility computation so the internal surface remains hidden.  
-* **Success body (dev/internal; authenticated).** After the production-excluding environment gate and internal authentication, `POST /api/compat/v1` returns the canonical `magic10_compat_result.v1` defined in §4.1.3 for an eligible pair. It does not return or wrap Reader v1 bytes. Full signals, scores, and narrative keys remain internal/admin-only. A valid self-pair has no complete result, and this route must not fabricate a matrix.
+  * **Dev/admin gate (step 2).** The compatibility namespace is a dev/admin-only surface under **HDE-Governance** §4.1.4. Step 1 is the production-like guard above. Before any compatibility computation, database read, or vendor call, a request that step 1 does not refuse is served only when `APP_ENV` is exactly `dev`, `test`, or `local`, with no trimming, no case-folding, and no default. A missing, empty, or other `APP_ENV` value fails closed with the writer-style refusal that the dev/admin HTTP surfaces use: status `403`, presenter-backed `error_v1` `code=ERR_WRITER_FORBIDDEN`, `Cache-Control: no-store`, and no `ETag`; `HEAD` carries no body. `ENGINE_ENV` never admits the surface. The method, probe, and POST rules of this section apply only to a request that both steps admit.  
+* **Success body (dev/internal).** After both environment-gate steps admit the request, `POST /api/compat/v1` returns the canonical `magic10_compat_result.v1` defined in §4.1.3 for an eligible pair. It does not return or wrap Reader v1 bytes. Full signals, scores, and narrative keys remain internal/admin-only. A valid self-pair has no complete result, and this route must not fabricate a matrix.  
+* **Authentication.** No credential is required while the dev/admin gate admits the route only under `APP_ENV` exactly `dev`, `test`, or `local`. Before the route is served in any other environment, a later decision must require the **HDE-Governance** §8.3.2 admin credential, or an equivalent credential pinned in this document, and must add the **HDE-Governance** §8.3.4 logging rules.  
+* **Residual risk (accepted).** An admitted dev, test, or local process connected to the shared production database serves stored-user compat results to any caller that reaches its port. That exposure is controlled by where the process listens, under the documented loopback access in **Glow-Infrastructure** §2.2, not by this route. The posture is the same as for every other dev/admin surface.  
+* **Implementation state (informative).** Bounded static inspection at `main@e2b7427ff418ca8f08f05587c4a541308a76da56` finds that the guard in `engine/http/compat_handler.py` refuses only production-like posture. It classifies posture through `adapter/env_guard.py`, which treats an absent or blank `APP_ENV` and `ENGINE_ENV` as `dev` and passes every other non-production value through. The step 2 gate is therefore a Required-Now gap against this contract. Its fix belongs to the implementing change for Candidate CRD Items List item 9, as HDE Build Notes records. This inspection concerns checked-in bytes only and establishes no runtime behavior, deployment, or acceptance.
 
 **Error body.** Typed, numeric-free **error\_v1** envelope as defined in §5.2: `{"schema":"v1","ok":false,"code":"<ERR_*>", "error":"<message>", ...}`. For this route, the canonical codes include:
 
@@ -2506,7 +2510,7 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 
 * **Success (200).** `Content-Type: application/json; charset=utf-8`; `Cache-Control: no-store`; no `ETag`. POST is non-conditional and never returns `304`.  
 * **Errors.** Except for the explicit bodyless non-production `HEAD` response above, all error responses use `Content-Type: application/json; charset=utf-8`, `Cache-Control: no-store`, and no `ETag`. Compatibility `404` and `405` responses use the shared presenter/emitter to emit canonical error\_v1 with `code=ERR_NOT_FOUND` while preserving the routing status; HTTP `HEAD` semantics suppress the production `404` body. The selected factory converts compatibility-scoped HTML `404` and `405` responses to this envelope and preserves Flask’s `Allow` header on a converted `405`.  
-* **Method and subpath handling.** In non-production posture, `HEAD /api/compat/v1` returns `405` with no body, `Content-Length: 0`, no `Content-Type`, `Cache-Control: no-store`, and `Allow: POST, OPTIONS`; `OPTIONS /api/compat/v1` returns `204` with no body, `Content-Length: 0`, no `Content-Type`, `Cache-Control: no-store`, and `Allow: POST, OPTIONS`. Other unsupported methods at the exact namespace return presenter-backed `405` error\_v1, and unsupported descendant paths return presenter-backed `404` error\_v1. Compat GET does not use the optional A7 HEAD/304 flow.
+* **Method and subpath handling.** For a request that both environment-gate steps admit, `HEAD /api/compat/v1` returns `405` with no body, `Content-Length: 0`, no `Content-Type`, `Cache-Control: no-store`, and `Allow: POST, OPTIONS`; `OPTIONS /api/compat/v1` returns `204` with no body, `Content-Length: 0`, no `Content-Type`, `Cache-Control: no-store`, and `Allow: POST, OPTIONS`. Other unsupported methods at the exact namespace return presenter-backed `405` error\_v1, and unsupported descendant paths return presenter-backed `404` error\_v1. Compat GET does not use the optional A7 HEAD/304 flow.
 
 ### **Serialization & determinism (dev)**
 
@@ -2517,7 +2521,7 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 ### **Parity (clarified)**
 
 * **Public parity lives in §5.4** (`/reader?v=1` ↔ Reader-v1 bytes written by `hdctl showcompat --dump-reader <path>`). Ordinary `showcompat` stdout is the distinct compat envelope.  
-* **Compat v1 parity (normative).** For the same eligible normalized inputs, active configuration, and release, `hdctl showcompat` stdout and authenticated `POST /api/compat/v1` MUST emit byte-identical canonical `magic10_compat_result.v1` bytes. Both surfaces consume the same complete result and neither may calculate, weight, round, band, augment, or rescore independently.
+* **Compat v1 parity (normative).** For the same eligible normalized inputs, active configuration, and release, `hdctl showcompat` stdout and `POST /api/compat/v1` MUST emit byte-identical canonical `magic10_compat_result.v1` bytes. Both surfaces consume the same complete result and neither may calculate, weight, round, band, augment, or rescore independently.
 
 ### **Evidence (records-only; titles-only; indexed via PF12)**
 
@@ -3473,7 +3477,7 @@ Codex Audit or other supplied read-only repo-reality observations may support PF
 
 **Normative route selection.**
 
-`bg:resolve --source vendor` selects one full-detail route from the validated terminal API-version segment of the configured base:
+Route selection and the configured-base boundary below govern every resolver-selected vendor acquisition: `bg:resolve --source vendor`, and compat chart acquisition by `hdctl showcompat`, including its conjunction mode. Each acquisition selects one full-detail route from the validated terminal API-version segment of the configured base:
 
 * A terminal, case-sensitive `v2` segment selects the version-neutral resource `charts`.  
 * A terminal, case-sensitive `v1` segment selects the intentionally retained legacy resource `bodygraphs`.  
@@ -3504,7 +3508,7 @@ The bounded Fermentation work and repository request builders do not establish b
 
 ### **7.1.11 SAFE rails and production vendor override**
 
-**Implementation state (informative).** HDE-CRD-0002 delivered this contract as its requirement S14, and HDE Build Notes records the delivery. That delivery resolves the DD-04 / QA50-B01 implementation gap recorded outside HDE-EPIC040. Bounded static inspection at `main@0838ba08254eaefc888019df49a06aa2ae99cc6c` finds:
+**Implementation state (informative).** HDE-CRD-0002 delivered this contract for `hdctl bg:resolve --source vendor` as its requirement S14, and HDE Build Notes records the delivery. That delivery resolves the DD-04 / QA50-B01 implementation gap recorded outside HDE-EPIC040. Bounded static inspection at `main@0838ba08254eaefc888019df49a06aa2ae99cc6c` finds:
 
 * the §7.1.11a flag, its pre-scan and its usage refusals in `engine/cli/main.py`;
 * the §7.1.11b classification, the §7.1.11c matrix and the §7.1.11d order in `engine/bodygraph/resolver.py`;
@@ -3515,10 +3519,17 @@ The bounded Fermentation work and repository request builders do not establish b
 These limits apply:
 
 * An account name identifies an account, not necessarily a person. §7.1.11e still decides who may initiate, and supplying the flag authorizes nothing by itself.
-* The gate covers only the command §7.1.11a names. Vendor acquisition through the compat chart resolver, which `hdctl showcompat --source vendor` and its conjunction mode use, applies the generic rails but not this gate. The HDE-CRD-0002 close report defers that gap to the Product Owner as pending and non-gating.
-* The same close report records S14 as met: one check proves the local matrix, and one covers a single bounded live vendor call initiated by the Product Owner, not broad HumanDesignAPI v2 conformance.
+* The HDE-CRD-0002 close report records S14 as met: one check proves the local matrix, and one covers a single bounded live vendor call initiated by the Product Owner, not broad HumanDesignAPI v2 conformance.
 
-This inspection concerns checked-in bytes only, and a close-report record is not a QA verdict; neither establishes runtime behavior, deployment or acceptance.
+**Required-Now implementation gap.** The gate applies to every path §7.1.11a names, but the delivered gate covers only `hdctl bg:resolve --source vendor`. Bounded static inspection at `main@e2b7427ff418ca8f08f05587c4a541308a76da56` finds:
+
+* the pre-scan in `engine/cli/main.py` refuses `--allow-prod-vendor` as a usage error on every command other than `bg:resolve`;
+* in conjunction mode, `engine/cli/main.py` passes the vendor source policy for every `--source` value other than `db` or `auto`, including an absent `--source`;
+* vendor acquisition through the compat chart resolver in `engine/bodygraph/resolver.py`, which `hdctl showcompat --source vendor` and its conjunction mode use, applies the generic rails but not this gate.
+
+The uncovered paths are a gap against this contract, not a decided limit. The HDE-CRD-0002 close report defers them to the Product Owner as pending and non-gating. Their fix belongs to the implementing change for Candidate CRD Items List item 9, as HDE Build Notes records.
+
+These inspections concern checked-in bytes only, and a close-report record is not a QA verdict; none establishes runtime behavior, deployment or acceptance.
 
 Vendor HTTP remains subject to the generic SAFE rails in **HDE-Governance**. Closed SAFE or network rails refuse before every vendor decision and perform no credential loading, DNS, socket, or HTTP activity. The production override is an additional admin gate; it never opens either generic rail and never permits public Reader or Aux traffic to call the vendor.
 
@@ -3530,7 +3541,13 @@ The only production authorization flag in this selection is:
 --allow-prod-vendor <AUTHORIZATION_REF>
 ```
 
-It is one value-bearing flag accepted only by `hdctl bg:resolve --source vendor`. It has no short spelling, compatibility alias, negated form, environment-variable form, or implicit default.
+It is one value-bearing flag accepted only by the three CLI paths that acquire a chart from the vendor, and by no other command:
+
+* `hdctl bg:resolve --source vendor`;
+* `hdctl showcompat --source vendor`;
+* `hdctl showcompat --conjunction` when the invocation selects vendor acquisition for either party.
+
+Each path applies the §7.1.11b classification, the §7.1.11c matrix, the §7.1.11d order and the §7.1.11e initiator rule unchanged. The flag has no short spelling, compatibility alias, negated form, environment-variable form, or implicit default.
 
 `AUTHORIZATION_REF` is an audit reference, not a credential. It must contain 1–128 ASCII characters and match:
 
@@ -3574,18 +3591,18 @@ The familiar open representation is `SAFE_MODE=0` and `ALLOW_NETWORK=1`. The pro
 Evaluate the gates in this order before client construction, secret loading, DNS, sockets, or HTTP:
 
 1. Parse the command and reject malformed, duplicated, or inapplicable flags.  
-2. Confirm `--source vendor`; using the flag with `--source db` or `--source auto` is a CLI usage error.  
+2. Confirm that the invocation selects vendor acquisition. Supplying the flag to an invocation that selects no vendor acquisition is a CLI usage error, exit `64`; that covers `--source db`, `--source auto`, and conjunction with `db` or `auto`.  
 3. Apply the generic SAFE and network rails.  
 4. Resolve and validate the effective environment.  
 5. Apply the production/non-production flag matrix.  
 6. Resolve authenticated actor identity and durably write the pre-I/O audit event.  
 7. Apply base-URL, route, credential-presence, request, retry, and any separate persistence gates.
 
-The flag authorizes only one bounded admin vendor HTTP opportunity. It does not authorize public Reader/Aux vendor traffic, production `--upsert`, any production database write, bypass of `PROVIDER_WRITE_UNSUPPORTED`, a route or version, credentials, expanded retries, or a no-network dry run. A production dry run that contacts the vendor still requires the flag.
+One valid flag authorizes only the bounded admin vendor acquisitions of one invocation: at most one acquisition per party, so at most two for a pair. It does not authorize opening a closed rail, public Reader/Aux vendor traffic, production `--upsert`, any production database write, bypass of `PROVIDER_WRITE_UNSUPPORTED`, a route or version, credentials, expanded retries, or a no-network dry run. A production dry run that contacts the vendor still requires the flag.
 
 #### **7.1.11e Error carrier and authorized setter**
 
-A missing value, duplicate flag, invalid syntax, or use with a non-vendor source uses the canonical CLI usage carrier and exits `64`. Runtime policy refusals use the canonical `status="error"` resolver envelope with one stable typed code and a non-sensitive message and exit `1`. Every refusal has outbound-attempt count `0`.
+A missing value, duplicate flag, invalid syntax, or use with an invocation that selects no vendor acquisition uses the canonical CLI usage carrier and exits `64`. On `hdctl bg:resolve`, runtime policy refusals use the canonical `status="error"` resolver envelope with one stable typed code and a non-sensitive message and exit `1`. On `hdctl showcompat`, including its conjunction mode, policy refusals use that command's existing canonical typed error carrier (§4.1.4), with the same stable codes (`PROVIDER_PROD_OVERRIDE_REQUIRED`, `PROVIDER_PROD_OVERRIDE_INVALID`, `PROVIDER_AUDIT_UNAVAILABLE`, `PROVIDER_CONFIG_INVALID`) and exit `1`. Every refusal has outbound-attempt count `0`.
 
 The authorized initiator is an authenticated human Product Owner or a human operations executor explicitly delegated by the Product Owner in the referenced approved work item. An AI agent, CI job, application request, or unauthenticated shell cannot self-authorize by supplying the flag. Actor identity comes from the authenticated execution environment or control plane, never a free-form `--operator` value. If a stable authenticated actor identity is unavailable, refuse the operation. The authorization reference records the decision basis; it is not authentication and grants no privilege by itself.
 
@@ -3601,7 +3618,7 @@ Every production-like invocation that reaches semantic override evaluation, incl
 | `correlation_id` | generated by the trusted runtime; not supplied as birth or user data |
 | `actor_principal` | authenticated OS/control-plane principal |
 | `authorization_ref` | validated flag value, or `null` when absent |
-| `command` | exactly `bg:resolve` |
+| `command` | exactly one of `bg:resolve`, `showcompat`, or `showcompat:conjunction` |
 | `source` | exactly `vendor` |
 | `environment` | normalized production alias |
 | `safe_mode_open` | boolean result only |
@@ -4146,6 +4163,7 @@ Admin surfaces are never part of the Reader public covenant and must remain clea
 * v2.4.9 — Define the PF12-owned `public_aux` Catalog alias model, reject undocumented Aux query controls, require exactly one `v=1`, and normalize the §6.2 status tag in §§5–6. Sentinel updated: NO.  
 * v2.5.3 — Admit production Reader v1/v2 on the distinct POST mount; define ordered v2 projection/examples and inherited transport; correct v1 success/error schema references and resolve PR04 F03/F05/F07 deferrals; conform directed-agent vendor execution and environment/base-URL alias facts; retain held DD-04 and proof/availability limits in §§0.2, 1, 3.7, 4.1, 5.1–5.6, 5.12, 6, 7.1, 7.4, 8.1, 9.1 and Appendix C. Sentinel updated: NO.
 * v2.5.4 — Record the delivered production vendor override and its limits in §7.1.11, remove it from the gap statements in §§1 and 7.2.0, record the Endpoint Catalog state with the canon-retired route exclusion in §5.6, and record the resolved not-found, showcompat-help and legacy CLI proof limitations in §§4.1.6, 5.1.0 and 5.1.7. Sentinel updated: NO.
+* v2.5.5 — Extend the production vendor override to `hdctl showcompat --source vendor` and vendor-selecting conjunction, with the showcompat carrier and audit command values, and record the uncovered paths as an implementation gap in §7.1.11; extend §7.1.10 route selection to compat chart acquisition, align §4.6 with it, and correct the §1 legacy-route wording to terminal-v1 legacy selection with the §7.2.0 non-v2 gap; add the `APP_ENV` dev/admin gate to `/api/compat/v1`, withdraw its authentication wording and record the gate gap in §5.5. Sentinel updated: NO.
 * **Where to put links.** Governed artifact identities and paths are indexed through the Evidence Catalog in **HDE-Schemas & Artifacts**; do not paste payload or transport bytes here. If the Human Evidence Index changes, record “Sentinel updated: YES” only after recomputing `docs/evidence/INDEX.sha256`; the sentinel is the SHA-256 digest of the canonical bytes of `docs/evidence/INDEX.json` and is not mirrored.
 
 ## **11.2 Doc-Delta Hooks (how we propose, review, and land changes)**

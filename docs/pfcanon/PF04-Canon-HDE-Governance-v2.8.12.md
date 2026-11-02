@@ -3,10 +3,10 @@
 ## **0.1 Header**
 
 **Title:** PF04-Canon-HDE-Governance  
-**Version:** v2.8.8  
+**Version:** v2.8.12  
 **Status:** Canon  
-**Effective date:** 2026-10-26  
-**Last Update Gate:** BN 13.8.8  
+**Effective date:** 2026-11-02  
+**Last Update Gate:** BN 14.0.5  
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
 ## **0.2 Scope & boundaries \[Required-Now\]**
@@ -581,7 +581,8 @@ Acceptance tokens `ENV_RAILS_POLICY_OK` and `ENV_LC_ALL_C_OK` together assert th
 
 *Observability & privacy tokens.*
 
-* **LOGS\_KEYS\_ONLY\_OK** — Governed logs (including A7 proofs, BodyGraph diagnostics, and ops probes) are keys-only: no payload values, no PII. Payload bytes and PII must never appear in governed logs.  
+* **LOGS\_KEYS\_ONLY\_OK** — Governed logs (including A7 proofs, BodyGraph diagnostics, ops probes, and governed gate check rows) are keys-only: no payload values, no PII. Payload bytes and PII must never appear in governed logs.  
+  * **Governed gate check rows.** Each row of `audit/gates/json_gate/canonical/json_gate_check_log.ndjson` and `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`, and of any other gate family that **HDE-Schemas & Artifacts** governs, is a governed log under this token and §7.1. Each issue entry is a closed token; an exception contributes its type name at most, as `validation_error:<ExceptionType>`. No row carries exception message text, library message text or a stack trace. Every path a row records is repository-relative (§2.0.6); no row carries an absolute or machine-local path. Detail for diagnosing a failing run goes to the tool's stderr, which is not governed evidence.  
 * **BG\_PRIVACY\_REDACTION\_OK** — BodyGraph-specific logs and metrics apply privacy-preserving redaction rules as defined in Glow QA Guide; sensitive fields are omitted or redacted before emission.  
 * **BG\_METRICS\_EXPOSED\_OK** — Exposed BodyGraph metrics are limited, non-PII, and consistent with infra/QA observability policy; metrics surfaces must not leak user-identifying or sensitive information.
 
@@ -911,7 +912,7 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
     * a `PF09 pointers:` line listing the relevant PF09 pointer IDs,  
     * a `TI-002 pointers:` line listing the canon pointers used to evidence TI-002 (or a `TI-<id> pointers:` line for other TI items), and  
     * an `ADR status line:` line identifying the ADR governing the TI claim,  
-  * **Tracked-issue items under the generic v2 writer.** The v2 writer renders each tracked-issue item only as an ADR-status item, in the literal `ADR status line:` field, and the item's ID occurs in the drain-targets ledger (**Change Process Guide** §3.5.2.1, form (b)). It cannot express a TI item closed as satisfied through PF09 or PF30 pointers (form (a), with the `PF09 pointers:` and `TI-<id> pointers:` fields); such a close needs a later source-schema version.  
+  * **Tracked-issue items under the generic v2 writer.** The v2 writer renders each tracked-issue item only as an ADR-status item, in the literal `ADR status line:` field, and the item's ID occurs in the drain-targets ledger (**Change Process Guide** §3.5.2.1, form (b)). A tracked-issue ID is `TI-NNN` or, for an Epic, that Epic's own `ISSUE-EPIC<NNN>-TI-<nn>`; the writer refuses an ID that names another Epic. It cannot express a TI item closed as satisfied through PF09 or PF30 pointers (form (a), with the `PF09 pointers:` and `TI-<id> pointers:` fields); such a close needs a later source-schema version.  
   * **Closure decision with an accepted `TOOLING_BLOCKED` check (v2 writer).** A v2 `SATISFIED` decision needs every check of the change's current QA plan recorded in the QA step-logs manifest as `PASS`, or as `TOOLING_BLOCKED` where exactly one closure-override gap in the ADR block names that check. A check recorded as `FAIL_BEHAVIOR`, `FAIL_TOOLING` or `PARKED`, or a planned check the manifest does not record, blocks `SATISFIED`. A `TOOLING_BLOCKED` check accepted under the override is never PASS evidence for a `MET` criterion. **Change Process Guide** §3.5.4 owns the ADR block, the closure override and the no-posture-only-PASS rule.  
   * **Coverage vs QA Plan accounting (required when the epic has a Live QA Plan or otherwise requires Live QA).** The closeout record MUST include an explicit, step-by-step, complete, and auditable coverage ledger. It MUST list every planned QA step in plan order with a stable step identifier, a coverage status (\`PASS\`, \`FAIL\`, \`BLOCKED\`, or \`NOT\_RUN\`), and the closeout impact for that step,  
   * \***Accepted execution-deviation accounting (required).** When a step recorded in the coverage ledger as \`PASS\` materially diverged from the approved QA Plan but was still accepted, the closeout record MUST preserve the step’s coverage status and add a separate deviation note for that step.  
@@ -976,6 +977,7 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
     * If a close report states that governed evidence artifacts were refreshed, re-validated, or gate-checked, that statement MUST be backed by same-run governed execution evidence produced by the cited workflow. Template-generated or unconditional claims are non-conforming.  
   * Same-run evidence pointer rule.  
     * When the close slice touches the Evidence Index, hash sentinel, machine mirror, or their required proof companions, the close report MUST point directly, or via the manifest \`key\_outputs\` or token/evidence matrix, to the same-run gate or QA log evidence that proves the write/check workflow actually executed and passed.  
+    * For a v2 close pack, the same-run evidence of the close run is the change's post-verdict close-run family under `audit/qa/<change-dir>/close/`, which the canonical updater publishes after the close pack is written. The close report's pointer to that directory meets this rule, and it may name the directory before the close run writes it: a CRD's close report MUST name it, and an Epic's close report MAY. Only an admitted CRD, and an Epic whose close run the Product Owner has explicitly admitted, has a close-run family. **HDE-Schemas & Artifacts** records the family's path and post-verdict status, and **Change Process Guide** names it as the same-run evidence home.  
 * Close-pack manifest `key_outputs` shape (normative):  
   * The close-pack manifest, `audit/EPIC-###_MANIFEST.json` or, for a CRD, `audit/HDE-CRD-NNNN_MANIFEST.json`, MUST include `key_outputs` as a JSON object (map) from stable names → repo-relative artifact paths.  
   * `key_outputs` MUST NOT be a list.  
@@ -1189,15 +1191,31 @@ The evidence bundle MUST capture commands, stdout, stderr, exit codes, redacted 
 
 The result is `FAIL_TOOLING` if secret-bearing output is persisted. The result is `FAIL_BEHAVIOR` only when command, credentials, safe posture, source selection, target facts, and evidence shape are proven and the runtime behavior contradicts the expected vendor behavior. Open-rails success does not by itself claim QA PASS, Live QA completion, PF09 status change, epic closure, public Reader change, new route, new acceptance token, or PF-canon drainage.
 
-**Production-functional epic live-proof requirement.** Every QA plan for an epic touching any surface used to produce a production feature that PF canon describes as functional MUST include an open-rails test. The test MUST make a live vendor call under `SAFE_MODE=0` and `ALLOW_NETWORK=1`, using synthetic data only, with no real person, user or production data. Identification of the affected surfaces remains with the epic's Specification and plans. A plan without this test is not approval-ready.
+**Every Epic's Live QA runs the live compat test.** Every Epic's QA plan includes, and its QA run executes, the live compat test below, whatever the Epic changed and whether or not its own surfaces are on a production path. Compat is the product: a QA verdict that has not seen compat work live says nothing about the product. This rule covers Epics; whether a CRD that changes runtime code also runs the test is undecided and remains the Product Owner's decision.
 
-Closed-rails tests, fixture replay, mocks or fake services, static analysis, generated or governed evidence artifacts, path-proof validation, Index or Mirror refresh, repository inspection, review approval, an unrun smoke procedure, and OPS discovery without a live vendor call do not satisfy this requirement. A non-vendor deployed-service check or database read does not satisfy it by itself. An exemption or closed-rails-only approval does not replace the required test within this scope. Any question about retaining an exemption ground remains for Product Owner determination; it is not permission to omit the test.
+* **Live vendor compat.** `hdctl showcompat --source vendor` runs under `SAFE_MODE=0` and `ALLOW_NETWORK=1`, step-local, on synthetic birth data only, at the Epic's QA execution source. It runs at least two distinct pairs, each as AB and as BA, and runs one pair twice. It passes only when each output has the canonical result shape and the release identity of the source, AB and BA are byte-identical, the two runs are byte-identical, the Reader bytes stay `{id, band}` only, and the two pairs produce different results.  
+* **Deployed-service check.** The check compares the production HD Engine's `/internal/version` release identity with the release on `main`, and has the production Reader score the two synthetic stored people, SYN-A and SYN-B, in both orders for each Reader version. It passes only when each answer is eligible and bands-only and AB and BA are byte-identical. A mismatch between the deployed release and `main`, and a difference between the deployed bands and the CLI bands for the same birth data, are reported as findings with the QA result.  
+* **The two synthetic stored people.** The production Reader scores only people whose charts are stored in the production database, so two synthetic people are kept there as permanent QA fixtures under fixed UUIDs: SYN-A, `9cff60ae-6eb6-5618-aec5-8acaa4f290d2` (`uuid5(NAMESPACE_URL, "hde-live-qa-synthetic-a")`), born 1990-01-01 at 12:00 in Amsterdam, Netherlands; and SYN-B, `57f0c055-ff09-5fdb-aedb-def880437e6f` (`uuid5(NAMESPACE_URL, "hde-live-qa-synthetic-b")`), born 1985-07-15 at 08:30 in London, United Kingdom. They are stored through the engine's own write path under the Product Owner's write authorization. If either is missing when a QA run starts, the deployed-service check is `TOOLING_BLOCKED` until it is stored again.  
+* **The Epic's own live surfaces.** An Epic whose own surfaces are on a production or vendor path also runs at least one open-rails step that exercises those surfaces live, under the production-functional and production-affecting rules below.  
+* **Ops evidence and stage records.** The live compat test and the deployed-service check are Ops evidence under this section, and the execution controls below apply to them in full. **Change Process Guide**, **Glow QA Guide** and **Plan Templates** govern how each QA and closure stage plans, records and enforces the live test.
 
-The live vendor step retains task-specific Product Owner authorization where secrets or external services are involved, a defined request limit, explicit step-local rails, synthetic inputs, redaction, secret scanning and quarantine, trustworthy evidence, stop checks and failure classification before any product-failure conclusion. It authorizes no load, stress or volume testing and raises no request limit. Open-rails Ops evidence remains Ops evidence; including or referencing it does not convert it into QA evidence.
+**Only the Product Owner can waive any part of the live test.** Only the Product Owner may decide that the live test of this section, or any part of it, does not apply to an Epic.
+
+* **Recorded waiver.** A waiver is written and specific to the change. It quotes the Product Owner's words with their date and states the reason, the accepted risk, the substitute proof and why it suffices, the claim withheld and any later live-proof obligation.  
+* **An agent's finding is a question.** An agent may find that an Epic's surfaces are not on a live path, or that the live test cannot be run meaningfully. Either finding is put to the Product Owner as a named decision no later than QA-10 readiness, and the QA plan is not approval-ready until the Product Owner answers.  
+* **Not a waiver.** Silence, reviewer agreement or preference, convenience, closed-rails success or a finding of non-applicability is not a waiver. Without a recorded waiver, the live test applies in full.
+
+**A live test that cannot run blocks; it does not pass.** A live test that cannot run is `TOOLING_BLOCKED`, including for missing credentials, missing target facts, an unavailable vendor or a missing authorization. The Epic waits: a blocked live test is never converted into a PASS, a waiver or a closure, and the Product Owner decides how to proceed.
+
+**Production-functional epic live-proof requirement.** Every QA plan for an epic touching any surface used to produce a production feature that PF canon describes as functional MUST include an open-rails test. The test MUST make a live vendor call under `SAFE_MODE=0` and `ALLOW_NETWORK=1`, using synthetic data only, with no real person, user or production data. The epic's Specification and plans identify the affected surfaces; a finding that the epic touches no such surface is a question for the Product Owner under the waiver rule above. A plan without this test is not approval-ready.
+
+Closed-rails tests, fixture replay, mocks or fake services, static analysis, generated or governed evidence artifacts, path-proof validation, Index or Mirror refresh, repository inspection, review approval, an unrun procedure, and OPS discovery without a live vendor call do not satisfy the live compat test or this requirement. A non-vendor deployed-service check or database read does not satisfy either by itself. Only a recorded Product Owner waiver under the rule above removes any part of a required test; another exemption or a closed-rails-only approval does not replace it.
+
+Each live step, including the live compat test and the deployed-service check, retains task-specific Product Owner authorization where secrets or external services are involved, a defined request limit, explicit step-local rails, synthetic inputs, redaction, secret scanning and quarantine, trustworthy evidence, stop checks and failure classification before any product-failure conclusion. It authorizes no load, stress or volume testing and raises no request limit. Open-rails Ops evidence remains Ops evidence; including or referencing it does not convert it into QA evidence.
 
 A passing test proves only the behavior it exercises. It does not establish full vendor conformance, whole-change QA PASS, acceptance, PF09 movement, deployment, release activation, epic closure, public Reader behavior changes, new routes or flags, or PF-canon drainage.
 
-**Other production-affecting scope.** Outside the mandatory production-functional scope above, the standing broader requirement remains: an epic that can affect production surfaces, public or app-facing behavior, runtime compute, vendor ingest, HumanDesignAPI calls, external API integrations, database persistence or retrieval, DB bridge behavior, deployed service behavior, environment-variable or secret binding, request shaping, response mapping, authentication or authorization, production-used CLI/API behavior, queues, workers, jobs, schedulers, runtime services or another path that must work outside isolated fixtures requires at least one bounded open-rails live QA step before acceptance unless an explicit approved exemption is recorded. The step proves a real production-relevant behavior the epic can affect, retains the existing authorization and evidence controls, and is clear about its limits. Closed-rails-only QA is not approval-ready for that broader scope without the explicit exemption. A valid exemption states why no open-rails behavior can be safely or meaningfully exercised, the authorizing owner, accepted risk, substitute proof and why it is sufficient, the production claim withheld and any future live-proof obligation. Silence, reviewer preference, convenience or closed-rails success is not an exemption. This retained broader rule supplies no exemption from the mandatory synthetic-data live vendor test for production-functional surfaces.
+**Other production-affecting scope.** Outside the mandatory production-functional scope above, the standing broader requirement remains: an epic that can affect production surfaces, public or app-facing behavior, runtime compute, vendor ingest, HumanDesignAPI calls, external API integrations, database persistence or retrieval, DB bridge behavior, deployed service behavior, environment-variable or secret binding, request shaping, response mapping, authentication or authorization, production-used CLI/API behavior, queues, workers, jobs, schedulers, runtime services or another path that must work outside isolated fixtures requires at least one bounded open-rails live QA step before acceptance unless the Product Owner has waived it under the waiver rule above. The step proves a real production-relevant behavior the epic can affect, retains the existing authorization and evidence controls, and is clear about its limits. Closed-rails-only QA is not approval-ready for that broader scope without a recorded waiver. A valid waiver of this step also states why no open-rails behavior can be safely or meaningfully exercised. This retained broader rule supplies no waiver of the live compat test or of the mandatory synthetic-data live vendor test for production-functional surfaces.
 
 **Route-family proof is not workflow proof.** A bounded open-rails vendor observation proves only the exact command family, route family, auth posture, credential-binding posture, request class, and evidence shape it exercises. A successful observation on one vendor route family MUST NOT be treated as proof that another CLI workflow, route family, adapter path, BodyGraph cache path, compat path, or app-integration path is conformant.
 
@@ -1311,6 +1329,14 @@ Dev/admin-only surfaces that exercise engine internals under controlled rails (f
 
 This `APP_ENV` gating is a precondition for treating any dev/admin-only surface as “on-rails”; it couples to `ENV_RAILS_POLICY_OK` in §2.0.10 and applies regardless of whether vendor rails are open or closed.
 
+**Compat namespace (dev/admin surface).** The compat namespace, `/api/compat/v1` and its descendants, is a dev/admin-only surface under this rule.
+
+* **Gate order.** On every method, the gate runs before any compat computation, database read or vendor call. A production-like posture, as **HDE-CLI-API-Vendor-Ref** resolves it, keeps that route's not-found response. Any other request is served only when `APP_ENV` is exactly `dev`, `test` or `local`, with no trimming, no case-folding and no default; a missing, empty or other value receives the writer-style refusal envelope that the dev/admin HTTP surfaces use. `ENGINE_ENV` never admits the surface.  
+* **No credential while gated.** No credential is required while the surface is admitted only under those `APP_ENV` values, as for every other dev/admin surface under this rule. The admin-bundle scope of §8.3 is unchanged.  
+* **Wider exposure.** Before the compat route is served in any other environment, a later decision MUST require the admin credential of §8.3.2, or an equivalent credential pinned in **HDE-CLI-API-Vendor-Ref**, and MUST add the logging rules of §8.3.4.  
+* **Accepted residual risk.** A dev, test or local process connected to the shared production database serves stored-user compat results to whoever reaches its port. Where the process listens, under the loopback access that **Glow Infrastructure** documents, controls that exposure; this route does not. It is the same posture as every other dev/admin surface.  
+* **Exact bytes.** The compat route's status codes, error codes, headers, method rules and probe rules are owned by **HDE-CLI-API-Vendor-Ref**.
+
 **Determinism env pins harness (EPIC018 D2)**
 
 For determinism-sensitive suites (serializer identity, AB↔BA, evidence ordering/orientation, and other invariance tests named in HDE-Mechanics Guide and Glow QA Guide), rails policy is further constrained.
@@ -1392,6 +1418,7 @@ Tokens and coupling.
   * one `check <name>:OK|FAIL` line per step, in a fixed order, and  
   * a final `summary:PASS|FAIL` line.  
 * The log **MUST NOT** include timestamps, wall-clock data, or env-dependent noise that would break determinism. It is LF-terminated and BOM-free.
+* **`--log-path` bound.** A `--log-path` target inside the repository is accepted only when it is the canonical log `audit/gates/sanity_pipeline/sanity_pipeline.log`. A target outside the repository is accepted only when it is not a symlink, no component of its path is a symlink, its parent directory exists, and it names a regular file or no existing file. A refused target fails with a typed, numeric-free error before any step runs or any byte is written.
 
 **Coupling to the evidence skeleton.**
 
@@ -2437,9 +2464,13 @@ For a real contradiction, identify the exact current sources, versions and confl
 
 The persistent PF authority is `docs/pfcanon/` on `main`. Each document keeps the standing it declares; the current version is the version there, and repository history retains superseded versions after they leave that directory. Native Google Docs, Markdown exports, Drive folders, Notion pages and PF-named files elsewhere in the repository confer no PF authority. Adoption does not prove content approval, implementation, QA acceptance or closure. Resolving repository canon grants no tool, credential, network, rails, mutation or privileged-action permission; agents may edit PF canon only under the Product Owner's exact authority for the identified document and action.
 
+**PF-Canon is resolved by stable identity, never by version.** PF-Canon document versions, and therefore file names, may change at any time. No code, test, tool, CI step, schema, governed artifact or committed record that must remain valid pins a PF document's file name, version or content digest, or requires its bytes to stay unchanged. A tool that needs current canon resolves the document when it runs, by PF identity and versionless title, to the one current file under `docs/pfcanon/`, and refuses when that resolution is not unique. Validation of an already committed artifact does not re-read canon. A citation of canon in code, a test, a tool, an ADR or a governed artifact names the PF document by title, and its section where needed; **HDE Build Notes** is cited by title alone, without an addendum number, because its addendum numbers restart with each base version.
+
 At the start of each task and whenever its subject changes, search `docs/pfcanon/` and the change's in-flight documents by task terms, affected surfaces, environments and headings. Read governing sections in full before planning, authoring, reviewing, deciding or asking the Product Owner. Record the actual PF titles and sections relied on and claim conformance only to material read. Ask only when canon is silent or its precedence leaves a conflict unresolved, naming the searched sections.
 
 In-flight documents in `docs/ephemeral/` are canon for their change: the approved Specification is its permanent intended-scope authority; approved Plans are working execution direction; actual reviews and Product Owner dispositions govern within their scope. Use current versions, preserve superseded history and apply the **Plan Templates** canon-precedence rule for conflicts. No Specification write is implied by PF drainage.
+
+**Planning documents serve planning only.** A planning document is any change-process work product stored under `docs/ephemeral/`: Specifications, Plans, instructions, reviews, reports, RCAs, readiness records, dispositions, handoffs and result records. No code, test, tool, CI step, workflow, schema, governed evidence artifact, close pack, manifest, Index or Mirror row or path proof reads, binds, hashes, resolves or requires a path under `docs/ephemeral/`; a test builds any document it needs as its own fixture. A fact a later stage needs from a planning document is recorded where that stage reads it, when it is recorded: for a close pack, in the close-candidate source, as a record text naming the document's identity and SHA-256, and as the structured facts the writer checks (requirement IDs, QA plan checks and their mapped criteria, and the QA verdict). A prose citation of a planning document in a permanent record is a reference only; archiving or deleting the cited document invalidates nothing that depends on the record.
 
 The Notion development board remains operational metadata. Board Cards maintain working state; Board History, the imported snapshot and stable historical pointers preserve lineage and navigation. PF16, PF20 and PF30 pointer pages resolve the applicable current repository PF document by PF identity and versionless title. Preserve the historical-source roles `PF16 historical map`, `PF20 phased history` and `PF30 CRD history`; do not assign a source by inference to a board-level event with no card. A board value, imported snapshot, pointer or history event independently proves neither canon nor implementation, QA, acceptance or closure. A `DONE` card does not replace its governed approved Specification or actual decision lineage. Board links must not depend on version-numbered PF filenames or version-specific Drive URLs.
 
@@ -2449,7 +2480,7 @@ Before the first write, classify each output and identify its authorized destina
 
 | Class | Required destination and boundary |
 | ----- | ----- |
-| `REPOSITORY_CONTROLLED` | Intake, kickoff, Specifications, Plans, audits, triage, readiness records, Guides, instructions, tasks, reviews, reports, RCAs, remediation, handoffs, redlines, dispositions, drainage, closure and retrospective work products belong under `docs/ephemeral/`. Persistent prompt-ecosystem management records belong under `docs/prompt_ecosystem_management/`. Code, tests, configuration and governed evidence retain their established paths, writers and integrity contracts. |
+| `REPOSITORY_CONTROLLED` | Intake, kickoff, Specifications, Plans, audits, triage, readiness records, Guides, instructions, tasks, reviews, reports, RCAs, remediation, handoffs, redlines, dispositions, drainage, closure and retrospective work products belong under `docs/ephemeral/`. Persistent prompt-ecosystem management records belong under `docs/prompt_ecosystem_management/`. Code, tests, configuration and governed evidence retain their established paths, writers and integrity contracts. Storage under `docs/ephemeral/` serves planning only; §9.1.2 governs what may depend on it. |
 | `CONTROL_NOTION` | Authorized operational state, navigation, ownership, indexes and exact artifact references remain in Notion. It does not become the PF authority or a second store of complete change artifacts. Reusable GCFPE prompt bodies retain their separately governed Notion single home. |
 | `TRANSIENT_SCRATCH` | Active authoring, extraction and validation intermediates may use scratch. Work needed for review, continuity or handoff is saved under the applicable repository home before durable reliance. |
 
@@ -2663,6 +2694,160 @@ v2.8.8 | GOV-20261026-gtwpe-pf04 | NON_EPIC | Scope: GCFPE TypeSafe model guidan
 > Rollout plan: Nathan's authorized publication of the complete revised PF is a separate manual action. No runtime staging, canary, deployment or pointer flip is performed by this revision. A document backout uses the retained v2.8.7 source through ordinary authorized publication. Runtime monitoring and rollback retain their existing owners and controls.
 >
 > Change Log entry (one line): v2.8.8 | GOV-20261026-gtwpe-pf04 | NON_EPIC | Scope: GCFPE TypeSafe model guidance; business case per requirement and work unit; CRD close packs and the generic v2 close-pack writer | Targets: §2.0.19, §9.1.3, §9.1.6, §9.7.7, §11.2, Appendix D.0 | Acceptance: None | Evidence: None | Freeze-pack: No | Canonical record: PF04 §9.3.1 / GOV-20261026-gtwpe-pf04
+
+v2.8.9 | GOV-20261102-gtwpe-pf04 | NON_EPIC | Scope: Live compat test for every Epic and Product Owner-only waiver; GATE:CORE-DET evidence and retired entries; compat namespace as a dev/admin surface; sanity-pipeline log-path bound; governed gate check rows; planning-document and PF-version independence; v2 close-run evidence and tracked-issue IDs | Targets: §2.0.10, §2.0.19, §3.4, §4.1.4, §4.1.8, §9.1.2, §9.1.3, §12.2, Appendices B.2/D.1/D.3 | Acceptance: LOGS_KEYS_ONLY_OK | Evidence: None | Freeze-pack: No | Canonical record: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04
+
+> DOC-DELTA-ID: GOV-20261102-gtwpe-pf04
+>
+> Date / Author: 2026-11-02 / executing document agent in Nathan's T-01 document session
+>
+> PF04 version: v2.8.9
+>
+> Record class: NON_EPIC
+>
+> Epic ID: NOT APPLICABLE - NON_EPIC
+>
+> Draft / binding surface: NOT APPLICABLE - NON_EPIC
+>
+> Stable record surface: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04
+>
+> Scope: Acceptance/Evidence; Rails Enablement; Security/Logging; Governance/Documentation
+>
+> Targets (section anchors): §2.0.10, §2.0.19, §3.4, §4.1.4, §4.1.8, §9.1.2, §9.1.3, §12.2, Appendices B.2/D.1/D.3
+>
+> Summary (≤ 5 bullets):
+>
+> 1) Every Epic's QA runs the live compat test and the deployed-service check on SYN-A and SYN-B; only the Product Owner waives any part of it, and a live test that cannot run is `TOOLING_BLOCKED` while the Epic waits.
+> 2) GATE:CORE-DET evidence is the compat-path owner tests and each live compat test run; the compat-determinism generator, the A3 identity marker, three CI jobs and four composite fixture and log entries are retired from §12.2 and Appendices B.2, D.1 and D.3.
+> 3) Name the compat namespace a dev/admin surface, bound the sanity pipeline's `--log-path` target, and make governed gate check rows keys-only governed logs.
+> 4) State that planning documents serve planning only and that PF-Canon is resolved by stable identity, never by version.
+> 5) Name the v2 close-run family as the close report's same-run evidence, and the accepted tracked-issue ID forms.
+>
+> Acceptance impact (binary gates to update or verify): Every Epic's QA plan and run include the live compat test unless the Product Owner's recorded waiver removes a part of it; GATE:CORE-DET evidence binds to the compat-path owner tests and the live compat test runs, and its pass conditions are unchanged; `LOGS_KEYS_ONLY_OK` names governed gate check rows within its existing keys-only meaning; the compat namespace follows the dev/admin `APP_ENV` gate. The A3, A4 and A7 gates are unchanged. No new or satisfied token, QA verdict, OPS result or acceptance decision is claimed.
+>
+> Evidence updates (titles and paths only): No governed evidence artifact, golden, script, header snapshot, CI job, Human Evidence Index, hash sentinel, Machine Mirror or path proof is created or regenerated by this document revision. §12.2 and Appendices B.2, D.1 and D.3 drop the retired GATE:CORE-DET entries and name the compat-path owner tests; the retired files that remain in the repository stay as history.
+>
+> Freeze-pack impact: No; this document revision cuts, recomputes, activates and promotes no release and changes no release member.
+>
+> Routing (titles only confirmations): HDE CLI/API Vendor Ref owns the compat route's exact refusal bytes. HDE Schemas and Artifacts owns gate-family row schemas and the close-run family's path. Change Process Guide, Glow QA Guide and Plan Templates own stage enforcement of the live test and the Live QA name. HDE Build Notes supplies the scoped overrides.
+>
+> Rollout plan: Nathan's authorized publication of the complete revised PF is a separate manual action. No runtime staging, canary, deployment or pointer flip is performed by this revision. A document backout uses the retained v2.8.8 source through ordinary authorized publication. Runtime monitoring and rollback retain their existing owners and controls.
+>
+> Change Log entry (one line): v2.8.9 | GOV-20261102-gtwpe-pf04 | NON_EPIC | Scope: Live compat test for every Epic and Product Owner-only waiver; GATE:CORE-DET evidence and retired entries; compat namespace as a dev/admin surface; sanity-pipeline log-path bound; governed gate check rows; planning-document and PF-version independence; v2 close-run evidence and tracked-issue IDs | Targets: §2.0.10, §2.0.19, §3.4, §4.1.4, §4.1.8, §9.1.2, §9.1.3, §12.2, Appendices B.2/D.1/D.3 | Acceptance: LOGS_KEYS_ONLY_OK | Evidence: None | Freeze-pack: No | Canonical record: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04
+
+v2.8.10 | GOV-20261102-gtwpe-pf04-route | NON_EPIC | Scope: Vendor route selection by the configured base's terminal v1 or v2 segment; terminal-v1 legacy selection, not fallback | Targets: §11.1.1, §11.1.6 | Acceptance: None | Evidence: None | Freeze-pack: No | Canonical record: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04-route
+
+> DOC-DELTA-ID: GOV-20261102-gtwpe-pf04-route
+>
+> Date / Author: 2026-11-02 / executing document agent in Nathan's T-01 document session (follow-up for vendor route selection)
+>
+> PF04 version: v2.8.10
+>
+> Record class: NON_EPIC
+>
+> Epic ID: NOT APPLICABLE - NON_EPIC
+>
+> Draft / binding surface: NOT APPLICABLE - NON_EPIC
+>
+> Stable record surface: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04-route
+>
+> Scope: Vendor Ingest; Governance/Documentation
+>
+> Targets (section anchors): §11.1.1, §11.1.6
+>
+> Summary (≤ 5 bullets):
+>
+> 1) For every resolver-selected vendor acquisition (`bg:resolve --source vendor`, and compat chart acquisition by `hdctl showcompat` and conjunction), state the single permitted classification of the configured base's terminal segment: `v2` selects the chart route family, `v1` the retained legacy BodyGraph route family, and every other base fails closed before credential projection or any network I/O.
+> 2) Name terminal-v1 selection as retained legacy selection, not fallback; keep the governed-evidence label `explicit_legacy_fallback` unchanged; leave v1 retirement to a separately versioned decision.
+> 3) Align the mapped-cache proof obligation and the §11.1.6 route-policy acceptance item with that classification.
+>
+> Acceptance impact (binary gates to update or verify): §11.1.6 item 1 accepts the single terminal-segment classification and still rejects any other route or auth inference from an API-version string. The other vendor-governance acceptance items and the A3, A4, A7 and rails gates are unchanged. No new or satisfied token, QA verdict, OPS result or acceptance decision is claimed.
+>
+> Evidence updates (titles and paths only): No governed evidence artifact, golden, script, header snapshot, CI job, Human Evidence Index, hash sentinel, Machine Mirror or path proof is created or regenerated by this document revision. The governed-evidence label `explicit_legacy_fallback` and the evidence that carries it are unchanged.
+>
+> Freeze-pack impact: No; this document revision cuts, recomputes, activates and promotes no release and changes no release member.
+>
+> Routing (titles only confirmations): HDE CLI/API Vendor Ref owns route selection bytes, the configured-base boundary and the refusal codes. HDE Mechanics Guide owns the remaining version-string prohibitions. HDE Build Notes supplies the scoped override.
+>
+> Rollout plan: Nathan's authorized publication of the complete revised PF is a separate manual action. No runtime staging, canary, deployment or pointer flip is performed by this revision. A document backout uses the retained v2.8.9 source through ordinary authorized publication. Runtime monitoring and rollback retain their existing owners and controls.
+>
+> Change Log entry (one line): v2.8.10 | GOV-20261102-gtwpe-pf04-route | NON_EPIC | Scope: Vendor route selection by the configured base's terminal v1 or v2 segment; terminal-v1 legacy selection, not fallback | Targets: §11.1.1, §11.1.6 | Acceptance: None | Evidence: None | Freeze-pack: No | Canonical record: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04-route
+
+v2.8.11 | GOV-20261102-gtwpe-pf04-a7path | NON_EPIC | Scope: Appendix D.4 encoding-invariance proof pointer corrected to the tracked path | Targets: Appendix D.4 | Acceptance: None | Evidence: None | Freeze-pack: No | Canonical record: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04-a7path
+
+> DOC-DELTA-ID: GOV-20261102-gtwpe-pf04-a7path
+>
+> Date / Author: 2026-11-02 / executing document agent in Nathan's T-16 document session, under Nathan's authorization of 2026-11-02 to correct the T-01 document
+>
+> PF04 version: v2.8.11
+>
+> Record class: NON_EPIC
+>
+> Epic ID: NOT APPLICABLE - NON_EPIC
+>
+> Draft / binding surface: NOT APPLICABLE - NON_EPIC
+>
+> Stable record surface: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04-a7path
+>
+> Scope: Acceptance/Evidence; Governance/Documentation
+>
+> Targets (section anchors): Appendix D.4
+>
+> Summary (≤ 5 bullets):
+>
+> 1) Correct the Appendix D.4 routing pointer for the optional encoding-invariance proof from `artifacts/proofs/encoding_invariance.txt`, which is not tracked, to `artifacts/proofs/success_encoding_invariance.txt`, the path that HDE Schemas and Artifacts lists and the Human Evidence Index records.
+>
+> Acceptance impact (binary gates to update or verify): None. The A7 transport gate and its proof obligations are unchanged; only the routing pointer now names the tracked proof. No new or satisfied token, QA verdict, OPS result or acceptance decision is claimed.
+>
+> Evidence updates (titles and paths only): No governed evidence artifact, golden, script, header snapshot, CI job, Human Evidence Index, hash sentinel, Machine Mirror or path proof is created or regenerated by this document revision. The Appendix D routing pointer is refreshed to `artifacts/proofs/success_encoding_invariance.txt`.
+>
+> Freeze-pack impact: No; this document revision cuts, recomputes, activates and promotes no release and changes no release member.
+>
+> Routing (titles only confirmations): HDE Schemas and Artifacts owns the A7 proof paths and the Evidence Index. HDE CLI/API Vendor Ref owns the transport bytes.
+>
+> Rollout plan: Nathan's authorized publication of the complete revised PF is a separate manual action. No runtime staging, canary, deployment or pointer flip is performed by this revision. A document backout uses the retained v2.8.10 source through ordinary authorized publication. Runtime monitoring and rollback retain their existing owners and controls.
+>
+> Change Log entry (one line): v2.8.11 | GOV-20261102-gtwpe-pf04-a7path | NON_EPIC | Scope: Appendix D.4 encoding-invariance proof pointer corrected to the tracked path | Targets: Appendix D.4 | Acceptance: None | Evidence: None | Freeze-pack: No | Canonical record: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04-a7path
+
+v2.8.12 | GOV-20261102-gtwpe-pf04-headersnaps | NON_EPIC | Scope: Appendix D.4 header-snapshot pointers aligned with the tracked Aux and writer/error snapshots | Targets: Appendix D.4 | Acceptance: None | Evidence: None | Freeze-pack: No | Canonical record: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04-headersnaps
+
+> DOC-DELTA-ID: GOV-20261102-gtwpe-pf04-headersnaps
+>
+> Date / Author: 2026-11-02 / executing document agent in Nathan's T-16 document session, under Nathan's authorization of 2026-11-02 to correct the T-01 document
+>
+> PF04 version: v2.8.12
+>
+> Record class: NON_EPIC
+>
+> Epic ID: NOT APPLICABLE - NON_EPIC
+>
+> Draft / binding surface: NOT APPLICABLE - NON_EPIC
+>
+> Stable record surface: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04-headersnaps
+>
+> Scope: Acceptance/Evidence; Governance/Documentation
+>
+> Targets (section anchors): Appendix D.4
+>
+> Summary (≤ 5 bullets):
+>
+> 1) Correct the Aux suppression snapshot pointer from `tests/transport/headers/aux_suppression.snap` to `tests/transport/headers/aux_suppression_200.snap`, the snapshot that HDE Schemas and Artifacts, HDE CLI/API Vendor Ref and HDE Narratives Guide list.
+>
+> 2) Remove the `tests/transport/headers/aux_head.snap` and `tests/transport/headers/aux_304.snap` pointers. Neither file has a commit in the history of `main`, and HDE Narratives Guide keeps Aux HEAD and 304 captures out of scope, with exactly two Aux header snapshots.
+>
+> 3) Remove the `tests/transport/headers/error_headers_utf8.snap` pointer. The file has no commit in the history of `main`; the writer and error headers, including the error `Content-Type`, are captured in `tests/transport/headers/no_store_writers_errors.snap`, which D.4 keeps.
+>
+> Acceptance impact (binary gates to update or verify): None. The A7 transport gate, the Aux evidence scope and the writer and error no-store posture are unchanged; only the routing pointers now name tracked snapshots. No new or satisfied token, QA verdict, OPS result or acceptance decision is claimed.
+>
+> Evidence updates (titles and paths only): No governed evidence artifact, golden, script, header snapshot, CI job, Human Evidence Index, hash sentinel, Machine Mirror or path proof is created or regenerated by this document revision. The Appendix D routing pointers are refreshed to `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap` and `tests/transport/headers/no_store_writers_errors.snap`.
+>
+> Freeze-pack impact: No; this document revision cuts, recomputes, activates and promotes no release and changes no release member.
+>
+> Routing (titles only confirmations): HDE Schemas and Artifacts owns the header-snapshot paths and the Evidence Index. HDE Narratives Guide owns the Aux evidence scope. HDE CLI/API Vendor Ref owns the transport bytes.
+>
+> Rollout plan: Nathan's authorized publication of the complete revised PF is a separate manual action. No runtime staging, canary, deployment or pointer flip is performed by this revision. A document backout uses the retained v2.8.11 source through ordinary authorized publication. Runtime monitoring and rollback retain their existing owners and controls.
+>
+> Change Log entry (one line): v2.8.12 | GOV-20261102-gtwpe-pf04-headersnaps | NON_EPIC | Scope: Appendix D.4 header-snapshot pointers aligned with the tracked Aux and writer/error snapshots | Targets: Appendix D.4 | Acceptance: None | Evidence: None | Freeze-pack: No | Canonical record: PF04 §9.3.1 / GOV-20261102-gtwpe-pf04-headersnaps
 
 
 > ---
@@ -4001,10 +4186,10 @@ Exact endpoint, authentication, request-body, response-envelope, rate-limit, pro
 
 * **Exact-byte owner:** **PF05-Canon-HDE-CLI-API-Vendor-Ref** owns route availability, HTTP method, exact resource path, base-URL composition, authentication bytes, request body, response envelope, provider-error bytes, and route-specific fallback details.  
 * **Governed route-family classifications:** legacy BodyGraph resources are `bodygraphs` and `bodygraphs/simple`; chart resources are `charts`, `charts/simple`, and `charts/coordinates`. These names classify PF04 route policy only and do not define or amend PF05 wire bytes.  
-* **Base-URL and route-policy governance:** one explicit route policy MUST select the route family. Ambiguous configuration MUST fail closed before network I/O. Runtime code MUST NOT infer auth family or resource policy from string checks for vendor API-version path segments. Exact base-URL and resource-path behavior is governed by PF05.  
+* **Base-URL and route-policy governance:** one explicit route policy MUST select the route family for every resolver-selected vendor acquisition: `bg:resolve --source vendor`, and compat chart acquisition by `hdctl showcompat` and conjunction. Ambiguous configuration MUST fail closed before network I/O. The single permitted reading of a version from the configured base is one exact, case-sensitive comparison of its validated terminal segment against `v1` and `v2`, made once before any route is built: `v2` selects the chart route family and `v1` selects the retained legacy BodyGraph route family. Every other base, including an unversioned base, another version, a nonterminal or case-variant marker and multiple markers, fails closed before credential projection or any network I/O; no non-v2 base reaches the legacy route by fallback. The selected route's resource, payload family and credential projection then come from its contract metadata. Runtime code MUST NOT otherwise infer auth family or resource policy from vendor API-version strings: no version route constants, no appended or normalized version, no auth selected by path prefix and no other runtime behavior keyed on a version string. Exact base-URL boundary, refusal codes and resource-path behavior are governed by PF05.  
 * **Determinism:** route-policy selection and request construction are order-neutral and locale-neutral. Auth family must be represented by governed route metadata or contract metadata.
 
-**`bg:resolve --source vendor` route-policy governance.** `bg:resolve --source vendor` remains an HD Engine workflow for resolving BodyGraph details. Future claims that this workflow works as a canonical vendor-backed BodyGraph-resolution path require an explicit vendor-route policy. The policy must classify the selected behavior as v2 chart-backed BodyGraph resolution, explicit legacy BodyGraph fallback, dual-route policy, or unsupported nonclaim.
+**`bg:resolve --source vendor` route-policy governance.** `bg:resolve --source vendor` remains an HD Engine workflow for resolving BodyGraph details. Future claims that this workflow works as a canonical vendor-backed BodyGraph-resolution path require an explicit vendor-route policy. The policy must classify the selected behavior as v2 chart-backed BodyGraph resolution, terminal-v1 legacy BodyGraph selection, dual-route policy, or unsupported nonclaim. Terminal-v1 selection is retained legacy selection, not fallback. Governed evidence keeps its existing classification label `explicit_legacy_fallback` unchanged as a wire value; the label names that selection and makes no fallback claim. Retiring the v1 legacy route needs its own separately versioned decision.
 
 `bg:resolve --source vendor` MUST NOT accidentally compose a legacy BodyGraph resource path against a configured v2 base URL and then treat the result as provider unavailability, full v2 runtime conformance, or acceptable final behavior. If the configured base URL is v2, appending a legacy BodyGraph resource is allowed only when vendor evidence and PF10 or permanent PF canon explicitly support that combination. If both v1 and v2 route families are required at runtime, the base-url and route-family configuration strategy must be defined explicitly and kept secret-safe.
 
@@ -4012,7 +4197,7 @@ Simple chart success may prove provider reachability, v2 auth posture, geocode-k
 
 **Mapped-cache persistence boundary.** Scoped dry-run or evidence-flow proof that a configured-v2 chart route can be requested, mapped into HDE internal BodyGraph/person/cache/compat shape, and used for bounded compatibility evidence does not authorize durable BodyGraph cache persistence. Until a future governed implementation slice proves mapped-cache persistence, configured-v2 non-dry-run writes MUST remain fail-closed.
 
-A future mapped-cache persistence slice MUST NOT simply turn on writes. It must design and prove a safe persistence path that writes adapter-mapped HDE data, not raw HumanDesignAPI v2 envelopes, raw vendor response bodies, raw request bodies, plaintext secrets, or uncontrolled vendor payloads. The proof must cover mapped-cache write, mapped-cache read-back, canonical-equivalence between pre-write mapped output and post-read cached output for governed fields, idempotence for repeated writes of the same normalized identity, no raw vendor-payload persistence, closed-rails refusal before outbound I/O, and preservation of explicit legacy fallback behavior.
+A future mapped-cache persistence slice MUST NOT simply turn on writes. It must design and prove a safe persistence path that writes adapter-mapped HDE data, not raw HumanDesignAPI v2 envelopes, raw vendor response bodies, raw request bodies, plaintext secrets, or uncontrolled vendor payloads. The proof must cover mapped-cache write, mapped-cache read-back, canonical-equivalence between pre-write mapped output and post-read cached output for governed fields, idempotence for repeated writes of the same normalized identity, no raw vendor-payload persistence, closed-rails refusal before outbound I/O, and preservation of the retained terminal-v1 legacy selection.
 
 Production persistence requires an additional authorization boundary. The safe path is dry-run evidence, then mapped-cache write and read-back proof, then controlled non-prod repeatability, then an explicit production authorization decision. Do not skip from configured-v2 dry-run evidence directly to production persistence, production upsert reopening, or durable reusable user BodyGraph data.
 
@@ -4065,7 +4250,7 @@ Provider outcomes **MUST** be remapped under the exact **PF05-Canon-HDE-CLI-API-
 
 To pass governance:
 
-1. **Explicit route policy:** one route policy is selected, and no route or auth family is inferred from an API-version substring.  
+1. **Explicit route policy:** one route policy is selected by the single permitted terminal-segment classification of §11.1.1, and no route or auth family is otherwise inferred from an API-version string.  
 2. **Closed-rails refusal:** rails refuse network I/O deterministically when closed.  
 3. **PF05 contract conformance:** implementation conforms to the exact PF05-owned contract for the selected route.  
 4. **No family crossing:** route-family authentication and geocode policy are not crossed.  
@@ -4203,9 +4388,13 @@ All gates inherit the serializer and locale pins: UTF-8, sorted keys, compact se
 
 ### **GATE:CORE-DET — Determinism and identity**
 
-* Goldens (AB↔BA, two-run): `goldens/reader/v1/g02_ab_ba_parity_A.jsonl`, `goldens/reader/v1/g02_ab_ba_parity_B.jsonl`  
-* Idempotence recompute and parity scripts: `scripts/make_reader_v1_goldens.py`, `scripts/make_compat_determinism_artifacts.py`  
-* Identity marker (preimage → sha256 → final): `artifacts/cards/A3/IDENTITY_OK.txt`
+GATE:CORE-DET evidence is the real compat path, in two parts; the gate's pass conditions in §12.1 are unchanged.
+
+* Compat-path owner tests (closed rails; run as CI selects them): `tests/core/test_engine_core_abba.py`, `tests/core/test_engine_core_determinism.py`, `tests/compat/test_evaluate_pair_eligibility.py`, `tests/compat/test_compat_public_ab_ba_identity.py`, `tests/cli/test_showcompat_parity_and_identity.py`. A change that removes or weakens one of them needs its owner's review, like any other gate test.  
+* Live compat test (open rails): each run of the §3.4 live compat test, which is Ops evidence under §3.4.  
+* Reader goldens (emitter canonical bytes and preimage hashing; not evidence of compat AB↔BA): `goldens/reader/v1/g02_ab_ba_parity_A.jsonl`, `goldens/reader/v1/g02_ab_ba_parity_B.jsonl`  
+* Reader golden and preimage recompute script: `scripts/make_reader_v1_goldens.py`  
+* Retired entries: `scripts/make_compat_determinism_artifacts.py`, `artifacts/cards/A3/IDENTITY_OK.txt`, `ci/jobs/preimage_recompute_and_compare.yml`, `ci/jobs/ab_ba_parity_bytecompare.yml`, `ci/jobs/two_run_identity_bytecompare.yml`, `fixtures/composite/abba/*.json`, `audit/gates/determinism/abba_compare.log`, `fixtures/composite/integration_abba/*.json` and `audit/gates/determinism/abba_compare_integration.log` are not GATE:CORE-DET evidence, and no record may cite them as current proof. The generator, its test that pins exit 2, its captures under `artifacts/compat/` and the lower-case marker `artifacts/cards/a3/IDENTITY_OK.txt` stay as history; no code changes with this retirement.
 
 ### **GATE:CORE-READER — Public covenant and transport hooks**
 
@@ -4447,10 +4636,8 @@ Titles and paths only; no payload bytes. This appendix lists gate checklists and
 ## **B.2 GATE:CORE-DET — Determinism and identity**
 
 * **Checklist (binary):** preimage (five-key) → `sha256` → final; AB↔BA byte-equality; two-run identity.  
-* **CI jobs (titles-only):**  
-  * `ci/jobs/preimage_recompute_and_compare.yml`  
-  * `ci/jobs/ab_ba_parity_bytecompare.yml`  
-  * `ci/jobs/two_run_identity_bytecompare.yml`
+* **CI enforcement (closed rails):** the compat-path owner tests named in §12.2, run as CI selects them. The former CI job entries `ci/jobs/preimage_recompute_and_compare.yml`, `ci/jobs/ab_ba_parity_bytecompare.yml` and `ci/jobs/two_run_identity_bytecompare.yml` are retired (§12.2).  
+* **Open rails:** each run of the §3.4 live compat test, as Ops evidence.
 
 ## **B.3 GATE:CORE-READER — Public covenant and transport hooks**
 
@@ -4599,9 +4786,9 @@ These artifacts MUST NOT be relocated into `audit/qa/**` or `artifacts/**` witho
 
 * Goldens: `goldens/reader/v1/g02_ab_ba_parity_A.jsonl`, `goldens/reader/v1/g02_ab_ba_parity_B.jsonl`; v2 AB↔BA: `goldens/reader/v2/g02_ab_ba_parity_A.jsonl`, `goldens/reader/v2/g02_ab_ba_parity_B.jsonl`. These v2 pointers do not extend CLI dump parity beyond v1.  
 * Harness/tests: `tests/reader_v1/test_emitter.py`, `tests/cli/test_cli_stdout_schema_and_lf.py`  
-* Byte-compare scripts: `scripts/make_reader_v1_goldens.py`, `scripts/make_compat_determinism_artifacts.py`  
-* Composite fingerprint: `fixtures/composite/abba/*.json`, `audit/gates/determinism/abba_compare.log`  
-* Integration set: `fixtures/composite/integration_abba/*.json`, `audit/gates/determinism/abba_compare_integration.log`
+* Byte-compare scripts: `scripts/make_reader_v1_goldens.py`  
+* Compat-path owner tests (GATE:CORE-DET; closed rails): `tests/core/test_engine_core_abba.py`, `tests/core/test_engine_core_determinism.py`, `tests/compat/test_evaluate_pair_eligibility.py`, `tests/compat/test_compat_public_ab_ba_identity.py`, `tests/cli/test_showcompat_parity_and_identity.py`  
+* Live compat test (GATE:CORE-DET; open rails; Ops evidence): each run of the §3.4 live compat test
 
 ---
 
@@ -4614,8 +4801,8 @@ These artifacts MUST NOT be relocated into `audit/qa/**` or `artifacts/**` witho
 
 ## **D.3 Idempotence coupling (preimage → sha256 → final)**
 
-* Identity marker/logs: `artifacts/cards/A3/IDENTITY_OK.txt`  
-* Recompute scripts: `scripts/make_reader_v1_goldens.py`, `scripts/make_compat_determinism_artifacts.py`  
+* Recompute scripts: `scripts/make_reader_v1_goldens.py`  
+* Compat-path preimage recompute (owner tests): `tests/compat/test_evaluate_pair_eligibility.py`, `tests/cli/test_showcompat_parity_and_identity.py`  
 * Schemas (success, six keys; version-specific projection): `schemas/reader.v1.schema.json`, `schemas/reader.v2.schema.json`
 
 ---
@@ -4634,14 +4821,12 @@ These artifacts MUST NOT be relocated into `audit/qa/**` or `artifacts/**` witho
 * Catalog snapshot — `artifacts/reader/endpoints_snapshot.json`  
 * Env-gate proof (headers-only; one LF) — `artifacts/proofs/endpoints_env_gate_proof.log`  
 * Composite success proof (records-only JSON) — `artifacts/proofs/reader_success_get_head_304.json` *(PF12 schema; presence required)*  
-* Optional encoding-invariance proof — `artifacts/proofs/encoding_invariance.txt`
+* Optional encoding-invariance proof — `artifacts/proofs/success_encoding_invariance.txt`
 
 **Aux Narrative (text) snapshots (headers-only).**
 
 * `tests/transport/headers/aux_text_200.snap`  
-* `tests/transport/headers/aux_head.snap`  
-* `tests/transport/headers/aux_304.snap`  
-* `tests/transport/headers/aux_suppression.snap`
+* `tests/transport/headers/aux_suppression_200.snap`
 
 **Catalog source and integrity (titles-only).**
 
@@ -4657,7 +4842,6 @@ Note: When Endpoint Catalog JSON bytes change, regenerate the checksum and path-
 
 **Writer/error posture (headers-only).**
 
-* `tests/transport/headers/error_headers_utf8.snap`  
 * `tests/transport/headers/no_store_writers_errors.snap`
 
 **CI jobs (titles-only).**

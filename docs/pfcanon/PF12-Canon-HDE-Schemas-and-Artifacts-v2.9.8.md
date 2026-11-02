@@ -3,10 +3,10 @@
 ## **0.1 Header**
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts  
-**Version:** v2.9.7  
+**Version:** v2.9.8  
 **Status:** Canon  
-**Effective date:** 2026-10-26  
-**Last Update Gate:** BN 13.8.8; HDE-CRD-0002-specification-v1.1-approved.md; HDE-CRD-0002-CL-C-10-closure-decision-v1.2.md  
+**Effective date:** 2026-11-02  
+**Last Update Gate:** BN 14.0.5  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ## **0.2 Scope & single homes \[Required-Now\]**
@@ -548,6 +548,15 @@ EPIC-029 bounded conjunction route-probe current-state.
 
 Acceptance bindings MUST cite audit/gates/json\_gate/canonical/ as the authoritative family. The legacy family under audit/gates/canonical\_json/ and the optional legacy artifact audit/gates/canonical\_json\_gate.json MAY be present and tracked during migration, but they MUST NOT be treated as independent acceptance bindings.
 
+Governed gate check row content (normative).
+
+* Scope. This rule applies to each row of `audit/gates/json_gate/canonical/json_gate_check_log.ndjson` and of `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`, and to each check row of any other PF12-governed gate family. HDE-Governance governs these rows as keys-only governed logs.  
+* Issue entries. Each issue entry MUST be a closed token. An exception contributes at most its type name, as `validation_error:<ExceptionType>`. No row carries exception message text, library message text, or a stack trace.  
+* Paths. Every path a row records MUST be repository-relative. No row carries an absolute or machine-local path.  
+* Diagnostics. Detail for diagnosing a failing run goes to the gate tool's stderr, which is not governed evidence.
+
+This rule states the required row content; this section does not assert that the current gate tool already enforces it. Frozen gate captures retain their recorded bytes.
+
 Evidence index snapshot artifacts (single home; remove EPIC-local variant)
 
 Canonical evidence index snapshot artifacts MUST use the gate-family path:
@@ -600,11 +609,12 @@ Generic close-pack writer (normative).
 
 * `tools/qa/generate_epic_close_pack.py` is the single generic writer for Epic and CRD close packs. It selects its model by the candidate source's `schema_version`.  
 * A source whose `schema_version` is `epic_close_candidate_source.v1` is read against `schemas/epic_close_candidate_source.v1.json` and keeps the v1 model, refusals, and output bytes.  
-* A source whose `schema_version` is `close_candidate_source.v2` is read against `schemas/close_candidate_source.v2.json`, a closed schema for exactly one Epic (`HDE-EPICNNN`) or CRD (`HDE-CRD-NNNN`, four or more digits) identity.  
+* A source whose `schema_version` is `close_candidate_source.v2` is read against `schemas/close_candidate_source.v2.json`, a closed schema for exactly one Epic (`HDE-EPICNNN`) or CRD (`HDE-CRD-NNNN`, four or more digits) identity. Its tracked-issue IDs are `TI-NNN` or the Epic's own `ISSUE-EPIC<NNN>-TI-<nn>`, and the writer refuses a tracked-issue ID that names another Epic (`TRACKED_ISSUE_UNBOUND`). A tracked issue maps only through an ADR status; the v2 schema refuses the register-pointer form for it.  
+* A v2 source records the planning facts the writer checks and binds no planning document: `planning_records` holds the identity and SHA-256 of the Specification, the implementation plan, the QA plan, and the final QA report, each as a record text; `requirement_ids` holds the approved Specification's requirement IDs; `qa_checks` holds the QA plan's checks in plan order with the criteria each maps; and `qa_verdict` holds the final QA report's verdict. It has no plan path and no requirements, QA plan, or QA report binding. The writer checks the form of these records, not their agreement with the documents they name.  
 * An Epic close writes `audit/EPIC-NNN_close_report.md` and `audit/EPIC-NNN_MANIFEST.json`. A CRD close uses its CRD ID as the filename prefix, writing `audit/HDE-CRD-NNNN_close_report.md` and `audit/HDE-CRD-NNNN_MANIFEST.json`, and uses its lower-case ID, for example `hde-crd-0002`, as its directory form.  
-* The v2 close report and manifest are rendered only from tracked inputs. Requirement and acceptance text is bound by reference, never copied into a causal field. The feedback-dependency refusal is kept, and the writer refuses as causal inputs the Human Evidence Index, the Machine Evidence Mirror, their hash and checksum sentinels, every `.path_proof.txt`, the orientation output, the close-run family, and `catalog/manifest.json`. Check mode writes nothing and validates the exact committed bytes.  
+* The v2 close report and manifest are rendered only from tracked inputs. Requirement and acceptance text is bound by reference, never copied into a causal field. The feedback-dependency refusal is kept, and the writer refuses as causal inputs the Human Evidence Index, the Machine Evidence Mirror, their hash and checksum sentinels, every `.path_proof.txt`, the orientation output, the close-run family, and `catalog/manifest.json`. In either schema version, no path under `docs/ephemeral/` or `docs/pfcanon/` is a causal input, pointer, or key output: the writer refuses one with `PLANNING_OR_CANON_INPUT_PROHIBITED`, and the v2 schema refuses one too. A later-drain statement's evidence basis and a superseded artifact MAY name a planning document by a record text instead of a binding. A deferral's drain target names its register by PF title and gives the full text of one of its headings. PF titles and register headings are resolved at write time only, by title, against the PF-Canon files tracked at HEAD. Check mode writes nothing, reads no PF-Canon file, and validates the exact committed bytes.  
 * The v2 closure decision is `SATISFIED` or `NOT SATISFIED`, stated with the review-trace-only posture. Change Process Guide and HDE-Governance govern the decision criteria, the close report's required content, and the treatment of a check accepted under a closure override.  
-* The canonical updater registers a CRD close pack's report and manifest as Human Evidence Index and Machine Evidence Mirror rows `hde_crd_nnnn.close_report` and `hde_crd_nnnn.manifest`, each carrying `crd_id`. The rows are absent-tolerant: when neither file is present there are no rows, and when both are present there is one row each. One file present without the other, or a row whose file is absent, is refused.
+* The canonical updater registers a CRD close pack's report and manifest as Human Evidence Index and Machine Evidence Mirror rows `hde_crd_nnnn.close_report` and `hde_crd_nnnn.manifest`, each carrying `crd_id`. For an Epic admitted in the canonical updater's Epic close admission table, `ADMITTED_EPIC_CLOSE` in `tools/evidence/update_evidence_index.py`, it registers the writer close pack's report and manifest as rows `epicNNN.close_report` and `epicNNN.manifest`, each carrying `epic_id`, the key form of earlier Epic close packs. The rows are absent-tolerant: when neither file is present there are no rows, and when both are present there is one row each. One file present without the other, or a row whose file is absent, is refused. Another Epic's v2 close pack is written and checked by the writer, but its rows need that Epic's own row in `ADMITTED_EPIC_CLOSE`.
 
 The close-pack baseline artifacts MUST be located under audit/ using the EPIC-\#\#\# pattern (3 digits):
 
@@ -665,7 +675,7 @@ In the close report’s dedicated deferrals section, each deferral MUST include 
 
 These are baseline closure artifacts (required artifacts), not acceptance tokens by default. They MUST NOT be relocated into alternate directory trees (for example audit/qa/\*\* or artifacts/\*\*) without an explicit canon change.
 
-Same-run close evidence for a CRD (normative). For a CRD admitted in the canonical updater's CRD admission table, the same-run evidence of the close workflow is its post-verdict close-run family under `audit/qa/<change-id>/close/`, where `<change-id>` is the CRD's lower-case directory form: one `primary.log` per close-run check at `audit/qa/<change-id>/close/<check_id>/primary.log`, each with its sibling `primary.log.path_proof.txt`. The family is written after the final QA verdict. It neither reopens nor adds to the approved `audit/qa/<change-id>/qa_step_logs_manifest.json` or any `checks/` primary, and it is not a close-pack baseline artifact. §8.17 owns its writer, membership, and indexing. No Epic close-run family is admitted.
+Same-run close evidence for an admitted CRD or Epic (normative). For a CRD admitted in the canonical updater's CRD admission table, or an Epic admitted in its Epic close admission table, the same-run evidence of the close workflow is its post-verdict close-run family under `audit/qa/<change-id>/close/`, where `<change-id>` is the change's lower-case directory form: one `primary.log` per close-run check at `audit/qa/<change-id>/close/<check_id>/primary.log`, each with its sibling `primary.log.path_proof.txt`. The family is written after the final QA verdict and after the close pack. It neither reopens nor adds to the approved `audit/qa/<change-id>/qa_step_logs_manifest.json` or any `checks/` primary, and it is not a close-pack baseline artifact. In a v2 source, every pointer names a tracked file or a directory holding one, except the change's own close-run directory, which the close run writes after the close pack: a CRD's source MUST point to its own close-run directory, and an admitted Epic's source MAY. Any other pointer that does not resolve is refused (`POINTER_UNRESOLVED`). §8.17 owns the family's writer, membership, indexing, and admission.
 
 Acceptance-binding family coherence (normative).
 
@@ -1956,7 +1966,7 @@ Do not compute `release_id` from a malformed, incomplete, noncanonical, duplicat
 
 ### **Current repository posture**
 
-At the current inspected baseline, `catalog/manifest.json` is canonical JSON with `root: "catalog/"`, `version: "1.3.0"`, `built_at_utc: "2026-08-24T18:04:49Z"`, and exactly 45 unique ASCII-sorted members. Every row's recorded hash and size matches the baseline member bytes. The exact manifest digest and current `release_id` are `52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96`. This is a static byte-binding observation, not a new attestation, QA run, or deployment claim.
+At the current inspected baseline, `catalog/manifest.json` is canonical JSON with `root: "catalog/"`, `version: "1.3.0"`, `built_at_utc: "2026-08-24T18:04:49Z"`, and exactly 45 unique ASCII-sorted members. Every row's recorded hash and size matches the baseline member bytes. The exact manifest digest and current `release_id` are `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e`. This is a static byte-binding observation, not a new attestation, QA run, or deployment claim.
 
 Historical cuts retain their original standing:
 
@@ -1965,9 +1975,10 @@ Historical cuts retain their original standing:
 | Pre-mechanics and PR01 | Actual fifteen-member `1.0.0`, timestamp `2025-12-26T00:00:00Z`; local construction contract delivered, release admission not yet complete | Original actual roster, distinct from synthetic 42-member proofs |
 | PR02 F03 owner refresh | Same fifteen-member `1.0.0` roster; one serializer entry refreshed by the owning tools | `e0d5c9805408640a987c757426937be90c770e55ee949f962aa1a2154af49856`; strict admission still refuses the incomplete roster |
 | PR04 source refresh | Same fifteen-member `1.0.0` roster; existing Reader member refreshed | `a5f06ae3fcc964c41bb80c3630f455d9c246d9f87fcad500a5b74bf79b96bc01`; accepted scoped integration, not final release admission |
-| PR06 | Actual complete 44-member `1.1.0`, timestamp `2026-08-24T18:04:49Z` | Recorded identity prefix `988ed2a7…`; the source supplies a prefix, not a full digest. Complete actual admission ends the incomplete-roster interval |
+| PR06 | Actual complete 44-member `1.1.0`, timestamp `2026-08-24T18:04:49Z` | Recorded identity prefix `988ed2a7`; the source supplies only this prefix, not a full digest. Complete actual admission ends the incomplete-roster interval |
 | PR06a | Actual 45-member `1.2.0`; adds the Reader v2 schema member | `9f962ce338c448c7a2312f05695d5fdab12b01fbc1a67d490465d9fc87edab3f`; existing Reader v1 error-schema issue subsequently corrected |
-| PR06b / current | Actual 45-member `1.3.0`; no new roster member, Reader v1 error-schema correction | `52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96` |
+| PR06b | Actual 45-member `1.3.0`; no new roster member, Reader v1 error-schema correction | `52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96` |
+| HDE-CRD-0002 refreshes / current | Same 45-member `1.3.0`, timestamp `2026-08-24T18:04:49Z`; same-version refreshes at the WU-PR-03, WU-PR-04 and WU-PR-05 merges kept the version, build time and 45 members, with no version cut | Recorded identity prefixes `72fca4c3`, `d84d99e1` and `2f18a5eb` in turn, which HDE CRD Records supplies as prefixes only; current `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e` |
 
 The synthetic 42-member and 44-member candidates proved their named admission boundaries only. They did not activate the original actual fifteen-member release. During the PR04–PR06 incomplete-roster interval, truthful `RELEASE_NOT_ADMITTED` / `release_not_admitted` outcomes were refusals, never PASS or successful attestations. The bounded interim rule self-extinguished when PR06 admitted the complete actual release. Current success still requires the exact external-attestation predicate in §6.4; no historical acceptance, synthetic success, or static file inspection substitutes for it.
 
@@ -2046,7 +2057,15 @@ Its tracked contracts are:
 
 A successful final attestation requires an exact clean source commit, `source_commit_exact:true`, `release_admission:"PR06R_B_FINAL_PASS"`, and `pipeline_stop:null`. It binds the exact source commit, deterministic tracked-tree digest, canonical manifest and release identity, sorted file inventory, deterministic transcript facts, canonical checksums, and final release-admission posture.
 
-The builder MUST refuse a symlinked output root, an output inside the source repository, a non-directory destination, a non-empty destination, or overwrite of existing output. Success and failure outputs remain external. They are not checked-in release primaries and do not create Human Evidence Index, Machine Evidence Mirror, QA PASS, acceptance-token, PF09, deployment, migration, or OPS claims by implication.
+The builder MUST refuse a symlinked output root, an output inside the source repository, a non-directory destination, a non-empty destination, or overwrite of existing output. An absent output root is created by the builder, and an existing, empty, non-symlinked directory outside the source repository is accepted. Success and failure outputs remain external. They are not checked-in release primaries and do not create Human Evidence Index, Machine Evidence Mirror, QA PASS, acceptance-token, PF09, deployment, migration, or OPS claims by implication.
+
+The builder owns its output root for the run:
+
+* Exclusive claim. Before any other write, the builder MUST claim the output root exclusively for the run, by an atomic create that fails if another run holds the root. A root it cannot claim MUST be refused with a typed failure code before any write. The claim adds no member to a successful bundle beyond the `hde.release_attestation.v1` contract.  
+* No writes through symlinks. Every write below the output root MUST go to a path the run created. A pre-existing or substituted symlink anywhere below the root MUST be refused, not followed.  
+* Scoped cleanup. On failure, the builder MUST remove only the files and directories the run created, and then write its failure receipt. It never removes a path it did not create.
+
+These rules state the required contract. They do not fix the mechanism of the exclusive claim, and this section does not assert that the current builder already enforces them.
 
 Checked-in release evidence remains historical capture evidence, not a runtime identity input, and MUST NOT be relabeled as a current attestation. Configuration evidence and derived configuration bundles MUST NOT acquire incidental manifest digests, release IDs, or frozen-source identities merely because a release is cut.
 
@@ -2141,7 +2160,7 @@ Those captures MUST NOT be regenerated, rewritten, relabeled, or compared with t
 
 The canonical-JSON gate evaluates a historical capture using that capture's own release/preimage/identity only after verifying the frozen digest. Relevant captured identities must agree with one another. Current `artifacts/identity/service_identity.json` is not a substitute identity input for a historical capture. A genuine frozen-capture mismatch refuses validation; it does not authorize rewriting or reidentifying the capture. The existing 26-target inventory and six declared set rules remain unchanged.
 
-`RELEASE_ID_RECOMPUTE_OK` remains a historical EPIC022 label. Magic-10 MUST NOT emit, claim, redefine, or infer it as a current token. Its plan-local current-release condition is the exact external-attestation predicate stated above..
+`RELEASE_ID_RECOMPUTE_OK` remains a historical EPIC022 label. Magic-10 MUST NOT emit, claim, redefine, or infer it as a current token. Its plan-local current-release condition is the exact external-attestation predicate stated above.
 
 ### **Acceptance hints**
 
@@ -2259,7 +2278,7 @@ The mirror has a governed checksum sidecar at `artifacts/evidence_index.jsonl.sh
 
 #### **Governed locations only.**
 
-Every evidence file referenced by the mirror MUST live under governed repo paths (for example, artifacts/, docs/). Transient generator paths (scratch/temp) are disallowed; mirror entries pointing to non-governed paths fail CI.
+Every evidence file referenced by the mirror MUST live under governed repo paths (for example, artifacts/, docs/). Transient generator paths (scratch/temp) are disallowed; mirror entries pointing to non-governed paths fail CI. No Machine Evidence Mirror record, Human Evidence Index row, or path proof binds a path under `docs/ephemeral/` or `docs/pfcanon/`: planning documents serve planning only, and a PF-Canon file's name and version may change at any time.
 
 #### **Evidence-path safety invariants (mirror discovered\_physical\_path).**
 
@@ -2968,8 +2987,8 @@ The existing owner is `tools/config/generate_config_artifacts.py::generate_catal
 ##### **Canonical JSON and topology**
 
 * `artifacts/canonical/arrays_as_sets_report.log`  
-* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`  
-* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`  
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`: its rows follow §1.2 "Governed gate check row content".  
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`: its rows follow §1.2 "Governed gate check row content".  
 * `audit/gates/json_gate/canonical/json_gate_structured_record.json` (optional)  
 * `audit/gates/canonical_json/canonical_json.gate.json`  
 * `audit/gates/canonical_json/json_canon_compare.log`  
@@ -3062,6 +3081,10 @@ The deterministic showcompat capture artifacts above are byte-determinism eviden
 * `artifacts/compat/AB.json`: governed compat proof artifact for canonical AB ordering bytes; canonical single-line JSON.  
 * `artifacts/compat/BA.json`: governed compat proof artifact for canonical BA ordering bytes; canonical single-line JSON; matches the AB proof family bytes for the same pair.  
 * `artifacts/compat/identity_hash.txt`: primary governed compat-closure artifact for explicit conjunction identity-hash capture. Its bytes MUST match the canonical AB compat bytes for the same pair. Family-scoped compat closure checks MAY target artifacts/compat/identity\_hash.txt directly when a compat-only slice is being validated, but those targeted checks MUST NOT narrow or replace same-PR updates and validations for docs/evidence/INDEX.json, docs/evidence/INDEX.sha256, artifacts/evidence\_index.jsonl, artifacts/evidence\_index.jsonl.sha256, or the governed sibling .path\_proof.txt transcripts required elsewhere in PF12 when governed evidence bytes change.
+
+**Standing of the compat closure captures.**
+
+The three captures above date from the placeholder compat calculation that `hdctl showcompat` and the compat handler ran until HDE-EPIC040 PR-04 replaced it with the real calculation. Their generator, `scripts/make_compat_determinism_artifacts.py`, has exited with status 2 ever since. They remain governed bytes, kept as history, and are not evidence of the current compat calculation: GATE:CORE-DET evidence is the real compat path, as HDE-Governance and HDE Build Notes define it. The HDE-EPIC030 PR-03 compat evidence family below reuses `artifacts/compat/AB.json` and `artifacts/compat/BA.json` with the same standing.
 
 ##### **HDE-EPIC030 PR-01 normalization evidence**
 
@@ -3749,6 +3772,10 @@ The HDE-EPIC033 contract-inventory evidence family MAY be reused as a pattern fo
 * any legacy fallback or vendor-route gap that remains  
 * the nonclaims preserved by the proof. The evidence MUST distinguish simple route availability from full BodyGraph-detail resolution. A successful charts/simple observation MAY prove provider availability, auth posture, geocode-key posture, or route-family availability. It MUST NOT prove that bg:resolve \--source vendor resolves complete BodyGraph detail unless the route-policy and adapter/schema proof also establish the required internal contract. The evidence MUST NOT treat accidental /v2/bodygraphs composition, route-family mismatch, or a wrong-shape 404 as generic provider unavailability. It MUST classify route-shape mismatch separately from provider unavailability when that distinction is visible.
 
+**Legacy route reading (normative).**
+
+Vendor route selection belongs to HDE-CLI-API-Vendor-Ref. Only a configured base whose terminal API-version segment is exactly `v1` selects the legacy BodyGraph route, and it does so as retained legacy selection, not as a fallback; every other non-v2 base fails closed before credential projection or any external I/O. In this section, the wordings "explicit legacy fallback", "legacy fallback" and "non-v2 legacy BodyGraph fallback", the classification label `explicit_legacy_fallback`, and artifact names and keys containing `legacy_fallback` name that terminal-v1 legacy selection and make no fallback claim. Frozen HDE-EPIC036 and HDE-EPIC037 captures stay as history: they record the posture at capture time and are not rewritten. This section does not assert that the current route classifier already enforces the terminal-segment rule.
+
 **Current bounded configured-v2 mapped-cache persistence evidence family.**
 
 This family governs bounded non-production persistence of adapter-mapped HDE BodyGraph/cache payloads. Its current primary bindings are:
@@ -3769,7 +3796,7 @@ These primaries use record type `epic038_pr05_mapped_cache_evidence`. The govern
 
 The schemas use record type `epic038_pr05_schema`. `tools/evidence/generate_v2_mapped_cache_evidence.py` is the sole primary producer. `tools/evidence/update_evidence_index.py` owns sibling path proofs, Human Evidence Index rows, Machine Evidence Mirror rows, hash sentinels, checksums, and orientation companions.
 
-The family MUST prove canonical write/read-back parity, absence of raw vendor-envelope persistence, idempotence, closed-rails refusal, adapter-mapped payload use, cache-compatible identity types, and legacy non-v2 fallback preservation. It does not authorize production-like writes and does not create a public Reader change, new public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI ownership, raw secret or request/response persistence, AI scope, QA PASS, PF09 status movement, OPS completion, PO closeout, board update, production deployment, acceptance-token satisfaction, or epic closeout.
+The family MUST prove canonical write/read-back parity, absence of raw vendor-envelope persistence, idempotence, closed-rails refusal, adapter-mapped payload use, cache-compatible identity types, and preservation of the terminal-v1 legacy selection, recorded under the existing names `legacy_fallback_preservation.log` and `explicit_legacy_fallback`. It does not authorize production-like writes and does not create a public Reader change, new public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI ownership, raw secret or request/response persistence, AI scope, QA PASS, PF09 status movement, OPS completion, PO closeout, board update, production deployment, acceptance-token satisfaction, or epic closeout.
 
 ##### **HDE-EPIC036 bg\_resolve\_\* route-policy evidence family**
 
@@ -5396,16 +5423,16 @@ Under audit/qa/\\/:
 
 Tools MUST NOT infer run state by enumerating subdirectories under audit/qa/\\/. The manifest is the authoritative index of current-state step evidence.
 
-Close-run family exception (normative; admitted CRDs only).
+Close-run family exception (normative; admitted CRDs and Epics only).
 
 * A CRD admitted in the canonical updater's source-owned CRD admission table, `ADMITTED_CRD_QA` in `tools/evidence/update_evidence_index.py`, has a post-verdict close-run family at `audit/qa/<change-id>/close/<check_id>/primary.log`, each primary with its sibling `primary.log.path_proof.txt`. Each row of that table maps a CRD ID to its QA root and Index key prefix; another CRD needs its own row.  
+* An Epic admitted in the canonical updater's source-owned Epic close admission table, `ADMITTED_EPIC_CLOSE` in the same file, has the same family at `audit/qa/<epic-id>/close/<check_id>/primary.log`, each primary with its sibling `primary.log.path_proof.txt`. Each row of that table maps an Epic ID to its QA root and Index key prefix. The table admits HDE-EPIC041 only; another Epic close run needs its own row and its own explicit Product Owner admission.  
 * The family holds the same-run mechanical evidence of the change's close workflow: one primary per close-run check, rendered from that check's captured command, exit code, and output with a `pf27.step_log_header.v2` header as Plan Templates defines it. Its posture is `PASS`, `FAIL`, or `BLOCKED`, as Glow QA Guide "Close-pack truthfulness and same-run execution" requires.  
 * The family is written after the final QA verdict. It neither reopens nor adds to the change's approved `qa_step_logs_manifest.json` or any `checks/` primary, and that manifest never lists it.  
-* Only the canonical updater writes the family, through its close-run publication entrypoint `publish_crd_close_run_family`, inside one recoverable write transaction. The given results replace the whole family. The entrypoint requires the change's recorded QA family to exist.  
+* Only the canonical updater writes the family, inside one recoverable write transaction, through its close-run publication entrypoint: `publish_crd_close_run_family` for an admitted CRD and `publish_epic_close_run_family` for an admitted Epic. The given results replace the whole family. The entrypoint requires the change's recorded QA family to exist. For an Epic, it renders each primary through the canonical QA harness's own renderer, writes neither the Epic's QA step-logs manifest nor any of its `checks/` primaries, and refuses if either changes during publication.  
 * The family's members are its validated primaries and their path proofs under `close/`, in a closed shape: each member is a directory, not a symlink, named by a valid lower-case check ID, and it holds only `primary.log` and `primary.log.path_proof.txt`. Anything else under `close/`, an aliased `close/` root, or a `close/` root without a primary is refused.  
 * This is a scoped exception, for `close/` only, to the rule above that tools MUST NOT infer run state by enumerating subdirectories: the canonical updater discovers the family's members by enumerating `close/`. That rule continues to govern `checks/` and every other part of a QA root, where `qa_step_logs_manifest.json` stays the authoritative index.  
-* Each primary has one Human Evidence Index row and one Machine Evidence Mirror record with artifact key `<key_prefix>.close.<check_id>.primary.log`, where `<key_prefix>` is the CRD's Index key prefix in the admission table, and Mirror role `log`. HDE Build Notes introduced this family under the rule for new standardized evidence families above.  
-* No Epic close-run family is admitted. An Epic close run needs its own explicit admission later, as each CRD needs its admission row.
+* Each primary has one Human Evidence Index row and one Machine Evidence Mirror record with artifact key `<key_prefix>.close.<check_id>.primary.log`, where `<key_prefix>` is the change's Index key prefix in its admission table, and Mirror role `log`. An Epic's rows also carry `epic_id`. HDE Build Notes introduced this family, and its extension to admitted Epics, under the rule for new standardized evidence families above.
 
 ### **8.17.1 Root and step directories**
 
@@ -5421,7 +5448,7 @@ EPIC\_QA\_ROOT MAY contain:
 
 * 00\_meta/ — stable, mechanically produced epic-level QA metadata (for example, baseline rails/env pins capture, optional debugging captures).  
 * checks/ — current-state per-check directories (one directory per check\_id). Each check directory contains primary.log and MAY contain auxiliary tmp\_\* supporting files or plan-owned outputs.  
-* close/ — for a CRD in the canonical updater's CRD admission table only, the post-verdict close-run family; written only by the canonical updater, never plan-owned (§8.17 "Close-run family exception").  
+* close/ — only for a CRD in the canonical updater's CRD admission table or an Epic in its Epic close admission table, the post-verdict close-run family; written only by the canonical updater, never plan-owned (§8.17 "Close-run family exception").  
 * results/ — current-state step outputs and verdict artifacts (names-only; plan-owned).  
 * snapshots/ — run-local convenience copies of governed artifacts and headers (names-only; non-canon).  
 * closeout/ — current-state closeout summaries (names-only; plan-owned).  
@@ -6160,6 +6187,156 @@ doc_delta:
     bytes remain unchanged; the prior release_id remains valid. Exact
     preparation and application evidence is retained in the document output
     proof logs.
+```
+
+## 9.7 Documentary drainage record — 2026-11-02
+
+This record drains into PF12 the Product Owner decisions on evidence-tool output roots and governed gate check rows; the rules that planning documents and PF-Canon file identities are never inputs, as they bear on the close-pack writer and on Human Evidence Index, Machine Evidence Mirror and path-proof records; the close-pack writer decisions as amended for HDE-EPIC041's admitted close run; the terminal-v1 reading of vendor legacy route selection; and the standing of the compat closure captures as history, all recorded in HDE Build Notes. At the Product Owner's direction of 2026-11-02, it also brings §5.3's current `release_id` and historical cuts table up to the repository's actual release identity and corrects two punctuation defects. It changes PF text only. HDE-CRD-0002 and HDE-EPIC041 are closed; neither those closures nor this record establishes a QA verdict, acceptance, Ops, deployment, register movement, or implementation of a rule this record states as required.
+
+```yaml
+doc_delta:
+  id: "DOCDELTA-20261102-pf12-evidence-rules-and-epic-close-run-drain"
+  date: "2026-11-02"
+  author: "Claude Code — T-04 document worker"
+  document_version: "v2.9.8"
+  scope:
+    catalogs: "false"
+    schemas: "true"
+    manifest_checksums: "false"
+    validation: "true"
+    evidence_index: "true"
+    routing_only: "false"
+    operation_boundary: "documented contracts and status only; no governed payload writes"
+  targets:
+    catalogs_changed: []
+    schemas_changed: []
+    other_artifacts_changed: []
+    documented_contracts:
+      - title: "Release attestation builder"
+        path: "tools/evidence/build_release_attestation.py"
+      - title: "Canonical JSON gate check log"
+        path: "audit/gates/json_gate/canonical/json_gate_check_log.ndjson"
+      - title: "Canonical JSON gate compare log"
+        path: "audit/gates/json_gate/canonical/json_gate_compare_log.ndjson"
+      - title: "Canonical JSON gate tool"
+        path: "tools/evidence/run_canonical_json_gate.py"
+      - title: "Close candidate source v2 schema"
+        path: "schemas/close_candidate_source.v2.json"
+      - title: "Generic close-pack writer"
+        path: "tools/qa/generate_epic_close_pack.py"
+      - title: "Evidence Index updater"
+        path: "tools/evidence/update_evidence_index.py"
+      - title: "Epic close-run family"
+        path: "audit/qa/<epic-id>/close/<check_id>/primary.log"
+      - title: "Release manifest"
+        path: "catalog/manifest.json"
+      - title: "Compat determinism generator"
+        path: "scripts/make_compat_determinism_artifacts.py"
+      - title: "Compat closure identity capture"
+        path: "artifacts/compat/identity_hash.txt"
+      - title: "Configured-v2 mapped-cache evidence generator"
+        path: "tools/evidence/generate_v2_mapped_cache_evidence.py"
+  summary: |
+    Add to the release attestation builder's contract the exclusive claim of
+    its output root, the refusal of writes through symlinks, and cleanup
+    scoped to what the run created. Add the governed gate check row content
+    rule for the canonical JSON gate logs and point their Evidence Catalog
+    entries to it. State that no Machine Evidence Mirror record, Human
+    Evidence Index row or path proof binds a planning-document or PF-Canon
+    path. Record the v2 close-candidate source's planning records,
+    requirement IDs, QA checks and QA verdict, the refusal of planning and
+    PF-Canon paths as inputs, write-time-only PF title resolution, and the
+    Epic tracked-issue ID form with its ADR-status-only mapping. Extend the
+    absent-tolerant close-pack Index rows, the close-run pointer exception,
+    and the post-verdict close-run family to an Epic admitted in the
+    canonical updater's Epic close admission table, which admits HDE-EPIC041
+    only. Read the legacy-fallback wordings, labels and names of the HDAPI v2
+    evidence section as the retained terminal-v1 legacy selection, and state
+    the mapped-cache family's legacy predicate in those terms. Record that the
+    compat closure captures are placeholder-era history, not evidence of the
+    current compat calculation. Update the current release_id in §5.3 to the
+    digest of the current manifest, add the HDE-CRD-0002 same-version
+    refreshes to its historical cuts table, and correct an ellipsis and a
+    doubled period.
+  domain_impact:
+    current_domains_changed: []
+    future_promotions: []
+    mathematical_or_public_numeric_change: "none"
+  release_identity:
+    frozen_input_changed: "false"
+    manifest_changed: "false"
+    release_id_expected_change: "false"
+    prior_release_id: "77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e"
+    computed_release_id: "77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e"
+    disposition: "prior release_id remains valid; static SHA-256 of the unchanged catalog/manifest.json bytes at the source baseline commit"
+  acceptance_impact:
+    tokens_added: []
+    tokens_removed: []
+    tokens_unchanged: []
+    decision_boundary: "no new QA, OPS, acceptance, deployment, register movement, or closure claim"
+  validation:
+    - behavior: "exclusive output-root claim, no writes through symlinks, and scoped cleanup by the release attestation builder"
+      entrypoint: "python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean"
+      result: "not-run by this documentary revision; the rules are required and their implementation is not asserted"
+      evidence_path: "tools/evidence/build_release_attestation.py"
+    - behavior: "closed issue tokens and repository-relative paths in governed gate check rows"
+      entrypoint: "python tools/evidence/run_canonical_json_gate.py --check-only"
+      result: "not-run by this documentary revision; the rule is required and its implementation is not asserted"
+      evidence_path: "tools/evidence/run_canonical_json_gate.py"
+    - behavior: "v2 source planning records, planning and PF-Canon input refusal, tracked-issue ID form and ADR-status-only mapping"
+      entrypoint: "python tools/qa/generate_epic_close_pack.py --source <candidate-source> --check"
+      result: "not-run by this documentary revision; schema and writer statically inspected"
+      evidence_path: "schemas/close_candidate_source.v2.json"
+    - behavior: "Epic close-pack rows and Epic close-run family for the admitted Epic"
+      entrypoint: "python tools/evidence/update_evidence_index.py --check"
+      result: "not-run by this documentary revision; implementation statically inspected"
+      evidence_path: "tools/evidence/update_evidence_index.py"
+    - behavior: "current release_id and 1.3.0 release history recorded in §5.3"
+      entrypoint: "python scripts/release_id_recompute.py --check-manifest-only"
+      result: "passed under closed rails (exit 0) on catalog/manifest.json bytes equal to those at the source baseline commit; their SHA-256 is the computed_release_id above"
+      evidence_path: "catalog/manifest.json"
+    - behavior: "compat determinism generator exits with status 2 before any computation"
+      entrypoint: "python scripts/make_compat_determinism_artifacts.py"
+      result: "not-run; the retained generator was statically inspected"
+      evidence_path: "scripts/make_compat_determinism_artifacts.py"
+    - behavior: "mapped-cache legacy predicate computed from a terminal v1 base"
+      entrypoint: "python tools/evidence/generate_v2_mapped_cache_evidence.py --check"
+      result: "not-run by this documentary revision; the predicate's fixture base was statically inspected"
+      evidence_path: "tools/evidence/generate_v2_mapped_cache_evidence.py"
+    - behavior: "complete exact original-bound PF redline preparation and application"
+      entrypoint: "TW-DRAIN-10 then TW-APPLY-10, both 100926.1"
+      result: "recorded in the evidence path; this record states no outcome in advance"
+      evidence_path: "docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF12/PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md"
+  evidence_updates: []
+  index_and_mirror:
+    human_index: "docs/evidence/INDEX.json"
+    human_index_sentinel: "docs/evidence/INDEX.sha256"
+    machine_mirror: "artifacts/evidence_index.jsonl"
+    machine_mirror_checksum: "artifacts/evidence_index.jsonl.sha256"
+    parity_status: "not-run; no governed evidence bytes, paths, records, sidecars, sentinels, or companions changed"
+    required_updates: "none for this PF-text-only drainage; original owner rules continue to govern future payload changes"
+  routing_titles_only:
+    math: "HDE-Math-Spec"
+    governance: "HDE-Governance"
+    cli_api_vendor: "HDE-CLI-API-Vendor-Ref"
+    architecture: "HDE Architecture"
+  open_decisions: []
+  traceability:
+    pull_request: "https://github.com/amthorn78/glow-hdengine-v2/pull/826"
+    source_baseline_commit: "e2b7427ff418ca8f08f05587c4a541308a76da56"
+    publication: "document output only; canonical source publication remains separately governed"
+  change_log_entry: |
+    v2.9.8 / 2026-11-02 — Documentary drainage of the Product Owner decisions
+    on evidence-tool output roots and governed gate check rows, and of the
+    close-pack writer decisions as amended for HDE-EPIC041's admitted close
+    run, into the release attestation, canonical JSON gate, close-pack,
+    Machine Evidence Mirror, and Live QA evidence layout homes above; the
+    terminal-v1 legacy route reading and the compat closure captures'
+    standing into the Evidence Catalog; and, at the Product Owner's
+    direction, the current release identity into §5.3, with two punctuation
+    corrections. Canonical runtime and evidence bytes remain unchanged; the
+    prior release_id remains valid. Exact preparation and application evidence is
+    retained in the document output proof logs.
 ```
 
 # **Appendix A: UMS Schemas**

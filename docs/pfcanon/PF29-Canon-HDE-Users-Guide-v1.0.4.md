@@ -4,13 +4,13 @@
 
 **Title:** PF29-Canon-HDE-Users-Guide
 
-**Version:** v1.0.3
+**Version:** v1.0.4
 
 **Status:** Canon
 
-**Effective date:** 2026-10-26
+**Effective date:** 2026-11-02
 
-**Last Update Gate:** BN 13.8.8; HDE-CRD-0002-specification-v1.1-approved.md
+**Last Update Gate:** BN 14.0.5
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -78,7 +78,7 @@ When this guide names a command, route, or file, it is documenting how to run th
 
 ## **1.1 Implemented local and QA surfaces**
 
-Availability below is based on bounded read-only inspection of repository snapshot `e7265a090ad0cc8de5f36de2f19481216aa3d073`, except for the statements updated for delivered HDE-CRD-0002 behavior, which were inspected at repository snapshot `0838ba08254eaefc888019df49a06aa2ae99cc6c`: the retired-route production posture in this section, the start-helper bind in §4.1, the Reader environment gate in §6.1, Aux preview band selection in §10.1, the `bg:resolve --source vendor` environment classification and production override in §11.2, §13.3, §15 Recipe F, §16, §17 and §18, and the unknown-path, CLI help and dev-route gate limits in §16. Commands are examples to run from the repository root with their stated prerequisites; no recipe was executed for this revision.
+Availability below is based on bounded read-only inspection of repository snapshot `e7265a090ad0cc8de5f36de2f19481216aa3d073`, except for the statements updated for delivered HDE-CRD-0002 behavior, which were inspected at repository snapshot `0838ba08254eaefc888019df49a06aa2ae99cc6c`: the retired-route production posture in this section, the start-helper bind in §4.1, the Reader environment gate in §6.1, Aux preview band selection in §10.1, the `bg:resolve --source vendor` environment classification and production override in §11.2, §13.3, §15 Recipe F, §16, §17 and §18, and the unknown-path, CLI help and dev-route gate limits in §16. The statements that record current gaps against decided canon for the production vendor override scope, vendor route selection and compat route gating, in the `hdctl bg:resolve` and `POST /api/compat/v1` rows of this section, §1.2, §7.2, §7.5, §9.2, §11.3, §12.2, §13.3, §16 and §17, were inspected at repository snapshot `e2b7427ff418ca8f08f05587c4a541308a76da56`. Commands are examples to run from the repository root with their stated prerequisites; no recipe was executed for this revision.
 
 | Surface | Current availability | Primary use |
 | :---- | :---- | :---- |
@@ -89,7 +89,7 @@ Availability below is based on bounded read-only inspection of repository snapsh
 | hdctl showcompat \--dump-admin-dir | \[Implemented\] | Emit left/right BodyGraph JSON, composite BodyGraph JSON, compat proof JSON, and .sha256 sidecars. |
 | hdctl showcompat \--conjunction | \[Implemented\] | Emit conjunction compat JSON. |
 | hdctl aux-preview | \[Implemented\] | Preview Aux narrative text and write IDs-only admin sidecar JSON. |
-| hdctl bg:resolve | \[Implemented\] | Resolve BodyGraph control-flow envelope and vendor route-policy classification. Configured-v2 dry-run uses the version-neutral charts resource path and deterministic v2 ChartResult adapter mapping. Configured-v2 non-dry-run mapped-cache persistence is implemented only with explicit \--upsert, open rails, non-production-like requested and process environments, and an available sanctioned direct PostgreSQL target; failed gates refuse before the vendor request. Non-v2 configured bases preserve explicit legacy BodyGraph fallback |
+| hdctl bg:resolve | \[Implemented\] | Resolve BodyGraph control-flow envelope and vendor route-policy classification. Configured-v2 dry-run uses the version-neutral charts resource path and deterministic v2 ChartResult adapter mapping. Configured-v2 non-dry-run mapped-cache persistence is implemented only with explicit \--upsert, open rails, non-production-like requested and process environments, and an available sanctioned direct PostgreSQL target; failed gates refuse before the vendor request. A configured base whose final path segment is exactly `v1` selects the retained legacy BodyGraph route; checked-in code still sends every other non-v2 base to that route, which canon refuses \[Current gap\] (§11.3). |
 | hdctl dev:sampler | \[Implemented\] \[Dev or QA only\] | Deterministic CLI sampler harness. |
 | scripts/dev\_start\_reader.sh | \[Implemented\] \[Dev or QA only\] | Start local Reader/dev adapter harness. |
 | POST /internal/dev/sampler | \[Implemented\] \[Dev or QA only\] | HTTP dev sampler harness. |
@@ -97,7 +97,7 @@ Availability below is based on bounded read-only inspection of repository snapsh
 | POST /api/reader?v=1 and POST /api/reader?v=2 | \[Implemented\] | Versioned production Reader route with read-only current-row resolution. A declared route does not prove live database success or deployment. |
 | python tools/config/generate_config_artifacts.py --compare-goldens . | \[Implemented\] | Read-only complete golden comparison against the explicitly selected candidate root; see §7.6. |
 | python tools/bodygraph/check_magic10_gate_readiness.py | \[Implemented\] | Read-only readiness for an explicit UUID selection and an available database; see §7.7. |
-| POST /api/compat/v1 | \[Implemented\] \[Dev or QA only\] | Local HTTP compat computation. Returns 404 in prod. |
+| POST /api/compat/v1 | \[Implemented\] \[Dev or QA only\] | Local HTTP compat computation. Returns 404 in prod. Canon serves it only when APP\_ENV is exactly `dev`, `test` or `local`; checked-in code still serves it when APP\_ENV is unset or names another non-production value \[Current gap\] (§16). |
 | GET /api/aux/narrative and GET /aux/narrative | \[Implemented\] | Aux narrative HTTP preview routes on Reader harness. |
 | GET /dev/sampler/conjunction, GET /dev/reader/conjunction, GET /dev/writer/conjunction | \[Implemented\] \[Dev or QA only\] | Dev HTTP conjunction routes. |
 | GET /internal/version and HEAD /internal/version | \[Implemented\] | Service identity checks, including production service identity checks when the correct service URL is known. |
@@ -119,7 +119,7 @@ These rows report checked-in repository drift only; they do not define route byt
 | hdctl read singlebg | \[Planned, not implemented\] | Do not document as runnable until the CLI exposes it. |
 | hdctl list people | \[Planned, not implemented\] | Do not document as runnable until the CLI exposes it. |
 | Fetch person or batch commands | \[Planned, not implemented\] | Explicitly disabled for current alpha-style posture. |
-| Production-public POST /api/compat/v1 | \[Current gap\] | Do not claim. Current code returns 404 when APP\_ENV resolves to prod, production, or live, or when APP\_ENV is empty and ENGINE\_ENV resolves to one of those values. |
+| Production-public POST /api/compat/v1 | \[Current gap\] | Do not claim. Current code returns 404 when APP\_ENV resolves to prod, production, or live, or when APP\_ENV is empty and ENGINE\_ENV resolves to one of those values. Canon keeps the route dev/admin-only; serving it in any other environment needs a later decision (§16). |
 | Configured-v2 ChartResult dry-run resolution | \[Implemented\] \[Operator-authorized only\] | With a configured v2 base and authorized open rails, \--dry-run uses the version-neutral charts route and deterministic v2 ChartResult adapter, reports rows\_written=0, and performs no mapped-cache persistence. |
 | Mapped v2 ChartResult adapter output feeding compat computation | \[Implemented\] \[Dev or QA only\] | Current repository code supports mapped v2 ChartResult adapter output entering the existing compatibility computation path while preserving public Reader boundary posture. This does not change public Reader bytes or prove execution, QA PASS, or broad platform conformance. |
 | ChartSimpleResult as full BodyGraph-detail source | \[Current gap\] | ChartSimpleResult may support bounded smoke, auth, geokey, provider availability, or route-family confirmation, but it is not presumed sufficient for full BodyGraph detail or durable cache use. |
@@ -414,7 +414,7 @@ Supported method posture:
     
 * In non-production posture, HEAD returns 405 with an empty body and `Allow: POST, OPTIONS`; OPTIONS returns 204 with an empty body and the same Allow value.  
     
-* The route and its descendants return 404 when APP\_ENV resolves to prod, production, or live, or when APP\_ENV is empty and ENGINE\_ENV resolves to one of those values.
+* The route and its descendants return 404 when APP\_ENV resolves to prod, production, or live, or when APP\_ENV is empty and ENGINE\_ENV resolves to one of those values. In any other posture, canon serves the route only when APP\_ENV is exactly `dev`, `test` or `local`, and otherwise refuses with `ERR_WRITER_FORBIDDEN` (403); the checked-in guard does not yet return that refusal \[Current gap\] (§16). The §4.1 harness sets APP\_ENV=dev.
 
 Inline `a` and `b` must be complete mapped charts. Alternatively, use the supported stored-identity input family with both `a_id` and `b_id` and available current rows; do not mix the families. Identifier-only `a`/`b` objects and birth-tuple-only inline charts do not demonstrate successful Gate-based compat.
 
@@ -480,9 +480,11 @@ LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 hdctl showcompat \--source
 
 Vendor mode is an operator-authorized open-rails workflow and requires complete birth tuples for both people:
 
-LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl showcompat \--source vendor \--birthdate-a YYYY-MM-DD \--birthtime-a HH:MM \--location-a "Place" \--birthdate-b YYYY-MM-DD \--birthtime-b HH:MM \--location-b "Place" \> compat\_vendor.json
+LC\_ALL=C LANG=C TZ=UTC APP\_ENV=dev SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl showcompat \--source vendor \--birthdate-a YYYY-MM-DD \--birthtime-a HH:MM \--location-a "Place" \--birthdate-b YYYY-MM-DD \--birthtime-b HH:MM \--location-b "Place" \> compat\_vendor.json
 
 The current resolved-compat vendor path uses read-only dry-run acquisition: no mapped-cache database persistence, and success/retry logging is disabled at that acquisition boundary. Do not confuse it with the separately authorized persistence recipe in §11.4.
+
+Canon applies the environment classification and production override of §13.3 to this path: APP\_ENV, or ENGINE\_ENV when APP\_ENV is blank, must name a recognized environment, as the command above does with `dev`, and a production-like environment needs `--allow-prod-vendor`. Its chart acquisition follows the route selection in §11.3. The checked-in path does not yet classify the environment or accept the flag, and it still uses the earlier route classification \[Current gap\] (§11.3, §13.3).
 
 With \--source auto, both user IDs are required and resolution is DB-only. Birth-based vendor fallback is prohibited; use explicit \--source vendor for the two complete synthetic birth tuples. Without both IDs, auto refuses AUTO\_SOURCE\_UNRESOLVED. No database or vendor success is implied by the command declaration.
 
@@ -586,7 +588,7 @@ DB mode requires available database access and resolvable rows for both canonica
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 hdctl showcompat \--conjunction \--user-a \<user\_a\> \--user-b \<user\_b\> \--source db \> conjunction\_db.json
 
-The current conjunction resolver tries local rows first. After a local miss, explicit vendor source requires both user-ID arguments and may acquire read-only complete charts only with authorized open rails and the required complete birth inputs; closed rails refuse that acquisition. This resolver uses dry-run acquisition and does not perform mapped-cache database persistence. The CLI exposes no \--upsert option for showcompat; explicit persistence belongs to the separate BodyGraph workflow in §11.4.
+The current conjunction resolver tries local rows first. After a local miss, explicit vendor source requires both user-ID arguments and may acquire read-only complete charts only with authorized open rails and the required complete birth inputs; closed rails refuse that acquisition. Canon also applies the environment classification and production override of §13.3 to that acquisition, and the route selection of §11.3; the checked-in resolver does not yet apply the override and still uses the earlier route classification \[Current gap\] (§11.3, §13.3). This resolver uses dry-run acquisition and does not perform mapped-cache database persistence. The CLI exposes no \--upsert option for showcompat; explicit persistence belongs to the separate BodyGraph workflow in §11.4.
 
 No live DB or vendor success is established by this static availability check. A vendor-source refusal is not a successful acquisition or computation.
 
@@ -707,11 +709,13 @@ With a configured v2 base, current dry-run behavior uses the version-neutral cha
 
 Success is determined by the emitted JSON payload. For dry-run, do not claim persistence.
 
-## **11.3 Non-v2 legacy fallback \[Implemented\] \[Operator-authorized only\]**
+## **11.3 Terminal-v1 legacy BodyGraph route \[Implemented\] \[Operator-authorized only\]**
 
-When the configured base is non-v2, explicit legacy BodyGraph fallback is preserved. Treat this as legacy fallback only, not v2 runtime conformance.
+Canon reaches the legacy BodyGraph route only with a configured base whose final path segment is exactly `v1`. That route is retained legacy selection, not fallback, and not v2 runtime conformance; the emitted classification label `explicit_legacy_fallback` is its existing wire value and makes no fallback claim. Every other non-v2 base, including an unversioned base, another version, a nonterminal or case-variant marker, and multiple markers, must fail with `PROVIDER_ROUTE_UNSUPPORTED` before credential projection or any external I/O. The same rule covers `bg:resolve --source vendor` and the compat chart acquisition of `showcompat --source vendor` and vendor-selecting conjunction. PF05-Canon-HDE-CLI-API-Vendor-Ref owns route selection and the configured-base boundary.
 
-For non-v2 legacy fallback, persistent success must be determined by fields emitted in the JSON payload, including rows\_written, db\_rows\_after, db\_emitted\_sha256, and parity\_match where present. Do not claim rows were written by assumption.
+\[Current gap\] The checked-in route classifier does not yet fail closed. It reads a `v2` or `v1` marker from any path segment, case-insensitively, so a nonterminal or case-variant `v2` marker still selects the charts route, and every base without a `v2` marker, including an unversioned base, reaches the legacy BodyGraph route. No checked-in runtime code under `engine/` or `adapter/` emits `PROVIDER_ROUTE_UNSUPPORTED`. Configure a base whose final path segment is exactly `v2`, or exactly `v1` for legacy work, and do not rely on any other base shape.
+
+For the legacy route, persistent success must be determined by fields emitted in the JSON payload, including rows\_written, db\_rows\_after, db\_emitted\_sha256, and parity\_match where present. Do not claim rows were written by assumption.
 
 ## **11.4 Configured-v2 mapped-cache persistence \[Implemented\] \[Operator-authorized only\]**
 
@@ -768,7 +772,7 @@ Current v2 chart-style routes:
 | charts/simple | Authorization: Bearer \<redacted\> | Requires HD-Geocode-Key: \<redacted\> |
 | charts/coordinates | Authorization: Bearer \<redacted\> | Uses coordinates; geocode key not required for that route. |
 
-Use version-neutral runtime resource paths. Do not hardcode /v1 or /v2 as active runtime request-construction inputs. The configured HD\_API\_BASE\_URL owns any vendor API version prefix.
+Use version-neutral runtime resource paths. Do not hardcode /v1 or /v2 as active runtime request-construction inputs. The configured HD\_API\_BASE\_URL owns any vendor API version prefix. Canon requires that base to be absolute HTTPS, with a host and no userinfo, query or fragment, and to end in exactly `v2`, or exactly `v1` for the legacy routes; PF05-Canon-HDE-CLI-API-Vendor-Ref owns that boundary. The checked-in client checks only the HTTPS scheme, and the route classifier accepts other base shapes \[Current gap\] (§11.3).
 
 ## **12.3 Secret handling**
 
@@ -835,7 +839,7 @@ The production-contract Reader route is `POST /api/reader?v=1` or `?v=2`, with u
 
 ## **13.3 Production/open-rails vendor BodyGraph acquisition \[Operator-authorized only\]**
 
-This section summarizes production and production-like posture. Configured-v2 bg:resolve \--source vendor \--dry-run may use the version-neutral charts route and deterministic v2 ChartResult adapter under authorized open rails. With a non-v2 configured base, explicit legacy fallback may proceed under its normal rails, configuration, and emitted-payload success rules.
+This section summarizes production and production-like posture. Configured-v2 bg:resolve \--source vendor \--dry-run may use the version-neutral charts route and deterministic v2 ChartResult adapter under authorized open rails. With a configured base whose final path segment is exactly `v1`, the retained legacy BodyGraph route may proceed under its normal rails, configuration, and emitted-payload success rules. Canon refuses every other non-v2 base, which the checked-in classifier does not yet do \[Current gap\] (§11.3).
 
 Configured-v2 mapped-cache persistence is implemented only for the bounded non-production workflow in §11.4. Production or production-like non-dry-run attempts fail closed with PROVIDER\_WRITE\_UNSUPPORTED even when \--upsert is supplied. Do not treat the bounded non-production workflow or OPS-02 evidence as production write authorization or broad v2 conformance.
 
@@ -845,7 +849,11 @@ LC\_ALL=C LANG=C TZ=UTC APP\_ENV=prod SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:res
 
 Set APP\_ENV to the value that names the environment the process actually runs in; the flag never changes that classification.
 
-Persistent success for any supported non-v2 legacy fallback must be determined by emitted JSON fields, not by assumption.
+Canon applies the same production override, with the same environment classification, initiator rule and pre-I/O audit event, to `hdctl showcompat --source vendor` and to `hdctl showcompat --conjunction` whenever the invocation selects vendor acquisition for either party, which in the checked-in CLI is any conjunction source other than `db` or `auto`. An unset or unrecognized environment then refuses with `PROVIDER_CONFIG_INVALID`. One flag authorizes at most one vendor acquisition per party, two for a pair, and no write, public Reader or Aux vendor traffic, or opening of a closed rail. Refusals use the showcompat typed error carrier with the same stable codes and exit 1, and make no outbound attempt. Supplying the flag to an invocation that selects no vendor acquisition, including `--source db`, `--source auto` and conjunction with either, is a usage error with exit 64. PF05-Canon-HDE-CLI-API-Vendor-Ref owns these rules.
+
+\[Current gap\] The checked-in CLI accepts `--allow-prod-vendor` only on `bg:resolve` and refuses it on every `showcompat` invocation as a usage error with exit 64. Showcompat and conjunction vendor acquisition do not classify the environment, apply the override or write an audit event before the vendor request. Until that gate is delivered, no canon-conforming production-like showcompat or conjunction vendor run is available.
+
+Persistent success on the legacy route must be determined by emitted JSON fields, not by assumption.
 
 # **14\. Evidence and validation workflow**
 
@@ -960,13 +968,13 @@ This recipe is not production-write authorization, OPS authorization, QA PASS, P
 
 PF29 must preserve these nonclaims:
 
-* POST /api/compat/v1 is not production-public. Current code returns 404 when APP\_ENV resolves to prod, production, or live, or when APP\_ENV is empty and ENGINE\_ENV resolves to one of those values.  
+* POST /api/compat/v1 is not production-public. Current code returns 404 when APP\_ENV resolves to prod, production, or live, or when APP\_ENV is empty and ENGINE\_ENV resolves to one of those values. Canon classifies the compat namespace, `/api/compat/v1` and its descendants, as a dev/admin-only surface: outside production-like posture it is served only when APP\_ENV is exactly `dev`, `test` or `local`, with no trimming or case-folding, and any other value, including an unset or empty APP\_ENV, refuses with `ERR_WRITER_FORBIDDEN` (403) before any compat work; ENGINE\_ENV never admits it. \[Current gap\] The checked-in guard refuses only production-like posture and treats unset APP\_ENV and ENGINE\_ENV as dev, so it still serves the route when APP\_ENV is unset or empty and ENGINE\_ENV is not production-like, when APP\_ENV is a case or whitespace variant of `dev`, `test` or `local`, and when it is `staging` or another unrecognized value. Run local HTTP compat with APP\_ENV=dev, as the §4.1 harness does. No credential is required while the surface stays dev/admin-only; serving it in any other environment needs a later decision, which PF04-Canon-HDE-Governance and PF05-Canon-HDE-CLI-API-Vendor-Ref own.  
     
 * /internal/dev/sampler and /dev/\*/conjunction are dev/test/local-only.  
     
 * GET /reader is a dev/local Reader v1 harness route and requires safe fixture chart paths.  
     
-* Current configured-v2 bg:resolve \--source vendor \--dry-run may use the version-neutral charts route and deterministic v2 ChartResult adapter. For non-v2 configured bases, explicit legacy BodyGraph fallback is preserved.  
+* Current configured-v2 bg:resolve \--source vendor \--dry-run may use the version-neutral charts route and deterministic v2 ChartResult adapter. A configured base whose final path segment is exactly `v1` selects the retained legacy BodyGraph route, which is legacy selection, not fallback. Canon gives no other non-v2 base a route; the checked-in classifier still sends one to the legacy route \[Current gap\] (§11.3).  
     
 * Current configured-v2 repository surfaces support scoped dry-run mapping, mapped v2 output feeding compatibility computation, and bounded mapped-cache persistence of adapter-mapped HDE data. This guide does not establish execution or acceptance of any separate OPS smoke. These surfaces do not authorize production upsert, public Reader changes, new public routes, app-side vendor ownership, or broad HumanDesignAPI v2 platform conformance.  
     
@@ -982,7 +990,7 @@ Additional Gate/Reader limits:
 * The current admitted release declaration is 1.3.0 with 45 members. Source-tree inspection is not an admission run; packaged wheel admission remains a recorded gap with the packaging owner and Product Owner.
 * In the checked-in application factories, `adapter.factory`, `adapter.http_reader.create_app` and `adapter.wsgi`, an unknown path answers 404 with the governed `ERR_NOT_FOUND` JSON envelope, not framework HTML. PF05-Canon-HDE-CLI-API-Vendor-Ref owns those bytes; a checked-in handler does not prove a deployed answer.
 * `--dump-reader` remains v1-only. The CLI help describes ordinary `showcompat` stdout as the canonical `magic10_compat_result.v1` document, matching its handler, and names `--dump-reader` as the only source of Reader v1 bytes. `scripts/hd_cli.py` is a separate legacy stub that emits `open_leader`; do not use it as proof of the supported Reader contract. The historical `test_cli_proof.py` failure and the recorded unselected test baseline remain out-of-lane, not fresh results of this revision.
-* `--allow-prod-vendor <AUTHORIZATION_REF>` is implemented, for `hdctl bg:resolve --source vendor` only. A production-like environment requires it for any vendor access and a recognized non-production environment refuses it; only an authenticated human initiator supplies it. It permits one bounded vendor read and authorizes no `--upsert`, production write, public Reader or Aux vendor traffic, or opening of a closed rail (§11.2, §13.3). PF05-Canon-HDE-CLI-API-Vendor-Ref owns the flag, environment classification, evaluation order and audit contract. The checked-in implementation does not prove a live or deployed override run.
+* `--allow-prod-vendor <AUTHORIZATION_REF>` is implemented, for `hdctl bg:resolve --source vendor` only. A production-like environment requires it for any vendor access and a recognized non-production environment refuses it; only an authenticated human initiator supplies it. It permits one bounded vendor read and authorizes no `--upsert`, production write, public Reader or Aux vendor traffic, or opening of a closed rail (§11.2, §13.3). Canon extends the same override to `hdctl showcompat --source vendor` and to vendor-selecting `hdctl showcompat --conjunction`, with at most one vendor acquisition per party; the checked-in CLI refuses the flag on `showcompat` as a usage error, and its vendor acquisition applies no override \[Current gap\] (§13.3). PF05-Canon-HDE-CLI-API-Vendor-Ref owns the flag, environment classification, evaluation order and audit contract. The checked-in implementation does not prove a live or deployed override run.
 * Dev GET `/reader` requires APP_ENV exactly `dev`, and the dev sampler and conjunction dev routes require exactly `dev`, `test` or `local`. Neither gate trims or case-folds the value, and an unset value refuses.
 * The supplied QA record proves bounded offline/in-process Reader v1/v2 behavior and a synthetic live vendor-backed CLI AB/BA run with Reader v1 dumps. It does not prove exact vendor resource/auth family, mapped-cache persistence, rate-limit/error handling, Reader v2 live HTTP success or deployment. The live current-row readiness and live DB Reader v1/v2 success observations remain environment-blocked.
 * HDE-EPIC040 was exceptionally closed by its recorded owner. That decision resolved the historical evidence landing/indexing gap; it did not establish an ordinary close pack, PF09 movement, canon publication, activation, deployment or the deferred live facts.
@@ -995,15 +1003,15 @@ Additional Gate/Reader limits:
 | VERSION\_FLAG\_WITH\_COMMAND | \--version was passed with another command. | Run hdctl \--version by itself. |
 | DEV\_ADMIN\_ONLY | A dev/admin CLI command was run without APP\_ENV=dev, test, or local. | Add APP\_ENV=dev for local QA. |
 | HTTP 403 from /internal/dev/sampler | APP\_ENV is not dev, test, or local. | Restart the harness with APP\_ENV=dev. |
-| HTTP 404 from POST /api/compat/v1 in prod | Expected current production block. | Use dev/QA HTTP compat locally or an internal CLI/server-side production workflow. |
+| HTTP 404 from POST /api/compat/v1 in prod | Expected current production block. Canon also refuses the route outside production with `ERR_WRITER_FORBIDDEN` (403) unless APP\_ENV is exactly `dev`, `test` or `local`; the checked-in guard does not yet return that refusal \[Current gap\] (§16). | Use dev/QA HTTP compat locally with APP\_ENV=dev, or an internal CLI/server-side production workflow. |
 | ERR\_READER\_FORBIDDEN | Reader v1 route was called outside APP\_ENV=dev. | Use the local dev harness for GET /reader, or the production POST /api/reader versioned route with existing current-row IDs (§6.4). |
 | ERR\_READER\_MISSING\_TZ\_A or ERR\_READER\_MISSING\_TZ\_B | Fixture chart lacks timezone and no override was supplied. | Add a\_tz or b\_tz, or use fixture files that include timezone. |
 | MISSING\_VENDOR\_INPUT | Vendor source was requested without full birth tuple. | Supply birthdate, birthtime, and location. |
 | PROVIDER\_REFUSED | Vendor source was attempted under closed rails. | Confirm authorization, then run with SAFE\_MODE=0 ALLOW\_NETWORK=1. |
 | PROVIDER\_NETWORK\_BLOCKED | Network access is disabled. | Confirm authorization and set ALLOW\_NETWORK=1 only for bounded open-rails runs. |
 | PROVIDER\_CONFIG\_MISSING | Required vendor config is absent or the configured base is not HTTPS. | Confirm HD\_API\_BASE\_URL, HD\_API\_KEY, and when needed GEO\_API\_KEY, without printing values, and confirm the configured base uses HTTPS. |
-| PROVIDER\_CONFIG\_INVALID | Vendor configuration is ambiguous or violates contract. For bg:resolve \--source vendor, this includes an unset or unrecognized APP\_ENV and ENGINE\_ENV, or the two disagreeing. | Check for conflicting HD\_API\_BASE\_URL and HDAPI\_BASE\_URL or unpinned vendor policy. For bg:resolve \--source vendor, set APP\_ENV to the recognized value that names the actual environment (§11.2). |
-| PROVIDER\_PROD\_OVERRIDE\_REQUIRED, PROVIDER\_PROD\_OVERRIDE\_INVALID, or PROVIDER\_AUDIT\_UNAVAILABLE | bg:resolve \--source vendor ran in a production-like environment without \--allow-prod-vendor, supplied the flag in a recognized non-production environment, or could not resolve the authenticated actor or write the pre-I/O audit event. | Do not change the environment value to avoid the refusal. Only an authenticated human initiator supplies the flag (§13.3); for non-production work, use §11.2 without it. |
+| PROVIDER\_CONFIG\_INVALID | Vendor configuration is ambiguous or violates contract. For bg:resolve \--source vendor, this includes an unset or unrecognized APP\_ENV and ENGINE\_ENV, or the two disagreeing. Canon gives `showcompat --source vendor` and vendor-selecting conjunction the same environment refusal; the checked-in `showcompat` does not yet classify the environment \[Current gap\] (§13.3). | Check for conflicting HD\_API\_BASE\_URL and HDAPI\_BASE\_URL or unpinned vendor policy. For bg:resolve \--source vendor, set APP\_ENV to the recognized value that names the actual environment (§11.2). |
+| PROVIDER\_PROD\_OVERRIDE\_REQUIRED, PROVIDER\_PROD\_OVERRIDE\_INVALID, or PROVIDER\_AUDIT\_UNAVAILABLE | bg:resolve \--source vendor ran in a production-like environment without \--allow-prod-vendor, supplied the flag in a recognized non-production environment, or could not resolve the authenticated actor or write the pre-I/O audit event. Canon gives `showcompat --source vendor` and vendor-selecting conjunction the same refusals, on the showcompat error carrier with exit 1; the checked-in `showcompat` does not yet emit them and refuses the flag as a usage error with exit 64 \[Current gap\] (§13.3). | Do not change the environment value to avoid the refusal. Only an authenticated human initiator supplies the flag (§13.3); for non-production work, use §11.2 without it. No canon-conforming production-like showcompat or conjunction vendor run is available until that gate is delivered (§13.3). |
 | PROVIDER\_ROUTE\_REQUIRES\_ADAPTER | Generic BodyGraph ingest attempted to build a configured-v2 chart request outside the resolver adapter path. | Use bg:resolve \--source vendor through the configured-v2 resolver path. Add \--dry-run for mapping-only use; add \--upsert only for the authorized bounded persistence workflow in §11.4. Do not treat generic BodyGraph ingest as adapter-backed v2 resolution. |
 | PROVIDER\_WRITE\_UNSUPPORTED | Explicit upsert intent is missing, the environment is production-like, or the mapped-cache input or projection violates the supported contract. | Use \--dry-run for mapping-only work. Use \--upsert only within the authorized non-production workflow in §11.4. Never bypass a production-like refusal. |
 | DB\_WRITER\_UNAVAILABLE | DATABASE\_URL is absent or unavailable, a retired bridge key is present, or the sanctioned direct provider or write transaction could not be used. | Confirm authorization and names-only DATABASE\_URL presence, remove retired bridge keys from the execution environment, and retry only within the authorized workflow. Do not print values or fall back to another transport. |
