@@ -9,13 +9,13 @@ This is the record report for the updated HDE Phased Epics file produced by GTWP
 | Artifact | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF20/PF20-Reference-HDE-Phased-Epicsv1.9.7.md` |
 | Logical document | `PF20-Reference-HDE-Phased-Epics`, Reference |
 | Internal version | v1.9.7 (from v1.9.6) |
-| Size and lines | 1,071,699 bytes, 11,669 lines |
-| SHA-256 | `0ab1ac760ad93b22363e4ce2734bbeb247800878451f87d8c5c02193bead94f7` |
+| Size and lines | 1,072,177 bytes, 11,669 lines |
+| SHA-256 | `4c84bbbca31407f94bd704643b3e6bc5f6497a2e95e10aafffe3be38b2718520` (revision 2; see §11) |
 | Change | One new historical record, `### **2.27 HDE-EPIC041 Epic Specification — Separation Pass 4**`, appended after §2.26, and three document-control fields |
 | Prompt | TW-RECORD-10 — Update Epic History — 100926.1, Notion page `3f44590a05eb81be8aacdd5b075d2605`, fetched live in this session (the Notion tool reported the page as of `2026-10-09T11:05:22.175Z`) |
 | Task | GTWPE ledger `gtwpe-20261101-pf10-v14-0-5`, task T-10, route RECORD-10 |
 | Execution date | 2026-11-02 |
-| Run identity | Single run; no earlier output existed at this path. |
+| Run identity | Single run; no earlier output existed at this path. Revision 2 corrects the same run in place under the same output identity (§11). |
 | Status | A proposed replacement carried in draft PR amthorn78/glow-hdengine-v2#826. It is not canon. Publishing it is Nathan's separately authorized action. |
 
 ## 2. Original
@@ -96,7 +96,7 @@ Each change was made by `apply_pf20.py`, a local script that refuses to run unle
 | 1 | l.5 | `**Version:** v1.9.6` | `**Version:** v1.9.7` | One bump in the established patch scheme; the ledger names the final file v1.9.7 |
 | 2 | l.7 | `**Effective date:** 2026-10-09` | `**Effective date:** 2026-11-02` | Actual execution date |
 | 3 | l.9 | `**Last Update Gate:** HDE-EPIC040-specification-v1.1-approved.md; HDE-EPIC040-CL-E-10-closure-decision-v1.2.md; HDE-EPIC040-CL-E-10-closure-decision-v1.0.md; BN 13.5` | `**Last Update Gate:** HDE-EPIC041-epic-specification-v1.1.md; HDE-EPIC041-epic-specification-review-v1.1.md; HDE-EPIC041-CL-E-10-closure-decision-v1.0.md; HDE-EPIC041-CL-20-post-closure-record-v1.0.md; BN 14.0.5` | TW-RECORD-10 gate rule; see I-5 |
-| 4 | l.11453 to 11669 (217 lines, 52,636 bytes, SHA-256 `87ab49b3e654aed5c86a2da9cd0a7431e41ede3e0134e18b71ca8f48b3c5d536`) | (none) | §2.27, sections 2.27.1 to 2.27.8 | The assigned rows (§5); appended after §2.26, whose last line is original l.11451 followed by the blank l.11452 |
+| 4 | l.11453 to 11669 (217 lines, 53,114 bytes, SHA-256 `fa5462eb91051018c5f6de7b5f72b65f1016a5eba318560a3eed5740d4d88948`) | (none) | §2.27, sections 2.27.1 to 2.27.8 | The assigned rows (§5); appended after §2.26, whose last line is original l.11451 followed by the blank l.11452 |
 
 Unchanged control field: l.11 `**Invocation tag:** INV-f2ac55d77ce9aacc` (I-2). The original has no revision history, change log or other restatement of its version or date: `v1.9.6` and `2026-10-09` each occur once, at l.5 and l.7.
 
@@ -111,7 +111,7 @@ Entry form follows the precedent §2.26: eight `#### **2.27.N` sections with the
 - **I-3 HDE Build Notes citation.** The entry names HDE Build Notes by title only, with no addendum number, heading number or version, as AGENTS.md and PF03 require of a PF document other than PF10. The gate value `BN 14.0.5` is the gate format TW-RECORD-10 prescribes, not a citation. The artifact-type value `PF10_BUILD_NOTES_ADDENDUM` appears once as a literal enum value (2.27.6), not as a citation.
 - **I-4 Ellipsis.** PF03 forbids the three-dot ASCII ellipsis and U+2026. The new entry contains neither. The original's 22 three-dot and 19 U+2026 occurrences sit in earlier historical records and are unchanged.
 - **I-5 Last Update Gate.** The Specification filename comes first. The review follows it because the Specification file keeps its authored `SPECIFICATION_PENDING` / `ASK OK?` front matter and the review is the approval record. CL-E-10 and CL-20 follow as the closure and post-closure sources whose content the entry carries. `BN 14.0.5` closes the gate. Evidence files linked from the entry (Plan, QA Plan, QA Report, RCA, close pack, lineage reviews) are evidence references, not change sources; the precedent §2.26 gate likewise lists only its Specification, closure decisions and HDE Build Notes.
-- **I-6 Route of the pending checklist update.** The handoff describes the Separation checklist update as approved in 2.14 and applied only by the Product Owner's manual paste (U-3). The ledger correction of 2026-11-02 superseded H-01 and routed HDE Build Checklist — Separation to T-13. The entry attributes the manual-paste route to HDE Build Notes as recorded (2.27.4, 2.27.7), states the update as approved, not applied and pending, and does not name T-13, a working record. If Nathan wants the entry to name the T-13 route, it is a one-line change in 2.27.7.
+- **I-6 Route of the pending checklist update.** HDE Build Notes 2.14 U-3 (l.1593) records application by the Product Owner's manual paste with no Technical Writing route. The ledger correction of 2026-11-02 superseded H-01 and routed HDE Build Checklist — Separation to T-13, and after delivery Nathan directed, on 2026-11-02: "all updates are done via the GTWPE workflow". No PF canon on `main` states the GTWPE route (searched `GTWPE`, "Technical Writing flow", "manual paste" in `docs/pfcanon/`). Revision 2 therefore keeps U-3 as the recorded history and states that the Product Owner's direction of 2026-11-02 replaces that route: the update is applied through the GTWPE workflow, which derives the document-control values (ledger T-13 row), with the approved redlines as source content (2.27.4, 2.27.7). The owner column of the 2.27.7 row reads "GTWPE workflow, then the Product Owner's publication; pending". The entry names the workflow, not the T-13 task, a working record.
 - **I-7 Earlier HDE-EPIC030 record.** §2.15.7 records the `engine/charts/loader.py` seam classification as carried forward with destination Epic Unknown. That record states what its inputs showed and is not edited. The new entry adds a cross-reference in 2.27.3 ("Earlier archive record").
 - **I-8 Scope limit.** HDE Build Notes 2.16 and the `HDE-EPIC041-POSTCLOSE-OPS01` execution result are outside T-10 (2.16 routes to T-01). The entry states only that the live test is carried by the Ops task, and says it does not state that task's execution or result.
 - **I-9 Sibling outputs.** The branch holds unpublished outputs of T-09 (HDE Architecture v2.4.8, DELTA-001) and T-05 (HDE Mechanics Guide v3.5.10, DELTA-002). `docs/pfcanon/` is unchanged on `main`, so the entry records DELTA-001 and DELTA-002 drainage as pending.
@@ -164,7 +164,7 @@ No chunk holds HDE-EPIC041 content. The only chart-loader text in the original i
 
 - The output is a proposed replacement, not canon. Nothing was published, approved or drained by this task.
 - The pending owner actions recorded in the entry remain open: the Separation checklist update, DELTA-001 to DELTA-003, CCR-1, CCR-5, CCR-6 and M-0 to M-3.
-- I-6: the route wording for the pending checklist update is a judgment between the handoff and the corrected ledger; Nathan may want T-13 named.
+- I-6: the GTWPE route rests on the Product Owner's direction of 2026-11-02, which no PF canon text yet records; HDE Build Notes still records U-3 as written.
 - Facts the selected sources do not give are written as such in the entry: Kronos's platform identity; the WU-PR-03 reviewed head; a separate implementation-start date.
 - The clone is shallow (50 commits), so landing facts are cited from the records, not re-derived from history.
 - The entry does not state the outcome of `HDE-EPIC041-POSTCLOSE-OPS01` (I-8).
@@ -177,3 +177,11 @@ No chunk holds HDE-EPIC041 content. The only chart-loader text in the original i
 - `python tools/ci/prepush_check.py --base 71c6cf653b367cf8961347f243469252f890faf1 --head a2047fe69b691e7536a4c9548f28dc95cbe46340 lanes build-notes`, under `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`: exit 0. `CI_CHANGE_CLASSIFICATION:event=pull_request;reason=documentation_only;paths=2;lanes=none`; build notes `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, 385,734 bytes, SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`; `PREPUSH_CHECK_RESULT: PASS lanes=PASS build-notes=PASS`, repository unchanged.
 - `python tools/ci/prepush_check.py` with one `--path` for each of the two outputs and `LEDGER.md`, `membership`, same rails: exit 0. All three paths `not-member` of release 1.3.0 (45 members, `release_id` `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e`); `PREPUSH_CHECK_RESULT: PASS membership=PASS`.
 - The tool's own nonclaim applies: its result is not CI's result, not QA and not governed evidence.
+
+## 11. Revision 2
+
+- Trigger: Nathan's answer of 2026-11-02 to the I-6 question, verbatim: "all updates are done via the GTWPE workflow".
+- Change: two passages of the entry. Output l.11518 (2.27.4, the later-drain paragraph) adds that the Product Owner's direction replaces the U-3 manual-paste route with the GTWPE workflow. Output l.11634 (2.27.7, the checklist-update row) states the GTWPE route and sets the owner to "GTWPE workflow, then the Product Owner's publication; pending". No other entry text, control field or line count changed.
+- Method: the output was rebuilt, not edited in place by hand. It was copied again from `origin/main` (blob `e168dc0eba810fc235c8c6030f5df5376517c8ef` confirmed by `git hash-object`), and `apply_pf20.py` was run with the revised entry. The Last Update Gate is unchanged, because the direction is not a source file and a ledger is never a gate.
+- Verification: against the original, only l.5, 7 and 9 differ before the entry, and the bytes after them are exactly the revised entry. Against revision 1 (`0ab1ac76`, 1,071,699 bytes), only l.11518 and 11634 differ. The entry has no three-dot ellipsis, no U+2026 and no drafting or status markers. Both revised lines were read back from the saved file.
+- Revision 1 output, SHA-256 `0ab1ac760ad93b22363e4ce2734bbeb247800878451f87d8c5c02193bead94f7`, stays in commit `a2047fe69b691e7536a4c9548f28dc95cbe46340`. The commit holding revision 2 cannot name itself; the session's final response names it.
