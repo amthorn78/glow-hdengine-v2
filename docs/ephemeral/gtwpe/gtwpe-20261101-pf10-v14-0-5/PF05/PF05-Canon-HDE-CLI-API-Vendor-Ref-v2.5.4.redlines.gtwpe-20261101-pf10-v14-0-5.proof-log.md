@@ -1,4 +1,4 @@
-# Proof log — PF05 redlines — gtwpe-20261101-pf10-v14-0-5 — T-02
+# Proof log — PF05 redlines — gtwpe-20261101-pf10-v14-0-5 — T-02 — drain-r2
 
 ## 1. Identity
 
@@ -7,12 +7,47 @@
 | Artifact this log documents | `PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.redlines.gtwpe-20261101-pf10-v14-0-5.md`, in this directory |
 | This log | `PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md` |
 | Directory | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF05/` |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-02/drain-r1` (first preparation run; no earlier output existed in this directory) |
-| Preparer | TW-DRAIN-10 "Prepare PF Document Redlines", version 100926.1, Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live at the start of this step (page last edited 2026-10-09T11:05:22Z) |
-| Session | The Claude Code document session Nathan started for T-02, on branch `claude/gtwpe-triage-authoring-j94ewf`, 2026-11-02 (UTC). No subagent, reviewer or other session was used. |
-| Authorized sequence | Nathan's handoff authorizes TW-DRAIN-10, then TW-APPLY-10 100926.1 (page `3f44590a05eb81eebff6e3afa3d9aa5b`) after a `READY` / `COMPLETE_PACKAGE` result, in this session |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-02/drain-r2`. It supersedes `drain-r1` (commit `0d22343e742c08012fc3bb6d613fb0c334026725`) at the same paths, on the Product Owner's direction of 2026-11-02 (§1A). `drain-r1` stays readable in that commit. |
+| Preparer | TW-DRAIN-10 "Prepare PF Document Redlines", version 100926.1, Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live at the start of each run (`drain-r1` and `drain-r2`; page last edited 2026-10-09T11:05:22Z, unchanged between them) |
+| Session | The Claude Code document session Nathan started for T-02, on branch `claude/gtwpe-triage-authoring-j94ewf`, 2026-11-02 (UTC). `drain-r2` runs in the same session, under Nathan's T-02 remediation handoff. No subagent, reviewer or other session was used. |
+| Authorized sequence | The remediation handoff authorizes TW-DRAIN-10 (`drain-r2`), then TW-APPLY-10 100926.1 (page `3f44590a05eb81eebff6e3afa3d9aa5b`, run `apply-r2`), in this session, replacing the `apply-r1` output |
 | Preparation outcome | `READY` |
 | Save state | Recorded in §11 after both files were read back |
+
+## 1A. Correction in drain-r2 (Product Owner direction, 2026-11-02)
+
+Direction. In the T-02 remediation handoff of 2026-11-02, the Product Owner directed a corrected package. Its terms:
+
+- Location: §1 "Map at a Glance", the bullet "Legacy BodyGraph fallback and bounded HumanDesignAPI v2 chart path — implemented with remaining PF05 gaps." (v2.5.4 line 119).
+- `drain-r1` §8 kept this bullet as a dated repository-state record. It stays a dated record, but it must stop calling the legacy route a fallback. Its title and the sentence "non-v2 bases retain an explicit legacy `bodygraphs` fallback" contradict HDE Build Notes v14.0.5 2.1 D-2 ("The v1 path is retained legacy selection, not fallback"; "No non-v2 base reaches bodygraphs by fallback") and PF05's own §7.1.10.
+- The corrected bullet must: (a) keep its pin `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, its nonclaims and its pointer to §§7.1.10, 7.2 and 7.4; (b) say that a terminal v1 base selects the retained legacy `bodygraphs` route under §7.1.10, as legacy selection, not fallback; (c) say that legacy selection by any other non-v2 base, at that pin, is the material gap recorded in §7.2.0, not a retained capability; (d) not use "fallback" for the legacy route, in the title or the body.
+- Before writing (c), check the current behaviour read-only, and stop if the code no longer selects legacy for other non-v2 bases. Search all of v2.5.4 for any other text that calls the legacy route a fallback.
+- Unchanged: the thirteen `drain-r1` operations, renumbered only if position requires it; RL-13's v2.5.5 Change Log entry is extended to cover this change; §7.2.0 stays as written (H-09); AGENTS.md is not edited (H-05); the source is HDE Build Notes v14.0.5 2.1 D-2, lines 277–344 (row C-02), and the Last Update Gate stays `BN 14.0.5`.
+
+What `drain-r1` said and what is now true. `drain-r1` §8 left line 119 unchanged as "a dated repository-state record", on the ground that it described implementation, not policy. Its wording still calls the legacy route a fallback, in the title and the body, and so restates the posture D-2 rejects. `drain-r2` adds RL-14, which keeps the record and its pin and corrects only that characterization.
+
+Behaviour check (read-only, closed rails, `origin/main` `84d6d1cad95c67788336d174dc4b8922d9bb0cb2`; `engine/` is identical at `e2b7427`):
+
+- `engine/bodygraph/vendor_client.py` lines 102–109: `_configured_base_version` lower-cases every path segment and returns `v2` if any segment is `v2`, `v1` if any is `v1`, otherwise `unversioned`.
+- Lines 124–153: `classify_bg_resolve_route_policy` gives the v2 chart route only for `v2`. Every other result, including `unversioned`, gets resource `bodygraphs`, route family `legacy_bodygraph`, classification `explicit_legacy_fallback` and `supported: True`.
+- `engine/bodygraph/resolver.py` lines 686–705: `_classify_env_route_policy` passes the configured base straight to that classifier.
+
+So the code still selects the legacy route for non-v2 bases other than a terminal `v1`, and (c) holds. The pin `cc754cfb` itself is not in this clone's shallow history and could not be read. RL-14 therefore makes no new claim about it: it re-characterizes the behaviour the dated record already states at that pin, which current code still shows.
+
+Search. An exact case-insensitive search of all of v2.5.4 for "fallback", "fall back", "falls back" and "falling back" found 25 lines. Only two call the legacy route a fallback:
+
+- Line 119, the bullet above. RL-14 corrects it.
+- Line 956, §4.6 ("Non-v2 configured bases MAY preserve the legacy BodyGraph route only as explicit legacy fallback"). `drain-r1` RL-01 already corrects it.
+
+The other 23 concern vendor, local, timezone, credential, base-URL or narrative fallbacks, or negate fallback (lines 3493 and 4306). After `drain-r2`, every remaining "fallback" near "legacy" in the simulated result is a negation. A T-04 finding of line 119 alone is consistent with reading v2.5.5, where line 956 was already corrected.
+
+Changes in `drain-r2`:
+
+- RL-14 (new, CONSISTENCY, row C-02): replaces line 119. The title becomes "Retained legacy BodyGraph selection and bounded HumanDesignAPI v2 chart path — implemented with remaining PF05 gaps." The clause "; non-v2 bases retain an explicit legacy `bodygraphs` fallback." becomes ". A terminal `v1` base selects the retained legacy `bodygraphs` route under §7.1.10, which is legacy selection, not fallback. Legacy selection by any other non-v2 base at that pin is the material gap recorded in §7.2.0, not a retained capability." The pin, the Fermentation sentence, the nonclaims and "See §§7.1.10, 7.2, and 7.4." are unchanged. The word "fallback" now appears in the bullet only in "not fallback", which (b) requires.
+- RL-13 (extended): the v2.5.5 Change Log entry adds "and correct the §1 legacy-route wording to terminal-v1 legacy selection with the §7.2.0 non-v2 gap". The first `drain-r2` build worded this "instead of a legacy fallback". It was reworded before saving so that the entry doesn't use the term either.
+- RL-01 to RL-12: unchanged, byte for byte. No renumbering: each operation binds to its own unique original span, so IDs need not follow document order. RL-14 sits at line 119, before RL-01.
+
+Not changed by this correction: §7.2.0 (H-09, held) and AGENTS.md (H-05). The Product Owner separately instructed the AGENTS.md edit for a new PR, and it went to draft PR [amthorn78/glow-hdengine-v2#827](https://github.com/amthorn78/glow-hdengine-v2/pull/827), on its own branch, outside this package and this ledger task.
 
 ## 2. Target
 
@@ -25,9 +60,9 @@
 | SHA-256 of the original bytes | `1de30cbb6cde8be9c7ae3f0a518e871d22cc47b02a87b3209723e8b3d1213028` |
 | Size | 327,342 bytes; 4,461 lines; UTF-8; LF only (zero CR bytes); ends with `---` and one blank line |
 | Read at | `origin/main` `e2b7427ff418ca8f08f05587c4a541308a76da56`, the handoff and ledger baseline |
-| Currency check | `origin/main` moved to `84d6d1cad95c67788336d174dc4b8922d9bb0cb2` during the session. `git diff --stat e2b7427 origin/main -- docs/pfcanon/` is empty, and the PF05, PF10 and PF03 blobs are identical at both commits. No target or source change affects this package. |
+| Currency check | `origin/main` moved to `84d6d1cad95c67788336d174dc4b8922d9bb0cb2` during the session. `git diff --stat e2b7427 origin/main -- docs/pfcanon/` is empty, and the PF05, PF10 and PF03 blobs are identical at both commits. No target or source change affects this package. Re-checked for `drain-r2`: unchanged. |
 | Scope anchor | §0.2 "Scope", Ownership bullet: PF05 owns the bytes for CLI, Reader transport and Vendor ingest |
-| Coverage | Complete. Lines 1–4,461 were read in full, in windows of up to 400 lines with no gap: 1–400, 400–800, 800–1200, 1200–1600, 1600–2000, 2000–2400, 2400–2800, 2800–3200, 3200–3529, 3529–3858, 3858–4178, 4178–4461. Every heading, table, fence and appendix was inside a window. |
+| Coverage | Complete. `drain-r2` reuses this session's complete reading of the same verified bytes, and re-read line 119 and the whole-file fallback search above. Lines 1–4,461 were read in full, in windows of up to 400 lines with no gap: 1–400, 400–800, 800–1200, 1200–1600, 1600–2000, 2000–2400, 2400–2800, 2800–3200, 3200–3529, 3529–3858, 3858–4178, 4178–4461. Every heading, table, fence and appendix was inside a window. |
 
 Baseline document-control schema, for TW-APPLY-10 (§0.1 "Header", lines 5–10, exact field order):
 
@@ -69,6 +104,7 @@ Other inputs:
 | Ledger `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` | Commit `142feb35144d8795f927e0c78b665ace52279064`, the head of `claude/gtwpe-triage-authoring-j94ewf` at session start | Routing only: task T-02, rows C-01, C-02, C-03, support C-06, holds H-05 and H-09. Not a change source and not a Last Update Gate. |
 | `docs/pfcanon/PF03-Reference-Technical-Writing-Best-Practices-v1.8.8.md` | v1.8.8, blob `504712df548a02f3aa4e7b8c37027385e46a3878`, 633 lines, read in full | Common editorial standard |
 | Draft PR [amthorn78/glow-hdengine-v2#826](https://github.com/amthorn78/glow-hdengine-v2/pull/826) | Open, draft, head `142feb3` at session start | Shared execution destination |
+| Product Owner direction, 2026-11-02 (T-02 remediation handoff) | Inline in this session; terms in §1A | Correction authority for RL-14 and the RL-13 extension. Not a change source for the Last Update Gate, which stays `BN 14.0.5`. |
 
 Supporting reading, not drainage:
 
@@ -100,6 +136,7 @@ All inspection was read-only, with `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`
 | The compat chart resolver applies the generic rails but not the production override | `engine/bodygraph/resolver.py` line 1083 `resolve_compat_chart`: its body (lines 1083–1175) references rails but no authorization reference, override or audit. The override lives in lines 171–380 (`resolve_bodygraph` path). |
 | The compat route guard refuses only production-like posture | `engine/http/compat_handler.py` line 5 imports `_compute_env_mode` from `adapter/env_guard.py`; line 112 returns 404 only when it yields `prod` |
 | `_compute_env_mode` treats absent or blank `APP_ENV` and `ENGINE_ENV` as `dev` and passes other values through | `adapter/env_guard.py` line 17 (`_PROD_ALIASES = {"prod", "production", "live"}`) and lines 31–51 |
+| (`drain-r2`) Every non-v2 base other than a terminal `v1`, including an unversioned one, still selects the legacy route | `engine/bodygraph/vendor_client.py` lines 102–109 and 124–153; `engine/bodygraph/resolver.py` lines 686–705 (§1A), checked at `84d6d1c` |
 
 These findings concern checked-in bytes only. They establish no runtime behavior, test result, deployment or acceptance.
 
@@ -135,7 +172,7 @@ Every change in the selected units has one disposition.
 | "Canon superseded": §7.1.11 implementation-state limit becomes a gap (l.259) | RL-06, RL-07; see §6 | §7.1.11 |
 | HDE Governance §3.1 unchanged (l.260) | No PF05 edit | — |
 | Drainage targets: HDE Users Guide §13.3 and §16 (l.265) | Out of this target: T-08 (PF29) | — |
-| Drainage target: AGENTS.md "Showcompat Live QA posture" (l.266) | Held, H-05: not a PF target; needs the Product Owner's explicit instruction | — |
+| Drainage target: AGENTS.md "Showcompat Live QA posture" (l.266) | H-05: not a PF target and not in this package. The Product Owner instructed it on 2026-11-02 for a separate PR (draft PR #827). | — |
 | Consequences for tests, evidence and frozen captures (l.268–273) | Not PF05 text; belongs to the implementing change (item 9). No edit. | — |
 | Left undecided: none (l.275) | Nothing to drain | — |
 
@@ -147,14 +184,14 @@ Every change in the selected units has one disposition.
 | Selection: terminal case-sensitive v2 and v1; every other base fails with `PROVIDER_ROUTE_UNSUPPORTED` before credential projection or I/O (l.284–286) | Already represented | §7.1.10 lines 3478–3480 |
 | The base: absolute HTTPS, host, no userinfo, query or fragment, ends in v1 or v2 (l.287) | Already represented | §7.1.10 line 3487 |
 | The v1 path is retained legacy selection, not fallback; retirement needs a separate versioned decision (l.288) | Already represented | §7.1.10 line 3493 |
-| No fallback: no non-v2 base reaches bodygraphs by fallback (l.289) | Already represented in §7.1.10 (lines 3480–3481, 3493). RL-01 removes the contradicting permission in §4.6 (line 956, "Non-v2 configured bases MAY preserve the legacy BodyGraph route only as explicit legacy fallback"). | §7.1.10; §4.6 |
+| No fallback: no non-v2 base reaches bodygraphs by fallback (l.289) | Already represented in §7.1.10 (lines 3480–3481, 3493). RL-01 removes the contradicting permission in §4.6 (line 956, "Non-v2 configured bases MAY preserve the legacy BodyGraph route only as explicit legacy fallback"). RL-14 (`drain-r2`) corrects the §1 dated record (line 119), which called the legacy route a fallback. | §7.1.10; §4.6; §1 |
 | The two canon rules fit together; single permitted classification; HDE Mechanics Guide §1.1 prohibitions (l.290–297) | Out of this target: it adds to HDE Mechanics Guide §1.1 (T-05). PF05 §1 line 123 already forbids inferring route or auth from hardcoded `/v1` or `/v2` strings; no conflict, no edit. | — |
 | Classification label `explicit_legacy_fallback` kept as an existing wire value (l.298) | Out of this target: it is a governed-evidence wire value, not a PF05 byte contract, and PF05 never mentions it (exact search, no occurrence). D-2 names no PF05 location for it. | — |
 | Basis (l.300–308) | Rationale only | — |
 | "Canon superseded": HDE Mechanics Guide §1.1 (two items), HDE Users Guide §11.3, §13.3, §16, Plan Templates route-policy posture (l.312–314, l.316) | Out of this target: T-05, T-08, T-07 | — |
 | "Canon superseded": HDE CLI/API/Vendor Ref §7.1.10 added to (l.315) | RL-05 | §7.1.10 |
 | Drainage target: §7.2.0, "the gap, once the implementing change delivers" (l.322) | Held, H-09 (see §8) | — |
-| Drainage target: AGENTS.md EPIC036 and EPIC038 lines (l.324) | Held, H-05 | — |
+| Drainage target: AGENTS.md EPIC036 and EPIC038 lines (l.324) | H-05: outside this package; draft PR #827 | — |
 | Consequences for tests, evidence and frozen captures (l.326–339) | Not PF05 text; implementing change. No edit. | — |
 | Left undecided: v1 retirement stays a separate versioned decision (l.341–343) | Already represented | §7.1.10 line 3493 |
 
@@ -197,13 +234,13 @@ Held. Not drafted.
 | ID | Item | What it waits for |
 | :---- | :---- | :---- |
 | H-09 | PF05 §7.2.0 gap row under D-2 (SRC-1 l.322), "broad non-v2 legacy selection", line 3626 | D-2 drains it only "once the implementing change delivers". That change is Candidate CRD Items List item 9, which is open (SRC-1 l.506) and has no CRD identity or Specification. The gap stays as written until item 9 delivers and the route classifier fails closed. |
-| H-05 | AGENTS.md edits under D-1 and D-2 (SRC-1 l.266, l.324, l.507) | Not a PF target. They need the Product Owner's explicit instruction. |
+| H-05 | AGENTS.md edits under D-1 and D-2 (SRC-1 l.266, l.324, l.507) | Not a PF target, and not in this package. The Product Owner instructed them on 2026-11-02 for a separate PR: draft PR [amthorn78/glow-hdengine-v2#827](https://github.com/amthorn78/glow-hdengine-v2/pull/827), on branch `claude/nifty-thompson-jjwptl`. |
 
 Considered and left unchanged, with reason:
 
 | PF05 location | Why no edit |
 | :---- | :---- |
-| §1 "Vendor ingest (HDAPI)", line 119: "non-v2 bases retain an explicit legacy `bodygraphs` fallback" | A dated repository-state record pinned to `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, pointing to the remaining gaps in §7.2. It describes implementation, not policy, and it changes when the H-09 gap closes. |
+| §1 "Vendor ingest (HDAPI)", line 119: "non-v2 bases retain an explicit legacy `bodygraphs` fallback" | Superseded in `drain-r2`. The `drain-r1` disposition, preserved as written: "A dated repository-state record pinned to `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, pointing to the remaining gaps in §7.2. It describes implementation, not policy, and it changes when the H-09 gap closes." That left the bullet calling the legacy route a fallback, contrary to D-2. By the Product Owner's direction, RL-14 now corrects it and keeps the dated record (§1A). |
 | §3.7 "Interim no-user QA mode": `showcompat --source vendor` in pre-Glow production QA | The subsection states that CLI bytes and flag semantics elsewhere in PF05 remain canonical. It does not say the flag is unneeded, so it does not conflict with §7.1.11. The operator-facing restatement D-1 names is AGENTS.md (H-05). |
 | §4.1.2 "Rails interaction" and §4.1.4 "Errors and exit codes" | Rails remain a necessary condition. §4.1.4's exit-1 single-token carrier is the carrier RL-11 points to. Neither conflicts. |
 | §4.1.6 "Implementation status" | The override gap is recorded once, in §7.1.11 (RL-07), which D-1 names. Repeating it would create a second home. |
@@ -220,13 +257,14 @@ No `Draft` status language, TODO, TBD or drafting note was found in PF05.
 - Every operation is `REPLACE` with an exact OLD block that occurs once in the whole original. Two of them insert new text by widening: RL-02 replaces the "Success body" bullet with the new gate sub-bullet, the revised bullet and three new bullets; RL-13 replaces the v2.5.4 Change Log line with itself plus the v2.5.5 line. This avoids an insertion gap that touches a replaced span.
 - PF10 citation rule. No redline cites HDE Build Notes by addendum, section, heading, version or line; it is named by title only, as PF05 §0.2 and PF03 §3 require.
 - Repository claims. All new repository claims use one snapshot, `e2b7427` (PF03 §4 step 5). Existing dated claims keep their own pins.
+- RL-14 is a consistency change, made on the Product Owner's direction (§1A). It keeps the bullet a dated record and adds no new repository claim at the pin.
 - RL-01 is a consistency change. The ledger routed C-02 to the §7.1.10 scope sentence only, but D-2's decision ("No non-v2 base reaches bodygraphs by fallback") also governs PF05 §4.6's contrary permission, which is in the selected unit's scope and in this target. Leaving it would keep PF05 contradicting both D-2 and its own §7.1.10.
 - RL-02's implementation-state bullet and RL-07's gap paragraph are qualifications, not new requirements. They keep the new Required-Now rules from reading as delivered (PF05 §0.3; PF03 §3 "Claim-state separation").
 - Anchors to other documents. RL-02 cites HDE-Governance §4.1.4, §8.3.2 and §8.3.4 and Glow-Infrastructure §2.2. Each anchor was confirmed in the owning document (§3), and PF05 already cites HDE-Governance by section elsewhere.
 
 ## 10. Producer validation
 
-Method. A scratch script, kept outside the repository, built every OLD and NEW literal. It checked that each OLD block occurs exactly once in the original, by character count over the whole file; that every quoted heading line occurs exactly once and precedes its span in order; that no two spans overlap or touch; and that no NEW literal adds an ellipsis. It then applied all thirteen operations in one pass to the unchanged original, by original position. A second, independent script parsed only the saved redlines file. It re-extracted each payload from its four-backtick fences, repeated the count, overlap and one-pass checks, and compared the result with the first script's.
+Method. A scratch script, kept outside the repository, built every OLD and NEW literal. It checked that each OLD block occurs exactly once in the original, by character count over the whole file; that every quoted heading line occurs exactly once and precedes its span in order; that no two spans overlap or touch; and that no NEW literal adds an ellipsis. It then applied all fourteen operations in one pass to the unchanged original, by original position. A second, independent script parsed only the saved redlines file. It re-extracted each payload from its four-backtick fences, repeated the count, overlap and one-pass checks, and compared the result with the first script's.
 
 | ID | Operation | Original line(s) | Expected / observed OLD count | Character span in the original | Conflicts |
 | :---- | :---- | :---- | :---- | :---- | :---- |
@@ -243,34 +281,36 @@ Method. A scratch script, kept outside the repository, built every OLD and NEW l
 | RL-11 | REPLACE | 3588 | 1 / 1 | [266196, 266426) | none |
 | RL-12 | REPLACE | 3604 | 1 / 1 | [267979, 268015) | none |
 | RL-13 | REPLACE | 4148 | 1 / 1 | [309120, 309474) | none |
+| RL-14 | REPLACE | 119 | 1 / 1 | [15975, 16690) | none |
 
 Results:
 
-- 13 of 13 operations resolve to exactly one occurrence. No `FIND_AND_REPLACE` is used, so the RL-045 rule has nothing to apply to.
+- 14 of 14 operations resolve to exactly one occurrence. No `FIND_AND_REPLACE` is used, so the RL-045 rule has nothing to apply to.
 - The spans are strictly ordered with gaps between them: no overlap, no shared boundary, no insertion at a replaced boundary, and no operation reads another's output.
 - After one-pass application, each NEW literal occurs exactly once. Each OLD literal is absent, except in RL-13, whose NEW literal keeps the v2.5.4 line by design.
-- The simulated result is 332,176 bytes with SHA-256 `a3c9a08b7f0c685bfd5ba6a59441f63b0a961e475587e86efcf9483a34a248ee`. The independent check of the saved file reproduced that hash exactly. The simulation was a scratch file only; TW-APPLY-10 produces the final PF and its document-control fields, so the final file will differ from the simulation in the header.
-- The diff between the original and the simulation was read in full. It touches only the thirteen spans above.
+- The `drain-r2` simulated result is 332,470 bytes with SHA-256 `1587ea2110a62813f82e43c715c45c5dc097aecc88aabb9c2f71914667e2bad6`. The independent check of the saved file reproduced that hash exactly. Against the `drain-r1` simulation (`a3c9a08b…48ee`), it differs only at line 119 and in the v2.5.5 Change Log line. The simulation was a scratch file only; TW-APPLY-10 produces the final PF and its document-control fields, so the final file will differ from the simulation in the header.
+- The diff between the original and the simulation was read in full. It touches only the fourteen spans above.
 
-Two corrections were made to this preparer's own package before it was signalled ready, and each was followed by a full rebuild and revalidation:
+Corrections to this preparer's own package. Each was followed by a full rebuild and revalidation of the whole batch:
 
 1. Before the first save, the residual-risk sentence in RL-02 was reworded for clarity.
 2. After the first save, a check of every HDE Build Notes line citation against the numbered source found that the "Source basis" fields of eleven redlines, and the matching rows of this log, cited lines a few positions off (for example D-1's three-path scope as l.229–235 instead of l.229–232). The citations were corrected in the redlines file and here. No OLD or NEW literal changed: the corrected redlines file re-validated to the same simulated SHA-256 `a3c9a08b7f0c685bfd5ba6a59441f63b0a961e475587e86efcf9483a34a248ee`. The first saved redlines file (SHA-256 `737318bdd3d9fce7641a08a83e872a2d84c6c8c1c5c6ee02f5b73f926f2fddc5`) was overwritten in the working tree before any commit; it was never committed or offered for application.
+3. `drain-r2`, on the Product Owner's direction (§1A): RL-14 added and RL-13 extended. Within the `drain-r2` build, RL-13's first wording ("instead of a legacy fallback") was replaced before saving, so that the entry doesn't use the term. The `drain-r1` file (SHA-256 `c1804a5954a288573ded0e427253d633aa0248fd96fb5d44c335a1e19aa1faab`) is overwritten at the same path; it remains in commit `0d22343`.
 
 ## 11. Save state
 
 | File | Path | Bytes | SHA-256 | Verified |
 | :---- | :---- | :---- | :---- | :---- |
-| Redlines | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF05/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.redlines.gtwpe-20261101-pf10-v14-0-5.md` | 22,317 (368 lines) | `c1804a5954a288573ded0e427253d633aa0248fd96fb5d44c335a1e19aa1faab` | Read back in full; byte-identical to the validated build; independent re-validation passed; ends with `END OF REDLINES` |
-| Proof log | This file | — | Not self-hashed | Read back in full after writing, and again after this receipt was added |
+| Redlines (`drain-r2`) | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF05/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.redlines.gtwpe-20261101-pf10-v14-0-5.md` | 25,034 (392 lines) | `cc0984889e9c9e3e40f23f6a86c5a05d32d78c5b21372a14fae1399378bb043a` | Byte-identical to the validated build; independent re-validation passed; read back in full; ends with `END OF REDLINES` |
+| Proof log (`drain-r2`) | This file | — | Not self-hashed | Read back in full after writing, and again after this receipt was added |
 
-Completion receipt (2026-11-02, UTC). Both files were read back in full from disk in this session. The redlines file matched the validated build byte for byte, ended with `END OF REDLINES`, and passed the independent re-validation (13 of 13 operations, count 1 each, non-overlapping, one-pass result SHA-256 `a3c9a08b7f0c685bfd5ba6a59441f63b0a961e475587e86efcf9483a34a248ee`). This log was read back in full and its identities agree with the redlines file: target, source, ledger rows, run identity `drain-r1`, preparer and outcome.
+Completion receipt (`drain-r2`, 2026-11-02, UTC). Both files were read back from disk in this session. The redlines file matched the validated build byte for byte, ended with `END OF REDLINES`, and passed the independent re-validation: 14 of 14 operations, count 1 each, non-overlapping, one-pass result SHA-256 `1587ea2110a62813f82e43c715c45c5dc097aecc88aabb9c2f71914667e2bad6`. Its diff against the `drain-r1` file is limited to the run identity, the simulated-result row, RL-13's new entry line and the added RL-14. This log was read back in full; its identities agree with the redlines file: target, source, ledger rows, run identity `drain-r2`, preparer and outcome.
 
 Save state: `COMPLETE_PACKAGE`. Preparation outcome: `READY`.
 
 ## 12. Next step
 
-On `READY` / `COMPLETE_PACKAGE`, the handoff authorizes TW-APPLY-10 100926.1 (Notion page `3f44590a05eb81eebff6e3afa3d9aa5b`) in this session, fetched live, with:
+On `READY` / `COMPLETE_PACKAGE`, the remediation handoff authorizes TW-APPLY-10 100926.1 (Notion page `3f44590a05eb81eebff6e3afa3d9aa5b`) in this session, fetched live, as run `apply-r2`, with:
 
 - original: `docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.md` at `e2b7427`, SHA-256 `1de30cbb6cde8be9c7ae3f0a518e871d22cc47b02a87b3209723e8b3d1213028`;
 - redlines and this proof log, at the paths in §11;
@@ -280,6 +320,6 @@ On `READY` / `COMPLETE_PACKAGE`, the handoff authorizes TW-APPLY-10 100926.1 (No
 - final output: the revised PF under the name TW-APPLY-10 derives (expected `PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.5.md`) with its `.proof-log` file, in this directory;
 - diagnostic, if needed: `PF05-apply-diagnostic.gtwpe-20261101-pf10-v14-0-5.md`, in this directory.
 
-A returned diagnostic comes back to this preparer, which issues a corrected package under a new run identity (`drain-r2`) and revalidates the whole batch.
+A returned diagnostic comes back to this preparer, which issues a corrected package under a new run identity (`drain-r3`) and revalidates the whole batch.
 
 This package changes no PF canon, Specification or AGENTS.md. It establishes no implementation, QA verdict, acceptance, deployment or closure.

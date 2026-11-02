@@ -6,13 +6,13 @@
 | :---- | :---- |
 | Redlines file | `PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.redlines.gtwpe-20261101-pf10-v14-0-5.md` |
 | Proof log | `PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md`, in the same directory |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-02/drain-r1` |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-02/drain-r2`. It supersedes `drain-r1` (commit `0d22343`) at the same path, on the Product Owner's direction of 2026-11-02. |
 | Preparer | TW-DRAIN-10 100926.1 (Notion page `3f44590a05eb8172a314fe6b958bb9ff`), run in the Claude Code document session Nathan started for T-02 on 2026-11-02 |
 | Preparation outcome | `READY`; save state recorded in the proof log |
 | Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` at `142feb35144d8795f927e0c78b665ace52279064`; task T-02; rows C-01, C-02, C-03; support C-06 |
 | Target (original) | `docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.md`, title `PF05-Canon-HDE-CLI-API-Vendor-Ref`, v2.5.4, git blob `53e6a9028dfa5d79b91e9b98cc949160c5a5cefe`, SHA-256 `1de30cbb6cde8be9c7ae3f0a518e871d22cc47b02a87b3209723e8b3d1213028`, 327,342 bytes, 4,461 lines, read at `origin/main` `e2b7427ff418ca8f08f05587c4a541308a76da56` |
 | Source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, v14.0.5, git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`, SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`; addendum 2.1 D-1 (l.225–276), D-2 (l.277–344), D-3 (l.345–396), context l.205–224 and l.491–516 |
-| Simulated one-pass result | SHA-256 `a3c9a08b7f0c685bfd5ba6a59441f63b0a961e475587e86efcf9483a34a248ee`, 332,176 bytes (scratch only; Apply produces the final file) |
+| Simulated one-pass result | SHA-256 `1587ea2110a62813f82e43c715c45c5dc097aecc88aabb9c2f71914667e2bad6`, 332,470 bytes (scratch only; Apply produces the final file) |
 
 ## Literal and operation conventions
 
@@ -362,7 +362,31 @@ NEW:
 
 ````
 * v2.5.4 — Record the delivered production vendor override and its limits in §7.1.11, remove it from the gap statements in §§1 and 7.2.0, record the Endpoint Catalog state with the canon-retired route exclusion in §5.6, and record the resolved not-found, showcompat-help and legacy CLI proof limitations in §§4.1.6, 5.1.0 and 5.1.7. Sentinel updated: NO.
-* v2.5.5 — Extend the production vendor override to `hdctl showcompat --source vendor` and vendor-selecting conjunction, with the showcompat carrier and audit command values, and record the uncovered paths as an implementation gap in §7.1.11; extend §7.1.10 route selection to compat chart acquisition and align §4.6 with it; add the `APP_ENV` dev/admin gate to `/api/compat/v1`, withdraw its authentication wording and record the gate gap in §5.5. Sentinel updated: NO.
+* v2.5.5 — Extend the production vendor override to `hdctl showcompat --source vendor` and vendor-selecting conjunction, with the showcompat carrier and audit command values, and record the uncovered paths as an implementation gap in §7.1.11; extend §7.1.10 route selection to compat chart acquisition, align §4.6 with it, and correct the §1 legacy-route wording to terminal-v1 legacy selection with the §7.2.0 non-v2 gap; add the `APP_ENV` dev/admin gate to `/api/compat/v1`, withdraw its authentication wording and record the gate gap in §5.5. Sentinel updated: NO.
+````
+
+## RL-14
+
+- Ledger rows: C-02
+- Source basis: PF10 2.1 D-2, l.288-289 and l.303 (The v1 path; No fallback; §7.2.0 records broad non-v2 legacy selection as a material gap); Product Owner direction 2026-11-02
+- Change type: CONSISTENCY
+- Operation: REPLACE
+- Target document: PF05-Canon-HDE-CLI-API-Vendor-Ref
+- Section path: "# **1\) “Map at a Glance” — What’s live vs planned \[Required-Now\]**" > "  ## **Vendor ingest (HDAPI)**"
+- Original line(s): 119 (informative)
+- Expected OLD occurrences in the whole original: 1
+- Rationale: Product Owner direction (2026-11-02): keep the dated record, but stop calling the legacy route a fallback. Its title and 'non-v2 bases retain an explicit legacy `bodygraphs` fallback' contradict D-2 and §7.1.10. The pin, the nonclaims and the §§7.1.10, 7.2 and 7.4 pointer are kept.
+
+OLD:
+
+````
+* **Legacy BodyGraph fallback and bounded HumanDesignAPI v2 chart path — implemented with remaining PF05 gaps.** **HDE Build Checklist — Fermentation** records HDE-FERM006 through HDE-FERM008 Done for the bounded HDE BodyGraph-detail scope. At `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, configured v2 bases use the version-neutral `charts` resource, Bearer auth, and the deterministic `ChartResult` adapter; non-v2 bases retain an explicit legacy `bodygraphs` fallback. This does not claim broad HumanDesignAPI v2 platform conformance, public Reader expansion, production deployment, production DB-hot-path completion, or complete conformance to every §7.2/§7.3 byte requirement. See §§7.1.10, 7.2, and 7.4.  
+````
+
+NEW:
+
+````
+* **Retained legacy BodyGraph selection and bounded HumanDesignAPI v2 chart path — implemented with remaining PF05 gaps.** **HDE Build Checklist — Fermentation** records HDE-FERM006 through HDE-FERM008 Done for the bounded HDE BodyGraph-detail scope. At `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, configured v2 bases use the version-neutral `charts` resource, Bearer auth, and the deterministic `ChartResult` adapter. A terminal `v1` base selects the retained legacy `bodygraphs` route under §7.1.10, which is legacy selection, not fallback. Legacy selection by any other non-v2 base at that pin is the material gap recorded in §7.2.0, not a retained capability. This does not claim broad HumanDesignAPI v2 platform conformance, public Reader expansion, production deployment, production DB-hot-path completion, or complete conformance to every §7.2/§7.3 byte requirement. See §§7.1.10, 7.2, and 7.4.  
 ````
 
 END OF REDLINES
