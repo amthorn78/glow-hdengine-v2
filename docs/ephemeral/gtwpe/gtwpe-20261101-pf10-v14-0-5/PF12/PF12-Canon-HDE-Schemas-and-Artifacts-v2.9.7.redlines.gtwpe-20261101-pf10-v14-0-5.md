@@ -6,7 +6,7 @@
 | :---- | :---- |
 | Package | `PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.redlines.gtwpe-20261101-pf10-v14-0-5.md` |
 | Proof log | `PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.7.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md`, in the same directory |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5` / task T-04 / preparation revision r1 (the first preparation of this run) |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5` / task T-04 / preparation revision r2. It supersedes r1 (commit `324de26`), which TW-APPLY-10 never received; the proof log records the correction. |
 | Prompt | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1 (Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live in this session) |
 | Preparer | One Claude Code session started by Nathan for T-04; no subagent, reviewer or other session took part |
 | Preparation outcome | `READY` |
@@ -48,7 +48,7 @@ These redlines leave the header to TW-APPLY-10's derivation. The baseline header
 
 - Version scheme: the third component increments once per revision (v2.9.5, v2.9.6, v2.9.7 in §§9.5 and 9.6). The expected derived version is v2.9.8.
 - Sources that justified this update, in source order: `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, version v14.0.5. No other source changed the target.
-- Revision-history entry: RL-10 adds §9.7 in PF12's own Doc-Delta record format, naming `document_version: "v2.9.8"` and `date: "2026-11-02"` (the preparation date). The record's `change_log_entry` also names `v2.9.8 / 2026-11-02`.
+- Revision-history entry: RL-11 adds §9.7 in PF12's own Doc-Delta record format, naming `document_version: "v2.9.8"` and `date: "2026-11-02"` (the preparation date). The record's `change_log_entry` also names `v2.9.8 / 2026-11-02`.
 - No redline below touches the header, the title, the status or the invocation tag.
 
 ## Literal-block convention
@@ -57,10 +57,10 @@ Each literal block below is fenced with five backticks and the info string `text
 
 ## Operations and application
 
-- Ten redlines: eight `REPLACE` and two `INSERT`. No `DELETE` and no repeated-replacement operation.
+- Eleven redlines: nine `REPLACE` and two `INSERT`. No `DELETE` and no repeated-replacement operation.
 - Each `REPLACE` old block occurs exactly once in the original. Each `INSERT` gap is the single place where its BEFORE anchor is immediately followed by its AFTER anchor.
-- Resolve every locator against the unchanged original, then apply all ten in one pass by original position. No redline's output is another redline's locator, and no two redlines touch or overlap.
-- RL-01 to RL-10 are listed in original-document order.
+- Resolve every locator against the unchanged original, then apply all eleven in one pass by original position. No redline's output is another redline's locator, and no two redlines touch or overlap.
+- RL-01 to RL-11 are listed in original-document order.
 
 ## RL-01
 
@@ -124,7 +124,7 @@ Exact old block:
 Replacement block:
 
 `````text
-* A source whose `schema_version` is `close_candidate_source.v2` is read against `schemas/close_candidate_source.v2.json`, a closed schema for exactly one Epic (`HDE-EPICNNN`) or CRD (`HDE-CRD-NNNN`, four or more digits) identity. Its tracked-issue IDs are `TI-NNN` or the Epic's own `ISSUE-EPIC<NNN>-TI-<nn>`, and the writer refuses a tracked-issue ID that names another Epic (`TRACKED_ISSUE_UNBOUND`).  
+* A source whose `schema_version` is `close_candidate_source.v2` is read against `schemas/close_candidate_source.v2.json`, a closed schema for exactly one Epic (`HDE-EPICNNN`) or CRD (`HDE-CRD-NNNN`, four or more digits) identity. Its tracked-issue IDs are `TI-NNN` or the Epic's own `ISSUE-EPIC<NNN>-TI-<nn>`, and the writer refuses a tracked-issue ID that names another Epic (`TRACKED_ISSUE_UNBOUND`). A tracked issue maps only through an ADR status; the v2 schema refuses the register-pointer form for it.  
 * A v2 source records the planning facts the writer checks and binds no planning document: `planning_records` holds the identity and SHA-256 of the Specification, the implementation plan, the QA plan, and the final QA report, each as a record text; `requirement_ids` holds the approved Specification's requirement IDs; `qa_checks` holds the QA plan's checks in plan order with the criteria each maps; and `qa_verdict` holds the final QA report's verdict. It has no plan path and no requirements, QA plan, or QA report binding. The writer checks the form of these records, not their agreement with the documents they name.  
 `````
 
@@ -148,7 +148,7 @@ Exact old block:
 Replacement block:
 
 `````text
-* The v2 close report and manifest are rendered only from tracked inputs. Requirement and acceptance text is bound by reference, never copied into a causal field. The feedback-dependency refusal is kept, and the writer refuses as causal inputs the Human Evidence Index, the Machine Evidence Mirror, their hash and checksum sentinels, every `.path_proof.txt`, the orientation output, the close-run family, and `catalog/manifest.json`. In either schema version, no path under `docs/ephemeral/` or `docs/pfcanon/` is a causal input, pointer, or key output: the writer refuses one with `PLANNING_OR_CANON_INPUT_PROHIBITED`, and the v2 schema refuses one too. A later-drain statement's evidence basis and a superseded artifact MAY name a planning document by a record text instead of a binding. A deferral's drain target names its register by PF title. PF titles and register headings are resolved at write time only, by title, against the PF-Canon files tracked at HEAD. Check mode writes nothing, reads no PF-Canon file, and validates the exact committed bytes.  
+* The v2 close report and manifest are rendered only from tracked inputs. Requirement and acceptance text is bound by reference, never copied into a causal field. The feedback-dependency refusal is kept, and the writer refuses as causal inputs the Human Evidence Index, the Machine Evidence Mirror, their hash and checksum sentinels, every `.path_proof.txt`, the orientation output, the close-run family, and `catalog/manifest.json`. In either schema version, no path under `docs/ephemeral/` or `docs/pfcanon/` is a causal input, pointer, or key output: the writer refuses one with `PLANNING_OR_CANON_INPUT_PROHIBITED`, and the v2 schema refuses one too. A later-drain statement's evidence basis and a superseded artifact MAY name a planning document by a record text instead of a binding. A deferral's drain target names its register by PF title and gives the full text of one of its headings. PF titles and register headings are resolved at write time only, by title, against the PF-Canon files tracked at HEAD. Check mode writes nothing, reads no PF-Canon file, and validates the exact committed bytes.  
 `````
 
 ## RL-04
@@ -230,6 +230,29 @@ These rules state the required contract. They do not fix the mechanism of the ex
 
 ## RL-07
 
+- Source rows: C-07, C-10
+- Change type: CLARIFY
+- Operation: `REPLACE`
+- Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
+- Complete authored heading path (raw original heading lines, outermost first): `# **8\. CI & Evidence \[Required-Now\]**` > `## **8.3 Machine Evidence Index — JSONL mirror (records-only) \[Required-Now\]**` > `### **Single home and path**` > `#### **Governed locations only.**`
+- Location within that section: the paragraph under this heading
+- Original location: line 2262 (informative only; the exact old block below is the locator)
+- Expected occurrences of the exact old block in the original: 1 (observed: 1)
+
+Exact old block:
+
+`````text
+Every evidence file referenced by the mirror MUST live under governed repo paths (for example, artifacts/, docs/). Transient generator paths (scratch/temp) are disallowed; mirror entries pointing to non-governed paths fail CI.
+`````
+
+Replacement block:
+
+`````text
+Every evidence file referenced by the mirror MUST live under governed repo paths (for example, artifacts/, docs/). Transient generator paths (scratch/temp) are disallowed; mirror entries pointing to non-governed paths fail CI. No Machine Evidence Mirror record, Human Evidence Index row, or path proof binds a path under `docs/ephemeral/` or `docs/pfcanon/`: planning documents serve planning only, and a PF-Canon file's name and version may change at any time.
+`````
+
+## RL-08
+
 - Source rows: C-05
 - Change type: CANON_UPDATE
 - Operation: `REPLACE`
@@ -253,7 +276,7 @@ Replacement block:
 * `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`: its rows follow §1.2 "Governed gate check row content".  
 `````
 
-## RL-08
+## RL-09
 
 - Source rows: C-18, C-17
 - Change type: CANON_UPDATE
@@ -294,7 +317,7 @@ Close-run family exception (normative; admitted CRDs and Epics only).
 * Each primary has one Human Evidence Index row and one Machine Evidence Mirror record with artifact key `<key_prefix>.close.<check_id>.primary.log`, where `<key_prefix>` is the change's Index key prefix in its admission table, and Mirror role `log`. An Epic's rows also carry `epic_id`. HDE Build Notes introduced this family, and its extension to admitted Epics, under the rule for new standardized evidence families above.
 `````
 
-## RL-09
+## RL-10
 
 - Source rows: C-18, C-17
 - Change type: CANON_UPDATE
@@ -317,9 +340,9 @@ Replacement block:
 * close/ — only for a CRD in the canonical updater's CRD admission table or an Epic in its Epic close admission table, the post-verdict close-run family; written only by the canonical updater, never plan-owned (§8.17 "Close-run family exception").  
 `````
 
-## RL-10
+## RL-11
 
-- Source rows: C-04, C-05, C-10, C-17, C-18
+- Source rows: C-04, C-05, C-07, C-10, C-17, C-18
 - Change type: NEW_CANON
 - Operation: `INSERT`
 - Target document: PF12-Canon-HDE-Schemas-and-Artifacts (v2.9.7 original baseline)
@@ -350,7 +373,7 @@ Inserted text (it ends with 2 newline characters):
 `````text
 ## 9.7 Documentary drainage record — 2026-11-02
 
-This record drains into PF12 the Product Owner decisions on evidence-tool output roots and governed gate check rows, the close-pack writer's planning-record source fields and its refusal of planning and PF-Canon inputs, and the close-pack writer decisions as amended for HDE-EPIC041's admitted close run, all recorded in HDE Build Notes. It changes PF text only. HDE-CRD-0002 and HDE-EPIC041 are closed; neither those closures nor this record establishes a QA verdict, acceptance, Ops, deployment, register movement, or implementation of a rule this record states as required.
+This record drains into PF12 the Product Owner decisions on evidence-tool output roots and governed gate check rows; the rules that planning documents and PF-Canon file identities are never inputs, as they bear on the close-pack writer and on Human Evidence Index, Machine Evidence Mirror and path-proof records; and the close-pack writer decisions as amended for HDE-EPIC041's admitted close run, all recorded in HDE Build Notes. It changes PF text only. HDE-CRD-0002 and HDE-EPIC041 are closed; neither those closures nor this record establishes a QA verdict, acceptance, Ops, deployment, register movement, or implementation of a rule this record states as required.
 
 ```yaml
 doc_delta:
@@ -392,13 +415,16 @@ doc_delta:
     its output root, the refusal of writes through symlinks, and cleanup
     scoped to what the run created. Add the governed gate check row content
     rule for the canonical JSON gate logs and point their Evidence Catalog
-    entries to it. Record the v2 close-candidate source's planning records,
+    entries to it. State that no Machine Evidence Mirror record, Human
+    Evidence Index row or path proof binds a planning-document or PF-Canon
+    path. Record the v2 close-candidate source's planning records,
     requirement IDs, QA checks and QA verdict, the refusal of planning and
     PF-Canon paths as inputs, write-time-only PF title resolution, and the
-    Epic tracked-issue ID form. Extend the absent-tolerant close-pack Index
-    rows, the close-run pointer exception, and the post-verdict close-run
-    family to an Epic admitted in the canonical updater's Epic close
-    admission table, which admits HDE-EPIC041 only.
+    Epic tracked-issue ID form with its ADR-status-only mapping. Extend the
+    absent-tolerant close-pack Index rows, the close-run pointer exception,
+    and the post-verdict close-run family to an Epic admitted in the
+    canonical updater's Epic close admission table, which admits HDE-EPIC041
+    only.
   domain_impact:
     current_domains_changed: []
     future_promotions: []
@@ -424,7 +450,7 @@ doc_delta:
       entrypoint: "python tools/evidence/run_canonical_json_gate.py --check-only"
       result: "not-run by this documentary revision; the rule is required and its implementation is not asserted"
       evidence_path: "tools/evidence/run_canonical_json_gate.py"
-    - behavior: "v2 source planning records, planning and PF-Canon input refusal, and tracked-issue ID form"
+    - behavior: "v2 source planning records, planning and PF-Canon input refusal, tracked-issue ID form and ADR-status-only mapping"
       entrypoint: "python tools/qa/generate_epic_close_pack.py --source <candidate-source> --check"
       result: "not-run by this documentary revision; schema and writer statically inspected"
       evidence_path: "schemas/close_candidate_source.v2.json"
@@ -458,10 +484,11 @@ doc_delta:
     v2.9.8 / 2026-11-02 — Documentary drainage of the Product Owner decisions
     on evidence-tool output roots and governed gate check rows, and of the
     close-pack writer decisions as amended for HDE-EPIC041's admitted close
-    run, into the release attestation, canonical JSON gate, close-pack, and
-    Live QA evidence layout homes above. Canonical runtime and evidence bytes
-    remain unchanged; the prior release_id remains valid. Exact preparation
-    and application evidence is retained in the document output proof logs.
+    run, into the release attestation, canonical JSON gate, close-pack,
+    Machine Evidence Mirror, and Live QA evidence layout homes above.
+    Canonical runtime and evidence bytes remain unchanged; the prior
+    release_id remains valid. Exact preparation and application evidence is
+    retained in the document output proof logs.
 ```
 
 
