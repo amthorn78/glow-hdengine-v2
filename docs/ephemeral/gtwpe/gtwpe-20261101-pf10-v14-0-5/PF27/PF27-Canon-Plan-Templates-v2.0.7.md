@@ -2259,8 +2259,8 @@ A close mutation set task performs the change flow's close-mutation-set stage, C
 
 ### Entries and exit (normative)
 
-* **Entries:** the final QA Report with verdict PASS; or a closure decision of `DO_NOT_CLOSE` whose return work is the close mutation set, because the set is missing, incomplete, or defective.  
-* **Exit:** the closure decision, after the Product Owner merges the close pull request.  
+* **Entry:** a closure decision of `CLOSE` for the change. The close mutation set, the close pack included, is written only after that decision confirms the close.  
+* **Exit:** the Product Owner's merge of the close pull request.  
 * The task never reopens implementation, QA, or the closure decision.
 
 ### Dev, not Ops (normative)
@@ -2272,7 +2272,7 @@ A close mutation set task performs the change flow's close-mutation-set stage, C
 
 * The Product Owner's invocation of the stage for a change authorizes that change's close mutation set and any close-tooling repair it needs, and is the Proceed for both.  
 * The task runs as a standalone top-level session that the Product Owner starts with the stage page and the change ID. It needs no handoff to start and resolves its inputs from the change's records.  
-* The closure authority (Isis) judges its result at the closure decision. The Product Owner alone merges.
+* The task starts only after the closure authority (Isis) has decided to close the change, and it does not revisit that decision. The Product Owner alone merges.
 
 ### Close-tooling repair (normative)
 
@@ -2288,13 +2288,13 @@ A close mutation set task performs the change flow's close-mutation-set stage, C
 Every close mutation set task record MUST include:
 
 * **Change identity:** the exact Epic or CRD identity.  
-* **Entry:** the final QA Report with verdict PASS, or the `DO_NOT_CLOSE` closure decision whose return work is the close mutation set, by exact source.  
+* **Entry:** the closure decision of `CLOSE` for the change, by exact source.  
 * **Authorization:** the Product Owner's invocation of the stage for this change.  
 * **Close mutation set:** the close pack, its two ledgers, the same-run close evidence, and their Index and Mirror registration, each by exact path and produced through the canonical writers.  
 * **Close rehearsal:** the throwaway-clone rehearsal and its outcome.  
 * **Close-tooling repair:** each defect found, its repair, the owner tests, any close-pack ADR amendment, and any narrowed rule with its basis, or `None`.  
 * **Close pull request:** its identity and the Product Owner's merge.  
-* **Exit:** the closure decision that judges the result.  
+* **Exit:** the Product Owner's merge of the close pull request.  
 * **Live test:** `RAN` (and its evidence references), `WAIVED` (and the Product Owner's quoted words and date), or `MISSING`. With `MISSING`, the close mutation set is not close-PR-ready.  
 * **Nonclaims:** the task does not reopen implementation, QA, or the closure decision, and changes no approved QA evidence, product code, or PF canon.
 
