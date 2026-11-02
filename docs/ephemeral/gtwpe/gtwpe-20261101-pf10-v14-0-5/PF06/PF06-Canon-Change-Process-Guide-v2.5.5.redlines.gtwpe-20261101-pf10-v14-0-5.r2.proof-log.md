@@ -133,6 +133,8 @@ Remaining defects, not repaired:
 
 Knock-on of CCR-5 (A), for the CCR-6 disposition (not drafted): the H-08 landing paragraph lets Live QA evidence land "inside the epic close mutation set" (line 3247). Under (A) the close mutation set follows the closure decision, so that route would place QA evidence after the decision it supports. Glow QA Guide §3.1.3 (T-06) still states the old order.
 
+> Corrected 2026-11-02, after this package was committed (`224d9f0`): T-06 had already prepared Glow QA Guide redlines revision 4 under the same CCR-5 ruling (commit `ad418d5`), which this session fetched only afterwards. The sentence above is superseded; that document's application belongs to T-06.
+
 ## 9. Validation
 
 The validator is `validate_redlines_r2.py`, a scratchpad script that is not committed. It parses the saved r2 file and compares it with the committed r1 file. Every check listed for r1 passed again:
