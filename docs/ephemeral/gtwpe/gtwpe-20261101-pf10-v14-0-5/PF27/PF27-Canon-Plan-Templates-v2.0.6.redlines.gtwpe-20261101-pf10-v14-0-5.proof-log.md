@@ -6,12 +6,13 @@
 | :---- | :---- |
 | Artifact this log documents | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF27/PF27-Canon-Plan-Templates-v2.0.6.redlines.gtwpe-20261101-pf10-v14-0-5.md` |
 | This proof log | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF27/PF27-Canon-Plan-Templates-v2.0.6.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md` |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-07/prep-r1` (first preparation of T-07; no earlier T-07 output existed on the branch) |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5/T-07/prep-r2` |
+| Revision | `prep-r2` supersedes `prep-r1`, this preparer's own first package. `prep-r1` is the parent commit on the branch ("docs(ephemeral): add T-07 PF27 redlines and proof log (gtwpe-20261101-pf10-v14-0-5)"), kept as history; it was never given to TW-APPLY-10. §12 records the correction. |
 | Originating preparer | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1, Notion page `3f44590a05eb8172a314fe6b958bb9ff`, fetched live at the start of this step (page last edited 2026-10-09T11:05:22Z), run in the Claude Code cloud session https://claude.ai/code/session_01Q789tyeqMDbVqbUtqxA64b, which Nathan started for T-07 on 2026-11-02. No subagent, reviewer or other session took part. |
 | Authorized step sequence | Nathan's handoff authorizes TW-DRAIN-10, then TW-APPLY-10 100926.1 (Notion page `3f44590a05eb81eebff6e3afa3d9aa5b`) in this same session after a READY / COMPLETE_PACKAGE result, and a return to TW-DRAIN-10 if Apply returns a diagnostic. |
 | Preparation outcome | `READY` |
-| Save outcome | Recorded in §12 after both files were read back. |
-| Correction route | An Apply diagnostic returns to this preparer, in this session, under a distinguishable revision identity (`prep-r2` and later). |
+| Save outcome | Recorded in §13 after both files were read back. |
+| Correction route | An Apply diagnostic returns to this preparer, in this session, under a new revision identity (`prep-r3` and later). |
 
 ## 2. Inputs and source roles
 
@@ -20,65 +21,77 @@
 | Target (original) | `docs/pfcanon/PF27-Canon-Plan-Templates-v2.0.6.md`; in-document title `PF27-Canon-Plan-Templates`; version v2.0.6; Status Canon; Effective date 2026-10-26; git blob `c21096d78b9865bf5aa0c531eee701e462d71a50`; SHA-256 `850dc1a3c8294a0e0521f02cb7300fb05233beccb1ecadf611b41e8ea9adfb00` over the whole blob; 323,765 bytes; 3,938 lines; LF endings | The one current PF27 Markdown under `docs/pfcanon/` on `main`. Baseline `origin/main` `e2b7427ff418ca8f08f05587c4a541308a76da56`. On 2026-11-02 `origin/main` was `84d6d1cf`; its two later commits (amthorn78/glow-hdengine-v2#824 and amthorn78/glow-hdengine-v2#825) touch only `docs/ephemeral/HDE-M10V2-*` files and leave PF27 and PF10 byte-identical (same blobs). |
 | Change source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`; HDE Build Notes v14.0.5, effective 2026.11.01; git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`; SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`; 385,734 bytes; 1,976 lines | The only substantive change source. One unlettered logical version. |
 | Editorial standard | `docs/pfcanon/PF03-Reference-Technical-Writing-Best-Practices-v1.8.8.md`; blob `504712df548a02f3aa4e7b8c37027385e46a3878`; SHA-256 `df685f3a66aa18fdcacb697b340263cb59fc682564fa59c50b3d9b9ca735c462`; 633 lines | Read in full (lines 1–633). Applied to authored wording only; not a change source. |
-| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md` at `142feb35144d8795f927e0c78b665ace52279064`; task T-07; rows C-02, C-08, C-09, C-26; supporting C-06; holds H-06 and H-07 | Routing and provenance only. Not a change source and not a Last Update Gate. The target and the selected units agree with the handoff. |
-| Supporting canon (read, not drained) | `docs/pfcanon/PF04-Canon-HDE-Governance-v2.8.8.md` (blob `0c3ce100f942`), §3.4 "Open rails (controlled)", lines 1171–1243, read in full; `docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.md` (blob `53e6a9028dfa`), §7.1.10 "Endpoint policy (explicit version-gated dual lineage)", lines 3472–3504, read in full | Ownership checks for the routing sentences in RL-03 and RL-06. Neither is edited. |
-| Handoff | Nathan's inline handoff of 2026-11-02 ("GTWPE document session — T-07 — Plan Templates (drain, then apply)") | Control instructions: target, selected units, holds, branch, outputs, the decision to drain 2.2 R-3 as written. |
+| Governing decision | `docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md` (blob `1c65c85339cb`, the same on `main` and on the branch), GTWPE-D3 "Every PF10 addendum is drained, and a prompt in the run evaluates the drain targets", read in full (lines 114–170), with GTWPE-D4 (172–226) | Nathan's standing ruling: "all pf docs should be updated based on context and scope, not whether or not the addenda specify a drain target"; "No document is gated on a drain target or a specification, PF20 and PF30 aside. Every eligible document is updated on context and scope, PF27 among them"; a change is already represented only on a pass's verified finding. It decides how the selected units map onto PF27. |
+| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md`: the handoff pins `142feb35144d8795f927e0c78b665ace52279064`; also read at the branch head `aef3266a0cd180405db363465f69ec2efdb1417b` (blob `f43c7241e5bc`), which adds the 2026-11-02 correction banner, §8 (T-11 to T-18) and other tasks' completion rows. T-07's task row, its rows C-02, C-08, C-09, C-26 (supporting C-06) and holds H-06 and H-07 are unchanged. | Routing and provenance only. Not a change source and not a Last Update Gate. Its banner quotes Nathan's 2026-11-02 direction: "Just because there is not routing in a sections is NOT grounds for exclusion. You are supposed to analyze by context." |
+| Supporting canon (read, not drained) | `docs/pfcanon/PF04-Canon-HDE-Governance-v2.8.8.md` (blob `0c3ce100f942`), §3.4 "Open rails (controlled)", lines 1171–1243, read in full; `docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.4.md` (blob `53e6a9028dfa`), §7.1.10 "Endpoint policy (explicit version-gated dual lineage)", lines 3472–3504, read in full | Ownership checks for the routing sentences in RL-01, RL-04, RL-08 and RL-09. Neither is edited. |
+| Handoff | Nathan's inline handoff of 2026-11-02 ("GTWPE document session — T-07 — Plan Templates (drain, then apply)") | Control instructions: target, selected units, holds, branch, outputs, the decision to drain 2.2 R-3 as written, and the instruction to keep the Live QA Plan template's own placeholders. |
 
 ## 3. Coverage
 
 Target. Read completely, lines 1–3938, in twelve recorded windows (line range, bytes): 1–300 (28,897); 301–600 (22,102); 601–900 (33,849); 901–1060 (20,092); 1061–1200 (39,350); 1201–1385 (27,843); 1385–1599 (22,612); 1600–1899 (22,292); 1900–2269 (29,228); 2266–2705 (19,284); 2706–3225 (19,933); 3226–3938 (38,388). The windows overlap at lines 1385 and 2266–2269 and leave no gap. Every window ended at a complete line; the last ends at the file's final LF.
 
-Selected source units, each read completely (PF10 lines, bytes):
+Context scan of the target (for `prep-r2`): exact-term searches of the whole target for each selected rule's terms, then a read of every hit's section from the full reading above. For D-2: `fallback`, `bodygraphs`, `PROVIDER_ROUTE`, `terminal`, `route famil`, `base URL`, `/v1`, `/v2`. For 2.2: `docs/ephemeral`, `planning document`, `version`, `file name`, `digest`, `SHA-256`, `pin`, `close-pack writer`, `close pack`, `full validation`, `required PR CI`. For 2.15: `Live QA`, `live vendor`, `live test`, `open-rails`, `open rails`, `closed-rails`, `exempt`, `waive`, `synthetic`, `showcompat`, `/internal/version`, `TOOLING_BLOCKED`, and each template's verdict, decision and record-field blocks. §5 gives each finding.
+
+Selected source units, each read completely (PF10 lines):
 
 | Unit | Lines | Row |
 | :---- | :---- | :---- |
 | 2.1 heading, timestamp, "Decision and approval status" | 205–224 | C-06 |
 | 2.1 D-1 (read in passing; not selected) | 225–276 | none (C-01, not T-07) |
-| 2.1 D-2 | 277–344 (with 205–224: 13,633 bytes for 205–344) | C-02 |
+| 2.1 D-2 | 277–344 (205–344: 13,633 bytes) | C-02 |
 | 2.1 "Scope, exclusions and nonclaims", "Dependencies and unresolved obligations", "Evidence" | 491–516 | C-06 |
 | 2.2 heading, "Decision and approval status", "The defect that prompted it", R-1, R-2 | 517–546 | C-08 (R-1 is C-07, see §5) |
 | 2.2 R-3 | 547–551 (491–551: 7,237 bytes) | C-09 |
 | 2.15 heading to R-6 | 1650–1804 (11,087 bytes) | C-26 |
 
-Supporting reading, labeled as such and not drained: 2.2 lines 552–588 (6,048 bytes: changes delivered, nonconforming items, scope, dependencies; line 581 names the Plan Templates drainage targets); 2.5 lines 765–780 and line 856 (R-3 governs as written; CCR-5 and its alternatives); 2.9 lines 1150–1170 (line 1161: the CCR-5 ruling bounded to HDE-EPIC041); 2.15 lines 1805–1868 (4,159 bytes: HDE-EPIC041 disposition, nonconforming items, scope with the CRD exclusion at lines 1825 and 1835, and the drainage target list at lines 1845–1849); 2.16 R-3, lines 1936–1950. No unrelated addendum was read to rebuild triage.
+Supporting reading, labeled as such and not drained: 2.2 lines 552–588 (6,048 bytes; line 581 names the Plan Templates drainage targets); 2.5 lines 765–780 and line 856 (R-3 governs as written; CCR-5 and its alternatives); 2.9 lines 1150–1170 (line 1161: the CCR-5 ruling bounded to HDE-EPIC041); 2.15 lines 1805–1868 (4,159 bytes; the CRD exclusion at lines 1825 and 1835 and the drainage target list at lines 1845–1849); 2.16 R-3, lines 1936–1950. No unrelated addendum was read to rebuild triage.
 
 Coverage state: complete for the target and for every selected unit.
 
 ## 4. Redlines prepared
 
-Six `REPLACE` operations, each on one unique original line, in original order.
+Fifteen `REPLACE` operations in original order. Fourteen replace one unique original line; RL-08 replaces the contiguous lines 1450–1453 as one region.
 
 | Redline | Row | Target location (original line) | What it does | Source basis |
 | :---- | :---- | :---- | :---- | :---- |
-| RL-01 | C-08 | "Purpose & scope" > "Canon precedence for template use" (287) | Adds R-2's premise that PF versions and file names may change; keeps the title-only rule for HDE Build Notes and adds its reason; requires other PF references by current title, section where needed, never file name or version; applies the rules to an ADR a derived artifact carries; keeps the provenance sentence and states that a derived artifact that must remain valid pins no PF file name, version or digest. | 2.2 R-2 bullets 1, 2 and 4 (lines 542, 543, 545); target named at line 581 ("R-2 citations") |
-| RL-02 | C-26 | §1 "Live QA Plan" > "Front matter" (326) | Adds the template field `Live test:` with the values RAN, WAIVED and MISSING after the Operators line, using allowed `<PLACEHOLDER>` markers for the evidence references and for the Product Owner's quoted words and date. | 2.15 R-4, lines 1763–1771 |
-| RL-03 | C-26 | §1 "Live QA Plan" > "Open-Rails Live QA Requirement for production-affecting epics" (389, its last line) | Appends a new H3 "Live compat test for every Epic (required)": R-1's universal live compat test (live vendor compat and deployed-service check, pass predicates, findings, SYN-A and SYN-B, the own-surfaces step, what does not satisfy it), the CRD scope boundary, routing of execution controls to HDE Governance §3.4, R-4's live-test line for the plan and its review with the approval block and override rule, and R-3's naming rule. | 2.15 "Relation to other canon" (1666–1681), R-1 (1704–1739), R-3 (1755–1759), R-4 (1761–1784); supporting 1825, 1835; target at 1849 |
-| RL-04 | C-26 | §1 "Live QA Plan" > "Close-out deliverables" > "What “QA RCA & Doc Delta summary” means" (973) | Adds a content bullet: the summary carries the live-test line and, with MISSING, gives no PASS verdict. | 2.15 R-4, line 1769 and table row line 1780 |
-| RL-05 | C-09 | "Review guardrails" > "CI lane classification and automated budget-control discipline" (1312) | Adds R-3 as written as a new paragraph after the administrative-closeout paragraph. | 2.2 R-3, lines 549–550; target at line 581 |
-| RL-06 | C-02 | §2 "HDE-EPIC-Specification" > "Epic Record Template (Normative)" > "Contract and Compatibility Posture (MUST)" (1459) | Keeps the four categories and adds that "explicit legacy fallback" reads as the terminal-v1 legacy selection, which is not a fallback, and routes route selection and the configured-base boundary to HDE CLI/API/Vendor Ref §7.1.10. | 2.1 D-2, line 316 (supersession), line 323 (drainage target); lines 288–289 |
+| RL-01 | C-02 | "Purpose & scope" > "Exact technical facts and secret safety", row "Version literals" (112) | Adds the configured base's terminal `v1` or `v2` classification, owned by HDE CLI/API/Vendor Ref §7.1.10, to the closed list of classifications under which a plan may show a version literal. | D-2, lines 290–297 and 313 |
+| RL-02 | C-08 | "Purpose & scope" > "Canon precedence for template use" (287) | Adds R-2's premise that PF versions and file names may change; keeps the title-only rule for HDE Build Notes and adds its reason; requires other PF references by current title, section where needed, never file name or version; applies the rules to an ADR a derived artifact carries; keeps the provenance sentence and states that a derived artifact that must remain valid pins no PF file name, version or digest. | 2.2 R-2 bullets 1, 2 and 4 (lines 542, 543, 545); line 581 |
+| RL-03 | C-26 | §1 "Live QA Plan" > "Front matter" (326) | Adds the template field `Live test:` with RAN, WAIVED and MISSING, using allowed `<PLACEHOLDER>` markers for the evidence references and for the Product Owner's quoted words and date. | 2.15 R-4, lines 1763–1771 |
+| RL-04 | C-26 | §1 "Live QA Plan" > "Open-Rails Live QA Requirement for production-affecting epics" (389, its last line) | Appends a new H3 "Live compat test for every Epic (required)": R-1's live compat test (live vendor compat and deployed-service check, pass predicates, findings, SYN-A and SYN-B, the own-surfaces step, what does not satisfy it); the CRD boundary; routing of execution, controls and the Ops-evidence posture to HDE Governance §3.4 (R-6); the blocked-live-test rule (R-5); the Product Owner-only waiver (R-2); the live-test line for the plan and its review with the approval block (R-4); and the naming rule (R-3). | 2.15, lines 1666–1681 and R-1 to R-6 (1704–1803); supporting 1825, 1835; target at 1849 |
+| RL-05 | C-26 | §1 > "Close-out deliverables" > "What “QA RCA & Doc Delta summary” means" (973) | Adds a content bullet: the summary carries the live-test line and, with MISSING, gives no PASS verdict. | 2.15 R-4, lines 1769 and 1780 |
+| RL-06 | C-26 | "Review guardrails" > "Hard blockers for plan approval/execution", bullet "Valid Live QA Plan approval blockers" (1168) | Adds "a missing live compat test with no recorded Product Owner waiver (a `Live test:` line that reads `MISSING`)" to the closed list of valid approval blockers. | 2.15 R-4, lines 1777–1778 and 1784 |
+| RL-07 | C-09 | "Review guardrails" > "CI lane classification and automated budget-control discipline" (1312) | Adds R-3 as written as a new paragraph after the administrative-closeout paragraph. | 2.2 R-3, lines 549–550; line 581 |
+| RL-08 | C-26 | §2 "HDE-EPIC-Specification" > "Epic Record Template (Normative)" > "Contract and Compatibility Posture (MUST)" (1450–1453) | The "Open-rails QA declaration", "Implementation preservation" and "Review posture" bullets also carry the live compat test every Epic's QA runs, waivable only by the Product Owner; the production-functional and broader open-rails rules stay as written; "Open-rails triggering surfaces" (1451) is unchanged inside the region. | 2.15, lines 1666–1681, 1706, 1743, 1777 |
+| RL-09 | C-02 | Same section, bullet "`bg:resolve --source vendor` route-policy posture" (1459) | Keeps the four categories and adds that "explicit legacy fallback" reads as the terminal-v1 legacy selection, which is not a fallback, and routes route selection and the configured-base boundary to HDE CLI/API/Vendor Ref §7.1.10. | D-2, lines 288, 316, 323 |
+| RL-10 | C-26 | §3B "Close Mutation Set Task Record (Template)" > "Record fields (required)" (2261) | Adds the record field `Live test:`; with MISSING, the close mutation set is not close-PR-ready. | 2.15 R-4, lines 1770 and 1781 |
+| RL-11 | C-26 | §8 "QA Pass Review Record" > "Required structure (paste-ready)", Review Summary (3120) | Adds a conditional field: when the record is the run's QA evidence review, it carries the live-test line, and with MISSING the evidence is not acceptable. | 2.15 R-4, lines 1768 and 1779 |
+| RL-12 | C-26 | §9 "Final QA Closeout Review + QA RCA" > "Scope" (3218) | Adds the first-line rule: when no live test ran, the report's first line is `No live test ran.` and it names the waiver or the missing test. | 2.15 R-3, line 1759 |
+| RL-13 | C-26 | §9 > "Required structure (paste-ready)", QA Closeout Summary (3232) | Adds the field `Live test:` after "Epic reviewed". | 2.15 R-4, line 1769 |
+| RL-14 | C-26 | §9 > "Required structure (paste-ready)", QA Verdict and Recommendation (3447) | Keeps the four verdict values and adds "(not PASS when the live-test line reads `MISSING`)". | 2.15 R-4, line 1780 |
+| RL-15 | C-26 | §10 "Epic Closure Review + Retrospective" > "Required structure (paste-ready)", Closure Decision (3560) | Adds the field `Live test:`; with MISSING, the closure decision is not CLOSE. | 2.15 R-4, lines 1771 and 1782 |
 
-Change-type classification (report labels only): RL-01 CANON_UPDATE with CONSISTENCY; RL-02, RL-03, RL-04 and RL-05 NEW_CANON; RL-06 CLARIFY. No DOC_HYGIENE or DELETION redline is prepared.
+Change-type classification (report labels only): RL-01 and RL-06 CONSISTENCY; RL-02 CANON_UPDATE with CONSISTENCY; RL-03, RL-04, RL-05, RL-07 and RL-10 to RL-15 NEW_CANON; RL-08 CANON_UPDATE; RL-09 CLARIFY. RL-01, RL-06, RL-08 and RL-10 to RL-15 are context drainage under GTWPE-D3. No DOC_HYGIENE or DELETION redline is prepared.
 
 ## 5. Change and disposition ledger
 
-Every change in the selected units, with its disposition. "Not PF27" means the change belongs to another target or owner and is not repeated here.
+Every change in the selected units, with its disposition and, where no change is made, the verified finding and its location.
 
 **2.1 D-2 (C-02), lines 277–344**
 
 | Element | Disposition |
 | :---- | :---- |
-| "What governs", "Selection", "The base", "No fallback" (281–289) | Owned by HDE CLI/API/Vendor Ref §7.1.10 (supporting reading confirms §7.1.10 already states the selection, the configured-base boundary and "retained legacy selection, not fallback"). Not PF27; RL-06 routes to the owner. |
-| "The v1 path is retained legacy selection, not fallback" (288) | Represented in RL-06 ("It is not a fallback and makes no fallback claim"). |
-| Fit with HDE Mechanics Guide §1.1 (290–297) | Not PF27 (T-05). PF27's "Exact technical facts and secret safety" rows (lines 110–113) were checked: they forbid `/v1` and `/v2` as route-construction inputs and auth selection by string inspection, consistent with D-2. No change. |
-| Classification label `explicit_legacy_fallback` (298) | Not routed to PF27. RL-06 keeps the PF27 category name, matching D-2's choice to keep the label unchanged. |
+| "What governs", "Selection", "The base", "No fallback" (281–289) | Owned by HDE CLI/API/Vendor Ref §7.1.10, which already states the selection, the configured-base boundary and "retained legacy selection, not fallback" (supporting reading). RL-09 routes to it. |
+| "The v1 path is retained legacy selection, not fallback" (288) | RL-09. |
+| The single permitted classification; contract metadata; the remaining prohibitions (290–297) | RL-01 for the "Version literals" row (112). The rows "Active resource paths" (111) and "Authentication selection" (113) already agree: the configured base owns the version boundary, and authentication comes from contract or route metadata, never from `/v1` or `/v2` string inspection. Verified, no change. |
+| Classification label `explicit_legacy_fallback` (298) | RL-09 keeps the PF27 category name, matching D-2's choice to keep the label unchanged. |
 | Basis (300–308) | Explanatory. No change. |
-| Supersession of HDE Mechanics Guide, HDE Users Guide, HDE CLI/API/Vendor Ref (312–315) | Not PF27 (T-05, T-08, T-02). |
-| Plan Templates "bg:resolve --source vendor route-policy posture" (316) | Actionable: RL-06. |
-| Drainage targets (320–324) | PF27's target (323): RL-06. AGENTS.md (324): H-05, not a PF target. |
-| Consequences for tests and evidence (328–339) | Not PF27. No change. |
-| Left undecided: v1 retirement (343) | Unresolved by source; RL-06 says nothing about retirement. |
+| Supersession of HDE Mechanics Guide, HDE Users Guide, HDE CLI/API/Vendor Ref (312–315) | Other targets (T-05, T-08, T-02). |
+| Plan Templates route-policy category (316) and drainage target (323) | RL-09. |
+| AGENTS.md (324) | H-05. Not a PF target. |
+| Consequences for tests and evidence (328–339); v1 retirement left undecided (343) | No PF27 content bears on them. RL-09 says nothing about retirement. |
+| Other PF27 text on fallback and the base | Verified, no change. "Future proof requirement" (1458), "Route-family proof requirement" (1462) and "Mapped-cache proof requirement" (1470) ask a plan to state what fallback remains; while Candidate CRD Items List item 9 is open, D-2's basis (304–305) records that the current classifier still reaches the legacy route from non-v1 bases, so the question stays live. "Base URL key" (110) and the Check Blocks preflight (776) are presence-only; the base-boundary contract stays with HDE CLI/API/Vendor Ref §7.1.10, and stating its fail-closed behavior as current would claim a delivery that item 9 has not made. |
 
-**2.1 context (C-06), lines 205–224 and 491–516**: supporting. D-2 takes effect as canon on publication (line 211), so RL-06 does not wait for Candidate CRD Items List item 9 (H-10). RL-06 states the category's meaning and routes to the owner; it makes no implementation-state claim, so the open implementing change does not block it. The scope, nonclaims and evidence are not drained.
+**2.1 context (C-06), lines 205–224 and 491–516**: supporting. D-2 takes effect as canon on publication (line 211), so RL-01 and RL-09 do not wait for item 9 (H-10). Neither states implementation state. The scope, nonclaims and evidence are not drained.
 
 **2.2 (C-08, C-09), lines 517–551**
 
@@ -86,92 +99,84 @@ Every change in the selected units, with its disposition. "Not PF27" means the c
 | :---- | :---- |
 | Heading, timestamp, decision (517–523) | Context. |
 | "Status. Proposed." (524) | Not drained. v14.0.5 publishes the addendum, so its rules are active (ledger §2 status reading). |
-| Relation to other canon (525) | Context. It names HDE Governance, HDE Schemas & Artifacts, Change Process Guide, Glow QA Guide and HDE Mechanics Guide; Plan Templates is not among them. |
+| Relation to other canon (525) | Context. |
 | The defect that prompted it (527–531) | History. No change. |
-| R-1 (533–538) | Row C-07, routed to T-01 (and, uncertain, T-03 to T-06), not to T-07. Line 525 does not list Plan Templates and line 581 names Plan Templates only for R-2 citations and R-3. No PF27 change. |
-| R-2 bullet 1, versions may change (542) | RL-01. |
-| R-2 bullet 2, no pin (543) | RL-01, as the consistency qualifier for the retained provenance sentence. |
-| R-2 bullet 3, tool resolution at run time; validation does not re-read canon (544) | Tool behavior. Its drainage targets are HDE Governance §9.1.2 and §9.1.3 (line 581, T-01). Not PF27. |
-| R-2 bullet 4, citations (545) | RL-01. Already represented in part at line 287 (title-only HDE Build Notes; current title and section); the reason, the never-by-file-name-or-version rule and the ADR scope are added. |
-| R-3 (547–551) | RL-05, as written. Its own parenthetical citation of this PF27 section is not repeated inside that section. |
+| R-1 (533–538), row C-07 | Context scan, verified no change: no PF27 template makes code, a test, a tool, CI, a workflow, a schema, a governed artifact, a close pack, a manifest, an Index or Mirror row or a path proof read or bind a path under `docs/ephemeral/`. The close report and manifest fields (1744–1773) bind close-pack artifacts and governed evidence; §3B's record fields (2250–2262) bind the close pack, its ledgers and same-run evidence; "Canon precedence for template use" (283–285) places derived documents under `docs/ephemeral/` without making anything depend on them; the Live QA Plan provenance lock (888–906) governs plan text, which R-1 permits (a prose citation of a planning document is a reference only). |
+| R-2 bullet 1, versions may change (542) | RL-02. |
+| R-2 bullet 2, no pin (543) | RL-02. Context scan, verified no other change: no template asks for a PF file name, version or digest; the step-log header's `pf_refs` takes exact in-document titles (571); the Live QA canon set is titles-only (334); §12's governing-source map is title-only for HDE Build Notes (3861). |
+| R-2 bullet 3, tool resolution; validation does not re-read canon (544) | Tool behavior. No PF27 template defines a tool's canon resolution. Verified, no change. |
+| R-2 bullet 4, citations (545) | RL-02. |
+| R-3 (547–551) | RL-07, as written. Context scan: §3B "Close-tooling repair" (2241–2248) names the writer's owner tests without placing them in a CI lane, so it agrees. §3B "Entries and exit" (2224–2228) is H-06. |
 
 **2.15 (C-26), lines 1650–1804**
 
 | Element | Disposition |
 | :---- | :---- |
-| Heading, timestamp, decision (1650–1664) | Context. The Product Owner's quoted direction is not drained. |
+| Heading, timestamp, decision (1650–1664) | Context. |
 | "Status. Proposed." (1665) | Not drained (ledger §2 status reading). |
-| Relation to other canon (1666–1681) | Applied in RL-03: the live compat test "does not depend on a finding that the Epic touches or can affect a production surface". The controls it preserves are routed to HDE Governance §3.4 in RL-03. |
-| The failure that prompted it (1683–1702) | History of HDE-EPIC041. Not drained into PF27 (ledger C-27 and T-10 carry Epic history). |
-| R-1 scope and why (1704–1707) | RL-03, first paragraph. |
-| R-1 live vendor compat, pairs, pass predicates (1708–1716) | RL-03, first check bullet. |
-| R-1 deployed-service check and findings (1717–1725) | RL-03, second check bullet. |
-| R-1 own surfaces (1726) | RL-03. The existing Open-Rails subsection (lines 363–389) stays as the template's statement of HDE Governance §3.4 for those surfaces. |
-| R-1 what does not satisfy it (1727–1734) | RL-03. |
-| R-1 SYN-A and SYN-B (1735–1739) | RL-03, with UUIDs, derivations, birth data, the write path and authorization, and the TOOLING_BLOCKED rule. The Ops task that stores them (HDE-EPIC041-POSTCLOSE-OPS01 Part W) is history and is not named in the template. |
-| R-2 (1741–1753) | Not PF27's share: 2.15's drainage list (1846) sends R-2 to HDE Governance §3.4 (T-01). RL-03 carries only R-4's override sentence ("only the Product Owner may waive this requirement, or any part of it") and R-3's reference to "a recorded Product Owner waiver". |
-| R-3 (1755–1759) | RL-03, "Use of the name "Live QA"". |
-| R-4 live-test line (1763–1771) | RL-02 (plan field), RL-03 (plan and review), RL-04 (QA RCA & Doc Delta summary). The other records R-4 names have PF27 homes outside §1 or none; see O-1. |
-| R-4 table (1774–1782) | QA plan and plan review rows: RL-03. Final QA report row: RL-04. Other rows: O-1. |
-| R-4 "Who may override" (1784) | RL-03. |
+| Relation to other canon (1666–1681) | RL-04 and RL-08: the minimum live test no longer depends on a touches-production finding. The preserved controls are routed to HDE Governance §3.4. |
+| The failure that prompted it (1683–1702) | HDE-EPIC041 history. Not drained into PF27 (ledger C-27 and T-10). |
+| R-1 (1704–1739) | RL-04 (all elements, with UUIDs, derivations, birth data, write path and authorization, and the missing-fixture rule); RL-08 for the Epic Specification. The Ops task that stores SYN-A and SYN-B is history and is not named in the template. The §1 Open-Rails subsection (363–389) stays as the template's statement of HDE Governance §3.4 for the Epic's own surfaces. |
+| R-2 (1741–1753) | RL-04 "Waiver (Product Owner only)"; RL-08 ("only the Product Owner may waive the test or any part of it"). The exemption text that stays in §1 (385) and §2 (1450) governs the Epic's own production-affecting surfaces under HDE Governance §3.4, which R-1 (1726) keeps governing. |
+| R-3 (1755–1759) | RL-04 naming rule; RL-12 first-line rule in §9. Context scan, verified no change: §2 "Live QA requirement (closeout statement only)" (1627–1634) states that Live QA is required for close, which R-3 now gives its meaning; the template name "Live QA Plan" and the other uses of "Live QA" describe QA that R-1 requires to include the live test. |
+| R-4 live-test line (1763–1771) and table (1774–1782) | QA plan: RL-03, RL-04. Plan review: RL-04, RL-06. QA evidence review: RL-11 (conditional). Final QA report and RCA: RL-05 (§1 summary), RL-13, RL-14 (§9). Close mutation set result: RL-10 (§3B). Closure decision: RL-15 (§10). QA readiness, the QA task set and the QA execution result have no PF27 template: PF27 has no readiness or task-set template, and its step-log header and step-logs manifest are governed per-check evidence, not the run's result record. Verified, no change. |
+| R-4 "Who may override" (1784) | RL-04 ("No agent may override this block"), RL-06. |
 | R-4 prompts (1785) | Prompt instruction, not template text. Owner GCFPE management (H-11). Not drained. |
-| R-5 (1787–1790) | Not PF27's share (1846: HDE Governance §3.4). RL-03 keeps only R-1's own sentence that a missing SYN person makes the deployed check TOOLING_BLOCKED. |
-| R-6 (1792–1803) | Not PF27's share; a restatement of HDE Governance §3.4 controls. RL-03 routes execution and controls to HDE Governance §3.4, as 2.15's scope (1835) does. |
+| R-5 (1787–1790) | RL-04, blocked-live-test paragraph. |
+| R-6 (1792–1803) | RL-04 routes execution and controls to HDE Governance §3.4 and states that the live test's result is Ops evidence there. The §1 Open-Rails subsection's control list (369–383) stays. |
 
-**Supporting units**: 2.9 line 1161 records the CCR-5 "(B) now, bounded" ruling for HDE-EPIC041 only; it is history and is not drained as a general rule. 2.16 R-3 (1940–1948) records that SYN-A and SYN-B are stored and registered; RL-03 states the requirement and the missing-fixture rule and makes no claim about current storage.
+**Supporting units**: 2.9 line 1161 records the CCR-5 "(B) now, bounded" ruling for HDE-EPIC041 only; it is history and is not drained as a general rule. 2.16 R-3 (1940–1948) records that SYN-A and SYN-B are stored and registered; RL-04 states the requirement and the missing-fixture rule and makes no claim about current storage.
 
 ## 6. Held items, not drafted
 
 | Hold | What is held | What it waits for |
 | :---- | :---- | :---- |
-| H-06, CCR-5 | Alternative (A) drain of §3B "Entries and exit (normative)" (target lines 2224–2228). §3B is unchanged. | The Product Owner's ruling between CCR-5 alternatives (A) and (B), which 2.5 line 856 offers. The correcting HDE Build Notes addendum is the Product Owner's (2.9 line 1161; 2.10 line 1298, item P-1). |
+| H-06, CCR-5 | Alternative (A) drain of §3B "Entries and exit (normative)" (target lines 2224–2228). Unchanged. RL-10 adds a record field in "Record fields (required)" and does not touch Entries and exit. | The Product Owner's ruling between CCR-5 alternatives (A) and (B), which 2.5 line 856 offers. The correcting HDE Build Notes addendum is the Product Owner's (2.9 line 1161; 2.10 line 1298, item P-1). |
 | H-07, CCR-1 / P-2 | Spec Preflight B "Close-pack baseline declared (planning gate)", which lists the acceptance map (target lines 1733–1749). Unchanged. | The Product Owner's decision whether a tokenless Epic needs an acceptance map (2.10 line 1299). No source text exists to drain. |
 
 ## 7. Outside dependencies
 
 None blocks this package.
 
-* The concurrent T-01 (HDE Governance), T-03 (Change Process Guide) and T-06 (Glow QA Guide) drains of 2.15 are not inputs. RL-03 cites HDE Governance §3.4 for the existing open-rails requirement and execution controls, which §3.4 already states in v2.8.8 (lines 1192–1206).
-* Candidate CRD Items List item 9 (H-10) is open. RL-06 does not depend on its delivery (see §5, C-06).
+* The concurrent T-01 (HDE Governance), T-03 (Change Process Guide) and T-06 (Glow QA Guide) drains of 2.15 are not inputs. RL-04 and RL-08 cite HDE Governance §3.4 for the existing open-rails requirement, exemption content and execution controls, which §3.4 already states in v2.8.8 (lines 1192–1206).
+* Candidate CRD Items List item 9 (H-10) is open. RL-01 and RL-09 do not depend on its delivery (§5, C-06).
 
 ## 8. Constraints, assumptions and interpretations
 
+* Mapping by context. GTWPE-D3 decides that no document is gated on a drain target. The selected source units are the handoff's; their mapping onto PF27 sections is by context and scope. The ledger's section anchors ("bg:resolve --source vendor route-policy posture", "Canon precedence for template use", "CI lane classification", §1 "Live QA Plan") and 2.15's own drainage list (1849) locate changes but do not limit them.
 * Redline format. TW-DRAIN-10 requires literal fenced payloads; PF03 §8 says "When the operator supplies a redline format, follow it exactly", so its no-fence default does not apply to this redlines file. No fence enters PF27.
-* New heading style. RL-03's heading has no outer bold, as PF03 §8 "Structure and presentation" requires. Most PF27 headings are bold-wrapped; §3B's are not. PF27's review guardrails treat heading styling as non-material.
-* Placeholders. The existing Live QA Plan template placeholders are kept unchanged, as the handoff requires. RL-02 adds only allowed `<PLACEHOLDER>` markers ("Template-safe placeholders and omission syntax").
-* RL-03 placement. The new H3 follows the last line of the Open-Rails subsection (line 389) and precedes its `---` rule, so no existing heading, title or order changes. Line 389 belongs logically to the empty H4 "PF10 overrides / conflicts (if any)" at line 361, which the Open-Rails H3 at line 363 separates from its content; that pre-existing structure is unchanged (O-7).
-* RL-04 mapping. R-4 names "the final QA report and RCA". This template's QA RCA & Doc Delta summary is the closure-oriented summary that states what Live QA found and gives the readiness / closeout recommendation, so RL-04 places R-4's line and effect there. R-3's first-line rule is stated once, in RL-03, because the summary may live as a section of the close report.
-* CRD boundary. 2.15 excludes CRDs (1835) and leaves to the Product Owner whether a runtime-changing CRD runs the R-1 test (1825). PF27's CRD profile reuses this template with CRD substituted for Epic, so RL-03 states that reuse for a CRD does not by itself apply these rules.
-* RL-05 and §3B. R-3's first bullet places the close-pack write after the closure decision; §3B "Entries and exit" places the close mutation set before it. That is CCR-5. Under PF10's precedence rule R-3 governs as written (2.5 line 772), and the handoff directs draining it as written. After application PF27 states both rules until the Product Owner's CCR-5 ruling resolves H-06 (O-3).
-* RL-06 wording. D-2 says the category "reads as" the terminal-v1 legacy selection and keeps the matching evidence label unchanged, so the category keeps its name and gains its reading. The other "fallback" phrases in §2 (lines 1458, 1462 and 1470) ask a plan to state what fallback remains; D-2 names only the route-policy bullet for Plan Templates, and those prompts stay valid (O-6).
-* Citation form. New text names other PF documents by their in-document titles (`PF04-Canon-HDE-Governance`, `PF05-Canon-HDE-CLI-API-Vendor-Ref`) with a section, and HDE Build Notes is not cited by addendum, consistent with PF03 §3 "Canonical ownership" and with RL-01.
+* New heading style. RL-04's heading has no outer bold, as PF03 §8 "Structure and presentation" requires. Most PF27 headings are bold-wrapped; §3B's are not. PF27's review guardrails treat heading styling as non-material.
+* Placeholders. The existing template placeholders are kept unchanged, as the handoff requires. RL-03 adds only allowed `<PLACEHOLDER>` markers ("Template-safe placeholders and omission syntax"). RL-14 keeps the four verdict values.
+* RL-04 placement. The new H3 follows the last line of the Open-Rails subsection (line 389) and precedes its `---` rule, so no existing heading, title or order changes. Line 389 belongs logically to the empty H4 "PF10 overrides / conflicts (if any)" at line 361, which the Open-Rails H3 at line 363 separates from its content; that pre-existing structure is unchanged.
+* Record mapping for R-4. The final QA report and RCA maps to §1's QA RCA & Doc Delta summary and to §9; the close mutation set result to §3B's record; the closure decision to §10's Closure Decision. §8 reviews a check or check cluster, so its field is conditional on the record being the run's QA evidence review.
+* CRD boundary. 2.15 excludes CRDs (1835) and leaves to the Product Owner whether a runtime-changing CRD runs the R-1 test (1825). PF27's CRD profile reuses this template with CRD substituted for Epic, so RL-04 states that reuse for a CRD does not by itself apply these rules. RL-08 is inside the Epic Specification template.
+* RL-07 and §3B. R-3's first bullet places the close-pack write after the closure decision; §3B "Entries and exit" places the close mutation set before it. That is CCR-5. Under PF10's precedence rule R-3 governs as written (2.5 line 772), and the handoff directs draining it as written. After application PF27 states both until the Product Owner's CCR-5 ruling resolves H-06 (O-1).
+* RL-09 wording. D-2 says the category "reads as" the terminal-v1 legacy selection and keeps the matching evidence label unchanged, so the category keeps its name and gains its reading.
+* Citation form. New text names other PF documents by their in-document titles (`PF04-Canon-HDE-Governance`, `PF05-Canon-HDE-CLI-API-Vendor-Ref`) with a section, and HDE Build Notes is not cited by addendum, consistent with PF03 §3 "Canonical ownership" and with RL-02.
+* Pronouns. The source refers to the Product Owner as "he"; the drafted text names the role instead.
 * Not a current-state claim. No redline states current repository, deployment or QA state.
 
-## 9. Observations for Nathan (not drafted; outside the assigned selection)
+## 9. Observations for Nathan (not drafted)
 
-* O-1. R-4 also names QA readiness, the QA task set, the QA execution result, the QA evidence review, the close mutation set result and the closure decision. PF27 templates that may carry some of these lie outside §1: §3B "Record fields (required)", §8 "QA Pass Review Record", §9 "Final QA Closeout Review + QA RCA" and §10 "Epic Closure Review + Retrospective". 2.15's drainage list (1849) names only §1 for Plan Templates, and HDE Build Notes governs those templates meanwhile.
-* O-2. §2 "Contract and Compatibility Posture (MUST)" bullets "Open-rails QA declaration", "Implementation preservation" and "Review posture" (lines 1450, 1452, 1453) keep the touches-a-production-surface dependency that 2.15 supersedes for the scopes R-1 to R-4 address. They are not a named drainage target.
-* O-3. RL-05 and §3B state different orderings of the close-pack write and the closure decision until CCR-5 is ruled (H-06).
-* O-4. R-4 gives a plan the values RAN (with evidence references), WAIVED or MISSING. It does not say which value a plan carries for a live test it includes but has not yet run. RL-02 and RL-03 reproduce the rule as written.
-* O-5. "Review guardrails" > "Explicit non-blockers" repeats one bullet at lines 1199 and 1200. Removing it needs a source or Nathan's authorization; it is not a placeholder or drafting marker. Unchanged.
-* O-6. See §8, RL-06 wording.
-* O-7. See §8, RL-03 placement.
+* O-1. After application, RL-07 (R-3 as written) and §3B "Entries and exit" state different orderings of the close-pack write and the closure decision until CCR-5 is ruled (H-06). §10's "Open closure items" field (line 3617), which lists "close-pack baseline existence" among decisions before PO closeout, belongs to the same ordering question and is unchanged.
+* O-2. R-4 gives a plan the values RAN (with evidence references), WAIVED or MISSING. It does not say which value a plan carries for a live test it includes but has not yet run. RL-03 and RL-04 reproduce the rule as written.
+* O-3. "Review guardrails" > "Explicit non-blockers" repeats one bullet at lines 1199 and 1200. Removing it needs a source or Nathan's authorization; it is not a placeholder or drafting marker. Unchanged.
 
 ## 10. Producer validation
 
-Method: a script built every OLD block from the unchanged original by line number, built every NEW block from its OLD block, and checked the batch before the file was written. A second, independent parser then read the saved redlines file, extracted each fenced block, and repeated the checks against the original.
+Method: a script built every OLD block from the unchanged original by line number, built every NEW block from its OLD block where the OLD text is kept, and checked the batch before the file was written. A second, independent parser then read the saved redlines file, extracted each fenced block, and repeated the checks against the original.
 
 | Check | Result |
 | :---- | :---- |
-| Operation dialect | Six `REPLACE`; no `FIND_AND_REPLACE`, so the RL-045 count rule does not arise |
-| OLD occurrence, expected / observed | 1 / 1 for each of RL-01 to RL-06 |
-| OLD alignment | Each OLD starts at a line start and is followed by the original LF; each is the whole stated line |
-| Stated line equals resolved line | 287, 326, 389, 973, 1312, 1459 |
-| Spans (character offsets) | RL-01 27086–27420; RL-02 30064–30143; RL-03 35357–35434; RL-04 88968–89193; RL-05 161547–162110; RL-06 180321–180705 |
+| Operation dialect | Fifteen `REPLACE`; no `FIND_AND_REPLACE`, so the RL-045 count rule does not arise |
+| OLD occurrence, expected / observed | 1 / 1 for each of RL-01 to RL-15 |
+| OLD alignment | Each OLD starts at a line start and ends before the LF that ends its stated last line; each equals its stated line or line range |
+| Stated lines equal resolved lines | 112, 287, 326, 389, 973, 1168, 1312, 1450–1453, 1459, 2261, 3120, 3218, 3232, 3447, 3560 |
+| Spans (character offsets) | RL-01 8497–8772; RL-02 27086–27420; RL-03 30064–30143; RL-04 35357–35434; RL-05 88968–89193; RL-06 134106–134961; RL-07 161547–162110; RL-08 176395–178345; RL-09 180321–180705; RL-10 245520–245578; RL-11 278628–278711; RL-12 284474–284820; RL-13 284997–285019; RL-14 295485–295549; RL-15 300089–300119 |
 | Overlap, shared boundary, insertion in a replaced span, redline anchored on another's output | None |
 | Payload hygiene | No U+2026, no three-period sequence, no fence, no CR in any NEW block |
 | Saved-file round trip | Every fenced block in the saved file matches its stated SHA-256 and byte length, and re-resolves to count 1 in the original |
-| One-pass simulation | Applying all six against the original, in descending offset order, gives 329,151 bytes and 3,970 lines (SHA-256 `37d404892bda68f5d5577f2d222c531a9e77ccd6580332d2f0bb06952d215596`). Each NEW block occurs exactly once in the result. This simulation changes no header field; TW-APPLY-10 derives the document-control fields. |
+| One-pass simulation | Applying all fifteen against the original, in descending offset order, gives 332,044 bytes and 3,980 lines (SHA-256 `1a955c0082b4082f3945bb60a8c0a6f5e8780a535827579f7af17fa79e76e8e4`). Each NEW block occurs exactly once in the result. This simulation changes no header field; TW-APPLY-10 derives the document-control fields. |
 
 The validation scripts ran in the session scratchpad and are not committed.
 
@@ -184,13 +189,21 @@ The validation scripts ran in the session scratchpad and are not committed.
 * Status language and drafting markers: Status is Canon, not stale. A search for TODO, FIXME, `???`, TBD, draft-status wording and editorial notes found only template rules and template fields, which canon requires; no hygiene redline is needed.
 * No redline touches the header.
 
-## 12. Save verification receipt
+## 12. Correction record: prep-r1 to prep-r2
 
-Written after both files were saved in the working tree and read back from disk, on 2026-11-02.
+* What `prep-r1` was. Six redlines, saved and verified as `READY` / `COMPLETE_PACKAGE` (redlines file SHA-256 `0bb360b2fa126207207216a4b48f3fb42da211cd78ba487a243868a3b64ce15f`) and committed as "docs(ephemeral): add T-07 PF27 redlines and proof log (gtwpe-20261101-pf10-v14-0-5)". The defect below was found before that commit was first pushed; it reaches the branch only as the parent of the `prep-r2` commit, and it was not given to TW-APPLY-10.
+* The defect, this preparer's own. `prep-r1` mapped the selected units only onto the ledger's section anchors. It left PF27 sections that 2.15 bears on in context (the Epic Specification's open-rails bullets; the §3B, §8, §9 and §10 records; the Live QA Plan approval-blocker list) as observations "outside the assigned selection", and it disposed of 2.15 R-2, R-5 and R-6 as "not PF27's share" because 2.15's drainage list sends them to HDE Governance. Both are drain-target gates, which GTWPE-D3 rules out. It also left the D-2 "Version literals" row unexamined.
+* How it was found. Before the push, the fetch of the shared branch brought the ledger's 2026-11-02 correction banner (commit `a3632c0e533c1dfbad2f215c368210a65ecceb21`), which cites GTWPE-D3. GTWPE-D3 was then read in full; it had not been read for `prep-r1`.
+* The correction. The whole target was rescanned on context for every selected rule (§3), and every finding is recorded in §5 with its location. Nine redlines were added (r2 RL-01, RL-06, RL-08 and RL-10 to RL-15), r1's RL-03 (now RL-04) gained R-2, R-5 and R-6, and the batch was revalidated as a whole (§10).
+* ID map, r1 to r2: RL-01 to RL-02; RL-02 to RL-03; RL-03 to RL-04 (extended); RL-04 to RL-05; RL-05 to RL-07; RL-06 to RL-09. The text of r1's other five redlines is unchanged in r2.
+
+## 13. Save verification receipt
+
+Written after the redlines file was saved in the working tree and read back from disk, on 2026-11-02.
 
 | File | Verification |
 | :---- | :---- |
-| Redlines file | Read back from disk: 21,864 bytes, 226 lines, SHA-256 `0bb360b2fa126207207216a4b48f3fb42da211cd78ba487a243868a3b64ce15f`, ending with the line `END OF REDLINES` and a final LF. The independent parser re-validated the saved bytes: six redlines, each block matching its stated hash and length, each OLD at count 1, no overlap, and a one-pass result byte-identical to the simulation in §10. |
-| This proof log | Read back in full (sections 1 to 11) before this receipt was added, then read back again after it was added. |
+| Redlines file | Read back from disk: 45,443 bytes, 486 lines, SHA-256 `e547b3353dbaae69d8bd86d740d759da957204c1683a4ec61248997e3bf69212`, ending with the line `END OF REDLINES` and a final LF. The independent parser re-validated the saved bytes: fifteen redlines, each block matching its stated hash and length, each OLD at count 1, no overlap, and a one-pass result byte-identical to the simulation in §10. |
+| This proof log | Read back in full (sections 1 to 13) after it was written. A locator in §5, the `prep-r1` commit reference in §1 and §12, and this receipt were then corrected; the redlines file's identity row was corrected to match and the file was regenerated and re-validated (the hash above is the regenerated file's). The corrected lines were read back. |
 
 Save completeness: `COMPLETE_PACKAGE`. Preparation outcome: `READY`. The package is ready for TW-APPLY-10 with the unchanged original, these two files, ledger rows C-02, C-08, C-09 and C-26, the selected source units in §3, branch `claude/gtwpe-triage-authoring-j94ewf`, final-output directory `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF27/` and diagnostic path `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/PF27/PF27-apply-diagnostic.gtwpe-20261101-pf10-v14-0-5.md`. The commit that holds the pair is given in the ledger row and the session's final response.
