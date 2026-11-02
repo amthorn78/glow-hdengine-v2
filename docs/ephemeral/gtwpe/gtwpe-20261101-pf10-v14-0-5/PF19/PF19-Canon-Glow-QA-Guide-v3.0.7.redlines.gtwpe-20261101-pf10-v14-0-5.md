@@ -4,11 +4,12 @@
 
 | Field | Value |
 | :---- | :---- |
-| Run identity | `gtwpe-20261101-pf10-v14-0-5` task T-06, preparation revision 3 (supersedes revisions 1 and 2, see the proof log §11) |
+| Run identity | `gtwpe-20261101-pf10-v14-0-5` task T-06, preparation revision 4 (supersedes revisions 1 to 3, see the proof log §11) |
 | Target (original baseline) | `docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.7.md`, in-document title PF19-Canon-Glow-QA-Guide, v3.0.7, read at `origin/main` `e2b7427ff418ca8f08f05587c4a541308a76da56`, unchanged at `84d6d1cad95c67788336d174dc4b8922d9bb0cb2`; git blob `9af5e056608153aa8b279b5f170b6c7528e0e35b`; SHA-256 `e745ef3a939f103ef1aeeaef17e6d04ff0c03ca7e8ecc0d95abf261a07c1b160`; 682,678 bytes; 5,622 lines |
 | Source | `docs/pfcanon/PF10-HDE-Build-Notes-v14.0.5.md`, v14.0.5; git blob `9df074d90b59fe783c32f7cb3db25872d5dfe9d2`; SHA-256 `cea605d0475889bd9120a51947e23176ce7d2308eb5ab4503b040fd68ddf669d`; selected units 2.8 (lines 1063–1106, 1111–1127), 2.15 (lines 1650–1804), 2.2 (lines 517–551) and 2.16 (lines 1869–1939) |
-| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md`, the handoff's identity `142feb35144d8795f927e0c78b665ace52279064`, re-read at `31c91e586b30a82ba1651e0d8a8970d7da35de13` (T-06 selections unchanged); task T-06; rows C-17, C-18, C-26 (assigned), C-07, C-29 (uncertain, now drained), C-20, C-30 (supporting) |
+| Ledger | `docs/ephemeral/gtwpe/gtwpe-20261101-pf10-v14-0-5/LEDGER.md`, the handoff's identity `142feb35144d8795f927e0c78b665ace52279064`, re-read at `8ca919b00630caac5f3d62a422369e7923ad8989` (T-06 selections unchanged); task T-06; rows C-17, C-18, C-26 (assigned), C-07, C-29 (uncertain, now drained), C-20, C-30 (supporting); H-06 released for this document by the CCR-5 ruling |
 | Product Owner direction | Nathan, 2026-11-02, in this session: “fixed the defects and inconsistencies you noticed. And PF10 addenda should be referenced in any case” |
+| Product Owner ruling | Nathan, 2026-11-02, in the T-06 follow-up handoff: “close pack should go after the decision to close is confirmed”. It decides CCR-5 as alternative (A): 2.2 R-3 stands as written, its first bullet included, and the permanent documents are drained to match. |
 | Preparer | TW-DRAIN-10 — Prepare PF Document Redlines — 100926.1, run in the Claude Code session Nathan started for T-06 on 2026-11-02 |
 | Preparation outcome | `READY` |
 | Proof log | `PF19-Canon-Glow-QA-Guide-v3.0.7.redlines.gtwpe-20261101-pf10-v14-0-5.proof-log.md`, in this directory |
@@ -18,7 +19,7 @@
 * Every payload is fenced with `~~~~~~`. The literal is every byte between the line after the opening fence and the line before the closing fence, lines joined by LF, with no trailing LF. The fence lines and the labels around them are not part of the literal.
 * Every old block is one or more complete, contiguous baseline lines without the final terminating LF. Each old block occurs exactly once in the whole original baseline (expected and observed count 1). Where a single line repeats in the baseline, the old block is widened upward with the preceding lines until it is unique, and the replacement reproduces those lines unchanged.
 * Each replacement replaces only its old block. The baseline LF that follows the old block stays in place.
-* All 52 redlines resolve independently against the unchanged original. Their line spans do not overlap and no redline's output is another's locator.
+* All 53 redlines resolve independently against the unchanged original. Their line spans do not overlap and no redline's output is another's locator.
 * Trailing spaces are literal. Several old blocks and replacements end lines with two U+0020 spaces, as the baseline does.
 
 ## Document-control fields for TW-APPLY-10
@@ -186,7 +187,7 @@ QA-10 is the readiness decision and remediation return point. There is no separa
 
 * Operation: `REPLACE`
 * Change type: NEW_CANON
-* Source rows: C-26 (R-4, R-3, R-2 waiver form); support C-30; HDE Build Notes source reference
+* Source rows: C-26 (R-4, R-3, R-2 waiver form); support C-30; HDE Build Notes source reference; CCR-5 ruling (A), Nathan 2026-11-02: closure decision listed before the close mutation set
 * Heading path (literal baseline heading lines, outermost first): `# **3\. Post-commit QA (staging/prod)**` > `## **3.1 Intent**` > `### **3.1.2 Independent QA, reporting and closure**`
 * Location: §3.1.2, the third and last paragraph, beginning “Ops remains implementation work:” (baseline line 511)
 * Old block: baseline line 511
@@ -211,8 +212,8 @@ Live test line (normative; Epics). For an Epic, each of these records carries a 
 * the QA execution result;
 * the QA evidence review;
 * the final QA Report and the RCA;
-* the close mutation set result; and
-* the closure decision.
+* the closure decision; and
+* the close mutation set result.
 
 Only the Product Owner may decide that the live compat test, or any part of it, does not apply to an Epic. `WAIVED` needs the Product Owner's own written waiver, specific to the change, that quotes the Product Owner's words with their date and carries the exemption content HDE Governance requires. Silence, reviewer agreement, convenience, closed-rails success and an agent's finding that the test does not apply are not waivers; without a recorded waiver, the live compat test applies in full. `MISSING` blocks each stage:
 
@@ -223,8 +224,8 @@ Only the Product Owner may decide that the live compat test, or any part of it, 
 | QA Plan review | Not approvable |
 | QA evidence review | Not acceptable |
 | Final QA Report | No PASS verdict |
-| Close mutation set | Not close-PR-ready |
 | Closure decision | Not `CLOSE` |
+| Close mutation set | Not close-PR-ready |
 
 No agent may override that block; only the Product Owner may waive the live compat test or any part of it. Every prompt that produces one of these records applies this rule, and until a prompt is updated to carry it, the agent running that prompt applies it.
 
@@ -234,6 +235,28 @@ Both rules are expressly scoped to Epics (§0.2), and §3.5.5 records the open C
 ~~~~~~
 
 ### RL-08
+
+* Operation: `REPLACE`
+* Change type: CANON_UPDATE
+* Source rows: C-07 (2.2 R-3, first bullet; released from H-06 by the CCR-5 ruling (A), Nathan 2026-11-02)
+* Heading path (literal baseline heading lines, outermost first): `# **3\. Post-commit QA (staging/prod)**` > `## **3.1 Intent**` > `### **3.1.3 Permanent drainage and post-closure administration**`
+* Location: §3.1.3, the second paragraph, beginning “The close mutation set is outside the post-closure drainage rule above.” (baseline line 517)
+* Old block: baseline line 517
+* Expected occurrence of the old block in the whole baseline: 1
+
+Old block:
+
+~~~~~~
+The close mutation set is outside the post-closure drainage rule above. It comprises the change's close pack, its two ledgers, its same-run close evidence and their Human Evidence Index and Machine Mirror registration. It is produced after the final QA Report records verdict PASS, or after a `DO_NOT_CLOSE` closure decision whose return work is a missing, incomplete or defective close mutation set. It lands through the Product Owner's merge of the close pull request before the closure decision is made. The close mutation set is a closure prerequisite and precedes the closure decision; permanent PF drainage is not a closure prerequisite. HDE Build Notes governs the change-flow stage that produces the set, including its entries, its exit to the closure decision and its repair of close tooling; Change Process Guide governs the close pull request and its close-pack files.
+~~~~~~
+
+Replacement:
+
+~~~~~~
+The close mutation set is outside the post-closure drainage rule above. It comprises the change's close pack, its two ledgers, its same-run close evidence and their Human Evidence Index and Machine Mirror registration. The close-pack writer writes a close pack only at the close stage, at the end of a full work-unit cycle, after the authorized QA verdict and the closure decision exist (HDE Build Notes). The stage's entry is therefore a closure decision of `CLOSE`: the set is produced only after that decision confirms the close, and it never reopens implementation, QA or the closure decision. Its exit is the Product Owner's merge of the close pull request. Neither the close mutation set nor permanent PF drainage is a prerequisite of the closure decision. HDE Build Notes governs the change-flow stage that produces the set, including its entry, its exit and its repair of close tooling; Change Process Guide governs the close pull request and its close-pack files.
+~~~~~~
+
+### RL-09
 
 * Operation: `REPLACE`
 * Change type: NEW_CANON
@@ -257,11 +280,11 @@ This section describes a manual Live QA execution pattern that is generalized ac
 For an Epic, Live QA always includes the live compat test of §3.5.5; only QA that covers or records that test, or a recorded Product Owner waiver of it, carries the name “Live QA”, and each QA record carries the live test line of §3.1.2. This pattern governs how a Live QA check is run and evidenced. Following it does not make a check live: a QA run whose checks all ran under closed rails is closed-rails QA, whatever its records are titled.
 ~~~~~~
 
-### RL-09
+### RL-10
 
 * Operation: `REPLACE`
 * Change type: CANON_UPDATE
-* Source rows: C-18 (Epic close-run family); C-17 context; support C-20
+* Source rows: C-18 (Epic close-run family); C-17 context; support C-20; CCR-5 ruling (A), Nathan 2026-11-02: written after the closure decision
 * Heading path (literal baseline heading lines, outermost first): `# **3\. Post-commit QA (staging/prod)**` > `## **3.4 EPIC017 Live QA pattern (Codespaces → Railway)**` > `### **3.4.3 Evidence layout: current-state first (new posture)**` > `#### **QA evidence and work-product path grammar (normative)**`
 * Location: Path-grammar table row “Post-verdict close-run evidence of an admitted CRD” (baseline line 742)
 * Old block: baseline line 742
@@ -276,10 +299,10 @@ Old block:
 Replacement:
 
 ~~~~~~
-| Post-verdict close-run evidence of an admitted CRD or Epic | `audit/qa/<crd-id>/close/<check_id>/primary.log` for a CRD, or `audit/qa/<epic-id>/close/<check_id>/primary.log` for an Epic, each with its sibling `primary.log.path_proof.txt` | Introduced by HDE Build Notes for a CRD that the canonical evidence updater admits and extended to an Epic whose close run it admits; `<crd-id>` is the CRD's lower-case directory form, for example `hde-crd-0002`, and `<epic-id>` is the Epic's, for example `hde-epic041`. Each close-run check has one primary holding same-run mechanical evidence of the change's close workflow, rendered from that check's captured command, exit code and output as a Plan Templates v2 step-log header, with the PASS, FAIL or BLOCKED posture that “Close-pack truthfulness and same-run execution” requires. Only the canonical evidence updater writes the family, after the final QA verdict; it neither reopens nor adds to `qa_step_logs_manifest.json` or any `checks/` primary. Its members are the validated primaries and path proofs under `close/`, and anything else there is refused. This membership rule is a scoped exception, for `close/` only, to the rule against inferring state by enumerating subdirectories (§4.4.2); that rule continues to govern `checks/` and every other part of the QA root, where `qa_step_logs_manifest.json` stays the authoritative index. An Epic has the family only after its own explicit admission; HDE-EPIC041 is the first Epic admitted. HDE Schemas & Artifacts and HDE Build Notes govern the family's artifact contract. |
+| Post-verdict close-run evidence of an admitted CRD or Epic | `audit/qa/<crd-id>/close/<check_id>/primary.log` for a CRD, or `audit/qa/<epic-id>/close/<check_id>/primary.log` for an Epic, each with its sibling `primary.log.path_proof.txt` | Introduced by HDE Build Notes for a CRD that the canonical evidence updater admits and extended to an Epic whose close run it admits; `<crd-id>` is the CRD's lower-case directory form, for example `hde-crd-0002`, and `<epic-id>` is the Epic's, for example `hde-epic041`. Each close-run check has one primary holding same-run mechanical evidence of the change's close workflow, rendered from that check's captured command, exit code and output as a Plan Templates v2 step-log header, with the PASS, FAIL or BLOCKED posture that “Close-pack truthfulness and same-run execution” requires. Only the canonical evidence updater writes the family, after the final QA verdict and the closure decision of `CLOSE`; it neither reopens nor adds to `qa_step_logs_manifest.json` or any `checks/` primary. Its members are the validated primaries and path proofs under `close/`, and anything else there is refused. This membership rule is a scoped exception, for `close/` only, to the rule against inferring state by enumerating subdirectories (§4.4.2); that rule continues to govern `checks/` and every other part of the QA root, where `qa_step_logs_manifest.json` stays the authoritative index. An Epic has the family only after its own explicit admission; HDE-EPIC041 is the first Epic admitted. HDE Schemas & Artifacts and HDE Build Notes govern the family's artifact contract. |
 ~~~~~~
 
-### RL-10
+### RL-11
 
 * Operation: `REPLACE`
 * Change type: CANON_UPDATE
@@ -301,7 +324,7 @@ Replacement:
 5. exact owner-defined closeout surfaces, including the post-verdict close-run family of an admitted CRD under `audit/qa/<crd-id>/close/` or of an admitted Epic under `audit/qa/<epic-id>/close/`;  
 ~~~~~~
 
-### RL-11
+### RL-12
 
 * Operation: `REPLACE`
 * Change type: CONSISTENCY
@@ -323,7 +346,7 @@ Replacement:
 * Approved omission markers are `[SNIP: <n> lines omitted]` and `[SNIP: paragraph omitted]`. Any other omission marker is treated as non-canon.  
 ~~~~~~
 
-### RL-12
+### RL-13
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -348,11 +371,11 @@ Replacement:
 ### **3.4.12 Doc-alignment steps (mechanical, not narrative)**
 ~~~~~~
 
-### RL-13
+### RL-14
 
 * Operation: `REPLACE`
 * Change type: CANON_UPDATE
-* Source rows: C-18 (Epic close-run family); C-17 context; support C-20
+* Source rows: C-18 (Epic close-run family); C-17 context; support C-20; CCR-5 ruling (A), Nathan 2026-11-02: published after the closure decision
 * Heading path (literal baseline heading lines, outermost first): `# **3\. Post-commit QA (staging/prod)**` > `## **3.4 EPIC017 Live QA pattern (Codespaces → Railway)**` > `### **3.4.11 Vendor and DB safety constraints (names-only)**`
 * Location: Third paragraph of “Close-pack truthfulness and same-run execution (normative)”, beginning “For a CRD that the canonical evidence updater admits,” (baseline line 1124)
 * Old block: baseline line 1124
@@ -367,10 +390,10 @@ For a CRD that the canonical evidence updater admits, the home of that same-run 
 Replacement:
 
 ~~~~~~
-For a CRD or an Epic that the canonical evidence updater admits, the home of that same-run close evidence is the post-verdict close-run family under `audit/qa/<crd-id>/close/` or `audit/qa/<epic-id>/close/` (§3.4.3): one primary log per close-run check, each with its sibling path proof, published after the final QA verdict without reopening or adding to the change's approved QA step-logs manifest or any `checks/` primary. An Epic has that family only after its own explicit admission; HDE-EPIC041 is the first Epic admitted.
+For a CRD or an Epic that the canonical evidence updater admits, the home of that same-run close evidence is the post-verdict close-run family under `audit/qa/<crd-id>/close/` or `audit/qa/<epic-id>/close/` (§3.4.3): one primary log per close-run check, each with its sibling path proof, published after the final QA verdict and the closure decision of `CLOSE`, without reopening or adding to the change's approved QA step-logs manifest or any `checks/` primary. An Epic has that family only after its own explicit admission; HDE-EPIC041 is the first Epic admitted.
 ~~~~~~
 
-### RL-14
+### RL-15
 
 * Operation: `REPLACE`
 * Change type: CANON_UPDATE
@@ -392,7 +415,7 @@ Replacement:
 The same requirements apply to a CRD close report, for example `audit/HDE-CRD-0002_close_report.md`. The generic close-pack writer renders both elements from a `close_candidate_source.v2` source, for an Epic or a CRD: the heading `QA Rails — Open/Close (Final PR)` verbatim, and the “Acceptance and evidence pointers” list with one entry for each pointer the source records. For a CRD, the change's close-run family root, `audit/qa/<crd-id>/close/`, is a required pointer, and the writer refuses a source that omits it. An Epic's source may record its own close-run family root, `audit/qa/<epic-id>/close/`, as a pointer before the close run writes that directory, but is not required to. HDE Mechanics Guide, HDE Schemas & Artifacts and Change Process Guide own the writer, its source schema and the close-pack paths of record.
 ~~~~~~
 
-### RL-15
+### RL-16
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -414,7 +437,7 @@ Replacement:
 * it stores each check’s QA artifacts under `audit/qa/<epic-id>/checks/<check_id>/` in the repo, where `<epic-id>` is the lower-case epic identifier (for example `hde-epic018`) and the approved plan resolves the concrete \\
 ~~~~~~
 
-### RL-16
+### RL-17
 
 * Operation: `REPLACE`
 * Change type: NEW_CANON
@@ -456,7 +479,7 @@ This minimum, and the live test line and “Live QA” name rules in §3.1.2, ar
 Production-affecting Live QA minimum is as follows.
 ~~~~~~
 
-### RL-17
+### RL-18
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -482,7 +505,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-18
+### RL-19
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -507,7 +530,7 @@ Replacement:
 ### **Tokens (names-only)**
 ~~~~~~
 
-### RL-19
+### RL-20
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -533,7 +556,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-20
+### RL-21
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -559,7 +582,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-21
+### RL-22
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -585,7 +608,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-22
+### RL-23
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -610,7 +633,7 @@ Replacement:
 ### **Scope**
 ~~~~~~
 
-### RL-23
+### RL-24
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -636,7 +659,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-24
+### RL-25
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -661,7 +684,7 @@ Replacement:
 ### **Tokens (names-only)**
 ~~~~~~
 
-### RL-25
+### RL-26
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -687,7 +710,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-26
+### RL-27
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -712,7 +735,7 @@ Replacement:
 ### **Scope**
 ~~~~~~
 
-### RL-27
+### RL-28
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -738,7 +761,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-28
+### RL-29
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -763,7 +786,7 @@ Replacement:
 ### **Evidence**
 ~~~~~~
 
-### RL-29
+### RL-30
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -788,7 +811,7 @@ Replacement:
 ### **Scope**
 ~~~~~~
 
-### RL-30
+### RL-31
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -814,7 +837,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-31
+### RL-32
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -840,7 +863,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-32
+### RL-33
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -865,7 +888,7 @@ Replacement:
 ### **Tokens (names-only, FE pattern)**
 ~~~~~~
 
-### RL-33
+### RL-34
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -891,7 +914,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-34
+### RL-35
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -913,7 +936,7 @@ Replacement:
 * FE QA artifacts added without corresponding updates to the human index and machine mirror in the same PR.
 ~~~~~~
 
-### RL-35
+### RL-36
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -937,7 +960,7 @@ Replacement:
 * `artifacts/admin/http_bundle_<pair>.json` — HTTP admin bundle.  
 ~~~~~~
 
-### RL-36
+### RL-37
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -959,7 +982,7 @@ Replacement:
 When a new `audit/qa/<epic-id>/` tree is introduced, the build/infra owner MUST ensure that .gitignore has no entries that match audit/qa, unless explicit allow rules keep per-epic QA evidence trees visible to git while still allowing narrowly targeted ignores for non-evidence scratch files.
 ~~~~~~
 
-### RL-37
+### RL-38
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -985,7 +1008,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-38
+### RL-39
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1011,7 +1034,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-39
+### RL-40
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1037,7 +1060,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-40
+### RL-41
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1063,7 +1086,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-41
+### RL-42
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1089,7 +1112,7 @@ Replacement:
 
 ~~~~~~
 
-### RL-42
+### RL-43
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1114,7 +1137,7 @@ Replacement:
 ### **9.1.7 App FE/BE (App QA docs)**
 ~~~~~~
 
-### RL-43
+### RL-44
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1136,7 +1159,7 @@ Replacement:
     * The manifest is current-state only. Any per-run retention logs under `runs/<run_id>/<RUN_SUBPATH>` are optional and non-canonical, and MUST NOT be referenced by log\_path.  
 ~~~~~~
 
-### RL-44
+### RL-45
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1158,7 +1181,7 @@ Replacement:
   * The epic maintains `audit/qa/<epic-id>/qa_step_logs_manifest.json` as a per-epic index keyed by check\_id, mapping each required check to its canonical primary log via log\_path.  
 ~~~~~~
 
-### RL-45
+### RL-46
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1182,7 +1205,7 @@ Replacement:
     * `artifacts/admin/http_bundle_<pair>.json` (HTTP),  
 ~~~~~~
 
-### RL-46
+### RL-47
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1204,7 +1227,7 @@ Replacement:
   * At least one governed admin bundle artifact (for example `artifacts/admin/cli_bundle_<pair>.json`) per test match, produced via the canonical admin bundle builder under determinism env pins.  
 ~~~~~~
 
-### RL-47
+### RL-48
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1226,7 +1249,7 @@ Replacement:
     * a consolidated step logs manifest (`audit/qa/<epic-id>/qa_step_logs_manifest.json`)  
 ~~~~~~
 
-### RL-48
+### RL-49
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1248,7 +1271,7 @@ Replacement:
 Note: Under current QA posture, the manifest is a current-state index keyed by check\_id. Optional per-run retention paths under `audit/qa/<epic-id>/runs/<run_id>/<RUN_SUBPATH>` may exist, but are not required for this token.
 ~~~~~~
 
-### RL-49
+### RL-50
 
 * Operation: `REPLACE`
 * Change type: CONSISTENCY
@@ -1271,7 +1294,7 @@ Replacement:
 * for an Epic, the live test line of §3.1.2 in the final QA Report and RCA, with its value and the evidence references or waiver it cites  
 ~~~~~~
 
-### RL-50
+### RL-51
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
@@ -1293,7 +1316,7 @@ Replacement:
 | 13.8 | SRC-0292 | H | Retain the temporary PF10 clarification as historical; current HDE Build Notes addenda govern where they speak. |
 ~~~~~~
 
-### RL-51
+### RL-52
 
 * Operation: `REPLACE`
 * Change type: DELETION
@@ -1317,7 +1340,7 @@ Replacement:
 Known non-goals: this entry does not redefine canonical JSON mechanics, arrays-as-sets semantics, evidence publication or Machine Mirror mechanics, exact repository paths, commands, tests, hashes, artifacts, PF09 row text or status, close-pack bytes, token semantics, workflow syntax, implementation state, deployment state, or current repository state. PF19 records the QA posture and review learnings only.
 ~~~~~~
 
-### RL-52
+### RL-53
 
 * Operation: `REPLACE`
 * Change type: DOC_HYGIENE
