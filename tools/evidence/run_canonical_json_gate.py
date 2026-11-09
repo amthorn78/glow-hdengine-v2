@@ -1162,6 +1162,9 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
     check_rows: list[dict[str, object]] = []
     compare_rows: list[dict[str, object]] = []
     failures: list[str] = []
+    # HDE Schemas & Artifacts §1.2: rows carry closed tokens only; the exception
+    # detail of a failing row goes to stderr, which is not governed evidence.
+    details: list[tuple[str, str, BaseException]] = []
 
     if not _target_inventory_is_exact(targets):
         failures.append("target_inventory_incomplete_or_duplicate")
@@ -1194,7 +1197,8 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
             obj = json.loads(data)
         except json.JSONDecodeError as exc:
             obj = None
-            issues.append(f"json_error:{exc.msg}")
+            issues.append("json_error:JSONDecodeError")
+            details.append((rel, "json_error:JSONDecodeError", exc))
 
         canonical_bytes = b""
         if obj is not None:
@@ -1202,7 +1206,9 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
             try:
                 _validate_target(target, obj)
             except Exception as exc:  # validators deliberately fail closed
-                issues.append(f"validation_error:{type(exc).__name__}:{exc}")
+                token = f"validation_error:{type(exc).__name__}"
+                issues.append(token)
+                details.append((rel, token, exc))
 
         trailing_lf = data.endswith(b"\n")
         if not trailing_lf:
@@ -1290,7 +1296,8 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
                 obj = json.loads(data)
             except json.JSONDecodeError as exc:
                 obj = None
-                issues.append(f"json_error:{exc.msg}")
+                issues.append("json_error:JSONDecodeError")
+                details.append((f"endpoint:{probe.route}", "json_error:JSONDecodeError", exc))
             canonical_bytes = b""
             if obj is not None:
                 canonical_bytes = sercanon(obj, sort_keys=True)
@@ -1419,9 +1426,28 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
                 produced_at=generated_at,
             )
 
+    _report_failed_rows(check_rows, details)
     if failures:
         return 1
     return 0
+
+
+def _report_failed_rows(
+    check_rows: Sequence[Mapping[str, object]],
+    details: Sequence[tuple[str, str, BaseException]],
+) -> None:
+    """Print diagnostic detail for failing rows to stderr; a passing run prints nothing."""
+
+    for row in check_rows:
+        if row.get("status") == "fail":
+            issues = ",".join(str(issue) for issue in row.get("issues", ()))
+            print(f"CANONICAL_JSON_GATE_ROW_FAIL {row['path']} {issues}", file=sys.stderr)
+    for path, token, exc in details:
+        message = " ".join(str(exc).split())
+        print(
+            f"CANONICAL_JSON_GATE_ROW_DETAIL {path} {token} {type(exc).__name__}: {message}",
+            file=sys.stderr,
+        )
 
 
 def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:

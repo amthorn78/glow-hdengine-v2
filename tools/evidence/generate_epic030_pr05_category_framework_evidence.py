@@ -2,6 +2,7 @@
 """Generate EPIC030 PR-05 category-framework carry-forward evidence artifacts."""
 from __future__ import annotations
 
+import argparse
 import datetime as _dt
 import hashlib
 import json
@@ -240,5 +241,20 @@ def generate() -> None:
     _write_text(OUT_DIR / "category_framework_binding.log", "\n".join(binding_lines))
 
 
-if __name__ == "__main__":
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Regenerate the HDE-EPIC030 PR-05 category-framework evidence family."
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Parse arguments before any write (HDE-CRD-0003 S19-R04)."""
+
+    parse_args([] if argv is None else list(argv))
     generate()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import os
+import shutil
 import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -423,8 +428,11 @@ def test_attestation_maps_the_release_sanity_distinct_code_to_release_not_admitt
     assert other.value.code == "isolated_stage_failed"
 
     receipt_dir = tmp_path / "receipt"
-    receipt_dir.mkdir()
-    attestation._write_failure(receipt_dir, excinfo.value)
+    owned = attestation._claim_output_root(receipt_dir, tmp_path / "source")
+    try:
+        attestation._fail_owned_output(owned, excinfo.value)
+    finally:
+        owned.close()
     receipt = json.loads((receipt_dir / "failure.json").read_bytes())
     assert receipt == {
         "schema": "hde.release_attestation.failure.v1",
@@ -488,3 +496,179 @@ def test_attestation_maps_every_admission_gated_isolated_stage(tmp_path, monkeyp
     with pytest.raises(attestation.AttestationBuildError) as other:
         attestation._run_stage(tmp_path, "build_package_wheel", ("python", "x.py"), [], attestation_bin=tmp_path)
     assert other.value.code == "isolated_stage_failed"
+
+
+# --- HDE-CRD-0003 S04: the --log-path bound (HDE Governance §4.1.8) -------------------------
+
+
+def _log_path_case(tmp_path: Path, case: str) -> Path:
+    real = tmp_path / "real"
+    real.mkdir()
+    (real / "existing.log").write_bytes(b"keep\n")
+    if case == "SYMLINK":
+        (tmp_path / "link.log").symlink_to(real / "existing.log")
+        return tmp_path / "link.log"
+    if case in ("SYMLINK_COMPONENT", "SYMLINK_COMPONENT_AFTER_DOTDOT"):
+        (tmp_path / "linkdir").symlink_to(real, target_is_directory=True)
+        if case == "SYMLINK_COMPONENT":
+            return tmp_path / "linkdir" / "sanity.log"
+        # Lexically the target is linkdir/sanity.log; the walk of the path as
+        # given stops at the missing component, so the normalized path is walked too.
+        return tmp_path / "missing" / ".." / "linkdir" / "sanity.log"
+    if case == "IN_REPOSITORY_NOT_CANONICAL":
+        return run_sanity_pipeline.SANITY_LOG.parent / "not-the-canonical.log"
+    if case == "PARENT_MISSING":
+        return tmp_path / "missing" / "sanity.log"
+    if case == "NOT_REGULAR_FILE":
+        return real
+    if case == "SYMLINK_TO_CANONICAL":
+        (tmp_path / "canonical.log").symlink_to(run_sanity_pipeline.SANITY_LOG)
+        return tmp_path / "canonical.log"
+    raise AssertionError(case)
+
+
+def _tree_bytes(root: Path) -> dict[str, bytes]:
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in sorted(root.rglob("*"))
+        if path.is_file() and not path.is_symlink()
+    }
+
+
+def _assert_refused_before_any_step_or_write(monkeypatch, capsys, tmp_path, target, code):
+    canonical_before = run_sanity_pipeline.SANITY_LOG.read_bytes()
+    tmp_before = _tree_bytes(tmp_path)
+    calls: list[object] = []
+    monkeypatch.setattr(run_sanity_pipeline, "_run_stage", lambda step: calls.append(step) or 0)
+    monkeypatch.setattr(run_sanity_pipeline, "_rebind_failure_log", lambda: calls.append("rebind") or 0)
+
+    with pytest.raises(run_sanity_pipeline.LogPathRefused) as refused:
+        run_sanity_pipeline.run_pipeline(log_path=target)
+    assert refused.value.code == code
+    assert run_sanity_pipeline.main(["--log-path", str(target)]) == run_sanity_pipeline.LOG_PATH_REFUSED_EXIT_CODE == 2
+    stderr = capsys.readouterr().err
+    assert stderr == f"SANITY_LOG_PATH_REFUSED:{code}\n"
+    assert not any(char.isdigit() for char in stderr)
+    assert calls == []
+    assert run_sanity_pipeline.SANITY_LOG.read_bytes() == canonical_before
+    assert _tree_bytes(tmp_path) == tmp_before
+    assert not (run_sanity_pipeline.SANITY_LOG.parent / "not-the-canonical.log").exists()
+
+
+@pytest.mark.parametrize(
+    ("case", "code"),
+    (
+        ("SYMLINK", "SYMLINK"),
+        ("SYMLINK_COMPONENT", "SYMLINK_COMPONENT"),
+        ("SYMLINK_COMPONENT_AFTER_DOTDOT", "SYMLINK_COMPONENT"),
+        ("IN_REPOSITORY_NOT_CANONICAL", "IN_REPOSITORY_NOT_CANONICAL"),
+        ("PARENT_MISSING", "PARENT_MISSING"),
+        ("NOT_REGULAR_FILE", "NOT_REGULAR_FILE"),
+        ("SYMLINK_TO_CANONICAL", "SYMLINK"),
+    ),
+)
+def test_log_path_bound_refuses_before_any_step_or_write(tmp_path, monkeypatch, capsys, case, code):
+    target = _log_path_case(tmp_path, case)
+    _assert_refused_before_any_step_or_write(monkeypatch, capsys, tmp_path, target, code)
+
+
+def test_log_path_bound_refuses_a_component_it_cannot_examine(tmp_path, monkeypatch, capsys):
+    # A directory without search permission makes lstat of its entries fail.  The
+    # test process runs as root in some environments, so the OS answer is simulated.
+    guarded = tmp_path / "guarded"
+    guarded.mkdir()
+    real_lstat = os.lstat
+
+    def lstat(path, *args, **kwargs):
+        if Path(path) == guarded / "sanity.log":
+            raise PermissionError(13, "Permission denied", str(path))
+        return real_lstat(path, *args, **kwargs)
+
+    monkeypatch.setattr(run_sanity_pipeline.os, "lstat", lstat)
+    _assert_refused_before_any_step_or_write(
+        monkeypatch, capsys, tmp_path, guarded / "sanity.log", "UNREADABLE_COMPONENT"
+    )
+
+
+def test_log_path_bound_accepts_an_existing_regular_file_outside_the_repository(tmp_path, monkeypatch):
+    log_path = tmp_path / "sanity.log"
+    log_path.write_bytes(b"older\n")
+    steps = [run_sanity_pipeline.SanityStep("step-one", ["echo", "one"])]
+    monkeypatch.setattr(run_sanity_pipeline, "_run_command", _fake_runner([0]))
+    assert run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps) == 0
+    assert log_path.read_bytes().endswith(b"summary:PASS\n")
+
+
+# --- HDE-CRD-0003 S19-R04: asking an owner tool for usage changes nothing ------------------
+
+_FIXED_TIME_NS = 1_000_000_000_000_000_000
+
+
+def _tracked_copy(destination: Path) -> Path:
+    """Copy every tracked file, with one fixed old mtime, so any rewrite is visible."""
+
+    listed = subprocess.run(
+        ["git", "-C", str(run_sanity_pipeline.ROOT), "ls-files", "-z"],
+        check=True,
+        capture_output=True,
+    ).stdout
+    for raw in listed.split(b"\0"):
+        if not raw:
+            continue
+        rel = raw.decode("utf-8")
+        source, target = run_sanity_pipeline.ROOT / rel, destination / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if source.is_symlink():
+            target.symlink_to(os.readlink(source))
+        elif source.is_file():
+            shutil.copy2(source, target)
+            os.utime(target, ns=(_FIXED_TIME_NS, _FIXED_TIME_NS))
+    return destination
+
+
+def _tree_state(root: Path) -> dict[str, tuple[object, ...]]:
+    state: dict[str, tuple[object, ...]] = {}
+    for directory, names, files in os.walk(root):
+        for name in names + files:
+            path = Path(directory) / name
+            info = path.lstat()
+            body = (
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                if path.is_file() and not path.is_symlink()
+                else None
+            )
+            state[path.relative_to(root).as_posix()] = (
+                info.st_mode, info.st_size, info.st_mtime_ns, info.st_ino, body,
+            )
+    return state
+
+
+def _run_in_copy(copy: Path, tool: str, *args: str) -> subprocess.CompletedProcess[str]:
+    env = {**os.environ, **run_sanity_pipeline_gate.PINS, "PYTHONDONTWRITEBYTECODE": "1"}
+    return subprocess.run(
+        [sys.executable, tool, *args], cwd=copy, env=env, capture_output=True, text=True, timeout=600
+    )
+
+
+def test_sanity_gate_help_changes_no_file(tmp_path):
+    copy = _tracked_copy(tmp_path / "tree")
+    before = _tree_state(copy)
+    result = _run_in_copy(copy, "tools/evidence/run_sanity_pipeline_gate.py", "--help")
+    assert result.returncode == 0
+    assert result.stdout.startswith("usage:") and result.stderr == ""
+    assert _tree_state(copy) == before
+
+
+def test_sanity_gate_main_parses_an_empty_argument_list(monkeypatch):
+    runs: list[object] = []
+    monkeypatch.setattr(
+        run_sanity_pipeline_gate.subprocess, "run",
+        lambda *args, **kwargs: runs.append(args) or _FakeCompletedProcess(1),
+    )
+    monkeypatch.setattr(sys, "argv", ["pytest", "--unknown-pytest-option"])
+    assert run_sanity_pipeline_gate.main() == 1
+    assert run_sanity_pipeline_gate.main([]) == 1
+    assert len(runs) == 2
+    with pytest.raises(SystemExit) as usage:
+        run_sanity_pipeline_gate.main(["--help"])
+    assert usage.value.code == 0 and len(runs) == 2

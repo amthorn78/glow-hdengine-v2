@@ -11,6 +11,7 @@ fails.  The constants below are an independent copy of the pipeline's model;
 """
 from __future__ import annotations
 
+import argparse
 import os
 import subprocess
 import sys
@@ -77,7 +78,17 @@ def _valid_not_admitted_log() -> bool:
     return _read_log() == _expected_not_admitted_log()
 
 
-def main() -> int:
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Run the canonical release-sanity pipeline and validate its log."
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Parse arguments before running the pipeline (HDE-CRD-0003 S19-R04)."""
+
+    parse_args([] if argv is None else list(argv))
     env = os.environ.copy()
     env.update(PINS)
     result = subprocess.run(
@@ -104,4 +115,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))
