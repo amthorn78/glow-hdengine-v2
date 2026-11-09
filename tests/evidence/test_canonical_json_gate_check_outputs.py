@@ -3,7 +3,11 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import os
+import re
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -44,14 +48,17 @@ _FROZEN_CAPTURE_IDENTITY = {
 }
 
 
-def _gate_root(tmp_path, *, copy_artifacts=False):
+def _gate_root(tmp_path, *, copy_artifacts=False, copy_audit=False):
     """A temporary root holding every release roster member and the gate's inputs."""
     source_root = run_canonical_json_gate.ROOT
     if copy_artifacts:
         shutil.copytree(source_root / "artifacts", tmp_path / "artifacts")
     else:
         (tmp_path / "artifacts").symlink_to(source_root / "artifacts", target_is_directory=True)
-    (tmp_path / "audit").symlink_to(source_root / "audit", target_is_directory=True)
+    if copy_audit:
+        shutil.copytree(source_root / "audit", tmp_path / "audit")
+    else:
+        (tmp_path / "audit").symlink_to(source_root / "audit", target_is_directory=True)
     for name in _ROSTER_DIRECTORIES:
         shutil.copytree(source_root / name, tmp_path / name)
     for rel_path in ADMITTED_RELEASE_ROSTER:
@@ -1608,3 +1615,95 @@ def test_gate_never_reads_service_identity_for_capture_identity(tmp_path, monkey
     for rel_path, _key_path in run_canonical_json_gate._CAPTURE_IDENTITY_SOURCES:
         assert rel_path in run_canonical_json_gate._FROZEN_GENERATED_SHA256
     assert not hasattr(run_canonical_json_gate, "_CAPTURE_IDENTITY_META")
+
+
+# --- HDE-CRD-0003 S05: governed gate check rows carry closed tokens only --------------------
+
+_CLOSED_ISSUE = re.compile(
+    r"\A(?:validation_error:[A-Za-z_][A-Za-z0-9_]*|json_error:JSONDecodeError"
+    r"|missing:[A-Za-z0-9_.][A-Za-z0-9_./-]*|unexpected_http_status:[0-9]+!=[0-9]+"
+    r"|missing_trailing_lf|utf8_bom_present|empty_bytes|non_canonical_bytes)\Z"
+)
+_GATE_LOGS = (
+    "audit/gates/json_gate/canonical/json_gate_check_log.ndjson",
+    "audit/gates/json_gate/canonical/json_gate_compare_log.ndjson",
+    "audit/gates/canonical_json/json_canonical_check.log",
+    "audit/gates/canonical_json/json_canon_compare.log",
+)
+
+
+def test_write_mode_failure_rows_carry_only_closed_tokens(tmp_path, monkeypatch, capsys):
+    from flask import request
+    from tools.evidence import update_evidence_index
+
+    source_root = run_canonical_json_gate.ROOT
+    tracked_before = {rel: (source_root / rel).read_bytes() for rel in _GATE_LOGS}
+    (tmp_path / "root").mkdir()
+    root = _gate_root(tmp_path / "root", copy_audit=True)
+    _point_gate_at(monkeypatch, root)
+    monkeypatch.setattr(update_evidence_index, "ROOT", root)
+
+    leaked = f"{tmp_path}/machine/local/detail"
+    original_validate = run_canonical_json_gate._validate_target
+
+    def forced_validation_failure(target, obj):
+        if target.rel_path == "catalog/magic10.json":
+            raise ValueError(f"forced failure at {leaked}")
+        return original_validate(target, obj)
+
+    monkeypatch.setattr(run_canonical_json_gate, "_validate_target", forced_validation_failure)
+    (root / "catalog/narratives/palettes.json").write_bytes(b"{not json\n")
+    probe_route = run_canonical_json_gate.CONJUNCTION_PROBES[0].route
+    real_create_app = run_canonical_json_gate.create_app
+
+    def app_with_one_non_json_probe():
+        app = real_create_app()
+
+        @app.after_request
+        def _break(response):
+            if request.path == probe_route:
+                response.set_data(b"<html>not json</html>\n")
+            return response
+
+        return app
+
+    monkeypatch.setattr(run_canonical_json_gate, "create_app", app_with_one_non_json_probe)
+
+    assert run_canonical_json_gate._run_gate(run_canonical_json_gate.TARGETS) == 1
+
+    rows_by_path: dict[str, list[str]] = {}
+    for rel in _GATE_LOGS:
+        text = (root / rel).read_text(encoding="utf-8")
+        assert str(tmp_path) not in text and str(source_root) not in text
+        assert "forced failure" not in text and "Expecting" not in text
+        for line in text.splitlines():
+            row = json.loads(line)
+            assert not str(row["path"]).startswith("/")
+            for issue in row["issues"]:
+                assert _CLOSED_ISSUE.match(issue), issue
+            rows_by_path.setdefault(row["path"], row["issues"])
+    assert "validation_error:ValueError" in rows_by_path["catalog/magic10.json"]
+    assert "json_error:JSONDecodeError" in rows_by_path["catalog/narratives/palettes.json"]
+    assert "json_error:JSONDecodeError" in rows_by_path[f"endpoint:{probe_route}"]
+
+    stderr = capsys.readouterr().err
+    assert (
+        "CANONICAL_JSON_GATE_ROW_DETAIL catalog/magic10.json validation_error:ValueError "
+        f"ValueError: forced failure at {leaked}"
+    ) in stderr
+    assert "CANONICAL_JSON_GATE_ROW_DETAIL catalog/narratives/palettes.json json_error:JSONDecodeError" in stderr
+    assert f"CANONICAL_JSON_GATE_ROW_DETAIL endpoint:{probe_route} json_error:JSONDecodeError" in stderr
+    assert {rel: (source_root / rel).read_bytes() for rel in _GATE_LOGS} == tracked_before
+
+
+def test_passing_check_only_run_prints_nothing_and_keeps_the_recorded_hashes():
+    root = run_canonical_json_gate.ROOT
+    env = {**os.environ, "LC_ALL": "C", "LANG": "C", "TZ": "UTC", "SAFE_MODE": "1", "ALLOW_NETWORK": "0", "PYTHONDONTWRITEBYTECODE": "1"}
+    result = subprocess.run(
+        [sys.executable, "tools/evidence/run_canonical_json_gate.py", "--check-only"],
+        cwd=root, env=env, capture_output=True, timeout=600,
+    )
+    recorded = json.loads((root / "audit/gates/parity/reader_cli/summary.json").read_bytes())["canonical_gate"]
+    assert result.returncode == 0
+    assert hashlib.sha256(result.stdout).hexdigest() == recorded["stdout_sha256"]
+    assert hashlib.sha256(result.stderr).hexdigest() == recorded["stderr_sha256"]
