@@ -21,6 +21,8 @@ EXCLUDED_PREFIXES = (
     "docs/prompt_ecosystem_management/",
     "handoff/",
     "tests/",
+    # HDE-CRD-0003 S17: vendored PF document copies are tool input, not code or guidance.
+    "tools/pf_tool_inputs/documents/",
     "codex/out/",
     "notes/",
     "build/",

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from tools.pf_tool_inputs.refresh import git_blob_id, write_input_set
 from tools.qa import qa_harness
 from tools.qa.qa_harness import (
     CheckResult,
@@ -213,6 +214,26 @@ def _emulate_modern_non_strict_loop_resolution(
     monkeypatch.setattr(Path, "resolve", resolve)
 
 
+PF04_FIXTURE_TEXT = (
+    "## **2.0 Acceptance Tokens (single-home roster)**\n"
+    "* **QA\\_HARNESS\\_DISCIPLINE\\_OK** — declared.\n"
+    "* **QA\\_HARNESS\\_DISCIPLINE\\_OK** — duplicate declaration is harmless.\n"
+    "`RETIRED_PROSE_OK` is not a token.\n"
+    "## **2.1 Next**\n"
+)
+
+
+def _write_pf04_fixture(root: Path, text: str, *, vendored: bool = True) -> None:
+    """The repository's PF04 Governance source as a PF tool input (HDE-CRD-0003 S17)."""
+    data = text.encode("utf-8")
+    write_input_set(
+        root,
+        "0" * 40,
+        [("PF04-Canon-HDE-Governance-v1.md", data, git_blob_id(data))],
+        vendored_ids={"PF04"} if vendored else (),
+    )
+
+
 @pytest.fixture
 def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     for key, value in {
@@ -224,21 +245,13 @@ def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         "APP_ENV": "test",
     }.items():
         monkeypatch.setenv(key, value)
-    (tmp_path / "docs/pfcanon").mkdir(parents=True)
-    (tmp_path / "docs/pfcanon/PF04-Canon-HDE-Governance-v1.md").write_text(
-        "## **2.0 Acceptance Tokens (single-home roster)**\n"
-        "* **QA\\_HARNESS\\_DISCIPLINE\\_OK** — declared.\n"
-        "* **QA\\_HARNESS\\_DISCIPLINE\\_OK** — duplicate declaration is harmless.\n"
-        "`RETIRED_PROSE_OK` is not a token.\n"
-        "## **2.1 Next**\n",
-        encoding="utf-8",
-    )
+    _write_pf04_fixture(tmp_path, PF04_FIXTURE_TEXT)
     (tmp_path / "evidence").mkdir()
     (tmp_path / "evidence/proof.json").write_text('{"ok":true}\n', encoding="utf-8")
     _write_evidence_graph(
         tmp_path, {"evidence/proof.json": ("fixture.primary_evidence",)}
     )
-    (tmp_path / "tools").mkdir()
+    (tmp_path / "tools").mkdir(exist_ok=True)
     (tmp_path / "tools/check.py").write_text("raise SystemExit(0)\n", encoding="utf-8")
     return tmp_path
 
@@ -987,12 +1000,11 @@ def test_viability_rechecks_all_causal_inputs_before_pass(
     def mutate_after_collection(*args: object, **kwargs: object):
         receipts = original_apply(*args, **kwargs)
         if input_name == "pf04_source_set":
-            extra = repository / "docs/pfcanon/PF04-Canon-HDE-Governance-v999.md"
-            extra.write_text("additional source\n", encoding="utf-8")
+            # A refresh during evaluation that stops vendoring the PF04 source.
+            _write_pf04_fixture(repository, PF04_FIXTURE_TEXT, vendored=False)
         else:
             paths = {
-                "pf04": repository
-                / "docs/pfcanon/PF04-Canon-HDE-Governance-v1.md",
+                "pf04": repository / "tools/pf_tool_inputs/documents/PF04.md",
                 "acceptance_map": config.acceptance_map_path,
                 "matrix": config.token_matrix_path,
             }
@@ -1623,14 +1635,13 @@ def test_collection_stops_on_controlling_failure_and_blocks_pending_requests(
         "HDE-EPIC039",
         ci="pytest tests/test_one.py; pytest tests/test_two.py",
     )
-    governance = repository / "docs/pfcanon/PF04-Canon-HDE-Governance-v1.md"
-    governance.write_text(
-        governance.read_text(encoding="utf-8").replace(
+    _write_pf04_fixture(
+        repository,
+        PF04_FIXTURE_TEXT.replace(
             "## **2.1 Next**",
             "* **QA\\_HARNESS\\_ENTRYPOINT\\_SELFTEST\\_OK** — declared.\n"
             "## **2.1 Next**",
         ),
-        encoding="utf-8",
     )
     acceptance = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
     acceptance["tokens"].append(

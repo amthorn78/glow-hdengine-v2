@@ -22,15 +22,10 @@ from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.narratives.constants import BANDS
 from engine.narratives.lints import run_all as run_narrative_lints
 from engine.runtime.determinism_env import ensure_determinism_env
+from tools.pf_tool_inputs.resolver import DOCUMENT_MISMATCH, PfToolInputError, pf_document
 
 CATALOG_ROOT = ROOT / "catalog" / "narratives"
 MANIFEST_PATH = CATALOG_ROOT / "manifest.json"
-PF18_SOURCE_PATH = (
-    ROOT
-    / "docs"
-    / "pfcanon"
-    / "PF18-Reference-HDE-Narrative Deliverables v0.7.md"
-)
 
 REQUIRED_MANIFEST_FILES = (
     "catalog/narratives/keys.json",
@@ -82,6 +77,17 @@ def _normalize_source_value(value: str) -> str:
     return value.replace(r"\_", "_")
 
 
+def _pf18_source_path() -> Path:
+    """The vendored HDE Narrative Deliverables copy (HDE-CRD-0003 S17; tools/pf_tool_inputs)."""
+
+    try:
+        return pf_document("PF18")
+    except PfToolInputError as exc:
+        if exc.code == DOCUMENT_MISMATCH:
+            raise RegistryDiffError("PF18 narrative source digest mismatch") from exc
+        raise RegistryDiffError("PF18 narrative source missing") from exc
+
+
 def _pf18_source_records(
     source_path: Path | None = None,
 ) -> list[dict[str, Any]]:
@@ -91,7 +97,7 @@ def _pf18_source_records(
     Exact repeats are coalesced; conflicting repeats fail closed.
     """
 
-    active_source = source_path or PF18_SOURCE_PATH
+    active_source = source_path or _pf18_source_path()
     try:
         source_bytes = active_source.read_bytes()
     except FileNotFoundError as exc:

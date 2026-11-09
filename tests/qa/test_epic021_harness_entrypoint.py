@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from tools.pf_tool_inputs.refresh import git_blob_id, write_input_set
 from tools.qa import epic021_qa
 from tools.evidence import run_sanity_pipeline
 from tools.qa.epic021_qa import run_epic021_qa
@@ -25,12 +26,17 @@ def enforce_closed_rails(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def _repo(root: Path) -> None:
-    (root / "docs/pfcanon").mkdir(parents=True)
-    (root / "docs/pfcanon/PF04-Canon-HDE-Governance-v1.md").write_text(
+    pf04 = (
         "## **2.0 Acceptance Tokens (single-home roster)**\n"
         "* **QA_HARNESS_DISCIPLINE_OK** — registered.\n"
-        "## **2.1 Next**\n",
-        encoding="utf-8",
+        "## **2.1 Next**\n"
+    ).encode("utf-8")
+    # The PF04 Governance source as a PF tool input (HDE-CRD-0003 S17).
+    write_input_set(
+        root,
+        "0" * 40,
+        [("PF04-Canon-HDE-Governance-v1.md", pf04, git_blob_id(pf04))],
+        vendored_ids={"PF04"},
     )
     (root / "docs").mkdir(exist_ok=True)
     (root / "docs/acceptance_map_epic021.json").write_text(

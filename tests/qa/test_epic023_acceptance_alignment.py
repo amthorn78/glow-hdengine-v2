@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from tools.pf_tool_inputs.resolver import pf_document
 from tools.qa import token_roster_validate
 
 QA_ROOT = Path("audit/qa/hde-epic023")
@@ -75,8 +76,8 @@ def _parse_acceptance_map() -> tuple[dict[str, dict[str, object]], set[str]]:
 
 
 def _load_registry_tokens() -> set[str]:
-    pf04_paths = sorted(Path("docs/pfcanon").glob("PF04-Canon-HDE-Governance-*.md"))
-    assert pf04_paths, "expected PF04 governance docs to be present"
+    # The vendored PF04 Governance source from the PF tool inputs (HDE-CRD-0003 S17).
+    pf04_paths = [pf_document("PF04")]
     registry_tokens: set[str] = set()
     for path in pf04_paths:
         registry_tokens.update(token_roster_validate.extract_ok_tokens(path.read_text(encoding="utf-8")))

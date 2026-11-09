@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -834,8 +835,17 @@ def test_reports_on_a_clone_of_the_repository_are_read_only(repo_clone: Path) ->
     assert notes.returncode == tool.EXIT_OK, notes.stdout + notes.stderr
     (line,) = [line for line in _report_lines(notes.stdout, "build-notes") if line.startswith("path=")]
     path, _size, digest = (part.split("=", 1)[1] for part in line.split())
-    assert re.fullmatch(r"docs/pfcanon/PF10-HDE-Build-Notes-v[^/]*\.md", path)
-    assert digest == hashlib.sha256((repo_clone / path).read_bytes()).hexdigest()
+    # HDE-CRD-0003 S17: the vendored HDE Build Notes copy, in agreement with the resolver.
+    from tools.pf_tool_inputs import resolver
+
+    entry = resolver.pf_entry("PF10", repo_clone)
+    assert path == tool.BUILD_NOTES_COPY == resolver.copy_rel("PF10")
+    assert digest == entry.sha256 == hashlib.sha256(resolver.pf_document("PF10", root=repo_clone).read_bytes()).hexdigest()
+    (source,) = [line for line in _report_lines(notes.stdout, "build-notes") if line.startswith("source=")]
+    assert source == (
+        f"source=amthorn78/glow-docs:docs/hde/pfcanon/{entry.file_name} "
+        f"commit={resolver.source_commit(repo_clone)} blob={entry.source_blob}"
+    )
 
     paths = [*ADMITTED_RELEASE_ROSTER, "tools/ci/prepush_check.py"]
     membership = _run(repo_clone, "membership", *(arg for p in paths for arg in ("--path", p)))
@@ -970,18 +980,65 @@ def _clone_at(source: Path, commit: str, tmp_path: Path) -> Path:
 # build-notes uniqueness, dirty-tree refusal, child environment, no hook
 # --------------------------------------------------------------------------
 
+def _manifest_document(name: str, body: bytes, *, vendored: bool) -> dict[str, object]:
+    pf_id = name.split("-", 1)[0]
+    return {
+        "file_name": name,
+        "pf_id": pf_id,
+        "sha256": hashlib.sha256(body).hexdigest(),
+        "size_bytes": len(body),
+        "source_blob": "1" * 40,
+        "title": "fixture",
+        "vendored": vendored,
+    }
+
+
 @pytest.mark.parametrize("names, ok", [((), False), (("v1.0",), True), (("v1.0", "v1.1"), False)])
 def test_build_notes_requires_exactly_one_file(tmp_path: Path, names: tuple[str, ...], ok: bool) -> None:
-    files = {f"docs/pfcanon/PF10-HDE-Build-Notes-{n}.md": f"notes {n}\n" for n in names}
-    repo = _synthetic(tmp_path / "notes", {"README.txt": "fixture\n", "docs/pfcanon/PF01-Other.md": "x\n", **files})
+    # The PF tool-input manifest at HEAD must name exactly one vendored PF10 entry (HDE-CRD-0003 S17).
+    documents = [_manifest_document("PF01-Other.md", b"x\n", vendored=False)] + [
+        _manifest_document(f"PF10-HDE-Build-Notes-{n}.md", f"notes {n}\n".encode(), vendored=True) for n in names
+    ]
+    manifest = {
+        "documents": documents,
+        "schema_version": "pf_tool_inputs.v1",
+        "source_commit": "2" * 40,
+        "source_path": "docs/hde/pfcanon/",
+        "source_repository": "amthorn78/glow-docs",
+    }
+    files = {"README.txt": "fixture\n", tool.PF_TOOL_INPUTS_MANIFEST: json.dumps(manifest, sort_keys=True) + "\n"}
+    if names:
+        files[tool.BUILD_NOTES_COPY] = f"notes {names[0]}\n"
+    repo = _synthetic(tmp_path / "notes", files)
     result = _run(repo, "build-notes")
     if ok:
         assert result.returncode == tool.EXIT_OK, result.stdout + result.stderr
         digest = hashlib.sha256(b"notes v1.0\n").hexdigest()
-        assert f"build-notes: path=docs/pfcanon/PF10-HDE-Build-Notes-v1.0.md bytes=11 sha256={digest}" in result.stdout
+        assert f"build-notes: path={tool.BUILD_NOTES_COPY} bytes=11 sha256={digest}" in result.stdout
+        assert (
+            "build-notes: source=amthorn78/glow-docs:docs/hde/pfcanon/PF10-HDE-Build-Notes-v1.0.md "
+            f"commit={'2' * 40} blob={'1' * 40}"
+        ) in result.stdout
     else:
         assert result.returncode == tool.EXIT_REPORT_FAILED
         assert f"found {len(names)}" in result.stdout
+
+
+def test_build_notes_refuses_a_copy_that_does_not_match_the_manifest(tmp_path: Path) -> None:
+    manifest = {
+        "documents": [_manifest_document("PF10-HDE-Build-Notes-v1.0.md", b"notes v1.0\n", vendored=True)],
+        "schema_version": "pf_tool_inputs.v1",
+        "source_commit": "2" * 40,
+        "source_path": "docs/hde/pfcanon/",
+        "source_repository": "amthorn78/glow-docs",
+    }
+    repo = _synthetic(
+        tmp_path / "mismatch",
+        {tool.PF_TOOL_INPUTS_MANIFEST: json.dumps(manifest) + "\n", tool.BUILD_NOTES_COPY: "notes v1.1\n"},
+    )
+    result = _run(repo, "build-notes")
+    assert result.returncode == tool.EXIT_REPORT_FAILED
+    assert "vendored PF10 bytes do not match the manifest" in result.stdout
 
 
 @pytest.mark.parametrize("dirty", ["modified", "staged", "untracked"])

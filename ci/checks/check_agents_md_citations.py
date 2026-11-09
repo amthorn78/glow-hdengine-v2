@@ -12,9 +12,8 @@ lines; consecutive quote lines form one paragraph), and paragraphs are split int
 
 * a PF document number other than 10 ("PF04", "PF-19", "PF 09.5") fails;
 * an addendum number, in either order ("addendum 2.29", "the 2.29 addendum"), fails;
-* a docs/pfcanon file name, or the exact name of a PF file, fails;
-* a PF title derived from the docs/pfcanon file names fails, with spaces,
-  hyphens and underscores treated alike;
+* a docs/pfcanon file path, or the exact name of a PF file, fails;
+* a PF title fails, with spaces, hyphens and underscores treated alike;
 * a sentence that names PF10 (or "HDE Build Notes") and also carries a locator
   fails, whatever the order: a section, paragraph or pilcrow mark, a
   "section/subsection/paragraph N", a version ("v13.4", "version 13"), or a
@@ -23,16 +22,25 @@ lines; consecutive quote lines form one paragraph), and paragraphs are split int
 
 Known limits: this is a lexical check. It cannot catch a citation phrased with
 no locator token (for example "the twenty-ninth addendum"), and it judges only
-AGENTS.md. Standard library only; reads AGENTS.md and the docs/pfcanon listing.
+AGENTS.md. Standard library only, because CI runs it before installing any
+dependency; it reads AGENTS.md and the PF tool-input manifest,
+tools/pf_tool_inputs/manifest.json, which names every PF document of
+docs/hde/pfcanon/ in amthorn78/glow-docs with its title (HDE-CRD-0003 S17). An
+unreadable manifest fails the check: there is no pass without PF names.
 """
 
 from __future__ import annotations
 
 import re
 import sys
+from collections.abc import Iterable
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.pf_tool_inputs.resolver import PfDocument, PfToolInputError, pf_entries  # noqa: E402
 
 _PF10_NAME = r"(?:PF10|HDE Build Notes)"
 _PF_NUMBER = re.compile(r"\bPF(\d{1,2}(?:\.\d+)?)(?![\d.]*\d)")
@@ -47,24 +55,23 @@ _PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s)]+\.md")
 _SENTENCE_END = re.compile(r"(?<=[.!?])\s+(?=[A-Z(\"'])")
 _SINGLE_LINE_BLOCK = re.compile(r"^(?:#|\|)")
 _BLOCK_START = re.compile(r"^(?:#|[-+*]\s|\||>|\d+[.)]\s)")
-_TITLE_FROM_FILE = re.compile(r"^PF[\d.]*[- ]*(?:(?:Canon|Reference)-)?(.*?)(?:[- ]v\d[\w.]*)?$")
 
 
-def _title_words(stem: str) -> list[str]:
-    match = _TITLE_FROM_FILE.match(stem)
-    return (match.group(1) if match else stem).replace("-", " ").split()
+def _not_pf10(entries: Iterable[PfDocument]) -> list[PfDocument]:
+    return sorted((e for e in entries if e.pf_id != "PF10"), key=lambda e: e.file_name)
 
 
-def pf_titles(pfcanon: Path) -> list[str]:
-    """Multi-word titles of PF documents other than PF10."""
-    titles = {" ".join(_title_words(p.stem)) for p in pfcanon.glob("*.md") if not p.stem.startswith("PF10")}
+def pf_titles(entries: Iterable[PfDocument]) -> list[str]:
+    """Multi-word titles of PF documents other than PF10, from the tool-input manifest."""
+    titles = {e.title for e in _not_pf10(entries)}
     return sorted(t for t in titles if len(t.split()) >= 2)
 
 
-def pf_names(pfcanon: Path) -> tuple[list[str], list[str]]:
-    """Exact PF file names (without .md) and single-word PF titles."""
-    stems = sorted(p.stem for p in pfcanon.glob("*.md") if not p.stem.startswith("PF10"))
-    single = [words[0] for words in map(_title_words, stems) if len(words) == 1]
+def pf_names(entries: Iterable[PfDocument]) -> tuple[list[str], list[str]]:
+    """Exact PF file names (without .md) and single-word PF titles, PF10 excepted."""
+    kept = _not_pf10(entries)
+    stems = sorted(e.file_name[: -len(".md")] for e in kept)
+    single = [e.title for e in sorted(kept, key=lambda e: e.file_name[: -len(".md")]) if len(e.title.split()) == 1]
     return stems, single
 
 
@@ -153,8 +160,12 @@ def main(root: Path = ROOT) -> int:
         print("AGENTS_MD_CITATIONS_MISSING_FILE", file=sys.stderr)
         return 2
     text = agents.read_text(encoding="utf-8")
-    pfcanon = root / "docs" / "pfcanon"
-    violations = scan(text, pf_titles(pfcanon)) + scan_names(text, *pf_names(pfcanon))
+    try:
+        entries = pf_entries(root)
+    except PfToolInputError as exc:
+        print(f"AGENTS_MD_CITATIONS_PF_INPUTS_INVALID:{exc.code}", file=sys.stderr)
+        return 2
+    violations = scan(text, pf_titles(entries)) + scan_names(text, *pf_names(entries))
     if violations:
         for row in violations:
             print(row, file=sys.stderr)

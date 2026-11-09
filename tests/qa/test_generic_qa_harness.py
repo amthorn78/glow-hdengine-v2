@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from tools.pf_tool_inputs.refresh import git_blob_id, write_input_set
 from tools.qa import qa_harness
 from tools.qa.qa_harness import (
     CheckResult,
@@ -155,6 +156,17 @@ def _matrix_row(
     return f"| {token} | PF04 | {evidence} | {ci} | {qa} | {status} | fixture |\n"
 
 
+def _write_pf04_fixture(root: Path, text: str) -> None:
+    """The repository's PF04 Governance source as a PF tool input (HDE-CRD-0003 S17)."""
+    data = text.encode("utf-8")
+    write_input_set(
+        root,
+        "0" * 40,
+        [("PF04-Canon-HDE-Governance-v1.md", data, git_blob_id(data))],
+        vendored_ids={"PF04"},
+    )
+
+
 @pytest.fixture
 def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     for key, value in {
@@ -166,8 +178,8 @@ def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         "APP_ENV": "test",
     }.items():
         monkeypatch.setenv(key, value)
-    (tmp_path / "docs/pfcanon").mkdir(parents=True)
-    (tmp_path / "docs/pfcanon/PF04-Canon-HDE-Governance-v1.md").write_text(
+    _write_pf04_fixture(
+        tmp_path,
         "## **2.0 Acceptance Tokens (single-home roster)**\n"
         "* **QA\\_HARNESS\\_DISCIPLINE\\_OK** — bullet declaration.\n"
         "**QA\\_HARNESS\\_ENTRYPOINT\\_SELFTEST\\_OK** — standalone declaration.\n"
@@ -177,14 +189,13 @@ def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         "QA_HARNESS_DISCIPLINE_OK appears again in explanatory prose.\n"
         "* **QA\\_HARNESS\\_DISCIPLINE\\_OK** — legitimate repeated declaration.\n"
         "## **2.1 Next**\n",
-        encoding="utf-8",
     )
     (tmp_path / "evidence").mkdir()
     (tmp_path / "evidence/proof.json").write_text('{"ok":true}\n', encoding="utf-8")
     _write_evidence_graph(
         tmp_path, {"evidence/proof.json": ("fixture.primary_evidence",)}
     )
-    (tmp_path / "tools").mkdir()
+    (tmp_path / "tools").mkdir(exist_ok=True)
     (tmp_path / "tools/check.py").write_text("raise SystemExit(0)\n", encoding="utf-8")
     config = HarnessConfig("HDE-EPIC039", repo_root=tmp_path)
     config.acceptance_map_path.parent.mkdir(exist_ok=True)

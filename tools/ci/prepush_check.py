@@ -7,8 +7,9 @@ One command with five reports, each read-only with respect to the repository:
   paths, delegated to ``ci/checks/classify_ci_changes.py``;
 * ``membership``: whether given paths are members of the admitted release
   roster;
-* ``build-notes``: the unique ``docs/pfcanon/PF10-HDE-Build-Notes-v*.md`` and
-  its SHA-256;
+* ``build-notes``: the vendored HDE Build Notes copy that the PF tool-input
+  manifest ``tools/pf_tool_inputs/manifest.json`` names (HDE-CRD-0003 S17), its
+  SHA-256 and its amthorn78/glow-docs source identity, read at HEAD as data;
 * ``sweep``: the tracked test files no CI lane and no full-validation target
   reaches, run in a throwaway copy of the head;
 * ``replay``: every step of the ``test`` job of ``.github/workflows/ci.yml``,
@@ -45,7 +46,6 @@ sys.dont_write_bytecode = True
 
 import argparse  # noqa: E402
 import ast  # noqa: E402
-import fnmatch  # noqa: E402
 import hashlib  # noqa: E402
 import importlib.metadata  # noqa: E402
 import importlib.util  # noqa: E402
@@ -71,8 +71,8 @@ WORKFLOW_PATH = ".github/workflows/ci.yml"
 CLASSIFIER_PATH = "ci/checks/classify_ci_changes.py"
 REGISTRY_LOADER_PATH = "engine/config/registry_loader.py"
 MANIFEST_PATH = "catalog/manifest.json"
-BUILD_NOTES_DIRECTORY = "docs/pfcanon/"
-BUILD_NOTES_PATTERN = "docs/pfcanon/PF10-HDE-Build-Notes-v*.md"
+PF_TOOL_INPUTS_MANIFEST = "tools/pf_tool_inputs/manifest.json"
+BUILD_NOTES_COPY = "tools/pf_tool_inputs/documents/PF10.md"
 REPLAY_JOB = "test"
 DEFAULT_BASE = "origin/main"
 DEFAULT_HEAD = "HEAD"
@@ -1039,16 +1039,29 @@ def report_membership(context: Context, report: Report) -> None:
 
 
 def report_build_notes(context: Context, report: Report) -> None:
-    listed = git(context.repo, "ls-tree", "-r", "-z", "--name-only", "HEAD", "--",
-                 BUILD_NOTES_DIRECTORY).stdout.decode("utf-8").split("\0")
-    matches = sorted(p for p in listed if p and fnmatch.fnmatchcase(p, BUILD_NOTES_PATTERN)
-                     and "/" not in p[len(BUILD_NOTES_DIRECTORY):])
-    if len(matches) != 1:
-        report.fail(f"expected exactly one {BUILD_NOTES_PATTERN}, found {len(matches)}: "
-                    + (", ".join(matches) or "none"))
+    # The PF tool-input manifest and the vendored copy are read from HEAD as data; no
+    # repository code runs in the caller's checkout (tools/pf_tool_inputs/resolver.py
+    # resolves the same entry, and a test holds the two in agreement).
+    manifest = git(context.repo, "cat-file", "blob", f"HEAD:{PF_TOOL_INPUTS_MANIFEST}", check=False)
+    try:
+        payload = json.loads(manifest.stdout.decode("utf-8")) if manifest.returncode == 0 else {}
+        documents = payload.get("documents", []) if isinstance(payload, dict) else []
+        entries = [d for d in documents if isinstance(d, dict) and d.get("pf_id") == "PF10" and d.get("vendored") is True]
+    except (UnicodeDecodeError, ValueError):
+        entries = []
+    if len(entries) != 1:
+        report.fail(f"expected exactly one vendored PF10 entry in {PF_TOOL_INPUTS_MANIFEST}, found {len(entries)}")
         return
-    data = (context.repo / matches[0]).read_bytes()
-    report.out(f"path={matches[0]} bytes={len(data)} sha256={hashlib.sha256(data).hexdigest()}")
+    (entry,) = entries
+    copy = git(context.repo, "cat-file", "blob", f"HEAD:{BUILD_NOTES_COPY}", check=False)
+    data = copy.stdout
+    digest = hashlib.sha256(data).hexdigest()
+    if copy.returncode != 0 or len(data) != entry.get("size_bytes") or digest != entry.get("sha256"):
+        report.fail("vendored PF10 bytes do not match the manifest")
+        return
+    report.out(f"path={BUILD_NOTES_COPY} bytes={len(data)} sha256={digest}")
+    report.out(f"source={payload.get('source_repository')}:{payload.get('source_path')}{entry.get('file_name')} "
+               f"commit={payload.get('source_commit')} blob={entry.get('source_blob')}")
 
 
 # --------------------------------------------------------------------------

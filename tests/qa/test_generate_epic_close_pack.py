@@ -17,6 +17,8 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
+from tools.pf_tool_inputs import resolver as pf_inputs
+from tools.pf_tool_inputs.refresh import git_blob_id, write_input_set
 from tools.qa import generate_epic_close_pack as close_pack
 
 
@@ -4318,9 +4320,9 @@ def test_linked_worktree_common_dir_retargeting_fails_closed(
 # --- close_candidate_source.v2 (HDE-CRD-0002 S21; IF-3) ---------------------
 #
 # Every v2 fixture is built here in the test's own repository. No test reads a planning document
-# under docs/ephemeral/ or a PF-Canon file under docs/pfcanon/ of this checkout: planning
-# documents exist only while a change is planned, and PF-Canon versions change at any time
-# (HDE Build Notes).
+# under docs/ephemeral/ or a PF tool input of this checkout: planning documents exist only while
+# a change is planned, and PF-Canon versions change at any time (HDE Build Notes; HDE-CRD-0003
+# S17).
 
 # HDE-CRD-0002 Specification v1.1 requirement rows (ID, scope, acceptance intent), held as
 # fixture text: their wording exercises the feedback-dependency refusal.
@@ -4384,10 +4386,12 @@ PF_FIXTURE_NAMES: tuple[str, ...] = (
     "PF30.1-Canon-HDE-CRD-Records-v0.9.2.md",
 )
 CRD_REGISTER_TITLE = "HDE CRD Records"
-CRD_REGISTER_REL = "docs/pfcanon/PF30.1-Canon-HDE-CRD-Records-v0.9.2.md"
+CRD_REGISTER_NAME = "PF30.1-Canon-HDE-CRD-Records-v0.9.2.md"
+CRD_REGISTER_REL = "tools/pf_tool_inputs/documents/PF30.1.md"
 CRD_REGISTER_HEADING = "**4.2 Material update**"
 EPIC_REGISTER_TITLE = "HDE Build Checklist Fermentation"
-EPIC_REGISTER_REL = "docs/pfcanon/PF09.5-Canon-HDE-Build-Checklist-Fermentation-v1.6.1.md"
+EPIC_REGISTER_NAME = "PF09.5-Canon-HDE-Build-Checklist-Fermentation-v1.6.1.md"
+EPIC_REGISTER_REL = "tools/pf_tool_inputs/documents/PF09.5.md"
 EPIC_REGISTER_HEADING = "**Subtask HDE-FERM001.3 — Observability & log posture (SAFE rails)**"
 
 
@@ -4428,15 +4432,17 @@ def _planning_records(change_id: str) -> dict[str, str]:
     }
 
 
-def _write_pf_fixtures(repo: Path) -> None:
+def _write_pf_fixtures(repo: Path, *, renamed: dict[str, str] | None = None) -> None:
+    # The fixture names as a PF tool-input manifest, with the two registers vendored (HDE-CRD-0003 S17).
+    registers = {
+        CRD_REGISTER_NAME: f"# {CRD_REGISTER_TITLE}\n\n### 0.1 Header\n\n#### {CRD_REGISTER_HEADING}\n",
+        EPIC_REGISTER_NAME: f"# {EPIC_REGISTER_TITLE}\n\n### 0.1 Header\n\n#### {EPIC_REGISTER_HEADING}\n",
+    }
+    documents = []
     for name in PF_FIXTURE_NAMES:
-        (repo / "docs/pfcanon").mkdir(parents=True, exist_ok=True)
-        (repo / "docs/pfcanon" / name).write_text("PF title placeholder.\n", encoding="utf-8")
-    for rel, title, heading in (
-        (CRD_REGISTER_REL, CRD_REGISTER_TITLE, CRD_REGISTER_HEADING),
-        (EPIC_REGISTER_REL, EPIC_REGISTER_TITLE, EPIC_REGISTER_HEADING),
-    ):
-        (repo / rel).write_text(f"# {title}\n\n### 0.1 Header\n\n#### {heading}\n", encoding="utf-8")
+        data = registers.get(name, "PF title placeholder.\n").encode("utf-8")
+        documents.append(((renamed or {}).get(name, name), data, git_blob_id(data)))
+    write_input_set(repo, "0" * 40, documents, vendored_ids={"PF30.1", "PF09.5"})
 
 
 def _primary_rel(change_id: str, check: str = "qa-01-setup") -> str:
@@ -4658,8 +4664,8 @@ def test_v2_crd_dry_run_writes_complete_close_pack_and_check_is_read_only(
         *(item["path"] for item in manifest["inputs"]["evidence"]),
         *(item["path"] for item in manifest["inputs"]["qa_primaries"]),
     ]
-    assert [path for path in inputs if path.startswith(("docs/ephemeral/", "docs/pfcanon/"))] == []
-    assert "docs/ephemeral" not in report and "docs/pfcanon" not in report
+    assert [path for path in inputs if path.startswith(("docs/ephemeral/", "docs/pfcanon/", "tools/pf_tool_inputs/"))] == []
+    assert "docs/ephemeral" not in report and "docs/pfcanon" not in report and "tools/pf_tool_inputs" not in report
     assert manifest["schema_version"] == "close_candidate_manifest.v2"
     assert manifest["change_id"] == "HDE-CRD-0002"
     assert isinstance(manifest["key_outputs"], dict)
@@ -4995,14 +5001,11 @@ def test_v2_check_reads_no_canon_and_write_resolves_registers_by_title(
     repo, source_rel = _init_v2_repo(tmp_path)
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
     _commit_all(repo, "commit v2 close pack")
-    new_register = "docs/pfcanon/PF30.1-Canon-HDE-CRD-Records-v1.0.md"
-    _git(repo, "mv", CRD_REGISTER_REL, new_register)
+    _write_pf_fixtures(repo, renamed={CRD_REGISTER_NAME: "PF30.1-Canon-HDE-CRD-Records-v1.0.md"})
     _commit_all(repo, "the CRD register changes version")
     assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
-    for name in PF_FIXTURE_NAMES:
-        if (repo / "docs/pfcanon" / name).exists():
-            _git(repo, "rm", "-q", f"docs/pfcanon/{name}")
-    _commit_all(repo, "every other PF-Canon file is gone")
+    _git(repo, "rm", "-r", "-q", pf_inputs.INPUT_SET_REL)
+    _commit_all(repo, "every PF tool input is gone")
     assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
     assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all", "--ignored") == ""
     # A fresh write still validates the source's PF titles against the canon at HEAD.
@@ -5535,7 +5538,7 @@ def test_v2_coverage_ledger_follows_the_recorded_qa_plan(
 
 
 def test_v2_pf_titles_derive_from_every_canon_filename_convention() -> None:
-    names = [f"docs/pfcanon/{name}" for name in PF_FIXTURE_NAMES]
+    names = list(PF_FIXTURE_NAMES)
     # CX7-19: every PF-Canon file name gives one title, whatever its filename convention, and
     # the schema's title pattern accepts each of them.
     assert [name for name in names if close_pack.PF_DOCUMENT_RE.fullmatch(name) is None] == []
@@ -5570,7 +5573,36 @@ def test_v2_pf_titles_derive_from_every_canon_filename_convention() -> None:
         assert close_pack._pf_title_key(title) in titles, title
     assert close_pack._pf_title_key("Imaginary Guide") not in titles
     # A title names the document whatever its version: another version gives the same title.
-    assert close_pack._pf_titles(["docs/pfcanon/PF30.1-Canon-HDE-CRD-Records-v7.md"]) == {"HDE CRD Records"}
+    assert close_pack._pf_titles(["PF30.1-Canon-HDE-CRD-Records-v7.md"]) == {"HDE CRD Records"}
+
+
+def test_v2_pf_titles_agree_with_the_pf_tool_input_resolver() -> None:
+    # HDE-CRD-0003 S17: the writer reads the PF tool-input manifest as data (its imports stay the
+    # standard library and jsonschema); its paths and titles agree with the resolver's.
+    assert close_pack.PF_TOOL_INPUTS_MANIFEST_REL == pf_inputs.MANIFEST_REL
+    assert close_pack.PF_TOOL_INPUTS_DOCUMENTS_REL == pf_inputs.DOCUMENTS_REL
+    names = pf_inputs.pf_file_names()
+    assert close_pack._pf_titles(names) == {close_pack._pf_title_key(title) for title in pf_inputs.pf_titles()}
+    assert len(close_pack._pf_titles(names)) == len(names)
+
+
+def test_v2_register_copy_must_match_its_manifest_digest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # HDE-CRD-0003 S17: a vendored register whose bytes differ from the manifest is not read.
+    repo, source_rel = _init_v2_repo(tmp_path)
+    register = repo / CRD_REGISTER_REL
+    register.write_text(register.read_text(encoding="utf-8") + "changed\n", encoding="utf-8")
+    _commit_all(repo, "the CRD register copy no longer matches the manifest")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:DEFERRAL_POINTER_UNBOUND"
+
+
+@pytest.mark.parametrize("path", ("tools/pf_tool_inputs/manifest.json", "tools/pf_tool_inputs/documents/PF30.1.md"))
+def test_v2_pf_tool_inputs_are_never_causal_inputs_or_pointers(path: str) -> None:
+    # HDE-CRD-0003 S17: no close pack binds a PF tool input.
+    with pytest.raises(close_pack.ClosePackError, match="PLANNING_OR_CANON_INPUT_PROHIBITED"):
+        close_pack._require_admitted_causal_input(path)
 
 
 @pytest.mark.parametrize(
@@ -5661,13 +5693,17 @@ def test_v2_deferral_drain_target_names_a_register_heading(
         source["deferrals"][1]["drain_target"] = "HDE Schemas and Artifacts 1.2 Close-pack artifacts"
     repo, source_rel = _init_v2_repo(tmp_path, source)
     if case == "register_new_version":
-        _git(repo, "mv", CRD_REGISTER_REL, "docs/pfcanon/PF30.1-Canon-HDE-CRD-Records-v1.0.md")
+        _write_pf_fixtures(repo, renamed={CRD_REGISTER_NAME: "PF30.1-Canon-HDE-CRD-Records-v1.0.md"})
         _commit_all(repo, "the register changes version")
     elif case == "register_untracked":
         _git(repo, "rm", "-q", CRD_REGISTER_REL)
         _commit_all(repo, "the register is gone")
     elif case == "two_register_versions":
-        shutil.copyfile(repo / CRD_REGISTER_REL, repo / "docs/pfcanon/PF30.1-Canon-HDE-CRD-Records-v1.0.md")
+        manifest_path = repo / pf_inputs.MANIFEST_REL
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        (register,) = [d for d in manifest["documents"] if d["file_name"] == CRD_REGISTER_NAME]
+        manifest["documents"].append({**register, "file_name": "PF30.1-Canon-HDE-CRD-Records-v1.0.md"})
+        manifest_path.write_text(json.dumps(manifest) + "\n", encoding="utf-8")
         _commit_all(repo, "two versions of one register")
     report_rel = close_pack._derived_paths_v2(change_id)[0]
     if code is None:
