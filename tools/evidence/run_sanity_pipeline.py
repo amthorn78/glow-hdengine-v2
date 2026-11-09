@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import os
+import stat
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -32,6 +33,65 @@ PIPELINE_ID = "hde-release-sanity-v1"
 RELEASE_NOT_ADMITTED_EXIT_CODE = 3
 RELEASE_NOT_ADMITTED_REFUSAL_CODE = "INCOMPLETE_RELEASE_ROSTER"
 NOT_ADMITTED_STATUS = "NOT_ADMITTED"
+
+# HDE Governance §4.1.8 "--log-path bound" (HDE-CRD-0003 S04).  A refused target
+# fails with this typed, numeric-free prefix before any step runs or any byte is
+# written; ``main`` exits with argparse's usage code, distinct from a stage
+# failure (1) and from NOT_ADMITTED (3).
+LOG_PATH_REFUSED_PREFIX = "SANITY_LOG_PATH_REFUSED"
+LOG_PATH_REFUSED_EXIT_CODE = 2
+
+
+class LogPathRefused(ValueError):
+    """A ``--log-path`` target the bound refuses; ``code`` is a closed token."""
+
+    def __init__(self, code: str) -> None:
+        super().__init__(f"{LOG_PATH_REFUSED_PREFIX}:{code}")
+        self.code = code
+
+
+def _refuse_symlink_on_path(path: Path) -> None:
+    """Refuse a symlink at any existing component of ``path``, the last included."""
+
+    probe = Path(path.anchor)
+    parts = path.parts[1:]
+    for index, part in enumerate(parts):
+        probe = probe / part
+        try:
+            mode = os.lstat(probe).st_mode
+        except FileNotFoundError:
+            return
+        except OSError as exc:
+            raise LogPathRefused("UNREADABLE_COMPONENT") from exc
+        if stat.S_ISLNK(mode):
+            raise LogPathRefused("SYMLINK" if index == len(parts) - 1 else "SYMLINK_COMPONENT")
+
+
+def validate_log_path(log_path: Path) -> Path:
+    """Return the accepted log target, or raise ``LogPathRefused`` (HDE Governance §4.1.8).
+
+    No component of the path, as given or normalized, and not the target
+    itself, may be a symlink.  Inside the repository only the canonical log is
+    accepted.  Outside it, the parent must exist and the target must be a
+    regular file or absent.
+    """
+
+    candidate = log_path if log_path.is_absolute() else ROOT / log_path
+    _refuse_symlink_on_path(candidate)
+    target = Path(os.path.normpath(candidate))
+    _refuse_symlink_on_path(target)
+    if target != SANITY_LOG:
+        if target == ROOT or target.is_relative_to(ROOT):
+            raise LogPathRefused("IN_REPOSITORY_NOT_CANONICAL")
+        if not target.parent.is_dir():
+            raise LogPathRefused("PARENT_MISSING")
+    try:
+        mode = os.lstat(target).st_mode
+    except FileNotFoundError:
+        return target
+    if not stat.S_ISREG(mode):
+        raise LogPathRefused("NOT_REGULAR_FILE")
+    return target
 
 
 class ReleaseNotAdmitted(RuntimeError):
@@ -330,7 +390,10 @@ def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: st
     except OSError:
         current = None
     if current != data:
-        path.write_bytes(data)
+        # O_NOFOLLOW: the validated target is never written through a symlink.
+        flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
+        with os.fdopen(os.open(path, flags, 0o644), "wb") as handle:
+            handle.write(data)
     return data
 
 
@@ -343,10 +406,10 @@ def _rebind_failure_log() -> int:
 
 
 def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | None = None, refresh_index: bool = True) -> int:
+    log_path = validate_log_path(log_path)
     ensure_determinism_env()
-    log_path = (log_path if log_path.is_absolute() else ROOT / log_path).resolve()
     roster = list(default_steps() if steps is None else steps)
-    canonical_run = log_path == SANITY_LOG.resolve() and steps is None
+    canonical_run = log_path == SANITY_LOG and steps is None
     results: list[tuple[str, str]] = []
     failure = "NONE"
     code = 0
@@ -432,7 +495,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--log-path", type=Path, default=SANITY_LOG)
     args = parser.parse_args(argv)
-    return run_pipeline(log_path=args.log_path)
+    try:
+        return run_pipeline(log_path=args.log_path)
+    except LogPathRefused as exc:
+        print(f"{LOG_PATH_REFUSED_PREFIX}:{exc.code}", file=sys.stderr)
+        return LOG_PATH_REFUSED_EXIT_CODE
 
 
 if __name__ == "__main__":
