@@ -4426,3 +4426,14 @@ def test_epic034_w004_renderer_refuses_supported_record_without_complete_proof_c
             break
     with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_SUPPORTED_ROUTE_PROOF_INCOMPLETE"):
         generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", broken)
+
+
+def test_missing_ruby_is_a_typed_failure_naming_the_dependency(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    # HDE-CRD-0003 S07 (FND-037): without ruby on PATH the YAML route specifications cannot be parsed.
+    monkeypatch.setattr(generator, "_RUBY", [])
+    monkeypatch.setenv("PATH", str(tmp_path))
+    with pytest.raises(generator.MissingDependencyError) as raised:
+        generator.parse_yaml_openapi(b"openapi: 3.1.0\n", "v2-routes.yaml")
+    message = str(raised.value)
+    assert message.startswith("MISSING_DEPENDENCY:ruby")
+    assert not any(ch.isdigit() for ch in message) and str(tmp_path) not in message

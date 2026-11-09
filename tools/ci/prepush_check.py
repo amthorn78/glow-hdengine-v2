@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only pre-push and pre-plan check (HDE-CRD-0002 S20).
 
-One command with five reports, each read-only with respect to the repository:
+One command with four reports, each read-only with respect to the repository:
 
 * ``lanes``: the CI lane classification for a base and head, or for given
   paths, delegated to ``ci/checks/classify_ci_changes.py``;
@@ -11,31 +11,24 @@ One command with five reports, each read-only with respect to the repository:
   manifest ``tools/pf_tool_inputs/manifest.json`` names (HDE-CRD-0003 S17), its
   SHA-256 and its amthorn78/glow-docs source identity, read at HEAD as data;
 * ``sweep``: the tracked test files no CI lane and no full-validation target
-  reaches, run in a throwaway copy of the head;
-* ``replay``: every step of the ``test`` job of ``.github/workflows/ci.yml``,
-  replayed in a throwaway copy of the head.  It replays only the one workflow
-  whose SHA-256 is REPLAY_WORKFLOW_SHA256 and refuses any other, so a PR that
-  changes ci.yml updates that value and the replay's model with it.  CI's
-  install step needs the package index and is not run: the caller's
-  environment holding CI's install is a precondition, checked only for the
-  presence of each distribution the step names.
+  reaches, run in a throwaway copy of the head.
 
 Every write goes under one owner-only temporary directory outside the
 repository, removed at exit.  Repository code runs only in a throwaway copy,
 never in the caller's checkout: ``lanes`` and ``membership`` load the
-classifier in a child process inside a copy of the head, as ``sweep`` and
-``replay`` run there.  The tool refuses a dirty tree, acts on committed
-revisions only, resolves refs locally, opens no network connection, runs
-children under closed rails, and compares the repository's state before and
-after as a check.  Its green is not CI's green and not QA; its output is not
+classifier in a child process inside a copy of the head, as ``sweep`` runs
+there.  The tool refuses a dirty tree, acts on committed revisions only,
+resolves refs locally, opens no network connection, runs children under
+closed rails, and compares the repository's state before and after as a
+check.  Its green is not CI's green and not QA; its output is not
 governed evidence.
 
 Children inherit only HOME, LOGNAME, PATH, SHELL, TERM and USER from the
 caller's environment, so no other variable of the caller's, secrets included,
-reaches them.  They are not sandboxed: ``sweep`` and ``replay`` execute the
-candidate's own tests and workflow steps with the caller's file-system and
-network access, and SAFE_MODE and ALLOW_NETWORK are application flags, not
-isolation.  Run them only on code you trust.
+reaches them.  They are not sandboxed: ``sweep`` executes the candidate's
+own tests with the caller's file-system and network access, and SAFE_MODE
+and ALLOW_NETWORK are application flags, not isolation.  Run them only on
+code you trust.
 """
 from __future__ import annotations
 
@@ -47,18 +40,15 @@ sys.dont_write_bytecode = True
 import argparse  # noqa: E402
 import ast  # noqa: E402
 import hashlib  # noqa: E402
-import importlib.metadata  # noqa: E402
 import importlib.util  # noqa: E402
 import json  # noqa: E402
 import os  # noqa: E402
-import platform  # noqa: E402
 import re  # noqa: E402
 import shlex  # noqa: E402
 import shutil  # noqa: E402
 import subprocess  # noqa: E402
 import tempfile  # noqa: E402
 import time  # noqa: E402
-import tomllib  # noqa: E402
 import xml.etree.ElementTree as ET  # noqa: E402
 from dataclasses import dataclass, field  # noqa: E402
 from pathlib import Path, PurePosixPath  # noqa: E402
@@ -66,14 +56,13 @@ from typing import Iterable, Sequence  # noqa: E402
 
 TOOL_PATH = Path(__file__).resolve()
 ROOT = TOOL_PATH.parents[2]
-REPORTS = ("lanes", "membership", "build-notes", "sweep", "replay")
+REPORTS = ("lanes", "membership", "build-notes", "sweep")
 WORKFLOW_PATH = ".github/workflows/ci.yml"
 CLASSIFIER_PATH = "ci/checks/classify_ci_changes.py"
 REGISTRY_LOADER_PATH = "engine/config/registry_loader.py"
 MANIFEST_PATH = "catalog/manifest.json"
 PF_TOOL_INPUTS_MANIFEST = "tools/pf_tool_inputs/manifest.json"
 BUILD_NOTES_COPY = "tools/pf_tool_inputs/documents/PF10.md"
-REPLAY_JOB = "test"
 DEFAULT_BASE = "origin/main"
 DEFAULT_HEAD = "HEAD"
 
@@ -87,23 +76,6 @@ EXIT_READ_ONLY_VIOLATION = 4
 # them; the tool sets the rest (closed rails, temporary directories, the
 # report's own values), so no other variable of the caller's reaches a child.
 CHILD_INHERITED_KEYS = ("HOME", "LOGNAME", "PATH", "SHELL", "TERM", "USER")
-# Never passed to a child (vendor, database and GitHub keys), and absent on a
-# hosted runner unless a step sets them.
-REMOVED_ENV_KEYS = (
-    "DATABASE_URL",
-    "ENGINE_ENV",
-    "GEO_API_KEY",
-    "GH_TOKEN",
-    "GITHUB_TOKEN",
-    "HDAPI_BASE_URL",
-    "HDAPI_KEY",
-    "HDE_VENDOR_OVERRIDE_AUDIT_PATH",
-    "HD_API_BASE_URL",
-    "HD_API_KEY",
-    "HD_GEOCODE_KEY",
-)
-# The only environment values the tool prints.
-PRINTED_PINS = ("LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK", "APP_ENV")
 CLOSED_RAILS = {
     "LC_ALL": "C",
     "LANG": "C",
@@ -115,109 +87,8 @@ CLOSED_RAILS = {
 }
 SWEEP_TOOLS = ("bash", "curl", "ruby")
 
-# The SHA-256 of the one ci.yml the replay models.  The replay refuses any
-# other workflow text before reading it, so its YAML reader and inventory only
-# ever see this file; a PR that changes ci.yml updates this value in the same
-# PR, which the owner test requires.
-REPLAY_WORKFLOW_SHA256 = "d02021f3bbeb22ec569fe6282c046d68468af003f0f0370313c5e76f58b6ab9b"
-# Every step of the ``test`` job, in file order.  A step the workflow adds,
-# renames or removes fails the replay (and the owner test) until this list
-# knows it, so the replay never silently runs a different job.
-REPLAY_EXCLUDED = "excluded"
-REPLAY_EXECUTED = "executed"
-REPLAY_INVENTORY: tuple[tuple[str, str, str], ...] = (
-    ("Check out exact candidate head", REPLAY_EXCLUDED,
-     "uses: actions/checkout; replaced by a throwaway clone of the head outside the repository"),
-    ("Classify affected CI lanes", REPLAY_EXECUTED, ""),
-    ("Check AGENTS.md cites no project documents", REPLAY_EXECUTED, ""),
-    ("Set up Python 3.12", REPLAY_EXCLUDED,
-     "uses: actions/setup-python; replaced by the caller's interpreter, whose major.minor must equal python-version"),
-    ("Install applicable validation dependencies", REPLAY_EXCLUDED,
-     "needs the package index; the caller's environment must already hold every distribution the step installs"),
-    ("Verify pytest readiness", REPLAY_EXECUTED, ""),
-    ("Verify closed deterministic environment", REPLAY_EXECUTED, ""),
-    ("Run affected behavioral tests in isolation", REPLAY_EXECUTED, ""),
-    ("Run product mechanics and ordering lane", REPLAY_EXECUTED, ""),
-    ("Run CLI and compatibility lane", REPLAY_EXECUTED, ""),
-    ("Run database and runtime-contract lane", REPLAY_EXECUTED, ""),
-    ("Run rails policy and secret-safety lane", REPLAY_EXECUTED, ""),
-    ("Run governed evidence integrity lane", REPLAY_EXECUTED, ""),
-    ("Run approved generic QA subsystem lane in isolation", REPLAY_EXECUTED, ""),
-    ("Build and verify exact-source release attestation", REPLAY_EXECUTED, ""),
-    ("Verify truthful applicability and clean candidate tree", REPLAY_EXECUTED, ""),
-)
-REPLAY_STEP_KEYS = frozenset({"name", "id", "if", "uses", "shell", "run", "env", "with"})
-# GitHub rejects a job whose step ids repeat.  An id outside the form it
-# documents for job ids, one beginning with "__", and two ids that differ only
-# in case are forms the replay does not model either.
-_STEP_ID_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_-]*")
-# The keys each excluded step may carry: its substitute models exactly these.
-# The checkout has no `if`, because the copy exists before step 1 whatever a
-# condition says; no excluded step has `env` or `shell`.
-REPLAY_EXCLUDED_STEP_KEYS = {
-    "Check out exact candidate head": frozenset({"name", "id", "uses", "with"}),
-    "Set up Python 3.12": frozenset({"name", "id", "if", "uses", "with"}),
-    "Install applicable validation dependencies": frozenset({"name", "id", "if", "run"}),
-}
-# The condition each excluded step must carry, exactly ("" for none).  The
-# caller's environment holds what the substituted steps provide whether or not
-# they run, so a substitute stands in for its step only when it runs exactly
-# when CI's does.
-REPLAY_EXCLUDED_STEP_CONDITIONS = {
-    "Check out exact candidate head": "",
-    "Set up Python 3.12": "${{ steps.classify.outputs.needs_python == 'true' }}",
-    "Install applicable validation dependencies": "${{ steps.classify.outputs.needs_python == 'true' }}",
-}
-REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
-# What the replay stands in for, and the only inputs it models: the workflow's
-# keys other than jobs, exactly as ci.yml sets them (GitHub validates them
-# before the job runs; the replay does not, so a key, value or scalar type
-# other than these is drift), the ubuntu-latest runner (x86_64 Linux, replayed
-# on this machine, which must be x86_64 Linux too), and the
-# two substituted actions, revision included, with their inputs (None: any
-# value; a string: exactly that value, required).  Anything else is inventory
-# drift.
-_REPLAY_PATHS = ["**", "!docs/crd/**", "!docs/ephemeral/**", "!docs/graph/**", "!docs/pfcanon/**", "!docs/plans/**",
-                 "!docs/prompt_ecosystem_management/**", "!docs/qa/**", "!docs/run/**", "**.path_proof.txt",
-                 "docs/run/EPIC011_TEST_IDENTITIES.md", "docs/run/PROD_ENDPOINTS.json"]
-REPLAY_WORKFLOW_HEADER: dict[str, object] = {
-    "name": "ci",
-    "on": {"pull_request": {"paths": _REPLAY_PATHS}, "push": {"branches": ["main"], "paths": _REPLAY_PATHS}},
-    "permissions": {"contents": "read"},
-    "concurrency": {"group": "ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}",
-                    "cancel-in-progress": "${{ github.event_name == 'pull_request' }}"},
-}
-REPLAY_RUNNER = "ubuntu-latest"
-REPLAY_MACHINES = frozenset({"x86_64", "amd64"})
-REPLAY_SUBSTITUTED_INPUTS: dict[str, dict[str, str | None]] = {
-    "actions/checkout@v4": {"fetch-depth": "0", "persist-credentials": "false",
-                            "ref": "${{ github.event.pull_request.head.sha || github.sha }}"},
-    "actions/setup-python@v5": {"python-version": None},
-}
-# The github context paths the replay models; any other path, and github.sha
-# and github.event.before on a pull_request event (the merge commit and the
-# payload's before are unknown offline), is refused where its value is used.
-REPLAY_GITHUB_PATHS = frozenset({"github.event_name", "github.sha", "github.event.before",
-                                 "github.event.pull_request.base.sha", "github.event.pull_request.head.sha"})
-# Variables the runner or a substituted action gives run steps.  The replay
-# sets REPLAY_RUNNER_VARIABLES, leaves REMOVED_ENV_KEYS absent as a hosted
-# runner does (children inherit no other runner variable; CHILD_INHERITED_KEYS),
-# and refuses a workflow whose run text or env keys name any other.  Scripts a
-# step calls are not scanned; they see the same environment.
-REPLAY_RUNNER_VARIABLES = frozenset({"GITHUB_ACTIONS", "GITHUB_EVENT_NAME", "GITHUB_OUTPUT", "RUNNER_TEMP"})
-_RUNNER_VARIABLE_RE = re.compile(
-    r"(?<![A-Za-z0-9_])(?:(?:GITHUB|RUNNER|ACTIONS)_[A-Za-z0-9_]+|ImageOS|ImageVersion|pythonLocation"
-    r"|Python[23]?_ROOT_DIR)(?![A-Za-z0-9_])")
-# A requirement as the install step and its -r files write one: a
-# distribution name, then optionally extras, version clauses or a marker, none
-# of which the presence check reads.  A URL, a path or any other form fails
-# closed.
-_REQUIREMENT_NAME_RE = re.compile(
-    r"([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)\s*(?:\[[^\]]*\])?\s*(?:[<>=!~(;][^@]*)?")
 
 _TESTS_TOKEN_RE = re.compile(r"tests/[A-Za-z0-9_./-]+")
-_EXPRESSION_RE = re.compile(r"\$\{\{(.*?)\}\}", re.DOTALL)
-_STATUS_FUNCTIONS = ("always()", "success()", "failure()", "cancelled()")
 
 
 class ToolingError(RuntimeError):
@@ -534,7 +405,7 @@ def _resolve(value: str) -> str:
 
 
 def _as_string(value: object) -> bool:
-    """Whether GitHub reads an env or with value as the very string the replay uses.
+    """Whether GitHub reads an env or with value as the very string the parser returns.
 
     A string is; GitHub writes a boolean as true or false and an integer in
     decimal, so only those spellings of them are; any other non-string is not.
@@ -965,7 +836,7 @@ def _lanes_for_refs(context: Context, report: Report) -> dict[str, str]:
 
 
 def parse_github_output(data: bytes) -> tuple[dict[str, str], tuple[str, str] | None]:
-    """A GITHUB_OUTPUT file's outputs as the Linux runner reads them, and the first record the replay cannot take.
+    """A GITHUB_OUTPUT file's outputs as the Linux runner reads them, and the first record the parser does not model.
 
     The runner splits the file at line feeds, skips empty lines and reads
     NAME=VALUE at the first '='.  It rejects a line with neither '=' nor '<<'
@@ -1155,574 +1026,6 @@ def _junit_outcomes(junit: Path, files: list[str]) -> dict[str, str]:
 
 
 # --------------------------------------------------------------------------
-# replay: expressions
-# --------------------------------------------------------------------------
-
-class Expressions:
-    """The subset of GitHub Actions expressions ci.yml uses; anything else is tooling."""
-
-    _TOKEN = re.compile(r"\s*(?:(\|\||&&|==|!=|\(|\)|!)|'((?:[^']|'')*)'|([A-Za-z_][A-Za-z0-9_.-]*(?:\(\))?))")
-
-    def __init__(self, contexts: dict[str, object], job_failed: bool) -> None:
-        self.contexts = contexts
-        self.job_failed = job_failed
-
-    def evaluate(self, text: str) -> object:
-        self.tokens = self._tokenize(text)
-        self.position = 0
-        value = self._or()
-        if self.position != len(self.tokens):
-            raise ToolingError(f"unsupported expression: {text.strip()}")
-        return value
-
-    def _tokenize(self, text: str) -> list[tuple[str, str]]:
-        tokens: list[tuple[str, str]] = []
-        index = 0
-        text = text.strip()
-        while index < len(text):
-            match = self._TOKEN.match(text, index)
-            if not match or match.end() == index:
-                raise ToolingError(f"unsupported expression: {text}")
-            if match.group(1):
-                tokens.append(("op", match.group(1)))
-            elif match.group(2) is not None:
-                tokens.append(("str", match.group(2).replace("''", "'")))
-            else:
-                tokens.append(("name", match.group(3)))
-            index = match.end()
-            while index < len(text) and text[index] == " ":
-                index += 1
-        return tokens
-
-    def _peek(self) -> tuple[str, str] | None:
-        return self.tokens[self.position] if self.position < len(self.tokens) else None
-
-    def _or(self) -> object:
-        value = self._and()
-        while self._peek() == ("op", "||"):
-            self.position += 1
-            right = self._and()
-            value = value if _truthy(value) else right
-        return value
-
-    def _and(self) -> object:
-        value = self._compare()
-        while self._peek() == ("op", "&&"):
-            self.position += 1
-            right = self._compare()
-            value = right if _truthy(value) else value
-        return value
-
-    def _compare(self) -> object:
-        left = self._unary()
-        token = self._peek()
-        if token in {("op", "=="), ("op", "!=")}:
-            self.position += 1
-            right = self._unary()
-            equal = _equal(left, right)
-            return equal if token[1] == "==" else not equal
-        return left
-
-    def _unary(self) -> object:
-        token = self._peek()
-        if token == ("op", "!"):
-            self.position += 1
-            return not _truthy(self._unary())
-        if token == ("op", "("):
-            self.position += 1
-            value = self._or()
-            if self._peek() != ("op", ")"):
-                raise ToolingError("unbalanced expression")
-            self.position += 1
-            return value
-        if token is None:
-            raise ToolingError("empty expression")
-        self.position += 1
-        kind, text = token
-        if kind == "str":
-            return text
-        if text in {"true", "false"}:
-            return text == "true"
-        if text.endswith("()"):
-            if text == "always()":
-                return True
-            if text == "success()":
-                return not self.job_failed
-            if text == "failure()":
-                return self.job_failed
-            if text == "cancelled()":
-                return False
-            raise ToolingError(f"unsupported function: {text}")
-        return self._lookup(text)
-
-    def _lookup(self, dotted: str) -> object:
-        parts = dotted.split(".")
-        if parts[0] not in self.contexts:
-            raise ToolingError(f"unsupported context: {dotted}")
-        if parts[0] == "github" and dotted not in REPLAY_GITHUB_PATHS:
-            return _Unmodelled(dotted)
-        value: object = self.contexts
-        for part in parts:
-            if isinstance(value, dict):
-                value = value.get(part, "")
-            else:
-                return ""
-        # GitHub compares objects by reference and treats every object as true; the replay models string values only.
-        if isinstance(value, dict):
-            return _Unmodelled(dotted, "is an object, which the replay does not model")
-        return value
-
-
-@dataclass(frozen=True)
-class _Unmodelled:
-    """A context value the replay does not model; using it, not discarding it, is tooling."""
-
-    path: str
-    reason: str = "is not modelled for this event"
-
-    def refuse(self) -> ToolingError:
-        return ToolingError(f"unsupported context: {self.path} {self.reason}")
-
-
-def _truthy(value: object) -> bool:
-    if isinstance(value, _Unmodelled):
-        raise value.refuse()
-    return bool(value) and value != 0
-
-
-def _string(value: object) -> str:
-    if isinstance(value, _Unmodelled):
-        raise value.refuse()
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    return str(value)
-
-
-def _equal(left: object, right: object) -> bool:
-    """GitHub's == where it needs no conversion: two booleans, or two strings compared ignoring case.
-
-    GitHub converts operands of different types to numbers, and folds the case of
-    non-ASCII letters by its own rules; the replay models neither, so such a
-    comparison is tooling."""
-    for value in (left, right):
-        if isinstance(value, _Unmodelled):
-            raise value.refuse()
-    if isinstance(left, bool) and isinstance(right, bool):
-        return left == right
-    if isinstance(left, str) and isinstance(right, str):
-        if left == right or (left.isascii() and right.isascii()):
-            return left.lower() == right.lower()
-        raise ToolingError("unsupported comparison: GitHub ignores the case of non-ASCII letters by rules the "
-                           "replay does not model")
-    raise ToolingError("unsupported comparison: GitHub converts a boolean and a string to numbers to compare them, "
-                       "which the replay does not model")
-
-
-def interpolate(text: str, expressions: Expressions) -> str:
-    return _EXPRESSION_RE.sub(lambda m: _string(expressions.evaluate(m.group(1))), text)
-
-
-def condition(text: object, expressions: Expressions) -> bool:
-    if text in (None, ""):
-        return not expressions.job_failed
-    raw = str(text).strip()
-    inner = _EXPRESSION_RE.fullmatch(raw)
-    expression = inner.group(1) if inner else raw
-    value = _truthy(expressions.evaluate(expression))
-    if not any(function in expression.replace(" ", "") for function in _STATUS_FUNCTIONS):
-        value = value and not expressions.job_failed
-    return value
-
-
-# --------------------------------------------------------------------------
-# replay
-# --------------------------------------------------------------------------
-
-def _identical(left: object, right: object) -> bool:
-    """Equal as parsed YAML, scalar types included: a plain scalar YAML reads as a non-string is not a string."""
-    if type(left) is not type(right):
-        return False
-    if isinstance(left, dict):
-        return left.keys() == right.keys() and all(_identical(left[key], right[key]) for key in left)
-    if isinstance(left, list):
-        return len(left) == len(right) and all(map(_identical, left, right))
-    return left == right
-
-
-def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
-    header = {key: value for key, value in parse_workflow(text).items() if key != "jobs"}
-    differ = sorted(key for key in header.keys() | REPLAY_WORKFLOW_HEADER.keys()
-                    if not _identical(header.get(key), REPLAY_WORKFLOW_HEADER.get(key)))
-    if differ:
-        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: workflow keys other than jobs differ from the tool's model: "
-                           + ", ".join(differ))
-    jobs = parse_jobs(text)
-    if REPLAY_JOB not in jobs:
-        raise ToolingError(f"{WORKFLOW_PATH} has no {REPLAY_JOB!r} job")
-    if set(jobs) != {REPLAY_JOB}:
-        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: the workflow's jobs {sorted(jobs)} are not exactly [{REPLAY_JOB!r}]")
-    job = jobs[REPLAY_JOB]
-    unknown_job_keys = set(job.keys) - REPLAY_JOB_KEYS
-    if unknown_job_keys:
-        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: unsupported job keys {sorted(unknown_job_keys)}")
-    runs_on = job.keys.get("runs-on", "")
-    if runs_on != REPLAY_RUNNER:
-        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: runs-on {runs_on!r} is not the modelled {REPLAY_RUNNER!r}")
-    names = [str(step.get("name", "")) for step in job.steps]
-    expected = [name for name, _kind, _reason in REPLAY_INVENTORY]
-    if names != expected:
-        raise ToolingError("REPLAY_INVENTORY_DRIFT: the test job's steps differ from the tool's inventory: "
-                           f"workflow={names} tool={expected}")
-    modelled_variables = REPLAY_RUNNER_VARIABLES | set(REMOVED_ENV_KEYS)
-    job_variables = {key for key in job.env if _RUNNER_VARIABLE_RE.fullmatch(key)}
-    if job_variables:
-        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: the test job's env sets runner variables {sorted(job_variables)}")
-    step_ids: set[str] = set()
-    for step, (name, kind, _reason) in zip(job.steps, REPLAY_INVENTORY):
-        unknown = set(step) - REPLAY_STEP_KEYS
-        if unknown:
-            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has unsupported keys {sorted(unknown)}")
-        if ("uses" in step) != (kind == REPLAY_EXCLUDED and name != "Install applicable validation dependencies"):
-            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} changed between uses: and run:")
-        if "uses" not in step and not (isinstance(step.get("run"), str) and step["run"].strip()):
-            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has neither uses: nor a run: command")
-        if kind == REPLAY_EXCLUDED and set(step) - REPLAY_EXCLUDED_STEP_KEYS[name]:
-            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: excluded step {name!r} has keys its substitute does not model "
-                               f"{sorted(set(step) - REPLAY_EXCLUDED_STEP_KEYS[name])}")
-        for key in ("name", "id", "if", "uses", "shell", "run"):
-            if key in step and (not isinstance(step[key], str) or isinstance(step[key], _Resolved)):
-                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has a {key} that is not a string")
-        for key in ("env", "with"):
-            if key in step and not (isinstance(step[key], dict) and all(_as_string(v) for v in step[key].values())):
-                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has a {key} that is not a mapping of strings")
-        if "id" in step:
-            step_id = str(step["id"])
-            if not _STEP_ID_RE.fullmatch(step_id) or step_id.startswith("__"):
-                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has the id {step_id!r}, a form the replay "
-                                   "does not model")
-            if step_id.lower() in step_ids:
-                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} repeats the id {step_id!r}; GitHub requires "
-                                   "step ids to be unique")
-            step_ids.add(step_id.lower())
-        if kind == REPLAY_EXCLUDED and str(step.get("if", "")).strip() != REPLAY_EXCLUDED_STEP_CONDITIONS[name]:
-            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: excluded step {name!r} has the condition {step.get('if')!r}, "
-                               f"not the modelled {REPLAY_EXCLUDED_STEP_CONDITIONS[name]!r}")
-        step_env = step.get("env", {})
-        named = set(_RUNNER_VARIABLE_RE.findall(str(step.get("run", "")))) - modelled_variables
-        named |= {str(key) for key in step_env if _RUNNER_VARIABLE_RE.fullmatch(str(key))}
-        if named:
-            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} names runner variables the replay does not "
-                               f"model: {', '.join(sorted(named))}")
-        if "uses" in step:
-            action = str(step["uses"]).strip()
-            supported = REPLAY_SUBSTITUTED_INPUTS.get(action)
-            given = step.get("with", {})
-            if supported is None or not isinstance(given, dict):
-                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} uses {action!r}, which the replay does not model")
-            unmodelled = sorted(set(given) - set(supported)) + sorted(
-                key for key, value in supported.items() if value is not None and str(given.get(key, "")).strip() != value)
-            if unmodelled:
-                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has inputs the replay does not model: "
-                                   + ", ".join(unmodelled))
-    return job, job.steps
-
-
-def replay_machine() -> str | None:
-    """Why this machine cannot stand in for the job's x86_64 Linux runner, or None."""
-    if sys.platform != "linux" or platform.machine().lower() not in REPLAY_MACHINES:
-        return f"{sys.platform} {platform.machine()}"
-    return None
-
-
-def replay_contexts(event: str, base: str, head: str) -> dict[str, object]:
-    """The expression contexts the replay models for one event."""
-    pull_request = event == "pull_request"
-    return {
-        "github": {
-            "event_name": event,
-            "sha": _Unmodelled("github.sha") if pull_request else head,
-            "event": {
-                "before": _Unmodelled("github.event.before") if pull_request else base,
-                "pull_request": {"base": {"sha": base}, "head": {"sha": head}} if pull_request else {},
-            },
-        },
-        "steps": {},
-    }
-
-
-def _python_version(steps: list[dict[str, object]]) -> str:
-    for step in steps:
-        uses = str(step.get("uses", ""))
-        if uses.startswith("actions/setup-python@"):
-            with_values = step.get("with", {})
-            if isinstance(with_values, dict) and "python-version" in with_values:
-                return str(with_values["python-version"])
-    raise ToolingError("no actions/setup-python step with python-version")
-
-
-def _distribution(name: str, search_path: list[str] | None) -> importlib.metadata.Distribution | None:
-    return next(iter(importlib.metadata.distributions(name=name, path=search_path or sys.path)), None)
-
-
-def _requirement_name(text: str) -> str:
-    match = _REQUIREMENT_NAME_RE.fullmatch(text.strip())
-    if not match:
-        raise ValueError(f"unsupported requirement {text.strip()!r}")
-    return match.group(1)
-
-
-def _requirement_lines(path: Path, seen: frozenset[Path] = frozenset()) -> list[str]:
-    """A requirements file's requirements; nested -r files are followed, any other option fails closed."""
-    if path.resolve() in seen:
-        raise ValueError(f"requirements file {path.name} includes itself")
-    lines: list[str] = []
-    for line in path.read_text(encoding="utf-8").replace("\\\n", "").splitlines():
-        line = re.sub(r"(^|\s)#.*", "", line).strip()
-        nested = re.fullmatch(r"(?:-r|--requirement)(?:\s+|=)(\S+)", line)
-        if nested:
-            lines += _requirement_lines(path.parent / nested.group(1), seen | {path.resolve()})
-        elif line.startswith("-"):
-            raise ValueError(f"unsupported requirements-file option {line!r} in {path.name}")
-        elif line:
-            lines.append(line)
-    return lines
-
-
-_SHELL_SPECIAL = frozenset(";&|<>()`$*?[]{}~!#\\")
-
-
-def _simple_command(text: str) -> list[str]:
-    """The words of one bash simple command with nothing for the shell to interpret, or ValueError.
-
-    Outside quotes no operator, expansion, glob, comment or escape is allowed,
-    inside double quotes no expansion or escape, and no line break anywhere: the
-    substitute stands in for exactly one command, so a second one, a pipeline or
-    a redirection would go unrun.
-    """
-    text = text.strip()
-    quote = ""
-    for char in text:
-        if char in "\n\r":
-            raise ValueError("the install step is not one simple command: it has a line break")
-        if quote:
-            if char == quote:
-                quote = ""
-            elif quote == '"' and char in "$`\\":
-                raise ValueError(f"the install step is not one simple command: {char!r} inside double quotes")
-        elif char in "'\"":
-            quote = char
-        elif char in _SHELL_SPECIAL:
-            raise ValueError(f"the install step is not one simple command: {char!r} outside quotes")
-    if quote:
-        raise ValueError("the install step is not one simple command: an unterminated quote")
-    return shlex.split(text)
-
-
-def _install_check(run_text: str, copy: Path, search_path: list[str] | None = None) -> list[str]:
-    """The distributions CI's install step names that the caller's environment does not hold.
-
-    The step needs the package index, so the replay does not run it: that the
-    caller's environment already holds CI's install is its stated
-    precondition (instruction ID-8).  This checks only that each distribution
-    the step names is installed: every requirement on its command line and in
-    its -r files, and the editable project by its [project] name.  Versions,
-    extras, markers, dependencies, the build system and the installed
-    project's metadata are the caller's to match; they are not checked.
-    """
-    words = _simple_command(run_text)
-    if "install" not in words or words[:words.index("install")] not in (["pip"], ["python", "-m", "pip"]):
-        raise ValueError("the install step is not one 'python -m pip install' command")
-    rest = words[words.index("install") + 1:]
-    if not rest:
-        # pip refuses an install with no requirement, requirements file or project.
-        raise ValueError("the install step names nothing to install, which pip refuses")
-    names: list[str] = []
-    index = 0
-    while index < len(rest):
-        word = rest[index]
-        if word in {"-r", "--requirement", "-e", "--editable"} and index + 1 < len(rest):
-            target = copy / rest[index + 1]
-            if word in {"-r", "--requirement"}:
-                names += [_requirement_name(line) for line in _requirement_lines(target)]
-            else:
-                project = tomllib.loads((target / "pyproject.toml").read_text(encoding="utf-8")).get("project")
-                if not isinstance(project, dict) or not isinstance(project.get("name"), str):
-                    raise ValueError("the editable project's pyproject.toml names no [project] name")
-                names.append(project["name"])
-            index += 2
-            continue
-        if word.startswith("-"):
-            raise ValueError(f"unsupported install option {word!r}")
-        names.append(_requirement_name(word))
-        index += 1
-    return sorted({name for name in names if _distribution(name, search_path) is None})
-
-
-def _resolution(copy: Path, env: dict[str, str], temporary: Path) -> list[tuple[str, str, bool]]:
-    """Where each console script's module resolves under the replay environment."""
-    pyproject = copy / "pyproject.toml"
-    scripts = {}
-    if pyproject.is_file():
-        scripts = tomllib.loads(pyproject.read_text(encoding="utf-8")).get("project", {}).get("scripts", {})
-    rows = []
-    for script, target in sorted(scripts.items()):
-        module = str(target).split(":", 1)[0]
-        result = subprocess.run(
-            [sys.executable, "-B", "-c",
-             "import importlib.util, sys; s = importlib.util.find_spec(sys.argv[1]); print(s.origin if s else '')",
-             module],
-            cwd=temporary, env=env, capture_output=True, text=True, check=False)
-        origin = result.stdout.strip()
-        inside = bool(origin) and Path(origin).resolve().is_relative_to(copy.resolve())
-        executable = shutil.which(script, path=env["PATH"]) or "not on PATH"
-        rows.append((f"{script} ({executable}) -> {module}", origin or "not importable", inside))
-    return rows
-
-
-def _classify_failure(returncode: int, log: str) -> str:
-    if returncode in {126, 127} or "command not found" in log:
-        return "TOOLING"
-    if any(marker in log for marker in ("errors during collection", "ImportError while importing test module",
-                                         "ModuleNotFoundError")):
-        return "TOOLING"
-    return "BEHAVIOR"
-
-
-def report_replay(context: Context, report: Report) -> None:
-    try:
-        head = resolve_commit(context.repo, context.head_ref)
-        base = head if context.full else resolve_commit(context.repo, context.base_ref)
-        copy = make_copy(context.repo, head, context.temporary / "replay-copy")
-        if git(copy, "cat-file", "-e", f"{base}^{{commit}}", check=False).returncode != 0:
-            raise ToolingError(f"base {base} is not available to the throwaway copy")
-        workflow = (copy / WORKFLOW_PATH).read_bytes()
-        workflow_sha256 = hashlib.sha256(workflow).hexdigest()
-        if workflow_sha256 != REPLAY_WORKFLOW_SHA256:
-            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: the head's {WORKFLOW_PATH} has SHA-256 {workflow_sha256}, "
-                               f"not the modelled {REPLAY_WORKFLOW_SHA256}; a PR that changes the workflow updates "
-                               "REPLAY_WORKFLOW_SHA256 and the replay's model with it")
-        job, steps = replay_steps(workflow.decode("utf-8"))
-        python_version = _python_version(steps)
-        machine = replay_machine()
-        if machine:
-            raise ToolingError(f"the job runs on {job.keys['runs-on']} (x86_64 Linux); this machine is {machine}")
-    except ToolingError as exc:
-        report.fail(str(exc), tooling=True)
-        return
-    actual = f"{sys.version_info.major}.{sys.version_info.minor}"
-    report.out(f"event={context.event} base={base} head={head}" + (" (full validation)" if context.full else ""))
-    report.out(f"copy={copy} interpreter={sys.executable} python={sys.version.split()[0]} workflow_python={python_version}")
-    report.out(f"workflow {WORKFLOW_PATH} sha256={workflow_sha256} (the modelled one)")
-    runner_temp = context.temporary / "replay-runner-temp"
-    runner_temp.mkdir()
-    contexts = replay_contexts(context.event, base, head)
-    expressions = Expressions(contexts, job_failed=False)
-    base_env = child_environment(dict(os.environ), context.temporary,
-                                 {"PYTHONPATH": str(copy), "RUNNER_TEMP": str(runner_temp),
-                                  "CI": "true", "GITHUB_ACTIONS": "true", "GITHUB_EVENT_NAME": context.event})
-    try:
-        base_env.update({k: interpolate(v, expressions) for k, v in job.env.items()})
-    except ToolingError as exc:
-        report.fail(str(exc), tooling=True)
-        return
-    report.out("job env " + " ".join(f"{k}={base_env[k]}" for k in PRINTED_PINS if k in base_env))
-    for label, origin, inside in _resolution(copy, base_env, context.temporary):
-        report.out(f"resolves {label}: {origin}" + ("" if inside else "  [outside the copy]"))
-        if not inside and origin != "not importable":
-            report.fail(f"{label} resolves outside the copy; tests would exercise other code", tooling=True)
-    steps_context: dict[str, dict[str, object]] = contexts["steps"]  # type: ignore[assignment]
-    job_failed = False
-    total_started = time.monotonic()
-    for number, (step, (name, kind, reason)) in enumerate(zip(steps, REPLAY_INVENTORY), start=1):
-        step_id = str(step.get("id", ""))
-        expressions.job_failed = job_failed
-        try:
-            applicable = condition(step.get("if"), expressions)
-        except ToolingError as exc:
-            report.fail(f"step {number} {name}: {exc}", tooling=True)
-            return
-        started = time.monotonic()
-        outputs: dict[str, str] = {}
-        detail = ""
-        if not applicable:
-            outcome = "skipped"
-        elif kind == REPLAY_EXCLUDED:
-            outcome, detail = _substitute(step, reason, copy, python_version, actual)
-        else:
-            outcome, detail, outputs = _execute(step, number, copy, base_env, expressions, context.temporary)
-        if step_id:
-            steps_context[step_id] = {"outcome": outcome, "conclusion": outcome, "outputs": outputs}
-        label = "excluded, substituted" if kind == REPLAY_EXCLUDED and applicable else kind
-        report.out(f"step {number:02d} {outcome.upper()} [{label}] {time.monotonic() - started:.1f}s {name}")
-        for line in detail.splitlines():
-            report.out(f"  {line}")
-        if outcome == "failure":
-            job_failed = True
-            report.status = "FAIL"
-    clean, status = copy_status(copy)
-    report.out(f"replay step time {time.monotonic() - total_started:.1f}s; copy after replay: "
-               + ("clean" if clean else "CHANGED"))
-    for line in status.splitlines():
-        report.out(f"copy-status {line}")
-
-
-def _substitute(step: dict[str, object], reason: str, copy: Path,
-                python_version: str, actual: str) -> tuple[str, str]:
-    uses = str(step.get("uses", ""))
-    if uses.startswith("actions/checkout@"):
-        return "success", f"{reason}; copy at {git_text(copy, 'rev-parse', 'HEAD')}"
-    if uses.startswith("actions/setup-python@"):
-        if actual != python_version:
-            return "failure", f"TOOLING interpreter {actual} is not the workflow's python-version {python_version}"
-        return "success", f"{reason}: {actual}"
-    run = str(step.get("run", ""))
-    try:
-        missing = _install_check(run, copy)
-    except (OSError, KeyError, TypeError, ValueError, tomllib.TOMLDecodeError) as exc:
-        return "failure", f"TOOLING cannot read the install step's inputs: {exc}"
-    if missing:
-        return "failure", ("TOOLING the caller's environment lacks distributions the install step names: "
-                           + ", ".join(missing))
-    return "success", (f"{reason}: every distribution the step names is installed (versions, dependencies and the "
-                       "editable project's metadata are the caller's to match)")
-
-
-def _execute(step: dict[str, object], number: int, copy: Path, base_env: dict[str, str],
-             expressions: Expressions, temporary: Path) -> tuple[str, str, dict[str, str]]:
-    try:
-        script = interpolate(str(step.get("run", "")), expressions)
-        env = dict(base_env)
-        step_env = step.get("env", {})
-        if isinstance(step_env, dict):
-            env.update({k: interpolate(str(v), expressions) for k, v in step_env.items()})
-    except ToolingError as exc:
-        return "failure", f"TOOLING {exc}", {}
-    output_file = temporary / f"replay-step-{number:02d}-output.txt"
-    output_file.write_text("", encoding="utf-8")
-    env["GITHUB_OUTPUT"] = str(output_file)
-    script_file = temporary / f"replay-step-{number:02d}.sh"
-    script_file.write_text(script, encoding="utf-8")
-    shell = step.get("shell")
-    if shell == "bash":
-        command = ["bash", "--noprofile", "--norc", "-eo", "pipefail", str(script_file)]
-    elif shell is None:
-        command = ["bash", "-e", str(script_file)]
-    else:
-        return "failure", f"TOOLING unsupported shell {shell!r}", {}
-    result = subprocess.run(command, cwd=copy, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            text=True, errors="replace", check=False)
-    # The runner reads the step's file commands whatever its exit status, and a record it rejects fails the step.
-    outputs, problem = parse_github_output(output_file.read_bytes())
-    lines = [line for line in result.stdout.splitlines() if line.strip()]
-    if result.returncode == 0 and problem is None:
-        return "success", "\n".join(lines[-3:]), outputs
-    head = [] if result.returncode == 0 else [
-        f"{_classify_failure(result.returncode, result.stdout)} exit {result.returncode}"]
-    head += [f"{problem[0]} {problem[1]}"] if problem else []
-    return "failure", "\n".join(head + lines[-30:]), outputs
-
-
-# --------------------------------------------------------------------------
 # main
 # --------------------------------------------------------------------------
 
@@ -1731,7 +1034,6 @@ RUNNERS = {
     "membership": report_membership,
     "build-notes": report_build_notes,
     "sweep": report_sweep,
-    "replay": report_replay,
 }
 
 
@@ -1742,16 +1044,16 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("reports", nargs="+", choices=(*REPORTS, "all"),
-                        help="reports to run, always in the order lanes, membership, build-notes, sweep, replay")
-    parser.add_argument("--base", default=DEFAULT_BASE, help="base ref for lanes and replay (local; default origin/main)")
+                        help="reports to run, always in the order lanes, membership, build-notes, sweep")
+    parser.add_argument("--base", default=DEFAULT_BASE, help="base ref for lanes (local; default origin/main)")
     parser.add_argument("--head", default=DEFAULT_HEAD,
-                        help="head ref for lanes, membership, sweep and replay (default HEAD)")
+                        help="head ref for lanes, membership and sweep (default HEAD)")
     parser.add_argument("--event", choices=("pull_request", "push"), default="pull_request",
-                        help="CI event the classification and replay assume (default pull_request)")
+                        help="CI event the classification assumes (default pull_request)")
     parser.add_argument("--path", dest="paths", action="append", default=[],
                         help="repository-relative path for lanes (given-paths mode) and membership; repeatable")
     parser.add_argument("--full", action="store_true",
-                        help="lanes and replay with base equal to head: the classifier's full validation")
+                        help="lanes with base equal to head: the classifier's full validation")
     parser.add_argument("--no-run", action="store_true", help="sweep: list the uncovered set without running it")
     parser.add_argument("--repo-root", type=Path, default=ROOT, help=argparse.SUPPRESS)
     return parser.parse_args(argv)

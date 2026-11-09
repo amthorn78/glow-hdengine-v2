@@ -66,7 +66,7 @@ def seams(monkeypatch):
     ids = iter(f"00000000-0000-4000-8000-{n:012d}" for n in range(1, 100))
     monkeypatch.setattr(vendor_audit, "new_correlation_id", lambda: next(ids))
     monkeypatch.setattr(vendor_audit, "resolve_actor_principal", lambda: "qa-operator")
-    for name in ("APP_ENV", "ENGINE_ENV", vendor_audit.VENDOR_OVERRIDE_AUDIT_PATH_KEY):
+    for name in ("APP_ENV", "ENGINE_ENV", "HDAPI_BASE_URL", "HD_API_BASE_URL", vendor_audit.VENDOR_OVERRIDE_AUDIT_PATH_KEY):
         monkeypatch.delenv(name, raising=False)
 
 

@@ -122,6 +122,8 @@ def _init_repo(
         _write_json(source_path, source or _valid_source())
 
     _git(repo, "init")
+    _git(repo, "config", "maintenance.auto", "false")
+    _git(repo, "config", "gc.auto", "0")
     _git(repo, "config", "user.email", "close-pack@example.invalid")
     _git(repo, "config", "user.name", "Close Pack Test")
     _git(repo, "add", "audit/README.md", SOURCE_REL, "evidence", "plans", "schemas")
@@ -4587,6 +4589,8 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
     source_rel = f"audit/{close_pack._derived_paths_v2(change_id)[0].split('/')[1].split('_close')[0]}_close_candidate_source.json"
     _write_json(repo / source_rel, source)
     _git(repo, "init")
+    _git(repo, "config", "maintenance.auto", "false")
+    _git(repo, "config", "gc.auto", "0")
     _git(repo, "config", "user.email", "close-pack@example.invalid")
     _git(repo, "config", "user.name", "Close Pack Test")
     _git(repo, "add", "-A")

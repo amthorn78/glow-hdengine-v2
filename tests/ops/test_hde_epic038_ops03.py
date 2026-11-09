@@ -254,6 +254,16 @@ def test_strict_schema_integer_semantics_match_draft_2020(value):
 
 
 @pytest.fixture
+def run_root_sibling():
+    # HDE-CRD-0003 S07 (O-1): a path beside RUN_ROOT, so a rename from RUN_ROOT stays on its filesystem.
+    path = runner.RUN_ROOT.parent / f"{runner.RUN_ROOT.name}-displaced-{uuid.uuid4().hex[:24]}"
+    try:
+        yield path
+    finally:
+        shutil.rmtree(path, ignore_errors=True)
+
+
+@pytest.fixture
 def authorization(tmp_path):
     runner.RUN_ROOT.mkdir(mode=0o700, parents=True, exist_ok=True)
     runner.RUN_ROOT.chmod(0o700)
@@ -2773,11 +2783,11 @@ def test_empty_database_url_fails_before_marker_without_provider(authorization):
     assert failure["launch_consumed"] is False
 
 
-def test_candidate_replacement_failure_is_persisted_before_cleanup(monkeypatch, authorization, tmp_path):
+def test_candidate_replacement_failure_is_persisted_before_cleanup(monkeypatch, authorization, run_root_sibling):
     auth_path, _auth, base, candidate = authorization
     original_source = runner.validate_source_identity
     source_checks = 0
-    displaced = tmp_path / "displaced-candidate"
+    displaced = run_root_sibling
 
     def replace_after_capture(auth, *, enforce_repo=True):
         nonlocal source_checks
@@ -2956,6 +2966,8 @@ def test_ignored_native_pathspec_uses_real_git_repository(monkeypatch, tmp_path)
 
 def _commit_test_repository(repo: Path) -> str:
     subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "maintenance.auto", "false"], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "gc.auto", "0"], check=True)
     subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
     subprocess.run(
         [
@@ -3409,10 +3421,10 @@ def test_provider_abort_is_bounded_and_contains_syscall_failures(monkeypatch):
     assert child.completed is True
 
 
-def test_validator_rejects_authorized_candidate_symlink(authorization, tmp_path):
+def test_validator_rejects_authorized_candidate_symlink(authorization, run_root_sibling):
     auth_path, _auth, _base, candidate = authorization
     assert _capture(authorization) == 0
-    outside = tmp_path / "external-candidate"
+    outside = run_root_sibling
     candidate.rename(outside)
     candidate.symlink_to(outside, target_is_directory=True)
     receipt = validator.validate_packet(

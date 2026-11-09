@@ -31,17 +31,13 @@ sys.dont_write_bytecode = _BYTECODE
 ROOT = Path(__file__).resolve().parents[2]
 TOOL = ROOT / "tools/ci/prepush_check.py"
 WORKFLOW = ROOT / ".github/workflows/ci.yml"
-IDENTITY = ("-c", "user.name=prepush-test", "-c", "user.email=prepush-test@invalid", "-c", "commit.gpgsign=false")
+IDENTITY = ("-c", "user.name=prepush-test", "-c", "user.email=prepush-test@invalid", "-c", "commit.gpgsign=false",
+            "-c", "maintenance.auto=false", "-c", "gc.auto=0")
 # The keys the tool must remove from every child, stated independently of the
 # tool's own list (instruction ID-9, plus the ENGINE_ENV alias).
 CHILD_KEYS = ("DATABASE_URL", "GEO_API_KEY", "HD_API_KEY", "HDAPI_KEY", "HDAPI_BASE_URL", "HD_API_BASE_URL",
               "HD_GEOCODE_KEY", "HDE_VENDOR_OVERRIDE_AUDIT_PATH", "GH_TOKEN", "GITHUB_TOKEN", "ENGINE_ENV")
 DUMMY_KEYS = {key: "dummy-not-a-secret" for key in CHILD_KEYS}
-EXCLUDED = {
-    "Check out exact candidate head",
-    "Set up Python 3.12",
-    "Install applicable validation dependencies",
-}
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -90,7 +86,7 @@ def _run(repo: Path, *args: str, extra_env: dict[str, str] | None = None,
 
 def _clone(destination: Path) -> Path:
     head = _git(ROOT, "rev-parse", "HEAD")
-    subprocess.run(["git", "clone", "--quiet", "--shared", "--no-checkout", str(ROOT), str(destination)],
+    subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", "--no-checkout", str(ROOT), str(destination)],
                    check=True, capture_output=True)
     _git(destination, "-c", "advice.detachedHead=false", "checkout", "--quiet", "--detach", head)
     # An ignored file the read-only rule must also cover.
@@ -122,126 +118,91 @@ def _report_lines(stdout: str, report: str) -> list[str]:
 
 
 # --------------------------------------------------------------------------
-# replay inventory (contract G-3) and expression handling
+# workflow parser (parse_workflow, parse_jobs), which sweep uses; read on a fixed excerpt so
+# that a change to .github/workflows/ci.yml needs no change here (HDE-CRD-0003 S11)
 # --------------------------------------------------------------------------
 
-def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
-    # The replay models exactly this workflow: a PR that changes ci.yml updates the pin and the model with it.
-    assert hashlib.sha256(WORKFLOW.read_bytes()).hexdigest() == tool.REPLAY_WORKFLOW_SHA256
-    text = WORKFLOW.read_text(encoding="utf-8")
-    job, steps = tool.replay_steps(text)
-    names = [str(step["name"]) for step in steps]
-    inventory = [name for name, _kind, _reason in tool.REPLAY_INVENTORY]
-    assert names == inventory
-    excluded = {name for name, kind, _reason in tool.REPLAY_INVENTORY if kind == tool.REPLAY_EXCLUDED}
-    executed = {name for name, kind, _reason in tool.REPLAY_INVENTORY if kind == tool.REPLAY_EXECUTED}
-    assert excluded == EXCLUDED
-    assert excluded | executed == set(names) and not excluded & executed
-    assert all(reason for _name, kind, reason in tool.REPLAY_INVENTORY if kind == tool.REPLAY_EXCLUDED)
-    assert {str(step.get("uses", "")).split("@")[0] for step in steps if "uses" in step} == {
-        "actions/checkout", "actions/setup-python"}
-    assert all("run" in step for step in steps if step["name"] in executed)
-    assert job.env == tool.CLOSED_RAILS
-    assert tool._python_version(steps) == "3.12"
+# .github/workflows/ci.yml lines 1-78 at 996fa276, verbatim except the two path-filter entries for the
+# PF documents directory: the header, the test job's settings and its first three steps hold every form the parser
+# tests below read.
+PARSER_WORKFLOW = """\
+name: ci
 
+on:
+  pull_request:
+    paths:
+      - '**'
+      - '!docs/crd/**'
+      - '!docs/ephemeral/**'
+      - '!docs/graph/**'
+      - '!docs/plans/**'
+      - '!docs/prompt_ecosystem_management/**'
+      - '!docs/qa/**'
+      - '!docs/run/**'
+      - '**.path_proof.txt'
+      - 'docs/run/EPIC011_TEST_IDENTITIES.md'
+      - 'docs/run/PROD_ENDPOINTS.json'
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!docs/crd/**'
+      - '!docs/ephemeral/**'
+      - '!docs/graph/**'
+      - '!docs/plans/**'
+      - '!docs/prompt_ecosystem_management/**'
+      - '!docs/qa/**'
+      - '!docs/run/**'
+      - '**.path_proof.txt'
+      - 'docs/run/EPIC011_TEST_IDENTITIES.md'
+      - 'docs/run/PROD_ENDPOINTS.json'
 
-@pytest.mark.parametrize(
-    "mutate",
-    [
-        lambda text: text.replace("name: Run CLI and compatibility lane", "name: Run CLI lane"),
-        lambda text: text.replace(
-            "      - name: Verify truthful applicability",
-            "      - name: A new step\n        run: echo new\n\n      - name: Verify truthful applicability"),
-        lambda text: text.replace("        id: env_pins\n", "        id: env_pins\n        continue-on-error: true\n"),
-        lambda text: text.replace("ref: ${{ github.event.pull_request.head.sha || github.sha }}", "ref: main"),
-        lambda text: text.replace("          fetch-depth: 0\n", "          fetch-depth: 0\n          submodules: true\n"),
-        lambda text: text.replace("fetch-depth: 0", "fetch-depth: 1"),
-        lambda text: text.replace("          python-version: '3.12'\n", "          python-version: '3.12'\n          architecture: x86\n"),
-        lambda text: text.replace("runs-on: ubuntu-latest", "runs-on: macos-latest"),
-        lambda text: text.replace("\njobs:\n", "\nenv:\n  EXTRA: one\n\njobs:\n"),
-        lambda text: text.replace("actions/checkout@v4", "actions/checkout@v5"),
-        lambda text: text.replace("actions/setup-python@v5", "actions/setup-python@main"),
-        lambda text: text.replace("run: python3 ci/checks/check_agents_md_citations.py",
-                                  'run: python3 ci/checks/check_agents_md_citations.py --sha "$GITHUB_SHA"'),
-        lambda text: text.replace("          BASE_SHA: ", "          RUNNER_OS: Linux\n          BASE_SHA: "),
-        lambda text: text.replace("      APP_ENV: dev\n", "      APP_ENV: dev\n      GITHUB_WORKSPACE: /w\n", 1),
-        lambda text: text.replace("persist-credentials: false", "persist-credentials: true"),
-        lambda text: text.replace("        uses: actions/checkout@v4\n",
-                                  "        if: ${{ false }}\n        uses: actions/checkout@v4\n"),
-        lambda text: text.replace("        id: dependencies\n",
-                                  "        id: dependencies\n        env:\n          PIP_INDEX_URL: x\n"),
-        lambda text: text.replace("        run: python3 ci/checks/check_agents_md_citations.py",
-                                  "        env: invalid\n        run: python3 ci/checks/check_agents_md_citations.py"),
-        lambda text: text.replace("runs-on: ubuntu-latest", "runs-on: ubuntu-24.04-arm"),
-        lambda text: text.replace("        run: python3 ci/checks/check_agents_md_citations.py\n", ""),
-        lambda text: text.rstrip("\n") + ("\n\n  other:\n    runs-on: ubuntu-latest\n    steps:\n"
-                                          "      - name: fail\n        run: exit 1\n"),
-        lambda text: text.replace("          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}\n",
-                                  "          BASE_SHA:\n            nested: invalid\n"),
-        lambda text: text.replace(
-            "        id: python_setup\n        if: ${{ steps.classify.outputs.needs_python == 'true' }}\n",
-            "        id: python_setup\n        if:\n          nested: invalid\n"),
-        lambda text: text.replace(
-            "        id: dependencies\n        if: ${{ steps.classify.outputs.needs_python == 'true' }}\n",
-            "        id: dependencies\n        if: ${{ false }}\n"),
-        lambda text: text.replace(
-            "        id: python_setup\n        if: ${{ steps.classify.outputs.needs_python == 'true' }}\n",
-            "        id: python_setup\n        if: ${{ false }}\n"),
-        lambda text: text.replace(
-            "        id: dependencies\n        if: ${{ steps.classify.outputs.needs_python == 'true' }}\n",
-            "        id: dependencies\n"),
-        lambda text: text.replace("run: python3 ci/checks/check_agents_md_citations.py", "run: true"),
-        lambda text: text.replace("          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
-                                  "          HEAD_SHA: 1.0"),
-        lambda text: text.replace("permissions:\n  contents: read\n", "permissions: invalid\n"),
-        lambda text: text.replace("permissions:\n  contents: read\n", "permissions:\n  contents: write\n"),
-        lambda text: text.replace("name: ci\n", "name: true\n", 1),
-        lambda text: text.replace("\njobs:\n", "\nrun-name: ${{ github.sha }}\n\njobs:\n"),
-        lambda text: text.replace("  cancel-in-progress: ${{ github.event_name == 'pull_request' }}\n", ""),
-        lambda text: text.replace("      - '!docs/qa/**'\n", "", 1),
-        lambda text: text.replace("    branches:\n      - main\n", "    branches:\n      - 'main*'\n"),
-        lambda text: text.replace("        uses: actions/checkout@v4\n",
-                                  "        id: classify\n        uses: actions/checkout@v4\n"),
-        lambda text: text.replace("        uses: actions/checkout@v4\n",
-                                  "        id: Classify\n        uses: actions/checkout@v4\n"),
-        lambda text: text.replace("        id: env_pins\n", "        id: env.pins\n"),
-        lambda text: text.replace("        id: env_pins\n", "        id: __env_pins\n"),
-    ],
-    ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
-         "setup-python-input", "runner", "workflow-env", "checkout-revision", "setup-python-revision",
-         "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env", "checkout-credentials",
-         "checkout-condition", "install-env", "step-env-not-a-mapping", "runner-label", "executed-without-run",
-         "second-job", "structured-env-value", "step-if-not-a-string", "install-condition",
-         "setup-python-condition", "install-condition-removed", "run-boolean", "step-env-float",
-         "permissions-scalar", "permissions-value", "name-boolean", "run-name-added", "concurrency-key-removed",
-         "pull-request-path-removed", "push-branch", "repeated-id", "repeated-id-case", "id-form", "id-reserved"],
-)
-def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
-    text = WORKFLOW.read_text(encoding="utf-8")
-    mutated = mutate(text)
-    assert mutated != text
-    with pytest.raises(tool.ToolingError, match="REPLAY_INVENTORY_DRIFT"):
-        tool.replay_steps(mutated)
+permissions:
+  contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-def test_the_workflow_header_is_compared_with_its_scalar_types(monkeypatch: pytest.MonkeyPatch) -> None:
-    text = WORKFLOW.read_text(encoding="utf-8")
-    monkeypatch.setitem(tool.REPLAY_WORKFLOW_HEADER, "name", "true")
-    assert len(tool.replay_steps(text.replace("name: ci\n", "name: 'true'\n", 1))[1]) == len(tool.REPLAY_INVENTORY)
-    # Plain, the same text is a YAML boolean, which GitHub does not read as the string.
-    with pytest.raises(tool.ToolingError, match="REPLAY_INVENTORY_DRIFT: .*: name$"):
-        tool.replay_steps(text.replace("name: ci\n", "name: true\n", 1))
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
+      APP_ENV: dev
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out exact candidate head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      - name: Classify affected CI lanes
+        id: classify
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          python3 ci/checks/classify_ci_changes.py \\
+            --base "$BASE_SHA" \\
+            --head "$HEAD_SHA" \\
+            --event-name "${{ github.event_name }}" \\
+            --github-output "$GITHUB_OUTPUT" \\
+            --changed-tests-output "$RUNNER_TEMP/ci-changed-test-targets.txt"
 
-def test_replay_needs_an_x86_64_linux_machine(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(tool.sys, "platform", "linux")
-    monkeypatch.setattr(tool.platform, "machine", lambda: "x86_64")
-    assert tool.replay_machine() is None
-    monkeypatch.setattr(tool.platform, "machine", lambda: "aarch64")
-    assert tool.replay_machine() == "linux aarch64"
-    monkeypatch.setattr(tool.platform, "machine", lambda: "x86_64")
-    monkeypatch.setattr(tool.sys, "platform", "darwin")
-    assert tool.replay_machine() == "darwin x86_64"
+      - name: Check AGENTS.md cites no project documents
+        shell: bash
+        run: python3 ci/checks/check_agents_md_citations.py
+"""
 
 
 def test_a_temporary_directory_inside_the_repository_is_refused_before_anything_is_created(tmp_path: Path) -> None:
@@ -254,28 +215,28 @@ def test_a_temporary_directory_inside_the_repository_is_refused_before_anything_
 
 
 def test_a_step_that_is_not_a_mapping_is_refused() -> None:
-    text = WORKFLOW.read_text(encoding="utf-8")
-    mutated = text.replace("      - name: Verify truthful applicability",
-                           "      - echo hi\n\n      - name: Verify truthful applicability")
+    text = PARSER_WORKFLOW
+    mutated = text.replace("      - name: Check AGENTS.md cites no project documents",
+                           "      - echo hi\n\n      - name: Check AGENTS.md cites no project documents")
     assert mutated != text
     with pytest.raises(tool.ToolingError, match="unsupported shape"):
-        tool.replay_steps(mutated)
+        tool.parse_jobs(mutated)
     nested_job_env = text.replace("      APP_ENV: dev\n", "      APP_ENV:\n        nested: invalid\n", 1)
     assert nested_job_env != text
     with pytest.raises(tool.ToolingError, match="unsupported shape"):
-        tool.replay_steps(nested_job_env)
+        tool.parse_jobs(nested_job_env)
 
 
 @pytest.mark.parametrize("value", ["{nested: invalid}", "[a, b]", "&anchor x", "*alias", "!tag x", "|+", ">2",
                                    '"echo replay_pass\\nexit 1"', '"unterminated', "'a' b", "a: b", "- x", "# c",
                                    "]", "}", ",x", "] x", "-\tx", "?\tx", ":\tx", "? x", "foo:\tbar"])
 def test_yaml_forms_the_parser_does_not_model_are_refused(value: str) -> None:
-    text = WORKFLOW.read_text(encoding="utf-8")
+    text = PARSER_WORKFLOW
     mutated = text.replace("          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}",
                            f"          BASE_SHA: {value}")
     assert mutated != text
     with pytest.raises(tool.ToolingError, match="unsupported YAML value"):
-        tool.replay_steps(mutated)
+        tool.parse_jobs(mutated)
 
 
 def test_quoted_scalars_and_keys_are_read_as_yaml_reads_them() -> None:
@@ -286,56 +247,56 @@ def test_quoted_scalars_and_keys_are_read_as_yaml_reads_them() -> None:
     for value in ("-x", "?x", ":x", "a,b", "a]", "x}", "foo:bar"):
         assert tool._plain(value) == value
     # GitHub rejects a repeated key; a key is a plain word followed by ': '.
-    text = WORKFLOW.read_text(encoding="utf-8")
+    text = PARSER_WORKFLOW
     line = "        run: python3 ci/checks/check_agents_md_citations.py\n"
     for mutated, message in ((text.replace(line, line + "        run: exit 0\n"), "repeated"),
                              (text.replace(line, line.replace("run: ", "run:")), "unsupported workflow key"),
                              (text.replace(line, line.replace("run:", '"run":')), "unsupported workflow key")):
         assert mutated != text
         with pytest.raises(tool.ToolingError, match=message):
-            tool.replay_steps(mutated)
+            tool.parse_jobs(mutated)
 
 
 def test_implicitly_typed_scalars_are_refused_unless_github_writes_them_back_unchanged() -> None:
     # GitHub reads the workflow as YAML 1.2 and writes an env value it reads as a boolean or an integer back as
     # true, false or decimal; any other spelling, a null or a float would become another string.
-    text = WORKFLOW.read_text(encoding="utf-8")
+    text = PARSER_WORKFLOW
     env_line = "      APP_ENV: dev\n"
     for value in ("1.0", "0x10", "010", "+1", "True", "~", "null", ".inf"):
         with pytest.raises(tool.ToolingError, match="unsupported shape"):
-            tool.replay_steps(text.replace(env_line, f"      APP_ENV: {value}\n"))
+            tool.parse_jobs(text.replace(env_line, f"      APP_ENV: {value}\n"))
     for value in ("true", "false", "0", "12", "-3"):
-        assert tool.replay_steps(text.replace(env_line, f"      APP_ENV: {value}\n"))[0].env["APP_ENV"] == value
+        assert tool.parse_jobs(text.replace(env_line, f"      APP_ENV: {value}\n"))["test"].env["APP_ENV"] == value
     with pytest.raises(tool.ToolingError, match="unsupported workflow key"):
-        tool.replay_steps(text.replace(env_line, env_line + "      true: x\n"))
+        tool.parse_jobs(text.replace(env_line, env_line + "      true: x\n"))
     assert isinstance(tool._plain("TRUE"), tool._Resolved) and not isinstance(tool._plain("'true'"), tool._Resolved)
     assert not isinstance(tool._plain("ubuntu-latest"), tool._Resolved)
 
 
 def test_the_whole_workflow_is_one_mapping_without_repeated_keys() -> None:
-    text = WORKFLOW.read_text(encoding="utf-8")
+    text = PARSER_WORKFLOW
     second_jobs = "\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - name: only\n        run: exit 1\n"
     for appended in ("\nname: other\n", second_jobs):
         with pytest.raises(tool.ToolingError, match="repeated"):
-            tool.replay_steps(text + appended)
+            tool.parse_jobs(text + appended)
     # The sweep's coverage reads the jobs through the same parse.
     with pytest.raises(tool.ToolingError, match="repeated"):
         tool.pytest_command_tokens(text + second_jobs)
 
 
 def test_sequence_entries_share_one_indentation() -> None:
-    text = WORKFLOW.read_text(encoding="utf-8")
+    text = PARSER_WORKFLOW
     entries = "    paths:\n      - '**'\n      - '!docs/crd/**'\n"
     for new in ("    paths:\n      - '**'\n        - '!docs/crd/**'\n",
                 "    paths:\n        - '**'\n      - '!docs/crd/**'\n"):
         mutated = text.replace(entries, new, 1)
         assert mutated != text
         with pytest.raises(tool.ToolingError, match="indented differently from its sequence's first entry"):
-            tool.replay_steps(mutated)
+            tool.parse_jobs(mutated)
 
 
 def test_tabs_in_indentation_are_refused_and_elsewhere_read_as_yaml_reads_them() -> None:
-    text = WORKFLOW.read_text(encoding="utf-8")
+    text = PARSER_WORKFLOW
     body = "          set -euo pipefail\n"
     for old, new in (("name: ci\n", "\tname: ci\n"), ("  contents: read\n", "\tcontents: read\n"),
                      ("      - main\n", "    \t- main\n"), (body, "        \tset -euo pipefail\n"),
@@ -343,24 +304,24 @@ def test_tabs_in_indentation_are_refused_and_elsewhere_read_as_yaml_reads_them()
         mutated = text.replace(old, new, 1)
         assert mutated != text
         with pytest.raises(tool.ToolingError, match="a tab in the indentation of line"):
-            tool.replay_steps(mutated)
+            tool.parse_jobs(mutated)
     with pytest.raises(tool.ToolingError, match="whitespace with a tab"):
-        tool.replay_steps(text.replace(body, body + "\t\n", 1))
+        tool.parse_jobs(text.replace(body, body + "\t\n", 1))
     # A tab after a block's indentation is content, and one after a key's colon separates its value.
-    assert tool.replay_steps(text.replace(body, "          \tset -euo pipefail\n", 1))[1][1]["run"].startswith(
+    assert tool.parse_jobs(text.replace(body, "          \tset -euo pipefail\n", 1))["test"].steps[1]["run"].startswith(
         "\tset -euo pipefail\n")
     tab_separated = text.replace("  contents: read\n", "  contents:\tread\n")
-    assert len(tool.replay_steps(tab_separated)[1]) == len(tool.REPLAY_INVENTORY)
+    assert len(tool.parse_jobs(tab_separated)["test"].steps) == len(tool.parse_jobs(text)["test"].steps) == 3
 
 
 def test_block_scalars_are_read_as_yaml_reads_them_or_refused() -> None:
-    text = WORKFLOW.read_text(encoding="utf-8")
+    text = PARSER_WORKFLOW
     line = "        run: python3 ci/checks/check_agents_md_citations.py\n"
 
     def run_of(block: str) -> object:
         mutated = text.replace(line, block)
         assert mutated != text
-        return tool.replay_steps(mutated)[1][2]["run"]
+        return tool.parse_jobs(mutated)["test"].steps[2]["run"]
 
     assert run_of("        run: >-\n          echo a\n          echo b\n\n          echo c\n") == "echo a echo b\necho c"
     assert run_of("        run: |\n          echo a\n            echo b\n") == "echo a\n  echo b\n"
@@ -369,21 +330,6 @@ def test_block_scalars_are_read_as_yaml_reads_them_or_refused() -> None:
         run_of("        run: >\n          echo replay_pass\n            exit 1\n")
     with pytest.raises(tool.ToolingError, match="less indented"):
         run_of("        run: |\n            echo a\n          echo b\n")
-
-
-@pytest.mark.parametrize("extra", ["\npytest", "; pytest", " && pytest", " | cat", " $(true)", " `true`",
-                                   ' "$HOME"', " > log", " # note", " \\\n -r more.txt", " 'unterminated"])
-def test_the_install_substitute_stands_in_for_one_simple_command_only(tmp_path: Path, extra: str) -> None:
-    with pytest.raises(ValueError, match="not one simple command"):
-        tool._install_check("python -m pip install pytest" + extra, tmp_path)
-
-
-@pytest.mark.parametrize("run", ["python -m pip install", "pip install", "python -m pip install  "])
-def test_an_install_step_with_nothing_to_install_is_refused(tmp_path: Path, run: str) -> None:
-    with pytest.raises(ValueError, match="names nothing to install"):
-        tool._install_check(run, tmp_path)
-    outcome, detail = tool._substitute({"run": run}, "reason", tmp_path, "3.12", "3.12")
-    assert outcome == "failure" and detail.startswith("TOOLING") and "names nothing to install" in detail
 
 
 def test_an_unexpected_report_exception_still_reaches_the_read_only_check(
@@ -398,86 +344,6 @@ def test_an_unexpected_report_exception_still_reaches_the_read_only_check(
     out = capsys.readouterr().out
     assert "build-notes: TOOLING_FAILURE TypeError: boom" in out
     assert "PREPUSH_CHECK_RESULT: FAIL build-notes=FAIL; repository unchanged" in out
-
-
-def test_expressions_cover_the_workflow_forms() -> None:
-    contexts = {
-        "github": {"event_name": "pull_request", "sha": "merge",
-                   "event": {"before": "", "pull_request": {"base": {"sha": "b"}, "head": {"sha": "h"}}}},
-        "steps": {"classify": {"outcome": "success", "outputs": {"needs_python": "true", "qa": "false"}}},
-    }
-    expressions = tool.Expressions(contexts, job_failed=False)
-    assert tool.interpolate("${{ github.event.pull_request.head.sha || github.sha }}", expressions) == "h"
-    assert tool.interpolate("${{ github.event.pull_request.base.sha || github.event.before }}", expressions) == "b"
-    assert tool.interpolate('--event-name "${{ github.event_name }}"', expressions) == '--event-name "pull_request"'
-    assert tool.interpolate("${{ steps.classify.outcome }}/${{ steps.missing.outcome }}", expressions) == "success/"
-    assert tool.condition("${{ steps.classify.outputs.needs_python == 'true' }}", expressions) is True
-    assert tool.condition("${{ steps.classify.outputs.qa == 'true' }}", expressions) is False
-    expressions.job_failed = True
-    assert tool.condition("${{ steps.classify.outputs.needs_python == 'true' }}", expressions) is False
-    assert tool.condition("${{ always() }}", expressions) is True
-    assert tool.condition(None, expressions) is False
-    push = tool.Expressions({"github": {"event_name": "push", "sha": "s", "event": {"before": "p", "pull_request": {}}}},
-                            job_failed=False)
-    assert tool.interpolate("${{ github.event.pull_request.head.sha || github.sha }}", push) == "s"
-    assert tool.interpolate("${{ github.event.pull_request.base.sha || github.event.before }}", push) == "p"
-    for unsupported in ("${{ fromJSON('1') }}", "${{ secrets.TOKEN }}", "${{ matrix.os }}"):
-        with pytest.raises(tool.ToolingError):
-            tool.interpolate(unsupported, expressions)
-    # On a pull_request the merge commit and the payload's before are not modelled: discarded by || they are
-    # harmless, used they are tooling, as is any github path the replay does not model.
-    pull = tool.Expressions(tool.replay_contexts("pull_request", "b", "h"), job_failed=False)
-    assert tool.interpolate("${{ github.event.pull_request.head.sha || github.sha }}", pull) == "h"
-    assert tool.interpolate("${{ github.event.pull_request.base.sha || github.event.before }}", pull) == "b"
-    for unmodelled in ("${{ github.sha }}", "${{ github.event.before == 'x' }}", "${{ github.run_id }}",
-                       "${{ github.workspace }}", "${{ github.event.pull_request.title }}", "${{ env.LC_ALL }}"):
-        with pytest.raises(tool.ToolingError, match="not modelled|unsupported context"):
-            tool.interpolate(unmodelled, pull)
-    with pytest.raises(tool.ToolingError, match="not modelled"):
-        tool.condition("${{ github.sha }}", pull)
-    push = tool.Expressions(tool.replay_contexts("push", "p", "s"), job_failed=False)
-    assert tool.interpolate("${{ github.sha }}/${{ github.event.before }}", push) == "s/p"
-    assert tool.interpolate("${{ github.event.pull_request.head.sha || github.sha }}", push) == "s"
-
-
-@pytest.mark.parametrize(
-    "expression, value",
-    [
-        ("steps.classify.outputs.needs_python == 'true'", True),
-        ("steps.classify.outputs.needs_python == 'TRUE'", True),
-        ("steps.classify.outputs.needs_python != 'false'", True),
-        ("github.event_name == 'push'", False),
-        ("true == true", True),
-        ("false != true", True),
-        ("!steps.classify.outputs.needs_python == false", True),
-        ("'\u00e9' == '\u00e9'", True),
-        ("false == ''", "converts a boolean and a string"),
-        ("false != ''", "converts a boolean and a string"),
-        ("true == '1'", "converts a boolean and a string"),
-        ("steps.classify.outputs.needs_python == true", "converts a boolean and a string"),
-        ("'\u00e9' == '\u00c9'", "non-ASCII"),
-        ("'k' == '\u212a'", "non-ASCII"),
-        ("steps.classify.outputs == ''", "is an object"),
-        ("steps.classify != 'x'", "is an object"),
-        ("steps.classify.outputs || 'x'", "is an object"),
-        ("!steps.classify", "is an object"),
-    ],
-)
-def test_comparisons_are_github_s_where_no_conversion_is_needed_and_refused_otherwise(
-        expression: str, value: object) -> None:
-    # GitHub converts operands of different types to numbers (false == '' is true there) and compares objects
-    # by reference; the replay models strings and booleans only.
-    contexts = tool.replay_contexts("pull_request", "b", "h")
-    contexts["steps"] = {"classify": {"outcome": "success", "outputs": {"needs_python": "true"}}}
-    expressions = tool.Expressions(contexts, job_failed=False)
-    if isinstance(value, bool):
-        assert expressions.evaluate(expression) is value
-    else:
-        with pytest.raises(tool.ToolingError, match=value):
-            expressions.evaluate(expression)
-    for text in ("${{ steps.classify.outputs }}", "${{ steps.classify }}"):
-        with pytest.raises(tool.ToolingError, match="is an object"):
-            tool.interpolate(text, expressions)
 
 
 _REJECTED = "the runner rejects GITHUB_OUTPUT record"
@@ -509,24 +375,6 @@ def test_github_output_is_read_as_the_linux_runner_reads_it(
         assert got_problem[0] == problem[0] and problem[1] in got_problem[1]
 
 
-def test_a_step_whose_output_the_runner_rejects_fails(tmp_path: Path) -> None:
-    expressions = tool.Expressions(tool.replay_contexts("pull_request", "b", "h"), job_failed=False)
-    env = tool.child_environment(dict(os.environ), tmp_path)
-    copy = tmp_path / "copy"
-    copy.mkdir()
-
-    def run(body: str) -> tuple[str, str, dict[str, str]]:
-        return tool._execute({"run": body, "shell": "bash"}, 1, copy, env, expressions, tmp_path)
-
-    assert run('echo product=true >> "$GITHUB_OUTPUT"') == ("success", "", {"product": "true"})
-    outcome, detail, outputs = run('echo product=true >> "$GITHUB_OUTPUT"\necho invalid >> "$GITHUB_OUTPUT"')
-    assert (outcome, outputs) == ("failure", {"product": "true"})
-    assert detail.startswith(f"BEHAVIOR {_REJECTED} 'invalid'")
-    outcome, detail, _outputs = run('printf "body<<EOF\\nx\\nEOF\\n" >> "$GITHUB_OUTPUT"\nexit 3')
-    assert outcome == "failure" and detail.splitlines()[:2] == [
-        "BEHAVIOR exit 3", f"TOOLING GITHUB_OUTPUT record 'body<<EOF' {_UNMODELLED}"]
-
-
 def test_lanes_refuses_classifier_output_the_runner_would_reject(tmp_path: Path) -> None:
     output, targets = tmp_path / "output.txt", tmp_path / "targets.txt"
     output.write_text("product=true\ninvalid\n", encoding="utf-8")
@@ -536,62 +384,6 @@ def test_lanes_refuses_classifier_output_the_runner_would_reject(tmp_path: Path)
     assert report.status == "FAIL"
     assert f"lanes: FAILURE classifier output: {_REJECTED} 'invalid', which is neither NAME=VALUE nor " \
            "NAME<<DELIMITER" in report.lines
-
-
-def test_interpreter_substitute_requires_the_workflow_python(tmp_path: Path) -> None:
-    step = {"uses": "actions/setup-python@v5", "with": {"python-version": "3.12"}}
-    outcome, detail = tool._substitute(step, "reason", tmp_path, "3.12", "3.11")
-    assert outcome == "failure" and detail.startswith("TOOLING")
-    assert tool._substitute(step, "reason", tmp_path, "3.12", "3.12")[0] == "success"
-
-
-def _site(root: Path, distributions: dict[str, str]) -> list[str]:
-    """A synthetic site directory holding the named distributions at the given versions."""
-    for name, version in distributions.items():
-        info = root / f"{name}-{version}.dist-info"
-        info.mkdir(parents=True)
-        (info / "METADATA").write_text(f"Metadata-Version: 2.1\nName: {name}\nVersion: {version}\n", encoding="utf-8")
-    return [str(root)]
-
-
-def test_install_substitute_checks_only_that_each_named_distribution_is_installed(tmp_path: Path) -> None:
-    site = _site(tmp_path / "site", {"present": "1.0", "glow_fixture": "0.0.0"})
-    (tmp_path / "requirements.txt").write_text("# fixture\npresent[extra]>=99,<100 ; python_version < '2'\n",
-                                               encoding="utf-8")
-    (tmp_path / "pyproject.toml").write_text('[project]\nname = "glow-fixture"\n', encoding="utf-8")
-    run = "python -m pip install 'present>=5' -r requirements.txt -e ."
-    # The step's stated precondition is that CI's install is already present; versions, extras and markers
-    # are the caller's to match.
-    assert tool._install_check(run, tmp_path, site) == []
-    (tmp_path / "requirements.txt").write_text("absent>=1\n", encoding="utf-8")
-    assert tool._install_check(run, tmp_path, site) == ["absent"]
-    (tmp_path / "pyproject.toml").write_text('[project]\nname = "uninstalled-project"\n', encoding="utf-8")
-    assert tool._install_check(run, tmp_path, site) == ["absent", "uninstalled-project"]
-    for unreadable in ("present @ https://example.invalid/present.whl", "./present", "git+https://example.invalid/x"):
-        (tmp_path / "requirements.txt").write_text(unreadable + "\n", encoding="utf-8")
-        with pytest.raises(ValueError, match="unsupported requirement"):
-            tool._install_check(run, tmp_path, site)
-    (tmp_path / "pyproject.toml").write_text("[build-system]\nrequires = []\n", encoding="utf-8")
-    with pytest.raises(ValueError, match="names no \\[project\\] name"):
-        tool._install_check("python -m pip install -e .", tmp_path, site)
-    # Nothing beyond the [project] name is read, so a pyproject.toml change elsewhere cannot break the replay.
-    (tmp_path / "pyproject.toml").write_text('[build-system]\nbuild-backend = "other"\n[project]\n'
-                                             'name = "glow-fixture"\nversion = "9"\n[tool.setuptools]\nx = 1\n',
-                                             encoding="utf-8")
-    assert tool._install_check("python -m pip install -e .", tmp_path, site) == []
-    (tmp_path / "requirements.txt").write_text("distribution-that-is-not-installed\n", encoding="utf-8")
-    outcome, detail = tool._substitute({"run": "python -m pip install -r requirements.txt"}, "reason", tmp_path,
-                                       "3.12", "3.12")
-    assert outcome == "failure" and detail == ("TOOLING the caller's environment lacks distributions the install "
-                                               "step names: distribution-that-is-not-installed")
-
-
-def test_the_real_install_step_names_only_installed_distributions() -> None:
-    step = next(s for s in tool.replay_steps(WORKFLOW.read_text(encoding="utf-8"))[1]
-                if s["name"] == "Install applicable validation dependencies")
-    outcome, detail = tool._substitute(step, "reason", ROOT, "3.12", "3.12")
-    assert outcome == "success", detail
-    assert detail.startswith("reason: every distribution the step names is installed")
 
 
 def test_coverage_matches_the_binding_definition_and_the_guard_on_the_repository() -> None:
@@ -1078,7 +870,7 @@ def test_child_environment_is_closed_rails_without_keys(tmp_path: Path) -> None:
     # Only the allowlisted caller variables are inherited; everything else is the tool's own.
     assert set(env) == {"HOME", "PATH", "USER", "TMPDIR", "XDG_STATE_HOME", *tool.CLOSED_RAILS}
     assert env["HOME"] == "/home/x" and env["USER"] == "x"
-    assert set(tool.REMOVED_ENV_KEYS) == set(CHILD_KEYS) and not set(CHILD_KEYS) & set(tool.CHILD_INHERITED_KEYS)
+    assert not set(CHILD_KEYS) & set(tool.CHILD_INHERITED_KEYS)
 
 
 def test_tool_installs_no_hook_fetches_nothing_and_opens_no_network() -> None:
@@ -1093,122 +885,23 @@ def test_tool_installs_no_hook_fetches_nothing_and_opens_no_network() -> None:
 
 
 # --------------------------------------------------------------------------
-# replay: a synthetic workflow with the real step inventory
+# replay is not a report (HDE-CRD-0003 S11, P-2)
 # --------------------------------------------------------------------------
 
-def _replay_workflow(product_body: str) -> str:
-    version = f"{sys.version_info.major}.{sys.version_info.minor}"
-    run_steps = {
-        "Classify affected CI lanes": ("classify", "", (
-            'test -n "$BASE_SHA" && test -n "$HEAD_SHA"\n'
-            'echo "event=${{ github.event_name }}"\n'
-            "printf 'product=true\\nqa=false\\nneeds_python=true\\nchanged_tests=false\\n' >> \"$GITHUB_OUTPUT\"")),
-        "Check AGENTS.md cites no project documents": ("", "", "bash ci/runner_env.sh\necho citations"),
-        "Verify pytest readiness": ("pytest_readiness", "needs_python", "python -m pytest --version"),
-        "Verify closed deterministic environment": ("env_pins", "needs_python", (
-            'test "$SAFE_MODE" = 1 && test "$ALLOW_NETWORK" = 0 && test "$TZ" = UTC\n'
-            "test -z \"" + "".join(f"${{{key}:-}}" for key in CHILD_KEYS) + "\"\n"
-            'test -n "$RUNNER_TEMP"')),
-        "Run affected behavioral tests in isolation": ("changed_tests", "changed_tests", "exit 1"),
-        "Run product mechanics and ordering lane": ("product_lane", "product", product_body),
-        "Run CLI and compatibility lane": ("compat_lane", "compat", "exit 1"),
-        "Run database and runtime-contract lane": ("db_lane", "db", "exit 1"),
-        "Run rails policy and secret-safety lane": ("rails_lane", "rails", "exit 1"),
-        "Run governed evidence integrity lane": ("evidence_lane", "evidence", "exit 1"),
-        "Run approved generic QA subsystem lane in isolation": ("qa_lane", "qa", "exit 1"),
-        "Build and verify exact-source release attestation": ("release_lane", "release", "exit 1"),
-    }
-    header = WORKFLOW.read_text(encoding="utf-8").split("\njobs:\n", 1)[0]
-    lines = header.splitlines() + ["jobs:", "  test:", "    runs-on: ubuntu-latest", "    env:"]
-    lines += [f'      {k}: "{v}"' for k, v in tool.CLOSED_RAILS.items()]
-    lines.append("    steps:")
-    for name, _kind, _reason in tool.REPLAY_INVENTORY:
-        lines.append(f"      - name: {name}")
-        if name == "Check out exact candidate head":
-            lines += ["        uses: actions/checkout@v4", "        with:", "          fetch-depth: 0",
-                      "          persist-credentials: false",
-                      "          ref: ${{ github.event.pull_request.head.sha || github.sha }}"]
-        elif name == "Set up Python 3.12":
-            lines += ["        id: python_setup", "        if: ${{ steps.classify.outputs.needs_python == 'true' }}",
-                      "        uses: actions/setup-python@v5", "        with:", f"          python-version: '{version}'"]
-        elif name == "Install applicable validation dependencies":
-            lines += ["        id: dependencies", "        if: ${{ steps.classify.outputs.needs_python == 'true' }}",
-                      "        run: >-", "          python -m pip install", "          -r requirements.txt"]
-        elif name == "Verify truthful applicability and clean candidate tree":
-            lines += ["        id: final_audit", "        if: ${{ always() }}", "        shell: bash", "        env:",
-                      "          SETUP: ${{ steps.python_setup.outcome }}",
-                      "          DEPS: ${{ steps.dependencies.outcome }}",
-                      "          PRODUCT: ${{ steps.product_lane.outcome }}",
-                      "          QA: ${{ steps.qa_lane.outcome }}",
-                      "        run: |",
-                      '          test "$SETUP/$DEPS/$PRODUCT/$QA" = "success/success/success/skipped"',
-                      "          test -z \"$(git status --short --untracked-files=all)\"",
-                      "          echo CI_APPLICABILITY_AND_EXACT_HEAD_OK"]
-        else:
-            step_id, flag, body = run_steps[name]
-            if step_id:
-                lines.append(f"        id: {step_id}")
-            if name == "Classify affected CI lanes":
-                lines += ["        env:", "          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}",
-                          "          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}"]
-            if flag:
-                lines.append(f"        if: ${{{{ steps.classify.outputs.{flag} == 'true' }}}}")
-            lines += ["        shell: bash", "        run: |"] + [f"          {line}" for line in body.splitlines()]
-        lines.append("")
-    return "\n".join(lines)
+def test_replay_is_not_a_report(tmp_path: Path) -> None:
+    assert tool.REPORTS == ("lanes", "membership", "build-notes", "sweep")
+    assert set(tool.RUNNERS) == set(tool.REPORTS)
+    repo = _synthetic(tmp_path / "usage", {"data.txt": "tracked\n"})
+    refused = _run(repo, "replay")
+    assert refused.returncode == tool.EXIT_USAGE == 2, refused.stdout + refused.stderr
+    assert "invalid choice: 'replay'" in refused.stderr and "PREPUSH_CHECK:" not in refused.stdout
+    shown = subprocess.run([sys.executable, str(TOOL), "--help"], capture_output=True, text=True, check=False)
+    assert shown.returncode == 0 and "replay" not in shown.stdout.lower()
 
 
-def _pinned_tool(tmp_path: Path, workflow: str) -> Path:
-    """A copy of the tool whose REPLAY_WORKFLOW_SHA256 is the given workflow's."""
-    source = TOOL.read_text(encoding="utf-8")
-    pin = f'REPLAY_WORKFLOW_SHA256 = "{tool.REPLAY_WORKFLOW_SHA256}"'
-    assert source.count(pin) == 1
-    copy = tmp_path / "pinned-tool" / "prepush_check.py"
-    copy.parent.mkdir()
-    copy.write_text(source.replace(pin, f'REPLAY_WORKFLOW_SHA256 = "{hashlib.sha256(workflow.encode()).hexdigest()}"'),
-                    encoding="utf-8")
-    return copy
-
-
-@pytest.mark.parametrize("product_body, ok", [("echo PRODUCT_RAN", True), ("echo PRODUCT_FAILED\nexit 1", False)],
-                         ids=["green", "lane-fails"])
-def test_replay_runs_a_synthetic_workflow_in_a_throwaway_copy(tmp_path: Path, product_body: str, ok: bool) -> None:
-    workflow = _replay_workflow(product_body)
-    repo = _synthetic(tmp_path / "replay", {
-        ".github/workflows/ci.yml": workflow,
-        "requirements.txt": "pytest\n",
-        # A script a step calls sees only the runner variables the replay models and none of the caller's others.
-        "ci/runner_env.sh": ('set -e\n'
-                             'test -z "${GITHUB_SHA:-}${RUNNER_OS:-}${GITHUB_WORKSPACE:-}${AWS_SECRET_ACCESS_KEY:-}"\n'
-                             'test "$GITHUB_ACTIONS/$GITHUB_EVENT_NAME" = true/pull_request\n'),
-    })
-    # The real tool refuses a workflow other than the one it models, before reading it.
-    refused = _run(repo, "replay", "--full")
-    assert refused.returncode == tool.EXIT_REPORT_FAILED, refused.stdout + refused.stderr
-    assert ("replay: TOOLING_FAILURE REPLAY_INVENTORY_DRIFT: the head's .github/workflows/ci.yml has SHA-256 "
-            f"{hashlib.sha256(workflow.encode()).hexdigest()}, not the modelled {tool.REPLAY_WORKFLOW_SHA256}") \
-        in refused.stdout
-    assert not any(line.startswith("replay: step ") for line in refused.stdout.splitlines())
-    result = _run(repo, "replay", "--full", tool_path=_pinned_tool(tmp_path, workflow),
-                  extra_env={"GITHUB_SHA": "caller", "RUNNER_OS": "caller", "GITHUB_WORKSPACE": "/caller",
-                             "AWS_SECRET_ACCESS_KEY": "aws-dummy"})
-    lines = _report_lines(result.stdout, "replay")
-    steps = {line.split(" ", 3)[1]: line for line in lines if line.startswith("step ")}
-    assert len(steps) == len(tool.REPLAY_INVENTORY)
-    assert steps["01"].startswith("step 01 SUCCESS [excluded, substituted]")
-    assert steps["04"].startswith("step 04 SUCCESS [excluded, substituted]")
-    assert steps["05"].startswith("step 05 SUCCESS [excluded, substituted]")
-    assert steps["08"].startswith("step 08 SKIPPED")
-    assert steps["14"].startswith("step 14 SKIPPED")
-    assert "  event=pull_request" in lines
-    if ok:
-        assert result.returncode == tool.EXIT_OK, result.stdout + result.stderr
-        assert steps["09"].startswith("step 09 SUCCESS")
-        assert steps["16"].startswith("step 16 SUCCESS")
-        assert "  CI_APPLICABILITY_AND_EXACT_HEAD_OK" in lines
-    else:
-        assert result.returncode == tool.EXIT_REPORT_FAILED
-        assert steps["09"].startswith("step 09 FAILURE")
-        assert "  BEHAVIOR exit 1" in lines and "  PRODUCT_FAILED" in lines
-        assert steps["16"].startswith("step 16 FAILURE")
-        assert "  CI_APPLICABILITY_AND_EXACT_HEAD_OK" not in lines
+def test_no_pre_push_file_pins_the_workflow_bytes() -> None:
+    # A change to ci.yml needs no change to the tool or to this test (S11 measure).
+    digest = hashlib.sha256(WORKFLOW.read_bytes()).hexdigest()
+    assert digest not in TOOL.read_text(encoding="utf-8")
+    assert digest not in Path(__file__).read_text(encoding="utf-8")
+    assert "REPLAY_" not in TOOL.read_text(encoding="utf-8")
