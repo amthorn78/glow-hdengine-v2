@@ -439,7 +439,7 @@ def test_crd_current_manifest_reconciles_supersession_without_history_conversion
     _success(_crd_program(crd_repo, '''
 qa.record_check(config, observed("replacement"), supersede_check_ids=("current",))
 (config.qa_root / "unlisted.log").write_text("not admitted by discovery\\n")
-other = writer.ROOT / "audit/qa/hde-crd-0003"
+other = writer.ROOT / "audit/qa/hde-crd-9999"
 other.mkdir()
 (other / "unlisted.log").write_text("no source-owned admission\\n")
 writer.main([])
@@ -450,7 +450,7 @@ writer.main([])
     assert f"{CRD_ROOT}/checks/current/primary.log" not in paths
     assert f"{CRD_ROOT}/checks/replacement/primary.log" in paths
     assert f"{CRD_ROOT}/unlisted.log" not in paths
-    assert "audit/qa/hde-crd-0003/unlisted.log" not in paths
+    assert "audit/qa/hde-crd-9999/unlisted.log" not in paths
     _checks(crd_repo)
 
 
@@ -511,7 +511,7 @@ def test_crd_publication_refuses_foreign_scope_and_invalid_inputs(crd_repo):
     before = _whole_tree_state(crd_repo, metadata=True)
     _success(_crd_program(crd_repo, '''
 cases = [
-    (qa.HarnessConfig(crd_id="HDE-CRD-0003", repo_root=writer.ROOT), (observed(),)),
+    (qa.HarnessConfig(crd_id="HDE-CRD-9999", repo_root=writer.ROOT), (observed(),)),
     (qa.HarnessConfig(crd_id="HDE-CRD-0001", repo_root=writer.ROOT / "tests"), (observed(),)),
     (config, ()), (config, (observed(), observed())), (config, (object(),)),
 ]
@@ -987,6 +987,7 @@ def test_admitted_crd_table_is_explicit_and_matches_the_harness_roots():
     assert dict(writer.ADMITTED_CRD_QA) == {
         "HDE-CRD-0001": ("audit/qa/hde-crd-0001", "audit.qa.hde_crd_0001"),
         "HDE-CRD-0002": ("audit/qa/hde-crd-0002", "audit.qa.hde_crd_0002"),
+        "HDE-CRD-0003": ("audit/qa/hde-crd-0003", "audit.qa.hde_crd_0003"),
     }
     for crd_id, (root_rel, _key) in writer.ADMITTED_CRD_QA.items():
         assert qa.HarnessConfig(crd_id=crd_id, repo_root=writer.ROOT).qa_root == writer.ROOT / root_rel
@@ -1041,10 +1042,10 @@ def test_crd_0002_fixture_root_publishes_beside_crd_0001(crd_repo):
 def test_crd_publication_refuses_an_unadmitted_id_by_name(crd_repo):
     before = _whole_tree_state(crd_repo, metadata=True)
     result = _crd_program(crd_repo, (
-        "writer.publish_crd_check_family(qa.HarnessConfig(crd_id='HDE-CRD-0003', repo_root=writer.ROOT), (observed(),))\n"
+        "writer.publish_crd_check_family(qa.HarnessConfig(crd_id='HDE-CRD-9999', repo_root=writer.ROOT), (observed(),))\n"
     ))
     assert result.returncode != 0
-    assert "admits only HDE-CRD-0001, HDE-CRD-0002; refused HDE-CRD-0003" in result.stderr
+    assert "admits only HDE-CRD-0001, HDE-CRD-0002, HDE-CRD-0003; refused HDE-CRD-9999" in result.stderr
     assert _whole_tree_state(crd_repo, metadata=True) == before
 
 
@@ -1386,7 +1387,7 @@ def test_close_run_publication_refuses_scope_and_restores_on_failure(close_repo:
     _success(_close_program(close_repo, "publish()"))
     before = _whole_tree_state(close_repo, metadata=True)
     _success(_close_program(close_repo, '''
-for selected in (qa.HarnessConfig(crd_id="HDE-CRD-0003", repo_root=writer.ROOT),):
+for selected in (qa.HarnessConfig(crd_id="HDE-CRD-9999", repo_root=writer.ROOT),):
     try:
         writer.publish_crd_close_run_family(selected, (observed(),))
     except ValueError:
@@ -1543,14 +1544,14 @@ def test_epic_close_run_publication_refuses_scope_and_restores_on_failure(epic_c
     repo = epic_close_repo
     before = _whole_tree_state(repo, metadata=True)
     _success(_epic_close_program(repo, '''
-for selected in (
-    qa.HarnessConfig("HDE-EPIC040", repo_root=writer.ROOT),
-    qa.HarnessConfig(crd_id="HDE-CRD-0002", repo_root=writer.ROOT),
+for selected, reason in (
+    (qa.HarnessConfig("HDE-EPIC040", repo_root=writer.ROOT), "refused HDE-EPIC040: no v2 close candidate source"),
+    (qa.HarnessConfig(crd_id="HDE-CRD-0002", repo_root=writer.ROOT), "refused None: not an Epic configuration"),
 ):
     try:
         writer.publish_epic_close_run_family(selected, (observed(),))
     except ValueError as exc:
-        assert "admits only HDE-EPIC041" in str(exc)
+        assert reason in str(exc), str(exc)
     else:
         raise AssertionError("unadmitted close-run publication was accepted")
 try:
@@ -1610,3 +1611,127 @@ def test_epic_close_run_family_refuses_an_unexpected_member(epic_close_repo: Pat
     primary.write_text(primary.read_text(encoding="utf-8").replace('"status":"PASS"', '"status":"PASS" '), encoding="utf-8")
     result = _run(repo, "tools/evidence/update_evidence_index.py", "--check")
     assert result.returncode != 0
+
+
+# --- HDE-CRD-0003 S14 (explicit HDE-CRD-0003 row) and S13 (Epic close admission by identity) ---
+
+
+def _copy_repo(tmp_path: Path) -> Path:
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    return repo
+
+
+def _write_epic_source(repo: Path, number: str, change_id: str, schema_version: str = "close_candidate_source.v2") -> None:
+    source = json.loads((repo / "audit/EPIC-041_close_candidate_source.json").read_text(encoding="utf-8"))
+    source["change_id"] = change_id
+    source["schema_version"] = schema_version
+    (repo / f"audit/EPIC-{number}_close_candidate_source.json").write_text(
+        json.dumps(source, ensure_ascii=True, separators=(",", ":"), sort_keys=True) + "\n", encoding="utf-8"
+    )
+
+
+def test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence(tmp_path: Path) -> None:
+    repo = _copy_repo(tmp_path)
+    assert not (repo / "audit/qa/hde-crd-0003").exists()
+    program = CRD_FIXTURE_PROGRAM.replace(
+        'config = qa.HarnessConfig(crd_id="HDE-CRD-0001", repo_root=writer.ROOT)',
+        'config = qa.HarnessConfig(crd_id="HDE-CRD-0003", repo_root=writer.ROOT)',
+    )
+    assert 'crd_id="HDE-CRD-0003"' in program
+    _success(subprocess.run(
+        [sys.executable, "-c", program + '\npublish((observed("qa-01-admission"),))\n'],
+        cwd=repo, env=ENV, capture_output=True, text=True, check=False,
+    ))
+    rows = _index_rows(repo)
+    manifest_rel = "audit/qa/hde-crd-0003/qa_step_logs_manifest.json"
+    primary_rel = "audit/qa/hde-crd-0003/checks/qa-01-admission/primary.log"
+    assert rows[manifest_rel] == {
+        "artifact_key": "audit.qa.hde_crd_0003.qa_step_logs_manifest",
+        "discovered_physical_path": manifest_rel,
+        "role": "snapshot",
+    }
+    assert rows[primary_rel] == {
+        "artifact_key": "audit.qa.hde_crd_0003.checks.qa-01-admission.primary.log",
+        "discovered_physical_path": primary_rel,
+        "role": "log",
+    }
+    _checks(repo)
+
+
+def test_s13_a_new_epic_with_a_v2_source_is_admitted_without_a_table_edit(tmp_path: Path) -> None:
+    from tools.evidence import update_evidence_index as writer
+
+    assert not hasattr(writer, "ADMITTED_EPIC_CLOSE")
+    repo = _copy_repo(tmp_path)
+    _write_epic_source(repo, "999", "HDE-EPIC999")
+    report, manifest = "audit/EPIC-999_close_report.md", "audit/EPIC-999_MANIFEST.json"
+    (repo / report).write_text("# HDE-EPIC999 Close Report\n", encoding="utf-8")
+    (repo / manifest).write_text("{}\n", encoding="utf-8")
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    rows = _index_rows(repo)
+    for suffix, rel in (("close_report", report), ("manifest", manifest)):
+        assert rows[rel] == {"artifact_key": f"epic999.{suffix}", "discovered_physical_path": rel, "epic_id": "HDE-EPIC999"}
+
+    program = EPIC_CLOSE_FIXTURE_PROGRAM.replace(
+        'qa.HarnessConfig("HDE-EPIC041", repo_root=writer.ROOT)',
+        'qa.HarnessConfig("HDE-EPIC999", repo_root=writer.ROOT)',
+    ) + '''
+print(sorted(writer.admitted_epic_close()))
+qa.record_check_family(config, (observed("qa-01-probe"),), captured_at_utc=timestamp)
+publish_epic_close(("close-pack-check",))
+'''
+    assert 'qa.HarnessConfig("HDE-EPIC999", repo_root=writer.ROOT)' in program
+    result = subprocess.run(
+        [sys.executable, "-c", program], cwd=repo, env=ENV, capture_output=True, text=True, check=False
+    )
+    _success(result)
+    assert "['HDE-EPIC041', 'HDE-EPIC999']" in result.stdout
+    close_rel = "audit/qa/hde-epic999/close/close-pack-check/primary.log"
+    assert _index_rows(repo)[close_rel] == {
+        "artifact_key": "audit.qa.hde_epic999.close.close-pack-check.primary.log",
+        "discovered_physical_path": close_rel,
+        "epic_id": "HDE-EPIC999",
+        "role": "log",
+    }
+    _checks(repo)
+
+
+def test_s13_unadmitted_epic_identities_are_refused(tmp_path: Path) -> None:
+    repo = _copy_repo(tmp_path)
+    _write_epic_source(repo, "998", "HDE-EPIC997")
+    _write_epic_source(repo, "996", "HDE-EPIC996", schema_version="epic_close_candidate_source.v1")
+    (repo / "audit/EPIC-995_close_candidate_source.json").symlink_to("EPIC-041_close_candidate_source.json")
+    before = _whole_tree_state(repo, metadata=True)
+    _success(_epic_close_program(repo, '''
+cases = (
+    ("HDE-EPIC040", "no v2 close candidate source"),
+    ("HDE-EPIC41", "malformed Epic ID"),
+    ("HDE-EPIC0410", "malformed Epic ID"),
+    ("HDE-CRD-0002", "malformed Epic ID"),
+    ("HDE-EPIC998", "close candidate source names another change"),
+    ("HDE-EPIC996", "no v2 close candidate source"),
+    ("HDE-EPIC995", "close candidate source is not a regular file"),
+)
+for epic_id, reason in cases:
+    assert writer._epic_close_refusal(epic_id) == reason, (epic_id, writer._epic_close_refusal(epic_id))
+    try:
+        writer.epic_close_admission(epic_id)
+    except ValueError as exc:
+        assert str(exc) == f"EPIC_CLOSE_NOT_ADMITTED:{epic_id}: {reason}"
+    else:
+        raise AssertionError(f"{epic_id} was admitted")
+assert writer.admitted_epic_close() == {"HDE-EPIC041": ("audit/qa/hde-epic041", "audit.qa.hde_epic041")}
+for epic_id, reason in cases:
+    if epic_id in ("HDE-EPIC41", "HDE-EPIC0410", "HDE-CRD-0002"):
+        continue
+    try:
+        writer.publish_epic_close_run_family(qa.HarnessConfig(epic_id, repo_root=writer.ROOT), (observed(),))
+    except ValueError as exc:
+        assert str(exc) == f"governed Epic close-run publication refused {epic_id}: {reason}"
+    else:
+        raise AssertionError(f"{epic_id} close-run publication was accepted")
+'''))
+    assert _whole_tree_state(repo, metadata=True) == before
+    _success(_run(repo, "tools/evidence/update_evidence_index.py", "--check"))
+    assert not [rel for rel in _index_rows(repo) if rel.startswith(("audit/EPIC-99", "audit/qa/hde-epic99"))]

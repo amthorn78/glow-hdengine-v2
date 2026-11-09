@@ -48,20 +48,76 @@ from tools.qa import qa_harness  # noqa: E402
 # Source-owned admission table for approved CRDs (HDE-CRD-0002 IF-5): each
 # admitted ID maps to its QA root and key prefix. This is not a check roster or
 # directory discovery rule; another CRD needs its own explicit row here.
+# HDE-CRD-0003 is admitted by its own row before its QA (HDE-CRD-0003 S14).
 ADMITTED_CRD_QA: Mapping[str, tuple[str, str]] = {
     "HDE-CRD-0001": ("audit/qa/hde-crd-0001", "audit.qa.hde_crd_0001"),
     "HDE-CRD-0002": ("audit/qa/hde-crd-0002", "audit.qa.hde_crd_0002"),
+    "HDE-CRD-0003": ("audit/qa/hde-crd-0003", "audit.qa.hde_crd_0003"),
 }
 
-# Source-owned admission table for Epic close mutation sets (HDE-EPIC041 CL-05,
-# close-tooling repair B-3 and B-4, by the Product Owner's explicit admission):
-# each admitted Epic maps to its QA root and key prefix. Admission registers the
-# Epic's writer close pack (absent-tolerant, as for a CRD) and its post-verdict
-# close-run family under <qa-root>/close/. It is not a check roster or directory
-# discovery rule; another Epic needs its own explicit row here.
-ADMITTED_EPIC_CLOSE: Mapping[str, tuple[str, str]] = {
-    "HDE-EPIC041": ("audit/qa/hde-epic041", "audit.qa.hde_epic041"),
-}
+# Epic close admission by identity (HDE-CRD-0003 S13; HDE Build Notes 2.8 R-1, R-2),
+# replacing the per-Epic table of HDE-EPIC041 CL-05: an Epic whose ID matches
+# HDE-EPIC[0-9]{3} is admitted when its close candidate source, in the governed
+# close-pack home audit/EPIC-NNN_close_candidate_source.json, is a regular file whose
+# strict JSON has schema_version close_candidate_source.v2 and a change_id equal to
+# that ID. Its QA root and key prefix derive from the ID in the forms the table used.
+# Admission registers the Epic's writer close pack (absent-tolerant, as for a CRD) and
+# its post-verdict close-run family under <qa-root>/close/. Candidates are named only
+# by files in audit/ itself; nothing under audit/qa/ is listed to infer admission.
+# The source is read in the checkout the updater runs on; the writer writes a close
+# pack only from a tracked source, and CI's checkout holds only tracked files.
+_EPIC_CLOSE_ID_RE = re.compile(r"HDE-EPIC(?P<number>[0-9]{3})\Z")
+_EPIC_CLOSE_SOURCE_NAME_RE = re.compile(r"EPIC-(?P<number>[0-9]{3})_close_candidate_source\.json\Z")
+EPIC_CLOSE_SOURCE_SCHEMA_VERSION = "close_candidate_source.v2"
+
+
+def _epic_close_refusal(epic_id: object) -> str | None:
+    """Return why the Epic is not admitted for close, or None when it is admitted."""
+    if not isinstance(epic_id, str):
+        return "malformed Epic ID"
+    match = _EPIC_CLOSE_ID_RE.fullmatch(epic_id)
+    if match is None:
+        return "malformed Epic ID"
+    source = ROOT / "audit" / f"EPIC-{match.group('number')}_close_candidate_source.json"
+    try:
+        metadata = os.lstat(source)
+    except FileNotFoundError:
+        return "no v2 close candidate source"
+    if not _stat.S_ISREG(metadata.st_mode):
+        return "close candidate source is not a regular file"
+    try:
+        document = qa_harness._loads_json_strict(_read_bytes(source).decode("utf-8"))
+    except OSError:
+        return "close candidate source is not a regular file"
+    except ValueError:
+        return "close candidate source is not strict JSON"
+    if not isinstance(document, dict) or document.get("schema_version") != EPIC_CLOSE_SOURCE_SCHEMA_VERSION:
+        return "no v2 close candidate source"
+    if document.get("change_id") != epic_id:
+        return "close candidate source names another change"
+    return None
+
+
+def epic_close_admission(epic_id: str) -> tuple[str, str]:
+    """The admitted Epic's QA root and Index key prefix; ValueError when not admitted."""
+    refusal = _epic_close_refusal(epic_id)
+    if refusal is not None:
+        raise ValueError(f"EPIC_CLOSE_NOT_ADMITTED:{epic_id}: {refusal}")
+    number = _EPIC_CLOSE_ID_RE.fullmatch(epic_id).group("number")
+    return f"audit/qa/hde-epic{number}", f"audit.qa.hde_epic{number}"
+
+
+def admitted_epic_close() -> dict[str, tuple[str, str]]:
+    """Every admitted Epic, read afresh at each call from the sources named in audit/."""
+    admitted: dict[str, tuple[str, str]] = {}
+    for name in sorted(os.listdir(ROOT / "audit")):
+        match = _EPIC_CLOSE_SOURCE_NAME_RE.fullmatch(name)
+        if match is None:
+            continue
+        epic_id = f"HDE-EPIC{match.group('number')}"
+        if _epic_close_refusal(epic_id) is None:
+            admitted[epic_id] = epic_close_admission(epic_id)
+    return admitted
 
 # HDE-CRD-0002 IF-7: Mirror rows for primaries whose bytes the admitted release
 # determines carry a release label inside the PF12 §8.3 allowed key set (notes).
@@ -4177,7 +4233,7 @@ def _epic_close_pack_pair(epic_id: str) -> tuple[str, str]:
 
 
 def _epic_close_run_entry(epic_id: str, check_id: str) -> dict[str, object]:
-    root_rel, key_prefix = ADMITTED_EPIC_CLOSE[epic_id]
+    root_rel, key_prefix = epic_close_admission(epic_id)
     qa_harness.validate_check_id(check_id)
     return {
         "artifact_key": f"{key_prefix}.close.{check_id}.primary.log",
@@ -4210,7 +4266,7 @@ def _parse_epic_close_primary(epic_id: str, check_id: str, payload: bytes) -> di
 
 def _epic_close_run_check_ids(epic_id: str) -> list[str]:
     """Validate and list an admitted Epic's close-run family; any other member is refused."""
-    root_rel = ADMITTED_EPIC_CLOSE[epic_id][0]
+    root_rel = epic_close_admission(epic_id)[0]
     qa_root = ROOT / root_rel
     close_root = qa_root / "close"
     for directory in (qa_root, close_root):
@@ -4247,7 +4303,8 @@ def _epic_close_entries(
     """
     pack: dict[str, dict[str, object]] = {}
     pairs: list[tuple[str, tuple[str, str]]] = []
-    for epic_id in sorted(ADMITTED_EPIC_CLOSE):
+    admitted = admitted_epic_close()
+    for epic_id in sorted(admitted):
         key = "epic" + epic_id.removeprefix("HDE-EPIC")
         report, manifest = _epic_close_pack_pair(epic_id)
         for suffix, rel in (("close_report", report), ("manifest", manifest)):
@@ -4266,14 +4323,14 @@ def _epic_close_entries(
         normalized_path = os.path.normpath(path) if isinstance(path, str) else ""
         run_claims = {
             epic_id
-            for epic_id, (root_rel, key_prefix) in ADMITTED_EPIC_CLOSE.items()
+            for epic_id, (root_rel, key_prefix) in admitted.items()
             if (isinstance(key, str) and key.startswith(f"{key_prefix}.close."))
             or normalized_path.startswith(f"{root_rel}/close/")
         }
         if run_claims:
             parts = path.split("/") if isinstance(path, str) else []
             epic_id, = run_claims
-            root_rel = ADMITTED_EPIC_CLOSE[epic_id][0]
+            root_rel = admitted[epic_id][0]
             if (
                 len(parts) != 6
                 or "/".join(parts[:4]) != f"{root_rel}/close"
@@ -5582,16 +5639,17 @@ def publish_epic_close_run_family(
     and refuses if either changes during publication. Recovery has the same
     bounds as publish_crd_close_run_family. No acceptance claim is inferred.
     """
-    if not isinstance(config, qa_harness.HarnessConfig) or config.epic_id not in ADMITTED_EPIC_CLOSE:
-        refused = getattr(config, "epic_id", None)
-        raise ValueError(
-            "governed Epic close-run publication admits only "
-            + ", ".join(sorted(ADMITTED_EPIC_CLOSE))
-            + f"; refused {refused}"
-        )
+    # Admission is the identity rule (HDE-CRD-0003 S13); the refusal names the Epic and why.
+    refused = getattr(config, "epic_id", None)
+    if not isinstance(config, qa_harness.HarnessConfig) or refused is None:
+        refusal: str | None = "not an Epic configuration"
+    else:
+        refusal = _epic_close_refusal(refused)
+    if refusal is not None:
+        raise ValueError(f"governed Epic close-run publication refused {refused}: {refusal}")
     if config.repo_root != ROOT:
         raise ValueError("Epic config must select this updater's repository root")
-    if config.qa_root != ROOT / ADMITTED_EPIC_CLOSE[config.epic_id][0]:
+    if config.qa_root != ROOT / epic_close_admission(config.epic_id)[0]:
         raise ValueError("Epic config QA root differs from its admitted root")
     if _ACTIVE_WRITE_TRANSACTION is not None or _STAGED_VIEW is not None:
         raise RuntimeError("Epic close-run publication requires its own outer transaction")
