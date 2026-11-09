@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat as _stat
 import subprocess
 import sys
 import tempfile
@@ -176,6 +177,8 @@ def _is_within(path: Path, parent: Path) -> bool:
 
 
 def _validate_output_root(output: Path, source: Path) -> Path:
+    """The write-free refusals of HDE Schemas & Artifacts §6.2.1; returns the root path."""
+
     if output.is_symlink():
         raise AttestationBuildError("output_root_symlink_refused")
     resolved = output.resolve()
@@ -186,9 +189,170 @@ def _validate_output_root(output: Path, source: Path) -> Path:
             raise AttestationBuildError("output_root_not_directory")
         if any(resolved.iterdir()):
             raise AttestationBuildError("output_root_not_empty")
-    else:
-        resolved.mkdir(parents=True)
     return resolved
+
+
+# The run's exclusive claim on its output root (HDE Schemas & Artifacts §6.2.1):
+# an atomic mkdir of this entry, which fails if another run holds the root.  It
+# is removed before the final verification, so it is never a bundle member.
+_CLAIM_NAME = ".hde-release-attestation.claim"
+_DIR_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
+_NEW_FILE_FLAGS = (
+    os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
+)
+
+
+class _OwnedOutput:
+    """A claimed output root; every write below it goes to a path this run created.
+
+    Directories are opened without following symlinks and addressed by
+    descriptor, files are created exclusively, and each created entry's device
+    and inode are recorded so that failure cleanup removes only those entries.
+    """
+
+    def __init__(self, root: Path, root_fd: int) -> None:
+        self.root = root
+        self._dirs: dict[tuple[str, ...], int] = {(): root_fd}
+        self._identity: dict[tuple[str, ...], tuple[int, int]] = {}
+        self._created: list[tuple[tuple[str, ...], bool, tuple[int, int]]] = []
+        self._claimed = True
+
+    def _refuse(self) -> AttestationBuildError:
+        return AttestationBuildError("output_path_not_owned")
+
+    def _assert_chain(self, key: tuple[str, ...]) -> None:
+        """Each directory on the path is still the entry this run created."""
+
+        for index in range(1, len(key) + 1):
+            sub = key[:index]
+            try:
+                metadata = os.stat(sub[-1], dir_fd=self._dirs[sub[:-1]], follow_symlinks=False)
+            except OSError as exc:
+                raise self._refuse() from exc
+            if (metadata.st_dev, metadata.st_ino) != self._identity[sub]:
+                raise self._refuse()
+
+    def mkdir(self, rel: Path) -> None:
+        parts = tuple(rel.parts)
+        for index in range(1, len(parts) + 1):
+            key = parts[:index]
+            if key in self._dirs:
+                self._assert_chain(key)
+                continue
+            parent_fd = self._dirs[key[:-1]]
+            try:
+                os.mkdir(key[-1], 0o777, dir_fd=parent_fd)  # umask applies, as before
+                fd = os.open(key[-1], _DIR_FLAGS, dir_fd=parent_fd)
+            except OSError as exc:
+                raise self._refuse() from exc
+            metadata = os.fstat(fd)
+            self._dirs[key] = fd
+            self._identity[key] = (metadata.st_dev, metadata.st_ino)
+            self._created.append((key, True, (metadata.st_dev, metadata.st_ino)))
+
+    def _create_file(self, rel: Path, mode: int) -> tuple[int, tuple[str, ...]]:
+        parts = tuple(rel.parts)
+        if len(parts) > 1:
+            self.mkdir(Path(*parts[:-1]))
+            self._assert_chain(parts[:-1])
+        try:
+            fd = os.open(parts[-1], _NEW_FILE_FLAGS, mode, dir_fd=self._dirs[parts[:-1]])
+        except OSError as exc:
+            raise self._refuse() from exc
+        metadata = os.fstat(fd)
+        self._created.append((parts, False, (metadata.st_dev, metadata.st_ino)))
+        return fd, parts
+
+    def write_bytes(self, rel: Path, data: bytes) -> None:
+        fd, _parts = self._create_file(rel, 0o666)
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(data)
+
+    def copy_file(self, source_path: Path, rel: Path) -> None:
+        """Copy bytes, permission bits and times, as shutil.copy2 did."""
+
+        body = source_path.read_bytes()
+        metadata = os.stat(source_path)
+        fd, _parts = self._create_file(rel, 0o600)
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(body)
+            handle.flush()
+            os.fchmod(handle.fileno(), _stat.S_IMODE(metadata.st_mode))
+            os.utime(handle.fileno(), ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+
+    def remove_created(self) -> None:
+        """Remove only entries this run created and that are still those entries."""
+
+        for parts, is_dir, identity in reversed(self._created):
+            parent_fd = self._dirs.get(parts[:-1])
+            if parent_fd is None:
+                continue
+            try:
+                metadata = os.stat(parts[-1], dir_fd=parent_fd, follow_symlinks=False)
+            except OSError:
+                continue
+            if (metadata.st_dev, metadata.st_ino) != identity:
+                continue
+            try:
+                if is_dir:
+                    os.rmdir(parts[-1], dir_fd=parent_fd)
+                    os.close(self._dirs.pop(parts))
+                else:
+                    os.unlink(parts[-1], dir_fd=parent_fd)
+            except OSError:
+                continue  # a non-empty directory holds a foreign entry; keep it
+        self._created = []
+
+    def release_claim(self) -> None:
+        if self._claimed:
+            self._claimed = False
+            try:
+                os.rmdir(_CLAIM_NAME, dir_fd=self._dirs[()])
+            except OSError:
+                pass
+
+    def close(self) -> None:
+        for key, fd in sorted(self._dirs.items(), key=lambda item: -len(item[0])):
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        self._dirs = {}
+
+
+def _claim_output_root(output: Path, source: Path) -> _OwnedOutput:
+    """Claim the output root exclusively before any write below it, or refuse."""
+
+    resolved = _validate_output_root(output, source)
+    try:
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            os.mkdir(resolved, 0o777)  # an absent root is created by the builder
+        except FileExistsError:
+            pass
+        root_fd = os.open(resolved, _DIR_FLAGS)
+    except OSError as exc:
+        if resolved.is_symlink():
+            raise AttestationBuildError("output_root_symlink_refused") from exc
+        if resolved.exists() and not resolved.is_dir():
+            raise AttestationBuildError("output_root_not_directory") from exc
+        raise AttestationBuildError("output_root_unavailable") from exc
+    try:
+        if os.listdir(root_fd):
+            raise AttestationBuildError("output_root_not_empty")
+        try:
+            os.mkdir(_CLAIM_NAME, 0o700, dir_fd=root_fd)
+        except FileExistsError as exc:
+            raise AttestationBuildError("output_root_claimed") from exc
+        except OSError as exc:
+            raise AttestationBuildError("output_root_unavailable") from exc
+        if os.listdir(root_fd) != [_CLAIM_NAME]:
+            os.rmdir(_CLAIM_NAME, dir_fd=root_fd)
+            raise AttestationBuildError("output_root_not_empty")
+    except BaseException:
+        os.close(root_fd)
+        raise
+    return _OwnedOutput(resolved, root_fd)
 
 
 def _run_git(source: Path, *args: str) -> subprocess.CompletedProcess[bytes]:
@@ -588,7 +752,7 @@ def _git_identity(source: Path) -> tuple[str, bool]:
     return value, not bool(status.stdout)
 
 
-def _write_failure(output: Path, exc: AttestationBuildError) -> None:
+def _write_failure(owned: _OwnedOutput, exc: AttestationBuildError) -> None:
     receipt = {
         "schema": "hde.release_attestation.failure.v1",
         "code": exc.code,
@@ -597,24 +761,17 @@ def _write_failure(output: Path, exc: AttestationBuildError) -> None:
         "secret_values_recorded": False,
     }
     _validate_failure_payload(receipt)
-    (output / "failure.json").write_bytes(_canonical_bytes(receipt))
+    owned.write_bytes(Path("failure.json"), _canonical_bytes(receipt))
 
 
-def _reset_failed_output(output: Path) -> None:
-    evidence = output / "evidence"
-    if evidence.is_symlink() or evidence.is_file():
-        evidence.unlink()
-    elif evidence.is_dir():
-        shutil.rmtree(evidence)
-    for name in (
-        "attestation.json",
-        "attestation.json.sha256",
-        "build.log",
-        "failure.json",
-    ):
-        path = output / name
-        if path.is_file() or path.is_symlink():
-            path.unlink()
+def _fail_owned_output(owned: _OwnedOutput, exc: AttestationBuildError) -> None:
+    """Scoped cleanup, then the failure receipt, then release of the claim."""
+
+    owned.remove_created()
+    try:
+        _write_failure(owned, exc)
+    finally:
+        owned.release_claim()
 
 
 def verify_attestation(
@@ -709,7 +866,8 @@ def build_attestation(
     require_clean: bool = False,
 ) -> Path:
     source = source.resolve()
-    output = _validate_output_root(output, source)
+    owned = _claim_output_root(output, source)
+    output = owned.root
     transcript: list[str] = []
     try:
         source_commit, source_clean = _git_identity(source)
@@ -786,11 +944,7 @@ def build_attestation(
                 raise AttestationBuildError("required_attestation_evidence_missing")
 
             evidence_root = output / "evidence"
-            evidence_root.mkdir()
-            if evidence_root.is_symlink() or not _is_within(
-                evidence_root.resolve(), output.resolve()
-            ):
-                raise AttestationBuildError("attestation_evidence_root_invalid")
+            owned.mkdir(Path("evidence"))
             file_rows = []
             omitted_rows = []
             omitted_primaries: set[str] = set()
@@ -834,11 +988,9 @@ def build_attestation(
                     )
                     omitted_primaries.add(name)
                     continue
-                destination = evidence_root / rel
-                destination.parent.mkdir(parents=True, exist_ok=True)
-                if not _is_within(destination.resolve(), evidence_root.resolve()):
+                if not _safe_relative_name(name):
                     raise AttestationBuildError("attestation_destination_escape")
-                shutil.copy2(source_path, destination)
+                owned.copy_file(source_path, Path("evidence") / rel)
                 file_rows.append(_file_record(evidence_root, rel))
 
             release_id = (
@@ -859,7 +1011,9 @@ def build_attestation(
                 raise AttestationBuildError("final_sanity_pass_missing")
 
             transcript_path = output / "build.log"
-            transcript_path.write_text("\n".join(transcript) + "\n", encoding="utf-8")
+            owned.write_bytes(
+                Path("build.log"), ("\n".join(transcript) + "\n").encode("utf-8")
+            )
             if validate_retained_text_safety(
                 transcript_path,
                 transcript_path.read_bytes(),
@@ -892,26 +1046,28 @@ def build_attestation(
             }
             _validate_payload(payload)
             attestation_bytes = _canonical_bytes(payload)
-            attestation_path = output / "attestation.json"
-            attestation_path.write_bytes(attestation_bytes)
-            (output / "attestation.json.sha256").write_text(
-                f"{hashlib.sha256(attestation_bytes).hexdigest()}  attestation.json\n",
-                encoding="utf-8",
+            owned.write_bytes(Path("attestation.json"), attestation_bytes)
+            owned.write_bytes(
+                Path("attestation.json.sha256"),
+                f"{hashlib.sha256(attestation_bytes).hexdigest()}  attestation.json\n".encode(
+                    "utf-8"
+                ),
             )
+            owned.release_claim()
             verify_attestation(
                 output,
                 require_exact=True,
                 source=source,
             )
     except AttestationBuildError as exc:
-        _reset_failed_output(output)
-        _write_failure(output, exc)
+        _fail_owned_output(owned, exc)
         raise
     except (OSError, UnicodeError, json.JSONDecodeError, TypeError, ValueError) as exc:
         wrapped = AttestationBuildError("attestation_build_io_or_contract_failure")
-        _reset_failed_output(output)
-        _write_failure(output, wrapped)
+        _fail_owned_output(owned, wrapped)
         raise wrapped from exc
+    finally:
+        owned.close()
     return output / "attestation.json"
 
 

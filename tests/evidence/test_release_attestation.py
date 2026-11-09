@@ -4,8 +4,10 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import os
 import subprocess
 import sys
+import threading
 from types import SimpleNamespace
 
 import pytest
@@ -62,6 +64,85 @@ def test_output_root_must_be_external_empty_directory(tmp_path):
     ):
         builder._validate_output_root(occupied, source)
     assert (occupied / "existing").read_text(encoding="utf-8") == "preserve\n"
+    with pytest.raises(builder.AttestationBuildError, match="output_root_not_empty"):
+        builder._claim_output_root(occupied, source)
+    assert {path.name for path in occupied.iterdir()} == {"existing"}
+
+    not_directory = tmp_path / "file-root"
+    not_directory.write_text("preserve\n", encoding="utf-8")
+    with pytest.raises(builder.AttestationBuildError, match="output_root_not_directory"):
+        builder._claim_output_root(not_directory, source)
+    assert not_directory.read_text(encoding="utf-8") == "preserve\n"
+
+    # An absent root is created by the builder; an existing empty one is accepted.
+    for root in (tmp_path / "absent" / "root", tmp_path / "empty"):
+        if root.name == "empty":
+            root.mkdir()
+        owned = builder._claim_output_root(root, source)
+        try:
+            assert {path.name for path in root.iterdir()} == {builder._CLAIM_NAME}
+            owned.release_claim()
+            assert list(root.iterdir()) == []
+        finally:
+            owned.close()
+
+
+def test_output_root_claim_is_exclusive_between_concurrent_runs(tmp_path):
+    source = tmp_path / "source"
+    source.mkdir()
+    for attempt in range(25):
+        root = tmp_path / f"root-{attempt}"
+        barrier = threading.Barrier(2)
+        outcomes: list[object] = []
+
+        def claim() -> None:
+            barrier.wait()
+            try:
+                outcomes.append(builder._claim_output_root(root, source))
+            except builder.AttestationBuildError as exc:
+                outcomes.append(exc.code)
+
+        threads = [threading.Thread(target=claim) for _ in range(2)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        owners = [item for item in outcomes if isinstance(item, builder._OwnedOutput)]
+        refusals = [item for item in outcomes if isinstance(item, str)]
+        assert len(owners) == 1, outcomes
+        assert refusals in (["output_root_claimed"], ["output_root_not_empty"])
+        assert {path.name for path in root.iterdir()} == {builder._CLAIM_NAME}
+        owners[0].close()
+
+
+def test_writes_below_the_root_refuse_preexisting_and_substituted_symlinks(tmp_path):
+    source = tmp_path / "source"
+    source.mkdir()
+    external = tmp_path / "external"
+    external.mkdir()
+    output = tmp_path / "output"
+    owned = builder._claim_output_root(output, source)
+    try:
+        (output / "build.log").symlink_to(external / "build.log")
+        with pytest.raises(builder.AttestationBuildError, match="output_path_not_owned"):
+            owned.write_bytes(Path("build.log"), b"x\n")
+        owned.mkdir(Path("evidence"))
+        (output / "evidence").rmdir()
+        (output / "evidence").symlink_to(external, target_is_directory=True)
+        with pytest.raises(builder.AttestationBuildError, match="output_path_not_owned"):
+            owned.write_bytes(Path("evidence/partial"), b"x\n")
+        with pytest.raises(builder.AttestationBuildError, match="output_path_not_owned"):
+            owned.mkdir(Path("evidence/nested"))
+        # A renamed-away directory replaced by a symlink is refused as well.
+        owned.mkdir(Path("other"))
+        (output / "other").rename(output / "other.moved")
+        (output / "other").symlink_to(external, target_is_directory=True)
+        with pytest.raises(builder.AttestationBuildError, match="output_path_not_owned"):
+            owned.write_bytes(Path("other/partial"), b"x\n")
+    finally:
+        owned.close()
+    assert list(external.iterdir()) == []
+    assert list((output / "other.moved").iterdir()) == []
 
 
 def test_output_root_refuses_symlink(tmp_path):
@@ -77,6 +158,9 @@ def test_output_root_refuses_symlink(tmp_path):
         match="output_root_symlink_refused",
     ):
         builder._validate_output_root(output, source)
+    with pytest.raises(builder.AttestationBuildError, match="output_root_symlink_refused"):
+        builder._claim_output_root(output, source)
+    assert list(external.iterdir()) == []
 
 
 def test_child_environment_is_closed_and_drops_sensitive_values(monkeypatch):
@@ -310,9 +394,16 @@ def test_failure_receipt_is_strict_and_secret_safe(tmp_path):
         returncode=7,
     )
 
-    builder._write_failure(tmp_path, exc)
+    source = tmp_path / "source"
+    source.mkdir()
+    output = tmp_path / "output"
+    owned = builder._claim_output_root(output, source)
+    try:
+        builder._fail_owned_output(owned, exc)
+    finally:
+        owned.close()
 
-    payload = json.loads((tmp_path / "failure.json").read_bytes())
+    payload = json.loads((output / "failure.json").read_bytes())
     assert payload == {
         "schema": "hde.release_attestation.failure.v1",
         "code": "isolated_stage_failed",
@@ -328,25 +419,49 @@ def test_failure_receipt_is_strict_and_secret_safe(tmp_path):
         builder._validate_failure_payload(payload)
 
 
-def test_failed_bundle_cleanup_emits_only_names_only_receipt(tmp_path):
-    (tmp_path / "evidence").mkdir()
-    (tmp_path / "evidence" / "partial").write_text(
-        "Authorization: Bearer should-not-survive\n",
-        encoding="utf-8",
-    )
-    (tmp_path / "build.log").write_text(
-        "postgresql://should-not-survive\n",
-        encoding="utf-8",
-    )
+def test_failed_bundle_cleanup_removes_only_run_created_paths(tmp_path):
+    source = tmp_path / "source"
+    source.mkdir()
+    output = tmp_path / "output"
+    owned = builder._claim_output_root(output, source)
+    try:
+        owned.write_bytes(
+            Path("evidence/nested/partial"),
+            b"Authorization: Bearer should-not-survive\n",
+        )
+        owned.write_bytes(Path("build.log"), b"postgresql://should-not-survive\n")
+        # A writer that never claimed the root: its files are not the run's.
+        (output / "foreign.txt").write_text("preserve\n", encoding="utf-8")
+        (output / "evidence" / "foreign-inside").write_text("preserve\n", encoding="utf-8")
+        builder._fail_owned_output(
+            owned,
+            builder.AttestationBuildError("isolated_stage_failed", stage="test"),
+        )
+    finally:
+        owned.close()
 
-    builder._reset_failed_output(tmp_path)
-    builder._write_failure(
-        tmp_path,
-        builder.AttestationBuildError("isolated_stage_failed", stage="test"),
-    )
+    assert {path.name for path in output.iterdir()} == {"evidence", "failure.json", "foreign.txt"}
+    assert [path.name for path in (output / "evidence").iterdir()] == ["foreign-inside"]
+    assert (output / "foreign.txt").read_text(encoding="utf-8") == "preserve\n"
+    assert b"Bearer" not in (output / "failure.json").read_bytes()
+    assert json.loads((output / "failure.json").read_bytes())["code"] == "isolated_stage_failed"
 
-    assert {path.name for path in tmp_path.iterdir()} == {"failure.json"}
-    assert b"Bearer" not in (tmp_path / "failure.json").read_bytes()
+
+def test_failed_build_keeps_a_foreign_file_and_writes_the_receipt(tmp_path, monkeypatch):
+    source = tmp_path / "source"
+    source.mkdir()
+    output = tmp_path / "output"
+
+    def dirty_after_a_foreign_write(_source):
+        # A writer that never claimed the root writes a bundle member's name.
+        (output / "build.log").write_text("another run's transcript\n", encoding="utf-8")
+        return "b" * 40, False
+
+    monkeypatch.setattr(builder, "_git_identity", dirty_after_a_foreign_write)
+    with pytest.raises(builder.AttestationBuildError, match="source_tree_not_clean"):
+        builder.build_attestation(output, source=source)
+    assert {path.name for path in output.iterdir()} == {"build.log", "failure.json"}
+    assert (output / "build.log").read_text(encoding="utf-8") == "another run's transcript\n"
 
 
 def test_tracked_source_copy_rejects_symlink_escape(tmp_path):

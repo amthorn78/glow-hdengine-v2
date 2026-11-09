@@ -425,8 +425,11 @@ def test_attestation_maps_the_release_sanity_distinct_code_to_release_not_admitt
     assert other.value.code == "isolated_stage_failed"
 
     receipt_dir = tmp_path / "receipt"
-    receipt_dir.mkdir()
-    attestation._write_failure(receipt_dir, excinfo.value)
+    owned = attestation._claim_output_root(receipt_dir, tmp_path / "source")
+    try:
+        attestation._fail_owned_output(owned, excinfo.value)
+    finally:
+        owned.close()
     receipt = json.loads((receipt_dir / "failure.json").read_bytes())
     assert receipt == {
         "schema": "hde.release_attestation.failure.v1",
