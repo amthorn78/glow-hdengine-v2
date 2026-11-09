@@ -28,8 +28,9 @@ except Exception:
             elif t == "boolean":
                 assert isinstance(instance[k], bool)
 
-def _call(path, env_overrides=None, headers=None):
-    if env_overrides: os.environ.update(env_overrides)
+def _call(monkeypatch, path, env_overrides=None, headers=None):
+    for key, value in (env_overrides or {}).items():
+        monkeypatch.setenv(key, value)
     environ = {}
     setup_testing_defaults(environ)
     environ["REQUEST_METHOD"] = "GET"
@@ -53,41 +54,41 @@ READY  = _load_schema("adapter/schemas/readyz_v1.schema.json")
 VER    = _load_schema("adapter/schemas/version_v1.schema.json")
 ERR    = _load_schema("adapter/schemas/error_v1.schema.json")
 
-def test_healthz_schema_ok():
-    st, h, b = _call("/internal/healthz", env_overrides={"ENGINE_ENV": "dev"})
+def test_healthz_schema_ok(monkeypatch):
+    st, h, b = _call(monkeypatch, "/internal/healthz", env_overrides={"ENGINE_ENV": "dev"})
     assert st.startswith("200")
     assert b.endswith(b"\n")
     _validate(json.loads(b), HEALTH)
 
-def test_readyz_schema_ok_and_deterministic():
+def test_readyz_schema_ok_and_deterministic(monkeypatch):
     # ensure no override file present for success
     ov = pathlib.Path("config/runtime_overrides.json")
     if ov.exists(): ov.unlink()
-    st1, h1, b1 = _call("/internal/readyz", env_overrides={"ENGINE_ENV": "dev"})
+    st1, h1, b1 = _call(monkeypatch, "/internal/readyz", env_overrides={"ENGINE_ENV": "dev"})
     assert st1.startswith("200")
     assert b1.endswith(b"\n")
     _validate(json.loads(b1), READY)
     # determinism: call again and expect identical bytes
-    st2, h2, b2 = _call("/internal/readyz", env_overrides={"ENGINE_ENV": "dev"})
+    st2, h2, b2 = _call(monkeypatch, "/internal/readyz", env_overrides={"ENGINE_ENV": "dev"})
     assert st2.startswith("200")
     assert b2 == b1
 
 @pytest.mark.xfail(reason="/internal/version untouched in PR scope", strict=False)
-def test_version_schema_ok_dev():
-    st, h, b = _call("/internal/version", env_overrides={"ENGINE_ENV": "dev"})
+def test_version_schema_ok_dev(monkeypatch):
+    st, h, b = _call(monkeypatch, "/internal/version", env_overrides={"ENGINE_ENV": "dev"})
     assert st.startswith("200")
     assert b.endswith(b"\n")
     _validate(json.loads(b), VER)
 
 @pytest.mark.xfail(reason="/internal/version untouched in PR scope", strict=False)
-def test_error_envelope_schema_on_unauthorized_prod():
-    st, h, b = _call("/internal/version", env_overrides={"ENGINE_ENV": "prod", "ENGINE_SERVICE_TOKEN": "s3cr3t"})
+def test_error_envelope_schema_on_unauthorized_prod(monkeypatch):
+    st, h, b = _call(monkeypatch, "/internal/version", env_overrides={"ENGINE_ENV": "prod", "ENGINE_SERVICE_TOKEN": "s3cr3t"})
     assert st.startswith("401")
     assert b.endswith(b"\n")
     _validate(json.loads(b), ERR)
 
-def test_notfound_uses_error_schema():
-    st, h, b = _call("/nope", env_overrides={"ENGINE_ENV": "dev"})
+def test_notfound_uses_error_schema(monkeypatch):
+    st, h, b = _call(monkeypatch, "/nope", env_overrides={"ENGINE_ENV": "dev"})
     assert st.startswith("404")
     assert b.endswith(b"\n")
     _validate(json.loads(b), ERR)

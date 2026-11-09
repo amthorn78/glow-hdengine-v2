@@ -17,6 +17,12 @@ from engine.cli.main import cli
 from tests.bodygraph.test_v2_adapter import chart_result_payload
 
 
+@pytest.fixture(autouse=True)
+def _pinned_app_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("APP_ENV", "dev")
+    monkeypatch.delenv("ENGINE_ENV", raising=False)
+
+
 def _open_env(base_url: str = "https://vendor.test/v2") -> dict[str, object]:
     return {
         "SAFE_MODE": "0",

@@ -177,18 +177,15 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/ci/prepush_check
 SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/ci/prepush_check.py --path <path> membership
 ```
 
-- Reports, always run in this order: `lanes` (the CI lane classification for `--base` and `--head`, or, when `--path` is given, for those paths, from `ci/checks/classify_ci_changes.py`); `membership` (whether the given `--path` values are members of the admitted release roster; it needs at least one `--path`); `build-notes` (the vendored HDE Build Notes copy that `tools/pf_tool_inputs/manifest.json` names, its SHA-256 and its glow-docs source identity); `sweep` (the tracked test files that no CI lane and no full-validation target reaches, run in a throwaway copy of the head; `--no-run` only lists them); `replay` (every step of the `test` job of `.github/workflows/ci.yml`, replayed in a throwaway copy of the head). `all` runs all five.
+- Reports, always run in this order: `lanes` (the CI lane classification for `--base` and `--head`, or, when `--path` is given, for those paths, from `ci/checks/classify_ci_changes.py`); `membership` (whether the given `--path` values are members of the admitted release roster; it needs at least one `--path`); `build-notes` (the vendored HDE Build Notes copy that `tools/pf_tool_inputs/manifest.json` names, its SHA-256 and its glow-docs source identity); `sweep` (the tracked test files that no CI lane and no full-validation target reaches, run in a throwaway copy of the head; `--no-run` only lists them). `all` runs all four.
 - Options: `--base` (default `origin/main`), `--head` (default `HEAD`), `--event {pull_request,push}` (default `pull_request`), `--path` (repeatable), `--full` (base equal to head: the classifier's full validation) and `--no-run`.
 - Read-only: it refuses a dirty tree, acts on committed revisions only, resolves refs locally, opens no network connection, runs its children under closed rails, writes only under one owner-only temporary directory outside the repository, and checks afterwards that the repository is unchanged.
 - Exit status: 0 when every requested report passes; 1 when a report fails; 2 for a usage error; 3 when it refuses to run (not the working tree's top level, a dirty tree, or a temporary directory inside the repository); 4 when the repository changed during the run, with the changed entries and the fields that moved named on stderr (paths and field names only; at most 20 lines and a count).
 - Prerequisites: CI's install in the caller's environment (`python -m pip install 'setuptools>=68' wheel -r requirements.txt -r requirements-dev.txt -e .`), Python 3.12, and `ruby`, `bash` and `curl` on `PATH`.
 - Limits:
-  - `replay` replays only the pinned `ci.yml`, whose SHA-256 is `REPLAY_WORKFLOW_SHA256` in the tool. Any change to `ci.yml` needs that value, and the replay's model, updated in the same pull request; otherwise the replay refuses.
-  - CI's install step is not run; only the presence of each distribution it names is checked.
-  - Runner defaults are not given to scripts that a step calls.
   - Directories under `.git` are compared by name only.
   - Concurrent git activity in the checkout fails the read-only check.
-  - Children inherit only `HOME`, `LOGNAME`, `PATH`, `SHELL`, `TERM` and `USER`, and they are not sandboxed: `sweep` and `replay` run the candidate's own tests and workflow steps with the caller's file-system and network access. Run them only on code you trust.
+  - Children inherit only `HOME`, `LOGNAME`, `PATH`, `SHELL`, `TERM` and `USER`, and they are not sandboxed: `sweep` runs the candidate's own tests with the caller's file-system and network access. Run them only on code you trust.
   - A shallow source makes the throwaway copies hold ref-reachable history only.
   - The throwaway copies own their objects: each holds a copy of the source's object store, and a source that borrows objects from another repository (`--shared`, `--reference`) is dissociated in the copy, at the cost of a repack.
 - Nonclaim: its result is not CI's result, not QA and not governed evidence.

@@ -17,6 +17,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -2512,12 +2513,33 @@ def load_source_cache() -> tuple[dict[str, dict[str, Any]], dict[str, bytes]]:
     return metadata, bodies
 
 
+class MissingDependencyError(RuntimeError):
+    """A program the generator runs is not available to this process."""
+
+
+_RUBY: list[str] = []
+
+
+def ruby_executable() -> str:
+    """The ``ruby`` that parses the YAML route specifications, resolved once per process."""
+    if not _RUBY:
+        found = shutil.which("ruby")
+        if found is None:
+            raise MissingDependencyError(
+                "MISSING_DEPENDENCY:ruby (the YAML route specifications are parsed with ruby; "
+                "make ruby available on PATH)"
+            )
+        _RUBY.append(found)
+    return _RUBY[0]
+
+
 def parse_yaml_openapi(body: bytes, name: str) -> dict[str, Any]:
+    ruby = ruby_executable()
     with tempfile.NamedTemporaryFile(suffix=".yaml") as tmp:
         tmp.write(body)
         tmp.flush()
         result = subprocess.run(
-            ["ruby", "-ryaml", "-rjson", "-e", "puts JSON.generate(YAML.safe_load_file(ARGV.fetch(0), permitted_classes: [], aliases: false))", tmp.name],
+            [ruby, "-ryaml", "-rjson", "-e", "puts JSON.generate(YAML.safe_load_file(ARGV.fetch(0), permitted_classes: [], aliases: false))", tmp.name],
             check=False,
             capture_output=True,
             text=True,
@@ -4768,7 +4790,10 @@ def main(argv: list[str] | None = None) -> None:
     else:
         fetched, bodies = load_source_cache()
         mode = "closed-rails-source-cache"
-    outputs = render_outputs(produced, fetched, bodies, mode=mode)
+    try:
+        outputs = render_outputs(produced, fetched, bodies, mode=mode)
+    except MissingDependencyError as exc:
+        raise SystemExit(str(exc)) from None
     write_outputs(outputs)
     if args.refresh_public_docs:
         remove_request_shaping_outputs()

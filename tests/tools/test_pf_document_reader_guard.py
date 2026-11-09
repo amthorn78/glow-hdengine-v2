@@ -60,10 +60,6 @@ ALLOWED: dict[tuple[str, str], str] = {
         "permitted AGENTS.md sample",
     ("tests/unit/test_check_agents_md_citations.py", '"Resolve all canon from `docs/pfcanon/` on `main`.",'):
         "permitted AGENTS.md sample",
-    (
-        "tools/ci/prepush_check.py",
-        '_REPLAY_PATHS = ["**", "!docs/crd/**", "!docs/ephemeral/**", "!docs/graph/**", "!docs/pfcanon/**", "!docs/plans/**",',
-    ): "replay of the workflow path filter, until WU-PR-02 removes replay",
     ("tools/qa/generate_epic026_close_pack.py", 'PF23_PATH = ROOT / "docs" / "pfcanon" / "PF23-Canon-Reality-Audits-v1.0.3.md"'):
         "D-18: retired reader with no caller, fail-closed in the classifier (WU-PR-01 instruction section 6)",
     ("tools/qa/generate_epic029_close_pack.py", 'or primary_rel.startswith("docs/pfcanon/")'):
