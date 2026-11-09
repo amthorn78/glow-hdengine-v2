@@ -17,6 +17,29 @@ from tools.evidence import regenerate_identity_closure as release_closure
 from tools.evidence import run_sanity_pipeline as release_sanity
 
 ROOT = Path(__file__).resolve().parents[2]
+# HDE-CRD-0003 S16 (Audit EC-20): the scoring configuration and code paths whose change
+# selects the score-distribution utility's owner test, expanded to the tracked files.
+S16_OWNER_TEST = "tests/tools/test_score_distribution.py"
+S16_TRIGGER_FILES = (
+    "catalog/magic10_mechanics_v1.json",
+    "catalog/magic10_caps.json",
+    "catalog/magic10.json",
+    "catalog/channels_v1.json",
+    "catalog/gates_v1.json",
+    "math/thresholds.json",
+    "engine/magic10/__init__.py",
+    "engine/magic10/calculators.py",
+    "engine/magic10/composite.py",
+    "engine/magic10/signals.py",
+    "engine/magic10/thresholds.py",
+    "engine/core/__init__.py",
+    "engine/core/core.py",
+    "engine/compat/compute.py",
+    "engine/config/registry_loader.py",
+    "engine/categories/registry.py",
+    "engine/bodygraph/gates.py",
+    "catalog/magic10_seeds.json",
+)
 DEFS = [
     ROOT / "ci/jobs/rails_closed_refusal.yml",
     ROOT / "ci/jobs/rails_open_conformance.yml",
@@ -742,12 +765,15 @@ def test_product_source_owner_policy_is_explicit_and_fail_closed() -> None:
     "catalog/channels_v1.json", "schemas/channels_v1.schema.json",
 ])
 def test_pr01_channel_sources_select_complete_catalog_and_gate_owners(source: str) -> None:
-    assert classifier.changed_test_targets(ROOT, (source,)) == (
+    owners = (
         "tests/compare/test_arrays_as_sets.py",
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
         "tests/evidence/test_canonical_json_gate_check_outputs.py",
     )
+    if source in S16_TRIGGER_FILES:
+        owners += (S16_OWNER_TEST,)
+    assert classifier.changed_test_targets(ROOT, (source,)) == owners
     assert classifier._lanes_for_path(source) == {"product", "compat", "release"}
 
 
@@ -758,14 +784,16 @@ def test_pr01_channel_sources_select_complete_catalog_and_gate_owners(source: st
     "schemas/magic10_compat_result_v1.schema.json",
 ])
 def test_pr01_mechanics_sources_have_the_real_contract_owner(source: str) -> None:
-    assert classifier.changed_test_targets(ROOT, (source,)) == (
-        "tests/config/test_magic10_contracts.py",
-    )
+    owners = ("tests/config/test_magic10_contracts.py",)
+    if source in S16_TRIGGER_FILES:
+        owners += (S16_OWNER_TEST,)
+    assert classifier.changed_test_targets(ROOT, (source,)) == owners
 
 
 def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
     assert classifier.changed_test_targets(ROOT, ("engine/bodygraph/gates.py",)) == (
         "tests/bodygraph/test_gates.py",
+        S16_OWNER_TEST,
     )
     assert classifier.changed_test_targets(ROOT, ("engine/config/registry_loader.py",)) == (
         "tests/config/test_alias_policy_enforcement.py",
@@ -776,6 +804,7 @@ def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
         "tests/config/test_production_admission.py",
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
+        S16_OWNER_TEST,
     )
     assert classifier.changed_test_targets(ROOT, ("engine/config/bundles.py",)) == (
         "tests/config/test_typed_bundles.py",
@@ -919,6 +948,7 @@ def test_pr02_changed_paths_keep_all_lanes_and_exact_new_test_targets() -> None:
         "tests/config/test_production_admission.py",
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
+        S16_OWNER_TEST,
     )
 
 
@@ -2316,16 +2346,31 @@ def test_open_rails_producer_check_mode_has_no_repo_residue(capsys: pytest.Captu
 
 
 @pytest.mark.parametrize('source,expected', [
-    ('engine/core/core.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_abba.py', 'tests/core/test_engine_core_determinism.py'}),
-    ('engine/core/__init__.py', {'tests/core/test_engine_core_purity.py'}),
-    ('engine/magic10/composite.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_abba.py', 'tests/core/test_engine_core_determinism.py'}),
-    ('engine/magic10/signals.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_determinism.py'}),
-    ('engine/magic10/calculators.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_determinism.py', 'tests/m10/test_thresholds_rounding.py'}),
-    ('engine/magic10/__init__.py', {'tests/core/test_engine_core_purity.py', 'tests/m10/test_defs_order.py'}),
+    ('engine/core/core.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_abba.py', 'tests/core/test_engine_core_determinism.py', S16_OWNER_TEST}),
+    ('engine/core/__init__.py', {'tests/core/test_engine_core_purity.py', S16_OWNER_TEST}),
+    ('engine/magic10/composite.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_abba.py', 'tests/core/test_engine_core_determinism.py', S16_OWNER_TEST}),
+    ('engine/magic10/signals.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_determinism.py', S16_OWNER_TEST}),
+    ('engine/magic10/calculators.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_determinism.py', 'tests/m10/test_thresholds_rounding.py', S16_OWNER_TEST}),
+    ('engine/magic10/__init__.py', {'tests/core/test_engine_core_purity.py', 'tests/m10/test_defs_order.py', S16_OWNER_TEST}),
     ('tools/evidence/generate_engine_core_evidence.py', {'tests/evidence/test_engine_core_evidence.py'}),
 ])
 def test_pr03_pure_sources_have_exact_behavioral_owners(source, expected):
     assert set(classifier.changed_test_targets(ROOT, (source,))) == expected
+
+
+def test_s16_trigger_files_select_the_score_distribution_owner() -> None:
+    """HDE-CRD-0003 S16: CI selects the utility's owner test for each scoring configuration
+    and code path, and the two scoring directories hold no file outside the trigger set."""
+    for path in S16_TRIGGER_FILES:
+        assert S16_OWNER_TEST in classifier.changed_test_targets(ROOT, (path,)), path
+    under_directories = {
+        path.relative_to(ROOT).as_posix()
+        for directory in ("engine/magic10", "engine/core")
+        for path in (ROOT / directory).glob("*.py")
+    }
+    assert under_directories == {
+        path for path in S16_TRIGGER_FILES if path.startswith(("engine/magic10/", "engine/core/"))
+    }
 
 
 def test_pr03_classifier_change_requires_all_seven_lanes():

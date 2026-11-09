@@ -190,6 +190,28 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/ci/prepush_check
   - The throwaway copies own their objects: each holds a copy of the source's object store, and a source that borrows objects from another repository (`--shared`, `--reference`) is dissociated in the copy, at the cost of a repack.
 - Nonclaim: its result is not CI's result, not QA and not governed evidence.
 
+## Score-distribution utility (HDE-CRD-0003 S16)
+
+`tools/score_distribution/score_distribution.py` reports how the admitted release's compat results fall into bands. It scores every pair through `engine.compat.compute.evaluate_pair` with the admitted bundle, so it adds no second scoring surface. Run it from the repository root under closed rails:
+
+```bash
+# the governed synthetic reference corpus, compared with the frozen baseline (exact counts)
+SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/score_distribution/score_distribution.py reference
+# the same corpus, compared with the Magic10 v2 target mix
+SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/score_distribution/score_distribution.py reference --compare target
+# an explicit selection of stored people, compared with the target mix (needs DATABASE_URL)
+SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/score_distribution/score_distribution.py stored --selection-file <path>
+```
+
+- Modes:
+  - `reference` scores `reference_corpus_v1.json`: the score-range record's 2,000 synthetic people and 20,000 stored pairs, pinned by SHA-256 in the tool, with their provenance. `--compare baseline` (the default) checks exact band counts, overall and per category, against `reference_baseline_v1.json`, the release 1.3.0 mix frozen with the corpus. `--compare target` reports band shares against the target mix 30 / 35 / 25 / 10.
+  - `stored` scores every pair of 2 to 1,000 stored people, given with `--user-id` (repeatable) or `--selection-file` (one canonical UUID per line, `#` comments; a regular file of at most 1 MiB). It reads each person read-only through `read_current_mapped_bodygraph` and the Reader's local resolution, and compares with the target mix, flagging a category band more than 5 points from the target. A person whose row is missing or refused is excluded and counted by reason.
+- Report: canonical JSON on stdout naming the release, the population (corpus digest, or the selection's SHA-256 and counts), band counts and shares overall and per category, distinct bands per pair (Reader v2's view), score percentiles, zero and tie shares, channels formed per pair, and the comparison. It carries aggregates only: no identity and no per-person or per-pair value. Two runs give identical bytes.
+- Exit status: 0 with a report; 5 when it refuses, with one value-free token on stderr (open rails, another working directory, a corpus or baseline that does not match, a selection outside its bounds, fewer than two scored people, the database unavailable); 2 for a usage error.
+- Writes nothing, makes no network or vendor call, and registers no route, blueprint or `hdctl` command.
+- Owner test: `tests/tools/test_score_distribution.py`. CI selects it for the tool's files and for the scoring configuration and code (`ci/checks/classify_ci_changes.py`); its reference run is the gate on the frozen baseline.
+- Nonclaim: a report proves only the distribution it measures. It is not a QA verdict, and it cuts no band maxima.
+
 ## Evidence & QA (HDE-EPIC039 + historical epics)
 
 - EPIC037 governed evidence families: PR-01 field sufficiency (`artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json`, `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract.snapshot.json`, `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json`), PR-02 adapter mapping (`artifacts/vendor/hdapi_v2/hde_epic037_adapter_mapping.snapshot.json`, `artifacts/vendor/hdapi_v2/hde_epic037_adapter_negative_fixtures.json`, `artifacts/vendor/hdapi_v2/hde_epic037_no_raw_payload_persistence.json`, `artifacts/vendor/hdapi_v2/hde_epic037_public_reader_no_change.json`), PR-03 resolver route/request/closed-rails/legacy-fallback snapshots, PR-04 v2-to-compat proofs, PO-produced OPS-01 evidence under `audit/ops/hde-epic037/ops-hde-epic037-001/`, and PR-05 parent binding under `docs/acceptance_map_epic037.json` plus `audit/qa/hde-epic037/`. These are governed evidence surfaces only; this docs sweep does not regenerate evidence or edit governed artifacts.
