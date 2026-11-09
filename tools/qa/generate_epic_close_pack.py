@@ -2,8 +2,10 @@
 """Generate or check one feedback-free epic closeout candidate pair.
 
 The candidate source, schema, plan, and evidence inputs are exact tracked files
-at the current Git HEAD.  Write mode is the sole publication path for the two
-derived candidate files.  Check mode never publishes or repairs candidate
+at the current Git HEAD, except that a v2 source's two governance documents, the
+close-pack writer decision record and the v2 source schema, are read at the
+governance commit its manifest records (HDE-CRD-0003 S15).  Write mode is the
+sole publication path for the two derived candidate files.  Check mode never publishes or repairs candidate
 state.  Both modes verify every tracked mode-120000 symlink target against its
 candidate-HEAD blob; only the inspected symlink inode's unavoidable,
 kernel-managed atime may advance, and this tool never sets or restores it.
@@ -22,6 +24,7 @@ import stat
 import struct
 import sys
 import zlib
+from collections import deque
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
@@ -1727,7 +1730,10 @@ def _git_blob_payload(
 def _tree_entries_from_store(
     context: GitContext, store: _GitObjectStore
 ) -> dict[str, GitTreeEntry]:
-    head = _head(context, store)
+    return _tree_entries_at(store, _head(context, store))
+
+
+def _tree_entries_at(store: _GitObjectStore, head: str) -> dict[str, GitTreeEntry]:
     commit = store.read(head)
     if commit.object_type != "commit":
         raise _fail("GIT_HEAD_UNAVAILABLE")
@@ -1992,13 +1998,36 @@ def _load_model(
     source_rel: str,
     *,
     verify_canon: bool = False,
+    governance_commit: str | None = None,
+    check: bool = False,
 ) -> tuple[CandidateModel, tuple[FileSnapshot, ...]]:
     store = _GitObjectStore(context)
     tree = _tree_entries(context, store)
     if _source_selects_v2(root, context, store, tree, source_rel):
+        # A v2 write names its governance commit; check mode takes it from the
+        # committed manifest and requires the recorded bytes to match (2.9 R-1, R-2).
+        recorded = None
+        if check:
+            governance_commit, recorded = _committed_governance(
+                root, context, store, tree, source_rel
+            )
+        elif governance_commit is None:
+            raise _fail("GOVERNANCE_COMMIT_REQUIRED")
+        governance = _governance_binding(context, store, head, governance_commit)
+        if recorded is not None and recorded != _governance_manifest_block(governance):
+            raise _fail("GOVERNANCE_BINDING_MISMATCH")
         return _load_model_v2(
-            root, context, head, source_rel, store, tree, verify_canon=verify_canon
+            root,
+            context,
+            head,
+            source_rel,
+            store,
+            tree,
+            verify_canon=verify_canon,
+            governance=governance,
         )
+    if governance_commit is not None:
+        raise _fail("GOVERNANCE_COMMIT_UNEXPECTED")
     remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
     schema_input = _capture_input(
         root, context, store, tree, SCHEMA_REL, max_bytes=remaining_input_bytes
@@ -2192,6 +2221,16 @@ def _render_candidate(model: CandidateModel | CandidateModelV2) -> dict[str, byt
 # requirements document (its path and digest) and never copied into a causal
 # field, so the feedback-dependency refusal applies unchanged to every v2 value.
 SCHEMA_V2_REL = "schemas/close_candidate_source.v2.json"
+# HDE-CRD-0003 S15 (HDE Build Notes 2.9): a v2 close pack binds its two governance
+# documents, this writer's decision record and the v2 source schema, at the commit
+# its manifest records, not at HEAD. Check mode verifies that the commit is HEAD
+# or an ancestor of HEAD, that the bytes there match the recorded SHA-256, and that
+# the source validates against the schema there; every pack artifact is still
+# re-rendered from HEAD. The commit is read from this writer's own object store, so
+# the imports stay the standard library and jsonschema.
+GOVERNANCE_DECISION_RECORD_REL = "docs/adr/hde/close_pack_writer_adr.md"
+GOVERNANCE_BLOCK_KEYS = frozenset({"commit", "decision_record", "source_schema"})
+MAX_GIT_ANCESTRY_COMMITS = 1_000_000
 SOURCE_SCHEMA_VERSION_V2 = "close_candidate_source.v2"
 MANIFEST_SCHEMA_VERSION_V2 = "close_candidate_manifest.v2"
 CHANGE_RE = re.compile(r"HDE-(?:EPIC(?P<epic>[0-9]{3})|CRD-(?P<crd>[0-9]{4,}))\Z")
@@ -2306,6 +2345,13 @@ PF_DOCUMENT_RE = re.compile(
 
 
 @dataclass(frozen=True)
+class GovernanceBinding:
+    commit: str
+    decision_record: FileSnapshot
+    source_schema: FileSnapshot
+
+
+@dataclass(frozen=True)
 class CandidateModelV2:
     source: Mapping[str, Any]
     source_path: str
@@ -2315,6 +2361,139 @@ class CandidateModelV2:
     report_path: str
     manifest_path: str
     qa_primaries: tuple[FileSnapshot, ...] = ()
+    governance: GovernanceBinding | None = None
+
+
+def _require_full_history(context: GitContext) -> None:
+    """A shallow checkout cannot prove ancestry, so it fails closed (2.9 R-2)."""
+    try:
+        (context.common_dir / "shallow").lstat()
+    except FileNotFoundError:
+        return
+    except OSError as exc:
+        raise _fail("GIT_OBJECT_STORE_UNAVAILABLE") from exc
+    raise _fail("GOVERNANCE_HISTORY_SHALLOW")
+
+
+def _commit_parents(store: _GitObjectStore, commit_id: str) -> list[str]:
+    value = store.read(commit_id)
+    if value.object_type != "commit":
+        raise _fail("GOVERNANCE_COMMIT_INVALID")
+    header = value.payload.split(b"\n\n", 1)[0].split(b"\n")
+    if not header[0].startswith(b"tree "):
+        raise _fail("GIT_OBJECT_INVALID")
+    parents: list[str] = []
+    for line in header[1:]:
+        if not line.startswith(b"parent "):
+            break
+        try:
+            parent = line[7:].decode("ascii")
+        except UnicodeDecodeError as exc:
+            raise _fail("GIT_OBJECT_INVALID") from exc
+        if len(parent) != len(commit_id) or re.fullmatch(r"[0-9a-f]+", parent) is None:
+            raise _fail("GIT_OBJECT_INVALID")
+        parents.append(parent)
+    return parents
+
+
+def _require_governance_ancestor(
+    context: GitContext, store: _GitObjectStore, head: str, commit: str
+) -> None:
+    """Require the commit to be HEAD or an ancestor of HEAD, from local objects only."""
+    _require_full_history(context)
+    try:
+        value = store.read(commit)
+    except ClosePackError as exc:
+        if str(exc) == "GIT_OBJECT_MISSING":
+            raise _fail("GOVERNANCE_COMMIT_ABSENT") from exc
+        raise
+    if value.object_type != "commit":
+        raise _fail("GOVERNANCE_COMMIT_INVALID")
+    queue = deque([head])
+    seen = {head}
+    while queue:
+        current = queue.popleft()
+        if current == commit:
+            return
+        try:
+            parents = _commit_parents(store, current)
+        except ClosePackError as exc:
+            if str(exc) == "GIT_OBJECT_MISSING":
+                raise _fail("GOVERNANCE_HISTORY_INCOMPLETE") from exc
+            raise
+        for parent in parents:
+            if parent in seen:
+                continue
+            if len(seen) >= MAX_GIT_ANCESTRY_COMMITS:
+                raise _fail("GOVERNANCE_HISTORY_INCOMPLETE")
+            seen.add(parent)
+            queue.append(parent)
+    raise _fail("GOVERNANCE_COMMIT_NOT_ANCESTOR")
+
+
+def _governance_binding(
+    context: GitContext, store: _GitObjectStore, head: str, commit: object
+) -> GovernanceBinding:
+    """Read both governance documents at the commit (2.9 R-1)."""
+    if (
+        not isinstance(commit, str)
+        or len(commit) != len(head)
+        or re.fullmatch(r"[0-9a-f]+", commit) is None
+    ):
+        raise _fail("GOVERNANCE_COMMIT_INVALID")
+    _require_governance_ancestor(context, store, head, commit)
+    tree = _tree_entries_at(store, commit)
+    snapshots: list[FileSnapshot] = []
+    for rel in (GOVERNANCE_DECISION_RECORD_REL, SCHEMA_V2_REL):
+        entry = tree.get(rel)
+        if entry is None or entry.object_type != "blob" or entry.mode not in REGULAR_GIT_MODES:
+            raise _fail("GOVERNANCE_DOCUMENT_MISSING")
+        payload = _git_blob_payload(context, entry.object_id, store)
+        if not payload:
+            raise _fail("GOVERNANCE_DOCUMENT_MISSING")
+        # Read from the commit's tree, never the working tree: no fingerprint applies.
+        snapshots.append(FileSnapshot(rel, entry.object_id, payload, (0, 0, 0, 0, 0, 0)))
+    return GovernanceBinding(commit, snapshots[0], snapshots[1])
+
+
+def _governance_manifest_block(governance: GovernanceBinding) -> dict[str, object]:
+    return {
+        "commit": governance.commit,
+        "decision_record": _binding(governance.decision_record),
+        "source_schema": _binding(governance.source_schema),
+    }
+
+
+def _committed_governance(
+    root: Path,
+    context: GitContext,
+    store: _GitObjectStore,
+    tree: Mapping[str, GitTreeEntry],
+    source_rel: str,
+) -> tuple[object, object]:
+    """Read the governance block of the committed manifest the source derives."""
+    source = _capture_input(root, context, store, tree, source_rel)
+    document = _strict_json(source.payload, code="SOURCE_JSON_INVALID")
+    change_id = document.get("change_id") if isinstance(document, dict) else None
+    if not isinstance(change_id, str) or CHANGE_RE.fullmatch(change_id) is None:
+        raise _fail("SOURCE_SCHEMA_INVALID")
+    _, manifest_rel = _derived_paths_v2(change_id)
+    entry = tree.get(manifest_rel)
+    if entry is None:
+        raise _fail("OUTPUT_MISSING")
+    if entry.object_type != "blob" or entry.mode != "100644":
+        raise _fail("OUTPUT_MODE_MISMATCH")
+    manifest = _strict_json(
+        _git_blob_payload(context, entry.object_id, store), code="MANIFEST_JSON_INVALID"
+    )
+    block = manifest.get("governance") if isinstance(manifest, dict) else None
+    if (
+        not isinstance(block, dict)
+        or set(block) != GOVERNANCE_BLOCK_KEYS
+        or not isinstance(block["commit"], str)
+    ):
+        raise _fail("GOVERNANCE_BINDING_ABSENT")
+    return block["commit"], block
 
 
 def _derived_paths_v2(change_id: str) -> tuple[str, str]:
@@ -2885,12 +3064,12 @@ def _load_model_v2(
     tree: Mapping[str, GitTreeEntry],
     *,
     verify_canon: bool,
+    governance: GovernanceBinding,
 ) -> tuple[CandidateModelV2, tuple[FileSnapshot, ...]]:
     remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
     _require_admitted_causal_input(source_rel)
-    schema_input = _capture_input(
-        root, context, store, tree, SCHEMA_V2_REL, max_bytes=remaining_input_bytes
-    )
+    # The v2 schema is bound at the governance commit, never at HEAD (HDE-CRD-0003 S15).
+    schema_input = governance.source_schema
     remaining_input_bytes -= len(schema_input.payload)
     source_input = _capture_input(
         root, context, store, tree, source_rel, max_bytes=remaining_input_bytes
@@ -2926,8 +3105,10 @@ def _load_model_v2(
         if binding in bindings or rel in evidence_paths:
             raise _fail("EVIDENCE_BINDING_AMBIGUOUS")
         _require_admitted_causal_input(rel)
-        snapshot = _capture_input(
-            root, context, store, tree, rel, max_bytes=remaining_input_bytes
+        snapshot = (
+            governance.decision_record
+            if rel == GOVERNANCE_DECISION_RECORD_REL
+            else _capture_input(root, context, store, tree, rel, max_bytes=remaining_input_bytes)
         )
         remaining_input_bytes -= len(snapshot.payload)
         bindings[binding] = snapshot
@@ -2982,11 +3163,16 @@ def _load_model_v2(
         report_path=report_path,
         manifest_path=manifest_path,
         qa_primaries=tuple(qa_primaries),
+        governance=governance,
     )
     snapshots = (
-        schema_input,
         source_input,
-        *(snapshot for _, snapshot in model.evidence_inputs),
+        # Governance documents come from the governance commit, not the working tree.
+        *(
+            snapshot
+            for _, snapshot in model.evidence_inputs
+            if snapshot.rel != GOVERNANCE_DECISION_RECORD_REL
+        ),
         *model.qa_primaries,
     )
     return model, snapshots
@@ -3226,6 +3412,7 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
     manifest = {
         "change_id": source["change_id"],
         "closure_decision": dict(decision),
+        "governance": _governance_manifest_block(model.governance),
         "inputs": {
             "candidate_source": _binding(model.source_input),
             "evidence": [
@@ -4737,13 +4924,21 @@ def _run_write(
     index_state: Mapping[
         str, tuple[int, int, int, int, int, int, int, str] | None
     ],
+    governance_commit: str | None = None,
 ) -> tuple[str, str]:
     metadata_before = _repository_metadata(root)
     if _git_control_state((context.git_dir / "index",)) != index_state:
         raise _fail("GIT_CONTROL_STATE_CHANGED")
     if _head(context) != head:
         raise _fail("GIT_HEAD_CHANGED")
-    model, snapshots = _load_model(root, context, head, source_rel, verify_canon=True)
+    model, snapshots = _load_model(
+        root,
+        context,
+        head,
+        source_rel,
+        verify_canon=True,
+        governance_commit=governance_commit,
+    )
     outputs = _render_twice(model)
     _verify_snapshots(root, context, head, snapshots)
     tree = _tree_entries(context)
@@ -4828,7 +5023,7 @@ def _run_check(
     _require_clean(root, context)
     primary_error: BaseException | None = None
     try:
-        model, snapshots = _load_model(root, context, head, source_rel)
+        model, snapshots = _load_model(root, context, head, source_rel, check=True)
         outputs = _render_twice(model)
         _verify_snapshots(root, context, head, snapshots)
         store = _GitObjectStore(context)
@@ -4898,6 +5093,19 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         action="store_true",
         help="validate the exact committed pair without writing",
     )
+    parser.add_argument(
+        "--governance-commit",
+        default=None,
+        help="v2 --write only: the commit on main at which the pack binds its governance documents",
+    )
+    governance_arguments = sum(
+        argument == "--governance-commit" or argument.startswith("--governance-commit=")
+        for argument in arguments
+    )
+    if governance_arguments > 1:
+        parser.error("at most one --governance-commit is allowed")
+    if governance_arguments and "--check" in arguments:
+        parser.error("--governance-commit applies to --write only")
     if sum(
         argument == "--source" or argument.startswith("--source=")
         for argument in arguments
@@ -4928,6 +5136,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 head,
                 source_rel,
                 index_state,
+                args.governance_commit,
             )
         else:
             git_control_paths = _git_control_paths(context)
