@@ -65,9 +65,10 @@ def test_pf17_directional_source_export_is_exact_and_current():
 
 def test_pf18_source_digest_is_pinned(tmp_path):
     from tools.evidence import generate_narrative_registry_diff as generator
+    from tools.pf_tool_inputs.resolver import pf_document
 
     changed_source = tmp_path / "PF18.md"
-    changed_source.write_bytes(generator.PF18_SOURCE_PATH.read_bytes() + b"\n")
+    changed_source.write_bytes(pf_document("PF18").read_bytes() + b"\n")
 
     with pytest.raises(generator.RegistryDiffError, match="source digest mismatch"):
         generator._pf18_source_records(changed_source)

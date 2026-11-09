@@ -18,11 +18,25 @@ from enum import Enum
 from pathlib import Path, PurePosixPath
 
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
+from tools.pf_tool_inputs.resolver import PfToolInputError, pf_document
 
 EPIC_RE = re.compile(r"HDE-EPIC([0-9]{3})\Z")
 CRD_RE = re.compile(r"HDE-CRD-[0-9]{4,}\Z")
 CHECK_RE = re.compile(r"[a-z0-9][a-z0-9._-]*\Z")
 LEGACY_CHECK_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
+# The PF titles each check result cites (PF27 v2 pf_refs). An owner test holds each to a
+# document named in the PF tool-input manifest (HDE-CRD-0003 S17).
+PYTEST_CHECK_PF_REFS = (
+    "PF14-Canon-HDE-Mechanics-Guide",
+    "PF19-Canon-Glow-QA-Guide",
+    "PF27-Canon-Plan-Templates",
+)
+VIABILITY_PF_REFS = (
+    "PF04-Canon-HDE-Governance",
+    "PF14-Canon-HDE-Mechanics-Guide",
+    "PF19-Canon-Glow-QA-Guide",
+    "PF27-Canon-Plan-Templates",
+)
 PF_TITLE_RE = re.compile(
     r"PF[0-9]{2}(?:\.[0-9]+)?-(?:Canon|Reference)-[A-Za-z0-9][A-Za-z0-9-]*\Z"
 )
@@ -1057,6 +1071,18 @@ def _valid_graph_timestamp(value: object) -> bool:
     return True
 
 
+def _pf04_governance_sources(repo_root: Path) -> tuple[Path, ...]:
+    """The vendored PF04 Governance source from the PF tool inputs (HDE-CRD-0003 S17).
+
+    One path, or none when the tool-input set cannot resolve a sound vendored copy.
+    """
+
+    try:
+        return (pf_document("PF04", root=repo_root),)
+    except PfToolInputError:
+        return ()
+
+
 class _EvidenceGovernanceValidator:
     """Validate acceptance evidence against one immutable per-evaluation graph."""
 
@@ -1274,13 +1300,7 @@ class _EvidenceGovernanceValidator:
         """Re-read captured governance inputs before the evaluation can report PASS."""
 
         if self._pf04_sources is not None:
-            current_pf04_sources = tuple(
-                sorted(
-                    (self._config.repo_root / "docs" / "pfcanon").glob(
-                        "PF04-Canon-HDE-Governance-v*.md"
-                    )
-                )
-            )
+            current_pf04_sources = _pf04_governance_sources(self._config.repo_root)
             if current_pf04_sources != self._pf04_sources:
                 return (
                     Status.FAIL_TOOLING,
@@ -2297,11 +2317,7 @@ def run_pytest_check(
         intended_tokens=(
             () if status is Status.TOOLING_BLOCKED else tuple(intended_tokens)
         ),
-        pf_refs=(
-            "PF14-Canon-HDE-Mechanics-Guide",
-            "PF19-Canon-Glow-QA-Guide",
-            "PF27-Canon-Plan-Templates",
-        ),
+        pf_refs=PYTEST_CHECK_PF_REFS,
     )
 
 
@@ -2526,11 +2542,7 @@ def _governance_tokens(
     captured_bytes: bytes | None = None,
 ) -> tuple[set[str] | None, str]:
     if captured_bytes is None:
-        matches = sorted(
-            (config.repo_root / "docs" / "pfcanon").glob(
-                "PF04-Canon-HDE-Governance-v*.md"
-            )
-        )
+        matches = _pf04_governance_sources(config.repo_root)
         if len(matches) != 1:
             return None, "exactly one current PF04 Governance source is required"
         status, reason, captured_bytes = _read_stable_repo_file_bytes(
@@ -3497,13 +3509,7 @@ def evaluate_acceptance_map_viability(
     acceptance_identity_is_valid = True
     governance_validator = _EvidenceGovernanceValidator(config)
 
-    pf04_sources = tuple(
-        sorted(
-            (config.repo_root / "docs" / "pfcanon").glob(
-                "PF04-Canon-HDE-Governance-v*.md"
-            )
-        )
-    )
+    pf04_sources = _pf04_governance_sources(config.repo_root)
     governance_validator.set_pf04_sources(pf04_sources)
     if len(pf04_sources) != 1:
         registry: set[str] | None = None
@@ -3902,12 +3908,7 @@ def evaluate_acceptance_map_viability(
             else ()
         ),
         intended_tokens=(),
-        pf_refs=(
-            "PF04-Canon-HDE-Governance",
-            "PF14-Canon-HDE-Mechanics-Guide",
-            "PF19-Canon-Glow-QA-Guide",
-            "PF27-Canon-Plan-Templates",
-        ),
+        pf_refs=VIABILITY_PF_REFS,
     )
     return result, evaluation_content
 

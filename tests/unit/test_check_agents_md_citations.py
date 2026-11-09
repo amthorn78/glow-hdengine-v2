@@ -5,6 +5,9 @@ from pathlib import Path
 
 import pytest
 
+from tools.pf_tool_inputs.refresh import git_blob_id, write_input_set
+from tools.pf_tool_inputs.resolver import MANIFEST_REL, pf_entries
+
 ROOT = Path(__file__).resolve().parents[2]
 _SPEC = importlib.util.spec_from_file_location(
     "check_agents_md_citations", ROOT / "ci" / "checks" / "check_agents_md_citations.py"
@@ -66,16 +69,24 @@ def test_permitted_lines_pass(line: str) -> None:
     assert check.scan(line + "\n", TITLES) == []
 
 
-def test_titles_derive_from_pfcanon_filenames(tmp_path: Path) -> None:
-    for name in (
-        "PF04-Canon-HDE-Governance-v2.8.6.md",
-        "PF19-Canon-Glow-QA-Guide-v3.0.5.md",
-        "PF10-HDE-Build-Notes-v13.4.1.md",
-        "PF08-Reference-Human Design System.md",
-        "PF-Reference-Glow Story.md",
-    ):
-        (tmp_path / name).write_text("x\n", encoding="utf-8")
-    titles = check.pf_titles(tmp_path)
+def _manifest_entries(root: Path, names: tuple[str, ...]):
+    """PF tool-input manifest entries for these file names (HDE-CRD-0003 S17)."""
+    write_input_set(root, "0" * 40, [(name, b"x\n", git_blob_id(b"x\n")) for name in names], vendored_ids=())
+    return pf_entries(root)
+
+
+def test_titles_come_from_the_pf_tool_input_manifest(tmp_path: Path) -> None:
+    entries = _manifest_entries(
+        tmp_path,
+        (
+            "PF04-Canon-HDE-Governance-v2.8.6.md",
+            "PF19-Canon-Glow-QA-Guide-v3.0.5.md",
+            "PF10-HDE-Build-Notes-v13.4.1.md",
+            "PF08-Reference-Human Design System.md",
+            "PF-Reference-Glow Story.md",
+        ),
+    )
+    titles = check.pf_titles(entries)
     assert "HDE Governance" in titles and "Glow QA Guide" in titles
     assert "Human Design System" in titles and "Glow Story" in titles
     assert not any("Build Notes" in title for title in titles)
@@ -85,10 +96,37 @@ def test_repository_agents_md_passes() -> None:
     assert check.main(ROOT) == 0
 
 
+def _agents_copy(root: Path, extra: str) -> None:
+    (root / "AGENTS.md").write_text((ROOT / "AGENTS.md").read_text(encoding="utf-8") + extra, encoding="utf-8")
+    manifest = root / MANIFEST_REL
+    manifest.parent.mkdir(parents=True)
+    manifest.write_bytes((ROOT / MANIFEST_REL).read_bytes())
+
+
+def test_a_cited_pf_title_is_refused(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    # HDE-CRD-0003 S17: the repository's AGENTS.md, with one sentence citing a PF title
+    # from the PF tool-input manifest, is refused.
+    _agents_copy(tmp_path, "\nFollow the HDE Governance rules.\n")
+    assert check.main(tmp_path) == 1
+    assert ":pf_title:HDE Governance" in capsys.readouterr().err
+
+
+def test_a_cited_pf_file_name_is_refused(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    (name,) = [e.file_name for e in pf_entries(ROOT) if e.pf_id == "PF19"]
+    _agents_copy(tmp_path, f"\nThe rules are in {name}.\n")
+    assert check.main(tmp_path) == 1
+    assert f":pf_filename:{name.removesuffix('.md')}" in capsys.readouterr().err
+
+
+def test_an_unreadable_manifest_fails_the_check(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    (tmp_path / "AGENTS.md").write_text((ROOT / "AGENTS.md").read_text(encoding="utf-8"), encoding="utf-8")
+    assert check.main(tmp_path) == 2
+    assert "AGENTS_MD_CITATIONS_PF_INPUTS_INVALID:PF_TOOL_INPUTS_MANIFEST_MISSING" in capsys.readouterr().err
+
+
 def test_single_word_and_exact_file_names(tmp_path: Path) -> None:
-    (tmp_path / "PF-Invocation.md").write_text("x\n", encoding="utf-8")
-    (tmp_path / "PF10-HDE-Build-Notes-v13.4.1.md").write_text("x\n", encoding="utf-8")
-    stems, single = check.pf_names(tmp_path)
+    entries = _manifest_entries(tmp_path, ("PF-Invocation.md", "PF10-HDE-Build-Notes-v13.4.1.md"))
+    stems, single = check.pf_names(entries)
     assert stems == ["PF-Invocation"] and single == ["Invocation"]
     assert any(":pf_filename:" in r for r in check.scan_names("see PF-Invocation.md\n", stems, single))
     assert any(":pf_title:" in r for r in check.scan_names("per the Invocation document\n", stems, single))

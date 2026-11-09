@@ -28,6 +28,9 @@ SHA_RE = re.compile(r"[0-9a-fA-F]{40,64}\Z")
 _FULL_VALIDATION_PREFIXES = (
     ".claude/",  # agent hooks execute shell commands every session turn
     ".github/",
+    # HDE-CRD-0003 S17: the PF tool inputs (manifest, vendored copies, resolver and
+    # refresh tool) feed readers in several lanes, so a change to them selects every lane.
+    "tools/pf_tool_inputs/",
 )
 _FULL_VALIDATION_PATHS = {
     ".gitignore",
@@ -656,7 +659,12 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     "tools/evidence/generate_hde_epic037_v2_adapter.py": (
         "tests/evidence/test_hde_epic037_v2_adapter.py",
     ),
-    "tools/evidence/generate_narrative_registry_diff.py": _NARRATIVE_TEST_OWNERS,
+    "tools/evidence/generate_narrative_registry_diff.py": (
+        *_NARRATIVE_TEST_OWNERS,
+        # HDE-CRD-0003 S17: its PF18 pin is checked against the PF tool inputs.
+        "tests/tools/test_pf_tool_inputs.py",
+        "tests/tools/test_pf_document_reader_guard.py",
+    ),
     # HDE-EPIC040-PR04: generators exercised through pytest and the F01 overlay gates.
     "tools/evidence/generate_open_rails_abba_proof.py": (
         "tests/evidence/test_open_rails_abba_proof.py",
@@ -823,8 +831,10 @@ _QA_TOOL_TEST_OWNERS = {
     "tools/qa/generate_epic_close_pack.py": (
         "tests/qa/test_generate_epic_close_pack.py",
         _QA_TOOL_OWNERSHIP_TEST,
+        "tests/tools/test_pf_document_reader_guard.py",
     ),
-    "tools/qa/qa_harness.py": _QA_TEST_OWNERS + (_QA_TOOL_OWNERSHIP_TEST,),
+    "tools/qa/qa_harness.py": _QA_TEST_OWNERS
+    + (_QA_TOOL_OWNERSHIP_TEST, "tests/tools/test_pf_document_reader_guard.py"),
     "tools/qa/refresh_epic024_step_logs_manifest.py": (
         _QA_TOOL_OWNERSHIP_TEST,
     ),
@@ -880,7 +890,18 @@ _BODYGRAPH_TOOL_TEST_OWNERS = {
 _CI_TOOL_PREFIX = "tools/ci/"
 _CI_TOOL_LANES = frozenset({"product"})
 _CI_TOOL_TEST_OWNERS = {
-    "tools/ci/prepush_check.py": ("tests/tools/test_prepush_check.py",),
+    "tools/ci/prepush_check.py": (
+        "tests/tools/test_prepush_check.py",
+        "tests/tools/test_pf_document_reader_guard.py",
+    ),
+}
+# HDE-CRD-0003 S17: the owner tests of the PF tool inputs. The prefix is a full-validation
+# path, so these run with every full validation; registering them keeps them in it.
+_PF_TOOL_INPUT_TEST_OWNERS = {
+    "tools/pf_tool_inputs/": (
+        "tests/tools/test_pf_tool_inputs.py",
+        "tests/tools/test_pf_document_reader_guard.py",
+    ),
 }
 # Governed chart fixtures consumed by the dev GET /reader route and its tests.
 _FIXTURE_LANE_PREFIXES = (
@@ -1114,6 +1135,8 @@ def _registered_owner_test_paths() -> set[str]:
     for targets in _BODYGRAPH_TOOL_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _CI_TOOL_TEST_OWNERS.values():
+        paths.update(targets)
+    for targets in _PF_TOOL_INPUT_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _TEST_SUPPORT_OWNER_PATHS.values():
         paths.update(targets)

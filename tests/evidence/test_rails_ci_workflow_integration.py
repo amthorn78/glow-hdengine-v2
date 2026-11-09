@@ -1134,12 +1134,13 @@ def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
             classifier.changed_test_targets(ROOT, (source,))
     assert classifier.changed_test_targets(
         ROOT, ("tools/qa/qa_harness.py",)
-    ) == (classifier._QA_TOOL_OWNERSHIP_TEST,)
+    ) == (classifier._QA_TOOL_OWNERSHIP_TEST, _PF_DOCUMENT_READER_GUARD)
     assert classifier.changed_test_targets(
         ROOT, ("tools/qa/generate_epic_close_pack.py",)
     ) == (
         "tests/qa/test_generate_epic_close_pack.py",
         classifier._QA_TOOL_OWNERSHIP_TEST,
+        _PF_DOCUMENT_READER_GUARD,
     )
     assert classifier.changed_test_targets(
         ROOT, ("schemas/epic_close_candidate_source.v1.json",)
@@ -2449,3 +2450,40 @@ def test_every_tracked_test_module_is_reached_by_a_lane_or_full_validation_targe
         | set(classifier._CLOSE_STAGE_TESTS)
     )
     assert [path for path in tracked if not _reached(path, roots)] == []
+
+
+_PF_TOOL_INPUT_OWNER_TEST = "tests/tools/test_pf_tool_inputs.py"
+_PF_DOCUMENT_READER_GUARD = "tests/tools/test_pf_document_reader_guard.py"
+
+
+@pytest.mark.parametrize(
+    "path",
+    (
+        "tools/pf_tool_inputs/manifest.json",
+        "tools/pf_tool_inputs/documents/PF18.md",
+        "tools/pf_tool_inputs/resolver.py",
+        "tools/pf_tool_inputs/refresh.py",
+    ),
+)
+def test_a_pf_tool_input_change_selects_full_validation(path: str) -> None:
+    # HDE-CRD-0003 S17: a change that removes or alters the PF tool inputs selects every lane
+    # that runs a reader of them, and the full-validation targets, which include their owners.
+    result = classifier.classify_paths((path,))
+    assert all(result.flags[lane] for lane in classifier.LANES), path
+    expected = classifier._full_validation_test_targets()
+    assert {_PF_TOOL_INPUT_OWNER_TEST, _PF_DOCUMENT_READER_GUARD} <= set(expected)
+    assert classifier.changed_test_targets(ROOT, (path,)) == expected
+
+
+def test_a_pf_document_reader_change_runs_the_guard() -> None:
+    # HDE-CRD-0003 S17 (RK-12): a change to a reader of PF documents runs the reader guard.
+    for reader in (
+        "tools/evidence/generate_narrative_registry_diff.py",
+        "tools/qa/qa_harness.py",
+        "tools/qa/generate_epic_close_pack.py",
+        "tools/ci/prepush_check.py",
+    ):
+        assert _PF_DOCUMENT_READER_GUARD in classifier.changed_test_targets(ROOT, (reader,)), reader
+    assert _PF_TOOL_INPUT_OWNER_TEST in classifier.changed_test_targets(
+        ROOT, ("tools/evidence/generate_narrative_registry_diff.py",)
+    )

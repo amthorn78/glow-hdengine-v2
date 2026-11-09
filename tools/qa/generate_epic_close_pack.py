@@ -2243,8 +2243,12 @@ QA_PRIMARY_INPUT_RE = re.compile(
 )
 # Planning documents live under docs/ephemeral/ only while a change is planned, and PF-Canon
 # under docs/pfcanon/ changes version at any time, so neither is ever a causal input, pointer or
-# output (HDE Build Notes). The v2 source records the facts the writer needs instead.
-PLANNING_OR_CANON_PATH_RE = re.compile(r"docs/(?:ephemeral|pfcanon)(?:/|\Z)", re.IGNORECASE)
+# output (HDE Build Notes). The v2 source records the facts the writer needs instead. The PF
+# tool inputs under tools/pf_tool_inputs/ are copies of PF documents refreshed at any time, so
+# no pack binds them either (HDE-CRD-0003 S17).
+PLANNING_OR_CANON_PATH_RE = re.compile(
+    r"(?:docs/(?:ephemeral|pfcanon)|tools/pf_tool_inputs)(?:/|\Z)", re.IGNORECASE
+)
 PRIMARY_HEADER_SCHEMA = "pf27.step_log_header.v2"
 # The PF27 v2 header contract of tools/qa/qa_harness.py (_parse_primary_header, with
 # _parse_crd_primary's rules for a CRD), restated here because the writer imports only the
@@ -2285,11 +2289,17 @@ COVERAGE_STATUS = {
 # register's stable PF title, never by a versioned file name (HDE Build Notes).
 CRD_REGISTER_TITLE = "HDE CRD Records"
 EPIC_REGISTER_TITLE_PREFIX = "HDE Build Checklist "
-# A PF title is a tracked PF-Canon file's name, after its PF number and kind and before its
-# version, hyphens read as spaces and "&" as "and" (PO-35-16). The tracked names separate those
-# parts with hyphens, spaces or both, and some carry no number or no version (CX7-19).
+# A PF title is a PF-Canon file's name, after its PF number and kind and before its version,
+# hyphens read as spaces and "&" as "and" (PO-35-16). The names separate those parts with
+# hyphens, spaces or both, and some carry no number or no version (CX7-19). The names are those
+# of docs/hde/pfcanon/ in amthorn78/glow-docs, as the PF tool-input manifest tracked at HEAD
+# records them, and a register is read from its vendored copy there (HDE-CRD-0003 S17). The
+# writer reads that manifest as data, because its imports stay the standard library and
+# jsonschema; tests hold it in agreement with tools/pf_tool_inputs/resolver.py.
+PF_TOOL_INPUTS_MANIFEST_REL = "tools/pf_tool_inputs/manifest.json"
+PF_TOOL_INPUTS_DOCUMENTS_REL = "tools/pf_tool_inputs/documents"
 PF_DOCUMENT_RE = re.compile(
-    r"docs/pfcanon/PF(?:[0-9]{2}(?:\.[0-9]+)?)?[- ]+(?:(?:Canon|Reference)[- ]+)?"
+    r"PF(?:[0-9]{2}(?:\.[0-9]+)?)?[- ]+(?:(?:Canon|Reference)[- ]+)?"
     r"(?P<name>[A-Za-z0-9&'](?:[A-Za-z0-9&' -]*?[A-Za-z0-9&'])?)"
     r"(?:[- ]?v[0-9]+(?:\.[0-9]+)*)?\.md\Z"
 )
@@ -2434,12 +2444,37 @@ def _pf_title_key(title: str) -> str:
     return " ".join(title.replace("-", " ").split()).replace(" & ", " and ")
 
 
-def _pf_titles(tracked_paths: Iterable[str]) -> frozenset[str]:
+def _pf_titles(file_names: Iterable[str]) -> frozenset[str]:
     return frozenset(
         _pf_title_key(match["name"])
-        for rel in tracked_paths
-        if (match := PF_DOCUMENT_RE.fullmatch(rel))
+        for name in file_names
+        if (match := PF_DOCUMENT_RE.fullmatch(name))
     )
+
+
+def _pf_tool_input_documents(
+    context: GitContext,
+    store: _GitObjectStore,
+    tree: Mapping[str, GitTreeEntry],
+) -> list[Mapping[str, Any]]:
+    # Write time only: the PF tool-input manifest tracked at HEAD, read as data. An absent or
+    # malformed manifest names no document, so every title is unknown (PF_TITLE_UNKNOWN) and
+    # every register pointer unbound (DEFERRAL_POINTER_UNBOUND).
+    entry = tree.get(PF_TOOL_INPUTS_MANIFEST_REL)
+    if entry is None or entry.object_type != "blob" or entry.mode not in REGULAR_GIT_MODES:
+        return []
+    try:
+        payload = json.loads(_git_blob_payload(context, entry.object_id, store).decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return []
+    documents = payload.get("documents") if isinstance(payload, dict) else None
+    if not isinstance(documents, list):
+        return []
+    return [
+        document
+        for document in documents
+        if isinstance(document, dict) and isinstance(document.get("file_name"), str)
+    ]
 
 
 def _qa_plan_checks(source: Mapping[str, Any]) -> list[str]:
@@ -2783,10 +2818,11 @@ def _require_canon_names_v2(
     store: _GitObjectStore,
     tree: Mapping[str, GitTreeEntry],
 ) -> None:
-    # Write time only. Every PF title names a tracked PF-Canon document (Change Process Guide
-    # 3.5.4; PO-35-16), and every drain-target heading occurs in the register its title names,
-    # each resolved by title to the version current at HEAD. PF-Canon is never a causal input, so
-    # a later canon version never invalidates a committed close pack (HDE Build Notes).
+    # Write time only. Every PF title names a PF-Canon document (Change Process Guide 3.5.4;
+    # PO-35-16), and every drain-target heading occurs in the register its title names, each
+    # resolved by title to the version the PF tool-input manifest at HEAD records (HDE-CRD-0003
+    # S17). PF-Canon is never a causal input, so a later canon version never invalidates a
+    # committed close pack (HDE Build Notes).
     titles = [
         *(home for item in source["later_drain_statements"] for home in item["canon_homes"]),
         *(
@@ -2800,7 +2836,8 @@ def _require_canon_names_v2(
             for title in gap["drain_targets"]
         ),
     ]
-    known_titles = _pf_titles(tree)
+    documents = _pf_tool_input_documents(context, store, tree)
+    known_titles = _pf_titles(str(document["file_name"]) for document in documents)
     if any(_pf_title_key(str(title)) not in known_titles for title in titles):
         raise _fail("PF_TITLE_UNKNOWN")
     for item in source["deferrals"]:
@@ -2808,15 +2845,35 @@ def _require_canon_names_v2(
             continue
         title = _pf_title_key(str(item["drain_target"]["register"]))
         registers = [
-            rel
-            for rel in tree
-            if (match := PF_DOCUMENT_RE.fullmatch(rel)) and _pf_title_key(match["name"]) == title
+            document
+            for document in documents
+            if (match := PF_DOCUMENT_RE.fullmatch(str(document["file_name"])))
+            and _pf_title_key(match["name"]) == title
         ]
         if len(registers) != 1 or not _heading_occurs(
             str(item["drain_target"]["heading"]),
-            _git_blob_payload(context, _require_tracked_regular(tree, registers[0]).object_id, store),
+            _pf_register_payload(context, store, tree, registers[0]),
         ):
             raise _fail("DEFERRAL_POINTER_UNBOUND")
+
+
+def _pf_register_payload(
+    context: GitContext,
+    store: _GitObjectStore,
+    tree: Mapping[str, GitTreeEntry],
+    document: Mapping[str, Any],
+) -> bytes:
+    # A register's vendored copy at HEAD, which must match the manifest's digest.
+    pf_id = document.get("pf_id")
+    if document.get("vendored") is not True or not isinstance(pf_id, str):
+        raise _fail("DEFERRAL_POINTER_UNBOUND")
+    entry = tree.get(f"{PF_TOOL_INPUTS_DOCUMENTS_REL}/{pf_id}.md")
+    if entry is None or entry.object_type != "blob" or entry.mode not in REGULAR_GIT_MODES:
+        raise _fail("DEFERRAL_POINTER_UNBOUND")
+    payload = _git_blob_payload(context, entry.object_id, store)
+    if hashlib.sha256(payload).hexdigest() != document.get("sha256"):
+        raise _fail("DEFERRAL_POINTER_UNBOUND")
+    return payload
 
 
 def _load_model_v2(
