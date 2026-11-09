@@ -1,9 +1,15 @@
+import hashlib
 import json
+import os
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
 from engine.compat.error_tokens import ERROR_TOKEN_MAP, admission_token_for
+import tools.errors.generate_error_artifacts as error_artifacts
 from tools.errors.generate_error_artifacts import (
     SCENARIOS,
     capture_cli,
@@ -162,3 +168,90 @@ def test_both_admission_tokens_carry_the_governed_503_status():
     for token in ("ERR_M10_MANIFEST_MISMATCH", "ERR_M10_CONFIG_MISMATCH"):
         assert token in ERROR_TOKEN_MAP
         assert MAGIC10_HTTP_STATUS[token] == 503
+
+
+# --- HDE-CRD-0003 S19-R04: asking an owner tool for usage changes nothing ------------------
+
+_FIXED_TIME_NS = 1_000_000_000_000_000_000
+
+
+def _tracked_copy(destination: Path) -> Path:
+    """Copy every tracked file, with one fixed old mtime, so any rewrite is visible."""
+
+    listed = subprocess.run(
+        ["git", "-C", str(error_artifacts.ROOT), "ls-files", "-z"], check=True, capture_output=True
+    ).stdout
+    for raw in listed.split(b"\0"):
+        if not raw:
+            continue
+        rel = raw.decode("utf-8")
+        source, target = error_artifacts.ROOT / rel, destination / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if source.is_symlink():
+            target.symlink_to(os.readlink(source))
+        elif source.is_file():
+            shutil.copy2(source, target)
+            os.utime(target, ns=(_FIXED_TIME_NS, _FIXED_TIME_NS))
+    return destination
+
+
+def _tree_state(root: Path) -> dict[str, tuple[object, ...]]:
+    state: dict[str, tuple[object, ...]] = {}
+    for directory, names, files in os.walk(root):
+        for name in names + files:
+            path = Path(directory) / name
+            info = path.lstat()
+            body = (
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                if path.is_file() and not path.is_symlink()
+                else None
+            )
+            state[path.relative_to(root).as_posix()] = (
+                info.st_mode, info.st_size, info.st_mtime_ns, info.st_ino, body,
+            )
+    return state
+
+
+def _run_in_copy(copy: Path, tool: str, *args: str) -> subprocess.CompletedProcess[str]:
+    env = {**os.environ, **DETERMINISM_PINS, "PYTHONDONTWRITEBYTECODE": "1"}
+    return subprocess.run(
+        [sys.executable, tool, *args], cwd=copy, env=env, capture_output=True, text=True, timeout=600
+    )
+
+
+_TOOL = "tools/errors/generate_error_artifacts.py"
+
+
+def test_error_artifact_tool_help_changes_no_file(tmp_path):
+    copy = _tracked_copy(tmp_path / "tree")
+    before = _tree_state(copy)
+    result = _run_in_copy(copy, _TOOL, "--help")
+    assert result.returncode == 0
+    assert result.stdout.startswith("usage:") and result.stderr == ""
+    assert _tree_state(copy) == before
+
+
+def test_error_artifact_tool_without_arguments_reproduces_the_tracked_outputs(tmp_path):
+    copy = _tracked_copy(tmp_path / "tree")
+    result = _run_in_copy(copy, _TOOL)
+    assert result.returncode == 0, result.stderr
+    changed = sorted(
+        rel
+        for rel, (_mode, _size, mtime, _ino, _body) in _tree_state(copy).items()
+        if (copy / rel).is_file() and mtime != _FIXED_TIME_NS
+    )
+    assert "errors/token_map/token_map.json" in changed
+    for rel in changed:
+        assert (copy / rel).read_bytes() == (error_artifacts.ROOT / rel).read_bytes(), rel
+
+
+def test_error_artifact_tool_main_parses_an_empty_argument_list(monkeypatch):
+    calls: list[str] = []
+    monkeypatch.setattr(error_artifacts, "write_parity_artifacts", lambda: calls.append("write"))
+    monkeypatch.setattr(sys, "argv", ["pytest", "--unknown-pytest-option"])
+    assert error_artifacts.main() == 0
+    assert error_artifacts.main([]) == 0
+    assert calls == ["write", "write"]
+    with pytest.raises(SystemExit) as usage:
+        error_artifacts.main(["--help"])
+    assert usage.value.code == 0 and calls == ["write", "write"]

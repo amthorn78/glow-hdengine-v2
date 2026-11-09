@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import subprocess
@@ -316,5 +317,23 @@ def write_parity_artifacts() -> None:
     (parity_dir / "README.md").write_text(readme, encoding="utf-8")
 
 
-if __name__ == "__main__":
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Regenerate the error parity captures, schema-check logs and the release "
+            "member errors/token_map/token_map.json."
+        )
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Parse arguments before any write (HDE-CRD-0003 S19-R04)."""
+
+    parse_args([] if argv is None else list(argv))
     write_parity_artifacts()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))
