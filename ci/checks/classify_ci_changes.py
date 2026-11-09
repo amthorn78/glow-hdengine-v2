@@ -408,37 +408,61 @@ _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS = {
     # This indirect owner validates Reader's public log-route identifier.
     "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
 }
+# HDE-CRD-0003 S16 (WU-PR-03): the score-distribution utility's owner test. It owns the
+# tool's files and joins the owners of every scoring configuration and code path (EC-20).
+_SCORE_DISTRIBUTION_OWNER_TEST = "tests/tools/test_score_distribution.py"
 _PRODUCT_TEST_OWNER_PATHS = {
     "engine/core/core.py": (
         "tests/core/test_engine_core_purity.py",
         "tests/core/test_engine_core_abba.py",
         "tests/core/test_engine_core_determinism.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
-    "engine/core/__init__.py": ("tests/core/test_engine_core_purity.py",),
+    "engine/core/__init__.py": (
+        "tests/core/test_engine_core_purity.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
+    ),
     "engine/magic10/composite.py": (
         "tests/core/test_engine_core_determinism.py",
         "tests/core/test_engine_core_abba.py",
         "tests/core/test_engine_core_purity.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "engine/magic10/signals.py": (
         "tests/core/test_engine_core_determinism.py",
         "tests/core/test_engine_core_purity.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "engine/magic10/calculators.py": (
         "tests/m10/test_thresholds_rounding.py",
         "tests/core/test_engine_core_determinism.py",
         "tests/core/test_engine_core_purity.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "engine/magic10/__init__.py": (
         "tests/m10/test_defs_order.py",
         "tests/core/test_engine_core_purity.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
-    "engine/bodygraph/gates.py": ("tests/bodygraph/test_gates.py",),
+    "catalog/gates_v1.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "catalog/magic10.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "catalog/magic10_caps.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "catalog/magic10_seeds.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "math/thresholds.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "engine/magic10/thresholds.py": (
+        "tests/compat/test_thresholds_constants_pack.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
+    ),
+    "engine/bodygraph/gates.py": (
+        "tests/bodygraph/test_gates.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
+    ),
     "catalog/channels_v1.json": (
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
         "tests/compare/test_arrays_as_sets.py",
         "tests/evidence/test_canonical_json_gate_check_outputs.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "schemas/channels_v1.schema.json": (
         "tests/config/test_registry_catalog_contract.py",
@@ -446,7 +470,10 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/compare/test_arrays_as_sets.py",
         "tests/evidence/test_canonical_json_gate_check_outputs.py",
     ),
-    "catalog/magic10_mechanics_v1.json": ("tests/config/test_magic10_contracts.py",),
+    "catalog/magic10_mechanics_v1.json": (
+        "tests/config/test_magic10_contracts.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
+    ),
     "schemas/magic10_mechanics_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
     "schemas/magic10_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
     "schemas/magic10_compat_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
@@ -459,6 +486,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/config/test_production_admission.py",
         "tests/config/test_execution_coherence.py",
         "tests/config/test_typed_bundles.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "engine/serializer/canon.py": (
         "tests/cli/test_serializer_guards.py",
@@ -472,6 +500,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "engine/categories/registry.py": (
         "tests/categories/test_registry_and_purity.py",
         "tests/config/test_execution_coherence.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "engine/config/bundles.py": ("tests/config/test_typed_bundles.py",),
     "catalog/manifest.json": (
@@ -526,6 +555,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/compat/test_evaluate_pair_eligibility.py",
         "tests/compat/test_conjunction_no_user_boundary.py",
         "tests/compat/test_hde_epic037_v2_adapter_to_compat.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "engine/bodygraph/resolver.py": (
         "tests/bodygraph/test_resolve_compat_chart.py",
@@ -895,6 +925,17 @@ _CI_TOOL_TEST_OWNERS = {
         "tests/tools/test_pf_document_reader_guard.py",
     ),
 }
+# HDE-CRD-0003 S16 (WU-PR-03): the score-distribution utility, its reference corpus and its
+# frozen baseline. Not a release member and it writes nothing. Every file under the prefix,
+# whatever its suffix, resolves to the owner test or fails closed; the stored-population
+# mode reads through DBAccess, so the db lane's direct-DB contract check runs on a change.
+_SCORE_DISTRIBUTION_TOOL_PREFIX = "tools/score_distribution/"
+_SCORE_DISTRIBUTION_TOOL_LANES = frozenset({"db", "product"})
+_SCORE_DISTRIBUTION_TOOL_TEST_OWNERS = {
+    "tools/score_distribution/reference_baseline_v1.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "tools/score_distribution/reference_corpus_v1.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "tools/score_distribution/score_distribution.py": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+}
 # HDE-CRD-0003 S17: the owner tests of the PF tool inputs. The prefix is a full-validation
 # path, so these run with every full validation; registering them keeps them in it.
 _PF_TOOL_INPUT_TEST_OWNERS = {
@@ -1135,6 +1176,8 @@ def _registered_owner_test_paths() -> set[str]:
     for targets in _BODYGRAPH_TOOL_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _CI_TOOL_TEST_OWNERS.values():
+        paths.update(targets)
+    for targets in _SCORE_DISTRIBUTION_TOOL_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _PF_TOOL_INPUT_TEST_OWNERS.values():
         paths.update(targets)
@@ -1410,6 +1453,25 @@ def _ci_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
         path,
         targets,
         error_code="CI_TOOL_OWNER_TEST_INVALID",
+    )
+
+
+def _score_distribution_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    """Resolve the owner of every file under the score-distribution tool (fail closed).
+
+    Unlike the source-only tool blocks, every suffix is resolved: the corpus and the
+    baseline are governed inputs whose change must run the owner test.
+    """
+    if not path.startswith(_SCORE_DISTRIBUTION_TOOL_PREFIX):
+        return ()
+    targets = _SCORE_DISTRIBUTION_TOOL_TEST_OWNERS.get(path)
+    if targets is None:
+        raise ValueError(f"CI_SCORE_DISTRIBUTION_OWNER_TEST_MISSING:{path}")
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_SCORE_DISTRIBUTION_OWNER_TEST_INVALID",
     )
 
 
@@ -1761,6 +1823,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
         targets.update(_qa_tool_owner_targets(repo_root, path))
         targets.update(_bodygraph_tool_owner_targets(repo_root, path))
         targets.update(_ci_tool_owner_targets(repo_root, path))
+        targets.update(_score_distribution_tool_owner_targets(repo_root, path))
         targets.update(_promoted_member_owner_targets(repo_root, path))
         if (
             PurePosixPath(path).suffix.lower() in _UNKNOWN_SOURCE_SUFFIXES
@@ -1849,6 +1912,9 @@ def _lanes_for_path(path: str) -> set[str] | None:
 
     if path.startswith(_CI_TOOL_PREFIX):
         return set(_CI_TOOL_LANES)
+
+    if path.startswith(_SCORE_DISTRIBUTION_TOOL_PREFIX):
+        return set(_SCORE_DISTRIBUTION_TOOL_LANES)
 
     if path.startswith("tests/evidence/"):
         lanes = {"evidence"}
