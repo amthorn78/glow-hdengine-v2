@@ -4570,7 +4570,9 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
     source = source or _v2_source()
     change_id = str(source["change_id"])
     repo = tmp_path / "repo"
-    for rel in (close_pack.SCHEMA_REL, close_pack.SCHEMA_V2_REL):
+    # The decision record and the v2 schema are the governance documents a v2 pack binds
+    # at its governance commit (HDE-CRD-0003 S15).
+    for rel in (close_pack.SCHEMA_REL, close_pack.SCHEMA_V2_REL, close_pack.GOVERNANCE_DECISION_RECORD_REL):
         (repo / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / rel, repo / rel)
     # PF titles and register headings resolve against these fixtures at write time (PO-35-16, -17).
@@ -4596,6 +4598,12 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
     _git(repo, "add", "-A")
     _git(repo, "commit", "-m", "tracked v2 candidate inputs")
     return repo, source_rel
+
+
+def _run_v2_write(repo: Path, monkeypatch: pytest.MonkeyPatch, source_rel: str) -> int:
+    """A v2 write binds its governance documents at the fixture's input commit (HDE-CRD-0003 S15)."""
+    head = _git(repo, "rev-parse", "HEAD")
+    return _run(repo, monkeypatch, "--source", source_rel, "--write", "--governance-commit", head)
 
 
 def _commit_all(repo: Path, message: str) -> None:
@@ -4624,9 +4632,28 @@ def test_v2_crd_dry_run_writes_complete_close_pack_and_check_is_read_only(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repo, source_rel = _init_v2_repo(tmp_path)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    input_commit = _git(repo, "rev-parse", "HEAD")
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
     manifest = json.loads((repo / CRD_MANIFEST_REL).read_text(encoding="utf-8"))
+    governance_bytes = {
+        rel: (repo / rel).read_bytes()
+        for rel in (close_pack.GOVERNANCE_DECISION_RECORD_REL, close_pack.SCHEMA_V2_REL)
+    }
+    assert manifest["governance"] == {
+        "commit": input_commit,
+        "decision_record": {
+            "path": close_pack.GOVERNANCE_DECISION_RECORD_REL,
+            "sha256": hashlib.sha256(governance_bytes[close_pack.GOVERNANCE_DECISION_RECORD_REL]).hexdigest(),
+            "size_bytes": len(governance_bytes[close_pack.GOVERNANCE_DECISION_RECORD_REL]),
+        },
+        "source_schema": {
+            "path": close_pack.SCHEMA_V2_REL,
+            "sha256": hashlib.sha256(governance_bytes[close_pack.SCHEMA_V2_REL]).hexdigest(),
+            "size_bytes": len(governance_bytes[close_pack.SCHEMA_V2_REL]),
+        },
+    }
+    assert manifest["inputs"]["schema"] == manifest["governance"]["source_schema"]
     headings = [line[3:] for line in report.splitlines() if line.startswith("## ")]
     assert headings == [
         "QA Rails — Open/Close (Final PR)",
@@ -4690,7 +4717,7 @@ def test_v2_epic_dry_run_uses_the_epic_prefix(
 ) -> None:
     repo, source_rel = _init_v2_repo(tmp_path, _v2_source("HDE-EPIC041"))
     assert source_rel == "audit/EPIC-041_close_candidate_source.json"
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     report = (repo / "audit/EPIC-041_close_report.md").read_text(encoding="utf-8")
     assert report.startswith("# HDE-EPIC041 Close Report\n")
     assert "## QA Rails — Open/Close (Final PR)" in report
@@ -4712,7 +4739,7 @@ def test_real_requirement_text_trips_the_refusal_so_v2_binds_it_by_reference(
     source = _v2_source()
     source["acceptance"][5]["limitation"] = CRD_0002_REQUIREMENTS[5][2]  # S06 intent copied
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert "SOURCE_SCHEMA_INVALID" in _error(capsys)
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -4780,7 +4807,7 @@ def test_v2_refuses_updater_outputs_and_the_close_run_family_as_causal_inputs(
     (repo / path).parent.mkdir(parents=True, exist_ok=True)
     (repo / path).write_text("tracked\n", encoding="utf-8")
     _commit_all(repo, "track a prohibited input")
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:CAUSAL_INPUT_PROHIBITED"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -4834,11 +4861,11 @@ def test_v2_admits_a_recorded_qa_primary_whose_check_id_the_refusal_rejects(
         files[stray] = _primary_text("PASS", check=B4_CHECK)
     _write_and_commit(repo, files, "bind the QA primary of a check whose ID the refusal rejects")
     if code is not None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 1
         assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
         assert not (repo / CRD_REPORT_REL).exists()
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
     assert f"`qa_primary` (`{primary_rel}`)" in report
     assert "- Closure decision: SATISFIED" in report
@@ -4903,7 +4930,7 @@ def test_v2_epic_close_covers_every_recorded_requirement(
 ) -> None:
     source = _v2_source("HDE-EPIC040")
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     report = (repo / "audit/EPIC-040_close_report.md").read_text(encoding="utf-8")
     assert "- `K040-REQ-001`: MET; evidence" in report
     assert "- `K040-REQ-022`: MET; evidence" in report
@@ -4911,7 +4938,7 @@ def test_v2_epic_close_covers_every_recorded_requirement(
     source = _v2_source("HDE-EPIC040")
     source["acceptance"].pop()
     repo, source_rel = _init_v2_repo(tmp_path / "omitted", source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:REQUIREMENT_COVERAGE_INCOMPLETE"
 
 
@@ -4923,7 +4950,7 @@ def test_v2_not_satisfied_may_cover_part_of_the_requirements(
     source["closure_decision"]["decision"] = "NOT SATISFIED"
     source["follow_ups"] = ["Bind S22 before closure."]
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
 
 
 @pytest.mark.parametrize("change_id", ("HDE-EPIC041", "HDE-CRD-0002"))
@@ -4936,7 +4963,7 @@ def test_v2_tracked_issue_maps_only_through_an_adr_status(
     # PO-35-11: no register cites a TI ID, so a register pointer cannot show a TI's closure;
     # a TI item maps only through an ADR status whose ID the drain-targets ledger names.
     repo, source_rel = _init_v2_repo(tmp_path / "adr", _v2_source(change_id))
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     report_rel = close_pack._derived_paths_v2(change_id)[0]
     assert "- TI-002 ADR status line: Deferred with drain targets" in (repo / report_rel).read_text(encoding="utf-8")
 
@@ -4944,7 +4971,7 @@ def test_v2_tracked_issue_maps_only_through_an_adr_status(
     source = _v2_source(change_id)
     source["tracked_issues"] = [{"id": "TI-002", "pointer": {"register": _register(change_id)[0], "heading": "0.1 Header"}}]
     repo, source_rel = _init_v2_repo(tmp_path / "pointer", source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:SOURCE_SCHEMA_INVALID"
     assert not (repo / close_pack._derived_paths_v2(change_id)[0]).exists()
 
@@ -5003,7 +5030,7 @@ def test_v2_check_reads_no_canon_and_write_resolves_registers_by_title(
     # checking after the canon changes version, and a later write resolves each register by its
     # title to the version then current.
     repo, source_rel = _init_v2_repo(tmp_path)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     _commit_all(repo, "commit v2 close pack")
     _write_pf_fixtures(repo, renamed={CRD_REGISTER_NAME: "PF30.1-Canon-HDE-CRD-Records-v1.0.md"})
     _commit_all(repo, "the CRD register changes version")
@@ -5016,7 +5043,7 @@ def test_v2_check_reads_no_canon_and_write_resolves_registers_by_title(
     (repo / CRD_REPORT_REL).unlink()
     (repo / CRD_MANIFEST_REL).unlink()
     _commit_all(repo, "drop the close pack")
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:PF_TITLE_UNKNOWN"
 
 
@@ -5093,9 +5120,9 @@ def test_v2_qa_ledger_is_read_before_any_decision(
         (repo / _primary_rel("HDE-CRD-0002")).write_text(_primary_text("FAIL_BEHAVIOR"), encoding="utf-8")
     _commit_all(repo, "bind the QA ledger under test")
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5117,7 +5144,7 @@ def test_v2_report_renders_the_adr_block_and_literal_tracked_issue_fields(
     }
     repo, source_rel = _init_v2_repo(tmp_path, source)
     _write_proof_check(repo, source, "TOOLING_BLOCKED")
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
     block = report.split("## ADR block\n\n", 1)[1].split("\n\n## ", 1)[0].splitlines()
     assert block == [
@@ -5164,7 +5191,7 @@ def test_v2_adr_block_is_required_and_closed(
     else:
         decision["scope"] = "epic_only"
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert "SOURCE_SCHEMA_INVALID" in _error(capsys)
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5185,7 +5212,7 @@ def test_v2_closure_override_evidence_must_be_bound(
         ],
     }
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:BINDING_UNRESOLVED"
 
 
@@ -5211,7 +5238,7 @@ def test_v2_report_and_manifest_bind_each_qa_primary(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repo, source_rel = _init_v2_repo(tmp_path)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     primary = (repo / _primary_rel("HDE-CRD-0002")).read_bytes()
     digest = hashlib.sha256(primary).hexdigest()
     report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
@@ -5263,7 +5290,7 @@ def test_v2_qa_ledger_entries_must_agree_with_their_tracked_primaries(
     else:
         primary.write_text(_primary_text("PASS", check="qa-02"), encoding="utf-8")
     _commit_all(repo, "change the QA primary")
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:QA_LEDGER_INVALID"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5373,10 +5400,10 @@ def test_v2_close_expectation_uses_the_canonical_vocabulary(
     source["later_drain_statements"][0]["close_expectation"] = close_expectation
     repo, source_rel = _init_v2_repo(tmp_path, source)
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         assert f"Close expectation: {close_expectation}" in (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5467,11 +5494,11 @@ def test_v2_closure_override_exempts_only_the_tooling_blocked_check_it_names(
     # accepted gap is not PASS evidence (PO-35-21).
     _write_proof_check(repo, source, status)
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
         assert _coverage_line(1, "qa-01-setup", [], "BLOCKED", "accepted gap under the closure override") in report
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5483,7 +5510,7 @@ def test_v2_writer_never_claims_a_po_closeout(
     source = _v2_source()
     source["closure_decision"]["posture"] = "po_closeout"
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:SOURCE_SCHEMA_INVALID"
     assert not (repo / CRD_REPORT_REL).exists()
     assert "po_closeout" not in close_pack.DECISION_POSTURE_TEXT
@@ -5529,14 +5556,14 @@ def test_v2_coverage_ledger_follows_the_recorded_qa_plan(
         source["qa_checks"].append({"check_id": "qa-01-setup", "criteria": []})
     repo, source_rel = _init_v2_repo(tmp_path, source)
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
         assert "QA plan: HDE-CRD-0002 QA Plan v1.0." in report
         assert _coverage_line(1, "qa-01-setup", criteria, "PASS", "closure gate met") in report
         if case == "planned_not_run_not_satisfied":
             assert _coverage_line(2, "qa-02-writer", [], "NOT_RUN", "blocks a SATISFIED decision") in report
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5598,7 +5625,7 @@ def test_v2_register_copy_must_match_its_manifest_digest(
     register = repo / CRD_REGISTER_REL
     register.write_text(register.read_text(encoding="utf-8") + "changed\n", encoding="utf-8")
     _commit_all(repo, "the CRD register copy no longer matches the manifest")
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:DEFERRAL_POINTER_UNBOUND"
 
 
@@ -5649,9 +5676,9 @@ def test_v2_pf_titles_must_name_tracked_canon_documents(
     if field == "override_drain_targets":
         _write_proof_check(repo, source, "TOOLING_BLOCKED")
     if field.startswith("accepted_"):
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:PF_TITLE_UNKNOWN"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5711,7 +5738,7 @@ def test_v2_deferral_drain_target_names_a_register_heading(
         _commit_all(repo, "two versions of one register")
     report_rel = close_pack._derived_paths_v2(change_id)[0]
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         register, heading = _register(change_id)
         assert f"- `DEF-2`: drain target register {register}, section {heading}" in (repo / report_rel).read_text(
             encoding="utf-8"
@@ -5719,7 +5746,7 @@ def test_v2_deferral_drain_target_names_a_register_heading(
         _commit_all(repo, "commit the close pack")
         assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / report_rel).exists()
 
@@ -5767,7 +5794,7 @@ def test_v2_every_deliverable_is_allocated_to_its_slice(
         source["allocation"] = []
     repo, source_rel = _init_v2_repo(tmp_path, source)
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
         if case == "epic_plan_slices":
             assert "- `PR01`: The close-pack writer accepts Epic and CRD identities." in report
@@ -5780,7 +5807,7 @@ def test_v2_every_deliverable_is_allocated_to_its_slice(
         else:
             assert "## Reuse boundary\n\n- None recorded." in report
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5808,11 +5835,11 @@ def test_v2_an_external_qa_rca_is_the_canonical_rca_file(
     source["qa_rca"] = {"summary_lines": ["Root causes: none beyond the recorded findings."]} if binding == "summary" else {"binding": binding}
     repo, source_rel = _init_v2_repo(tmp_path, source)
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
         assert f"- {close_pack.NONCLAIM_FIXED_V2}" in report
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
 
 
@@ -5847,14 +5874,14 @@ def test_v2_satisfied_needs_a_pass_qa_verdict(
         source["qa_verdict"] = "pass, see the report"
     repo, source_rel = _init_v2_repo(tmp_path, source)
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
         verdict = "FAIL" if case == "verdict_fail_not_satisfied" else "PASS"
         assert f"Authorized decision: the QA report HDE-CRD-0002 final QA Report v1.0, verdict `{verdict}`." in report
         assert "- Decision posture: review-trace-only" in report
         assert "formal close-pack completion" not in close_pack.DECISION_POSTURE_TEXT.values()
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5906,9 +5933,9 @@ def test_v2_met_criteria_bind_a_mapped_passing_check(
             "the mapped check failed",
         )
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -5965,9 +5992,9 @@ def test_v2_supporting_ledgers_meet_their_minimum_content(
         qa_copy.write_text(copied if case.endswith("identical") else copied + "Drifted.\n", encoding="utf-8")
     _commit_all(repo, "ledger under test")
     if code is None:
-        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
         return
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / CRD_REPORT_REL).exists()
 
@@ -6081,7 +6108,7 @@ def test_v2_semantic_refusals_write_nothing(
     source = _v2_source()
     _mutate(source, case)
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
 
@@ -6090,7 +6117,7 @@ def test_v2_check_rejects_committed_bytes_that_differ_from_a_fresh_derivation(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     repo, source_rel = _init_v2_repo(tmp_path)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     _commit_all(repo, "commit v2 close pack")
     report = repo / CRD_REPORT_REL
     report.write_bytes(report.read_bytes().replace(b"SATISFIED", b"SATISFIED.", 1))
@@ -6146,7 +6173,7 @@ def test_b1_epic_scoped_tracked_issue_renders_as_an_adr_status_line(
     source = _v2_source("HDE-EPIC041")
     source["tracked_issues"] = [{"id": EPIC041_TI, "adr_status": "Completed under this epic"}]
     repo, source_rel = _epic041_with_ledger_ids(tmp_path, source, EPIC041_TI)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     report = (repo / "audit/EPIC-041_close_report.md").read_text(encoding="utf-8")
     assert f"- {EPIC041_TI} ADR status line: Completed under this epic" in report
     _commit_all(repo, "commit epic v2 close pack")
@@ -6160,7 +6187,7 @@ def test_b1_epic_scoped_tracked_issue_of_another_epic_is_refused(
     source = _v2_source("HDE-EPIC041")
     source["tracked_issues"] = [{"id": identifier, "adr_status": "Completed under this epic"}]
     repo, source_rel = _epic041_with_ledger_ids(tmp_path, source, identifier)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:TRACKED_ISSUE_UNBOUND"
     assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
 
@@ -6172,7 +6199,7 @@ def test_b2_epic_may_point_to_its_own_close_run_directory_before_it_exists(
     source["pointers"].append("audit/qa/hde-epic041/close/")
     repo, source_rel = _init_v2_repo(tmp_path, source)
     assert not (repo / "audit/qa/hde-epic041/close").exists()
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
     report = (repo / "audit/EPIC-041_close_report.md").read_text(encoding="utf-8")
     assert "- `audit/qa/hde-epic041/close/`" in report
     _commit_all(repo, "commit epic v2 close pack")
@@ -6188,7 +6215,7 @@ def test_b2_an_absent_close_run_directory_of_another_change_stays_unresolved(
     source = _v2_source("HDE-EPIC041")
     source["pointers"].append(pointer)
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:POINTER_UNRESOLVED"
     assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
 
@@ -6199,4 +6226,234 @@ def test_b2_an_epic_close_run_pointer_stays_optional(
     source = _v2_source("HDE-EPIC041")
     assert "audit/qa/hde-epic041/close/" not in source["pointers"]
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
+
+
+# --- HDE-CRD-0003 S15 (HDE Build Notes 2.9): governance documents bound at the written commit ---
+
+
+def _governance_rewrite(repo: Path, manifest_rel: str, mutate: object) -> None:
+    """Rewrite a committed manifest's governance block in canonical bytes, then commit."""
+    path = repo / manifest_rel
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    mutate(manifest["governance"])  # type: ignore[operator]
+    _write_json(path, manifest)
+    _commit_all(repo, "rewrite the committed governance block")
+
+
+def _exact_governance(repo: Path, commit: str) -> dict[str, object]:
+    block: dict[str, object] = {"commit": commit}
+    for key, rel in (
+        ("decision_record", close_pack.GOVERNANCE_DECISION_RECORD_REL),
+        ("source_schema", close_pack.SCHEMA_V2_REL),
+    ):
+        payload = subprocess.run(
+            ("git", "cat-file", "blob", f"{commit}:{rel}"), cwd=repo, capture_output=True, check=True
+        ).stdout
+        block[key] = {"path": rel, "sha256": hashlib.sha256(payload).hexdigest(), "size_bytes": len(payload)}
+    return block
+
+
+def _amend_governance_copies(repo: Path) -> None:
+    record = repo / close_pack.GOVERNANCE_DECISION_RECORD_REL
+    record.write_text(record.read_text(encoding="utf-8") + "\nA later amendment of this record.\n", encoding="utf-8")
+    schema_path = repo / close_pack.SCHEMA_V2_REL
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    schema["description"] = f"{schema.get('description', '')} (later amendment)"
+    schema_path.write_text(json.dumps(schema, indent=2) + "\n", encoding="utf-8")
+    _commit_all(repo, "amend the decision record and the v2 schema")
+
+
+@pytest.mark.parametrize("change_id", ["HDE-CRD-0002", "HDE-EPIC041"])
+def test_s15_amending_the_governance_documents_keeps_both_packs_checkable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], change_id: str
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path, _v2_source(change_id))
+    report_rel, manifest_rel = close_pack._derived_paths_v2(change_id)
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
+    _commit_all(repo, "commit the close pack")
+    _amend_governance_copies(repo)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
+    capsys.readouterr()
+
+    # Each pack still detects any change to its own artifacts.
+    pack_head = _git(repo, "rev-parse", "HEAD")
+    report = repo / report_rel
+    report.write_bytes(report.read_bytes().replace(b"## Key outputs\n", b"## Key outputs \n", 1))
+    _commit_all(repo, "change the close report")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:REPORT_HASH_MISMATCH"
+
+    _git(repo, "reset", "--hard", pack_head)
+    manifest = json.loads((repo / manifest_rel).read_text(encoding="utf-8"))
+    manifest["nonclaims"] = manifest["nonclaims"][::-1]
+    _write_json(repo / manifest_rel, manifest)
+    _commit_all(repo, "change the close manifest")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:MANIFEST_BINDING_MISMATCH"
+
+
+def test_s15_a_shallow_checkout_fails_closed_in_both_modes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path)
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
+    _commit_all(repo, "commit the close pack")
+    shallow = tmp_path / "shallow"
+    _git(tmp_path, "clone", "--quiet", "--depth", "1", "--no-local", repo.as_uri(), str(shallow))
+    _git(shallow, "remote", "remove", "origin")
+    _git(shallow, "config", "maintenance.auto", "false")
+    _git(shallow, "config", "gc.auto", "0")
+    assert (shallow / ".git/shallow").is_file()
+    before = {rel: (shallow / rel).read_bytes() for rel in (CRD_REPORT_REL, CRD_MANIFEST_REL)}
+    assert _run(shallow, monkeypatch, "--source", source_rel, "--check") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:GOVERNANCE_HISTORY_SHALLOW"
+    head = _git(shallow, "rev-parse", "HEAD")
+    assert _run(shallow, monkeypatch, "--source", source_rel, "--write", "--governance-commit", head) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:GOVERNANCE_HISTORY_SHALLOW"
+    assert {rel: (shallow / rel).read_bytes() for rel in before} == before
+
+
+@pytest.mark.parametrize("case", ["absent", "not_ancestor", "bytes_mismatch", "block_absent"])
+def test_s15_check_refuses_an_unverifiable_governance_binding(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], case: str
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path)
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
+    _commit_all(repo, "commit the close pack")
+    if case == "absent":
+        _governance_rewrite(repo, CRD_MANIFEST_REL, lambda block: block.update(commit="1" * 40))
+        expected = "GOVERNANCE_COMMIT_ABSENT"
+    elif case == "not_ancestor":
+        pack_head = _git(repo, "rev-parse", "HEAD")
+        _git(repo, "checkout", "--quiet", "-b", "side", "HEAD~1")
+        (repo / "side.txt").write_text("side\n", encoding="utf-8")
+        _commit_all(repo, "a commit that is not an ancestor")
+        side = _git(repo, "rev-parse", "HEAD")
+        _git(repo, "checkout", "--quiet", "--detach", pack_head)
+        _governance_rewrite(repo, CRD_MANIFEST_REL, lambda block: block.update(_exact_governance(repo, side)))
+        expected = "GOVERNANCE_COMMIT_NOT_ANCESTOR"
+    elif case == "bytes_mismatch":
+        _governance_rewrite(
+            repo, CRD_MANIFEST_REL, lambda block: block["decision_record"].update(sha256="0" * 64)
+        )
+        expected = "GOVERNANCE_BINDING_MISMATCH"
+    else:
+        path = repo / CRD_MANIFEST_REL
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        del manifest["governance"]
+        _write_json(path, manifest)
+        _commit_all(repo, "drop the governance block")
+        expected = "GOVERNANCE_BINDING_ABSENT"
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{expected}"
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all", "--ignored") == ""
+
+
+@pytest.mark.parametrize("mode", ["write", "check"])
+def test_s15_the_source_must_validate_against_the_schema_at_the_bound_commit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], mode: str
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path)
+    schema_path = repo / close_pack.SCHEMA_V2_REL
+    original = schema_path.read_bytes()
+    schema = json.loads(original)
+    schema["properties"]["change_id"]["pattern"] = "^HDE-NEVER$"
+    schema_path.write_text(json.dumps(schema, indent=2) + "\n", encoding="utf-8")
+    _commit_all(repo, "a schema that rejects the source")
+    rejecting = _git(repo, "rev-parse", "HEAD")
+    schema_path.write_bytes(original)
+    _commit_all(repo, "restore the schema")
+    if mode == "write":
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write", "--governance-commit", rejecting) == 1
+        assert not (repo / CRD_MANIFEST_REL).exists()
+    else:
+        assert _run_v2_write(repo, monkeypatch, source_rel) == 0
+        _commit_all(repo, "commit the close pack")
+        _governance_rewrite(repo, CRD_MANIFEST_REL, lambda block: block.update(_exact_governance(repo, rejecting)))
+        assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:SOURCE_SCHEMA_INVALID"
+
+
+def test_s15_write_option_is_required_validated_and_v2_only(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path / "v2")
+    head = _git(repo, "rev-parse", "HEAD")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:GOVERNANCE_COMMIT_REQUIRED"
+    tree = _git(repo, "rev-parse", "HEAD^{tree}")
+    blob = _git(repo, "rev-parse", f"HEAD:{close_pack.SCHEMA_V2_REL}")
+    for value in (head[:12], head.upper(), "z" * 40, tree, blob):
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write", "--governance-commit", value) == 1
+        assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:GOVERNANCE_COMMIT_INVALID"
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write", "--governance-commit", "2" * 40) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:GOVERNANCE_COMMIT_ABSENT"
+    (repo / close_pack.GOVERNANCE_DECISION_RECORD_REL).unlink()
+    _commit_all(repo, "a commit without the decision record")
+    without_record = _git(repo, "rev-parse", "HEAD")
+    _git(repo, "checkout", "--quiet", head, "--", close_pack.GOVERNANCE_DECISION_RECORD_REL)
+    _commit_all(repo, "restore the decision record")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write", "--governance-commit", without_record) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:GOVERNANCE_DOCUMENT_MISSING"
+    assert not (repo / CRD_MANIFEST_REL).exists() and not (repo / CRD_REPORT_REL).exists()
+    for arguments in (
+        ["--source", source_rel, "--check", "--governance-commit", head],
+        ["--source", source_rel, "--write", "--governance-commit", head, "--governance-commit", head],
+    ):
+        with pytest.raises(SystemExit) as raised:
+            _run(repo, monkeypatch, *arguments)
+        assert raised.value.code == 2
+        assert "--governance-commit" in capsys.readouterr().err
+
+    v1_repo = _init_repo(tmp_path / "v1")
+    v1_head = _git(v1_repo, "rev-parse", "HEAD")
+    assert _run(v1_repo, monkeypatch, "--source", SOURCE_REL, "--write", "--governance-commit", v1_head) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:GOVERNANCE_COMMIT_UNEXPECTED"
+    assert not (v1_repo / REPORT_REL).exists()
+
+
+@pytest.mark.parametrize("mode", ["write", "check"])
+def test_s15_v2_modes_read_the_governance_commit_without_a_git_subprocess(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mode: str
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path)
+    head = _git(repo, "rev-parse", "HEAD")
+    arguments = ["--source", source_rel, "--write", "--governance-commit", head]
+    if mode == "check":
+        assert _run(repo, monkeypatch, *arguments) == 0
+        _commit_all(repo, "commit the close pack")
+        arguments = ["--source", source_rel, "--check"]
+
+    def reject_git_subprocess(*_args: object, **_kwargs: object) -> bytes:
+        raise AssertionError(f"{mode} mode attempted a subprocess")
+
+    monkeypatch.setattr(subprocess, "run", reject_git_subprocess)
+    assert _run(repo, monkeypatch, *arguments) == 0
+
+
+def test_s15_an_evidence_input_naming_the_decision_record_binds_it_at_the_governance_commit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = _v2_source()
+    source["evidence_inputs"].append(  # type: ignore[union-attr]
+        {"binding": "close_pack_adr", "path": close_pack.GOVERNANCE_DECISION_RECORD_REL}
+    )
+    source["later_drain_statements"][0]["evidence_bindings"].append("close_pack_adr")  # type: ignore[index]
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    bound = (repo / close_pack.GOVERNANCE_DECISION_RECORD_REL).read_bytes()
+    _amend_governance_copies(repo)
+    bound_commit = _git(repo, "rev-parse", "HEAD~1")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write", "--governance-commit", bound_commit) == 0
+    manifest = json.loads((repo / CRD_MANIFEST_REL).read_text(encoding="utf-8"))
+    record = {
+        "path": close_pack.GOVERNANCE_DECISION_RECORD_REL,
+        "sha256": hashlib.sha256(bound).hexdigest(),
+        "size_bytes": len(bound),
+    }
+    assert manifest["governance"]["commit"] == bound_commit
+    assert manifest["governance"]["decision_record"] == record
+    assert {"binding": "close_pack_adr", **record} in manifest["inputs"]["evidence"]
+    assert (repo / close_pack.GOVERNANCE_DECISION_RECORD_REL).read_bytes() != bound
+    _commit_all(repo, "commit the close pack")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
