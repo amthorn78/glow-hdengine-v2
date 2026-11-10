@@ -1,5 +1,5 @@
 path: artifacts/catalog/domain_closure_report.log
 size_bytes: 1582
-sha256: 19c5f665ffa0518839a0c0329362cdb6d2f87a1da03962e44b6da78ab4ecbff3
+sha256: 437a70274f90b3f93ded192508544b34d3a07041556e470f6db724f362a9bb2a
 mtime_utc: 2026-09-09T18:42:42Z
 produced_at_utc: 2026-08-18T16:05:54Z

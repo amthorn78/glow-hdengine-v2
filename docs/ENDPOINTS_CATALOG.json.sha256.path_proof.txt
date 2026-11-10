@@ -1,5 +1,5 @@
 path: docs/ENDPOINTS_CATALOG.json.sha256
 size_bytes: 94
-sha256: d36ef16798f3a99429f5866abd6514f7a594505ec4023b887044fd2e985ee3ac
-mtime_utc: 2026-10-14T07:38:31Z
-produced_at_utc: 2026-10-14T07:38:31Z
+sha256: f7e5ef84aceaeef158422354fe295309782405e66a5708474d77574db8a0c236
+mtime_utc: 2026-11-10T05:40:50Z
+produced_at_utc: 2026-11-10T05:40:50Z
