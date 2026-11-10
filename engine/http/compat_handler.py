@@ -105,12 +105,29 @@ def _resolve_stored_party(person_id: str) -> ResolvedCompatChart:
     return resolve_compat_chart({"user_id": person_id}, source_policy="local", env=None, local_lookup=_current_row_lookup)
 
 
+# HDE CLI/API/Vendor Ref §5.5 "Dev/admin gate (step 2)" and HDE Governance §4.1.4
+# "Compat namespace (dev/admin surface)": exactly these APP_ENV values, with no
+# trimming, no case-folding and no default; ENGINE_ENV never admits.
+_DEV_ADMIN_APP_ENVS = frozenset({"dev", "test", "local"})
+
+
+def _dev_admin_refusal() -> Response | None:
+    if os.environ.get("APP_ENV") in _DEV_ADMIN_APP_ENVS:
+        return None
+    # The writer-style refusal the dev/admin HTTP surfaces use (``_dev_admin_gate``
+    # in adapter/http_reader.py): 403 ERR_WRITER_FORBIDDEN, no-store, no ETag.
+    return _writer_payload(error_envelope("ERR_WRITER_FORBIDDEN"), status=403)
+
+
 @compat_blueprint.before_app_request
 def _compat_writer_transport_guard():
     if not is_compat_request_path(request.path):
         return None
     if _compute_env_mode(os.environ) == "prod":
         return compat_error_response(404)
+    refusal = _dev_admin_refusal()
+    if refusal is not None:
+        return refusal
     if request.path.rstrip("/") != (compat_blueprint.url_prefix or "").rstrip("/"):
         return None
     if request.method == "HEAD":
