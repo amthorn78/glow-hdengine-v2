@@ -1277,6 +1277,9 @@ def test_epic034_pr04_superseded_rows_are_removed_when_outputs_absent(monkeypatc
     # release label (and refuses without one); this test concerns supersession.
     label = "current-release capture: release 0.0.0, release_id " + "0" * 64
     monkeypatch.setattr(indexer, "_current_release_label", lambda: label)
+    # HDE-CRD-0003 S13 (WU-PR-04): Epic close admission now reads the tracked sources
+    # under ROOT/audit at each call, so the temporary root holds an empty audit/.
+    (tmp_path / "audit").mkdir()
     rows = indexer._load_human_index()
     row_keys = {(row["artifact_key"], row["discovered_physical_path"]) for row in rows}
     assert not row_keys & indexer.EPIC034_PR04_SUPERSEDED_INDEX_KEYS

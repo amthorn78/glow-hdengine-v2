@@ -3,20 +3,20 @@ from typing import Optional, Dict, Any
 from engine.config.provider_types import Provider
 from engine.config.provider_errors import ProviderUnavailable, ProviderConfigMissing
 
-_TRUTHY = {"1", "true", "yes", "on"}
-
-def _is_truthy(v: Optional[str]) -> bool:
-    return (v or "").strip().lower() in _TRUTHY
+def _rail_value(v: Optional[str]) -> str:
+    return "" if v is None else v.strip()
 
 def _is_blank(v: Optional[str]) -> bool:
     return v is None or v.strip() == ""
 
 def _safe_mode_enabled() -> bool:
-    val = os.getenv("SAFE_MODE")
-    if val is None:
-        # Default SAFE_MODE ON in CI/tests
-        return bool(os.getenv("CI") or os.getenv("PYTEST_CURRENT_TEST"))
-    return _is_truthy(val)
+    # HDE-CLI-API-Vendor-Ref §7.1.2 (HDE-CRD-0003 X-03): the SAFE rail is open only
+    # for exactly SAFE_MODE=0; unset, empty and every other value keep it closed.
+    return _rail_value(os.getenv("SAFE_MODE")) != "0"
+
+def _network_allowed() -> bool:
+    # §7.1.2: the network rail is open only for exactly ALLOW_NETWORK=1.
+    return _rail_value(os.getenv("ALLOW_NETWORK")) == "1"
 
 class VendorHttpProvider(Provider):
     """
@@ -31,8 +31,8 @@ class VendorHttpProvider(Provider):
         if _safe_mode_enabled():
             raise ProviderUnavailable("provider unavailable: safe_mode")
 
-        # Rails: ALLOW_NETWORK must be truthy
-        if not _is_truthy(os.getenv("ALLOW_NETWORK")):
+        # Rails: ALLOW_NETWORK must be exactly 1
+        if not _network_allowed():
             raise ProviderUnavailable("provider unavailable: allow_network_gate")
 
         # Config presence (blank strings treated as missing)

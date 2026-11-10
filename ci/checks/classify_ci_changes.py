@@ -626,6 +626,9 @@ _PRODUCT_TEST_OWNER_PATHS = {
     ),
     # HDE-CRD-0002 WU-PR-04 (S14): the production vendor-override audit module.
     "engine/bodygraph/vendor_audit.py": ("tests/bodygraph/test_vendor_prod_override.py",),
+    # HDE-CRD-0003 WU-PR-06 (S06 X-03): the two exact-value rails readers.
+    "engine/providers/vendor_http.py": ("tests/provider/test_vendor_call_rails_and_config.py",),
+    "scripts/bodygraph/run_refresh_worker.py": ("tests/provider/test_vendor_call_rails_and_config.py",),
     "scripts/cut_release_manifest.py": ("tests/scripts/test_cut_release_manifest.py",),
     "scripts/dev_start_reader.sh": ("tests/scripts/test_dev_start_reader.py",),
     "scripts/emit_env_guard_artifact.py": (

@@ -90,12 +90,25 @@ class RefreshState:
         STATE_PATH.write_text(json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
 
 
-def _truthy(value: object | None) -> bool:
+def _rail_value(value: object | None) -> str:
+    if isinstance(value, bool):
+        return "1" if value else "0"
     if value is None:
-        return False
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on"}
-    return bool(value)
+        return ""
+    return str(value).strip()
+
+
+def _safe_mode_closed(value: object | None) -> bool:
+    """HDE-CLI-API-Vendor-Ref §7.1.2 (HDE-CRD-0003 X-03): open only for exactly
+    SAFE_MODE=0; unset, empty and every other value keep the SAFE rail closed."""
+
+    return _rail_value(value) != "0"
+
+
+def _network_allowed(value: object | None) -> bool:
+    """§7.1.2: the network rail is open only for exactly ALLOW_NETWORK=1."""
+
+    return _rail_value(value) == "1"
 
 
 def _utc_iso() -> str:
@@ -136,8 +149,8 @@ def _prune_failures(state: RefreshState, now: float) -> None:
 
 def run_refresh(env: Mapping[str, object] | None = None) -> None:
     env = env or os.environ
-    safe_mode = _truthy(env.get("SAFE_MODE"))
-    allow_network = _truthy(env.get("ALLOW_NETWORK"))
+    safe_mode = _safe_mode_closed(env.get("SAFE_MODE"))
+    allow_network = _network_allowed(env.get("ALLOW_NETWORK"))
     now = time.time()
     state = RefreshState.load()
     _maybe_reset_rate_limit(state, now)

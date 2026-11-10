@@ -89,7 +89,7 @@ def test_closed_rails_refuse_before_route_policy_and_external_io() -> None:
     assert "route_policy" not in result.payload["resolver"]
 
 
-def test_explicit_legacy_fallback_remains_available_for_non_v2_configured_base() -> None:
+def test_explicit_legacy_fallback_remains_available_for_a_terminal_v1_base() -> None:
     policy = classify_bg_resolve_route_policy("https://vendor.test/v1")
 
     assert policy["classification"] == "explicit_legacy_fallback"
@@ -279,3 +279,82 @@ def test_direct_ingest_merges_partial_env_with_process_credentials(monkeypatch: 
     assert "HDAPI_BASE_URL" not in captured["env"]
     assert captured["env"]["HD_API_KEY"] == "process-api-key"
     assert captured["env"]["GEO_API_KEY"] == "process-geo-key"
+
+
+# --- HDE-CRD-0003 S02: only a terminal v1 or v2 base selects a route (§7.1.10; Mechanics Guide §1.1) --
+
+UNSUPPORTED_BASES = {
+    "nonterminal_v2": "https://vendor.test/v2/charts",
+    "case_variant_V2": "https://vendor.test/V2",
+    "unversioned": "https://vendor.test",
+    "unversioned_prefix": "https://vendor.test/api",
+    "v3": "https://vendor.test/v3",
+    "conflicting_markers": "https://vendor.test/v1/v2",
+    "userinfo": "https://user:secret@vendor.test/v2",
+    "query": "https://vendor.test/v2?x=1",
+    "empty_query": "https://vendor.test/v2?",
+    "fragment": "https://vendor.test/v2#f",
+    "http": "http://vendor.test/v2",
+    "no_host": "https:///v2",
+    "relative": "vendor.test/v2",
+}
+SUPPORTED_BASES = {
+    "terminal_v2": ("https://vendor.test/v2", "v2", "charts", "recommended_v2_chart"),
+    "terminal_v1": ("https://vendor.test/v1", "v1", "bodygraphs", "legacy_bodygraph"),
+    "prefix_and_trailing_slash": (" https://vendor.test/api/v2/ ", "v2", "charts", "recommended_v2_chart"),
+    "port": ("https://vendor.test:8443/v1", "v1", "bodygraphs", "legacy_bodygraph"),
+}
+
+
+@pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+def test_s02_every_other_base_is_unsupported_and_never_raises(name):
+    policy = classify_bg_resolve_route_policy(UNSUPPORTED_BASES[name])
+    assert policy["supported"] is False
+    assert policy["error_code"] == "PROVIDER_ROUTE_UNSUPPORTED"
+    assert policy["route_family"] is None and policy["resource_path"] is None and policy["route_auth_posture"] is None
+    assert UNSUPPORTED_BASES[name].strip() not in repr(policy) and "secret" not in repr(policy)
+
+
+@pytest.mark.parametrize("name", sorted(SUPPORTED_BASES))
+def test_s02_terminal_v1_or_v2_selects_exactly_its_route(name):
+    base, version, resource, family = SUPPORTED_BASES[name]
+    policy = classify_bg_resolve_route_policy(base)
+    assert (policy["supported"], policy["configured_base_version"], policy["resource_path"], policy["route_family"]) == (True, version, resource, family)
+
+
+def _no_client(monkeypatch):
+    def fail(*_a, **_k):
+        raise AssertionError("vendor client constructed: a credential would be projected")
+
+    monkeypatch.setattr(HdApiClient, "__init__", fail)
+    monkeypatch.setattr(HdApiClient, "from_env", classmethod(lambda cls, **_: fail()))
+    monkeypatch.setattr("engine.bodygraph.resolver.ingest_vendor_bodygraph", fail)
+
+
+@pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+def test_s02_bg_resolve_refuses_before_any_client_or_credential(monkeypatch, name):
+    _no_client(monkeypatch)
+    result = resolve_bodygraph("operator-user", source="vendor", upsert=False, dry_run=True, env=_open_env(UNSUPPORTED_BASES[name]), birthdate="1990-01-01", birthtime="12:00", location="Amsterdam, NL")
+    assert result.status == "error" and result.exit_code == 1
+    assert result.payload["error"]["code"] == "PROVIDER_ROUTE_UNSUPPORTED"
+    assert "api-key" not in repr(result.payload) and "geo-key" not in repr(result.payload)
+
+
+@pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+    _no_client(monkeypatch)
+    for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+        monkeypatch.setenv(key, str(value))
+    argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+            "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+    assert cli(argv) == 1
+    captured = capsys.readouterr()
+    assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+
+
+@pytest.mark.parametrize("name", ["unversioned", "v3", "nonterminal_v2"])
+def test_s02_generic_ingest_builder_refuses_an_unsupported_base(name):
+    calls: list[str] = []
+    with pytest.raises(VendorError) as raised:
+        _client(UNSUPPORTED_BASES[name], calls).build_request(birthdate="1990-01-01", birthtime="12:00", location="Amsterdam, NL")
+    assert raised.value.code == "PROVIDER_ROUTE_UNSUPPORTED" and calls == []
