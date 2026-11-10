@@ -1,7 +1,8 @@
 """Production vendor-override audit record (HDE-CLI-API-Vendor-Ref §7.1.11e–f).
 
 One append-only, locally durable, keys-only JSONL event per production-like
-``bg:resolve --source vendor`` invocation that reaches override evaluation.
+``bg:resolve --source vendor``, ``showcompat --source vendor`` or vendor-selecting
+``showcompat --conjunction`` invocation that reaches override evaluation.
 The actor, the sink, the clock and the correlation ID are module-level seams
 so tests can replace them; nothing here reads the subject, the configured URL,
 any header or key value, or raw provider data.
@@ -23,6 +24,8 @@ VENDOR_PROD_OVERRIDE_EVENT = "vendor_prod_override"
 VENDOR_OVERRIDE_AUDIT_PATH_KEY = "HDE_VENDOR_OVERRIDE_AUDIT_PATH"
 DEFAULT_AUDIT_SUBPATH = Path("glow-hdengine") / "vendor_prod_override.jsonl"
 AUDIT_OUTCOMES = frozenset({"refused", "allowed", "failed", "completed"})
+# HDE-CLI-API-Vendor-Ref §7.1.11f: `command` is exactly one of these.
+AUDIT_COMMANDS = frozenset({"bg:resolve", "showcompat", "showcompat:conjunction"})
 AUDIT_FIELDS = (
     "actor_principal",
     "authorization_ref",
@@ -118,6 +121,7 @@ def build_event(
     actor_principal: str,
     authorization_ref: str | None,
     environment: str,
+    command: str,
     outcome: str,
     error_code: str | None,
     outbound_attempted: bool,
@@ -126,6 +130,8 @@ def build_event(
 ) -> dict[str, Any]:
     if outcome not in AUDIT_OUTCOMES:
         raise ValueError("unsupported audit outcome")
+    if command not in AUDIT_COMMANDS:
+        raise ValueError("unsupported audit command")
 
     def _optional(value: str | None) -> str | None:
         return None if value is None else sanitize_field(str(value))
@@ -137,7 +143,7 @@ def build_event(
         "correlation_id": sanitize_field(correlation_id),
         "actor_principal": sanitize_field(actor_principal),
         "authorization_ref": _optional(authorization_ref),
-        "command": "bg:resolve",
+        "command": command,
         "source": "vendor",
         "environment": sanitize_field(environment),
         "safe_mode_open": True,

@@ -426,7 +426,7 @@ def test_record_and_streams_carry_no_subject_url_or_secret(seams, tmp_path, monk
 def test_fields_are_sanitized_against_cr_lf_and_control_bytes(tmp_path):
     event = vendor_audit.build_event(
         correlation_id="c\r\nid", actor_principal="evil\r\n{\"x\":1}\x00 ", authorization_ref=REF,
-        environment="prod", outcome="refused", error_code="E\n", outbound_attempted=False,
+        environment="prod", command="bg:resolve", outcome="refused", error_code="E\n", outbound_attempted=False,
     )
     sink = tmp_path / "s" / "audit.jsonl"
     vendor_audit.append_event(sink, event)
@@ -439,7 +439,7 @@ def test_fields_are_sanitized_against_cr_lf_and_control_bytes(tmp_path):
 
 def test_sink_is_created_owner_only_and_appended(tmp_path):
     sink = tmp_path / "new" / "dir" / "audit.jsonl"
-    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="refused", error_code="X", outbound_attempted=False)
+    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", command="bg:resolve", outcome="refused", error_code="X", outbound_attempted=False)
     vendor_audit.append_event(sink, event)
     vendor_audit.append_event(sink, event)
     assert stat.S_IMODE(sink.stat().st_mode) == 0o600
@@ -455,7 +455,7 @@ def test_unwritable_sink_is_unavailable(tmp_path, make_bad):
     else:
         sink = tmp_path / "audit.jsonl"
         sink.mkdir()
-    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="refused", error_code="X", outbound_attempted=False)
+    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", command="bg:resolve", outcome="refused", error_code="X", outbound_attempted=False)
     with pytest.raises(vendor_audit.AuditUnavailable):
         vendor_audit.append_event(sink, event)
 
@@ -488,7 +488,7 @@ def test_append_persists_the_line_and_every_new_directory_entry(tmp_path, monkey
     monkeypatch.setattr(vendor_audit.os, "fsync", _fsync)
     (tmp_path / "existing").mkdir()
     sink = tmp_path / "existing" / "new" / "dir" / "audit.jsonl"
-    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="refused", error_code="X", outbound_attempted=False)
+    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", command="bg:resolve", outcome="refused", error_code="X", outbound_attempted=False)
     vendor_audit.append_event(sink, event)
     # The file, then the directory holding it, then each directory that holds a created one.
     assert synced == [_identity(sink), _identity(sink.parent), _identity(sink.parent.parent), _identity(tmp_path / "existing")]
@@ -500,7 +500,7 @@ def test_append_persists_the_line_and_every_new_directory_entry(tmp_path, monkey
 def test_directory_fsync_failure_is_unavailable(tmp_path, monkeypatch):
     _fail_directory_fsync(monkeypatch)
     sink = tmp_path / "audit.jsonl"
-    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="refused", error_code="X", outbound_attempted=False)
+    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", command="bg:resolve", outcome="refused", error_code="X", outbound_attempted=False)
     with pytest.raises(vendor_audit.AuditUnavailable):
         vendor_audit.append_event(sink, event)
 
@@ -534,6 +534,282 @@ def test_actor_comes_from_the_effective_uid_not_the_environment(monkeypatch):
         vendor_audit.resolve_actor_principal()
 
 
+def test_unknown_command_is_rejected():
+    with pytest.raises(ValueError, match="unsupported audit command"):
+        vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", command="other", outcome="refused", error_code=None, outbound_attempted=False)
+
+
 def test_unknown_outcome_is_rejected():
     with pytest.raises(ValueError):
-        vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="maybe", error_code=None, outbound_attempted=False)
+        vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", command="bg:resolve", outcome="maybe", error_code=None, outbound_attempted=False)
+
+
+# --- HDE-CRD-0003 S01: the same gate on hdctl showcompat (§7.1.11a to §7.1.11f) -------------
+
+from engine.cli.main import CliError  # noqa: E402
+from tests.support.pr04_fixtures import build_bundle, build_pack, inject_seams  # noqa: E402
+
+SHOWCOMPAT_BIRTH = [
+    "--birthdate-a", "1990-01-01", "--birthtime-a", "07:41", "--location-a", "Amsterdam, NL",
+    "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin, DE",
+]
+KINDS = {
+    "showcompat": (["showcompat", "--source", "vendor", *SHOWCOMPAT_BIRTH], "showcompat"),
+    "conjunction_vendor": (["showcompat", "--conjunction", "--source", "vendor", "--user-a", "user-1", "--user-b", "user-2", *SHOWCOMPAT_BIRTH], "showcompat:conjunction"),
+    "conjunction_absent": (["showcompat", "--conjunction", "--user-a", "user-1", "--user-b", "user-2", *SHOWCOMPAT_BIRTH], "showcompat:conjunction"),
+}
+
+
+@pytest.fixture(scope="module")
+def _sc_bundle(tmp_path_factory):
+    return build_bundle(tmp_path_factory.mktemp("s01-bundle"))
+
+
+@pytest.fixture(scope="module")
+def _sc_pack(tmp_path_factory):
+    return build_pack(tmp_path_factory.mktemp("s01-pack"))
+
+
+@pytest.fixture
+def sc(monkeypatch, _sc_bundle, _sc_pack, seams):
+    """The PR-04 test bundle, a local store that always misses, and an environment setter."""
+
+    inject_seams(monkeypatch, _sc_bundle, _sc_pack)
+    lookups: list[str] = []
+
+    def fetch_db(user_id, db_access=None):
+        lookups.append(user_id)
+        raise CliError("BODYGRAPH_NOT_FOUND")  # a local miss
+
+    monkeypatch.setattr("engine.cli.main._fetch_db_bodygraph", fetch_db)
+
+    def set_env(tmp_path, **kwargs):
+        for key, value in _env(tmp_path, **kwargs).items():
+            if value is None:
+                monkeypatch.delenv(key, raising=False)
+            else:
+                monkeypatch.setenv(key, value)
+
+    return {"lookups": lookups, "set_env": set_env}
+
+
+def _sc(kind, *, ref=None, extra=()):
+    argv, _command = KINDS[kind]
+    argv = [*argv, *extra]
+    if ref is not None:
+        argv = [*argv, "--allow-prod-vendor", ref]
+    return cli(argv)
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+@pytest.mark.parametrize("ref", [None, REF])
+@pytest.mark.parametrize("safe, net, code", [("1", "1", "PROVIDER_REFUSED"), ("0", "0", "PROVIDER_NETWORK_BLOCKED")])
+def test_s01_closed_rails_refuse_first_on_showcompat(no_io, sc, tmp_path, capsys, monkeypatch, kind, ref, safe, net, code):
+    monkeypatch.setattr(resolver, "classify_vendor_environment", _fail("classification"))
+    sc["set_env"](tmp_path, safe=safe, net=net)
+    assert _sc(kind, ref=ref) == 1
+    captured = capsys.readouterr()
+    assert (captured.out, captured.err) == ("", f"{code}\n")
+    assert _sink_lines(tmp_path) == []
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+def test_s01_production_without_flag_is_refused_and_recorded(no_io, sc, tmp_path, capsys, kind):
+    sc["set_env"](tmp_path)
+    assert _sc(kind) == 1
+    captured = capsys.readouterr()
+    assert (captured.out, captured.err) == ("", "PROVIDER_PROD_OVERRIDE_REQUIRED\n")
+    (event,) = _sink_lines(tmp_path)
+    assert set(event) == IF2_FIELDS
+    assert event["command"] == KINDS[kind][1]
+    assert (event["outcome"], event["error_code"], event["authorization_ref"], event["outbound_attempted"]) == ("refused", "PROVIDER_PROD_OVERRIDE_REQUIRED", None, False)
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+@pytest.mark.parametrize("app_env", ["dev", "staging"])
+def test_s01_non_production_with_flag_is_invalid(no_io, sc, tmp_path, capsys, kind, app_env):
+    sc["set_env"](tmp_path, app_env=app_env)
+    assert _sc(kind, ref=REF) == 1
+    assert capsys.readouterr().err == "PROVIDER_PROD_OVERRIDE_INVALID\n"
+    assert _sink_lines(tmp_path) == []
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+def test_s01_unrecognized_environment_is_config_invalid(no_io, sc, tmp_path, capsys, monkeypatch, kind):
+    sc["set_env"](tmp_path, app_env=None)
+    monkeypatch.delenv("APP_ENV", raising=False)
+    monkeypatch.delenv("ENGINE_ENV", raising=False)
+    assert _sc(kind, ref=REF) == 1
+    assert capsys.readouterr().err == "PROVIDER_CONFIG_INVALID\n"
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+@pytest.mark.parametrize("unavailable", ["sink", "actor"])
+def test_s01_audit_unavailable_refuses_before_io(no_io, sc, tmp_path, capsys, monkeypatch, kind, unavailable):
+    if unavailable == "sink":
+        sc["set_env"](tmp_path, **{vendor_audit.VENDOR_OVERRIDE_AUDIT_PATH_KEY: "relative/override.jsonl"})
+    else:
+        sc["set_env"](tmp_path)
+        monkeypatch.setattr(vendor_audit, "resolve_actor_principal", lambda: (_ for _ in ()).throw(vendor_audit.AuditUnavailable()))
+    assert _sc(kind, ref=REF) == 1
+    assert capsys.readouterr().err == "PROVIDER_AUDIT_UNAVAILABLE\n"
+    assert _sink_lines(tmp_path) == []
+
+
+class _OrderedClient(FakeClient):
+    """Asserts at each fetch that the allowed pre-I/O event is already durable."""
+
+    def __init__(self, tmp_path):
+        super().__init__()
+        self.tmp_path = tmp_path
+        self.events_at_fetch: list[int] = []
+
+    def fetch(self, request):
+        self.events_at_fetch.append(len(_sink_lines(self.tmp_path)))
+        return super().fetch(request)
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+@pytest.mark.parametrize("base, family, resource", [(V2_BASE, "recommended_v2_chart", "charts")])
+def test_s01_valid_flag_allows_one_bounded_read_per_party_with_one_decision(sc, tmp_path, capsys, monkeypatch, kind, base, family, resource):
+    client = _install_client(monkeypatch, _OrderedClient(tmp_path))
+    monkeypatch.setattr("engine.bodygraph.ingest._append_jsonl", lambda *_a, **_k: None)
+    sc["set_env"](tmp_path, base=base)
+    assert _sc(kind, ref=REF) == 0, capsys.readouterr().err
+    assert client.fetches == 2
+    events = _sink_lines(tmp_path)
+    allowed, first, second = events
+    assert client.events_at_fetch == [1, 2]
+    assert {e["correlation_id"] for e in events} == {allowed["correlation_id"]}
+    assert {e["command"] for e in events} == {KINDS[kind][1]}
+    assert (allowed["outcome"], allowed["outbound_attempted"], allowed["route_family"]) == ("allowed", False, None)
+    for state in (first, second):
+        assert (state["outcome"], state["outbound_attempted"], state["route_family"], state["resource_path"]) == ("completed", True, family, resource)
+
+
+def _with_local_store(monkeypatch, lookup):
+    """Give the conjunction's local-first lookup (keyed by canonical person ID) to *lookup*."""
+
+    import engine.cli.main as cli_main
+
+    real = cli_main.conjunction_public_resolved
+
+    def run(left, right, **kwargs):
+        kwargs["local_lookup"] = lookup
+        return real(left, right, **kwargs)
+
+    monkeypatch.setattr(cli_main, "conjunction_public_resolved", run)
+
+
+@pytest.mark.parametrize("kind", ["conjunction_vendor", "conjunction_absent"])
+def test_s01_locally_satisfied_parties_reach_no_gate(sc, tmp_path, capsys, monkeypatch, kind):
+    from tests.support.pr04_fixtures import GATES_A, complete_chart
+
+    client = _install_client(monkeypatch, _OrderedClient(tmp_path))
+    sc["set_env"](tmp_path)  # production, no flag: an acquisition would be refused and recorded
+    _with_local_store(monkeypatch, lambda key: complete_chart(key, GATES_A))
+    assert _sc(kind) == 0, capsys.readouterr().err
+    assert client.fetches == 0
+    assert _sink_lines(tmp_path) == []
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+def test_s01_legacy_v1_acquisition_uses_the_tracking_client_and_records_its_route(sc, tmp_path, capsys, monkeypatch, kind):
+    client = _install_client(monkeypatch, FakeClient())
+    seen = []
+
+    class Outcome:
+        vendor, vendor_version, input_fingerprint, payload = "hdapi", 1, "c" * 64, {"ok": True}
+
+    def ingest(inputs, env=None, dry_run=False, retry_log=None, success_log=None, client=None):
+        seen.append((dry_run, client is not None))
+        client.fetch(client.build_request(birthdate=inputs.birthdate, birthtime=inputs.birthtime, location=inputs.location))
+        return Outcome()
+
+    monkeypatch.setattr("engine.bodygraph.resolver.ingest_vendor_bodygraph", ingest)
+    sc["set_env"](tmp_path, base=V1_BASE)
+    assert _sc(kind, ref=REF) == 1  # the fake payload is not a chart: chart_incomplete after the fetch
+    assert seen == [(True, True)] and client.fetches == 1
+    allowed, state = _sink_lines(tmp_path)
+    assert (state["outcome"], state["outbound_attempted"], state["route_family"], state["resource_path"]) == ("failed", True, "legacy_bodygraph", "bodygraphs")
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+def test_s01_vendor_failure_after_attempt_is_recorded_failed(sc, tmp_path, capsys, monkeypatch, kind):
+    _install_client(monkeypatch, FakeClient(error=VendorError("PROVIDER_UNAVAILABLE", "down")))
+    sc["set_env"](tmp_path)
+    assert _sc(kind, ref=REF) == 1
+    assert capsys.readouterr().err == "PROVIDER_UNAVAILABLE\n"
+    allowed, state = _sink_lines(tmp_path)
+    assert (state["outcome"], state["outbound_attempted"], state["error_code"]) == ("failed", True, "PROVIDER_UNAVAILABLE")
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+def test_s01_unsupported_route_after_allow_is_refused_with_null_route(no_io, sc, tmp_path, capsys, kind):
+    sc["set_env"](tmp_path, base="https://vendor.example.test/v2/extra")
+    assert _sc(kind, ref=REF) == 1
+    assert capsys.readouterr().err == "PROVIDER_ROUTE_UNSUPPORTED\n"
+    allowed, state = _sink_lines(tmp_path)
+    assert (state["outcome"], state["outbound_attempted"], state["error_code"], state["route_family"], state["resource_path"]) == ("refused", False, "PROVIDER_ROUTE_UNSUPPORTED", None, None)
+
+
+@pytest.mark.parametrize("argv", [
+    ["showcompat", "--source", "db", "--user-a", "u1", "--user-b", "u2"],
+    ["showcompat", "--source", "auto", "--user-a", "u1", "--user-b", "u2"],
+    ["showcompat", "--conjunction", "--source", "db", "--user-a", "u1", "--user-b", "u2"],
+    ["showcompat", "--conjunction", "--source", "auto", "--user-a", "u1", "--user-b", "u2"],
+    ["showcompat", "--pair-file", "pair.json"],
+])
+def test_s01_flag_on_an_invocation_without_vendor_acquisition_is_usage(no_io, sc, tmp_path, capsys, monkeypatch, argv):
+    monkeypatch.setattr("engine.cli.main.resolve_compat_chart", _fail("resolver"))
+    monkeypatch.setattr("engine.cli.main.conjunction_public_resolved", _fail("conjunction"))
+    sc["set_env"](tmp_path, safe="1")
+    assert cli([*argv, "--allow-prod-vendor", REF]) == 64
+    captured = capsys.readouterr()
+    assert captured.out == "" and captured.err.count("\n") == 1 and REF not in captured.err
+    assert "--allow-prod-vendor" in captured.err
+    assert sc["lookups"] == []
+
+
+@pytest.mark.parametrize("flags, needle", [
+    (["--allow-prod-vendor", REF, "--allow-prod-vendor", REF], "hdctl showcompat: --allow-prod-vendor may be given only once"),
+    (["--allow-prod-vendor", "bad value"], "hdctl showcompat: --allow-prod-vendor requires one AUTHORIZATION_REF"),
+])
+def test_s01_parse_errors_name_showcompat_and_never_echo_the_value(no_io, sc, tmp_path, capsys, flags, needle):
+    sc["set_env"](tmp_path)
+    assert cli([*KINDS["showcompat"][0], *flags]) == 64
+    err = capsys.readouterr().err
+    assert err.startswith(needle) and "bad value" not in err and REF not in err
+
+
+@pytest.mark.parametrize("kind", sorted(KINDS))
+def test_s01_record_and_streams_carry_no_subject_url_or_secret(sc, tmp_path, capsys, monkeypatch, kind):
+    _install_client(monkeypatch, FakeClient())
+    sc["set_env"](tmp_path)
+    assert _sc(kind, ref=REF) == 0
+    captured = capsys.readouterr()
+    raw = (tmp_path / "state" / "override.jsonl").read_text()
+    for secret in (API_KEY, GEO_KEY, V2_BASE, "vendor.example.test", "1990-01-01", "07:41", "Amsterdam", "Berlin", "user-1"):
+        assert secret not in raw and secret not in captured.err
+
+
+@pytest.mark.parametrize("kind", ["conjunction_vendor", "conjunction_absent"])
+def test_s01_one_local_party_and_one_acquired_party_write_one_decision_and_one_state(sc, tmp_path, capsys, monkeypatch, kind):
+    from tests.support.pr04_fixtures import GATES_A, complete_chart
+
+    client = _install_client(monkeypatch, _OrderedClient(tmp_path))
+    sc["set_env"](tmp_path)
+    first: list[str] = []
+
+    def lookup(key):
+        if not first:
+            first.append(key)
+            return complete_chart(key, GATES_A)
+        return None
+
+    _with_local_store(monkeypatch, lookup)
+    assert _sc(kind, ref=REF) == 0, capsys.readouterr().err
+    assert client.fetches == 1
+    allowed, state = _sink_lines(tmp_path)
+    assert allowed["outcome"] == "allowed" and state["outcome"] == "completed"
+    assert allowed["correlation_id"] == state["correlation_id"]

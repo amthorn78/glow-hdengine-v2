@@ -254,13 +254,16 @@ def test_allow_prod_vendor_with_non_vendor_source_is_usage(monkeypatch, capsys, 
 
 
 @pytest.mark.parametrize("argv", [
+    # HDE-CRD-0003 S01: showcompat accepts the flag only when it selects vendor acquisition.
     ["showcompat", "--allow-prod-vendor", _REF],
+    ["showcompat", "--source", "db", "--user-a", "u1", "--user-b", "u2", "--allow-prod-vendor", _REF],
+    ["showcompat", "--conjunction", "--source", "auto", "--user-a", "u1", "--user-b", "u2", "--allow-prod-vendor", _REF],
     ["aux-preview", "--allow-prod-vendor", _REF],
     ["--allow-prod-vendor", _REF, "bg:resolve", "--user", "u", "--source", "vendor"],
     ["bg:resolve", "--user", "u", *_VENDOR_ARGS, "--", "--allow-prod-vendor", _REF],
     ["bg:resolve", "--user", "u", *_VENDOR_ARGS, "--", f"--allow-prod-vendor={_REF}"],
 ])
-def test_allow_prod_vendor_outside_bg_resolve_is_usage(monkeypatch, capsys, argv):
+def test_allow_prod_vendor_outside_its_vendor_paths_is_usage(monkeypatch, capsys, argv):
     _usage(argv, capsys, monkeypatch, forbidden=(_REF,))
 
 

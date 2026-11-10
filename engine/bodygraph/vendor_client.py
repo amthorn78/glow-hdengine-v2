@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import socket
 import time
 from dataclasses import dataclass
@@ -99,14 +100,41 @@ _VENDOR_LOG_ROUTE_LABELS = frozenset(
 )
 
 
-def _configured_base_version(base_url: str) -> str:
-    parsed = urlparse(base_url)
-    segments = [segment.lower() for segment in parsed.path.split("/") if segment]
-    if "v2" in segments:
-        return "v2"
-    if "v1" in segments:
-        return "v1"
-    return "unversioned"
+_ROUTE_SELECTING_SEGMENTS = ("v1", "v2")
+_VERSION_MARKER = re.compile(r"[vV][0-9]+")
+_BASE_TRIM = " \t\n\r\x0b\x0c"
+ROUTE_UNSUPPORTED_CODE = "PROVIDER_ROUTE_UNSUPPORTED"
+
+
+def _configured_base_version(base_url: object) -> str | None:
+    """Return ``"v1"`` or ``"v2"`` for a selectable configured base, else ``None``.
+
+    HDE-CLI-API-Vendor-Ref §7.1.10 and HDE Mechanics Guide §1.1: after trimming
+    surrounding ASCII whitespace and trailing ``/``, the base must be absolute
+    HTTPS with a host and no userinfo, query or fragment, and its terminal path
+    segment is compared once, exactly and case-sensitively, with ``v1`` and
+    ``v2``. A version marker in any other segment makes the base ambiguous.
+    """
+
+    if not isinstance(base_url, str):
+        return None
+    candidate = base_url.strip(_BASE_TRIM).rstrip("/")
+    if "?" in candidate or "#" in candidate:
+        return None
+    try:
+        parsed = urlparse(candidate)
+        hostname = parsed.hostname
+    except ValueError:
+        return None
+    if parsed.scheme != "https" or not hostname or "@" in parsed.netloc:
+        return None
+    segments = parsed.path.split("/")
+    terminal = segments[-1]
+    if terminal not in _ROUTE_SELECTING_SEGMENTS:
+        return None
+    if any(_VERSION_MARKER.fullmatch(segment) for segment in segments[:-1]):
+        return None
+    return terminal
 
 
 def route_auth_posture(path: str) -> str:
@@ -122,8 +150,27 @@ def route_auth_posture(path: str) -> str:
 
 
 def classify_bg_resolve_route_policy(base_url: str) -> dict[str, Any]:
-    """Classify bg:resolve vendor routing before any BodyGraph request is built."""
+    """Classify resolver vendor routing before any BodyGraph request is built.
+
+    Only a terminal ``v2`` (``charts``) or ``v1`` (``bodygraphs``) base selects a
+    route. Every other base returns ``supported: False`` with
+    ``PROVIDER_ROUTE_UNSUPPORTED`` and no route, so no credential is projected;
+    this function never raises (HDE-CRD-0003 S02).
+    """
     version = _configured_base_version(base_url)
+    if version is None:
+        return {
+            "configured_base_version": "unsupported",
+            "resource_path": None,
+            "route_family": None,
+            "payload_family": None,
+            "route_auth_posture": None,
+            "geocode_required": None,
+            "classification": "unsupported_configured_base",
+            "supported": False,
+            "error_code": ROUTE_UNSUPPORTED_CODE,
+            "reason": "configured base is not an absolute HTTPS URL with a host, no userinfo, query or fragment, and a terminal v1 or v2 segment",
+        }
     if version == "v2":
         chart_path = "charts"
         contract = _ROUTE_CONTRACTS[chart_path]

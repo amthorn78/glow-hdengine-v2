@@ -13,6 +13,7 @@ from engine.bodygraph.ingest import resolve_db_user_id
 from engine.bodygraph.mapped_cache import MappedBodyGraphRow, MappedCacheError, read_current_mapped_bodygraph
 from engine.bodygraph.projection import BodyGraphProjectionError, canonical_uuid
 from engine.bodygraph.resolver import (
+    CompatVendorOverride,
     ResolvedCompatChart,
     is_valid_authorization_ref,
     projection_refusal,
@@ -50,13 +51,22 @@ _BIRTH_KEYS = ("birthdate", "birthtime", "location")
 # HDE-CLI-API-Vendor-Ref §7.1.11a and §7.1.11e: usage errors name the option and
 # never echo its value.
 _ALLOW_PROD_VENDOR = "--allow-prod-vendor"
-_ALLOW_PROD_VENDOR_COMMAND_USAGE = "hdctl: --allow-prod-vendor is accepted only by bg:resolve --source vendor"
-_ALLOW_PROD_VENDOR_DUPLICATE_USAGE = "hdctl bg:resolve: --allow-prod-vendor may be given only once"
+# §7.1.11a: the commands whose vendor-acquiring paths accept the flag.
+_ALLOW_PROD_VENDOR_COMMANDS = ("bg:resolve", "showcompat")
+_ALLOW_PROD_VENDOR_COMMAND_USAGE = (
+    "hdctl: --allow-prod-vendor is accepted only by bg:resolve --source vendor, showcompat --source vendor "
+    "and showcompat --conjunction with --source vendor or no --source"
+)
+_ALLOW_PROD_VENDOR_DUPLICATE_USAGE = "hdctl {command}: --allow-prod-vendor may be given only once"
 _ALLOW_PROD_VENDOR_VALUE_USAGE = (
-    "hdctl bg:resolve: --allow-prod-vendor requires one AUTHORIZATION_REF of 1 to 128 characters "
-    "matching ^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    "hdctl {command}: --allow-prod-vendor requires one AUTHORIZATION_REF of 1 to 128 characters "
+    "matching ^[A-Za-z0-9][A-Za-z0-9._:/-]{{0,127}}$"
 )
 _ALLOW_PROD_VENDOR_SOURCE_USAGE = "hdctl bg:resolve: --allow-prod-vendor is accepted only with --source vendor"
+_ALLOW_PROD_VENDOR_SHOWCOMPAT_SOURCE_USAGE = (
+    "hdctl showcompat: --allow-prod-vendor is accepted only with --source vendor, "
+    "or with --conjunction and --source vendor or no --source"
+)
 
 
 class CliError(Exception):
@@ -135,6 +145,15 @@ def _build_parser() -> argparse.ArgumentParser:
     show.add_argument("--birthdate-b", dest="birthdate_b", help="Birthdate for party B (YYYY-MM-DD)")
     show.add_argument("--birthtime-b", dest="birthtime_b", help="Birth time for party B (HH:MM)")
     show.add_argument("--location-b", dest="location_b", help="Location for party B")
+    show.add_argument(
+        _ALLOW_PROD_VENDOR,
+        dest="allow_prod_vendor",
+        metavar="AUTHORIZATION_REF",
+        help=(
+            "Production-like environments only, with --source vendor or --conjunction without --source db/auto: "
+            "audit reference of the approved work item (not a credential)"
+        ),
+    )
     show.set_defaults(handler=showcompat)
 
     aux = sub.add_parser(
@@ -244,15 +263,16 @@ def _allow_prod_vendor_usage_error(argv: Sequence[str]) -> str | None:
     # After "--" argparse would report the option and its value as unrecognized arguments.
     if (
         command_index is None
-        or argv[command_index] != "bg:resolve"
+        or argv[command_index] not in _ALLOW_PROD_VENDOR_COMMANDS
         or values[0][0] < command_index
         or values[-1][0] > separator_index
     ):
         return _ALLOW_PROD_VENDOR_COMMAND_USAGE
+    command = argv[command_index]
     if len(values) > 1:
-        return _ALLOW_PROD_VENDOR_DUPLICATE_USAGE
+        return _ALLOW_PROD_VENDOR_DUPLICATE_USAGE.format(command=command)
     if not is_valid_authorization_ref(values[0][1]):
-        return _ALLOW_PROD_VENDOR_VALUE_USAGE
+        return _ALLOW_PROD_VENDOR_VALUE_USAGE.format(command=command)
     return None
 
 
@@ -392,12 +412,14 @@ def _resolve_party(
     *,
     source_policy: str,
     local_lookup=None,
+    acquisition=None,
 ) -> ResolvedCompatChart:
     return resolve_compat_chart(
         payload,
         source_policy=source_policy,
         env=_resolver_env(),
         local_lookup=local_lookup,
+        acquisition=acquisition,
     )
 
 
@@ -663,7 +685,32 @@ def aux_preview(args: argparse.Namespace) -> int:
     return 0
 
 
+def _showcompat_vendor_override(args: argparse.Namespace) -> CompatVendorOverride | None:
+    """Steps 1 and 2 of §7.1.11d for showcompat; ``None`` when no vendor acquisition is selected.
+
+    Vendor acquisition is selected by ``--source vendor``, and in conjunction mode
+    also by an absent ``--source`` (the conjunction source policy is ``vendor``
+    for every source but ``db`` and ``auto``). The flag on any other invocation
+    is a usage error, exit 64.
+    """
+
+    source = getattr(args, "source", None)
+    conjunction = bool(getattr(args, "conjunction", False))
+    authorization_ref = getattr(args, "allow_prod_vendor", None)
+    selects_vendor = source == "vendor" or (conjunction and source is None)
+    if not selects_vendor:
+        if authorization_ref is not None:
+            raise CliError(_ALLOW_PROD_VENDOR_SHOWCOMPAT_SOURCE_USAGE, exit_code=64)
+        return None
+    return CompatVendorOverride(
+        command="showcompat:conjunction" if conjunction else "showcompat",
+        authorization_ref=authorization_ref,
+    )
+
+
 def showcompat(_: argparse.Namespace) -> int:
+    vendor_override = _showcompat_vendor_override(_)
+    acquisition = vendor_override.acquire if vendor_override is not None else None
     viewer_prefs = _load_viewer_prefs(getattr(_, "viewer_prefs_file", None))
     engine_tag, release_id, invocation_tag = _engine_identity()
 
@@ -750,8 +797,8 @@ def showcompat(_: argparse.Namespace) -> int:
             left_birth = _vendor_inputs_from_args(_, "a")
             right_birth = _vendor_inputs_from_args(_, "b")
             return (
-                _resolve_party(left_birth, source_policy="vendor"),
-                _resolve_party(right_birth, source_policy="vendor"),
+                _resolve_party(left_birth, source_policy="vendor", acquisition=acquisition),
+                _resolve_party(right_birth, source_policy="vendor", acquisition=acquisition),
             )
         if source == "auto":
             # PF05 §4.1.2: auto is DB-only; the birth-based vendor fallback is prohibited.
@@ -796,6 +843,7 @@ def showcompat(_: argparse.Namespace) -> int:
             right,
             env=_resolver_env(),
             local_lookup=_lookup_local_conjunction,
+            acquisition=acquisition,
             source_policy="local" if source in ("db", "auto") else "vendor",
         )
         _emit_stdout_bytes(emitter.emit_public(conjunction_payload))

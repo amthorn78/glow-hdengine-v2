@@ -55,11 +55,108 @@ class VendorEnvironment:
 
 @dataclass
 class _OverrideGate:
-    """Per-invocation state of an allowed production override (step 7)."""
+    """State of one acquisition under an allowed production override (step 7)."""
 
     outbound_attempted: bool = False
     route_family: str | None = None
     resource_path: str | None = None
+
+
+# HDE-CLI-API-Vendor-Ref §7.1.11f: the audit `command` of each CLI path.
+OVERRIDE_COMMANDS = frozenset({"bg:resolve", "showcompat", "showcompat:conjunction"})
+
+
+@dataclass(frozen=True)
+class _OverrideAudit:
+    """The allowed pre-I/O event's identity, reused by the state events (§7.1.11f)."""
+
+    sink: Any
+    correlation_id: str
+    actor: str
+    authorization_ref: str
+    environment: "VendorEnvironment"
+    command: str
+
+
+@dataclass(frozen=True)
+class _OverrideDecision:
+    """Result of steps 4 to 6 of §7.1.11d for one invocation."""
+
+    environment: "VendorEnvironment"
+    audit: _OverrideAudit | None
+
+
+def _evaluate_production_override(
+    vendor_env: Mapping[str, object],
+    *,
+    command: str,
+    authorization_ref: str | None,
+) -> _OverrideDecision:
+    """Steps 4 to 6 of §7.1.11d, shared by every CLI path §7.1.11a names.
+
+    Called after the generic rails (step 3) and before any route, credential,
+    client or network activity (step 7). A refusal raises :class:`VendorError`
+    with ``outbound_attempted: False``; each caller maps it to its own carrier
+    (§7.1.11e). A non-production decision carries no audit; an allowed
+    production decision carries the pre-I/O event already written.
+    """
+
+    if command not in OVERRIDE_COMMANDS:
+        raise ValueError("unsupported override command")
+    # Step 4: the effective environment.
+    environment = classify_vendor_environment(vendor_env)
+    # Step 5: the rail and flag matrix (§7.1.11c).
+    if not environment.production_like:
+        if authorization_ref is not None:
+            raise _override_error(
+                "PROVIDER_PROD_OVERRIDE_INVALID",
+                "production vendor override is not accepted in a non-production environment",
+            )
+        return _OverrideDecision(environment=environment, audit=None)
+    if authorization_ref is None:
+        _append_flag_absent_event(vendor_env, environment, command)
+        raise _override_error(
+            "PROVIDER_PROD_OVERRIDE_REQUIRED",
+            "production-like vendor access requires --allow-prod-vendor",
+        )
+    # Step 6: actor identity and the durable pre-I/O audit event (§7.1.11e–f).
+    try:
+        actor = vendor_audit.resolve_actor_principal()
+        sink = vendor_audit.resolve_sink_path(vendor_env)
+        correlation_id = vendor_audit.new_correlation_id()
+        vendor_audit.append_event(
+            sink,
+            vendor_audit.build_event(
+                correlation_id=correlation_id,
+                actor_principal=actor,
+                authorization_ref=authorization_ref,
+                environment=environment.label,
+                command=command,
+                outcome="allowed",
+                error_code=None,
+                outbound_attempted=False,
+            ),
+        )
+    except vendor_audit.AuditUnavailable:
+        raise _override_error(
+            "PROVIDER_AUDIT_UNAVAILABLE",
+            "production vendor override audit is unavailable",
+        ) from None
+    return _OverrideDecision(
+        environment=environment,
+        audit=_OverrideAudit(
+            sink=sink,
+            correlation_id=correlation_id,
+            actor=actor,
+            authorization_ref=authorization_ref,
+            environment=environment,
+            command=command,
+        ),
+    )
+
+
+def _override_error(code: str, message: str) -> VendorError:
+    return VendorError(code, message, details={"outbound_attempted": False})
 
 
 def _environment_value(view: Mapping[str, object], name: str) -> str | None:
@@ -265,11 +362,6 @@ def _resolve_vendor(
     # that the vendor configuration overlay intentionally treats as removal.
     if env is not None:
         database_env.update(env)
-    # Step 4 (§7.1.11d): the effective environment.
-    try:
-        environment = classify_vendor_environment(vendor_env)
-    except VendorError as exc:
-        return _vendor_error(exc, resolver_meta)
     route_args = dict(
         user_id=user_id,
         resolver_meta=resolver_meta,
@@ -281,57 +373,35 @@ def _resolve_vendor(
         birthtime=birthtime,
         location=location,
     )
-    # Step 5: the rail and flag matrix (§7.1.11c).
-    if not environment.production_like:
-        if authorization_ref is not None:
-            return _override_refusal(
-                "PROVIDER_PROD_OVERRIDE_INVALID",
-                "production vendor override is not accepted in a non-production environment",
-                resolver_meta,
-            )
-        return _resolve_vendor_route(**route_args, gate=None)
-    if authorization_ref is None:
-        _append_flag_absent_event(vendor_env, environment)
-        return _override_refusal(
-            "PROVIDER_PROD_OVERRIDE_REQUIRED",
-            "production-like vendor access requires --allow-prod-vendor",
-            resolver_meta,
-        )
-    # Step 6: actor identity and the durable pre-I/O audit event (§7.1.11e–f).
+    # Steps 4 to 6 (§7.1.11d), shared with showcompat (HDE-CRD-0003 S01).
     try:
-        actor = vendor_audit.resolve_actor_principal()
-        sink = vendor_audit.resolve_sink_path(vendor_env)
-        correlation_id = vendor_audit.new_correlation_id()
-        vendor_audit.append_event(
-            sink,
-            vendor_audit.build_event(
-                correlation_id=correlation_id,
-                actor_principal=actor,
-                authorization_ref=authorization_ref,
-                environment=environment.label,
-                outcome="allowed",
-                error_code=None,
-                outbound_attempted=False,
-            ),
-        )
-    except vendor_audit.AuditUnavailable:
-        return _override_refusal(
-            "PROVIDER_AUDIT_UNAVAILABLE",
-            "production vendor override audit is unavailable",
-            resolver_meta,
-        )
+        decision = _evaluate_production_override(vendor_env, command="bg:resolve", authorization_ref=authorization_ref)
+    except VendorError as exc:
+        return _vendor_error(exc, resolver_meta)
+    audit = decision.audit
+    if audit is None:
+        return _resolve_vendor_route(**route_args, gate=None)
     # Step 7, then one state event under the same correlation ID.
     gate = _OverrideGate()
     try:
         result = _resolve_vendor_route(**route_args, gate=gate)
     except BaseException:
-        _append_state_event(sink, correlation_id, actor, authorization_ref, environment, gate, None)
+        _append_state_event(audit, gate, completed=False, error_code=None)
         raise
-    _append_state_event(sink, correlation_id, actor, authorization_ref, environment, gate, result)
+    _append_state_event(audit, gate, completed=result.status == "ok", error_code=_result_error_code(result))
     return result
 
 
-def _append_flag_absent_event(vendor_env: Mapping[str, object], environment: VendorEnvironment) -> None:
+def _result_error_code(result: "ResolveBodygraphResult") -> str | None:
+    if result.status == "ok":
+        return None
+    error = result.payload.get("error")
+    if isinstance(error, Mapping) and isinstance(error.get("code"), str):
+        return error["code"]
+    return None
+
+
+def _append_flag_absent_event(vendor_env: Mapping[str, object], environment: VendorEnvironment, command: str) -> None:
     """Row 3 of §7.1.11c: the refusal stands whether or not its event persists."""
 
     try:
@@ -342,6 +412,7 @@ def _append_flag_absent_event(vendor_env: Mapping[str, object], environment: Ven
                 actor_principal=vendor_audit.resolve_actor_principal(),
                 authorization_ref=None,
                 environment=environment.label,
+                command=command,
                 outcome="refused",
                 error_code="PROVIDER_PROD_OVERRIDE_REQUIRED",
                 outbound_attempted=False,
@@ -351,34 +422,22 @@ def _append_flag_absent_event(vendor_env: Mapping[str, object], environment: Ven
         return
 
 
-def _append_state_event(
-    sink: Any,
-    correlation_id: str,
-    actor: str,
-    authorization_ref: str,
-    environment: VendorEnvironment,
-    gate: _OverrideGate,
-    result: "ResolveBodygraphResult | None",
-) -> None:
-    """Append the post-step-7 state event; a failure changes nothing and prints nothing."""
+def _append_state_event(audit: _OverrideAudit, gate: _OverrideGate, *, completed: bool, error_code: str | None) -> None:
+    """Append one post-step-7 state event; a failure changes nothing and prints nothing."""
 
-    error_code: str | None = None
-    if result is not None and result.status == "ok":
-        outcome = "completed"
+    if completed:
+        outcome, error_code = "completed", None
     else:
         outcome = "failed" if gate.outbound_attempted else "refused"
-        if result is not None:
-            error = result.payload.get("error")
-            if isinstance(error, Mapping) and isinstance(error.get("code"), str):
-                error_code = error["code"]
     try:
         vendor_audit.append_event(
-            sink,
+            audit.sink,
             vendor_audit.build_event(
-                correlation_id=correlation_id,
-                actor_principal=actor,
-                authorization_ref=authorization_ref,
-                environment=environment.label,
+                correlation_id=audit.correlation_id,
+                actor_principal=audit.actor,
+                authorization_ref=audit.authorization_ref,
+                environment=audit.environment.label,
+                command=audit.command,
                 outcome=outcome,
                 error_code=error_code,
                 outbound_attempted=gate.outbound_attempted,
@@ -410,8 +469,9 @@ def _resolve_vendor_route(
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     if gate is not None:
-        gate.route_family = str(route_policy["route_family"])
-        gate.resource_path = str(route_policy["resource_path"])
+        # §7.1.11f: an allow-listed label once classification is reached; null for an unsupported base.
+        gate.route_family = route_policy["route_family"]
+        gate.resource_path = route_policy["resource_path"]
     resolver_meta = {**resolver_meta, "route_policy": route_policy}
     if not route_policy["supported"]:
         error = VendorError(
@@ -917,6 +977,7 @@ def _acquire_dry_run(
     seeds: set[str],
     birth: tuple[str | None, str | None, str | None],
     env: Mapping[str, object],
+    override: "CompatVendorOverride | None" = None,
 ) -> ResolvedCompatChart:
     """Guarded, read-only vendor acquisition through the existing v2 chart path.
 
@@ -937,98 +998,171 @@ def _acquire_dry_run(
         vendor_env = dict(_vendor_config_env(scoped))
         database_env = dict(vendor_env)
         database_env.update(scoped)
-        route_policy = _classify_env_route_policy(vendor_env)
-        if not route_policy["supported"]:
-            raise VendorError(
-                str(route_policy["error_code"]),
-                "compat acquisition route unsupported for configured base",
-                details={
-                    "classification": route_policy["classification"],
-                    "configured_base_version": route_policy["configured_base_version"],
-                    "route_family": route_policy["route_family"],
-                    "resource_path": route_policy["resource_path"],
-                },
-            )
-        birthdate, birthtime, location = birth
-        missing = [name for name, value in (("birthdate", birthdate), ("birthtime", birthtime), ("location", location)) if not value]
-        if missing:
-            raise VendorError("PROVIDER_INPUT_MISSING", "birth inputs missing", details={"missing": missing})
-        vendor_inputs = VendorInputs(
-            user_id=canonical_person_id,
-            birthdate=str(birthdate),
-            birthtime=str(birthtime),
-            location=str(location),
-        )
-        seed = sorted(seeds)[0] if seeds else canonical_person_id
-        user_identity = _ResolvedUserIdentity(database_user_id=canonical_person_id, person_uid_seed=seed)
-        resolver_meta: dict[str, object] = {
-            "requested_source": "vendor",
-            "resolved_source": "vendor",
-            "upsert": False,
-            "dry_run": True,
-            "safe_mode": False,
-            "allow_network": True,
-            "route_policy": route_policy,
-        }
-        if route_policy["route_family"] == "recommended_v2_chart":
-            outcome = _resolve_vendor_v2_chart(
-                user_identity,
-                resolver_meta,
-                vendor_inputs,
-                vendor_env=vendor_env,
-                database_env=database_env,
-                upsert=False,
-                dry_run=True,
-                route_policy=route_policy,
-            )
-            if outcome.status != "ok":
-                error = outcome.payload.get("error") if isinstance(outcome.payload, Mapping) else None
-                if isinstance(error, Mapping):
-                    details = error.get("details")
-                    raise VendorError(
-                        str(error.get("code") or "PROVIDER_UNAVAILABLE"),
-                        str(error.get("message") or "resolver unavailable"),
-                        details=details if isinstance(details, Mapping) else None,
-                    )
-                raise VendorError("PROVIDER_UNAVAILABLE", "resolver unavailable")
-            resolved = outcome.payload.get("resolved")
-            cache = outcome.payload.get("cache")
-            if not isinstance(resolved, Mapping) or not isinstance(cache, Mapping):
-                raise CompatBoundaryError("chart_missing", detail="acquisition")
-            return _bind_chart(
-                resolved,
-                canonical_person_id,
-                seeds,
-                source="vendor_v2_dry_run",
-                user_id=_text(cache.get("user_id")),
-                vendor=_text(cache.get("vendor")),
-                vendor_version=cache.get("vendor_version") if type(cache.get("vendor_version")) is int else None,
-                input_fingerprint=_text(cache.get("input_fingerprint")),
-            )
-        legacy = ingest_vendor_bodygraph(
-            vendor_inputs,
-            env=database_env,
-            dry_run=True,
-            retry_log=None,
-            success_log=None,
-        )
-        payload = legacy.payload
-        if not isinstance(payload, Mapping) or "bodygraph" not in payload:
-            raise CompatBoundaryError("chart_incomplete", detail="legacy_v1")
-        return _bind_chart(
-            {key: payload[key] for key in payload if key in _PROJECTION_KEYS},
-            canonical_person_id,
-            seeds,
-            source="legacy_v1_dry_run",
-            user_id=canonical_person_id,
-            vendor=legacy.vendor,
-            vendor_version=legacy.vendor_version,
-            input_fingerprint=legacy.input_fingerprint,
-        )
+        audit = override.decide(vendor_env) if override is not None else None
+        if audit is None:
+            return _acquire_route(canonical_person_id, seeds, birth, vendor_env, database_env, gate=None)
+        # Step 7 under an allowed production override, then one state event (§7.1.11f).
+        gate = _OverrideGate()
+        try:
+            acquired = _acquire_route(canonical_person_id, seeds, birth, vendor_env, database_env, gate=gate)
+        except VendorError as exc:
+            _append_state_event(audit, gate, completed=False, error_code=exc.code)
+            raise
+        except BaseException:
+            _append_state_event(audit, gate, completed=False, error_code=None)
+            raise
+        _append_state_event(audit, gate, completed=True, error_code=None)
+        return acquired
     finally:
         vendor_env.clear()
         database_env.clear()
         scoped.clear()
+
+
+def _acquire_route(
+    canonical_person_id: str,
+    seeds: set[str],
+    birth: tuple[str | None, str | None, str | None],
+    vendor_env: Mapping[str, object],
+    database_env: Mapping[str, object],
+    *,
+    gate: _OverrideGate | None,
+) -> ResolvedCompatChart:
+    """Step 7 of §7.1.11d for one compat acquisition: route, inputs, client and fetch."""
+
+    route_policy = _classify_env_route_policy(vendor_env)
+    if gate is not None:
+        gate.route_family = route_policy["route_family"]
+        gate.resource_path = route_policy["resource_path"]
+    if not route_policy["supported"]:
+        raise VendorError(
+            str(route_policy["error_code"]),
+            "compat acquisition route unsupported for configured base",
+            details={
+                "classification": route_policy["classification"],
+                "configured_base_version": route_policy["configured_base_version"],
+                "route_family": route_policy["route_family"],
+                "resource_path": route_policy["resource_path"],
+            },
+        )
+    birthdate, birthtime, location = birth
+    missing = [name for name, value in (("birthdate", birthdate), ("birthtime", birthtime), ("location", location)) if not value]
+    if missing:
+        raise VendorError("PROVIDER_INPUT_MISSING", "birth inputs missing", details={"missing": missing})
+    vendor_inputs = VendorInputs(
+        user_id=canonical_person_id,
+        birthdate=str(birthdate),
+        birthtime=str(birthtime),
+        location=str(location),
+    )
+    seed = sorted(seeds)[0] if seeds else canonical_person_id
+    user_identity = _ResolvedUserIdentity(database_user_id=canonical_person_id, person_uid_seed=seed)
+    resolver_meta: dict[str, object] = {
+        "requested_source": "vendor",
+        "resolved_source": "vendor",
+        "upsert": False,
+        "dry_run": True,
+        "safe_mode": False,
+        "allow_network": True,
+        "route_policy": route_policy,
+    }
+    if route_policy["route_family"] == "recommended_v2_chart":
+        outcome = _resolve_vendor_v2_chart(
+            user_identity,
+            resolver_meta,
+            vendor_inputs,
+            vendor_env=vendor_env,
+            database_env=database_env,
+            upsert=False,
+            dry_run=True,
+            route_policy=route_policy,
+            override_gate=gate,
+        )
+        if outcome.status != "ok":
+            error = outcome.payload.get("error") if isinstance(outcome.payload, Mapping) else None
+            if isinstance(error, Mapping):
+                details = error.get("details")
+                raise VendorError(
+                    str(error.get("code") or "PROVIDER_UNAVAILABLE"),
+                    str(error.get("message") or "resolver unavailable"),
+                    details=details if isinstance(details, Mapping) else None,
+                )
+            raise VendorError("PROVIDER_UNAVAILABLE", "resolver unavailable")
+        resolved = outcome.payload.get("resolved")
+        cache = outcome.payload.get("cache")
+        if not isinstance(resolved, Mapping) or not isinstance(cache, Mapping):
+            raise CompatBoundaryError("chart_missing", detail="acquisition")
+        return _bind_chart(
+            resolved,
+            canonical_person_id,
+            seeds,
+            source="vendor_v2_dry_run",
+            user_id=_text(cache.get("user_id")),
+            vendor=_text(cache.get("vendor")),
+            vendor_version=cache.get("vendor_version") if type(cache.get("vendor_version")) is int else None,
+            input_fingerprint=_text(cache.get("input_fingerprint")),
+        )
+    client = None
+    if gate is not None:
+        client = _AttemptTrackingClient(HdApiClient.from_env(env=_client_config_env(database_env)), gate)
+    legacy = ingest_vendor_bodygraph(
+        vendor_inputs,
+        env=database_env,
+        dry_run=True,
+        retry_log=None,
+        success_log=None,
+        client=client,  # type: ignore[arg-type]
+    )
+    payload = legacy.payload
+    if not isinstance(payload, Mapping) or "bodygraph" not in payload:
+        raise CompatBoundaryError("chart_incomplete", detail="legacy_v1")
+    return _bind_chart(
+        {key: payload[key] for key in payload if key in _PROJECTION_KEYS},
+        canonical_person_id,
+        seeds,
+        source="legacy_v1_dry_run",
+        user_id=canonical_person_id,
+        vendor=legacy.vendor,
+        vendor_version=legacy.vendor_version,
+        input_fingerprint=legacy.input_fingerprint,
+    )
+
+
+class CompatVendorOverride:
+    """One showcompat invocation's production vendor override (HDE-CRD-0003 S01).
+
+    HDE-CLI-API-Vendor-Ref §7.1.11a to §7.1.11f: steps 4 to 6 run once, at the
+    first compat vendor acquisition (after the local-first lookup misses and the
+    generic rails pass); the decision and its pre-I/O event are reused for the
+    second party. Pass :meth:`acquire` as ``acquisition`` to
+    :func:`resolve_compat_chart` or ``conjunction_public_resolved``.
+    """
+
+    def __init__(self, *, command: str, authorization_ref: str | None) -> None:
+        if command not in OVERRIDE_COMMANDS or command == "bg:resolve":
+            raise ValueError("unsupported compat override command")
+        if authorization_ref is not None and not is_valid_authorization_ref(authorization_ref):
+            raise ValueError("invalid authorization reference")
+        self.command = command
+        self.authorization_ref = authorization_ref
+        self._decision: _OverrideDecision | None = None
+
+    def decide(self, vendor_env: Mapping[str, object]) -> _OverrideAudit | None:
+        if self._decision is None:
+            self._decision = _evaluate_production_override(
+                vendor_env, command=self.command, authorization_ref=self.authorization_ref
+            )
+        return self._decision.audit
+
+    def acquire(
+        self,
+        *,
+        canonical_person_id: str,
+        seeds: frozenset[str],
+        birth: tuple[str | None, str | None, str | None],
+        env: Mapping[str, object],
+    ) -> ResolvedCompatChart:
+        return _acquire_dry_run(canonical_person_id, set(seeds), birth, env, override=self)
 
 
 def _resolve_stored(
