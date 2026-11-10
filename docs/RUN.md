@@ -14,7 +14,7 @@
 
 
 ## Release-sanity posture
-- The current release-sanity gate is `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_sanity_pipeline.py`; it is an exact fifteen-stage fail-closed chain and logs to `audit/gates/sanity_pipeline/sanity_pipeline.log`. It exercises current mapped-cache behavior in memory and leaves frozen architecture and historical OPS evidence untouched. Do not run it for a docs-only PR unless specifically scoped.
+- The current release-sanity gate is `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_sanity_pipeline.py`; it is an exact fifteen-stage fail-closed chain and logs to `audit/gates/sanity_pipeline/sanity_pipeline.log`. It exercises current mapped-cache behavior in memory and leaves the architecture snapshot and historical OPS evidence untouched. Do not run it for a docs-only PR unless specifically scoped.
 - Direct DB posture is direct-only through `DATABASE_URL`; retired bridge keys `DB_ALLOW_BRIDGE_IN_PROD`, `DB_BRIDGE_URL`, and `DB_FORCE_BRIDGE` are presence-sensitive refusal keys before provider construction or I/O.
 - Configured-v2 mapped-cache non-dry-run use requires explicit `--upsert`, open rails, a non-production-like environment, and a sanctioned `DBAccess.for_current_env()` target; it persists only the projected mapped-cache payload and refuses production-like writes.
 

@@ -139,6 +139,7 @@ jobs:
         run: |
           set -euo pipefail
           python tools/order/generate_ordering_artifacts.py --check
+          python tools/evidence/generate_architecture_snapshot.py --check
           python -m pytest -q \
             tests/order \
             tests/mech/test_order_properties.py \
@@ -231,6 +232,7 @@ jobs:
           python tools/evidence/validate_evidence_paths.py
           ci/checks/check_mirror_schema.sh
           ci/checks/check_final_lf.sh
+          python tools/evidence/generate_architecture_snapshot.py --check
           python -m pytest -q \
             tests/evidence/test_evidence_index_missing_state.py \
             tests/evidence/test_evidence_skeleton.py \
