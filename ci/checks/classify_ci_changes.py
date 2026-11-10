@@ -275,6 +275,9 @@ _WORKFLOW_CONTROL_PATH_LANES = {
     "VERIFY.sh": {"product"},
     "dev/reader_harness/__init__.py": {"product"},
     "dev/reader_harness/app.py": {"product"},
+    # HDE-CRD-0003 S03: the non-canonical Flask start helper defaults APP_ENV for
+    # the compat route's dev/admin gate; its owner test is in the compat lane.
+    "run_flask_dev.sh": {"compat"},
 }
 _RAILS_MARKERS = (
     "open_rails",
