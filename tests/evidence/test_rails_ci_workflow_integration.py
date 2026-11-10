@@ -1925,6 +1925,45 @@ def test_change_classifier_covers_release_chain_sources_and_outputs() -> None:
         assert classifier.classify_paths([path]).flags["release"], path
 
 
+def test_architecture_snapshot_check_runs_whenever_its_inputs_change() -> None:
+    # HDE-CRD-0003 S12 (IF-12): --check runs in the product and evidence lanes, and a
+    # change to any input of the snapshot selects at least one of them.
+    from tools.evidence import generate_architecture_snapshot as architecture
+
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    command = "python tools/evidence/generate_architecture_snapshot.py --check"
+    assert workflow.count(command) == 2
+    product_step = workflow[
+        workflow.index("      - name: Run product mechanics and ordering lane") :
+        workflow.index("      - name: Run CLI and compatibility lane")
+    ]
+    evidence_step = workflow[
+        workflow.index("      - name: Run governed evidence integrity lane") :
+        workflow.index("      - name: Run approved generic QA subsystem lane in isolation")
+    ]
+    assert "if: ${{ steps.classify.outputs.product == 'true' }}" in product_step
+    assert "if: ${{ steps.classify.outputs.evidence == 'true' }}" in evidence_step
+    assert command in product_step and command in evidence_step
+    artifact = "artifacts/architecture/architecture_snapshot.keys_only.json"
+    assert not artifact.startswith(classifier._HISTORICAL_PREFIXES)
+    inputs = {
+        *architecture.tracked(),
+        "tools/evidence/generate_architecture_snapshot.py",
+        "schemas/architecture_snapshot.keys_only.v1.json",
+        artifact,
+        f"{artifact}.path_proof.txt",
+        # A new module under each analysed root.
+        "engine/s12_new_module.py",
+        "adapter/s12_new_module.py",
+        "tools/evidence/s12_new_module.py",
+        "scripts/bodygraph/s12_new_module.py",
+        "scripts/db/s12_new_module.py",
+    }
+    for path in sorted(inputs):
+        flags = classifier.classify_paths((path,)).flags
+        assert flags["product"] or flags["evidence"], path
+
+
 def test_every_active_workflow_command_input_has_an_applicable_lane() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     command_paths = {

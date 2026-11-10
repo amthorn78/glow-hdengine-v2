@@ -306,7 +306,7 @@ supportability by themselves, production deployment, or epic closeout.
 ## Historical HDE-EPIC038 Distillation evidence orientation
 * `artifacts/runtime/direct_db_selection.snapshot.json` — direct-only `DATABASE_URL`/`psycopg` selection and retired-key pre-I/O refusal evidence.
 * `artifacts/audit/env/env_snapshot.json` — environment snapshot `schema: v3`; deterministic rails and config-key presence only, no secret values.
-* `artifacts/architecture/architecture_snapshot.keys_only.json` — frozen HDE-EPIC038 keys-only architecture snapshot; current source is analyzed without refreshing this capture, and DDL identity claims stay limited to `hde.ddl_identity_projection.v1`.
+* `artifacts/architecture/architecture_snapshot.keys_only.json` — governed HDE-EPIC038 keys-only architecture snapshot, written only by `tools/evidence/generate_architecture_snapshot.py`; it is current for a commit only when that tool's `--check` exits 0 on the commit, which CI checks whenever the product or evidence lane is selected, and DDL identity claims stay limited to `hde.ddl_identity_projection.v1`.
 * `artifacts/bodygraph/v2_mapped_cache/` — bounded configured-v2 mapped-cache local evidence for explicit upsert, mapped-payload-only write/read-back, idempotence, closed-rails zero I/O, legacy fallback, and production-like refusal.
 * `audit/ops/hde-epic038/ops-02/` — retained historical bounded mapped-cache OPS packet; not a current release-admission input.
 * `audit/ops/hde-epic038/ops-03/` — retained historical bounded read-only direct PostgreSQL OPS packet; not a current release-admission input.

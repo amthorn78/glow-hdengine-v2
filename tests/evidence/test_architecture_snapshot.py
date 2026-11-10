@@ -1,4 +1,8 @@
 import json
+import os
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 import pytest
 
@@ -54,3 +58,90 @@ def test_architecture_route_symbol_analysis_excludes_ordinary_get_and_fails_unkn
         next(row for row in result.routes if row['route_path']=='/mystery')
     ]
     assert len(result.registrations)==1
+
+
+# HDE-CRD-0003 S12: a change that leaves the stored snapshot stale fails --check.
+# The generator binds ROOT, ART, SCHEMA and tracked() to its own location, so the
+# proof runs the generator inside a repository copy, regenerated first. It never
+# compares this checkout's stored snapshot (HDE Build Notes 2.1 R-3).
+_GENERATOR = 'tools/evidence/generate_architecture_snapshot.py'
+_ART = 'artifacts/architecture/architecture_snapshot.keys_only.json'
+_SCHEMA = 'schemas/architecture_snapshot.keys_only.v1.json'
+
+
+def _run_generator(copy, *args):
+    env = {key: value for key, value in os.environ.items() if key != 'PYTHONPATH'}
+    env.update(LC_ALL='C', LANG='C', TZ='UTC', SAFE_MODE='1', ALLOW_NETWORK='0', PYTHONDONTWRITEBYTECODE='1')
+    return subprocess.run(
+        [sys.executable, str(copy / _GENERATOR), *args],
+        cwd=copy, env=env, capture_output=True, text=True, check=False,
+    )
+
+
+@pytest.fixture(scope='module')
+def regenerated_copy(tmp_path_factory):
+    copy = tmp_path_factory.mktemp('architecture_copy') / 'repo'
+    listed = subprocess.run(
+        ['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard'],
+        cwd=ROOT, capture_output=True, check=True,
+    ).stdout.decode('utf-8').split('\0')
+    for rel in filter(None, listed):
+        source = ROOT / rel
+        if not source.is_symlink() and not source.is_file():
+            continue
+        target = copy / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target, follow_symlinks=False)
+    subprocess.run(['git', 'init', '-q', str(copy)], check=True)
+    written = _run_generator(copy)
+    assert (written.returncode, written.stdout, written.stderr) == (0, '', '')
+    # The copy's snapshot is this checkout's current analysis.
+    assert (copy / _ART).read_bytes() == architecture.cjson(architecture.analyze())
+    assert (copy / _SCHEMA).read_bytes() == architecture.cjson(architecture.schema_payload())
+    current = _run_generator(copy, '--check')
+    assert (current.returncode, current.stdout, current.stderr) == (0, '', '')
+    return copy
+
+
+def _add_module(copy):
+    (copy / 'engine/s12_unregenerated_module.py').write_text('import json\n', encoding='utf-8')
+
+
+def _add_import(copy):
+    path = copy / 'engine/runtime/determinism_env.py'
+    path.write_text(path.read_text(encoding='utf-8') + 'import socket\n', encoding='utf-8')
+
+
+def _remove_module(copy):
+    removable = [
+        p for p in architecture.tracked()
+        if p != architecture.SELECTED_FACTORY and not p.startswith('engine/runtime/') and not p.endswith('__init__.py')
+    ]
+    (copy / removable[0]).unlink()
+
+
+def _edit_snapshot(copy):
+    (copy / _ART).write_bytes(b'{}\n')
+
+
+def _edit_schema(copy):
+    (copy / _SCHEMA).write_bytes(b'{}\n')
+
+
+@pytest.mark.parametrize(('make_stale', 'stale_path'), [
+    (_add_module, _ART),
+    (_add_import, _ART),
+    (_remove_module, _ART),
+    (_edit_snapshot, _ART),
+    (_edit_schema, _SCHEMA),
+])
+def test_stale_snapshot_fails_check(regenerated_copy, tmp_path, make_stale, stale_path):
+    copy = tmp_path / 'repo'
+    shutil.copytree(regenerated_copy, copy, symlinks=True)
+    make_stale(copy)
+    stored = {rel: (copy / rel).read_bytes() for rel in (_ART, _SCHEMA)}
+    result = _run_generator(copy, '--check')
+    assert result.returncode == 1
+    assert result.stdout == ''
+    assert result.stderr == f'STALE:{stale_path}\n'
+    assert {rel: (copy / rel).read_bytes() for rel in (_ART, _SCHEMA)} == stored
