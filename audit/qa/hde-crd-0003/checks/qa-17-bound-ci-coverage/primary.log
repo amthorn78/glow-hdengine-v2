@@ -1,0 +1,1272 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-17-bound-ci-coverage","check_name":"The hosted runs the Plan binds cover the bound criteria at T (the binding check)","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","rev-parse","--is-shallow-repository"],["git","status","--porcelain"],["python","--version"],["python","-m","pytest","--version"],["python","-c","import engine; print(engine.__file__)"],["bash","--version"],["git","--version"],["bash","/tmp/hde-crd-0003-qa/presence.sh","HD_API_KEY","GEO_API_KEY","HD_API_BASE_URL","HDAPI_BASE_URL","DATABASE_URL","GH_TOKEN","GITHUB_TOKEN","HDE_VENDOR_OVERRIDE_AUDIT_PATH","ENGINE_ENV"],["git","cat-file","-e","0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d^{commit}"],["git","cat-file","-e","156890b630efea81bfa5f0ccd69d6c09082ab3c3^{commit}"],["git","cat-file","-e","b687c813866befa5ee911a14b00ad21c1841e967^{commit}"],["grep","-n","      - name: ",".github/workflows/ci.yml"],["test","-e","ci/checks/classify_ci_changes.py"],["test","-e",".github/workflows/ci.yml"],["test","-e","tools/pf_tool_inputs/resolver.py"],["test","-e","tools/pf_tool_inputs/refresh.py"],["test","-e","tools/evidence/generate_narrative_registry_diff.py"],["test","-e","tools/qa/qa_harness.py"],["test","-e","tools/qa/generate_epic_close_pack.py"],["test","-e","tools/ci/prepush_check.py"],["test","-e","ci/checks/check_agents_md_citations.py"],["python3","ci/checks/classify_ci_changes.py","--base","156890b630efea81bfa5f0ccd69d6c09082ab3c3","--head","0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d","--event-name","push","--github-output","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/gh.out","--changed-tests-output","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/gh.out"],["wc","-l","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["wc","-c","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["sha256sum","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["bash","-c","git show 0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d:.github/workflows/ci.yml > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml"],["sha256sum","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml",".github/workflows/ci.yml"],["grep","-n","      - name: ","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml"],["python3","-I","-c","import re,sys; t=open(sys.argv[1]).read(); s=re.split(r'\\n      - name: ', t); n=dict(product='Run product mechanics and ordering lane', compat='Run CLI and compatibility lane', db='Run database and runtime-contract lane', rails='Run rails policy and secret-safety lane', evidence='Run governed evidence integrity lane', qa='Run approved generic QA subsystem lane in isolation', release='Build and verify exact-source release attestation'); b={k:[x for x in s if x.startswith(v+'\\n')] for k,v in n.items()}; [open(sys.argv[2]+'/lane-'+k+'.args','w').write(''.join(a+'\\n' for a in sorted(set(re.findall(r'(?<!\\S)tests/[A-Za-z0-9_./-]*', v[0]))))) for k,v in b.items() if len(v)==1]; print('LANE_STEPS_UNIQUE', ' '.join(k for k,v in b.items() if len(v)==1))","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.args"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.args"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.args"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.args"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.args"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.args"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.args"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.files"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.files"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.files"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.files"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.files"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.files"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.files"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.files"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.files"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.files"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.files"],["cat","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.files"],["grep","-qxF","tests/bodygraph/test_vendor_prod_override.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/cli/test_bg_resolve.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/bodygraph/test_bg_resolve_route_policy.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/provider/test_vendor_call_rails_and_config.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/adapter/test_compat_http_dev.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"],["grep","-qxF","tests/http/test_compat_endpoint_contract.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"],["grep","-qxF","tests/evidence/test_sanity_pipeline.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.files"],["grep","-qxF","tests/evidence/test_release_attestation.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.files"],["grep","-qxF","tests/evidence/test_canonical_json_gate_check_outputs.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/cli/test_errors_parity.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"],["grep","-qxF","tests/evidence/test_epic030_pr05_category_framework_evidence.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/tools/test_prepush_check.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/ops/test_hde_epic038_ops03.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/evidence/test_hdapi_v2_contract_inventory.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/adapter/test_jsonschema.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"],["grep","-qxF","tests/evidence/test_architecture_snapshot.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.files"],["grep","-qxF","tests/evidence/test_rails_ci_workflow_integration.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.files"],["grep","-qxF","tests/evidence/test_evidence_index_missing_state.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.files"],["grep","-qxF","tests/tools/test_score_distribution.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/tools/test_pf_tool_inputs.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/tools/test_pf_document_reader_guard.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"],["grep","-qxF","tests/unit/test_check_agents_md_citations.py","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.files"],["grep","-n","generate_architecture_snapshot.py --check","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt)"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.args)"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.args)"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.args)"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.args)"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.args)"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.args)"],["bash","-c","python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.args)"],["git","diff","--name-only","0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d","b687c813866befa5ee911a14b00ad21c1841e967"],["git","diff","--name-only","b687c813866befa5ee911a14b00ad21c1841e967","b687c813866befa5ee911a14b00ad21c1841e967"],["bash","-c","\nset -u; D=$1; T=$2; OWN=$(cat \"$D/owner_files.txt\")\n: > \"$D/R.name\"; : > \"$D/R.walk\"\necho \"### name search: git grep -l -F -e <path> -e <basename> -- <the twenty-two owner files>, once per listed path\"\nfor p in $(git diff --name-only 0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d \"$T\"); do\n  b=$(basename \"$p\"); m=$(git grep -l -F -e \"$p\" -e \"$b\" -- $OWN); rc=$?\n  echo \"path $p (basename $b): git grep exit $rc; matches: ${m:-(none)}\" | tr \"\\n\" \" \"; echo\n  [ -n \"$m\" ] && printf \"%s\\n\" \"$m\" >> \"$D/R.name\"\ndone\necho \"### tree-walking or tree-copying search: git grep -l -E \\\"rglob|glob\\\\(|ls-files|os\\\\.walk|copytree\\\" -- <the twenty-two owner files>\"\nm=$(git grep -l -E \"rglob|glob\\(|ls-files|os\\.walk|copytree\" -- $OWN); rc=$?\necho \"git grep exit $rc; matches: $(printf \"%s \" $m)\"; [ -n \"$m\" ] && printf \"%s\\n\" $m >> \"$D/R.walk\"\nsort -u \"$D/R.name\" \"$D/R.walk\" > \"$D/R.union\"\nif [ -z \"$(git diff --name-only b687c813866befa5ee911a14b00ad21c1841e967 \"$T\")\" ]; then\n  grep -v -x -F tests/evidence/test_evidence_index_missing_state.py \"$D/R.union\" > \"$D/R.txt\"; echo \"tests/evidence/test_evidence_index_missing_state.py leaves R: git diff --name-only b687c813 T prints nothing\"\nelse cp \"$D/R.union\" \"$D/R.txt\"; echo \"tests/evidence/test_evidence_index_missing_state.py stays in R\"; fi\necho \"### R ($(grep -c . \"$D/R.txt\") files):\"; cat \"$D/R.txt\"\n","_","/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d","b687c813866befa5ee911a14b00ad21c1841e967"],["python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa17-R","tests/cli/test_errors_parity.py","tests/evidence/test_architecture_snapshot.py","tests/evidence/test_canonical_json_gate_check_outputs.py","tests/evidence/test_epic030_pr05_category_framework_evidence.py","tests/evidence/test_rails_ci_workflow_integration.py","tests/evidence/test_sanity_pipeline.py","tests/ops/test_hde_epic038_ops03.py","tests/tools/test_pf_document_reader_guard.py","tests/tools/test_pf_tool_inputs.py","tests/tools/test_prepush_check.py","tests/tools/test_score_distribution.py","tests/unit/test_check_agents_md_citations.py"],["bash","-c","git grep -n -E '^\\s*(import|from)\\s+(urllib|requests|socket|http\\.client|httpx|aiohttp)\\b' -- tools/pf_tool_inputs/resolver.py tools/pf_tool_inputs/refresh.py tools/evidence/generate_narrative_registry_diff.py tools/qa/qa_harness.py tools/qa/generate_epic_close_pack.py tools/ci/prepush_check.py ci/checks/check_agents_md_citations.py; rc=$?; echo \"child_exit_code: $rc (expected 1, no match)\"; [ $rc -eq 1 ]"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.2 check qa-17; QA-90 task T02 attempt 1; normalizations: N-1, N-2, N-3","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates","PF04-Canon-HDE-Governance"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-11T08:29:27Z"}
+=== CONTEXT ===
+check_id: qa-17-bound-ci-coverage
+check_name: The hosted runs the Plan binds cover the bound criteria at T (the binding check)
+task: QA-90 task T02, attempt 1; QA Plan v1.2 CHECK 17 (criteria S01-a, S02-a, S03-a, S04-a, S05-a, S06-a, S06-b, S07-d, S11-a, S12-a, S12-b, S13-a, S14-a, S16-a, S16-b, S17-a, S17-b, S17-c, S17-d, S17-f, S17-g); dependency qa-01 PASS (published 2026-11-11T07:56:23Z)
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+environment_class: E-L; clone /tmp/hde-crd-0003-qa/clone (full history, detached at T); venv /tmp/hde-crd-0003-qa/venv with CI's install; scratch directory D=/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d outside the clone for the lists this check writes
+interpreter: /tmp/hde-crd-0003-qa/venv/bin/python (Python 3.12.15; python3 is the same venv interpreter)
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/tmp/hde-crd-0003-qa/state GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty (default rails)
+bound evidence (QA-110 confirms each figure and conclusion from GitHub; this check does not): push run 42863370974 (workflow ci, job test 129995117386, head 0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d, base 156890b630efea81bfa5f0ccd69d6c09082ab3c3); push run 42929167494 (job 130223250603, head b687c813866befa5ee911a14b00ad21c1841e967, lanes=evidence)
+start_utc: 2026-11-11T08:20:40Z
+end_utc: 2026-11-11T08:27:18Z
+=== READINESS ===
+Plan v1.2 §7 common rule A for E-L (bash and git are the further tools this check names):
+--- command 1: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:41Z; ended_utc: 2026-11-11T08:20:41Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- command 2: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:41Z; ended_utc: 2026-11-11T08:20:41Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command 3: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:41Z; ended_utc: 2026-11-11T08:20:41Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 4: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:41Z; ended_utc: 2026-11-11T08:20:41Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 5: ["python", "-m", "pytest", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:41Z; ended_utc: 2026-11-11T08:20:41Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command 6: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:41Z; ended_utc: 2026-11-11T08:20:41Z; exit_code: 0
+stdout (149 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py
+stderr (0 bytes):
+(empty)
+--- command 7: ["bash", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:41Z; ended_utc: 2026-11-11T08:20:41Z; exit_code: 0
+stdout (307 bytes):
+GNU bash, version 5.3.9(1)-release (x86_64-pc-linux-gnu)
+Copyright (C) 2025 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+stderr (0 bytes):
+(empty)
+--- command 8: ["git", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (19 bytes):
+git version 2.53.0
+stderr (0 bytes):
+(empty)
+--- command 9: ["bash", "/tmp/hde-crd-0003-qa/presence.sh", "HD_API_KEY", "GEO_API_KEY", "HD_API_BASE_URL", "HDAPI_BASE_URL", "DATABASE_URL", "GH_TOKEN", "GITHUB_TOKEN", "HDE_VENDOR_OVERRIDE_AUDIT_PATH", "ENGINE_ENV"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (186 bytes):
+HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET 
+stderr (0 bytes):
+(empty)
+=== COMMANDS ===
+--- command 10: ["git", "cat-file", "-e", "0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d^{commit}"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 11: ["git", "cat-file", "-e", "156890b630efea81bfa5f0ccd69d6c09082ab3c3^{commit}"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 12: ["git", "cat-file", "-e", "b687c813866befa5ee911a14b00ad21c1841e967^{commit}"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 13: ["grep", "-n", "      - name: ", ".github/workflows/ci.yml"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (896 bytes):
+54:      - name: Check out exact candidate head
+61:      - name: Classify affected CI lanes
+76:      - name: Check AGENTS.md cites no project documents
+80:      - name: Set up Python 3.12
+87:      - name: Install applicable validation dependencies
+97:      - name: Verify pytest readiness
+102:      - name: Verify closed deterministic environment
+107:      - name: Run affected behavioral tests in isolation
+135:      - name: Run product mechanics and ordering lane
+149:      - name: Run CLI and compatibility lane
+170:      - name: Run database and runtime-contract lane
+186:      - name: Run rails policy and secret-safety lane
+222:      - name: Run governed evidence integrity lane
+244:      - name: Run approved generic QA subsystem lane in isolation
+275:      - name: Build and verify exact-source release attestation
+347:      - name: Verify truthful applicability and clean candidate tree
+stderr (0 bytes):
+(empty)
+--- command 14: ["test", "-e", "ci/checks/classify_ci_changes.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 15: ["test", "-e", ".github/workflows/ci.yml"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 16: ["test", "-e", "tools/pf_tool_inputs/resolver.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 17: ["test", "-e", "tools/pf_tool_inputs/refresh.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 18: ["test", "-e", "tools/evidence/generate_narrative_registry_diff.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 19: ["test", "-e", "tools/qa/qa_harness.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 20: ["test", "-e", "tools/qa/generate_epic_close_pack.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 21: ["test", "-e", "tools/ci/prepush_check.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 22: ["test", "-e", "ci/checks/check_agents_md_citations.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 23: ["python3", "ci/checks/classify_ci_changes.py", "--base", "156890b630efea81bfa5f0ccd69d6c09082ab3c3", "--head", "0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d", "--event-name", "push", "--github-output", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/gh.out", "--changed-tests-output", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:42Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (117 bytes):
+CI_CHANGE_CLASSIFICATION:event=push;reason=selected_lanes;paths=15;lanes=product,compat,db,rails,evidence,qa,release
+stderr (0 bytes):
+(empty)
+--- command 24: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/gh.out"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (152 bytes):
+product=true
+compat=true
+db=true
+rails=true
+evidence=true
+qa=true
+release=true
+needs_python=true
+changed_tests=true
+reason=selected_lanes
+path_count=15
+stderr (0 bytes):
+(empty)
+--- command 25: ["wc", "-l", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (70 bytes):
+173 /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt
+stderr (0 bytes):
+(empty)
+--- command 26: ["wc", "-c", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (71 bytes):
+7587 /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt
+stderr (0 bytes):
+(empty)
+--- command 27: ["sha256sum", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (132 bytes):
+44bfc83117d7386b46319b88090560236736a1c7793cf0a4eee36da46843fae9  /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt
+stderr (0 bytes):
+(empty)
+--- command 28: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (7587 bytes):
+tests/adapter/test_chart_orchestration.py
+tests/adapter/test_compat_writer_transport.py
+tests/adapter/test_dev_sampler_http.py
+tests/adapter/test_diagnostic_writer.py
+tests/adapter/test_env_guard_forbidden_matrix.py
+tests/adapter/test_env_guard_import.py
+tests/adapter/test_env_guard_import_purity.py
+tests/adapter/test_env_guard_prod_variants.py
+tests/adapter/test_env_guard_silence_and_idempotence.py
+tests/adapter/test_gate_auth.py
+tests/adapter/test_headers_and_determinism.py
+tests/arch/test_arch_guards.py
+tests/artifacts/test_env_guard_artifact_bytes.py
+tests/bodygraph/test_bg_resolve_route_policy.py
+tests/bodygraph/test_check_magic10_gate_readiness.py
+tests/bodygraph/test_gates.py
+tests/bodygraph/test_projection.py
+tests/bodygraph/test_projection_gate_ingress.py
+tests/bodygraph/test_resolve_compat_chart.py
+tests/bodygraph/test_resolver_vendor.py
+tests/bodygraph/test_v2_adapter.py
+tests/bodygraph/test_v2_mapped_cache.py
+tests/bodygraph/test_vendor_client.py
+tests/bodygraph/test_vendor_prod_override.py
+tests/categories/test_registry_and_purity.py
+tests/charts/test_chart_loader_import_guard.py
+tests/charts/test_chart_pure_interface.py
+tests/charts/test_chart_pure_purity.py
+tests/cli/test_aux_preview.py
+tests/cli/test_bg_resolve.py
+tests/cli/test_cli_file_inputs.py
+tests/cli/test_cli_install_help.py
+tests/cli/test_dev_sampler_cli.py
+tests/cli/test_showcompat_sources.py
+tests/compare/test_arrays_as_sets.py
+tests/compat/test_abba_parity.py
+tests/compat/test_compat_public_ab_ba_identity.py
+tests/compat/test_compat_public_lf_bom.py
+tests/compat/test_conjunction_no_user_boundary.py
+tests/compat/test_evaluate_pair_eligibility.py
+tests/compat/test_hde_epic037_v2_adapter_to_compat.py
+tests/compat/test_thresholds_constants_pack.py
+tests/compat/test_ts_import_no_io.py
+tests/compliance/test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.py
+tests/compliance/test_invocation_tag_accept_reject_and_roundtrip.py
+tests/compliance/test_log_shape_snapshot.py
+tests/compliance/test_logging_filter_keys_only_and_redactions.py
+tests/compliance/test_reader_etag_and_conditional.py
+tests/compliance/test_reader_etag_compression_invariance.py
+tests/compliance/test_release_id_precedence_and_grep_guard.py
+tests/config/test_alias_policy_enforcement.py
+tests/config/test_config_artifacts.py
+tests/config/test_config_loader_unknown_ids_fail_closed.py
+tests/config/test_execution_coherence.py
+tests/config/test_magic10_contracts.py
+tests/config/test_manifest_schema.py
+tests/config/test_production_admission.py
+tests/config/test_registry_catalog_contract.py
+tests/config/test_registry_report.py
+tests/config/test_registry_report_determinism.py
+tests/config/test_registry_report_indexing.py
+tests/config/test_typed_bundles.py
+tests/core/test_engine_core_abba.py
+tests/core/test_engine_core_determinism.py
+tests/core/test_engine_core_purity.py
+tests/epic003/test_error_message_map.py
+tests/epic003/test_http_home_single_path.py
+tests/epic003/test_legacy_imports_denied.py
+tests/epic003/test_meta_invocation_ok.py
+tests/evidence/test_aux_preview_identity_parity.py
+tests/evidence/test_bodygraph_policy_proofs.py
+tests/evidence/test_canonical_json_gate_check_outputs.py
+tests/evidence/test_cli_conformance_artifacts.py
+tests/evidence/test_d23_evidence_index_snapshot_contract.py
+tests/evidence/test_db_runtime_posture.py
+tests/evidence/test_determinism_gate_proofs.py
+tests/evidence/test_dev_conjunction_identity.py
+tests/evidence/test_engine_core_evidence.py
+tests/evidence/test_env_matrix_snapshot_v3.py
+tests/evidence/test_epic024_acceptance_map_viability.py
+tests/evidence/test_epic024_evidence_path_binding_validation.py
+tests/evidence/test_epic030_pr01_pr03_fail_closed_evidence.py
+tests/evidence/test_epic030_pr04_band_thresholds_evidence.py
+tests/evidence/test_epic030_pr05_category_framework_evidence.py
+tests/evidence/test_evidence_index_env.py
+tests/evidence/test_evidence_index_snapshot.py
+tests/evidence/test_evidence_index_token_sets.py
+tests/evidence/test_evidence_tool_ownership.py
+tests/evidence/test_hdapi_v2_contract_inventory.py
+tests/evidence/test_hde_epic037_v2_adapter.py
+tests/evidence/test_hde_epic038_direct_db_selection.py
+tests/evidence/test_http_reader_ci_ownership.py
+tests/evidence/test_identity_provenance.py
+tests/evidence/test_internal_version_manifest_captures.py
+tests/evidence/test_open_rails_abba_proof.py
+tests/evidence/test_po_006_token_registry_validity.py
+tests/evidence/test_presenter_evidence_ownership.py
+tests/evidence/test_refresh_epic024_step_logs_manifest.py
+tests/evidence/test_refresh_policy_snapshot.py
+tests/evidence/test_release_bindings.py
+tests/evidence/test_retained_evidence_safety.py
+tests/evidence/test_sanity_evidence_index.py
+tests/evidence/test_v2_mapped_cache_evidence.py
+tests/hdctl/test_cli_admin_sidecar_invariance.py
+tests/hdctl/test_cli_showcompat_parity.py
+tests/hdctl/test_cli_streams_and_exits.py
+tests/hdctl/test_cli_two_run_identity.py
+tests/http/test_dev_conjunction_http.py
+tests/http/test_endpoint_catalog.py
+tests/http/test_reader_a7_transport.py
+tests/http/test_reader_post_v1.py
+tests/http/test_reader_post_v2.py
+tests/infra/test_hash_coupling.py
+tests/infra/test_sercanon_bytes.py
+tests/integration/test_normalized_fixture.py
+tests/invariance/test_bytes_identity.py
+tests/invariance/test_determinism_env_helper.py
+tests/invariance/test_locale_tz.py
+tests/loader/test_load_chart_fixture_only.py
+tests/loader/test_loader_hdapi_ignores_tz.py
+tests/loader/test_loader_logs_keys_only.py
+tests/loader/test_pinned_lists_not_empty.py
+tests/loader/test_validators_strict.py
+tests/m10/test_defs_order.py
+tests/m10/test_m10_symmetry_identity.py
+tests/m10/test_thresholds_rounding.py
+tests/mech/test_arrays_as_sets.py
+tests/mech/test_constants.py
+tests/ops/test_hde_epic038_ops03.py
+tests/provider/test_hdapi_error_mapping.py
+tests/provider/test_hdapi_json_headers.py
+tests/provider/test_provider_interface_contract.py
+tests/provider/test_prtest_precedence_and_artifact.py
+tests/provider/test_resolve_log_correlation_id.py
+tests/provider/test_secrets_dir_invalid.py
+tests/provider/test_secrets_unknown_provider_is_misconfigured.py
+tests/provider/test_startup_logging.py
+tests/provider/test_vendor_and_prod_guard.py
+tests/provider/test_vendor_and_prod_guard_min.py
+tests/provider/test_vendor_call_rails_and_config.py
+tests/provider/test_vendor_guard_min.py
+tests/qa/test_cli_admin_dumps.py
+tests/qa/test_cli_admin_parity.py
+tests/qa/test_epic021_scaffolding.py
+tests/qa/test_epic023_acceptance_alignment.py
+tests/qa/test_epic024_bootstrap_status.py
+tests/qa/test_qa_tool_ownership.py
+tests/reader_v1/test_emitter.py
+tests/reader_v1/test_goldens.py
+tests/reader_v1/test_release_pack.py
+tests/reader_v1/test_schema.py
+tests/runtime/test_emit_public_legacy_helper.py
+tests/scripts/test_cut_release_manifest.py
+tests/scripts/test_dev_sampler_healthcheck.py
+tests/scripts/test_dev_start_reader.py
+tests/scripts/test_make_compat_determinism_artifacts.py
+tests/scripts/test_release_id_recompute.py
+tests/support/test_change_gates.py
+tests/tools/test_epic020_bundle_tool.py
+tests/tools/test_pf_document_reader_guard.py
+tests/tools/test_pf_tool_inputs.py
+tests/tools/test_prepush_check.py
+tests/tools/test_score_distribution.py
+tests/transport/test_a7_transport_proofs.py
+tests/transport/test_aux_narrative.py
+tests/transport/test_ops_rails_refusal.py
+tests/transport/test_writers_errors_headers.py
+tests/unit/test_narratives_composer.py
+tests/unit/test_narratives_loader.py
+tests/unit/test_narratives_router.py
+tests/unit/test_no_io_guard.py
+tests/unit/test_sampler_core.py
+tests/unit/test_viewer_prefs_normalization.py
+stderr (0 bytes):
+(empty)
+--- command 29: ["bash", "-c", "git show 0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d:.github/workflows/ci.yml > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 30: ["sha256sum", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml", ".github/workflows/ci.yml"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (218 bytes):
+0cb13ad3c24c1dd7cb1b610c5becbd1005e78bbe62437362dfda8c2363923db8  /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml
+0cb13ad3c24c1dd7cb1b610c5becbd1005e78bbe62437362dfda8c2363923db8  .github/workflows/ci.yml
+stderr (0 bytes):
+(empty)
+--- command 31: ["grep", "-n", "      - name: ", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (896 bytes):
+54:      - name: Check out exact candidate head
+61:      - name: Classify affected CI lanes
+76:      - name: Check AGENTS.md cites no project documents
+80:      - name: Set up Python 3.12
+87:      - name: Install applicable validation dependencies
+97:      - name: Verify pytest readiness
+102:      - name: Verify closed deterministic environment
+107:      - name: Run affected behavioral tests in isolation
+135:      - name: Run product mechanics and ordering lane
+149:      - name: Run CLI and compatibility lane
+170:      - name: Run database and runtime-contract lane
+186:      - name: Run rails policy and secret-safety lane
+222:      - name: Run governed evidence integrity lane
+244:      - name: Run approved generic QA subsystem lane in isolation
+275:      - name: Build and verify exact-source release attestation
+347:      - name: Verify truthful applicability and clean candidate tree
+stderr (0 bytes):
+(empty)
+--- command 32: ["python3", "-I", "-c", "import re,sys; t=open(sys.argv[1]).read(); s=re.split(r'\\n      - name: ', t); n=dict(product='Run product mechanics and ordering lane', compat='Run CLI and compatibility lane', db='Run database and runtime-contract lane', rails='Run rails policy and secret-safety lane', evidence='Run governed evidence integrity lane', qa='Run approved generic QA subsystem lane in isolation', release='Build and verify exact-source release attestation'); b={k:[x for x in s if x.startswith(v+'\\n')] for k,v in n.items()}; [open(sys.argv[2]+'/lane-'+k+'.args','w').write(''.join(a+'\\n' for a in sorted(set(re.findall(r'(?<!\\S)tests/[A-Za-z0-9_./-]*', v[0]))))) for k,v in b.items() if len(v)==1]; print('LANE_STEPS_UNIQUE', ' '.join(k for k,v in b.items() if len(v)==1))", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (62 bytes):
+LANE_STEPS_UNIQUE product compat db rails evidence qa release
+stderr (0 bytes):
+(empty)
+--- command 33: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.args"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (138 bytes):
+tests/evidence/test_architecture_snapshot.py
+tests/mech/test_order_properties.py
+tests/order
+tests/unit/test_check_agents_md_citations.py
+stderr (0 bytes):
+(empty)
+--- command 34: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.args"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (400 bytes):
+tests/adapter/test_compat_http_dev.py
+tests/adapter/test_compat_http_parity.py
+tests/adapter/test_jsonschema.py
+tests/cli/test_cli_canonical_bytes.py
+tests/cli/test_cli_usage_and_errors.py
+tests/cli/test_errors_parity.py
+tests/cli/test_serializer_guards.py
+tests/cli/test_showcompat_parity_and_identity.py
+tests/http/test_compat_endpoint_contract.py
+tests/transport/test_internal_version_contract.py
+stderr (0 bytes):
+(empty)
+--- command 35: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.args"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (264 bytes):
+tests/bodygraph/test_bg_resolve_v2_mapped_cache.py
+tests/bodygraph/test_hde_epic038_mapped_cache_smoke.py
+tests/bodygraph/test_ingest.py
+tests/db
+tests/ops/test_capture_rails_open_scope.py
+tests/ops/test_http_logging.py
+tests/unit/test_check_direct_db_contract.py
+stderr (0 bytes):
+(empty)
+--- command 36: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.args"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:43Z; ended_utc: 2026-11-11T08:20:43Z; exit_code: 0
+stdout (53 bytes):
+tests/evidence/test_rails_ci_workflow_integration.py
+stderr (0 bytes):
+(empty)
+--- command 37: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.args"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:44Z; ended_utc: 2026-11-11T08:20:44Z; exit_code: 0
+stdout (248 bytes):
+tests/evidence/test_evidence_index_missing_state.py
+tests/evidence/test_evidence_skeleton.py
+tests/evidence/test_machine_mirror_self_proof.py
+tests/evidence/test_orientation_demo.py
+tests/ops/test_evidence_index.py
+tests/qa/test_epic020_qa_docs.py
+stderr (0 bytes):
+(empty)
+--- command 38: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.args"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:44Z; ended_utc: 2026-11-11T08:20:44Z; exit_code: 0
+stdout (285 bytes):
+tests/qa/test_epic021_acceptance_alignment.py
+tests/qa/test_epic021_harness_entrypoint.py
+tests/qa/test_epic029_requalification.py
+tests/qa/test_generic_qa_harness.py
+tests/qa/test_qa_harness_followup.py
+tests/qa/test_tooling_bootstrap.py
+tests/qa/test_viability_generator_wrappers.py
+stderr (0 bytes):
+(empty)
+--- command 39: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.args"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:44Z; ended_utc: 2026-11-11T08:20:44Z; exit_code: 0
+stdout (169 bytes):
+tests/evidence/test_release_attestation.py
+tests/evidence/test_release_manifest_content_binding.py
+tests/evidence/test_sanity_pipeline.py
+tests/runtime/test_identity.py
+stderr (0 bytes):
+(empty)
+--- command 40: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:44Z; ended_utc: 2026-11-11T08:20:45Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 41: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:45Z; ended_utc: 2026-11-11T08:20:45Z; exit_code: 0
+stdout (218 bytes):
+tests/evidence/test_architecture_snapshot.py
+tests/mech/test_order_properties.py
+tests/order/test_ordering_artifacts_stability.py
+tests/order/test_total_order_properties.py
+tests/unit/test_check_agents_md_citations.py
+stderr (0 bytes):
+(empty)
+--- command 42: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:45Z; ended_utc: 2026-11-11T08:20:47Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 43: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:47Z; ended_utc: 2026-11-11T08:20:47Z; exit_code: 0
+stdout (400 bytes):
+tests/adapter/test_compat_http_dev.py
+tests/adapter/test_compat_http_parity.py
+tests/adapter/test_jsonschema.py
+tests/cli/test_cli_canonical_bytes.py
+tests/cli/test_cli_usage_and_errors.py
+tests/cli/test_errors_parity.py
+tests/cli/test_serializer_guards.py
+tests/cli/test_showcompat_parity_and_identity.py
+tests/http/test_compat_endpoint_contract.py
+tests/transport/test_internal_version_contract.py
+stderr (0 bytes):
+(empty)
+--- command 44: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:47Z; ended_utc: 2026-11-11T08:20:48Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 45: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:48Z; ended_utc: 2026-11-11T08:20:48Z; exit_code: 0
+stdout (607 bytes):
+tests/bodygraph/test_bg_resolve_v2_mapped_cache.py
+tests/bodygraph/test_hde_epic038_mapped_cache_smoke.py
+tests/bodygraph/test_ingest.py
+tests/db/test_adapter_contract.py
+tests/db/test_adapter_selection.py
+tests/db/test_conn_env_only.py
+tests/db/test_db_resolver_attempt_both.py
+tests/db/test_ddl_identity_projection.py
+tests/db/test_direct_db_pr06r.py
+tests/db/test_env_matrix_resolver.py
+tests/db/test_no_import_time_connect.py
+tests/db/test_retention.py
+tests/db/test_rw_smoke_guard.py
+tests/ops/test_capture_rails_open_scope.py
+tests/ops/test_http_logging.py
+tests/unit/test_check_direct_db_contract.py
+stderr (0 bytes):
+(empty)
+--- command 46: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:48Z; ended_utc: 2026-11-11T08:20:49Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 47: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:49Z; ended_utc: 2026-11-11T08:20:49Z; exit_code: 0
+stdout (53 bytes):
+tests/evidence/test_rails_ci_workflow_integration.py
+stderr (0 bytes):
+(empty)
+--- command 48: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:49Z; ended_utc: 2026-11-11T08:20:50Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 49: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:50Z; ended_utc: 2026-11-11T08:20:50Z; exit_code: 0
+stdout (248 bytes):
+tests/evidence/test_evidence_index_missing_state.py
+tests/evidence/test_evidence_skeleton.py
+tests/evidence/test_machine_mirror_self_proof.py
+tests/evidence/test_orientation_demo.py
+tests/ops/test_evidence_index.py
+tests/qa/test_epic020_qa_docs.py
+stderr (0 bytes):
+(empty)
+--- command 50: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:50Z; ended_utc: 2026-11-11T08:20:52Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 51: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:52Z; ended_utc: 2026-11-11T08:20:52Z; exit_code: 0
+stdout (285 bytes):
+tests/qa/test_epic021_acceptance_alignment.py
+tests/qa/test_epic021_harness_entrypoint.py
+tests/qa/test_epic029_requalification.py
+tests/qa/test_generic_qa_harness.py
+tests/qa/test_qa_harness_followup.py
+tests/qa/test_tooling_bootstrap.py
+tests/qa/test_viability_generator_wrappers.py
+stderr (0 bytes):
+(empty)
+--- command 52: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.args) | grep '::' | cut -d: -f1 | sort -u > /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:52Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 53: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (169 bytes):
+tests/evidence/test_release_attestation.py
+tests/evidence/test_release_manifest_content_binding.py
+tests/evidence/test_sanity_pipeline.py
+tests/runtime/test_identity.py
+stderr (0 bytes):
+(empty)
+--- command 54: ["grep", "-qxF", "tests/bodygraph/test_vendor_prod_override.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 55: ["grep", "-qxF", "tests/cli/test_bg_resolve.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 56: ["grep", "-qxF", "tests/bodygraph/test_bg_resolve_route_policy.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 57: ["grep", "-qxF", "tests/provider/test_vendor_call_rails_and_config.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 58: ["grep", "-qxF", "tests/adapter/test_compat_http_dev.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 59: ["grep", "-qxF", "tests/http/test_compat_endpoint_contract.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 60: ["grep", "-qxF", "tests/evidence/test_sanity_pipeline.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 61: ["grep", "-qxF", "tests/evidence/test_release_attestation.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 62: ["grep", "-qxF", "tests/evidence/test_canonical_json_gate_check_outputs.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 63: ["grep", "-qxF", "tests/cli/test_errors_parity.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 64: ["grep", "-qxF", "tests/evidence/test_epic030_pr05_category_framework_evidence.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 65: ["grep", "-qxF", "tests/tools/test_prepush_check.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 66: ["grep", "-qxF", "tests/ops/test_hde_epic038_ops03.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 67: ["grep", "-qxF", "tests/evidence/test_hdapi_v2_contract_inventory.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 68: ["grep", "-qxF", "tests/adapter/test_jsonschema.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 69: ["grep", "-qxF", "tests/evidence/test_architecture_snapshot.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:54Z; ended_utc: 2026-11-11T08:20:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 70: ["grep", "-qxF", "tests/evidence/test_rails_ci_workflow_integration.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:55Z; ended_utc: 2026-11-11T08:20:55Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 71: ["grep", "-qxF", "tests/evidence/test_evidence_index_missing_state.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:55Z; ended_utc: 2026-11-11T08:20:55Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 72: ["grep", "-qxF", "tests/tools/test_score_distribution.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:55Z; ended_utc: 2026-11-11T08:20:55Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 73: ["grep", "-qxF", "tests/tools/test_pf_tool_inputs.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:55Z; ended_utc: 2026-11-11T08:20:55Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 74: ["grep", "-qxF", "tests/tools/test_pf_document_reader_guard.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:55Z; ended_utc: 2026-11-11T08:20:55Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 75: ["grep", "-qxF", "tests/unit/test_check_agents_md_citations.py", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.files"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:55Z; ended_utc: 2026-11-11T08:20:55Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 76: ["grep", "-n", "generate_architecture_snapshot.py --check", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/ci.yml"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:55Z; ended_utc: 2026-11-11T08:20:55Z; exit_code: 0
+stdout (156 bytes):
+142:          python tools/evidence/generate_architecture_snapshot.py --check
+235:          python tools/evidence/generate_architecture_snapshot.py --check
+stderr (0 bytes):
+(empty)
+--- command 77: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/targets.txt)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:20:55Z; ended_utc: 2026-11-11T08:21:04Z; exit_code: 0
+stdout (470777 bytes, 3769 lines, sha256 892feada42deff66c76095ccbc109fbd31a9b8b7a0744879e35ae161e8ac440c; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/adapter/test_chart_orchestration.py: 20
+  tests/adapter/test_compat_writer_transport.py: 3
+  tests/adapter/test_dev_sampler_http.py: 7
+  tests/adapter/test_diagnostic_writer.py: 21
+  tests/adapter/test_env_guard_forbidden_matrix.py: 5
+  tests/adapter/test_env_guard_import.py: 1
+  tests/adapter/test_env_guard_import_purity.py: 2
+  tests/adapter/test_env_guard_prod_variants.py: 5
+  tests/adapter/test_env_guard_silence_and_idempotence.py: 2
+  tests/adapter/test_gate_auth.py: 5
+  tests/adapter/test_headers_and_determinism.py: 3
+  tests/arch/test_arch_guards.py: 4
+  tests/artifacts/test_env_guard_artifact_bytes.py: 1
+  tests/bodygraph/test_bg_resolve_route_policy.py: 58
+  tests/bodygraph/test_check_magic10_gate_readiness.py: 63
+  tests/bodygraph/test_gates.py: 55
+  tests/bodygraph/test_projection.py: 10
+  tests/bodygraph/test_projection_gate_ingress.py: 35
+  tests/bodygraph/test_resolve_compat_chart.py: 38
+  tests/bodygraph/test_resolver_vendor.py: 120
+  tests/bodygraph/test_v2_adapter.py: 17
+  tests/bodygraph/test_v2_mapped_cache.py: 24
+  tests/bodygraph/test_vendor_client.py: 35
+  tests/bodygraph/test_vendor_prod_override.py: 156
+  tests/categories/test_registry_and_purity.py: 2
+  tests/charts/test_chart_loader_import_guard.py: 4
+  tests/charts/test_chart_pure_interface.py: 8
+  tests/charts/test_chart_pure_purity.py: 5
+  tests/cli/test_aux_preview.py: 9
+  tests/cli/test_bg_resolve.py: 39
+  tests/cli/test_cli_file_inputs.py: 8
+  tests/cli/test_cli_install_help.py: 1
+  tests/cli/test_dev_sampler_cli.py: 3
+  tests/cli/test_showcompat_sources.py: 17
+  tests/compare/test_arrays_as_sets.py: 24
+  tests/compat/test_abba_parity.py: 1
+  tests/compat/test_compat_public_ab_ba_identity.py: 2
+  tests/compat/test_compat_public_lf_bom.py: 1
+  tests/compat/test_conjunction_no_user_boundary.py: 21
+  tests/compat/test_evaluate_pair_eligibility.py: 29
+  tests/compat/test_hde_epic037_v2_adapter_to_compat.py: 5
+  tests/compat/test_thresholds_constants_pack.py: 1
+  tests/compat/test_ts_import_no_io.py: 1
+  tests/compliance/test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.py: 3
+  tests/compliance/test_invocation_tag_accept_reject_and_roundtrip.py: 2
+  tests/compliance/test_log_shape_snapshot.py: 1
+  tests/compliance/test_logging_filter_keys_only_and_redactions.py: 1
+  tests/compliance/test_reader_etag_and_conditional.py: 1
+  tests/compliance/test_reader_etag_compression_invariance.py: 1
+  tests/compliance/test_release_id_precedence_and_grep_guard.py: 3
+  tests/config/test_alias_policy_enforcement.py: 10
+  tests/config/test_config_artifacts.py: 154
+  tests/config/test_config_loader_unknown_ids_fail_closed.py: 2
+  tests/config/test_execution_coherence.py: 67
+  tests/config/test_magic10_contracts.py: 104
+  tests/config/test_manifest_schema.py: 38
+  tests/config/test_production_admission.py: 136
+  tests/config/test_registry_catalog_contract.py: 67
+  tests/config/test_registry_report.py: 2
+  tests/config/test_registry_report_determinism.py: 6
+  tests/config/test_registry_report_indexing.py: 2
+  tests/config/test_typed_bundles.py: 21
+  tests/core/test_engine_core_abba.py: 8
+  tests/core/test_engine_core_determinism.py: 105
+  tests/core/test_engine_core_purity.py: 6
+  tests/epic003/test_error_message_map.py: 1
+  tests/epic003/test_http_home_single_path.py: 1
+  tests/epic003/test_legacy_imports_denied.py: 2
+  tests/epic003/test_meta_invocation_ok.py: 1
+  tests/evidence/test_aux_preview_identity_parity.py: 5
+  tests/evidence/test_bodygraph_policy_proofs.py: 2
+  tests/evidence/test_canonical_json_gate_check_outputs.py: 96
+  tests/evidence/test_cli_conformance_artifacts.py: 5
+  tests/evidence/test_d23_evidence_index_snapshot_contract.py: 3
+  tests/evidence/test_db_runtime_posture.py: 4
+  tests/evidence/test_determinism_gate_proofs.py: 15
+  tests/evidence/test_dev_conjunction_identity.py: 10
+  tests/evidence/test_engine_core_evidence.py: 12
+  tests/evidence/test_env_matrix_snapshot_v3.py: 6
+  tests/evidence/test_epic024_acceptance_map_viability.py: 3
+  tests/evidence/test_epic024_evidence_path_binding_validation.py: 2
+  tests/evidence/test_epic030_pr01_pr03_fail_closed_evidence.py: 3
+  tests/evidence/test_epic030_pr04_band_thresholds_evidence.py: 1
+  tests/evidence/test_epic030_pr05_category_framework_evidence.py: 6
+  tests/evidence/test_evidence_index_env.py: 1
+  tests/evidence/test_evidence_index_snapshot.py: 3
+  tests/evidence/test_evidence_index_token_sets.py: 1
+  tests/evidence/test_evidence_tool_ownership.py: 27
+  tests/evidence/test_hdapi_v2_contract_inventory.py: 301
+  tests/evidence/test_hde_epic037_v2_adapter.py: 5
+  tests/evidence/test_hde_epic038_direct_db_selection.py: 19
+  tests/evidence/test_http_reader_ci_ownership.py: 4
+  tests/evidence/test_identity_provenance.py: 3
+  tests/evidence/test_internal_version_manifest_captures.py: 1
+  tests/evidence/test_open_rails_abba_proof.py: 78
+  tests/evidence/test_po_006_token_registry_validity.py: 4
+  tests/evidence/test_presenter_evidence_ownership.py: 9
+  tests/evidence/test_refresh_epic024_step_logs_manifest.py: 2
+  tests/evidence/test_refresh_policy_snapshot.py: 1
+  tests/evidence/test_release_bindings.py: 3
+  tests/evidence/test_retained_evidence_safety.py: 159
+  tests/evidence/test_sanity_evidence_index.py: 1
+  tests/evidence/test_v2_mapped_cache_evidence.py: 18
+  tests/hdctl/test_cli_admin_sidecar_invariance.py: 1
+  tests/hdctl/test_cli_showcompat_parity.py: 1
+  tests/hdctl/test_cli_streams_and_exits.py: 2
+  tests/hdctl/test_cli_two_run_identity.py: 1
+  tests/http/test_dev_conjunction_http.py: 77
+  tests/http/test_endpoint_catalog.py: 247
+  tests/http/test_reader_a7_transport.py: 27
+  tests/http/test_reader_post_v1.py: 71
+  tests/http/test_reader_post_v2.py: 72
+  tests/infra/test_hash_coupling.py: 1
+  tests/infra/test_sercanon_bytes.py: 1
+  tests/integration/test_normalized_fixture.py: 1
+  tests/invariance/test_bytes_identity.py: 1
+  tests/invariance/test_determinism_env_helper.py: 4
+  tests/invariance/test_locale_tz.py: 1
+  tests/loader/test_load_chart_fixture_only.py: 2
+  tests/loader/test_loader_hdapi_ignores_tz.py: 1
+  tests/loader/test_loader_logs_keys_only.py: 1
+  tests/loader/test_pinned_lists_not_empty.py: 1
+  tests/loader/test_validators_strict.py: 5
+  tests/m10/test_defs_order.py: 2
+  tests/m10/test_m10_symmetry_identity.py: 1
+  tests/m10/test_thresholds_rounding.py: 33
+  tests/mech/test_arrays_as_sets.py: 5
+  tests/mech/test_constants.py: 2
+  tests/ops/test_hde_epic038_ops03.py: 186
+  tests/provider/test_hdapi_error_mapping.py: 2
+  tests/provider/test_hdapi_json_headers.py: 1
+  tests/provider/test_provider_interface_contract.py: 3
+  tests/provider/test_prtest_precedence_and_artifact.py: 2
+  tests/provider/test_resolve_log_correlation_id.py: 1
+  tests/provider/test_secrets_dir_invalid.py: 2
+  tests/provider/test_secrets_unknown_provider_is_misconfigured.py: 1
+  tests/provider/test_startup_logging.py: 1
+  tests/provider/test_vendor_and_prod_guard.py: 6
+  tests/provider/test_vendor_and_prod_guard_min.py: 2
+  tests/provider/test_vendor_call_rails_and_config.py: 41
+  tests/provider/test_vendor_guard_min.py: 1
+  tests/qa/test_cli_admin_dumps.py: 2
+  tests/qa/test_cli_admin_parity.py: 1
+  tests/qa/test_epic021_scaffolding.py: 3
+  tests/qa/test_epic023_acceptance_alignment.py: 3
+  tests/qa/test_epic024_bootstrap_status.py: 10
+  tests/qa/test_qa_tool_ownership.py: 146
+  tests/reader_v1/test_emitter.py: 29
+  tests/reader_v1/test_goldens.py: 7
+  tests/reader_v1/test_release_pack.py: 1
+  tests/reader_v1/test_schema.py: 74
+  tests/runtime/test_emit_public_legacy_helper.py: 5
+  tests/scripts/test_cut_release_manifest.py: 46
+  tests/scripts/test_dev_sampler_healthcheck.py: 3
+  tests/scripts/test_dev_start_reader.py: 10
+  tests/scripts/test_make_compat_determinism_artifacts.py: 1
+  tests/scripts/test_release_id_recompute.py: 1
+  tests/support/test_change_gates.py: 1
+  tests/tools/test_epic020_bundle_tool.py: 6
+  tests/tools/test_pf_document_reader_guard.py: 3
+  tests/tools/test_pf_tool_inputs.py: 24
+  tests/tools/test_prepush_check.py: 63
+  tests/tools/test_score_distribution.py: 11
+  tests/transport/test_a7_transport_proofs.py: 26
+  tests/transport/test_aux_narrative.py: 10
+  tests/transport/test_ops_rails_refusal.py: 4
+  tests/transport/test_writers_errors_headers.py: 3
+  tests/unit/test_narratives_composer.py: 3
+  tests/unit/test_narratives_loader.py: 16
+  tests/unit/test_narratives_router.py: 6
+  tests/unit/test_no_io_guard.py: 1
+  tests/unit/test_sampler_core.py: 4
+  tests/unit/test_viewer_prefs_normalization.py: 5
+  node ids: 3767; final line: 3767 tests collected in 7.38s
+stderr (0 bytes):
+(empty)
+--- command 78: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-product.args)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:04Z; ended_utc: 2026-11-11T08:21:05Z; exit_code: 0
+stdout (9247 bytes, 87 lines, sha256 b5583ab54e967de3d5583077f8b66546a51e87d5e13f6920871a1f3a740c9907; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_architecture_snapshot.py: 10
+  tests/mech/test_order_properties.py: 9
+  tests/order/test_ordering_artifacts_stability.py: 1
+  tests/order/test_total_order_properties.py: 5
+  tests/unit/test_check_agents_md_citations.py: 60
+  node ids: 85; final line: 85 tests collected in 0.30s
+stderr (0 bytes):
+(empty)
+--- command 79: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-compat.args)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:05Z; ended_utc: 2026-11-11T08:21:06Z; exit_code: 0
+stdout (21749 bytes, 206 lines, sha256 345bc8445ac5f9b5c34916dd3f0612e0b1b0ffbae544a25e131825774e9b37e8; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/adapter/test_compat_http_dev.py: 79
+  tests/adapter/test_compat_http_parity.py: 4
+  tests/adapter/test_jsonschema.py: 5
+  tests/cli/test_cli_canonical_bytes.py: 6
+  tests/cli/test_cli_usage_and_errors.py: 22
+  tests/cli/test_errors_parity.py: 42
+  tests/cli/test_serializer_guards.py: 3
+  tests/cli/test_showcompat_parity_and_identity.py: 7
+  tests/http/test_compat_endpoint_contract.py: 35
+  tests/transport/test_internal_version_contract.py: 1
+  node ids: 204; final line: 204 tests collected in 0.91s
+stderr (0 bytes):
+(empty)
+--- command 80: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-db.args)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:07Z; ended_utc: 2026-11-11T08:21:08Z; exit_code: 0
+stdout (28668 bytes, 272 lines, sha256 c7f2ac3d49a43d0ed06573d0732f0dc8fa8c1e6b7ea84a981ad2d019e5e48ffd; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/bodygraph/test_bg_resolve_v2_mapped_cache.py: 28
+  tests/bodygraph/test_hde_epic038_mapped_cache_smoke.py: 13
+  tests/bodygraph/test_ingest.py: 24
+  tests/db/test_adapter_contract.py: 9
+  tests/db/test_adapter_selection.py: 3
+  tests/db/test_conn_env_only.py: 2
+  tests/db/test_db_resolver_attempt_both.py: 6
+  tests/db/test_ddl_identity_projection.py: 12
+  tests/db/test_direct_db_pr06r.py: 72
+  tests/db/test_env_matrix_resolver.py: 10
+  tests/db/test_no_import_time_connect.py: 1
+  tests/db/test_retention.py: 3
+  tests/db/test_rw_smoke_guard.py: 8
+  tests/ops/test_capture_rails_open_scope.py: 7
+  tests/ops/test_http_logging.py: 9
+  tests/unit/test_check_direct_db_contract.py: 63
+  node ids: 270; final line: 270 tests collected in 0.53s
+stderr (0 bytes):
+(empty)
+--- command 81: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-rails.args)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:08Z; ended_utc: 2026-11-11T08:21:09Z; exit_code: 0
+stdout (23466 bytes, 169 lines, sha256 a3fd157aead31aac07b5f01bd025830d7c6cd9566dede4d8573c36fe99f53656; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_rails_ci_workflow_integration.py: 167
+  node ids: 167; final line: 167 tests collected in 0.55s
+stderr (0 bytes):
+(empty)
+--- command 82: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-evidence.args)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:09Z; ended_utc: 2026-11-11T08:21:10Z; exit_code: 0
+stdout (17053 bytes, 147 lines, sha256 c701d568c9b086d2bfd149b39cf1883071f43bfc0d09d49d790c93e46abae7aa; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_evidence_index_missing_state.py: 75
+  tests/evidence/test_evidence_skeleton.py: 33
+  tests/evidence/test_machine_mirror_self_proof.py: 7
+  tests/evidence/test_orientation_demo.py: 3
+  tests/ops/test_evidence_index.py: 24
+  tests/qa/test_epic020_qa_docs.py: 3
+  node ids: 145; final line: 145 tests collected in 0.58s
+stderr (0 bytes):
+(empty)
+--- command 83: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-qa.args)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:10Z; ended_utc: 2026-11-11T08:21:12Z; exit_code: 0
+stdout (55542 bytes, 490 lines, sha256 1fa1432571af18f02682cdf2291efefad61035c1bef98760e7dcf182e0069c4b; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/qa/test_epic021_acceptance_alignment.py: 3
+  tests/qa/test_epic021_harness_entrypoint.py: 33
+  tests/qa/test_epic029_requalification.py: 82
+  tests/qa/test_generic_qa_harness.py: 167
+  tests/qa/test_qa_harness_followup.py: 114
+  tests/qa/test_tooling_bootstrap.py: 2
+  tests/qa/test_viability_generator_wrappers.py: 87
+  node ids: 488; final line: 488 tests collected in 0.98s
+stderr (0 bytes):
+(empty)
+--- command 84: ["bash", "-c", "python -m pytest -p no:cacheprovider --collect-only -q $(cat /tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d/lane-release.args)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:12Z; ended_utc: 2026-11-11T08:21:13Z; exit_code: 0
+stdout (10049 bytes, 95 lines, sha256 327512d59aae491bff7676c1ffe5509f6b86a7ddb1d7b0f594d4efd81d691c9d; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_release_attestation.py: 47
+  tests/evidence/test_release_manifest_content_binding.py: 10
+  tests/evidence/test_sanity_pipeline.py: 29
+  tests/runtime/test_identity.py: 7
+  node ids: 93; final line: 93 tests collected in 0.65s
+stderr (0 bytes):
+(empty)
+--- command 85: ["git", "diff", "--name-only", "0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d", "b687c813866befa5ee911a14b00ad21c1841e967"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:13Z; ended_utc: 2026-11-11T08:21:13Z; exit_code: 0
+stdout (627 bytes):
+AGENTS.md
+CHANGELOG.md
+README.md
+audit/ops/hde-crd-0003/wu-ops-01/SHA256SUMS.attempt1
+audit/ops/hde-crd-0003/wu-ops-01/binding_presence.attempt1.tsv
+audit/ops/hde-crd-0003/wu-ops-01/declarations_comparison.attempt1.tsv
+audit/ops/hde-crd-0003/wu-ops-01/deployment_facts.attempt1.tsv
+audit/ops/hde-crd-0003/wu-ops-01/expected_identity.attempt1.txt
+audit/ops/hde-crd-0003/wu-ops-01/identity_reads.attempt1.tsv
+audit/ops/hde-crd-0003/wu-ops-01/pf07_doc_delta_candidate.attempt1.md
+audit/ops/hde-crd-0003/wu-ops-01/result.attempt1.txt
+audit/ops/hde-crd-0003/wu-ops-01/run.attempt1.log
+docs/CLI_commands.md
+docs/INDEX.md
+docs/RUN.md
+stderr (0 bytes):
+(empty)
+--- command 86: ["git", "diff", "--name-only", "b687c813866befa5ee911a14b00ad21c1841e967", "b687c813866befa5ee911a14b00ad21c1841e967"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:13Z; ended_utc: 2026-11-11T08:21:13Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 87: ["bash", "-c", "\nset -u; D=$1; T=$2; OWN=$(cat \"$D/owner_files.txt\")\n: > \"$D/R.name\"; : > \"$D/R.walk\"\necho \"### name search: git grep -l -F -e <path> -e <basename> -- <the twenty-two owner files>, once per listed path\"\nfor p in $(git diff --name-only 0bf85b88a7cf4f865d350714364e6ddb4b3e2e2d \"$T\"); do\n  b=$(basename \"$p\"); m=$(git grep -l -F -e \"$p\" -e \"$b\" -- $OWN); rc=$?\n  echo \"path $p (basename $b): git grep exit $rc; matches: ${m:-(none)}\" | tr \"\\n\" \" \"; echo\n  [ -n \"$m\" ] && printf \"%s\\n\" \"$m\" >> \"$D/R.name\"\ndone\necho \"### tree-walking or tree-copying search: git grep -l -E \\\"rglob|glob\\\\(|ls-files|os\\\\.walk|copytree\\\" -- <the twenty-two owner files>\"\nm=$(git grep -l -E \"rglob|glob\\(|ls-files|os\\.walk|copytree\" -- $OWN); rc=$?\necho \"git grep exit $rc; matches: $(printf \"%s \" $m)\"; [ -n \"$m\" ] && printf \"%s\\n\" $m >> \"$D/R.walk\"\nsort -u \"$D/R.name\" \"$D/R.walk\" > \"$D/R.union\"\nif [ -z \"$(git diff --name-only b687c813866befa5ee911a14b00ad21c1841e967 \"$T\")\" ]; then\n  grep -v -x -F tests/evidence/test_evidence_index_missing_state.py \"$D/R.union\" > \"$D/R.txt\"; echo \"tests/evidence/test_evidence_index_missing_state.py leaves R: git diff --name-only b687c813 T prints nothing\"\nelse cp \"$D/R.union\" \"$D/R.txt\"; echo \"tests/evidence/test_evidence_index_missing_state.py stays in R\"; fi\necho \"### R ($(grep -c . \"$D/R.txt\") files):\"; cat \"$D/R.txt\"\n", "_", "/tmp/hde-crd-0003-qa/checks/qa-17-bound-ci-coverage/d", "b687c813866befa5ee911a14b00ad21c1841e967"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:13Z; ended_utc: 2026-11-11T08:21:13Z; exit_code: 0
+stdout (3354 bytes):
+### name search: git grep -l -F -e <path> -e <basename> -- <the twenty-two owner files>, once per listed path
+path AGENTS.md (basename AGENTS.md): git grep exit 0; matches: tests/tools/test_pf_document_reader_guard.py tests/tools/test_prepush_check.py tests/unit/test_check_agents_md_citations.py 
+path CHANGELOG.md (basename CHANGELOG.md): git grep exit 1; matches: (none) 
+path README.md (basename README.md): git grep exit 0; matches: tests/evidence/test_rails_ci_workflow_integration.py tests/tools/test_pf_tool_inputs.py 
+path audit/ops/hde-crd-0003/wu-ops-01/SHA256SUMS.attempt1 (basename SHA256SUMS.attempt1): git grep exit 1; matches: (none) 
+path audit/ops/hde-crd-0003/wu-ops-01/binding_presence.attempt1.tsv (basename binding_presence.attempt1.tsv): git grep exit 1; matches: (none) 
+path audit/ops/hde-crd-0003/wu-ops-01/declarations_comparison.attempt1.tsv (basename declarations_comparison.attempt1.tsv): git grep exit 1; matches: (none) 
+path audit/ops/hde-crd-0003/wu-ops-01/deployment_facts.attempt1.tsv (basename deployment_facts.attempt1.tsv): git grep exit 1; matches: (none) 
+path audit/ops/hde-crd-0003/wu-ops-01/expected_identity.attempt1.txt (basename expected_identity.attempt1.txt): git grep exit 1; matches: (none) 
+path audit/ops/hde-crd-0003/wu-ops-01/identity_reads.attempt1.tsv (basename identity_reads.attempt1.tsv): git grep exit 1; matches: (none) 
+path audit/ops/hde-crd-0003/wu-ops-01/pf07_doc_delta_candidate.attempt1.md (basename pf07_doc_delta_candidate.attempt1.md): git grep exit 1; matches: (none) 
+path audit/ops/hde-crd-0003/wu-ops-01/result.attempt1.txt (basename result.attempt1.txt): git grep exit 1; matches: (none) 
+path audit/ops/hde-crd-0003/wu-ops-01/run.attempt1.log (basename run.attempt1.log): git grep exit 1; matches: (none) 
+path docs/CLI_commands.md (basename CLI_commands.md): git grep exit 1; matches: (none) 
+path docs/INDEX.md (basename INDEX.md): git grep exit 1; matches: (none) 
+path docs/RUN.md (basename RUN.md): git grep exit 1; matches: (none) 
+### tree-walking or tree-copying search: git grep -l -E "rglob|glob\(|ls-files|os\.walk|copytree" -- <the twenty-two owner files>
+git grep exit 0; matches: tests/cli/test_errors_parity.py tests/evidence/test_architecture_snapshot.py tests/evidence/test_canonical_json_gate_check_outputs.py tests/evidence/test_epic030_pr05_category_framework_evidence.py tests/evidence/test_evidence_index_missing_state.py tests/evidence/test_rails_ci_workflow_integration.py tests/evidence/test_sanity_pipeline.py tests/ops/test_hde_epic038_ops03.py tests/tools/test_pf_document_reader_guard.py tests/tools/test_pf_tool_inputs.py tests/tools/test_prepush_check.py tests/tools/test_score_distribution.py 
+tests/evidence/test_evidence_index_missing_state.py leaves R: git diff --name-only b687c813 T prints nothing
+### R (12 files):
+tests/cli/test_errors_parity.py
+tests/evidence/test_architecture_snapshot.py
+tests/evidence/test_canonical_json_gate_check_outputs.py
+tests/evidence/test_epic030_pr05_category_framework_evidence.py
+tests/evidence/test_rails_ci_workflow_integration.py
+tests/evidence/test_sanity_pipeline.py
+tests/ops/test_hde_epic038_ops03.py
+tests/tools/test_pf_document_reader_guard.py
+tests/tools/test_pf_tool_inputs.py
+tests/tools/test_prepush_check.py
+tests/tools/test_score_distribution.py
+tests/unit/test_check_agents_md_citations.py
+stderr (0 bytes):
+(empty)
+--- command 88: ["python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa17-R", "tests/cli/test_errors_parity.py", "tests/evidence/test_architecture_snapshot.py", "tests/evidence/test_canonical_json_gate_check_outputs.py", "tests/evidence/test_epic030_pr05_category_framework_evidence.py", "tests/evidence/test_rails_ci_workflow_integration.py", "tests/evidence/test_sanity_pipeline.py", "tests/ops/test_hde_epic038_ops03.py", "tests/tools/test_pf_document_reader_guard.py", "tests/tools/test_pf_tool_inputs.py", "tests/tools/test_prepush_check.py", "tests/tools/test_score_distribution.py", "tests/unit/test_check_agents_md_citations.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:21:13Z; ended_utc: 2026-11-11T08:27:18Z; exit_code: 0
+stdout (832 bytes):
+........................................................................ [ 10%]
+........................................................................ [ 20%]
+........................................................................ [ 30%]
+........................................................................ [ 41%]
+........................................................................ [ 51%]
+........................................................................ [ 61%]
+........................................................................ [ 72%]
+........................................................................ [ 82%]
+........................................................................ [ 92%]
+.................................................                        [100%]
+697 passed in 363.87s (0:06:03)
+stderr (0 bytes):
+(empty)
+--- command 89: ["bash", "-c", "git grep -n -E '^\\s*(import|from)\\s+(urllib|requests|socket|http\\.client|httpx|aiohttp)\\b' -- tools/pf_tool_inputs/resolver.py tools/pf_tool_inputs/refresh.py tools/evidence/generate_narrative_registry_diff.py tools/qa/qa_harness.py tools/qa/generate_epic_close_pack.py tools/ci/prepush_check.py ci/checks/check_agents_md_citations.py; rc=$?; echo \"child_exit_code: $rc (expected 1, no match)\"; [ $rc -eq 1 ]"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:18Z; ended_utc: 2026-11-11T08:27:18Z; exit_code: 0
+stdout (42 bytes):
+child_exit_code: 1 (expected 1, no match)
+stderr (0 bytes):
+(empty)
+--- command 90: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:18Z; ended_utc: 2026-11-11T08:27:18Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness (Plan §7 common rule A, E-L): HEAD equals T, not shallow, status empty, Python 3.12.x, pytest, engine inside the clone, bash and git versions, every E-L-unset name UNSET | observed: b687c813866befa5ee911a14b00ad21c1841e967; shallow false; status 0 bytes; Python 3.12.15; pytest 8.4.2; engine in clone True; presence HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET | PASS
+- discovery: the three bound commits resolve and every named locus exists (git cat-file -e, test -e) | observed: 12 of 12 exit 0 | PASS
+- item 1: the classifier's stdout line is exactly the hosted classification line | observed: CI_CHANGE_CLASSIFICATION:event=push;reason=selected_lanes;paths=15;lanes=product,compat,db,rails,evidence,qa,release | PASS
+- item 1: the target list has 173 lines, 7,587 bytes, SHA-256 44bfc83117d7386b46319b88090560236736a1c7793cf0a4eee36da46843fae9 | observed: 173 lines, 7587 bytes, 44bfc83117d7386b46319b88090560236736a1c7793cf0a4eee36da46843fae9 | PASS
+- item 1: the lane command prints LANE_STEPS_UNIQUE product compat db rails evidence qa release | observed: LANE_STEPS_UNIQUE product compat db rails evidence qa release | PASS
+- item 1: every owner file is in its bound step's list (grep -qxF, 22 reads) | observed: tests/bodygraph/test_vendor_prod_override.py in targets.txt: exit 0; tests/cli/test_bg_resolve.py in targets.txt: exit 0; tests/bodygraph/test_bg_resolve_route_policy.py in targets.txt: exit 0; tests/provider/test_vendor_call_rails_and_config.py in targets.txt: exit 0; tests/adapter/test_compat_http_dev.py in lane-compat.files: exit 0; tests/http/test_compat_endpoint_contract.py in lane-compat.files: exit 0; tests/evidence/test_sanity_pipeline.py in lane-release.files: exit 0; tests/evidence/test_release_attestation.py in lane-release.files: exit 0; tests/evidence/test_canonical_json_gate_check_outputs.py in targets.txt: exit 0; tests/cli/test_errors_parity.py in lane-compat.files: exit 0; tests/evidence/test_epic030_pr05_category_framework_evidence.py in targets.txt: exit 0; tests/tools/test_prepush_check.py in targets.txt: exit 0; tests/ops/test_hde_epic038_ops03.py in targets.txt: exit 0; tests/evidence/test_hdapi_v2_contract_inventory.py in targets.txt: exit 0; tests/adapter/test_jsonschema.py in lane-compat.files: exit 0; tests/evidence/test_architecture_snapshot.py in lane-product.files: exit 0; tests/evidence/test_rails_ci_workflow_integration.py in lane-rails.files: exit 0; tests/evidence/test_evidence_index_missing_state.py in lane-evidence.files: exit 0; tests/tools/test_score_distribution.py in targets.txt: exit 0; tests/tools/test_pf_tool_inputs.py in targets.txt: exit 0; tests/tools/test_pf_document_reader_guard.py in targets.txt: exit 0; tests/unit/test_check_agents_md_citations.py in lane-product.files: exit 0 | PASS
+- item 1 (S12-a): grep -n 'generate_architecture_snapshot.py --check' shows the command inside the product and evidence lane steps | observed: lines [142, 235]; product step lines 135 to 148; evidence step lines 222 to 243 | PASS
+- item 2: the target list collects 3,767 tests; the lane lists collect 85, 204, 270, 167, 145, 488 and 93 (product, compat, db, rails, evidence, qa, release) | observed: [3767, 85, 204, 270, 167, 145, 488, 93] | PASS
+- item 3: git diff --name-only 0bf85b88 T lists only the fifteen allowed paths (or paths inside the guard's exclusion set); no path under tests, engine, adapter, presenter, tools, ci, .github, scripts, catalog, schemas or math | observed: 15 paths: AGENTS.md CHANGELOG.md README.md audit/ops/hde-crd-0003/wu-ops-01/SHA256SUMS.attempt1 audit/ops/hde-crd-0003/wu-ops-01/binding_presence.attempt1.tsv audit/ops/hde-crd-0003/wu-ops-01/declarations_comparison.attempt1.tsv audit/ops/hde-crd-0003/wu-ops-01/deployment_facts.attempt1.tsv audit/ops/hde-crd-0003/wu-ops-01/expected_identity.attempt1.txt audit/ops/hde-crd-0003/wu-ops-01/identity_reads.attempt1.tsv audit/ops/hde-crd-0003/wu-ops-01/pf07_doc_delta_candidate.attempt1.md audit/ops/hde-crd-0003/wu-ops-01/result.attempt1.txt audit/ops/hde-crd-0003/wu-ops-01/run.attempt1.log docs/CLI_commands.md docs/INDEX.md docs/RUN.md; outside the allowed set: none | PASS
+- item 3: the re-run set R by the Plan's selection rule (name search once per listed path; tree-walking search; tests/evidence/test_evidence_index_missing_state.py leaves R because git diff --name-only b687c813 T prints nothing) | observed: 12 files: tests/cli/test_errors_parity.py tests/evidence/test_architecture_snapshot.py tests/evidence/test_canonical_json_gate_check_outputs.py tests/evidence/test_epic030_pr05_category_framework_evidence.py tests/evidence/test_rails_ci_workflow_integration.py tests/evidence/test_sanity_pipeline.py tests/ops/test_hde_epic038_ops03.py tests/tools/test_pf_document_reader_guard.py tests/tools/test_pf_tool_inputs.py tests/tools/test_prepush_check.py tests/tools/test_score_distribution.py tests/unit/test_check_agents_md_citations.py | PASS
+- item 3: R all pass under common rule C (697 collected; zero failed, zero errors, zero skips, zero xfail) | observed: exit 0; final line '697 passed in 363.87s (0:06:03)'; non-pass items listed: none | PASS
+- item 4 (S17-g): the static read finds no match (asserting bash -c expecting git grep exit 1) | observed: asserting bash -c exit 0; child_exit_code: 1 (expected 1, no match); matching lines 0 | PASS
+- item 5: git status --porcelain empty after | observed: exit 0, 0 bytes | PASS
+- per-criterion record (N-3; each criterion's own result; membership, the eight counts and item 3's comparison are shared):
+  - S01-a: PASS (tests/bodygraph/test_vendor_prod_override.py in targets.txt; tests/cli/test_bg_resolve.py in targets.txt)
+  - S02-a: PASS (tests/bodygraph/test_bg_resolve_route_policy.py in targets.txt)
+  - S03-a: PASS (tests/adapter/test_compat_http_dev.py in lane-compat.files; tests/http/test_compat_endpoint_contract.py in lane-compat.files)
+  - S04-a: PASS (tests/evidence/test_sanity_pipeline.py in lane-release.files; tests/evidence/test_release_attestation.py in lane-release.files; in R and passing: tests/evidence/test_sanity_pipeline.py)
+  - S05-a: PASS (tests/evidence/test_canonical_json_gate_check_outputs.py in targets.txt; in R and passing: tests/evidence/test_canonical_json_gate_check_outputs.py)
+  - S06-a: PASS (tests/evidence/test_sanity_pipeline.py in lane-release.files; tests/cli/test_errors_parity.py in lane-compat.files; tests/evidence/test_epic030_pr05_category_framework_evidence.py in targets.txt; in R and passing: tests/evidence/test_sanity_pipeline.py, tests/cli/test_errors_parity.py, tests/evidence/test_epic030_pr05_category_framework_evidence.py)
+  - S06-b: PASS (tests/provider/test_vendor_call_rails_and_config.py in targets.txt)
+  - S07-d: PASS (tests/tools/test_prepush_check.py in targets.txt; tests/ops/test_hde_epic038_ops03.py in targets.txt; tests/bodygraph/test_vendor_prod_override.py in targets.txt; tests/bodygraph/test_bg_resolve_route_policy.py in targets.txt; tests/evidence/test_hdapi_v2_contract_inventory.py in targets.txt; tests/adapter/test_jsonschema.py in lane-compat.files; in R and passing: tests/tools/test_prepush_check.py, tests/ops/test_hde_epic038_ops03.py)
+  - S11-a: PASS (tests/tools/test_prepush_check.py in targets.txt; in R and passing: tests/tools/test_prepush_check.py)
+  - S12-a: PASS (the snapshot --check command inside the product and evidence lane steps (lines 142, 235))
+  - S12-b: PASS (tests/evidence/test_architecture_snapshot.py in lane-product.files; tests/evidence/test_rails_ci_workflow_integration.py in lane-rails.files; in R and passing: tests/evidence/test_architecture_snapshot.py, tests/evidence/test_rails_ci_workflow_integration.py)
+  - S13-a: PASS (tests/evidence/test_evidence_index_missing_state.py in lane-evidence.files)
+  - S14-a: PASS (tests/evidence/test_evidence_index_missing_state.py in lane-evidence.files)
+  - S16-a: PASS (tests/tools/test_score_distribution.py in targets.txt; in R and passing: tests/tools/test_score_distribution.py)
+  - S16-b: PASS (tests/evidence/test_rails_ci_workflow_integration.py in lane-rails.files; in R and passing: tests/evidence/test_rails_ci_workflow_integration.py)
+  - S17-a: PASS (tests/tools/test_pf_tool_inputs.py in targets.txt; tests/tools/test_pf_document_reader_guard.py in targets.txt; tests/unit/test_check_agents_md_citations.py in lane-product.files; in R and passing: tests/tools/test_pf_tool_inputs.py, tests/tools/test_pf_document_reader_guard.py, tests/unit/test_check_agents_md_citations.py)
+  - S17-b: PASS (tests/tools/test_prepush_check.py in targets.txt; in R and passing: tests/tools/test_prepush_check.py)
+  - S17-c: PASS (tests/evidence/test_rails_ci_workflow_integration.py in lane-rails.files; in R and passing: tests/evidence/test_rails_ci_workflow_integration.py)
+  - S17-d: PASS (the rails, evidence, QA subsystem and release attestation steps found exactly once in run 42863370974's ci.yml (their passes are confirmed by QA-110 from GitHub))
+  - S17-f: PASS (tests/unit/test_check_agents_md_citations.py in lane-product.files; in R and passing: tests/unit/test_check_agents_md_citations.py)
+  - S17-g: PASS (item 4's static read, no match)
+- rollup (N-3): every criterion's own result is PASS, so the published status is PASS (causal precedence FAIL_TOOLING over TOOLING_BLOCKED over FAIL_BEHAVIOR over PASS; no child is below PASS)
+- overall: every predicate met; status PASS
+=== NOTES ===
+- nonclaims: this check re-runs no owner test except R, and it does not confirm the hosted runs' conclusions or figures; QA-110 confirms them from GitHub (push runs 42863370974 and 42929167494). It proves, by command, which files each hosted figure covers and that T carries the same code and tests (Plan CHECK 17).
+- normalizations: N-1 (R ran as python -m pytest -q -rfEsx -p no:cacheprovider --basetemp=<fresh dir>, command 88); N-2 (each lane's file list is python -m pytest -p no:cacheprovider --collect-only -q $(cat D/lane-<lane>.args) | grep '::' | cut -d: -f1 | sort -u > D/lane-<lane>.files, commands 40 to 53); N-3 (the per-criterion record and rollup in PREDICATES). No other normalization.
+- execution forms, recorded as run: git show 0bf85b88:.github/workflows/ci.yml > D/ci.yml ran as one bash -c (command 29); D/ci.yml is byte-identical to T's .github/workflows/ci.yml (SHA-256 0cb13ad3c24c1dd7cb1b610c5becbd1005e78bbe62437362dfda8c2363923db8, command 30). The counts of item 2 ran as bash -c, because they use the Plan's $(cat ...) form (commands 77 to 84). The selection of R (command 87) is one bash -c that applies the Plan's rule verbatim: git grep -l -F -e <path> -e <basename> once per listed path, then the tree-walking git grep, then the missing_state exclusion. It prints each child's own exit status (1 means no match).
+- item 1: the classifier's GitHub output is command 24 and the target list is command 28; each lane's arguments are commands 33 to 39, and each lane's file list follows its collection read.
+- S12-a: the snapshot --check command sits at D/ci.yml lines 142 and 235, inside the product lane step (lines 135 to 148) and the evidence lane step (lines 222 to 243), by the step-name read of command 31.
+- item 3: git diff --name-only 0bf85b88 T lists exactly the fifteen allowed paths (command 85), and git diff --name-only b687c813 T prints nothing (command 86), so tests/evidence/test_evidence_index_missing_state.py leaves R; R is the Plan's twelve files and 697 tests.
+- R: 697 passed in 363.87 s (command 88); no failure, error, skip or xfail is listed.
+- consumed evidence: none in the repository; the bound hosted runs are referenced by ID.
+- recording: each argv ran unchanged through the scratch recorder /tmp/hde-crd-0003-qa/qarun.py; collect-only outputs are summarized under Plan §5.3 rule 5; the PREDICATES section was generated mechanically from this check's transcript by a scratch evaluator.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body before publication: NO_HIT in the check's shell; and NO_HIT in the venue's parent shell, which holds the vendor and database values (a stricter second scan; comparison only, no value printed).
+- LF normalization (collection §4.6): no CR byte in any capture

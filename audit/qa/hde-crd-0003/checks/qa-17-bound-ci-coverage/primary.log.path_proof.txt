@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log
+size_bytes: 100973
+sha256: 3a9d0379a4ca39ce24d6bbbf18c387b8aa9b7a64e54a1eac1e51d252999d5ed1
+mtime_utc: 2026-11-11T08:29:28Z
+produced_at_utc: 2026-09-22T14:25:29Z

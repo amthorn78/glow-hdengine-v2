@@ -1,0 +1,592 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-01-preflight","check_name":"Candidate, environment and Step-0B preflight","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","rev-parse","HEAD^{tree}"],["git","rev-parse","--is-shallow-repository"],["git","cat-file","-e","3570be826f1fe36323ed67471f327078b62e4667^{commit}"],["git","cat-file","-e","eff777e2461257520f419a095a9713ce27d331e4^{commit}"],["python","-I","-c","import runpy; g=runpy.run_path('ci/checks/classify_ci_changes.py'); print(' '.join(g['_DOCUMENTATION_PREFIXES']))"],["git","diff","--name-only","3570be826f1fe36323ed67471f327078b62e4667","b687c813866befa5ee911a14b00ad21c1841e967","--",".",":!audit/ops/hde-crd-0003",":!audit/qa/hde-crd-0003",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*",":!docs/crd/",":!docs/ephemeral/",":!docs/graph/",":!docs/pfcanon/",":!docs/plans/",":!docs/prompt_ecosystem_management/",":!docs/qa/",":!docs/run/"],["sha256sum","catalog/manifest.json"],["python","-c","import json; m=json.load(open('catalog/manifest.json')); print(m['version'], m['built_at_utc'], len(m['files']))"],["hdctl","--version"],["python","--version"],["python","-m","pytest","--version"],["ruby","--version"],["bash","--version"],["curl","--version"],["git","--version"],["python","-c","import engine; print(engine.__file__)"],["bash","/tmp/hde-crd-0003-qa/presence.sh","HD_API_KEY","GEO_API_KEY","HD_API_BASE_URL","HDAPI_BASE_URL","DATABASE_URL","GH_TOKEN","GITHUB_TOKEN","HDE_VENDOR_OVERRIDE_AUDIT_PATH","ENGINE_ENV"],["python","tools/evidence/update_evidence_index.py","--check"],["python","tools/evidence/orientation_demo.py","--check"],["python","tools/evidence/validate_evidence_paths.py"],["python","ci/checks/check_mirror_schema.sh"],["python","tools/evidence/check_lf_endings.py"],["bash","ci/checks/check_final_lf.sh"],["bash","ci/checks/check_evidence_index_hash.sh"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/qa/test_generate_epic_close_pack.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/tools/test_prepush_check.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/ops/test_hde_epic038_ops03.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/bodygraph/test_vendor_prod_override.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/bodygraph/test_bg_resolve_route_policy.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/adapter/test_jsonschema.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/evidence/test_hdapi_v2_contract_inventory.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/evidence/test_evidence_index_missing_state.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/tools/test_pf_document_reader_guard.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/unit/test_check_agents_md_citations.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/evidence/test_rails_ci_workflow_integration.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/tools/test_pf_tool_inputs.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/cli/test_errors_parity.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/evidence/test_architecture_snapshot.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/evidence/test_canonical_json_gate_check_outputs.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/evidence/test_epic030_pr05_category_framework_evidence.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/evidence/test_sanity_pipeline.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/tools/test_score_distribution.py"],["python","-m","pytest","-p","no:cacheprovider","--collect-only","-q","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/adapter/test_jsonschema.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["test","-e","tools/qa/generate_epic_close_pack.py"],["test","-e","tools/pf_tool_inputs/manifest.json"],["test","-e","tools/evidence/update_evidence_index.py"],["test","-e","tools/evidence/orientation_demo.py"],["test","-e","tools/evidence/validate_evidence_paths.py"],["test","-e","tools/evidence/check_lf_endings.py"],["test","-e","ci/checks/check_mirror_schema.sh"],["test","-e","ci/checks/check_final_lf.sh"],["test","-e","ci/checks/check_evidence_index_hash.sh"],["test","-e","ci/checks/classify_ci_changes.py"],["test","-e",".github/workflows/ci.yml"],["test","-e","schemas/magic10_compat_result_v1.schema.json"],["test","-e","docs/ENDPOINTS_CATALOG.json"],["test","-e","audit/HDE-CRD-0002_close_candidate_source.json"],["test","-e","audit/EPIC-041_close_candidate_source.json"],["test","-e","tools/pf_tool_inputs/resolver.py"],["test","-e","tools/pf_tool_inputs/refresh.py"],["test","-e","tools/evidence/generate_narrative_registry_diff.py"],["test","-e","tools/qa/qa_harness.py"],["test","-e","tools/ci/prepush_check.py"],["test","-e","ci/checks/check_agents_md_citations.py"],["python","-c","import json; m=json.load(open('tools/pf_tool_inputs/manifest.json')); print('source_commit', m['source_commit']); [print('PF10 entry:', d['file_name'], '|', d['title'], '|', d['sha256']) for d in m['documents'] if d.get('pf_id') == 'PF10']"],["git","-C","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/glow-docs","rev-parse","origin/main:docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md"],["git","ls-files","--","audit/docdeltas/hde-crd-0003_doc_deltas.md","audit/qa/hde-crd-0003/00_meta/doc_deltas.md"],["bash","-c","for f in audit/docdeltas/hde-crd-0003_doc_deltas.md audit/qa/hde-crd-0003/00_meta/doc_deltas.md; do if [ -e \"$f\" ]; then echo \"$f EXISTS $(wc -c < \"$f\") $(sha256sum \"$f\" | cut -d\" \" -f1)\"; else echo \"$f ABSENT\"; fi; done"],["python3","-I","/tmp/hde-crd-0003-qa/checks/qa-01-preflight/s0b_capture.py","/tmp/hde-crd-0003-qa/checks/qa-01-preflight/transcript.jsonl"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.2 check qa-01; QA-90 task T01 attempt 1; normalizations: none","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-01-preflight/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF27-Canon-Plan-Templates","PF19-Canon-Glow-QA-Guide","PF04-Canon-HDE-Governance"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-11T07:56:02Z"}
+=== CONTEXT ===
+check_id: qa-01-preflight
+check_name: Candidate, environment and Step-0B preflight
+task: QA-90 task T01, attempt 1; QA Plan v1.2 CHECK 1
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+environment_class: E-L; clone /tmp/hde-crd-0003-qa/clone (full history, detached at T); venv /tmp/hde-crd-0003-qa/venv with CI's install (python -m pip install 'setuptools>=68' wheel -r requirements.txt -r requirements-dev.txt -e .)
+interpreter: /tmp/hde-crd-0003-qa/venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/tmp/hde-crd-0003-qa/state GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty (collection §4.3 step 6; Plan §3.1 default rails)
+presence in the check shell (command 18): HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET
+start_utc: 2026-11-11T07:53:03Z
+end_utc: 2026-11-11T07:53:32Z
+=== READINESS ===
+qa-01 is the bootstrap (QA Plan v1.2 §7 common rule A): its actions 1 to 4 (commands 1 to 18 below) are its own readiness reads, recorded under COMMANDS.
+=== COMMANDS ===
+--- command 1: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:03Z; ended_utc: 2026-11-11T07:53:03Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- command 2: ["git", "rev-parse", "HEAD^{tree}"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:03Z; ended_utc: 2026-11-11T07:53:03Z; exit_code: 0
+stdout (41 bytes):
+85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+stderr (0 bytes):
+(empty)
+--- command 3: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:03Z; ended_utc: 2026-11-11T07:53:03Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command 4: ["git", "cat-file", "-e", "3570be826f1fe36323ed67471f327078b62e4667^{commit}"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:03Z; ended_utc: 2026-11-11T07:53:03Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 5: ["git", "cat-file", "-e", "eff777e2461257520f419a095a9713ce27d331e4^{commit}"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:03Z; ended_utc: 2026-11-11T07:53:03Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 6: ["python", "-I", "-c", "import runpy; g=runpy.run_path('ci/checks/classify_ci_changes.py'); print(' '.join(g['_DOCUMENTATION_PREFIXES']))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:03Z; ended_utc: 2026-11-11T07:53:03Z; exit_code: 0
+stdout (117 bytes):
+docs/crd/ docs/ephemeral/ docs/graph/ docs/pfcanon/ docs/plans/ docs/prompt_ecosystem_management/ docs/qa/ docs/run/
+stderr (0 bytes):
+(empty)
+--- command 7: ["git", "diff", "--name-only", "3570be826f1fe36323ed67471f327078b62e4667", "b687c813866befa5ee911a14b00ad21c1841e967", "--", ".", ":!audit/ops/hde-crd-0003", ":!audit/qa/hde-crd-0003", ":!docs/evidence/INDEX.*", ":!artifacts/evidence_index.jsonl*", ":!audit/gates/topology/orientation_demo.txt*", ":!docs/crd/", ":!docs/ephemeral/", ":!docs/graph/", ":!docs/pfcanon/", ":!docs/plans/", ":!docs/prompt_ecosystem_management/", ":!docs/qa/", ":!docs/run/"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:03Z; ended_utc: 2026-11-11T07:53:03Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 8: ["sha256sum", "catalog/manifest.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:04Z; ended_utc: 2026-11-11T07:53:04Z; exit_code: 0
+stdout (88 bytes):
+2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129  catalog/manifest.json
+stderr (0 bytes):
+(empty)
+--- command 9: ["python", "-c", "import json; m=json.load(open('catalog/manifest.json')); print(m['version'], m['built_at_utc'], len(m['files']))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:04Z; ended_utc: 2026-11-11T07:53:04Z; exit_code: 0
+stdout (30 bytes):
+1.3.0 2026-08-24T18:04:49Z 45
+stderr (0 bytes):
+(empty)
+--- command 10: ["hdctl", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:04Z; ended_utc: 2026-11-11T07:53:04Z; exit_code: 0
+stdout (93 bytes):
+hdctl 0.0.0 (hdengine@prod;2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129)
+stderr (0 bytes):
+(empty)
+--- command 11: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:04Z; ended_utc: 2026-11-11T07:53:04Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 12: ["python", "-m", "pytest", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:04Z; ended_utc: 2026-11-11T07:53:05Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command 13: ["ruby", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:05Z; ended_utc: 2026-11-11T07:53:05Z; exit_code: 0
+stdout (63 bytes):
+ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]
+stderr (0 bytes):
+(empty)
+--- command 14: ["bash", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:05Z; ended_utc: 2026-11-11T07:53:05Z; exit_code: 0
+stdout (307 bytes):
+GNU bash, version 5.3.9(1)-release (x86_64-pc-linux-gnu)
+Copyright (C) 2025 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+stderr (0 bytes):
+(empty)
+--- command 15: ["curl", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:05Z; ended_utc: 2026-11-11T07:53:05Z; exit_code: 0
+stdout (579 bytes):
+curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+Release-Date: 2026-01-07, security patched: 8.18.0-1ubuntu2.8
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp ws wss
+Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
+stderr (0 bytes):
+(empty)
+--- command 16: ["git", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:05Z; ended_utc: 2026-11-11T07:53:05Z; exit_code: 0
+stdout (19 bytes):
+git version 2.53.0
+stderr (0 bytes):
+(empty)
+--- command 17: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:05Z; ended_utc: 2026-11-11T07:53:05Z; exit_code: 0
+stdout (149 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py
+stderr (0 bytes):
+(empty)
+--- command 18: ["bash", "/tmp/hde-crd-0003-qa/presence.sh", "HD_API_KEY", "GEO_API_KEY", "HD_API_BASE_URL", "HDAPI_BASE_URL", "DATABASE_URL", "GH_TOKEN", "GITHUB_TOKEN", "HDE_VENDOR_OVERRIDE_AUDIT_PATH", "ENGINE_ENV"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:05Z; ended_utc: 2026-11-11T07:53:05Z; exit_code: 0
+stdout (186 bytes):
+HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET 
+stderr (0 bytes):
+(empty)
+--- command 19: ["python", "tools/evidence/update_evidence_index.py", "--check"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:05Z; ended_utc: 2026-11-11T07:53:06Z; exit_code: 0
+stdout (78 bytes):
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+stderr (0 bytes):
+(empty)
+--- command 20: ["python", "tools/evidence/orientation_demo.py", "--check"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:06Z; ended_utc: 2026-11-11T07:53:07Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 21: ["python", "tools/evidence/validate_evidence_paths.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:07Z; ended_utc: 2026-11-11T07:53:07Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 22: ["python", "ci/checks/check_mirror_schema.sh"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:07Z; ended_utc: 2026-11-11T07:53:08Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 23: ["python", "tools/evidence/check_lf_endings.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:08Z; ended_utc: 2026-11-11T07:53:08Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 24: ["bash", "ci/checks/check_final_lf.sh"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:08Z; ended_utc: 2026-11-11T07:53:08Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 25: ["bash", "ci/checks/check_evidence_index_hash.sh"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:08Z; ended_utc: 2026-11-11T07:53:08Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 26: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/qa/test_generate_epic_close_pack.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:08Z; ended_utc: 2026-11-11T07:53:10Z; exit_code: 0
+stdout (122970 bytes, 920 lines, sha256 d0691548f39ec2a11a303ca402cde2780f78648732dbfdf45fbf0852060abbd3; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/qa/test_generate_epic_close_pack.py: 918
+  node ids: 918; final line: 918 tests collected in 1.44s
+stderr (0 bytes):
+(empty)
+--- command 27: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/tools/test_prepush_check.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:10Z; ended_utc: 2026-11-11T07:53:11Z; exit_code: 0
+stdout (6156 bytes, 65 lines, sha256 19196c591b6913f369bc66247d7bf5912581ae28d5512fbd71906fa60cce6d85; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/tools/test_prepush_check.py: 63
+  node ids: 63; final line: 63 tests collected in 0.24s
+stderr (0 bytes):
+(empty)
+--- command 28: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/ops/test_hde_epic038_ops03.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:11Z; ended_utc: 2026-11-11T07:53:12Z; exit_code: 0
+stdout (19535 bytes, 188 lines, sha256 e156a963645912292a5b381e37af8b0035d159bd6baab4129a972b55c0eb7cc0; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/ops/test_hde_epic038_ops03.py: 186
+  node ids: 186; final line: 186 tests collected in 0.58s
+stderr (0 bytes):
+(empty)
+--- command 29: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/bodygraph/test_vendor_prod_override.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:12Z; ended_utc: 2026-11-11T07:53:13Z; exit_code: 0
+stdout (19537 bytes, 158 lines, sha256 a185bc646d3fcbab4df88dee3accb3ffc2fc4bc4ca3ab804e5eb35f502934a40; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/bodygraph/test_vendor_prod_override.py: 156
+  node ids: 156; final line: 156 tests collected in 0.48s
+stderr (0 bytes):
+(empty)
+--- command 30: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/bodygraph/test_bg_resolve_route_policy.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:13Z; ended_utc: 2026-11-11T07:53:14Z; exit_code: 0
+stdout (6967 bytes, 60 lines, sha256 a78d39e898809d4e23a197e74109873aeea684a3e95d15a18c75cab62abe37d7; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/bodygraph/test_bg_resolve_route_policy.py: 58
+  node ids: 58; final line: 58 tests collected in 0.37s
+stderr (0 bytes):
+(empty)
+--- command 31: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/adapter/test_jsonschema.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:14Z; ended_utc: 2026-11-11T07:53:15Z; exit_code: 0
+stdout (368 bytes, 7 lines, sha256 28f11b1d414f68700f2c2975ff0f357566b128daad39136837fb3302ac7db7df; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/adapter/test_jsonschema.py: 5
+  node ids: 5; final line: 5 tests collected in 0.48s
+stderr (0 bytes):
+(empty)
+--- command 32: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:15Z; ended_utc: 2026-11-11T07:53:17Z; exit_code: 0
+stdout (43342 bytes, 303 lines, sha256 ae6105f9170165b1bd265998ae6bc567af7cfc0263a810e4b9871fd557eadbde; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_hdapi_v2_contract_inventory.py: 301
+  node ids: 301; final line: 301 tests collected in 0.77s
+stderr (0 bytes):
+(empty)
+--- command 33: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/evidence/test_evidence_index_missing_state.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:17Z; ended_utc: 2026-11-11T07:53:18Z; exit_code: 0
+stdout (9372 bytes, 77 lines, sha256 ac1b4468f3c2666e61d7a9af39b99ce9edc2e8c3b159dc850fb9310f11f33df6; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_evidence_index_missing_state.py: 75
+  node ids: 75; final line: 75 tests collected in 0.26s
+stderr (0 bytes):
+(empty)
+--- command 34: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/tools/test_pf_document_reader_guard.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:18Z; ended_utc: 2026-11-11T07:53:18Z; exit_code: 0
+stdout (295 bytes, 5 lines, sha256 67ccbbec16ee2d344e3d2f0be0aec383b4e4b6053c7b51bef9932b3933129925; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/tools/test_pf_document_reader_guard.py: 3
+  node ids: 3; final line: 3 tests collected in 0.04s
+stderr (0 bytes):
+(empty)
+--- command 35: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/unit/test_check_agents_md_citations.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:18Z; ended_utc: 2026-11-11T07:53:19Z; exit_code: 0
+stdout (6745 bytes, 62 lines, sha256 6f794189686d2dfa025340a8e3b88375ee8837888b1d862a2fafcf1b4a960107; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/unit/test_check_agents_md_citations.py: 60
+  node ids: 60; final line: 60 tests collected in 0.07s
+stderr (0 bytes):
+(empty)
+--- command 36: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/evidence/test_rails_ci_workflow_integration.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:19Z; ended_utc: 2026-11-11T07:53:20Z; exit_code: 0
+stdout (23466 bytes, 169 lines, sha256 1a7ba7a242948aca54a3a5e4a704eeb1300525f36f74c6fb42943e61dce69917; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_rails_ci_workflow_integration.py: 167
+  node ids: 167; final line: 167 tests collected in 0.54s
+stderr (0 bytes):
+(empty)
+--- command 37: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/tools/test_pf_tool_inputs.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:20Z; ended_utc: 2026-11-11T07:53:20Z; exit_code: 0
+stdout (2267 bytes, 26 lines, sha256 5bf2cd57dfe051240ebf9266f668a6efb88ad1e3bededac5462f930c3fc2fb92; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/tools/test_pf_tool_inputs.py: 24
+  node ids: 24; final line: 24 tests collected in 0.14s
+stderr (0 bytes):
+(empty)
+--- command 38: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/cli/test_errors_parity.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:20Z; ended_utc: 2026-11-11T07:53:22Z; exit_code: 0
+stdout (4365 bytes, 44 lines, sha256 6dc24dfe9a20415c20c7e717baae756b90fbb15eacd67ab1e6982f65f26f17b4; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/cli/test_errors_parity.py: 42
+  node ids: 42; final line: 42 tests collected in 0.49s
+stderr (0 bytes):
+(empty)
+--- command 39: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/evidence/test_architecture_snapshot.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:22Z; ended_utc: 2026-11-11T07:53:22Z; exit_code: 0
+stdout (1329 bytes, 12 lines, sha256 0228e45e37eead9e64cad0ca7330b14f48ea03c282dff9677060b3f62dce52d7; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_architecture_snapshot.py: 10
+  node ids: 10; final line: 10 tests collected in 0.18s
+stderr (0 bytes):
+(empty)
+--- command 40: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/evidence/test_canonical_json_gate_check_outputs.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:22Z; ended_utc: 2026-11-11T07:53:24Z; exit_code: 0
+stdout (11905 bytes, 98 lines, sha256 d4f6ea22674b5839dfc6b95b98ecc271af46c5b03e89b285044a234698c5b378; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_canonical_json_gate_check_outputs.py: 96
+  node ids: 96; final line: 96 tests collected in 0.69s
+stderr (0 bytes):
+(empty)
+--- command 41: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/evidence/test_epic030_pr05_category_framework_evidence.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:24Z; ended_utc: 2026-11-11T07:53:24Z; exit_code: 0
+stdout (758 bytes, 8 lines, sha256 c180ae672c3238f2ba87f220355cf40c98ac62f39a6bcca267680f948e9e8d8a; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_epic030_pr05_category_framework_evidence.py: 6
+  node ids: 6; final line: 6 tests collected in 0.26s
+stderr (0 bytes):
+(empty)
+--- command 42: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/evidence/test_sanity_pipeline.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:25Z; ended_utc: 2026-11-11T07:53:25Z; exit_code: 0
+stdout (3136 bytes, 31 lines, sha256 ffbfaadde2bd393e3b0382e7c4d03acbd665ee6886112bfb0804e4184fe1fb5e; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/evidence/test_sanity_pipeline.py: 29
+  node ids: 29; final line: 29 tests collected in 0.38s
+stderr (0 bytes):
+(empty)
+--- command 43: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/tools/test_score_distribution.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:25Z; ended_utc: 2026-11-11T07:53:26Z; exit_code: 0
+stdout (1054 bytes, 13 lines, sha256 28a9dc5209ef76d06a16b07cfecf9127cbbe4bba538a00bb5804c51a99687f45; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/tools/test_score_distribution.py: 11
+  node ids: 11; final line: 11 tests collected in 0.40s
+stderr (0 bytes):
+(empty)
+--- command 44: ["python", "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/adapter/test_jsonschema.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:26Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (218700 bytes, 1689 lines, sha256 040d048119bbb2a4d9c9df8baab9a23b30f91d7679ff694c9b55a44f17a9c675; summarized under QA Plan v1.2 §5.3 rule 5: per-file node-id counts and the final line):
+  tests/qa/test_generate_epic_close_pack.py: 918
+  tests/tools/test_prepush_check.py: 63
+  tests/ops/test_hde_epic038_ops03.py: 186
+  tests/bodygraph/test_vendor_prod_override.py: 156
+  tests/bodygraph/test_bg_resolve_route_policy.py: 58
+  tests/adapter/test_jsonschema.py: 5
+  tests/evidence/test_hdapi_v2_contract_inventory.py: 301
+  node ids: 1687; final line: 1687 tests collected in 3.47s
+stderr (0 bytes):
+(empty)
+--- command 45: ["test", "-e", "tools/qa/generate_epic_close_pack.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 46: ["test", "-e", "tools/pf_tool_inputs/manifest.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 47: ["test", "-e", "tools/evidence/update_evidence_index.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 48: ["test", "-e", "tools/evidence/orientation_demo.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 49: ["test", "-e", "tools/evidence/validate_evidence_paths.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 50: ["test", "-e", "tools/evidence/check_lf_endings.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 51: ["test", "-e", "ci/checks/check_mirror_schema.sh"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 52: ["test", "-e", "ci/checks/check_final_lf.sh"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 53: ["test", "-e", "ci/checks/check_evidence_index_hash.sh"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 54: ["test", "-e", "ci/checks/classify_ci_changes.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 55: ["test", "-e", ".github/workflows/ci.yml"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 56: ["test", "-e", "schemas/magic10_compat_result_v1.schema.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 57: ["test", "-e", "docs/ENDPOINTS_CATALOG.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:31Z; ended_utc: 2026-11-11T07:53:31Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 58: ["test", "-e", "audit/HDE-CRD-0002_close_candidate_source.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 59: ["test", "-e", "audit/EPIC-041_close_candidate_source.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 60: ["test", "-e", "tools/pf_tool_inputs/resolver.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 61: ["test", "-e", "tools/pf_tool_inputs/refresh.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 62: ["test", "-e", "tools/evidence/generate_narrative_registry_diff.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 63: ["test", "-e", "tools/qa/qa_harness.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 64: ["test", "-e", "tools/ci/prepush_check.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 65: ["test", "-e", "ci/checks/check_agents_md_citations.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 66: ["python", "-c", "import json; m=json.load(open('tools/pf_tool_inputs/manifest.json')); print('source_commit', m['source_commit']); [print('PF10 entry:', d['file_name'], '|', d['title'], '|', d['sha256']) for d in m['documents'] if d.get('pf_id') == 'PF10']"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (184 bytes):
+source_commit 2b5847d203b6ccced3b5e363b7249ba8eecebddc
+PF10 entry: PF10-HDE-Build-Notes-v14.1.2.md | HDE Build Notes | 34739d02572ce41e861ae21bdadda49feacc36781e995762356c686b85492d9b
+stderr (0 bytes):
+(empty)
+--- command 67: ["git", "-C", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/glow-docs", "rev-parse", "origin/main:docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (41 bytes):
+021769ae06c4e090474fe086dad51487cca73bf6
+stderr (0 bytes):
+(empty)
+--- command 68: ["git", "ls-files", "--", "audit/docdeltas/hde-crd-0003_doc_deltas.md", "audit/qa/hde-crd-0003/00_meta/doc_deltas.md"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 69: ["bash", "-c", "for f in audit/docdeltas/hde-crd-0003_doc_deltas.md audit/qa/hde-crd-0003/00_meta/doc_deltas.md; do if [ -e \"$f\" ]; then echo \"$f EXISTS $(wc -c < \"$f\") $(sha256sum \"$f\" | cut -d\" \" -f1)\"; else echo \"$f ABSENT\"; fi; done"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (101 bytes):
+audit/docdeltas/hde-crd-0003_doc_deltas.md ABSENT
+audit/qa/hde-crd-0003/00_meta/doc_deltas.md ABSENT
+stderr (0 bytes):
+(empty)
+--- command 70: ["python3", "-I", "/tmp/hde-crd-0003-qa/checks/qa-01-preflight/s0b_capture.py", "/tmp/hde-crd-0003-qa/checks/qa-01-preflight/transcript.jsonl"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (1207 bytes):
+STEP-0B COLLECTIONS: tests/qa/test_generate_epic_close_pack.py 918; tests/tools/test_prepush_check.py 63; tests/ops/test_hde_epic038_ops03.py 186; tests/bodygraph/test_vendor_prod_override.py 156; tests/bodygraph/test_bg_resolve_route_policy.py 58; tests/adapter/test_jsonschema.py 5; tests/evidence/test_hdapi_v2_contract_inventory.py 301; tests/evidence/test_evidence_index_missing_state.py 75; tests/tools/test_pf_document_reader_guard.py 3; tests/unit/test_check_agents_md_citations.py 60; tests/evidence/test_rails_ci_workflow_integration.py 167; tests/tools/test_pf_tool_inputs.py 24; tests/cli/test_errors_parity.py 42; tests/evidence/test_architecture_snapshot.py 10; tests/evidence/test_canonical_json_gate_check_outputs.py 96; tests/evidence/test_epic030_pr05_category_framework_evidence.py 6; tests/evidence/test_sanity_pipeline.py 29; tests/tools/test_score_distribution.py 11; N together 1687; the twelve scope files 697 together (sum of their single collections)
+STEP-0B BLOCKERS:
+(none)
+STEP-0B CAVEATS:
+(none)
+DOC-DELTA SURFACES: audit/docdeltas/hde-crd-0003_doc_deltas.md ABSENT; audit/qa/hde-crd-0003/00_meta/doc_deltas.md ABSENT; tracked by git ls-files: (none)
+STEP-0B RESULT: no deltas
+stderr (0 bytes):
+(empty)
+--- command 71: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:53:32Z; ended_utc: 2026-11-11T07:53:32Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- T is recorded (QA-90 baseline b687c813866befa5ee911a14b00ad21c1841e967; a changed T stops the run) | observed: b687c813866befa5ee911a14b00ad21c1841e967 | PASS
+- shallow read prints false | observed: false | PASS
+- both cat-file reads exit 0 (3570be82..., eff777e2...) | observed: 3570be82 exit 0, eff777e2 exit 0 | PASS
+- the prefix read prints the tuple (at b687c813: docs/crd/ docs/ephemeral/ docs/graph/ docs/pfcanon/ docs/plans/ docs/prompt_ecosystem_management/ docs/qa/ docs/run/) | observed: docs/crd/ docs/ephemeral/ docs/graph/ docs/pfcanon/ docs/plans/ docs/prompt_ecosystem_management/ docs/qa/ docs/run/ | PASS
+- the candidate guard (git diff --name-only 3570be82 T with the full exclusion set) prints nothing | observed: exit 0, 0 bytes of stdout | PASS
+- manifest SHA-256 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 | observed: 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 | PASS
+- version 1.3.0, built 2026-08-24T18:04:49Z, 45 members | observed: 1.3.0 2026-08-24T18:04:49Z 45 | PASS
+- hdctl --version prints exactly hdctl 0.0.0 (hdengine@prod;2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129) | observed: hdctl 0.0.0 (hdengine@prod;2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129) | PASS
+- Python 3.12.x | observed: Python 3.12.15 | PASS
+- pytest, ruby, bash, curl, git present | observed: pytest: pytest 8.4.2 (exit 0); ruby: ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu] (exit 0); bash: GNU bash, version 5.3.9(1)-release (x86_64-pc-linux-gnu) (exit 0); curl: curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10 (exit 0); git: git version 2.53.0 (exit 0) | PASS
+- engine inside the clone (/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone) | observed: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py | PASS
+- every step-4 name UNSET | observed: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET | PASS
+- all seven validators exit 0 | observed: tools/evidence/update_evidence_index.py --check exit 0; tools/evidence/orientation_demo.py --check exit 0; tools/evidence/validate_evidence_paths.py exit 0; ci/checks/check_mirror_schema.sh exit 0; tools/evidence/check_lf_endings.py exit 0; ci/checks/check_final_lf.sh exit 0; ci/checks/check_evidence_index_hash.sh exit 0 | PASS
+- each collection equals the count measured at b687c813 (N 1,687, with tests/qa/test_generate_epic_close_pack.py 918 and tests/tools/test_prepush_check.py 63; tests/evidence/test_evidence_index_missing_state.py 75; the twelve scope files 697 together) | observed: tests/qa/test_generate_epic_close_pack.py 918; tests/tools/test_prepush_check.py 63; tests/ops/test_hde_epic038_ops03.py 186; tests/bodygraph/test_vendor_prod_override.py 156; tests/bodygraph/test_bg_resolve_route_policy.py 58; tests/adapter/test_jsonschema.py 5; tests/evidence/test_hdapi_v2_contract_inventory.py 301; tests/evidence/test_evidence_index_missing_state.py 75; tests/tools/test_pf_document_reader_guard.py 3; tests/unit/test_check_agents_md_citations.py 60; tests/evidence/test_rails_ci_workflow_integration.py 167; tests/tools/test_pf_tool_inputs.py 24; tests/cli/test_errors_parity.py 42; tests/evidence/test_architecture_snapshot.py 10; tests/evidence/test_canonical_json_gate_check_outputs.py 96; tests/evidence/test_epic030_pr05_category_framework_evidence.py 6; tests/evidence/test_sanity_pipeline.py 29; tests/tools/test_score_distribution.py 11; N together 1687; the twelve scope files 697 together (sum of their single collections) | PASS
+- every entrypoint and document exists (21 test -e reads) | observed: 21 of 21 exit 0 | PASS
+- both doc-delta surfaces recorded | observed: git ls-files: (none); audit/docdeltas/hde-crd-0003_doc_deltas.md ABSENT; audit/qa/hde-crd-0003/00_meta/doc_deltas.md ABSENT | PASS
+- Step-0B has no BLOCKER | observed: no deltas | PASS
+- git status --porcelain empty at the end | observed: exit 0, 0 bytes | PASS
+- overall: every predicate met; status PASS
+=== NOTES ===
+- nonclaims: environment readiness and candidate identity only (Plan CHECK 1). No product behaviour is judged; no criterion is carried.
+- normalizations: none (N-1 to N-3 of collection §4.10 do not apply to qa-01; it runs no pytest test, only --collect-only reads, which use the Plan's exact form).
+- execution forms where the Plan names the read but not its command, recorded as run: the presence read (command 18) is a scratch script printing NAME=SET or NAME=UNSET only; the doc-delta existence read (command 69) is one bash -c loop printing EXISTS or ABSENT per surface; the twelve scope files' total of 697 is the sum of their single collections (commands 26 to 43), as the Plan's action 6 collects each fixed selector file singly and N together.
+- the guard (command 7) used the exclusion set formed from command 6's record, verbatim: ':!audit/ops/hde-crd-0003' ':!audit/qa/hde-crd-0003' ':!docs/evidence/INDEX.*' ':!artifacts/evidence_index.jsonl*' ':!audit/gates/topology/orientation_demo.txt*' ':!docs/crd/' ':!docs/ephemeral/' ':!docs/graph/' ':!docs/pfcanon/' ':!docs/plans/' ':!docs/prompt_ecosystem_management/' ':!docs/qa/' ':!docs/run/'.
+- recording: each argv ran unchanged through a scratch recorder outside every repository (/tmp/hde-crd-0003-qa/qarun.py), which captures stdout, stderr and the producer's own exit status; --collect-only outputs are summarized under Plan §5.3 rule 5 as per-file node-id counts and the final line, with the full output's byte count, line count and SHA-256. The Step-0B capture (command 70) and the PREDICATES section were generated mechanically from this check's own transcript by scratch scripts, not written by hand.
+- Step-0B: the vendored PF10 entry is PF10-HDE-Build-Notes-v14.1.2.md | HDE Build Notes | 34739d02572ce41e861ae21bdadda49feacc36781e995762356c686b85492d9b with tool-input manifest source_commit 2b5847d203b6ccced3b5e363b7249ba8eecebddc (command 66), the Audit's recorded identity (IR-11: the vendored set lags canon's HDE Build Notes v14.2.2; expected, not a failure). The QA Plan in use is the approved v1.2 (command 67: blob 021769ae06c4e090474fe086dad51487cca73bf6 on amthorn78/glow-docs origin/main).
+- ignored files: the E-L clone carries the editable install's git-ignored glow_hdengine.egg-info/ and __pycache__/ directories, written by the install before this check (Audit K-013); git status --porcelain is empty (command 71).
+- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 unset removes them from this check's shell (command 18); no value is recorded anywhere.
+- consumed evidence: none.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body before publication: NO_HIT in the check's shell; and NO_HIT in the venue's parent shell, which holds the vendor and database values (a stricter second scan; comparison only, no value printed).
+- LF normalization (collection §4.6): no CR byte in any capture

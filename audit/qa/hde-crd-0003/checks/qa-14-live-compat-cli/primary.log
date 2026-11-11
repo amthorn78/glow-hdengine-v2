@@ -1,0 +1,388 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"qa-14-live-compat-cli","check_name":"The live vendor compat test","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","rev-parse","--is-shallow-repository"],["git","status","--porcelain"],["python","--version"],["python","-c","import engine; print(engine.__file__)"],["hdctl","--version"],["python","-c","import os; ws=' \\t\\n\\r\\x0b\\x0c'; s=lambda k: 'SET' if os.environ.get(k,'').strip() else 'UNSET'; u=os.environ.get('HD_API_BASE_URL','').strip().rstrip('/'); l=os.environ.get('HDAPI_BASE_URL','').strip().rstrip('/'); a=os.environ.get('APP_ENV','').strip(ws).lower(); g=os.environ.get('ENGINE_ENV','').strip(ws).lower(); print(*[k+'='+s(k) for k in ('HD_API_BASE_URL','HDAPI_BASE_URL','HD_API_KEY','GEO_API_KEY','HDE_VENDOR_OVERRIDE_AUDIT_PATH','DATABASE_URL')], 'BASE_CONFLICT='+str(bool(u and l and u!=l)), 'APP_ENV='+(a or 'UNSET'), 'ENGINE_ENV='+(g or 'UNSET'), 'P2_ENGINE_ENV='+('OK' if (not g or g==a) else 'CONFLICT'))"],["python3","-I","-c","import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"],["python","-c","import os; from engine.bodygraph.resolver import _classify_env_route_policy as c; p=c(dict(os.environ)); print('SUPPORTED=' + str(p['supported']), 'ROUTE_FAMILY=' + str(p['route_family']), 'RESOURCE_PATH=' + str(p['resource_path']))"],["git","status","--porcelain"],["bash","-c","ls -A /tmp/hde-crd-0003-qa/state | wc -l"],["git","rev-parse","HEAD"],["git","rev-parse","--is-shallow-repository"],["git","status","--porcelain"],["python","--version"],["python","-c","import engine; print(engine.__file__)"],["hdctl","--version"],["python","-c","import os; ws=' \\t\\n\\r\\x0b\\x0c'; s=lambda k: 'SET' if os.environ.get(k,'').strip() else 'UNSET'; u=os.environ.get('HD_API_BASE_URL','').strip().rstrip('/'); l=os.environ.get('HDAPI_BASE_URL','').strip().rstrip('/'); a=os.environ.get('APP_ENV','').strip(ws).lower(); g=os.environ.get('ENGINE_ENV','').strip(ws).lower(); print(*[k+'='+s(k) for k in ('HD_API_BASE_URL','HDAPI_BASE_URL','HD_API_KEY','GEO_API_KEY','HDE_VENDOR_OVERRIDE_AUDIT_PATH','DATABASE_URL')], 'BASE_CONFLICT='+str(bool(u and l and u!=l)), 'APP_ENV='+(a or 'UNSET'), 'ENGINE_ENV='+(g or 'UNSET'), 'P2_ENGINE_ENV='+('OK' if (not g or g==a) else 'CONFLICT'))"],["python3","-I","-c","import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"],["python","-c","import os; from engine.bodygraph.resolver import _classify_env_route_policy as c; p=c(dict(os.environ)); print('SUPPORTED=' + str(p['supported']), 'ROUTE_FAMILY=' + str(p['route_family']), 'RESOURCE_PATH=' + str(p['resource_path']))"],["hdctl","showcompat","--source","vendor","--birthdate-a","1990-01-01","--birthtime-a","12:00","--location-a","Amsterdam, Netherlands","--birthdate-b","1985-07-15","--birthtime-b","08:30","--location-b","London, United Kingdom","--dump-reader","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json"],["hdctl","showcompat","--source","vendor","--birthdate-a","1985-07-15","--birthtime-a","08:30","--location-a","London, United Kingdom","--birthdate-b","1990-01-01","--birthtime-b","12:00","--location-b","Amsterdam, Netherlands","--dump-reader","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json"],["hdctl","showcompat","--source","vendor","--birthdate-a","1990-01-01","--birthtime-a","12:00","--location-a","Amsterdam, Netherlands","--birthdate-b","1985-07-15","--birthtime-b","08:30","--location-b","London, United Kingdom","--dump-reader","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json"],["hdctl","showcompat","--source","vendor","--birthdate-a","1990-01-01","--birthtime-a","07:41","--location-a","Amsterdam, NL","--birthdate-b","1991-02-02","--birthtime-b","13:00","--location-b","Berlin, DE","--dump-reader","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json"],["hdctl","showcompat","--source","vendor","--birthdate-a","1991-02-02","--birthtime-a","13:00","--location-a","Berlin, DE","--birthdate-b","1990-01-01","--birthtime-b","07:41","--location-b","Amsterdam, NL","--dump-reader","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"],["wc","-c","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"],["sha256sum","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"],["cat","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json"],["cat","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json"],["cat","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json"],["cat","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json"],["cat","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"],["python","-c","import json,sys,jsonschema; s=json.load(open('schemas/magic10_compat_result_v1.schema.json')); V=jsonschema.validators.validator_for(s); V.check_schema(s); v=V(s); [print(p.rsplit('/',1)[1], 'VALID' if not list(v.iter_errors(json.loads(open(p,'rb').read().decode('utf-8')))) else 'INVALID', 'schema='+str(json.load(open(p)).get('schema')), 'release_id='+str(json.load(open(p)).get('release_id')), 'ONE_DOC_ONE_LF='+str(open(p,'rb').read().endswith(b'\\n') and not open(p,'rb').read().endswith(b'\\n\\n') and open(p,'rb').read().count(b'\\n')==1)) for p in sys.argv[1:]]","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"],["python3","-I","-c","import json,sys; [print(p.rsplit('/',1)[1], 'reader_version='+str(json.load(open(p)).get('reader_version')), 'CATEGORY_KEYS_EXACTLY_ID_BAND='+str(all(set(c)=={'id','band'} for c in json.load(open(p))['categories'])), 'categories='+json.dumps(json.load(open(p))['categories'])) for p in sys.argv[1:]]","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"],["python3","-I","-c","import json,sys; a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2])); a.pop('pair_key',None); b.pop('pair_key',None); print('L1_VS_L4_WITHOUT_PAIR_KEY='+('DIFFER' if a!=b else 'EQUAL'))","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout"],["git","status","--porcelain"],["bash","-c","ls -A /tmp/hde-crd-0003-qa/state | wc -l"]],"command_provenance":"QA Plan v1.2 check qa-14; QA-90 task T09 attempt 1; venue V-A, posture P-N, executed by the directed agent session (EI-1, EI-2, EI-4); segment 1 interrupted by a QA-created gate fault before any invocation and preserved; normalizations: none","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-14-live-compat-cli/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide","PF05-Canon-HDE-CLI-API-Vendor-Ref","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-11T08:08:40Z"}
+=== CONTEXT ===
+check_id: qa-14-live-compat-cli
+check_name: The live vendor compat test
+task: QA-90 task T09, attempt 1; QA Plan v1.2 CHECK 14 (criterion LT-3); dependency qa-01 (V-A) PASS (published 2026-11-11T07:56:23Z)
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+venue: V-A, the Product Owner's operator console (this workstation), whose environment holds HD_API_KEY, GEO_API_KEY and HD_API_BASE_URL; EI-1 recorded 2026-11-11T07:46Z
+posture: P-N (APP_ENV=dev, no --allow-prod-vendor); EI-2 recorded 2026-11-11T07:46Z
+vendor_client_agreement: EI-4, the Product Owner's agreement to use this QA console as a vendor client (Glow QA Guide §3.5.5), given with V-A at 2026-11-11T07:46Z
+executor: this Claude Code agent session, directed by the Product Owner to execute qa-14 under P-N (Glow QA Guide §3.5.7; Plan §2); no override invocation, so no human initiator applies
+environment_class: E-V V-A; the E-L clone /tmp/hde-crd-0003-qa/clone (full history, detached at T) with CI's install; interpreter /tmp/hde-crd-0003-qa/venv/bin/python (Python 3.12.15); hdctl from that venv
+rails: SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev with LC_ALL=C LANG=C TZ=UTC PYTHONDONTWRITEBYTECODE=1, for this check only (Plan §3.1, qa-14 P-N row); XDG_STATE_HOME=/tmp/hde-crd-0003-qa/state; GIT_CONFIG_GLOBAL the empty scratch file
+synthetic inputs: pair P1 (SYN-A and SYN-B's birth data) A 1990-01-01 12:00 "Amsterdam, Netherlands", B 1985-07-15 08:30 "London, United Kingdom"; pair P2 (the S01 owner test's tuples) A 1990-01-01 07:41 "Amsterdam, NL", B 1991-02-02 13:00 "Berlin, DE"; no real person (Audit §6.4)
+request limit: exactly five invocations, at most ten vendor acquisitions; no --upsert; no other vendor command; no retry beyond the client's own policy
+start_utc: 2026-11-11T08:06:25Z (segment 2); segment 1 2026-11-11T08:05:16Z to 2026-11-11T08:05:17Z
+end_utc: 2026-11-11T08:06:37Z
+=== READINESS ===
+Segment 1 (interrupted; 2026-11-11T08:05:16Z to 2026-11-11T08:05:17Z): the preflight reads P1, P2, P3 and P6 below ran, and every row held on its recorded output. The QA-created gate in the execution script compared each output with a trailing LF that bash command substitution had already removed, so it judged the rows failed and stopped before any invocation. No vendor request ran in segment 1, nothing was published, and no status was assigned. The gate was corrected (QA-created assembly only), and attempt 1 resumed in segment 2, which re-read the whole preflight before the five invocations. Segment 1 is preserved here unchanged as interruption evidence.
+--- segment-1 command 1: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:16Z; ended_utc: 2026-11-11T08:05:16Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- segment-1 command 2: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:16Z; ended_utc: 2026-11-11T08:05:16Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- segment-1 command 3: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:16Z; ended_utc: 2026-11-11T08:05:16Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- segment-1 command 4: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:16Z; ended_utc: 2026-11-11T08:05:16Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- segment-1 command 5: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:16Z; ended_utc: 2026-11-11T08:05:16Z; exit_code: 0
+stdout (149 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py
+stderr (0 bytes):
+(empty)
+--- segment-1 command 6: ["hdctl", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:16Z; ended_utc: 2026-11-11T08:05:17Z; exit_code: 0
+stdout (93 bytes):
+hdctl 0.0.0 (hdengine@prod;2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129)
+stderr (0 bytes):
+(empty)
+--- segment-1 command 7: ["python", "-c", "import os; ws=' \\t\\n\\r\\x0b\\x0c'; s=lambda k: 'SET' if os.environ.get(k,'').strip() else 'UNSET'; u=os.environ.get('HD_API_BASE_URL','').strip().rstrip('/'); l=os.environ.get('HDAPI_BASE_URL','').strip().rstrip('/'); a=os.environ.get('APP_ENV','').strip(ws).lower(); g=os.environ.get('ENGINE_ENV','').strip(ws).lower(); print(*[k+'='+s(k) for k in ('HD_API_BASE_URL','HDAPI_BASE_URL','HD_API_KEY','GEO_API_KEY','HDE_VENDOR_OVERRIDE_AUDIT_PATH','DATABASE_URL')], 'BASE_CONFLICT='+str(bool(u and l and u!=l)), 'APP_ENV='+(a or 'UNSET'), 'ENGINE_ENV='+(g or 'UNSET'), 'P2_ENGINE_ENV='+('OK' if (not g or g==a) else 'CONFLICT'))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:17Z; ended_utc: 2026-11-11T08:05:17Z; exit_code: 0
+stdout (194 bytes):
+HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET HD_API_KEY=SET GEO_API_KEY=SET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET DATABASE_URL=UNSET BASE_CONFLICT=False APP_ENV=dev ENGINE_ENV=UNSET P2_ENGINE_ENV=OK
+stderr (0 bytes):
+(empty)
+--- segment-1 command 8: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:17Z; ended_utc: 2026-11-11T08:05:17Z; exit_code: 0
+stdout (63 bytes):
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev
+stderr (0 bytes):
+(empty)
+--- segment-1 command 9: ["python", "-c", "import os; from engine.bodygraph.resolver import _classify_env_route_policy as c; p=c(dict(os.environ)); print('SUPPORTED=' + str(p['supported']), 'ROUTE_FAMILY=' + str(p['route_family']), 'RESOURCE_PATH=' + str(p['resource_path']))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:17Z; ended_utc: 2026-11-11T08:05:17Z; exit_code: 0
+stdout (70 bytes):
+SUPPORTED=True ROUTE_FAMILY=recommended_v2_chart RESOURCE_PATH=charts
+stderr (0 bytes):
+(empty)
+--- segment-1 command 10: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:17Z; ended_utc: 2026-11-11T08:05:17Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- segment-1 command 11: ["bash", "-c", "ls -A /tmp/hde-crd-0003-qa/state | wc -l"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:05:17Z; ended_utc: 2026-11-11T08:05:17Z; exit_code: 0
+stdout (2 bytes):
+0
+stderr (0 bytes):
+(empty)
+Segment 2: P1 to P3 and P6 (the check's own preflight is its readiness, Plan §7 common rule A for E-V; P4 and P5 apply under P-P only):
+--- command 1: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:25Z; ended_utc: 2026-11-11T08:06:25Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- command 2: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:25Z; ended_utc: 2026-11-11T08:06:25Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command 3: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:25Z; ended_utc: 2026-11-11T08:06:25Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 4: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:25Z; ended_utc: 2026-11-11T08:06:25Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 5: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:25Z; ended_utc: 2026-11-11T08:06:25Z; exit_code: 0
+stdout (149 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py
+stderr (0 bytes):
+(empty)
+--- command 6: ["hdctl", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:25Z; ended_utc: 2026-11-11T08:06:26Z; exit_code: 0
+stdout (93 bytes):
+hdctl 0.0.0 (hdengine@prod;2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129)
+stderr (0 bytes):
+(empty)
+--- command 7: ["python", "-c", "import os; ws=' \\t\\n\\r\\x0b\\x0c'; s=lambda k: 'SET' if os.environ.get(k,'').strip() else 'UNSET'; u=os.environ.get('HD_API_BASE_URL','').strip().rstrip('/'); l=os.environ.get('HDAPI_BASE_URL','').strip().rstrip('/'); a=os.environ.get('APP_ENV','').strip(ws).lower(); g=os.environ.get('ENGINE_ENV','').strip(ws).lower(); print(*[k+'='+s(k) for k in ('HD_API_BASE_URL','HDAPI_BASE_URL','HD_API_KEY','GEO_API_KEY','HDE_VENDOR_OVERRIDE_AUDIT_PATH','DATABASE_URL')], 'BASE_CONFLICT='+str(bool(u and l and u!=l)), 'APP_ENV='+(a or 'UNSET'), 'ENGINE_ENV='+(g or 'UNSET'), 'P2_ENGINE_ENV='+('OK' if (not g or g==a) else 'CONFLICT'))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:26Z; ended_utc: 2026-11-11T08:06:26Z; exit_code: 0
+stdout (194 bytes):
+HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET HD_API_KEY=SET GEO_API_KEY=SET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET DATABASE_URL=UNSET BASE_CONFLICT=False APP_ENV=dev ENGINE_ENV=UNSET P2_ENGINE_ENV=OK
+stderr (0 bytes):
+(empty)
+--- command 8: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:26Z; ended_utc: 2026-11-11T08:06:26Z; exit_code: 0
+stdout (63 bytes):
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev
+stderr (0 bytes):
+(empty)
+--- command 9: ["python", "-c", "import os; from engine.bodygraph.resolver import _classify_env_route_policy as c; p=c(dict(os.environ)); print('SUPPORTED=' + str(p['supported']), 'ROUTE_FAMILY=' + str(p['route_family']), 'RESOURCE_PATH=' + str(p['resource_path']))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:26Z; ended_utc: 2026-11-11T08:06:26Z; exit_code: 0
+stdout (70 bytes):
+SUPPORTED=True ROUTE_FAMILY=recommended_v2_chart RESOURCE_PATH=charts
+stderr (0 bytes):
+(empty)
+=== COMMANDS ===
+--- command 10: ["hdctl", "showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam, Netherlands", "--birthdate-b", "1985-07-15", "--birthtime-b", "08:30", "--location-b", "London, United Kingdom", "--dump-reader", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:26Z; ended_utc: 2026-11-11T08:06:29Z; exit_code: 0
+stdout (3302 bytes):
+{"categories":[{"band":"Cool","category_id":"harmony","personal_hi_to_lo_key":"nar.harmony.cool.b_to_a.1.sage-01","personal_lo_to_hi_key":"nar.harmony.cool.a_to_b.1.sage-01","score":10,"shared_key":"nar.harmony.cool.shared.1.sage-01"},{"band":"Cool","category_id":"heat","personal_hi_to_lo_key":"nar.heat.cool.b_to_a.1.spark-01","personal_lo_to_hi_key":"nar.heat.cool.a_to_b.1.spark-01","score":22,"shared_key":"nar.heat.cool.shared.1.spark-01"},{"band":"Cool","category_id":"communication","personal_hi_to_lo_key":"nar.communication.cool.b_to_a.1.voice-01","personal_lo_to_hi_key":"nar.communication.cool.a_to_b.1.voice-01","score":10,"shared_key":"nar.communication.cool.shared.1.voice-01"},{"band":"Open","category_id":"alignment","personal_hi_to_lo_key":"nar.alignment.open.b_to_a.1.face-01","personal_lo_to_hi_key":"nar.alignment.open.a_to_b.1.face-01","score":32,"shared_key":"nar.alignment.open.shared.1.face-01"},{"band":"Cool","category_id":"comfort","personal_hi_to_lo_key":"nar.comfort.cool.b_to_a.1.safe-01","personal_lo_to_hi_key":"nar.comfort.cool.a_to_b.1.safe-01","score":10,"shared_key":"nar.comfort.cool.shared.1.safe-01"},{"band":"Open","category_id":"consistency","personal_hi_to_lo_key":"nar.consistency.open.b_to_a.1.rhythm-01","personal_lo_to_hi_key":"nar.consistency.open.a_to_b.1.rhythm-01","score":27,"shared_key":"nar.consistency.open.shared.1.rhythm-01"},{"band":"Open","category_id":"expansion","personal_hi_to_lo_key":"nar.expansion.open.b_to_a.1.wide-01","personal_lo_to_hi_key":"nar.expansion.open.a_to_b.1.wide-01","score":25,"shared_key":"nar.expansion.open.shared.1.wide-01"},{"band":"Cool","category_id":"creativity","personal_hi_to_lo_key":"nar.creativity.cool.b_to_a.1.make-01","personal_lo_to_hi_key":"nar.creativity.cool.a_to_b.1.make-01","score":20,"shared_key":"nar.creativity.cool.shared.1.make-01"},{"band":"Open","category_id":"drive","personal_hi_to_lo_key":"nar.drive.open.b_to_a.1.move-01","personal_lo_to_hi_key":"nar.drive.open.a_to_b.1.move-01","score":40,"shared_key":"nar.drive.open.shared.1.move-01"},{"band":"Cool","category_id":"balance","personal_hi_to_lo_key":"nar.balance.cool.b_to_a.1.fair-01","personal_lo_to_hi_key":"nar.balance.cool.a_to_b.1.fair-01","score":0,"shared_key":"nar.balance.cool.shared.1.fair-01"}],"config_id":"m10-channel-state-v1.0.0","pair_key":"a55a5eefd785f65b1a30eef7d3f0e81f2101bf0b6b9a7982af2d34c5ae92928a","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129","schema":"magic10_compat_result.v1","signals":[{"q":38,"signal_id":"rapport_delta"},{"q":0,"signal_id":"resonance_strength"},{"q":88,"signal_id":"spark_intensity"},{"q":0,"signal_id":"momentum_flux"},{"q":40,"signal_id":"signal_clarity"},{"q":0,"signal_id":"exchange_density"},{"q":13,"signal_id":"vector_cohesion"},{"q":113,"signal_id":"axis_agreement"},{"q":38,"signal_id":"soothe_index"},{"q":0,"signal_id":"buffer_resilience"},{"q":70,"signal_id":"pattern_integrity"},{"q":38,"signal_id":"variance_stability"},{"q":50,"signal_id":"growth_tendency"},{"q":50,"signal_id":"horizon_reach"},{"q":38,"signal_id":"novelty_factor"},{"q":40,"signal_id":"expression_flow"},{"q":90,"signal_id":"willpower_current"},{"q":70,"signal_id":"focus_pressure"},{"q":0,"signal_id":"equilibrium_score"},{"q":0,"signal_id":"counterweight_ratio"}]}
+stderr (0 bytes):
+(empty)
+--- command 11: ["hdctl", "showcompat", "--source", "vendor", "--birthdate-a", "1985-07-15", "--birthtime-a", "08:30", "--location-a", "London, United Kingdom", "--birthdate-b", "1990-01-01", "--birthtime-b", "12:00", "--location-b", "Amsterdam, Netherlands", "--dump-reader", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:29Z; ended_utc: 2026-11-11T08:06:31Z; exit_code: 0
+stdout (3302 bytes):
+{"categories":[{"band":"Cool","category_id":"harmony","personal_hi_to_lo_key":"nar.harmony.cool.b_to_a.1.sage-01","personal_lo_to_hi_key":"nar.harmony.cool.a_to_b.1.sage-01","score":10,"shared_key":"nar.harmony.cool.shared.1.sage-01"},{"band":"Cool","category_id":"heat","personal_hi_to_lo_key":"nar.heat.cool.b_to_a.1.spark-01","personal_lo_to_hi_key":"nar.heat.cool.a_to_b.1.spark-01","score":22,"shared_key":"nar.heat.cool.shared.1.spark-01"},{"band":"Cool","category_id":"communication","personal_hi_to_lo_key":"nar.communication.cool.b_to_a.1.voice-01","personal_lo_to_hi_key":"nar.communication.cool.a_to_b.1.voice-01","score":10,"shared_key":"nar.communication.cool.shared.1.voice-01"},{"band":"Open","category_id":"alignment","personal_hi_to_lo_key":"nar.alignment.open.b_to_a.1.face-01","personal_lo_to_hi_key":"nar.alignment.open.a_to_b.1.face-01","score":32,"shared_key":"nar.alignment.open.shared.1.face-01"},{"band":"Cool","category_id":"comfort","personal_hi_to_lo_key":"nar.comfort.cool.b_to_a.1.safe-01","personal_lo_to_hi_key":"nar.comfort.cool.a_to_b.1.safe-01","score":10,"shared_key":"nar.comfort.cool.shared.1.safe-01"},{"band":"Open","category_id":"consistency","personal_hi_to_lo_key":"nar.consistency.open.b_to_a.1.rhythm-01","personal_lo_to_hi_key":"nar.consistency.open.a_to_b.1.rhythm-01","score":27,"shared_key":"nar.consistency.open.shared.1.rhythm-01"},{"band":"Open","category_id":"expansion","personal_hi_to_lo_key":"nar.expansion.open.b_to_a.1.wide-01","personal_lo_to_hi_key":"nar.expansion.open.a_to_b.1.wide-01","score":25,"shared_key":"nar.expansion.open.shared.1.wide-01"},{"band":"Cool","category_id":"creativity","personal_hi_to_lo_key":"nar.creativity.cool.b_to_a.1.make-01","personal_lo_to_hi_key":"nar.creativity.cool.a_to_b.1.make-01","score":20,"shared_key":"nar.creativity.cool.shared.1.make-01"},{"band":"Open","category_id":"drive","personal_hi_to_lo_key":"nar.drive.open.b_to_a.1.move-01","personal_lo_to_hi_key":"nar.drive.open.a_to_b.1.move-01","score":40,"shared_key":"nar.drive.open.shared.1.move-01"},{"band":"Cool","category_id":"balance","personal_hi_to_lo_key":"nar.balance.cool.b_to_a.1.fair-01","personal_lo_to_hi_key":"nar.balance.cool.a_to_b.1.fair-01","score":0,"shared_key":"nar.balance.cool.shared.1.fair-01"}],"config_id":"m10-channel-state-v1.0.0","pair_key":"a55a5eefd785f65b1a30eef7d3f0e81f2101bf0b6b9a7982af2d34c5ae92928a","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129","schema":"magic10_compat_result.v1","signals":[{"q":38,"signal_id":"rapport_delta"},{"q":0,"signal_id":"resonance_strength"},{"q":88,"signal_id":"spark_intensity"},{"q":0,"signal_id":"momentum_flux"},{"q":40,"signal_id":"signal_clarity"},{"q":0,"signal_id":"exchange_density"},{"q":13,"signal_id":"vector_cohesion"},{"q":113,"signal_id":"axis_agreement"},{"q":38,"signal_id":"soothe_index"},{"q":0,"signal_id":"buffer_resilience"},{"q":70,"signal_id":"pattern_integrity"},{"q":38,"signal_id":"variance_stability"},{"q":50,"signal_id":"growth_tendency"},{"q":50,"signal_id":"horizon_reach"},{"q":38,"signal_id":"novelty_factor"},{"q":40,"signal_id":"expression_flow"},{"q":90,"signal_id":"willpower_current"},{"q":70,"signal_id":"focus_pressure"},{"q":0,"signal_id":"equilibrium_score"},{"q":0,"signal_id":"counterweight_ratio"}]}
+stderr (0 bytes):
+(empty)
+--- command 12: ["hdctl", "showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam, Netherlands", "--birthdate-b", "1985-07-15", "--birthtime-b", "08:30", "--location-b", "London, United Kingdom", "--dump-reader", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:31Z; ended_utc: 2026-11-11T08:06:33Z; exit_code: 0
+stdout (3302 bytes):
+{"categories":[{"band":"Cool","category_id":"harmony","personal_hi_to_lo_key":"nar.harmony.cool.b_to_a.1.sage-01","personal_lo_to_hi_key":"nar.harmony.cool.a_to_b.1.sage-01","score":10,"shared_key":"nar.harmony.cool.shared.1.sage-01"},{"band":"Cool","category_id":"heat","personal_hi_to_lo_key":"nar.heat.cool.b_to_a.1.spark-01","personal_lo_to_hi_key":"nar.heat.cool.a_to_b.1.spark-01","score":22,"shared_key":"nar.heat.cool.shared.1.spark-01"},{"band":"Cool","category_id":"communication","personal_hi_to_lo_key":"nar.communication.cool.b_to_a.1.voice-01","personal_lo_to_hi_key":"nar.communication.cool.a_to_b.1.voice-01","score":10,"shared_key":"nar.communication.cool.shared.1.voice-01"},{"band":"Open","category_id":"alignment","personal_hi_to_lo_key":"nar.alignment.open.b_to_a.1.face-01","personal_lo_to_hi_key":"nar.alignment.open.a_to_b.1.face-01","score":32,"shared_key":"nar.alignment.open.shared.1.face-01"},{"band":"Cool","category_id":"comfort","personal_hi_to_lo_key":"nar.comfort.cool.b_to_a.1.safe-01","personal_lo_to_hi_key":"nar.comfort.cool.a_to_b.1.safe-01","score":10,"shared_key":"nar.comfort.cool.shared.1.safe-01"},{"band":"Open","category_id":"consistency","personal_hi_to_lo_key":"nar.consistency.open.b_to_a.1.rhythm-01","personal_lo_to_hi_key":"nar.consistency.open.a_to_b.1.rhythm-01","score":27,"shared_key":"nar.consistency.open.shared.1.rhythm-01"},{"band":"Open","category_id":"expansion","personal_hi_to_lo_key":"nar.expansion.open.b_to_a.1.wide-01","personal_lo_to_hi_key":"nar.expansion.open.a_to_b.1.wide-01","score":25,"shared_key":"nar.expansion.open.shared.1.wide-01"},{"band":"Cool","category_id":"creativity","personal_hi_to_lo_key":"nar.creativity.cool.b_to_a.1.make-01","personal_lo_to_hi_key":"nar.creativity.cool.a_to_b.1.make-01","score":20,"shared_key":"nar.creativity.cool.shared.1.make-01"},{"band":"Open","category_id":"drive","personal_hi_to_lo_key":"nar.drive.open.b_to_a.1.move-01","personal_lo_to_hi_key":"nar.drive.open.a_to_b.1.move-01","score":40,"shared_key":"nar.drive.open.shared.1.move-01"},{"band":"Cool","category_id":"balance","personal_hi_to_lo_key":"nar.balance.cool.b_to_a.1.fair-01","personal_lo_to_hi_key":"nar.balance.cool.a_to_b.1.fair-01","score":0,"shared_key":"nar.balance.cool.shared.1.fair-01"}],"config_id":"m10-channel-state-v1.0.0","pair_key":"a55a5eefd785f65b1a30eef7d3f0e81f2101bf0b6b9a7982af2d34c5ae92928a","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129","schema":"magic10_compat_result.v1","signals":[{"q":38,"signal_id":"rapport_delta"},{"q":0,"signal_id":"resonance_strength"},{"q":88,"signal_id":"spark_intensity"},{"q":0,"signal_id":"momentum_flux"},{"q":40,"signal_id":"signal_clarity"},{"q":0,"signal_id":"exchange_density"},{"q":13,"signal_id":"vector_cohesion"},{"q":113,"signal_id":"axis_agreement"},{"q":38,"signal_id":"soothe_index"},{"q":0,"signal_id":"buffer_resilience"},{"q":70,"signal_id":"pattern_integrity"},{"q":38,"signal_id":"variance_stability"},{"q":50,"signal_id":"growth_tendency"},{"q":50,"signal_id":"horizon_reach"},{"q":38,"signal_id":"novelty_factor"},{"q":40,"signal_id":"expression_flow"},{"q":90,"signal_id":"willpower_current"},{"q":70,"signal_id":"focus_pressure"},{"q":0,"signal_id":"equilibrium_score"},{"q":0,"signal_id":"counterweight_ratio"}]}
+stderr (0 bytes):
+(empty)
+--- command 13: ["hdctl", "showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "07:41", "--location-a", "Amsterdam, NL", "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin, DE", "--dump-reader", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:33Z; ended_utc: 2026-11-11T08:06:34Z; exit_code: 0
+stdout (3294 bytes):
+{"categories":[{"band":"Cool","category_id":"harmony","personal_hi_to_lo_key":"nar.harmony.cool.b_to_a.1.sage-01","personal_lo_to_hi_key":"nar.harmony.cool.a_to_b.1.sage-01","score":10,"shared_key":"nar.harmony.cool.shared.1.sage-01"},{"band":"Cool","category_id":"heat","personal_hi_to_lo_key":"nar.heat.cool.b_to_a.1.spark-01","personal_lo_to_hi_key":"nar.heat.cool.a_to_b.1.spark-01","score":13,"shared_key":"nar.heat.cool.shared.1.spark-01"},{"band":"Cool","category_id":"communication","personal_hi_to_lo_key":"nar.communication.cool.b_to_a.1.voice-01","personal_lo_to_hi_key":"nar.communication.cool.a_to_b.1.voice-01","score":10,"shared_key":"nar.communication.cool.shared.1.voice-01"},{"band":"Cool","category_id":"alignment","personal_hi_to_lo_key":"nar.alignment.cool.b_to_a.1.face-01","personal_lo_to_hi_key":"nar.alignment.cool.a_to_b.1.face-01","score":13,"shared_key":"nar.alignment.cool.shared.1.face-01"},{"band":"Cool","category_id":"comfort","personal_hi_to_lo_key":"nar.comfort.cool.b_to_a.1.safe-01","personal_lo_to_hi_key":"nar.comfort.cool.a_to_b.1.safe-01","score":0,"shared_key":"nar.comfort.cool.shared.1.safe-01"},{"band":"Cool","category_id":"consistency","personal_hi_to_lo_key":"nar.consistency.cool.b_to_a.1.rhythm-01","personal_lo_to_hi_key":"nar.consistency.cool.a_to_b.1.rhythm-01","score":5,"shared_key":"nar.consistency.cool.shared.1.rhythm-01"},{"band":"Cool","category_id":"expansion","personal_hi_to_lo_key":"nar.expansion.cool.b_to_a.1.wide-01","personal_lo_to_hi_key":"nar.expansion.cool.a_to_b.1.wide-01","score":0,"shared_key":"nar.expansion.cool.shared.1.wide-01"},{"band":"Cool","category_id":"creativity","personal_hi_to_lo_key":"nar.creativity.cool.b_to_a.1.make-01","personal_lo_to_hi_key":"nar.creativity.cool.a_to_b.1.make-01","score":10,"shared_key":"nar.creativity.cool.shared.1.make-01"},{"band":"Cool","category_id":"drive","personal_hi_to_lo_key":"nar.drive.cool.b_to_a.1.move-01","personal_lo_to_hi_key":"nar.drive.cool.a_to_b.1.move-01","score":10,"shared_key":"nar.drive.cool.shared.1.move-01"},{"band":"Cool","category_id":"balance","personal_hi_to_lo_key":"nar.balance.cool.b_to_a.1.fair-01","personal_lo_to_hi_key":"nar.balance.cool.a_to_b.1.fair-01","score":17,"shared_key":"nar.balance.cool.shared.1.fair-01"}],"config_id":"m10-channel-state-v1.0.0","pair_key":"d58f21039b0e9755c1ef0e41d334eb9e3d97d375ff0e46a22245d1ac9505e9c5","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129","schema":"magic10_compat_result.v1","signals":[{"q":0,"signal_id":"rapport_delta"},{"q":38,"signal_id":"resonance_strength"},{"q":50,"signal_id":"spark_intensity"},{"q":0,"signal_id":"momentum_flux"},{"q":0,"signal_id":"signal_clarity"},{"q":40,"signal_id":"exchange_density"},{"q":50,"signal_id":"vector_cohesion"},{"q":0,"signal_id":"axis_agreement"},{"q":0,"signal_id":"soothe_index"},{"q":0,"signal_id":"buffer_resilience"},{"q":20,"signal_id":"pattern_integrity"},{"q":0,"signal_id":"variance_stability"},{"q":0,"signal_id":"growth_tendency"},{"q":0,"signal_id":"horizon_reach"},{"q":0,"signal_id":"novelty_factor"},{"q":40,"signal_id":"expression_flow"},{"q":10,"signal_id":"willpower_current"},{"q":30,"signal_id":"focus_pressure"},{"q":0,"signal_id":"equilibrium_score"},{"q":67,"signal_id":"counterweight_ratio"}]}
+stderr (0 bytes):
+(empty)
+--- command 14: ["hdctl", "showcompat", "--source", "vendor", "--birthdate-a", "1991-02-02", "--birthtime-a", "13:00", "--location-a", "Berlin, DE", "--birthdate-b", "1990-01-01", "--birthtime-b", "07:41", "--location-b", "Amsterdam, NL", "--dump-reader", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:34Z; ended_utc: 2026-11-11T08:06:36Z; exit_code: 0
+stdout (3294 bytes):
+{"categories":[{"band":"Cool","category_id":"harmony","personal_hi_to_lo_key":"nar.harmony.cool.b_to_a.1.sage-01","personal_lo_to_hi_key":"nar.harmony.cool.a_to_b.1.sage-01","score":10,"shared_key":"nar.harmony.cool.shared.1.sage-01"},{"band":"Cool","category_id":"heat","personal_hi_to_lo_key":"nar.heat.cool.b_to_a.1.spark-01","personal_lo_to_hi_key":"nar.heat.cool.a_to_b.1.spark-01","score":13,"shared_key":"nar.heat.cool.shared.1.spark-01"},{"band":"Cool","category_id":"communication","personal_hi_to_lo_key":"nar.communication.cool.b_to_a.1.voice-01","personal_lo_to_hi_key":"nar.communication.cool.a_to_b.1.voice-01","score":10,"shared_key":"nar.communication.cool.shared.1.voice-01"},{"band":"Cool","category_id":"alignment","personal_hi_to_lo_key":"nar.alignment.cool.b_to_a.1.face-01","personal_lo_to_hi_key":"nar.alignment.cool.a_to_b.1.face-01","score":13,"shared_key":"nar.alignment.cool.shared.1.face-01"},{"band":"Cool","category_id":"comfort","personal_hi_to_lo_key":"nar.comfort.cool.b_to_a.1.safe-01","personal_lo_to_hi_key":"nar.comfort.cool.a_to_b.1.safe-01","score":0,"shared_key":"nar.comfort.cool.shared.1.safe-01"},{"band":"Cool","category_id":"consistency","personal_hi_to_lo_key":"nar.consistency.cool.b_to_a.1.rhythm-01","personal_lo_to_hi_key":"nar.consistency.cool.a_to_b.1.rhythm-01","score":5,"shared_key":"nar.consistency.cool.shared.1.rhythm-01"},{"band":"Cool","category_id":"expansion","personal_hi_to_lo_key":"nar.expansion.cool.b_to_a.1.wide-01","personal_lo_to_hi_key":"nar.expansion.cool.a_to_b.1.wide-01","score":0,"shared_key":"nar.expansion.cool.shared.1.wide-01"},{"band":"Cool","category_id":"creativity","personal_hi_to_lo_key":"nar.creativity.cool.b_to_a.1.make-01","personal_lo_to_hi_key":"nar.creativity.cool.a_to_b.1.make-01","score":10,"shared_key":"nar.creativity.cool.shared.1.make-01"},{"band":"Cool","category_id":"drive","personal_hi_to_lo_key":"nar.drive.cool.b_to_a.1.move-01","personal_lo_to_hi_key":"nar.drive.cool.a_to_b.1.move-01","score":10,"shared_key":"nar.drive.cool.shared.1.move-01"},{"band":"Cool","category_id":"balance","personal_hi_to_lo_key":"nar.balance.cool.b_to_a.1.fair-01","personal_lo_to_hi_key":"nar.balance.cool.a_to_b.1.fair-01","score":17,"shared_key":"nar.balance.cool.shared.1.fair-01"}],"config_id":"m10-channel-state-v1.0.0","pair_key":"d58f21039b0e9755c1ef0e41d334eb9e3d97d375ff0e46a22245d1ac9505e9c5","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129","schema":"magic10_compat_result.v1","signals":[{"q":0,"signal_id":"rapport_delta"},{"q":38,"signal_id":"resonance_strength"},{"q":50,"signal_id":"spark_intensity"},{"q":0,"signal_id":"momentum_flux"},{"q":0,"signal_id":"signal_clarity"},{"q":40,"signal_id":"exchange_density"},{"q":50,"signal_id":"vector_cohesion"},{"q":0,"signal_id":"axis_agreement"},{"q":0,"signal_id":"soothe_index"},{"q":0,"signal_id":"buffer_resilience"},{"q":20,"signal_id":"pattern_integrity"},{"q":0,"signal_id":"variance_stability"},{"q":0,"signal_id":"growth_tendency"},{"q":0,"signal_id":"horizon_reach"},{"q":0,"signal_id":"novelty_factor"},{"q":40,"signal_id":"expression_flow"},{"q":10,"signal_id":"willpower_current"},{"q":30,"signal_id":"focus_pressure"},{"q":0,"signal_id":"equilibrium_score"},{"q":67,"signal_id":"counterweight_ratio"}]}
+stderr (0 bytes):
+(empty)
+--- command 15: ["wc", "-c", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:36Z; ended_utc: 2026-11-11T08:06:36Z; exit_code: 0
+stdout (717 bytes):
+ 3302 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout
+ 3302 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout
+ 3302 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout
+ 3294 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout
+ 3294 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout
+  330 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json
+  330 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json
+  330 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json
+  330 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json
+  330 /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json
+18144 total
+stderr (0 bytes):
+(empty)
+--- command 16: ["sha256sum", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:36Z; ended_utc: 2026-11-11T08:06:36Z; exit_code: 0
+stdout (1305 bytes):
+9c08bebe20f6e2396ebfc09a897bea59cbea56d20b33abc32a9fbd1b102f9f81  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout
+9c08bebe20f6e2396ebfc09a897bea59cbea56d20b33abc32a9fbd1b102f9f81  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout
+9c08bebe20f6e2396ebfc09a897bea59cbea56d20b33abc32a9fbd1b102f9f81  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout
+8cc2ec570ec2241ae617fde7e2afc3b6efd86a8c0899bb2f38d2ea45fcd37439  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout
+8cc2ec570ec2241ae617fde7e2afc3b6efd86a8c0899bb2f38d2ea45fcd37439  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout
+081f0499577f21a8069681502288c328fe108878e10eaff224f7dcde40fa84a5  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json
+081f0499577f21a8069681502288c328fe108878e10eaff224f7dcde40fa84a5  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json
+081f0499577f21a8069681502288c328fe108878e10eaff224f7dcde40fa84a5  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json
+081f0499577f21a8069681502288c328fe108878e10eaff224f7dcde40fa84a5  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json
+081f0499577f21a8069681502288c328fe108878e10eaff224f7dcde40fa84a5  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json
+stderr (0 bytes):
+(empty)
+--- command 17: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:36Z; ended_utc: 2026-11-11T08:06:36Z; exit_code: 0
+stdout (330 bytes):
+{"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,"idempotence_hash":"e006c1f0ff9f4843e7e8a4ee869fd7acc582300f870e1044361dd4e5a75954e6","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v1","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 18: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:36Z; ended_utc: 2026-11-11T08:06:36Z; exit_code: 0
+stdout (330 bytes):
+{"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,"idempotence_hash":"e006c1f0ff9f4843e7e8a4ee869fd7acc582300f870e1044361dd4e5a75954e6","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v1","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 19: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:36Z; ended_utc: 2026-11-11T08:06:36Z; exit_code: 0
+stdout (330 bytes):
+{"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,"idempotence_hash":"e006c1f0ff9f4843e7e8a4ee869fd7acc582300f870e1044361dd4e5a75954e6","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v1","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 20: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:36Z; ended_utc: 2026-11-11T08:06:36Z; exit_code: 0
+stdout (330 bytes):
+{"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,"idempotence_hash":"e006c1f0ff9f4843e7e8a4ee869fd7acc582300f870e1044361dd4e5a75954e6","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v1","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 21: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:36Z; ended_utc: 2026-11-11T08:06:36Z; exit_code: 0
+stdout (330 bytes):
+{"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,"idempotence_hash":"e006c1f0ff9f4843e7e8a4ee869fd7acc582300f870e1044361dd4e5a75954e6","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v1","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 22: ["python", "-c", "import json,sys,jsonschema; s=json.load(open('schemas/magic10_compat_result_v1.schema.json')); V=jsonschema.validators.validator_for(s); V.check_schema(s); v=V(s); [print(p.rsplit('/',1)[1], 'VALID' if not list(v.iter_errors(json.loads(open(p,'rb').read().decode('utf-8')))) else 'INVALID', 'schema='+str(json.load(open(p)).get('schema')), 'release_id='+str(json.load(open(p)).get('release_id')), 'ONE_DOC_ONE_LF='+str(open(p,'rb').read().endswith(b'\\n') and not open(p,'rb').read().endswith(b'\\n\\n') and open(p,'rb').read().count(b'\\n')==1)) for p in sys.argv[1:]]", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:36Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (720 bytes):
+L1.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True
+L2.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True
+L3.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True
+L4.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True
+L5.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True
+stderr (0 bytes):
+(empty)
+--- command 23: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L2.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 24: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L3.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 25: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L5.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 26: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 27: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 28: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 29: ["python3", "-I", "-c", "import json,sys; [print(p.rsplit('/',1)[1], 'reader_version='+str(json.load(open(p)).get('reader_version')), 'CATEGORY_KEYS_EXACTLY_ID_BAND='+str(all(set(c)=={'id','band'} for c in json.load(open(p))['categories'])), 'categories='+json.dumps(json.load(open(p))['categories'])) for p in sys.argv[1:]]", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L1.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L2.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L3.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L4.reader.json", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/L5.reader.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (575 bytes):
+L1.reader.json reader_version=v1 CATEGORY_KEYS_EXACTLY_ID_BAND=True categories=[{"band": "Cool", "id": "harmony"}]
+L2.reader.json reader_version=v1 CATEGORY_KEYS_EXACTLY_ID_BAND=True categories=[{"band": "Cool", "id": "harmony"}]
+L3.reader.json reader_version=v1 CATEGORY_KEYS_EXACTLY_ID_BAND=True categories=[{"band": "Cool", "id": "harmony"}]
+L4.reader.json reader_version=v1 CATEGORY_KEYS_EXACTLY_ID_BAND=True categories=[{"band": "Cool", "id": "harmony"}]
+L5.reader.json reader_version=v1 CATEGORY_KEYS_EXACTLY_ID_BAND=True categories=[{"band": "Cool", "id": "harmony"}]
+stderr (0 bytes):
+(empty)
+--- command 30: ["python3", "-I", "-c", "import json,sys; a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2])); a.pop('pair_key',None); b.pop('pair_key',None); print('L1_VS_L4_WITHOUT_PAIR_KEY='+('DIFFER' if a!=b else 'EQUAL'))", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L4.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (33 bytes):
+L1_VS_L4_WITHOUT_PAIR_KEY=DIFFER
+stderr (0 bytes):
+(empty)
+--- command 31: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 32: ["bash", "-c", "ls -A /tmp/hde-crd-0003-qa/state | wc -l"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:06:37Z; ended_utc: 2026-11-11T08:06:37Z; exit_code: 0
+stdout (2 bytes):
+0
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- P1 (V-A): HEAD equals T, not shallow, status empty, Python 3.12.x, engine inside the clone, and hdctl --version prints qa-01's line | observed: b687c813866befa5ee911a14b00ad21c1841e967; shallow false; status 0 bytes; Python 3.12.15; engine /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py; hdctl 0.0.0 (hdengine@prod;2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129) | PASS
+- P2 presence: HD_API_BASE_URL, HD_API_KEY and GEO_API_KEY SET, BASE_CONFLICT=False, P2_ENGINE_ENV=OK (HDE_VENDOR_OVERRIDE_AUDIT_PATH and DATABASE_URL presence recorded) | observed: HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET HD_API_KEY=SET GEO_API_KEY=SET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET DATABASE_URL=UNSET BASE_CONFLICT=False APP_ENV=dev ENGINE_ENV=UNSET P2_ENGINE_ENV=OK | PASS
+- P3 rails: exactly SAFE_MODE=0, ALLOW_NETWORK=1, APP_ENV=dev (P-N), and the pins | observed: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev | PASS
+- P4 and P5 (sink, actor) | observed: not applicable: posture P-N (Plan CHECK 14: P-P only) | PASS
+- P6 route label with P1's interpreter: SUPPORTED=True ROUTE_FAMILY=recommended_v2_chart RESOURCE_PATH=charts | observed: SUPPORTED=True ROUTE_FAMILY=recommended_v2_chart RESOURCE_PATH=charts | PASS
+- exactly five invocations (at most ten vendor acquisitions), no --upsert, no other vendor command | observed: 5 invocations; --upsert in any argv: False; --allow-prod-vendor in any argv: False | PASS
+- L1 P1 AB: exit 0, empty stderr; stdout one JSON document ending in exactly one LF that validates against schemas/magic10_compat_result_v1.schema.json (schema magic10_compat_result.v1) with release_id 2d5a4ec485fd... | observed: exit 0; stderr 0 bytes; stdout 3302 bytes; L1.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True | PASS
+- L2 P1 BA: exit 0, empty stderr; stdout one JSON document ending in exactly one LF that validates against schemas/magic10_compat_result_v1.schema.json (schema magic10_compat_result.v1) with release_id 2d5a4ec485fd... | observed: exit 0; stderr 0 bytes; stdout 3302 bytes; L2.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True | PASS
+- L3 P1 AB again: exit 0, empty stderr; stdout one JSON document ending in exactly one LF that validates against schemas/magic10_compat_result_v1.schema.json (schema magic10_compat_result.v1) with release_id 2d5a4ec485fd... | observed: exit 0; stderr 0 bytes; stdout 3302 bytes; L3.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True | PASS
+- L4 P2 AB: exit 0, empty stderr; stdout one JSON document ending in exactly one LF that validates against schemas/magic10_compat_result_v1.schema.json (schema magic10_compat_result.v1) with release_id 2d5a4ec485fd... | observed: exit 0; stderr 0 bytes; stdout 3294 bytes; L4.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True | PASS
+- L5 P2 BA: exit 0, empty stderr; stdout one JSON document ending in exactly one LF that validates against schemas/magic10_compat_result_v1.schema.json (schema magic10_compat_result.v1) with release_id 2d5a4ec485fd... | observed: exit 0; stderr 0 bytes; stdout 3294 bytes; L5.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True | PASS
+- AB = BA: L1 bytes equal L2 bytes, and L4 bytes equal L5 bytes (cmp) | observed: cmp L1.stdout L2.stdout: exit 0, 0 bytes; cmp L4.stdout L5.stdout: exit 0, 0 bytes | PASS
+- two runs: L1 bytes equal L3 bytes (cmp) | observed: cmp L1.stdout L3.stdout: exit 0, 0 bytes | PASS
+- Reader bytes: each --dump-reader file is the v1 Reader envelope whose every categories item has exactly the keys id and band; L1's dump equals L2's and L3's, and L4's equals L5's | observed: reader_version ['v1', 'v1', 'v1', 'v1', 'v1']; every item exactly {id, band}: True; cmp L1.reader.json L2.reader.json: exit 0, 0 bytes; cmp L1.reader.json L3.reader.json: exit 0, 0 bytes; cmp L4.reader.json L5.reader.json: exit 0, 0 bytes | PASS
+- distinct pairs: L1's and L4's documents with pair_key removed differ | observed: L1_VS_L4_WITHOUT_PAIR_KEY=DIFFER | PASS
+- P-P sink lines | observed: not applicable: posture P-N writes no override event (the scratch XDG_STATE_HOME holds 0 entries after the run, command 32) | PASS
+- V-A git status --porcelain empty | observed: exit 0, 0 bytes | PASS
+- secret scan NO_HIT over all stdout, stderr and dumps: recorded in NOTES (the scan runs on this assembled body, which holds them all verbatim)
+- observation (not a predicate; Plan CHECK 14): L1's dump harmony band Cool against qa-13 R1 v1 band Cool: same; L1's categories bands by category_id against qa-13 R3 v2 bands: all ten the same (CLI {"alignment": "Open", "balance": "Cool", "comfort": "Cool", "communication": "Cool", "consistency": "Open", "creativity": "Cool", "drive": "Open", "expansion": "Open", "harmony": "Cool", "heat": "Cool"})
+- overall: every predicate met; status PASS
+=== NOTES ===
+- classification: PASS. Every predicate of CHECK 14 under posture P-N is met (PREDICATES). The live vendor compat test ran live (Glow QA Guide §3.5.5 "Live vendor compat"): `hdctl showcompat --source vendor` acquired both parties of each invocation from the vendor (no local lookup is passed, Audit QA50-F07) on a base P6 classified as terminal v2.
+- invocations (commands 10 to 14): L1 P1 AB, L2 P1 BA, L3 P1 AB again, L4 P2 AB, L5 P2 BA, each `hdctl showcompat --source vendor <pair flags> --dump-reader /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/<L>.reader.json`, each run once, each exit 0 with empty stderr. Each stdout is verbatim in its command entry. Lengths (command 15): L1, L2 and L3 3,302 bytes; L4 and L5 3,294 bytes. SHA-256 (command 16): L1, L2 and L3 9c08bebe20f6e2396ebfc09a897bea59cbea56d20b33abc32a9fbd1b102f9f81; L4 and L5 8cc2ec570ec2241ae617fde7e2afc3b6efd86a8c0899bb2f38d2ea45fcd37439. The five Reader dumps are verbatim in commands 17 to 21, each 330 bytes with SHA-256 081f0499577f21a8069681502288c328fe108878e10eaff224f7dcde40fa84a5.
+- observation, reported with the QA result (Glow QA Guide §3.5.5; not a predicate): L1's dump harmony band (Cool) equals qa-13's R1 v1 band, and L1's ten category bands by category_id equal qa-13's R3 v2 bands (PREDICATES, last observation line). The CLI's v1 Reader dump for P1 (SHA-256 081f0499…a5) is byte-identical to the deployed v1 Reader answer for SYN-A and SYN-B in qa-13 (R1, same SHA-256). The P2 dump has the same bytes, because pair P2's harmony band is also Cool and the v1 envelope carries no pair identity.
+- interruption (QA-100 step 3; collection §4.9): segment 1 stopped before any invocation because of a fault in the QA-created gate, not a preflight result. It is preserved verbatim at the top of READINESS. Attempt 1 resumed in segment 2 at the check's start (the check had no published primary; collection §4.9), with the gate corrected and the whole preflight re-read. The only vendor requests of attempt 1 are segment 2's five invocations. No vendor request, publication or status came from segment 1.
+- environment: the database, GitHub and override-path names were unset for this step, because it does not need them (Live QA Guide §6); P2 records DATABASE_URL=UNSET and HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET. Under P-N no override event is written, and the scratch XDG_STATE_HOME was empty after the run (command 32).
+- rails restored: this check's shell set the open rails for this check only and exited; every later check sets the default rails itself (collection §4.3 step 6, §4.4).
+- normalizations: none. Execution forms, recorded as run: the scratch recorder saved each invocation's stdout and stderr byte for byte to scratch files (outside every repository) for cmp and the schema read; the schema validation (command 22) uses the installed jsonschema validator selected by the schema's own declaration; the distinct-pair read (command 30) removes pair_key from both documents before comparing.
+- nonclaims: a CLI-local live call is not deployed-service validation (Glow QA Guide §3.5.5). No broad HumanDesignAPI v2 conformance, mapped-cache write, database write, deployment, QA PASS for the change or closure.
+- recording: each argv ran unchanged through the scratch recorder /tmp/hde-crd-0003-qa/qarun.py; the PREDICATES section was generated mechanically from this check's transcript and its byte-exact captures by a scratch evaluator.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body, which holds every stdout, stderr and dump verbatim, before publication: NO_HIT in the check's shell, which held HD_API_KEY, GEO_API_KEY and HD_API_BASE_URL; and NO_HIT in the venue's parent shell, which also holds DATABASE_URL (comparison only; no value printed).
+- LF normalization (collection §4.6): no CR byte in any capture
