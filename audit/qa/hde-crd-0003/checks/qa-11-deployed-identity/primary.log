@@ -1,0 +1,425 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"prod","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"qa-11-deployed-identity","check_name":"Service reachability, /internal/version invariants, the deployed release against main, the deployed code claim, the consumed Ops evidence","claimed_tokens":[],"command":[["curl","--version"],["python3","--version"],["bash","-c","command -v curl python3"],["git","rev-parse","HEAD"],["git","rev-parse","--is-shallow-repository"],["git","status","--porcelain"],["python","--version"],["python","-m","pytest","--version"],["python","-c","import engine; print(engine.__file__)"],["bash","/tmp/hde-crd-0003-qa/presence.sh","HD_API_KEY","GEO_API_KEY","HD_API_BASE_URL","HDAPI_BASE_URL","DATABASE_URL","GH_TOKEN","GITHUB_TOKEN","HDE_VENDOR_OVERRIDE_AUDIT_PATH","ENGINE_ENV"],["bash","/tmp/hde-crd-0003-qa/presence.sh","LC_ALL","LANG","TZ","SAFE_MODE","ALLOW_NETWORK","APP_ENV"],["python3","-I","-c","import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"],["curl","--http1.1","-sS","-D","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/internal/version"],["curl","--http1.1","-sS","-I","-D","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s2.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s2.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/internal/version"],["curl","--http1.1","-sS","-H","If-None-Match: \"qa-hde-crd-0003\"","-D","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/internal/version"],["curl","--http1.1","-sS","-H","If-Modified-Since: Thu, 01 Jan 2015 00:00:00 GMT","-D","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/internal/version"],["cat","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s2.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body"],["cat","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body"],["cat","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body"],["wc","-c","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s2.body","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body"],["sha256sum","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body"],["python3","-I","-c","import json,sys; b=open(sys.argv[1],'rb').read(); want=['engine_tag','build_commit','invocation_tag','invocation_sha256','emitter_sha256','release_id']; bom=b.startswith(b'\\xef\\xbb\\xbf'); cr=b'\\r' in b; lf_end=b.endswith(b'\\n') and not b.endswith(b'\\n\\n'); lfs=b.count(b'\\n'); o=json.loads(b.decode('utf-8')); keys=list(o); compact=(json.dumps(o,separators=(',',':'),ensure_ascii=False)+'\\n').encode('utf-8')==b; print('KEYS='+','.join(keys)); print('KEYS_EXACT_ORDER='+str(keys==want)); print('BOM='+str(bom), 'CR='+str(cr), 'LF_COUNT='+str(lfs), 'ONE_LF_AT_END='+str(lf_end and lfs==1), 'COMPACT_UTF8='+str(compact), 'LENGTH='+str(len(b))); print('build_commit='+str(o.get('build_commit'))); print('release_id='+str(o.get('release_id')))","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body","/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body"],["python3","-I","-c","import json; d=json.load(open('docs/ENDPOINTS_CATALOG.json')); [print(e.get('method'), e.get('path'), 'a7_eligible', e.get('a7_eligible')) for e in d['endpoints'] if e.get('path')=='/internal/version']"],["sha256sum","catalog/manifest.json"],["git","fetch","origin","main"],["git","rev-parse","origin/main"],["git","rev-list","3570be826f1fe36323ed67471f327078b62e4667..origin/main"],["git","diff","--name-only","3570be826f1fe36323ed67471f327078b62e4667","b687c813866befa5ee911a14b00ad21c1841e967","--",".",":!audit/ops/hde-crd-0003",":!audit/qa/hde-crd-0003",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*",":!docs/crd/",":!docs/ephemeral/",":!docs/graph/",":!docs/pfcanon/",":!docs/plans/",":!docs/prompt_ecosystem_management/",":!docs/qa/",":!docs/run/"],["sha256sum","-c","SHA256SUMS.attempt1"],["cat","result.attempt1.txt"],["cat","expected_identity.attempt1.txt"],["cat","identity_reads.attempt1.tsv"],["sha256sum","audit/ops/hde-crd-0003/wu-ops-01/SHA256SUMS.attempt1","audit/ops/hde-crd-0003/wu-ops-01/binding_presence.attempt1.tsv","audit/ops/hde-crd-0003/wu-ops-01/declarations_comparison.attempt1.tsv","audit/ops/hde-crd-0003/wu-ops-01/deployment_facts.attempt1.tsv","audit/ops/hde-crd-0003/wu-ops-01/expected_identity.attempt1.txt","audit/ops/hde-crd-0003/wu-ops-01/identity_reads.attempt1.tsv","audit/ops/hde-crd-0003/wu-ops-01/pf07_doc_delta_candidate.attempt1.md","audit/ops/hde-crd-0003/wu-ops-01/result.attempt1.txt","audit/ops/hde-crd-0003/wu-ops-01/run.attempt1.log"]],"command_provenance":"QA Plan v1.2 check qa-11; QA-90 task T06 attempt 1; normalizations: none","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-11-deployed-identity/primary.log","audit/ops/hde-crd-0003/wu-ops-01/SHA256SUMS.attempt1","audit/ops/hde-crd-0003/wu-ops-01/binding_presence.attempt1.tsv","audit/ops/hde-crd-0003/wu-ops-01/declarations_comparison.attempt1.tsv","audit/ops/hde-crd-0003/wu-ops-01/deployment_facts.attempt1.tsv","audit/ops/hde-crd-0003/wu-ops-01/expected_identity.attempt1.txt","audit/ops/hde-crd-0003/wu-ops-01/identity_reads.attempt1.tsv","audit/ops/hde-crd-0003/wu-ops-01/pf07_doc_delta_candidate.attempt1.md","audit/ops/hde-crd-0003/wu-ops-01/result.attempt1.txt","audit/ops/hde-crd-0003/wu-ops-01/run.attempt1.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide","PF14-Canon-HDE-Mechanics-Guide","PF07-Canon-Glow-Infrastructure"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-11T08:00:11Z"}
+=== CONTEXT ===
+check_id: qa-11-deployed-identity
+check_name: Service reachability, /internal/version invariants, the deployed release against main, the deployed code claim, the consumed Ops evidence
+task: QA-90 task T06, attempt 1; QA Plan v1.2 CHECK 11 (criteria LT-1, DEP-a, OPS-a)
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+environment_class: E-P for the four requests (this workstation's shell, HTTPS egress to https://glow-hdengine-v2-production.up.railway.app, curl 8.18.0 and python3; no credential header sent); the E-L clone /tmp/hde-crd-0003-qa/clone (full history, detached at T) for actions 6 to 8
+target: the Railway production service of amthorn78/glow-hdengine-v2, base https://glow-hdengine-v2-production.up.railway.app (Glow Infrastructure §2.2)
+interpreter: python3 = /tmp/hde-crd-0003-qa/venv/bin/python3 (Python 3.12.15), used only with -I for offline parsing; no product code runs on the client
+rails: production binding recorded, LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod PYTHONDONTWRITEBYTECODE=1 (Plan §3.1, qa-11 to qa-13 row); vendor and database names unset in this shell (readiness command 10)
+start_utc: 2026-11-11T07:58:50Z
+end_utc: 2026-11-11T07:58:54Z
+=== READINESS ===
+Plan v1.2 §7 common rule A for E-P (curl --version, python3 --version) and for the E-L clone actions 6 to 8 use (HEAD equals T, not shallow, status empty, python 3.12.x, pytest, engine inside the clone, presence table), then the six rails names as set:
+--- command 1: ["curl", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:50Z; ended_utc: 2026-11-11T07:58:50Z; exit_code: 0
+stdout (579 bytes):
+curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+Release-Date: 2026-01-07, security patched: 8.18.0-1ubuntu2.8
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp ws wss
+Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
+stderr (0 bytes):
+(empty)
+--- command 2: ["python3", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:50Z; ended_utc: 2026-11-11T07:58:50Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 3: ["bash", "-c", "command -v curl python3"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:50Z; ended_utc: 2026-11-11T07:58:50Z; exit_code: 0
+stdout (52 bytes):
+/usr/bin/curl
+/tmp/hde-crd-0003-qa/venv/bin/python3
+stderr (0 bytes):
+(empty)
+--- command 4: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:50Z; ended_utc: 2026-11-11T07:58:50Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- command 5: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:50Z; ended_utc: 2026-11-11T07:58:50Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command 6: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:50Z; ended_utc: 2026-11-11T07:58:50Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 7: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:50Z; ended_utc: 2026-11-11T07:58:50Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 8: ["python", "-m", "pytest", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:50Z; ended_utc: 2026-11-11T07:58:51Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command 9: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:51Z; ended_utc: 2026-11-11T07:58:51Z; exit_code: 0
+stdout (149 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py
+stderr (0 bytes):
+(empty)
+--- command 10: ["bash", "/tmp/hde-crd-0003-qa/presence.sh", "HD_API_KEY", "GEO_API_KEY", "HD_API_BASE_URL", "HDAPI_BASE_URL", "DATABASE_URL", "GH_TOKEN", "GITHUB_TOKEN", "HDE_VENDOR_OVERRIDE_AUDIT_PATH", "ENGINE_ENV"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:51Z; ended_utc: 2026-11-11T07:58:51Z; exit_code: 0
+stdout (186 bytes):
+HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET 
+stderr (0 bytes):
+(empty)
+--- command 11: ["bash", "/tmp/hde-crd-0003-qa/presence.sh", "LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK", "APP_ENV"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:51Z; ended_utc: 2026-11-11T07:58:51Z; exit_code: 0
+stdout (72 bytes):
+LC_ALL=SET LANG=SET TZ=SET SAFE_MODE=SET ALLOW_NETWORK=SET APP_ENV=SET 
+stderr (0 bytes):
+(empty)
+--- command 12: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:51Z; ended_utc: 2026-11-11T07:58:51Z; exit_code: 0
+stdout (64 bytes):
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod
+stderr (0 bytes):
+(empty)
+=== COMMANDS ===
+--- command 13: ["curl", "--http1.1", "-sS", "-D", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/internal/version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:51Z; ended_utc: 2026-11-11T07:58:52Z; exit_code: 0
+stdout (8 bytes):
+200 1.1
+stderr (0 bytes):
+(empty)
+--- command 14: ["curl", "--http1.1", "-sS", "-I", "-D", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s2.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s2.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/internal/version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:52Z; ended_utc: 2026-11-11T07:58:52Z; exit_code: 0
+stdout (8 bytes):
+200 1.1
+stderr (0 bytes):
+(empty)
+--- command 15: ["curl", "--http1.1", "-sS", "-H", "If-None-Match: \"qa-hde-crd-0003\"", "-D", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/internal/version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:52Z; ended_utc: 2026-11-11T07:58:52Z; exit_code: 0
+stdout (8 bytes):
+200 1.1
+stderr (0 bytes):
+(empty)
+--- command 16: ["curl", "--http1.1", "-sS", "-H", "If-Modified-Since: Thu, 01 Jan 2015 00:00:00 GMT", "-D", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/internal/version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:52Z; ended_utc: 2026-11-11T07:58:52Z; exit_code: 0
+stdout (8 bytes):
+200 1.1
+stderr (0 bytes):
+(empty)
+--- command 17: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:52Z; ended_utc: 2026-11-11T07:58:52Z; exit_code: 0
+stdout (315 bytes):
+HTTP/1.1 200 OK
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 07:58:52 GMT
+Server: railway-hikari
+x-railway-request-id: GROiz91MTziGOHFB21mRUA
+Content-Length: 347
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+vary: accept-encoding
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 18: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s2.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:52Z; ended_utc: 2026-11-11T07:58:52Z; exit_code: 0
+stdout (292 bytes):
+HTTP/1.1 200 OK
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 07:58:52 GMT
+Server: railway-hikari
+x-railway-request-id: D2rCdq8AR-CxxTtBjUJq2g
+Content-Length: 347
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 19: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:52Z; ended_utc: 2026-11-11T07:58:52Z; exit_code: 0
+stdout (315 bytes):
+HTTP/1.1 200 OK
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 07:58:52 GMT
+Server: railway-hikari
+x-railway-request-id: QFc0KC4cRzqwqqZeEuroCg
+Content-Length: 347
+x-hikari-trace: jfk1.aghq
+x-railway-edge: jfk1
+vary: accept-encoding
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 20: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:52Z; ended_utc: 2026-11-11T07:58:52Z; exit_code: 0
+stdout (315 bytes):
+HTTP/1.1 200 OK
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 07:58:52 GMT
+Server: railway-hikari
+x-railway-request-id: -rJ7MxqVSziusBOc2JZdWA
+Content-Length: 347
+x-hikari-trace: jfk1.cv40
+x-railway-edge: jfk1
+vary: accept-encoding
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 21: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (347 bytes):
+{"engine_tag":"hdengine@prod","build_commit":"9479d28","invocation_tag":"INV-f2ac55d77ce9aacc","invocation_sha256":"3f119e727a2a1f8a5332fe8f159321ea5274988e6a05633103fe0a5ae42c6e69","emitter_sha256":"c828effe645deae150593adbc90589f67141ab20fab1e719171cd8effad9bc19","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 22: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (347 bytes):
+{"engine_tag":"hdengine@prod","build_commit":"9479d28","invocation_tag":"INV-f2ac55d77ce9aacc","invocation_sha256":"3f119e727a2a1f8a5332fe8f159321ea5274988e6a05633103fe0a5ae42c6e69","emitter_sha256":"c828effe645deae150593adbc90589f67141ab20fab1e719171cd8effad9bc19","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 23: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (347 bytes):
+{"engine_tag":"hdengine@prod","build_commit":"9479d28","invocation_tag":"INV-f2ac55d77ce9aacc","invocation_sha256":"3f119e727a2a1f8a5332fe8f159321ea5274988e6a05633103fe0a5ae42c6e69","emitter_sha256":"c828effe645deae150593adbc90589f67141ab20fab1e719171cd8effad9bc19","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 24: ["wc", "-c", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s2.body", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (287 bytes):
+ 347 /tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body
+ 292 /tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s2.body
+ 347 /tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body
+ 347 /tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body
+1333 total
+stderr (0 bytes):
+(empty)
+--- command 25: ["sha256sum", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (390 bytes):
+3cd498d11f556a5a98644a347bd8d82633e25d3c7bbfdbf2d3d2b6fee2bc9820  /tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body
+3cd498d11f556a5a98644a347bd8d82633e25d3c7bbfdbf2d3d2b6fee2bc9820  /tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body
+3cd498d11f556a5a98644a347bd8d82633e25d3c7bbfdbf2d3d2b6fee2bc9820  /tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body
+stderr (0 bytes):
+(empty)
+--- command 26: ["python3", "-I", "-c", "import json,sys; b=open(sys.argv[1],'rb').read(); want=['engine_tag','build_commit','invocation_tag','invocation_sha256','emitter_sha256','release_id']; bom=b.startswith(b'\\xef\\xbb\\xbf'); cr=b'\\r' in b; lf_end=b.endswith(b'\\n') and not b.endswith(b'\\n\\n'); lfs=b.count(b'\\n'); o=json.loads(b.decode('utf-8')); keys=list(o); compact=(json.dumps(o,separators=(',',':'),ensure_ascii=False)+'\\n').encode('utf-8')==b; print('KEYS='+','.join(keys)); print('KEYS_EXACT_ORDER='+str(keys==want)); print('BOM='+str(bom), 'CR='+str(cr), 'LF_COUNT='+str(lfs), 'ONE_LF_AT_END='+str(lf_end and lfs==1), 'COMPACT_UTF8='+str(compact), 'LENGTH='+str(len(b))); print('build_commit='+str(o.get('build_commit'))); print('release_id='+str(o.get('release_id')))", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (285 bytes):
+KEYS=engine_tag,build_commit,invocation_tag,invocation_sha256,emitter_sha256,release_id
+KEYS_EXACT_ORDER=True
+BOM=False CR=False LF_COUNT=1 ONE_LF_AT_END=True COMPACT_UTF8=True LENGTH=347
+build_commit=9479d28
+release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+stderr (0 bytes):
+(empty)
+--- command 27: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s3.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 28: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s1.body", "/tmp/hde-crd-0003-qa/checks/qa-11-deployed-identity/cap/s4.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 29: ["python3", "-I", "-c", "import json; d=json.load(open('docs/ENDPOINTS_CATALOG.json')); [print(e.get('method'), e.get('path'), 'a7_eligible', e.get('a7_eligible')) for e in d['endpoints'] if e.get('path')=='/internal/version']"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (81 bytes):
+GET /internal/version a7_eligible False
+HEAD /internal/version a7_eligible False
+stderr (0 bytes):
+(empty)
+--- command 30: ["sha256sum", "catalog/manifest.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (88 bytes):
+2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129  catalog/manifest.json
+stderr (0 bytes):
+(empty)
+--- command 31: ["git", "fetch", "origin", "main"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (99 bytes):
+From https://github.com/amthorn78/glow-hdengine-v2
+ * branch              main       -> FETCH_HEAD
+--- command 32: ["git", "rev-parse", "origin/main"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- command 33: ["git", "rev-list", "3570be826f1fe36323ed67471f327078b62e4667..origin/main"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- command 34: ["git", "diff", "--name-only", "3570be826f1fe36323ed67471f327078b62e4667", "b687c813866befa5ee911a14b00ad21c1841e967", "--", ".", ":!audit/ops/hde-crd-0003", ":!audit/qa/hde-crd-0003", ":!docs/evidence/INDEX.*", ":!artifacts/evidence_index.jsonl*", ":!audit/gates/topology/orientation_demo.txt*", ":!docs/crd/", ":!docs/ephemeral/", ":!docs/graph/", ":!docs/pfcanon/", ":!docs/plans/", ":!docs/prompt_ecosystem_management/", ":!docs/qa/", ":!docs/run/"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:53Z; ended_utc: 2026-11-11T07:58:53Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 35: ["sha256sum", "-c", "SHA256SUMS.attempt1"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/audit/ops/hde-crd-0003/wu-ops-01
+started_utc: 2026-11-11T07:58:54Z; ended_utc: 2026-11-11T07:58:54Z; exit_code: 0
+stdout (262 bytes):
+binding_presence.attempt1.tsv: OK
+declarations_comparison.attempt1.tsv: OK
+deployment_facts.attempt1.tsv: OK
+expected_identity.attempt1.txt: OK
+identity_reads.attempt1.tsv: OK
+pf07_doc_delta_candidate.attempt1.md: OK
+result.attempt1.txt: OK
+run.attempt1.log: OK
+stderr (0 bytes):
+(empty)
+--- command 36: ["cat", "result.attempt1.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/audit/ops/hde-crd-0003/wu-ops-01
+started_utc: 2026-11-11T07:58:54Z; ended_utc: 2026-11-11T07:58:54Z; exit_code: 0
+stdout (990 bytes):
+task	HDE-CRD-0003 WU-OPS-01
+mode	EXECUTION
+attempt	1
+prior_action	NONE
+classification	PASS
+exit_status	0
+reason	candidate deployed and identified; all ten gating variables SET (environment validated)
+deployment	CANDIDATE
+build_command	NO_CUSTOM_COMMAND
+start_command	MATCHES_SERVICE_CMD
+identity_reads	MATCH (reads=1)
+binding_presence	ALL_SET
+base_url	https://glow-hdengine-v2-production.up.railway.app
+endpoint	GET /internal/version, no credential header
+executor	PO-delegated-agent
+delegation_ref	Claude Code session 4564f28a-630c-42e9-b08d-aa27fc3e6f28 (delegated by the Product Owner in this session)
+candidate_commit	3570be826f1fe36323ed67471f327078b62e4667
+script_sha256	782ecaa0de535cc7423b5f1a11937575d3a05c10846730c5158ca0c3476e26aa
+started_at_utc	2026-11-10T23:56:48Z
+finished_at_utc	2026-11-10T23:56:49Z
+nonclaims	no QA PASS, Live QA, acceptance, deployment by this script, closure or PF09 movement; presence only, values not verified; deployment facts are operator observations
+stderr (0 bytes):
+(empty)
+--- command 37: ["cat", "expected_identity.attempt1.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/audit/ops/hde-crd-0003/wu-ops-01
+started_utc: 2026-11-11T07:58:54Z; ended_utc: 2026-11-11T07:58:54Z; exit_code: 0
+stdout (451 bytes):
+candidate_commit	3570be826f1fe36323ed67471f327078b62e4667
+checkout_head	3570be826f1fe36323ed67471f327078b62e4667
+origin_main	3570be826f1fe36323ed67471f327078b62e4667
+manifest_sha256	2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+manifest_version	1.3.0
+manifest_built_at_utc	2026-08-24T18:04:49Z
+manifest_members	45
+pinned_release_id	2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+pinned_equal	yes
+prior_action	NONE
+stderr (0 bytes):
+(empty)
+--- command 38: ["cat", "identity_reads.attempt1.tsv"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/audit/ops/hde-crd-0003/wu-ops-01
+started_utc: 2026-11-11T07:58:54Z; ended_utc: 2026-11-11T07:58:54Z; exit_code: 0
+stdout (350 bytes):
+read	read_at_utc	http_status	curl_exit	class	release_id_reported	body_keys	body_sha256	body_bytes
+1	2026-11-10T23:56:49Z	200	0	MATCH	2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129	engine_tag,build_commit,invocation_tag,invocation_sha256,emitter_sha256,release_id	3cd498d11f556a5a98644a347bd8d82633e25d3c7bbfdbf2d3d2b6fee2bc9820	347
+stderr (0 bytes):
+(empty)
+--- command 39: ["sha256sum", "audit/ops/hde-crd-0003/wu-ops-01/SHA256SUMS.attempt1", "audit/ops/hde-crd-0003/wu-ops-01/binding_presence.attempt1.tsv", "audit/ops/hde-crd-0003/wu-ops-01/declarations_comparison.attempt1.tsv", "audit/ops/hde-crd-0003/wu-ops-01/deployment_facts.attempt1.tsv", "audit/ops/hde-crd-0003/wu-ops-01/expected_identity.attempt1.txt", "audit/ops/hde-crd-0003/wu-ops-01/identity_reads.attempt1.tsv", "audit/ops/hde-crd-0003/wu-ops-01/pf07_doc_delta_candidate.attempt1.md", "audit/ops/hde-crd-0003/wu-ops-01/result.attempt1.txt", "audit/ops/hde-crd-0003/wu-ops-01/run.attempt1.log"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T07:58:54Z; ended_utc: 2026-11-11T07:58:54Z; exit_code: 0
+stdout (1141 bytes):
+cc74d6b0724bc68f822ed18791b52e1e528f4df29c91dbb6044c141a2e3784ee  audit/ops/hde-crd-0003/wu-ops-01/SHA256SUMS.attempt1
+abbd0aa021f5795fc0db113fe64dcdcacafc30eb6f25baf6cbe86f063ee6544f  audit/ops/hde-crd-0003/wu-ops-01/binding_presence.attempt1.tsv
+3564ca4632b73e25027c4faa8e2ad6303990b9c65e3d76102ce39863e4646e04  audit/ops/hde-crd-0003/wu-ops-01/declarations_comparison.attempt1.tsv
+0dc093d31db073ac21c3e44f748e31d127fb44f9d49b18f159fb1af1835d43a5  audit/ops/hde-crd-0003/wu-ops-01/deployment_facts.attempt1.tsv
+af11662e4379ca35b2f5b6c52696020306498a7718df758e080ad1155fe68a5d  audit/ops/hde-crd-0003/wu-ops-01/expected_identity.attempt1.txt
+042268c91790c15045015e67f8a8b443444d70795b41981456011258632c18dc  audit/ops/hde-crd-0003/wu-ops-01/identity_reads.attempt1.tsv
+caa670cac638fbb2bbad3b001125b00a5894a5a88823b7fd61510f90d7b49c18  audit/ops/hde-crd-0003/wu-ops-01/pf07_doc_delta_candidate.attempt1.md
+d75289f7b4594bc56b4dbc3c9d195dd20c7c06680c93cfa204dcd8d0c2f17b4d  audit/ops/hde-crd-0003/wu-ops-01/result.attempt1.txt
+3224be5b9bb0c9e32a9e2d6836e9eb5cbde55e76aba2bbcce172ab1ca8ebe190  audit/ops/hde-crd-0003/wu-ops-01/run.attempt1.log
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- transport: step 1 200; step 2 200; steps 3 and 4 200, never 304 (curl -w http_code http_version) | observed: step 1 200 1.1 (curl exit 0); step 2 200 1.1 (curl exit 0); step 3 200 1.1 (curl exit 0); step 4 200 1.1 (curl exit 0) | PASS
+- each answer a valid HTTP/1.1 response with a status line and headers | observed: step 1: 'HTTP/1.1 200 OK', 10 header names; step 2: 'HTTP/1.1 200 OK', 9 header names; step 3: 'HTTP/1.1 200 OK', 10 header names; step 4: 'HTTP/1.1 200 OK', 10 header names | PASS
+- headers in each of steps 1 to 4: Cache-Control: no-store; Content-Type: application/json; charset=utf-8; no ETag; no Last-Modified | observed: step 1: Cache-Control ['no-store'], Content-Type ['application/json; charset=utf-8'], ETag absent, Last-Modified absent; step 2: Cache-Control ['no-store'], Content-Type ['application/json; charset=utf-8'], ETag absent, Last-Modified absent; step 3: Cache-Control ['no-store'], Content-Type ['application/json; charset=utf-8'], ETag absent, Last-Modified absent; step 4: Cache-Control ['no-store'], Content-Type ['application/json; charset=utf-8'], ETag absent, Last-Modified absent | PASS
+- HEAD parity: step 2's status, Content-Type and Cache-Control equal step 1's; its Content-Length equals step 1's body length | observed: status 'HTTP/1.1 200 OK' vs 'HTTP/1.1 200 OK'; Content-Type ['application/json; charset=utf-8'] vs ['application/json; charset=utf-8']; Cache-Control ['no-store'] vs ['no-store']; HEAD Content-Length ['347'] vs step 1 body 347 bytes | PASS
+- body form (step 5): exactly the six keys in the frozen order engine_tag, build_commit, invocation_tag, invocation_sha256, emitter_sha256, release_id; compact UTF-8 JSON without BOM; exactly one LF, at the end; no CR; length recorded | observed: KEYS=engine_tag,build_commit,invocation_tag,invocation_sha256,emitter_sha256,release_id KEYS_EXACT_ORDER=True BOM=False CR=False LF_COUNT=1 ONE_LF_AT_END=True COMPACT_UTF8=True LENGTH=347 build_commit=9479d28 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 | PASS
+- cmp of step 1's body with steps 3 and 4 prints nothing | observed: s3.body: exit 0, 0 bytes; s4.body: exit 0, 0 bytes | PASS
+- build_commit recorded and never judged | observed: 9479d28 | PASS
+- catalog: exactly GET /internal/version and HEAD /internal/version, each a7_eligible False | observed: GET /internal/version a7_eligible False; HEAD /internal/version a7_eligible False | PASS
+- LT-1: the deployed release_id equals sha256sum catalog/manifest.json at T, 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 | observed: deployed 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129; manifest at T 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 | PASS
+- DEP-a: for every commit C of git rev-list 3570be82..origin/main, git diff --name-only 3570be82 C with the guard's full exclusion set prints nothing | observed: origin/main b687c813866befa5ee911a14b00ad21c1841e967; commits ['b687c813866befa5ee911a14b00ad21c1841e967']; b687c813: exit 0, 0 bytes | PASS
+- OPS-a: sha256sum -c SHA256SUMS.attempt1 8 of 8 OK; result.attempt1.txt classification PASS; the identity read MATCH with the same release_id | observed: 8 of 8 OK (exit 0); classification PASS; identity read class MATCH, release_id 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 | PASS
+- overall: every predicate met; status PASS
+=== NOTES ===
+- nonclaims: /internal/version is an identity anchor and satisfies no behaviour criterion; DEP-a says the deployed code is the candidate's, not which commit Railway runs (Plan CHECK 11; Audit §12 U-3).
+- normalizations: none. Execution forms, recorded as run: each request is curl --http1.1 -sS (progress meter off, errors kept), with no -L, so no redirect is followed, and no credential header; -D, -o and the recorder's own stderr capture keep headers, body and curl's stderr apart, and -w '%{http_code} %{http_version}\n' is the recorded stdout. The captured header and body files are placed in this body by cat (commands 17 to 23), wc -c and sha256sum (commands 24 and 25).
+- step 2 (HEAD, curl -I): curl writes the response headers to its -o file, so s2.body (292 bytes, command 24) holds the header block, not a response body; HEAD's empty body is not observable with curl -I (limit recorded, Plan CHECK 11).
+- observation: the GET answers carry vary: accept-encoding and the HEAD answer does not; no predicate names that header. The answers were served by Railway edges yul1 (steps 1 and 2) and jfk1 (steps 3 and 4), as their x-railway-edge headers show.
+- observation: step 1's body SHA-256 3cd498d11f556a5a98644a347bd8d82633e25d3c7bbfdbf2d3d2b6fee2bc9820 and length 347 equal the WU-OPS-01 identity read of 2026-11-10T23:56:49Z (identity_reads.attempt1.tsv, command 38).
+- LF normalization: the four captured header files use CRLF line ends, normalized to LF in this body (collection §4.6; the count is in the last note line).
+- DEP-a: origin/main was fetched at action 7 (command 31) and is b687c813866befa5ee911a14b00ad21c1841e967, so git rev-list 3570be82..origin/main lists one commit, and its diff with the guard's full exclusion set (qa-01's recorded set) prints nothing (command 34).
+- consumed Ops evidence (Glow QA Guide §11.1; CR-1 interim treatment, collection §6): the nine audit/ops/hde-crd-0003/wu-ops-01/ files below are named in this primary's evidence_artifacts, so its path proof points to them; they are not re-homed. SHA-256 (command 39): SHA256SUMS.attempt1 cc74d6b0724bc68f822ed18791b52e1e528f4df29c91dbb6044c141a2e3784ee; binding_presence.attempt1.tsv abbd0aa021f5795fc0db113fe64dcdcacafc30eb6f25baf6cbe86f063ee6544f; declarations_comparison.attempt1.tsv 3564ca4632b73e25027c4faa8e2ad6303990b9c65e3d76102ce39863e4646e04; deployment_facts.attempt1.tsv 0dc093d31db073ac21c3e44f748e31d127fb44f9d49b18f159fb1af1835d43a5; expected_identity.attempt1.txt af11662e4379ca35b2f5b6c52696020306498a7718df758e080ad1155fe68a5d; identity_reads.attempt1.tsv 042268c91790c15045015e67f8a8b443444d70795b41981456011258632c18dc; pf07_doc_delta_candidate.attempt1.md caa670cac638fbb2bbad3b001125b00a5894a5a88823b7fd61510f90d7b49c18; result.attempt1.txt d75289f7b4594bc56b4dbc3c9d195dd20c7c06680c93cfa204dcd8d0c2f17b4d; run.attempt1.log 3224be5b9bb0c9e32a9e2d6836e9eb5cbde55e76aba2bbcce172ab1ca8ebe190.
+- dependency effect: qa-11 is PASS, so qa-12 (T07) and qa-13 (T08) may start (collection §3).
+- recording: each argv ran unchanged through the scratch recorder /tmp/hde-crd-0003-qa/qarun.py; the PREDICATES section was generated mechanically from this check's transcript and captured bytes by a scratch evaluator.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body before publication: NO_HIT in the check's shell; and NO_HIT in the venue's parent shell, which holds the vendor and database values (a stricter second scan; comparison only, no value printed).
+- LF normalization (collection §4.6): command 17 stdout: 12 line-end CR removed, 0 other CR shown as \r; command 18 stdout: 11 line-end CR removed, 0 other CR shown as \r; command 19 stdout: 12 line-end CR removed, 0 other CR shown as \r; command 20 stdout: 12 line-end CR removed, 0 other CR shown as \r

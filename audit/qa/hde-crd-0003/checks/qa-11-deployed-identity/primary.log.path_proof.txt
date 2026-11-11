@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0003/checks/qa-11-deployed-identity/primary.log
+size_bytes: 42773
+sha256: a46bd5f119b96daa0d82792f6be2fe6233a468714dea02b8527d688ba6ef1aca
+mtime_utc: 2026-11-11T08:00:23Z
+produced_at_utc: 2026-09-22T14:25:29Z
