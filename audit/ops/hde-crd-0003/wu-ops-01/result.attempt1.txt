@@ -1,0 +1,21 @@
+task	HDE-CRD-0003 WU-OPS-01
+mode	EXECUTION
+attempt	1
+prior_action	NONE
+classification	PASS
+exit_status	0
+reason	candidate deployed and identified; all ten gating variables SET (environment validated)
+deployment	CANDIDATE
+build_command	NO_CUSTOM_COMMAND
+start_command	MATCHES_SERVICE_CMD
+identity_reads	MATCH (reads=1)
+binding_presence	ALL_SET
+base_url	https://glow-hdengine-v2-production.up.railway.app
+endpoint	GET /internal/version, no credential header
+executor	PO-delegated-agent
+delegation_ref	Claude Code session 4564f28a-630c-42e9-b08d-aa27fc3e6f28 (delegated by the Product Owner in this session)
+candidate_commit	3570be826f1fe36323ed67471f327078b62e4667
+script_sha256	782ecaa0de535cc7423b5f1a11937575d3a05c10846730c5158ca0c3476e26aa
+started_at_utc	2026-11-10T23:56:48Z
+finished_at_utc	2026-11-10T23:56:49Z
+nonclaims	no QA PASS, Live QA, acceptance, deployment by this script, closure or PF09 movement; presence only, values not verified; deployment facts are operator observations

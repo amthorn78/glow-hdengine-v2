@@ -1,0 +1,2 @@
+read	read_at_utc	http_status	curl_exit	class	release_id_reported	body_keys	body_sha256	body_bytes
+1	2026-11-10T23:56:49Z	200	0	MATCH	2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129	engine_tag,build_commit,invocation_tag,invocation_sha256,emitter_sha256,release_id	3cd498d11f556a5a98644a347bd8d82633e25d3c7bbfdbf2d3d2b6fee2bc9820	347

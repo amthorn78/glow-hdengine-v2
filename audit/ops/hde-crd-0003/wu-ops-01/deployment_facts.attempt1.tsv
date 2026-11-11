@@ -1,0 +1,7 @@
+fact	observed	observed_at_utc
+deploy_trigger	repo amthorn78/glow-hdengine-v2, branch main; auto-deploy toggle not shown by Railway CLI, inferred on from three consecutive main-commit deployments with reason deploy	2026-11-10T23:56:49Z
+builder	RAILPACK	2026-11-10T23:56:49Z
+build_command	NONE	2026-11-10T23:56:49Z
+start_command	python -m pip install --no-cache-dir -r requirements.txt && python -m gunicorn 'adapter.factory:create_app()' --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30	2026-11-10T23:56:49Z
+active_deployment_commit	3570be826f1fe36323ed67471f327078b62e4667	2026-11-10T23:56:49Z
+active_deployment_status	SUCCESS	2026-11-10T23:56:49Z

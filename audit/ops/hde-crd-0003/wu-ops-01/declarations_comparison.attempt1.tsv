@@ -1,0 +1,8 @@
+declaration	source	text
+procfile_web	Procfile	/app/.venv/bin/python -m gunicorn 'adapter.factory:create_app()' --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
+service_cmd	validation/service_cmd.txt	python -m pip install --no-cache-dir -r requirements.txt && python -m gunicorn 'adapter.factory:create_app()' --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
+service_cmd_install	validation/service_cmd.txt (before " && ")	python -m pip install --no-cache-dir -r requirements.txt
+start_web	scripts/start_web.sh	(the script file; invoked as scripts/start_web.sh)
+build_class	comparison	NO_CUSTOM_COMMAND
+start_class	comparison	MATCHES_SERVICE_CMD
+deployment_class	comparison	CANDIDATE

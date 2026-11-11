@@ -1,0 +1,10 @@
+candidate_commit	3570be826f1fe36323ed67471f327078b62e4667
+checkout_head	3570be826f1fe36323ed67471f327078b62e4667
+origin_main	3570be826f1fe36323ed67471f327078b62e4667
+manifest_sha256	2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+manifest_version	1.3.0
+manifest_built_at_utc	2026-08-24T18:04:49Z
+manifest_members	45
+pinned_release_id	2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+pinned_equal	yes
+prior_action	NONE
