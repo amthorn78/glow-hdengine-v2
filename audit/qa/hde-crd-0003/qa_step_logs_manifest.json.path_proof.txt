@@ -1,5 +1,5 @@
 path: audit/qa/hde-crd-0003/qa_step_logs_manifest.json
-size_bytes: 1489
-sha256: 46f231ec0d7a0bd3673c726239591056d77598fbf963387da915fd76dcd85cbb
+size_bytes: 1669
+sha256: 1a3699b3738827b956c7e5cdf89d5eea760330cd74d7f625dc2dfffaf0584821
 mtime_utc: 2026-11-11T07:56:24Z
 produced_at_utc: 2026-09-22T14:25:29Z
