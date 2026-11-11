@@ -1,0 +1,32 @@
+HDE-CRD-0003 WU-OPS-01 run v1.0 mode=EXECUTION attempt=1 started_at=2026-11-10T23:56:48Z
+script_sha256=782ecaa0de535cc7423b5f1a11937575d3a05c10846730c5158ca0c3476e26aa
+candidate head=3570be826f1fe36323ed67471f327078b62e4667 origin_main=3570be826f1fe36323ed67471f327078b62e4667 manifest release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 version=1.3.0 built_at_utc=2026-08-24T18:04:49Z members=45
+PREFLIGHT: PASS
+Deployment facts: open Railway project ample-illumination, service glow-hdengine-v2, in the environment
+that serves https://glow-hdengine-v2-production.up.railway.app. Type what Railway shows, as text, on one line. Type NONE where Railway shows
+no custom value, NOT_OBSERVED where you cannot see it. Never type a variable value, token or URL credential.
+fact: deploy_trigger = repo amthorn78/glow-hdengine-v2, branch main; auto-deploy toggle not shown by Railway CLI, inferred on from three consecutive main-commit deployments with reason deploy
+fact: builder = RAILPACK
+fact: build_command = NONE
+fact: start_command = python -m pip install --no-cache-dir -r requirements.txt && python -m gunicorn 'adapter.factory:create_app()' --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
+fact: active_deployment_commit = 3570be826f1fe36323ed67471f327078b62e4667
+fact: active_deployment_status = SUCCESS
+comparison: build=NO_CUSTOM_COMMAND start=MATCHES_SERVICE_CMD deployment=CANDIDATE
+Binding presence: for each name, look at the variables of the same service and environment.
+Answer SET if a variable with exactly that name is listed, UNSET if it is not, NOT_OBSERVED if you
+cannot see the list. Do not reveal or type a value.
+presence: ALLOW_NETWORK is SET (gating=yes)
+presence: APP_ENV is SET (gating=yes)
+presence: DATABASE_URL is SET (gating=yes)
+presence: GEO_API_KEY is SET (gating=yes)
+presence: HD_API_BASE_URL is SET (gating=yes)
+presence: HD_API_KEY is SET (gating=yes)
+presence: LANG is SET (gating=yes)
+presence: LC_ALL is SET (gating=yes)
+presence: SAFE_MODE is SET (gating=yes)
+presence: TZ is SET (gating=yes)
+presence: HDAPI_BASE_URL is UNSET (gating=no)
+presence: ENGINE_ENV is UNSET (gating=no)
+read 1 at 2026-11-10T23:56:49Z: http_status=200 curl_exit=0 class=MATCH release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+RESULT: PASS (exit 0): candidate deployed and identified; all ten gating variables SET (environment validated)
+finished_at_utc=2026-11-10T23:56:49Z; checksum ledger follows as the last write
