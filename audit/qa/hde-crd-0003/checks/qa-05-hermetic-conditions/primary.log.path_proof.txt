@@ -1,5 +1,5 @@
 path: audit/qa/hde-crd-0003/checks/qa-05-hermetic-conditions/primary.log
-size_bytes: 92621
-sha256: 631990b1aefed350af5769044adaef28b41d30758ba2d0c8a8e8562ca196fe9e
+size_bytes: 76171
+sha256: a92037d88b428022ed3b0eeb5fe2b94def7a4fc0c4da950c6f04cabf8ab01612
 mtime_utc: 2026-11-11T09:38:07Z
 produced_at_utc: 2026-09-22T14:25:29Z
