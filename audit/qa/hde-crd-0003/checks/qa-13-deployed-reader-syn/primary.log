@@ -1,0 +1,252 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"prod","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"qa-13-deployed-reader-syn","check_name":"The production Reader scores SYN-A and SYN-B, v1 and v2, both orders","claimed_tokens":[],"command":[["curl","--version"],["python3","--version"],["bash","-c","command -v curl python3"],["python3","-I","-c","import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"],["bash","/tmp/hde-crd-0003-qa/presence.sh","HD_API_KEY","GEO_API_KEY","HD_API_BASE_URL","HDAPI_BASE_URL","DATABASE_URL"],["curl","--http1.1","-sS","-X","POST","-H","Content-Type: application/json; charset=utf-8","--data","{\"a_id\":\"9cff60ae-6eb6-5618-aec5-8acaa4f290d2\",\"b_id\":\"57f0c055-ff09-5fdb-aedb-def880437e6f\"}","-D","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/api/reader?v=1"],["curl","--http1.1","-sS","-X","POST","-H","Content-Type: application/json; charset=utf-8","--data","{\"a_id\":\"57f0c055-ff09-5fdb-aedb-def880437e6f\",\"b_id\":\"9cff60ae-6eb6-5618-aec5-8acaa4f290d2\"}","-D","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/api/reader?v=1"],["curl","--http1.1","-sS","-X","POST","-H","Content-Type: application/json; charset=utf-8","--data","{\"a_id\":\"9cff60ae-6eb6-5618-aec5-8acaa4f290d2\",\"b_id\":\"57f0c055-ff09-5fdb-aedb-def880437e6f\"}","-D","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/api/reader?v=2"],["curl","--http1.1","-sS","-X","POST","-H","Content-Type: application/json; charset=utf-8","--data","{\"a_id\":\"57f0c055-ff09-5fdb-aedb-def880437e6f\",\"b_id\":\"9cff60ae-6eb6-5618-aec5-8acaa4f290d2\"}","-D","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/api/reader?v=2"],["cat","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body"],["cat","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body"],["cat","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body"],["cat","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body"],["wc","-c","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body"],["sha256sum","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body"],["python3","-I","-c","import json,sys; [print(p.rsplit('/',1)[1], json.dumps({k:(v if k!='categories' else [{kk:vv for kk,vv in c.items()} for c in v]) for k,v in json.load(open(p)).items() if k in ('reader_version','eligible','release_id','categories')}, sort_keys=True)) for p in sys.argv[1:]]","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body","/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body"]],"command_provenance":"QA Plan v1.2 check qa-13; QA-90 task T08 attempt 1; normalizations: none","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-13-deployed-reader-syn/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide","PF05-Canon-HDE-CLI-API-Vendor-Ref"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-11T08:03:06Z"}
+=== CONTEXT ===
+check_id: qa-13-deployed-reader-syn
+check_name: The production Reader scores SYN-A and SYN-B, v1 and v2, both orders
+task: QA-90 task T08, attempt 1; QA Plan v1.2 CHECK 13 (criterion LT-2); dependency qa-11 PASS (published 2026-11-11T08:00:22Z)
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+environment_class: E-P (this workstation's shell, HTTPS egress to https://glow-hdengine-v2-production.up.railway.app; curl 8.18.0; no credential header sent); qa-11's protocol
+target: the Railway production service, base https://glow-hdengine-v2-production.up.railway.app; the production Reader POST /api/reader?v=1 and ?v=2
+inputs: the permanent production fixtures SYN-A 9cff60ae-6eb6-5618-aec5-8acaa4f290d2 and SYN-B 57f0c055-ff09-5fdb-aedb-def880437e6f (QA neither creates nor stores them); request bodies inline in the commands: AB {"a_id":"9cff60ae-6eb6-5618-aec5-8acaa4f290d2","b_id":"57f0c055-ff09-5fdb-aedb-def880437e6f"}, BA the same with a_id and b_id swapped
+rails: production binding recorded, LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod PYTHONDONTWRITEBYTECODE=1 (Plan §3.1); vendor and database names unset in this shell (readiness command 5)
+start_utc: 2026-11-11T08:02:02Z
+end_utc: 2026-11-11T08:02:06Z
+=== READINESS ===
+Plan v1.2 §7 common rule A for E-P: curl --version and python3 --version, then the rails names as set:
+--- command 1: ["curl", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:02Z; ended_utc: 2026-11-11T08:02:02Z; exit_code: 0
+stdout (579 bytes):
+curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+Release-Date: 2026-01-07, security patched: 8.18.0-1ubuntu2.8
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp ws wss
+Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
+stderr (0 bytes):
+(empty)
+--- command 2: ["python3", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:02Z; ended_utc: 2026-11-11T08:02:02Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 3: ["bash", "-c", "command -v curl python3"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:02Z; ended_utc: 2026-11-11T08:02:02Z; exit_code: 0
+stdout (52 bytes):
+/usr/bin/curl
+/tmp/hde-crd-0003-qa/venv/bin/python3
+stderr (0 bytes):
+(empty)
+--- command 4: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:02Z; ended_utc: 2026-11-11T08:02:03Z; exit_code: 0
+stdout (64 bytes):
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod
+stderr (0 bytes):
+(empty)
+--- command 5: ["bash", "/tmp/hde-crd-0003-qa/presence.sh", "HD_API_KEY", "GEO_API_KEY", "HD_API_BASE_URL", "HDAPI_BASE_URL", "DATABASE_URL"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:03Z; ended_utc: 2026-11-11T08:02:03Z; exit_code: 0
+stdout (98 bytes):
+HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET 
+stderr (0 bytes):
+(empty)
+=== COMMANDS ===
+--- command 6: ["curl", "--http1.1", "-sS", "-X", "POST", "-H", "Content-Type: application/json; charset=utf-8", "--data", "{\"a_id\":\"9cff60ae-6eb6-5618-aec5-8acaa4f290d2\",\"b_id\":\"57f0c055-ff09-5fdb-aedb-def880437e6f\"}", "-D", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/api/reader?v=1"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:03Z; ended_utc: 2026-11-11T08:02:03Z; exit_code: 0
+stdout (8 bytes):
+200 1.1
+stderr (0 bytes):
+(empty)
+--- command 7: ["curl", "--http1.1", "-sS", "-X", "POST", "-H", "Content-Type: application/json; charset=utf-8", "--data", "{\"a_id\":\"57f0c055-ff09-5fdb-aedb-def880437e6f\",\"b_id\":\"9cff60ae-6eb6-5618-aec5-8acaa4f290d2\"}", "-D", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/api/reader?v=1"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:03Z; ended_utc: 2026-11-11T08:02:04Z; exit_code: 0
+stdout (8 bytes):
+200 1.1
+stderr (0 bytes):
+(empty)
+--- command 8: ["curl", "--http1.1", "-sS", "-X", "POST", "-H", "Content-Type: application/json; charset=utf-8", "--data", "{\"a_id\":\"9cff60ae-6eb6-5618-aec5-8acaa4f290d2\",\"b_id\":\"57f0c055-ff09-5fdb-aedb-def880437e6f\"}", "-D", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/api/reader?v=2"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:04Z; ended_utc: 2026-11-11T08:02:04Z; exit_code: 0
+stdout (8 bytes):
+200 1.1
+stderr (0 bytes):
+(empty)
+--- command 9: ["curl", "--http1.1", "-sS", "-X", "POST", "-H", "Content-Type: application/json; charset=utf-8", "--data", "{\"a_id\":\"57f0c055-ff09-5fdb-aedb-def880437e6f\",\"b_id\":\"9cff60ae-6eb6-5618-aec5-8acaa4f290d2\"}", "-D", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/api/reader?v=2"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:04Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (8 bytes):
+200 1.1
+stderr (0 bytes):
+(empty)
+--- command 10: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (357 bytes):
+HTTP/1.1 200 OK
+Cache-Control: private, max-age=0, must-revalidate
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 08:02:03 GMT
+Server: railway-hikari
+vary: Authorization, Accept-Encoding
+x-railway-request-id: fyVpJ4vUS1iYZXgns_GTAg
+Content-Length: 330
+x-hikari-trace: jfk1.pqzh
+x-railway-edge: jfk1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 11: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (357 bytes):
+HTTP/1.1 200 OK
+Cache-Control: private, max-age=0, must-revalidate
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 08:02:04 GMT
+Server: railway-hikari
+vary: Authorization, Accept-Encoding
+x-railway-request-id: XrR3YRFXTvGSoKU2YqdHTg
+Content-Length: 330
+x-hikari-trace: jfk1.57w5
+x-railway-edge: jfk1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 12: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (357 bytes):
+HTTP/1.1 200 OK
+Cache-Control: private, max-age=0, must-revalidate
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 08:02:04 GMT
+Server: railway-hikari
+vary: Authorization, Accept-Encoding
+x-railway-request-id: F68fj0PtQM6z0IGpALIuDA
+Content-Length: 621
+x-hikari-trace: jfk1.aghq
+x-railway-edge: jfk1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 13: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (357 bytes):
+HTTP/1.1 200 OK
+Cache-Control: private, max-age=0, must-revalidate
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 08:02:05 GMT
+Server: railway-hikari
+vary: Authorization, Accept-Encoding
+x-railway-request-id: LefXUAiuSuy-ExxG8Hk9cQ
+Content-Length: 621
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 14: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (330 bytes):
+{"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,"idempotence_hash":"e006c1f0ff9f4843e7e8a4ee869fd7acc582300f870e1044361dd4e5a75954e6","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v1","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 15: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (330 bytes):
+{"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,"idempotence_hash":"e006c1f0ff9f4843e7e8a4ee869fd7acc582300f870e1044361dd4e5a75954e6","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v1","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 16: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (621 bytes):
+{"categories":[{"band":"Cool","id":"harmony"},{"band":"Cool","id":"heat"},{"band":"Cool","id":"communication"},{"band":"Open","id":"alignment"},{"band":"Cool","id":"comfort"},{"band":"Open","id":"consistency"},{"band":"Open","id":"expansion"},{"band":"Cool","id":"creativity"},{"band":"Open","id":"drive"},{"band":"Cool","id":"balance"}],"eligible":true,"idempotence_hash":"ff0b123906b4a94b69e56e2418ef34cbc543700f7e1b591a94f9fff9824471e6","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v2","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 17: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (621 bytes):
+{"categories":[{"band":"Cool","id":"harmony"},{"band":"Cool","id":"heat"},{"band":"Cool","id":"communication"},{"band":"Open","id":"alignment"},{"band":"Cool","id":"comfort"},{"band":"Open","id":"consistency"},{"band":"Open","id":"expansion"},{"band":"Cool","id":"creativity"},{"band":"Open","id":"drive"},{"band":"Cool","id":"balance"}],"eligible":true,"idempotence_hash":"ff0b123906b4a94b69e56e2418ef34cbc543700f7e1b591a94f9fff9824471e6","meta":{"engine_tag":"hdengine@prod","invocation_tag":"INV-f2ac55d77ce9aacc"},"reader_version":"v2","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+--- command 18: ["wc", "-c", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (295 bytes):
+ 330 /tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body
+ 330 /tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body
+ 621 /tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body
+ 621 /tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body
+1902 total
+stderr (0 bytes):
+(empty)
+--- command 19: ["sha256sum", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (528 bytes):
+081f0499577f21a8069681502288c328fe108878e10eaff224f7dcde40fa84a5  /tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body
+081f0499577f21a8069681502288c328fe108878e10eaff224f7dcde40fa84a5  /tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body
+9b0d9582d6ae5739ca20e3050c526356dd36e3dacec48119bc103083b834bf7f  /tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body
+9b0d9582d6ae5739ca20e3050c526356dd36e3dacec48119bc103083b834bf7f  /tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body
+stderr (0 bytes):
+(empty)
+--- command 20: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R2.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:05Z; ended_utc: 2026-11-11T08:02:05Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 21: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R4.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:06Z; ended_utc: 2026-11-11T08:02:06Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 22: ["python3", "-I", "-c", "import json,sys; [print(p.rsplit('/',1)[1], json.dumps({k:(v if k!='categories' else [{kk:vv for kk,vv in c.items()} for c in v]) for k,v in json.load(open(p)).items() if k in ('reader_version','eligible','release_id','categories')}, sort_keys=True)) for p in sys.argv[1:]]", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R1.body", "/tmp/hde-crd-0003-qa/checks/qa-13-deployed-reader-syn/cap/R3.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:02:06Z; ended_utc: 2026-11-11T08:02:06Z; exit_code: 0
+stdout (695 bytes):
+R1.body {"categories": [{"band": "Cool", "id": "harmony"}], "eligible": true, "reader_version": "v1", "release_id": "2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+R3.body {"categories": [{"band": "Cool", "id": "harmony"}, {"band": "Cool", "id": "heat"}, {"band": "Cool", "id": "communication"}, {"band": "Open", "id": "alignment"}, {"band": "Cool", "id": "comfort"}, {"band": "Open", "id": "consistency"}, {"band": "Open", "id": "expansion"}, {"band": "Cool", "id": "creativity"}, {"band": "Open", "id": "drive"}, {"band": "Cool", "id": "balance"}], "eligible": true, "reader_version": "v2", "release_id": "2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"}
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- R1 POST /api/reader?v=1 SYN AB: 200 with a JSON body; eligible true; reader_version v1; release_id 2d5a4ec485fd...; categories bands-only, every item exactly {id, band} with a string band (one item, id harmony); no numeric field in any category | observed: 200 1.1 (curl exit 0); Content-Type ['application/json; charset=utf-8']; JSON True; eligible True; reader_version v1; release_id 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129; 1 categories, exact {id, band} True, numeric field False | PASS
+- R2 POST /api/reader?v=1 SYN BA: 200 with a JSON body; eligible true; reader_version v1; release_id 2d5a4ec485fd...; categories bands-only, every item exactly {id, band} with a string band (one item, id harmony); no numeric field in any category | observed: 200 1.1 (curl exit 0); Content-Type ['application/json; charset=utf-8']; JSON True; eligible True; reader_version v1; release_id 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129; 1 categories, exact {id, band} True, numeric field False | PASS
+- R3 POST /api/reader?v=2 SYN AB: 200 with a JSON body; eligible true; reader_version v2; release_id 2d5a4ec485fd...; categories bands-only, every item exactly {id, band} with a string band (ten items); no numeric field in any category | observed: 200 1.1 (curl exit 0); Content-Type ['application/json; charset=utf-8']; JSON True; eligible True; reader_version v2; release_id 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129; 10 categories, exact {id, band} True, numeric field False | PASS
+- R4 POST /api/reader?v=2 SYN BA: 200 with a JSON body; eligible true; reader_version v2; release_id 2d5a4ec485fd...; categories bands-only, every item exactly {id, band} with a string band (ten items); no numeric field in any category | observed: 200 1.1 (curl exit 0); Content-Type ['application/json; charset=utf-8']; JSON True; eligible True; reader_version v2; release_id 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129; 10 categories, exact {id, band} True, numeric field False | PASS
+- R1 bytes equal R2 bytes (v1 AB = BA, cmp) | observed: exit 0, 0 bytes of output | PASS
+- R3 bytes equal R4 bytes (v2 AB = BA, cmp) | observed: exit 0, 0 bytes of output | PASS
+- four requests, each once | observed: 4 curl invocations | PASS
+- recorded for qa-14's observation (not a predicate): R1 v1 harmony band harmony=Cool; R3 v2 bands harmony=Cool; heat=Cool; communication=Cool; alignment=Open; comfort=Cool; consistency=Open; expansion=Open; creativity=Cool; drive=Open; balance=Cool
+- overall: every predicate met; status PASS
+=== NOTES ===
+- nonclaims: no live Reader expansion; no vendor call (the Reader has no vendor path, N-203); the SYN fixtures were read, not created or stored (Plan CHECK 13).
+- U-4: both SYN fixtures are present (no ERR_M10_PERSON_UNRESOLVED; all four answers 200 with eligible true).
+- normalizations: none. Execution forms, recorded as run: qa-11's protocol (curl --http1.1 -sS, no -L, no credential header, -D, -o, -w); POST with -H 'Content-Type: application/json; charset=utf-8' and --data <the body>; the Reader requires no content type (Audit §6.2).
+- the bands recorded for qa-14's observation: R1 (v1) harmony=Cool; R3 (v2) harmony=Cool, heat=Cool, communication=Cool, alignment=Open, comfort=Cool, consistency=Open, expansion=Open, creativity=Cool, drive=Open, balance=Cool (R2 and R4 are byte-identical to R1 and R3).
+- observation: the Reader answers carry Cache-Control: private, max-age=0, must-revalidate and vary: Authorization, Accept-Encoding; no predicate of CHECK 13 names a header.
+- LF normalization: the four captured header files use CRLF line ends, normalized to LF here (collection §4.6).
+- recording: each argv ran unchanged through the scratch recorder /tmp/hde-crd-0003-qa/qarun.py; the PREDICATES section was generated mechanically from the captured bytes by a scratch evaluator.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body before publication: NO_HIT in the check's shell; and NO_HIT in the venue's parent shell, which holds the vendor and database values (a stricter second scan; comparison only, no value printed).
+- LF normalization (collection §4.6): command 10 stdout: 12 line-end CR removed, 0 other CR shown as \r; command 11 stdout: 12 line-end CR removed, 0 other CR shown as \r; command 12 stdout: 12 line-end CR removed, 0 other CR shown as \r; command 13 stdout: 12 line-end CR removed, 0 other CR shown as \r

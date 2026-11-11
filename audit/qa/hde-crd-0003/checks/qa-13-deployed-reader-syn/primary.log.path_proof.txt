@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0003/checks/qa-13-deployed-reader-syn/primary.log
+size_bytes: 28876
+sha256: 6819e2a78751b9b0c6e7722b06cf6821a5e69e279ff8e30eb4d4cd51f726b552
+mtime_utc: 2026-11-11T08:03:07Z
+produced_at_utc: 2026-09-22T14:25:29Z
