@@ -1,0 +1,290 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-16-evidence-admission","check_name":"The real HDE-CRD-0003 publication validates, and existing families still validate","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","diff","--name-only","3570be826f1fe36323ed67471f327078b62e4667","HEAD","--",".",":!audit/ops/hde-crd-0003",":!audit/qa/hde-crd-0003",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*",":!docs/crd/",":!docs/ephemeral/",":!docs/graph/",":!docs/pfcanon/",":!docs/plans/",":!docs/prompt_ecosystem_management/",":!docs/qa/",":!docs/run/"],["python","--version"],["python","-c","import flask; print('flask', flask.__version__ if hasattr(flask, '__version__') else 'imported')"],["python","-c","import pathlib, json; from tools.qa.qa_harness import HarnessConfig, validate_crd_check_family as v; r=v(HarnessConfig(crd_id='HDE-CRD-0003', repo_root=pathlib.Path.cwd())); print('HDE-CRD-0003', len(r)); [print(k, r[k]['status'], r[k]['log_path']) for k in r]"],["python","-c","import pathlib, json; from tools.qa.qa_harness import HarnessConfig, validate_crd_check_family as v; r=v(HarnessConfig(crd_id='HDE-CRD-0002', repo_root=pathlib.Path.cwd())); print('HDE-CRD-0002', len(r)); [print(k, r[k]['status'], r[k]['log_path']) for k in r]"],["python","-c","import pathlib, json; from tools.qa.qa_harness import HarnessConfig, validate_crd_check_family as v; r=v(HarnessConfig(crd_id='HDE-CRD-0001', repo_root=pathlib.Path.cwd())); print('HDE-CRD-0001', len(r)); [print(k, r[k]['status'], r[k]['log_path']) for k in r]"],["python","tools/evidence/update_evidence_index.py","--check"],["python","tools/evidence/orientation_demo.py","--check"],["python","tools/evidence/validate_evidence_paths.py"],["python","ci/checks/check_mirror_schema.sh"],["python","tools/evidence/check_lf_endings.py"],["bash","ci/checks/check_final_lf.sh"],["bash","ci/checks/check_evidence_index_hash.sh"],["python3","-I","-c","import json,sys; s=open('docs/evidence/INDEX.json').read(); keys=['audit.qa.hde_crd_0003.qa_step_logs_manifest']+['audit.qa.hde_crd_0003.checks.'+i+'.primary.log' for i in sys.argv[1:]]; [print(k, 'PRESENT' if ('\"'+k+'\"') in s else 'ABSENT') for k in keys]","qa-01-preflight","qa-17-bound-ci-coverage","qa-05-hermetic-conditions","qa-06-prepush-snapshot-ci-selection","qa-07-admission-and-close-pack","qa-11-deployed-identity","qa-12-deployed-compat-not-found","qa-13-deployed-reader-syn","qa-14-live-compat-cli","qa-15-live-prod-override"],["python3","-I","-c","import json; m=json.load(open('audit/qa/hde-crd-0003/qa_step_logs_manifest.json')); [print(k, 'manifest', v['status'], 'primary_header', json.loads(open(v['log_path'],encoding='utf-8').readline())['status']) for k,v in m.items()]"],["git","diff","--stat","b687c813866befa5ee911a14b00ad21c1841e967","--",".",":!audit/ops/hde-crd-0003",":!audit/qa/hde-crd-0003",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*",":!docs/crd/",":!docs/ephemeral/",":!docs/graph/",":!docs/pfcanon/",":!docs/plans/",":!docs/prompt_ecosystem_management/",":!docs/qa/",":!docs/run/"],["git","status","--porcelain","--untracked-files=all","--",".",":!audit/ops/hde-crd-0003",":!audit/qa/hde-crd-0003",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*",":!docs/crd/",":!docs/ephemeral/",":!docs/graph/",":!docs/pfcanon/",":!docs/plans/",":!docs/prompt_ecosystem_management/",":!docs/qa/",":!docs/run/"],["git","cat-file","-e","b687c813866befa5ee911a14b00ad21c1841e967^{commit}"],["python","--version"],["python","-m","pytest","--version"],["python","-c","import engine; print(engine.__file__)"],["python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa16","tests/evidence/test_evidence_index_missing_state.py","--deselect","tests/evidence/test_evidence_index_missing_state.py::test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence"],["bash","-c","\nB=$1\npython -m pytest -q -rfE -p no:cacheprovider --basetemp=$B tests/evidence/test_evidence_index_missing_state.py::test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence > \"$B.out\" 2>&1; rc=$?\ncat \"$B.out\"\necho \"child_exit_code: $rc (expected 1)\"\nif grep -q \"assert not (repo / \\\"audit/qa/hde-crd-0003\\\").exists()\" \"$B.out\"; then echo \"PRECONDITION_ASSERTION_SEEN=yes\"; else echo \"PRECONDITION_ASSERTION_SEEN=no\"; fi\n[ \"$rc\" -eq 1 ] && grep -q \"assert not (repo / \\\"audit/qa/hde-crd-0003\\\").exists()\" \"$B.out\"\n","_","/tmp/hde-crd-0003-qa/bt/qa16b"]],"command_provenance":"QA Plan v1.2 check qa-16; QA-90 task T11 attempt 1; normalizations: N-1","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-16-evidence-admission/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide","PF14-Canon-HDE-Mechanics-Guide","PF12-Canon-HDE-Schemas-and-Artifacts"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-11T09:54:13Z"}
+=== CONTEXT ===
+check_id: qa-16-evidence-admission
+check_name: The real HDE-CRD-0003 publication validates, and existing families still validate
+task: QA-90 task T11, attempt 1; QA Plan v1.2 CHECK 16 (criterion S14-b); dependency: the ten earlier checks each published (any status), last at 2026-11-11T09:38Z
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+environment_class: E-E for step 1, the evidence checkout /tmp/hde-crd-0003-qa/evidence on branch qa/hde-crd-0003-evidence at 59cf13edc2b582492a504d350a18472bf01a3cd1 (T plus the ten committed check publications), with venv /tmp/hde-crd-0003-qa/venv-e (CI's install from the E-E root); for steps 2 and 3 a throwaway copy, cp -a of E-E to /tmp/hde-crd-0003-qa/evidence-copy, holding the published family, run with E-L's interpreter /tmp/hde-crd-0003-qa/venv/bin/python
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/tmp/hde-crd-0003-qa/state GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty (default rails)
+start_utc: 2026-11-11T09:39:50Z
+end_utc: 2026-11-11T09:53:43Z
+=== READINESS ===
+Plan v1.2 §7 common rule A for E-E (HEAD and the candidate guard, Python, flask), then CHECK 16's readiness for step 2's copy (code equal to T's with the guard's full exclusion set, T in history, Python, pytest, engine inside the copy):
+--- command 1: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:50Z; ended_utc: 2026-11-11T09:39:50Z; exit_code: 0
+stdout (41 bytes):
+59cf13edc2b582492a504d350a18472bf01a3cd1
+stderr (0 bytes):
+(empty)
+--- command 2: ["git", "diff", "--name-only", "3570be826f1fe36323ed67471f327078b62e4667", "HEAD", "--", ".", ":!audit/ops/hde-crd-0003", ":!audit/qa/hde-crd-0003", ":!docs/evidence/INDEX.*", ":!artifacts/evidence_index.jsonl*", ":!audit/gates/topology/orientation_demo.txt*", ":!docs/crd/", ":!docs/ephemeral/", ":!docs/graph/", ":!docs/pfcanon/", ":!docs/plans/", ":!docs/prompt_ecosystem_management/", ":!docs/qa/", ":!docs/run/"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:50Z; ended_utc: 2026-11-11T09:39:50Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 3: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:50Z; ended_utc: 2026-11-11T09:39:50Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 4: ["python", "-c", "import flask; print('flask', flask.__version__ if hasattr(flask, '__version__') else 'imported')"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:50Z; ended_utc: 2026-11-11T09:39:50Z; exit_code: 0
+stdout (12 bytes):
+flask 2.3.3
+stderr (0 bytes):
+(empty)
+--- command 5: ["git", "diff", "--stat", "b687c813866befa5ee911a14b00ad21c1841e967", "--", ".", ":!audit/ops/hde-crd-0003", ":!audit/qa/hde-crd-0003", ":!docs/evidence/INDEX.*", ":!artifacts/evidence_index.jsonl*", ":!audit/gates/topology/orientation_demo.txt*", ":!docs/crd/", ":!docs/ephemeral/", ":!docs/graph/", ":!docs/pfcanon/", ":!docs/plans/", ":!docs/prompt_ecosystem_management/", ":!docs/qa/", ":!docs/run/"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy
+started_utc: 2026-11-11T09:39:55Z; ended_utc: 2026-11-11T09:39:56Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 6: ["git", "status", "--porcelain", "--untracked-files=all", "--", ".", ":!audit/ops/hde-crd-0003", ":!audit/qa/hde-crd-0003", ":!docs/evidence/INDEX.*", ":!artifacts/evidence_index.jsonl*", ":!audit/gates/topology/orientation_demo.txt*", ":!docs/crd/", ":!docs/ephemeral/", ":!docs/graph/", ":!docs/pfcanon/", ":!docs/plans/", ":!docs/prompt_ecosystem_management/", ":!docs/qa/", ":!docs/run/"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy
+started_utc: 2026-11-11T09:39:56Z; ended_utc: 2026-11-11T09:39:56Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 7: ["git", "cat-file", "-e", "b687c813866befa5ee911a14b00ad21c1841e967^{commit}"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy
+started_utc: 2026-11-11T09:39:56Z; ended_utc: 2026-11-11T09:39:56Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 8: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy
+started_utc: 2026-11-11T09:39:56Z; ended_utc: 2026-11-11T09:39:56Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 9: ["python", "-m", "pytest", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy
+started_utc: 2026-11-11T09:39:56Z; ended_utc: 2026-11-11T09:39:56Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command 10: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy
+started_utc: 2026-11-11T09:39:56Z; ended_utc: 2026-11-11T09:39:57Z; exit_code: 0
+stdout (157 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy/engine/__init__.py
+stderr (0 bytes):
+(empty)
+=== COMMANDS ===
+--- command 11: ["python", "-c", "import pathlib, json; from tools.qa.qa_harness import HarnessConfig, validate_crd_check_family as v; r=v(HarnessConfig(crd_id='HDE-CRD-0003', repo_root=pathlib.Path.cwd())); print('HDE-CRD-0003', len(r)); [print(k, r[k]['status'], r[k]['log_path']) for k in r]"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:50Z; ended_utc: 2026-11-11T09:39:50Z; exit_code: 0
+stdout (1011 bytes):
+HDE-CRD-0003 10
+qa-01-preflight PASS audit/qa/hde-crd-0003/checks/qa-01-preflight/primary.log
+qa-05-hermetic-conditions TOOLING_BLOCKED audit/qa/hde-crd-0003/checks/qa-05-hermetic-conditions/primary.log
+qa-06-prepush-snapshot-ci-selection PASS audit/qa/hde-crd-0003/checks/qa-06-prepush-snapshot-ci-selection/primary.log
+qa-07-admission-and-close-pack PASS audit/qa/hde-crd-0003/checks/qa-07-admission-and-close-pack/primary.log
+qa-11-deployed-identity PASS audit/qa/hde-crd-0003/checks/qa-11-deployed-identity/primary.log
+qa-12-deployed-compat-not-found PASS audit/qa/hde-crd-0003/checks/qa-12-deployed-compat-not-found/primary.log
+qa-13-deployed-reader-syn PASS audit/qa/hde-crd-0003/checks/qa-13-deployed-reader-syn/primary.log
+qa-14-live-compat-cli PASS audit/qa/hde-crd-0003/checks/qa-14-live-compat-cli/primary.log
+qa-15-live-prod-override PASS audit/qa/hde-crd-0003/checks/qa-15-live-prod-override/primary.log
+qa-17-bound-ci-coverage PASS audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log
+stderr (0 bytes):
+(empty)
+--- command 12: ["python", "-c", "import pathlib, json; from tools.qa.qa_harness import HarnessConfig, validate_crd_check_family as v; r=v(HarnessConfig(crd_id='HDE-CRD-0002', repo_root=pathlib.Path.cwd())); print('HDE-CRD-0002', len(r)); [print(k, r[k]['status'], r[k]['log_path']) for k in r]"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:50Z; ended_utc: 2026-11-11T09:39:51Z; exit_code: 0
+stdout (1978 bytes):
+HDE-CRD-0002 21
+qa-01-preflight PASS audit/qa/hde-crd-0002/checks/qa-01-preflight/primary.log
+qa-02-ci-coverage PASS audit/qa/hde-crd-0002/checks/qa-02-ci-coverage/primary.log
+qa-03-attestation-debian PASS audit/qa/hde-crd-0002/checks/qa-03-attestation-debian/primary.log
+qa-04-showcompat-help PASS audit/qa/hde-crd-0002/checks/qa-04-showcompat-help/primary.log
+qa-05-aux-preview-band PASS audit/qa/hde-crd-0002/checks/qa-05-aux-preview-band/primary.log
+qa-06-dev-harness-retired PASS audit/qa/hde-crd-0002/checks/qa-06-dev-harness-retired/primary.log
+qa-07-dev-reader-gate PASS audit/qa/hde-crd-0002/checks/qa-07-dev-reader-gate/primary.log
+qa-08-release-evidence-tooling PASS audit/qa/hde-crd-0002/checks/qa-08-release-evidence-tooling/primary.log
+qa-09-override-matrix PASS audit/qa/hde-crd-0002/checks/qa-09-override-matrix/primary.log
+qa-10-endpoint-catalog PASS audit/qa/hde-crd-0002/checks/qa-10-endpoint-catalog/primary.log
+qa-11-template-and-documents PASS audit/qa/hde-crd-0002/checks/qa-11-template-and-documents/primary.log
+qa-12-security-review PASS audit/qa/hde-crd-0002/checks/qa-12-security-review/primary.log
+qa-13-prepush-check PASS audit/qa/hde-crd-0002/checks/qa-13-prepush-check/primary.log
+qa-14-close-pack-writer PASS audit/qa/hde-crd-0002/checks/qa-14-close-pack-writer/primary.log
+qa-15-s01-removal PASS audit/qa/hde-crd-0002/checks/qa-15-s01-removal/primary.log
+qa-16-deployed-identity PASS audit/qa/hde-crd-0002/checks/qa-16-deployed-identity/primary.log
+qa-17-deployed-not-found PASS audit/qa/hde-crd-0002/checks/qa-17-deployed-not-found/primary.log
+qa-18-deployed-dev-surfaces PASS audit/qa/hde-crd-0002/checks/qa-18-deployed-dev-surfaces/primary.log
+qa-19-deployed-reader-input PASS audit/qa/hde-crd-0002/checks/qa-19-deployed-reader-input/primary.log
+qa-20-live-vendor-override PASS audit/qa/hde-crd-0002/checks/qa-20-live-vendor-override/primary.log
+qa-21-evidence-admission PASS audit/qa/hde-crd-0002/checks/qa-21-evidence-admission/primary.log
+stderr (0 bytes):
+(empty)
+--- command 13: ["python", "-c", "import pathlib, json; from tools.qa.qa_harness import HarnessConfig, validate_crd_check_family as v; r=v(HarnessConfig(crd_id='HDE-CRD-0001', repo_root=pathlib.Path.cwd())); print('HDE-CRD-0001', len(r)); [print(k, r[k]['status'], r[k]['log_path']) for k in r]"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:51Z; ended_utc: 2026-11-11T09:39:51Z; exit_code: 0
+stdout (812 bytes):
+HDE-CRD-0001 10
+qa-01-setup PASS audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log
+qa-02-claims PASS audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log
+qa-03-crd-local PASS audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log
+qa-04-runner PASS audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log
+qa-05-epic-compat PASS audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log
+qa-06-publication PASS audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log
+qa-07-admission PASS audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log
+qa-08-recovery PASS audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log
+qa-09-docs-and-history PASS audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log
+qa-10-governed-evidence PASS audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log
+stderr (0 bytes):
+(empty)
+--- command 14: ["python", "tools/evidence/update_evidence_index.py", "--check"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:51Z; ended_utc: 2026-11-11T09:39:52Z; exit_code: 0
+stdout (78 bytes):
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+stderr (0 bytes):
+(empty)
+--- command 15: ["python", "tools/evidence/orientation_demo.py", "--check"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:52Z; ended_utc: 2026-11-11T09:39:53Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 16: ["python", "tools/evidence/validate_evidence_paths.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:53Z; ended_utc: 2026-11-11T09:39:53Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 17: ["python", "ci/checks/check_mirror_schema.sh"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:53Z; ended_utc: 2026-11-11T09:39:53Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 18: ["python", "tools/evidence/check_lf_endings.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:53Z; ended_utc: 2026-11-11T09:39:53Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 19: ["bash", "ci/checks/check_final_lf.sh"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:53Z; ended_utc: 2026-11-11T09:39:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 20: ["bash", "ci/checks/check_evidence_index_hash.sh"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:54Z; ended_utc: 2026-11-11T09:39:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 21: ["python3", "-I", "-c", "import json,sys; s=open('docs/evidence/INDEX.json').read(); keys=['audit.qa.hde_crd_0003.qa_step_logs_manifest']+['audit.qa.hde_crd_0003.checks.'+i+'.primary.log' for i in sys.argv[1:]]; [print(k, 'PRESENT' if ('\"'+k+'\"') in s else 'ABSENT') for k in keys]", "qa-01-preflight", "qa-17-bound-ci-coverage", "qa-05-hermetic-conditions", "qa-06-prepush-snapshot-ci-selection", "qa-07-admission-and-close-pack", "qa-11-deployed-identity", "qa-12-deployed-compat-not-found", "qa-13-deployed-reader-syn", "qa-14-live-compat-cli", "qa-15-live-prod-override"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:54Z; ended_utc: 2026-11-11T09:39:54Z; exit_code: 0
+stdout (804 bytes):
+audit.qa.hde_crd_0003.qa_step_logs_manifest PRESENT
+audit.qa.hde_crd_0003.checks.qa-01-preflight.primary.log PRESENT
+audit.qa.hde_crd_0003.checks.qa-17-bound-ci-coverage.primary.log PRESENT
+audit.qa.hde_crd_0003.checks.qa-05-hermetic-conditions.primary.log PRESENT
+audit.qa.hde_crd_0003.checks.qa-06-prepush-snapshot-ci-selection.primary.log PRESENT
+audit.qa.hde_crd_0003.checks.qa-07-admission-and-close-pack.primary.log PRESENT
+audit.qa.hde_crd_0003.checks.qa-11-deployed-identity.primary.log PRESENT
+audit.qa.hde_crd_0003.checks.qa-12-deployed-compat-not-found.primary.log PRESENT
+audit.qa.hde_crd_0003.checks.qa-13-deployed-reader-syn.primary.log PRESENT
+audit.qa.hde_crd_0003.checks.qa-14-live-compat-cli.primary.log PRESENT
+audit.qa.hde_crd_0003.checks.qa-15-live-prod-override.primary.log PRESENT
+stderr (0 bytes):
+(empty)
+--- command 22: ["python3", "-I", "-c", "import json; m=json.load(open('audit/qa/hde-crd-0003/qa_step_logs_manifest.json')); [print(k, 'manifest', v['status'], 'primary_header', json.loads(open(v['log_path'],encoding='utf-8').readline())['status']) for k,v in m.items()]"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence
+started_utc: 2026-11-11T09:39:54Z; ended_utc: 2026-11-11T09:39:54Z; exit_code: 0
+stdout (624 bytes):
+qa-01-preflight manifest PASS primary_header PASS
+qa-05-hermetic-conditions manifest TOOLING_BLOCKED primary_header TOOLING_BLOCKED
+qa-06-prepush-snapshot-ci-selection manifest PASS primary_header PASS
+qa-07-admission-and-close-pack manifest PASS primary_header PASS
+qa-11-deployed-identity manifest PASS primary_header PASS
+qa-12-deployed-compat-not-found manifest PASS primary_header PASS
+qa-13-deployed-reader-syn manifest PASS primary_header PASS
+qa-14-live-compat-cli manifest PASS primary_header PASS
+qa-15-live-prod-override manifest PASS primary_header PASS
+qa-17-bound-ci-coverage manifest PASS primary_header PASS
+stderr (0 bytes):
+(empty)
+--- command 23: ["python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa16", "tests/evidence/test_evidence_index_missing_state.py", "--deselect", "tests/evidence/test_evidence_index_missing_state.py::test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy
+started_utc: 2026-11-11T09:39:57Z; ended_utc: 2026-11-11T09:53:41Z; exit_code: 0
+stdout (205 bytes):
+........................................................................ [ 97%]
+..                                                                       [100%]
+74 passed, 1 deselected in 824.15s (0:13:44)
+stderr (0 bytes):
+(empty)
+--- command 24: ["bash", "-c", "\nB=$1\npython -m pytest -q -rfE -p no:cacheprovider --basetemp=$B tests/evidence/test_evidence_index_missing_state.py::test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence > \"$B.out\" 2>&1; rc=$?\ncat \"$B.out\"\necho \"child_exit_code: $rc (expected 1)\"\nif grep -q \"assert not (repo / \\\"audit/qa/hde-crd-0003\\\").exists()\" \"$B.out\"; then echo \"PRECONDITION_ASSERTION_SEEN=yes\"; else echo \"PRECONDITION_ASSERTION_SEEN=no\"; fi\n[ \"$rc\" -eq 1 ] && grep -q \"assert not (repo / \\\"audit/qa/hde-crd-0003\\\").exists()\" \"$B.out\"\n", "_", "/tmp/hde-crd-0003-qa/bt/qa16b"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy
+started_utc: 2026-11-11T09:53:41Z; ended_utc: 2026-11-11T09:53:43Z; exit_code: 0
+stdout (1321 bytes):
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence _____
+
+tmp_path = PosixPath('/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/bt/qa16b/test_s14_the_updater_publishes0')
+
+    def test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence(tmp_path: Path) -> None:
+        repo = _copy_repo(tmp_path)
+>       assert not (repo / "audit/qa/hde-crd-0003").exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = (PosixPath('/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/bt/qa16b/test_s14_the_updater_publishes0/repo') / 'audit/qa/hde-crd-0003').exists
+
+tests/evidence/test_evidence_index_missing_state.py:1636: AssertionError
+=========================== short test summary info ============================
+FAILED tests/evidence/test_evidence_index_missing_state.py::test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence
+1 failed in 0.93s
+child_exit_code: 1 (expected 1)
+PRECONDITION_ASSERTION_SEEN=yes
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- E-E readiness (Plan §7 common rule A): HEAD recorded and passing the candidate guard (git diff --name-only 3570be82 HEAD with the full exclusion set prints nothing); Python 3.12.x; flask imports | observed: HEAD 59cf13edc2b582492a504d350a18472bf01a3cd1; guard exit 0, 0 bytes; Python 3.12.15; flask 2.3.3 (exit 0) | PASS
+- step 1: validate_crd_check_family(HDE-CRD-0003) validates with exactly the ten earlier check IDs | observed: exit 0; 10 checks: ['qa-01-preflight', 'qa-05-hermetic-conditions', 'qa-06-prepush-snapshot-ci-selection', 'qa-07-admission-and-close-pack', 'qa-11-deployed-identity', 'qa-12-deployed-compat-not-found', 'qa-13-deployed-reader-syn', 'qa-14-live-compat-cli', 'qa-15-live-prod-override', 'qa-17-bound-ci-coverage'] | PASS
+- step 1: each manifest status equals its primary's header status | observed: qa-01-preflight PASS/PASS; qa-05-hermetic-conditions TOOLING_BLOCKED/TOOLING_BLOCKED; qa-06-prepush-snapshot-ci-selection PASS/PASS; qa-07-admission-and-close-pack PASS/PASS; qa-11-deployed-identity PASS/PASS; qa-12-deployed-compat-not-found PASS/PASS; qa-13-deployed-reader-syn PASS/PASS; qa-14-live-compat-cli PASS/PASS; qa-15-live-prod-override PASS/PASS; qa-17-bound-ci-coverage PASS/PASS | PASS
+- step 1: HDE-CRD-0002 validates with its 21 checks and HDE-CRD-0001 with its 10 | observed: HDE-CRD-0002 exit 0, 21 checks; HDE-CRD-0001 exit 0, 10 checks | PASS
+- step 1: the seven command-line validators exit 0 | observed: tools/evidence/update_evidence_index.py --check exit 0; tools/evidence/orientation_demo.py --check exit 0; tools/evidence/validate_evidence_paths.py exit 0; ci/checks/check_mirror_schema.sh exit 0; tools/evidence/check_lf_endings.py exit 0; ci/checks/check_final_lf.sh exit 0; ci/checks/check_evidence_index_hash.sh exit 0 | PASS
+- step 1: all eleven Index keys are present (audit.qa.hde_crd_0003.qa_step_logs_manifest and audit.qa.hde_crd_0003.checks.<id>.primary.log for the ten earlier IDs) | observed: 11 PRESENT, 0 ABSENT | PASS
+- copy readiness (i): its code equals T's (git diff --stat T and git status --porcelain --untracked-files=all, each with the guard's full exclusion set, print nothing); T is in its history | observed: diff --stat exit 0, 0 bytes; status exit 0, 0 bytes; cat-file -e T exit 0 | PASS
+- copy readiness (ii): Python 3.12.x, pytest, and engine resolving inside the copy | observed: Python 3.12.15; pytest 8.4.2; engine /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/evidence-copy/engine/__init__.py | PASS
+- step 2: common rule C on tests/evidence/test_evidence_index_missing_state.py with the one --deselect: all pass, 74 selected of 75 collected | observed: exit 0; final line '74 passed, 1 deselected in 824.15s (0:13:44)'; non-pass listed none | PASS
+- step 3: that one test alone, as one asserting bash -c expecting exit 1, fails exactly at its precondition assertion assert not (repo / "audit/qa/hde-crd-0003").exists() (QA50-F21's signature; not an S14 behaviour result) | observed: asserting bash -c exit 0; child_exit_code: 1 (expected 1); PRECONDITION_ASSERTION_SEEN=yes; ['FAILED tests/evidence/test_evidence_index_missing_state.py::test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence'] | PASS
+- criterion: S14-b = step 1 (the real HDE-CRD-0003 publication validates with the ten earlier checks, and the existing HDE-CRD-0002 and HDE-CRD-0001 families still validate) and step 2 (the admission and family tests with the real root present)
+- overall: every predicate met; status PASS
+=== NOTES ===
+- normalizations: N-1 (step 2 ran as python -m pytest -q -rfEsx -p no:cacheprovider --basetemp=<fresh dir> with the one --deselect). Step 3 uses -q -rfE and its own fresh --basetemp inside the asserting bash -c, which prints the child's output, its exit status and whether the precondition assertion appears in it.
+- step 3 records QA50-F21's signature with the real root present. It is not an S14 behaviour result: the deselected test's own precondition is the absence of audit/qa/hde-crd-0003, and the evidence lanes of push runs 42863370974 and 42929167494 ran it under that precondition (Plan CHECK 16). The evidence pull request's hosted evidence lane is expected to fail on this one test (Plan §5.6; collection §4.8); QA neither edits nor deselects it in CI, and its route is the Product Owner's before that pull request merges.
+- step 2 took 824.15 s on this 2-CPU venue.
+- this primary does not claim the graph that includes itself (HDE Mechanics Guide §1.6.3): after it is published, the final receipt (Plan §5.6) re-runs the validators and validate_crd_check_family over all eleven checks, recorded in the QA-100 result.
+- nonclaims: the evidence pull request's hosted result is read by QA-110; HDE-CRD-0003's close-run family is the close stage's (Plan CHECK 16).
+- recording: each argv ran unchanged through the scratch recorder /tmp/hde-crd-0003-qa/qarun.py; the PREDICATES section was generated mechanically from this check's transcript by a scratch evaluator.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body before publication: NO_HIT in the check's shell; and NO_HIT in the venue's parent shell, which holds the vendor and database values (a stricter second scan; comparison only, no value printed).
+- LF normalization (collection §4.6): no CR byte in any capture
