@@ -1,0 +1,136 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-06-prepush-snapshot-ci-selection","check_name":"Test clones leave the checkout's objects alone","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","rev-parse","--is-shallow-repository"],["git","status","--porcelain"],["python","--version"],["python","-m","pytest","--version"],["python","-c","import engine; print(engine.__file__)"],["bash","/tmp/hde-crd-0003-qa/presence.sh","HD_API_KEY","GEO_API_KEY","HD_API_BASE_URL","HDAPI_BASE_URL","DATABASE_URL","GH_TOKEN","GITHUB_TOKEN","HDE_VENDOR_OVERRIDE_AUDIT_PATH","ENGINE_ENV"],["bash","-c","find .git/objects -printf '%m %i %s %T@ %C@ %p\\n' | sort -k6 > /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/before.txt"],["bash","-c","wc -l < /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/before.txt; sha256sum < /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/before.txt"],["python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa06","tests/tools/test_prepush_check.py"],["bash","-c","find .git/objects -printf '%m %i %s %T@ %C@ %p\\n' | sort -k6 > /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/after.txt"],["bash","-c","wc -l < /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/after.txt; sha256sum < /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/after.txt"],["diff","/tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/before.txt","/tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/after.txt"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.2 check qa-06; QA-90 task T04 attempt 1; normalizations: N-1; find -printf %T@ and %C@ as the mtime_ns and ctime_ns equivalent (collection T04 note)","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-06-prepush-snapshot-ci-selection/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-11T09:38:35Z"}
+=== CONTEXT ===
+check_id: qa-06-prepush-snapshot-ci-selection
+check_name: Test clones leave the checkout's objects alone
+task: QA-90 task T04, attempt 1; QA Plan v1.2 CHECK 6 (criterion S07-b); dependency qa-01 PASS (published 2026-11-11T07:56:23Z)
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+environment_class: E-L; clone /tmp/hde-crd-0003-qa/clone (full history, detached at T); venv /tmp/hde-crd-0003-qa/venv with CI's install
+interpreter: /tmp/hde-crd-0003-qa/venv/bin/python (Python 3.12.15)
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/tmp/hde-crd-0003-qa/state GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty (default rails)
+start_utc: 2026-11-11T09:35:44Z
+end_utc: 2026-11-11T09:36:28Z
+=== READINESS ===
+Plan v1.2 §7 common rule A for E-L:
+--- command 1: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:44Z; ended_utc: 2026-11-11T09:35:44Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- command 2: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:44Z; ended_utc: 2026-11-11T09:35:44Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command 3: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:44Z; ended_utc: 2026-11-11T09:35:44Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 4: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:44Z; ended_utc: 2026-11-11T09:35:44Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 5: ["python", "-m", "pytest", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:44Z; ended_utc: 2026-11-11T09:35:45Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command 6: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:45Z; ended_utc: 2026-11-11T09:35:45Z; exit_code: 0
+stdout (149 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py
+stderr (0 bytes):
+(empty)
+--- command 7: ["bash", "/tmp/hde-crd-0003-qa/presence.sh", "HD_API_KEY", "GEO_API_KEY", "HD_API_BASE_URL", "HDAPI_BASE_URL", "DATABASE_URL", "GH_TOKEN", "GITHUB_TOKEN", "HDE_VENDOR_OVERRIDE_AUDIT_PATH", "ENGINE_ENV"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:45Z; ended_utc: 2026-11-11T09:35:45Z; exit_code: 0
+stdout (186 bytes):
+HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET 
+stderr (0 bytes):
+(empty)
+=== COMMANDS ===
+--- command 8: ["bash", "-c", "find .git/objects -printf '%m %i %s %T@ %C@ %p\\n' | sort -k6 > /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/before.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:45Z; ended_utc: 2026-11-11T09:35:45Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 9: ["bash", "-c", "wc -l < /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/before.txt; sha256sum < /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/before.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:45Z; ended_utc: 2026-11-11T09:35:45Z; exit_code: 0
+stdout (70 bytes):
+6
+b2e2d5afa021fc245aa41889b6d56234601f68b453c7c48942e613bef0e860e3  -
+stderr (0 bytes):
+(empty)
+--- command 10: ["python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa06", "tests/tools/test_prepush_check.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:35:45Z; ended_utc: 2026-11-11T09:36:28Z; exit_code: 0
+stdout (100 bytes):
+...............................................................          [100%]
+63 passed in 42.43s
+stderr (0 bytes):
+(empty)
+--- command 11: ["bash", "-c", "find .git/objects -printf '%m %i %s %T@ %C@ %p\\n' | sort -k6 > /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/after.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:36:28Z; ended_utc: 2026-11-11T09:36:28Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 12: ["bash", "-c", "wc -l < /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/after.txt; sha256sum < /tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/after.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:36:28Z; ended_utc: 2026-11-11T09:36:28Z; exit_code: 0
+stdout (70 bytes):
+6
+b2e2d5afa021fc245aa41889b6d56234601f68b453c7c48942e613bef0e860e3  -
+stderr (0 bytes):
+(empty)
+--- command 13: ["diff", "/tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/before.txt", "/tmp/hde-crd-0003-qa/checks/qa-06-prepush-snapshot-ci-selection/after.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:36:28Z; ended_utc: 2026-11-11T09:36:28Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 14: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:36:28Z; ended_utc: 2026-11-11T09:36:28Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness (Plan §7 common rule A, E-L) | observed: b687c813866befa5ee911a14b00ad21c1841e967; shallow false; status 0 bytes; Python 3.12.15; pytest 8.4.2; engine in clone True; presence all UNSET True | PASS
+- the (mode, inode, size, mtime, ctime) record of every entry under .git/objects/ is taken before and after | observed: 2 records, exits [0, 0]; before: 6 entries, sha256 b2e2d5afa021fc245aa41889b6d56234601f68b453c7c48942e613bef0e860e3; after: 6 entries, sha256 b2e2d5afa021fc245aa41889b6d56234601f68b453c7c48942e613bef0e860e3 | PASS
+- step 1: common rule C on tests/tools/test_prepush_check.py all pass (63 collected; zero skips, zero xfail) | observed: exit 0; final line '63 passed in 42.43s'; non-pass listed none | PASS
+- S07-b: zero object entries changed (diff of the before and after records prints nothing; access time is not compared) | observed: diff exit 0, 0 bytes | PASS
+- git status --porcelain empty | observed: exit 0, 0 bytes | PASS
+- overall: every predicate met; status PASS
+=== NOTES ===
+- normalizations: N-1 (the module ran as python -m pytest -q -rfEsx -p no:cacheprovider --basetemp=<fresh dir>). Form normalization recorded by the collection (T04 note): find -printf '%T@' and '%C@' give fractional-second modification and change times, the equivalent of mtime_ns and ctime_ns for the comparison; access time is not compared (Plan CHECK 6).
+- the record lists every entry under the clone's .git/objects/ with mode, inode, size, mtime and ctime, sorted by path. The fresh clone's objects are packed, so the record has 6 entries; the before and after records are byte-identical (SHA-256 b2e2d5afa021fc245aa41889b6d56234601f68b453c7c48942e613bef0e860e3), and diff prints nothing.
+- the before and after record files are scratch, outside every repository; this body carries their line counts, digests and the diff result.
+- recording: each argv ran unchanged through the scratch recorder /tmp/hde-crd-0003-qa/qarun.py; the PREDICATES section was generated mechanically from this check's transcript by a scratch evaluator.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body before publication: NO_HIT in the check's shell; and NO_HIT in the venue's parent shell, which holds the vendor and database values (a stricter second scan; comparison only, no value printed).
+- LF normalization (collection §4.6): no CR byte in any capture
