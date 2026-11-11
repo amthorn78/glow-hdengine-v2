@@ -1,0 +1,247 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"prod","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"qa-12-deployed-compat-not-found","check_name":"The compat namespace answers the governed 404 in production","claimed_tokens":[],"command":[["curl","--version"],["python3","--version"],["bash","-c","command -v curl python3"],["python3","-I","-c","import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"],["bash","/tmp/hde-crd-0003-qa/presence.sh","HD_API_KEY","GEO_API_KEY","HD_API_BASE_URL","HDAPI_BASE_URL","DATABASE_URL"],["curl","--http1.1","-sS","-D","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/api/compat/v1"],["curl","--http1.1","-sS","-I","-D","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r2.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r2.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/api/compat/v1"],["curl","--http1.1","-sS","-X","POST","-H","Content-Type: application/json","--data","{}","-D","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/api/compat/v1"],["curl","--http1.1","-sS","-X","OPTIONS","-D","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/api/compat/v1"],["curl","--http1.1","-sS","-D","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.headers","-o","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body","-w","%{http_code} %{http_version}\\n","https://glow-hdengine-v2-production.up.railway.app/api/compat/v1/qa-hde-crd-0003"],["cat","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r2.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.headers"],["cat","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body"],["cat","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body"],["cat","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body"],["cat","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body"],["wc","-c","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r2.body","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body"],["sha256sum","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body","/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body"]],"command_provenance":"QA Plan v1.2 check qa-12; QA-90 task T07 attempt 1; normalizations: none","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-12-deployed-compat-not-found/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref","PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-11T08:01:18Z"}
+=== CONTEXT ===
+check_id: qa-12-deployed-compat-not-found
+check_name: The compat namespace answers the governed 404 in production
+task: QA-90 task T07, attempt 1; QA Plan v1.2 CHECK 12 (criterion S03-b); dependency qa-11 PASS (published 2026-11-11T08:00:22Z)
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+environment_class: E-P (this workstation's shell, HTTPS egress to https://glow-hdengine-v2-production.up.railway.app; curl 8.18.0; no credential header sent); qa-11's protocol
+target: the Railway production service, base https://glow-hdengine-v2-production.up.railway.app
+rails: production binding recorded, LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod PYTHONDONTWRITEBYTECODE=1 (Plan §3.1); vendor and database names unset in this shell (readiness command 5)
+start_utc: 2026-11-11T08:00:50Z
+end_utc: 2026-11-11T08:00:52Z
+=== READINESS ===
+Plan v1.2 §7 common rule A for E-P: curl --version and python3 --version, then the rails names as set:
+--- command 1: ["curl", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:50Z; ended_utc: 2026-11-11T08:00:50Z; exit_code: 0
+stdout (579 bytes):
+curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+Release-Date: 2026-01-07, security patched: 8.18.0-1ubuntu2.8
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp ws wss
+Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
+stderr (0 bytes):
+(empty)
+--- command 2: ["python3", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:50Z; ended_utc: 2026-11-11T08:00:50Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 3: ["bash", "-c", "command -v curl python3"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:50Z; ended_utc: 2026-11-11T08:00:50Z; exit_code: 0
+stdout (52 bytes):
+/usr/bin/curl
+/tmp/hde-crd-0003-qa/venv/bin/python3
+stderr (0 bytes):
+(empty)
+--- command 4: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:50Z; ended_utc: 2026-11-11T08:00:51Z; exit_code: 0
+stdout (64 bytes):
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod
+stderr (0 bytes):
+(empty)
+--- command 5: ["bash", "/tmp/hde-crd-0003-qa/presence.sh", "HD_API_KEY", "GEO_API_KEY", "HD_API_BASE_URL", "HDAPI_BASE_URL", "DATABASE_URL"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:51Z; ended_utc: 2026-11-11T08:00:51Z; exit_code: 0
+stdout (98 bytes):
+HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET 
+stderr (0 bytes):
+(empty)
+=== COMMANDS ===
+--- command 6: ["curl", "--http1.1", "-sS", "-D", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/api/compat/v1"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:51Z; ended_utc: 2026-11-11T08:00:51Z; exit_code: 0
+stdout (8 bytes):
+404 1.1
+stderr (0 bytes):
+(empty)
+--- command 7: ["curl", "--http1.1", "-sS", "-I", "-D", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r2.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r2.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/api/compat/v1"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:51Z; ended_utc: 2026-11-11T08:00:51Z; exit_code: 0
+stdout (8 bytes):
+404 1.1
+stderr (0 bytes):
+(empty)
+--- command 8: ["curl", "--http1.1", "-sS", "-X", "POST", "-H", "Content-Type: application/json", "--data", "{}", "-D", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/api/compat/v1"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:51Z; ended_utc: 2026-11-11T08:00:51Z; exit_code: 0
+stdout (8 bytes):
+404 1.1
+stderr (0 bytes):
+(empty)
+--- command 9: ["curl", "--http1.1", "-sS", "-X", "OPTIONS", "-D", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/api/compat/v1"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:51Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (8 bytes):
+404 1.1
+stderr (0 bytes):
+(empty)
+--- command 10: ["curl", "--http1.1", "-sS", "-D", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.headers", "-o", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body", "-w", "%{http_code} %{http_version}\\n", "https://glow-hdengine-v2-production.up.railway.app/api/compat/v1/qa-hde-crd-0003"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (8 bytes):
+404 1.1
+stderr (0 bytes):
+(empty)
+--- command 11: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (298 bytes):
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 08:00:51 GMT
+Server: railway-hikari
+x-railway-request-id: 5LlnEYRQQt24TV5m2JZdWA
+Content-Length: 70
+x-hikari-trace: yul1.12cz
+x-railway-edge: yul1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 12: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r2.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (298 bytes):
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 08:00:51 GMT
+Server: railway-hikari
+x-railway-request-id: DI5B63A-QgiEGjTp21mRUA
+Content-Length: 70
+x-hikari-trace: yul1.dxc5
+x-railway-edge: yul1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 13: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (298 bytes):
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 08:00:51 GMT
+Server: railway-hikari
+x-railway-request-id: 7XOCds9GQaqiP_GsnTga3g
+Content-Length: 70
+x-hikari-trace: jfk1.48ys
+x-railway-edge: jfk1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 14: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (298 bytes):
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 08:00:52 GMT
+Server: railway-hikari
+x-railway-request-id: 67YzJUfgQty4skJkvEOTxA
+Content-Length: 70
+x-hikari-trace: jfk1.48ys
+x-railway-edge: jfk1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 15: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.headers"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (298 bytes):
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Date: Wed, 11 Nov 2026 08:00:52 GMT
+Server: railway-hikari
+x-railway-request-id: ZlK9dGoaTguLPVKZnbOCzg
+Content-Length: 70
+x-hikari-trace: jfk1.cv40
+x-railway-edge: jfk1
+Connection: keep-alive
+
+stderr (0 bytes):
+(empty)
+--- command 16: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (70 bytes):
+{"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"}
+stderr (0 bytes):
+(empty)
+--- command 17: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (70 bytes):
+{"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"}
+stderr (0 bytes):
+(empty)
+--- command 18: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (70 bytes):
+{"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"}
+stderr (0 bytes):
+(empty)
+--- command 19: ["cat", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (70 bytes):
+{"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"}
+stderr (0 bytes):
+(empty)
+--- command 20: ["wc", "-c", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r2.body", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (390 bytes):
+ 70 /tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body
+298 /tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r2.body
+ 70 /tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body
+ 70 /tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body
+ 70 /tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body
+578 total
+stderr (0 bytes):
+(empty)
+--- command 21: ["sha256sum", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body", "/tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:00:52Z; ended_utc: 2026-11-11T08:00:52Z; exit_code: 0
+stdout (552 bytes):
+80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629  /tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r1.body
+80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629  /tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r3.body
+80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629  /tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r4.body
+80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629  /tmp/hde-crd-0003-qa/checks/qa-12-deployed-compat-not-found/cap/r5.body
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- request 1, GET /api/compat/v1: 404, Content-Type application/json; charset=utf-8, Cache-Control no-store, no ETag, body exactly {"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"} plus one LF; not text/html, 403 or 2xx | observed: 404 1.1 (curl exit 0); 'HTTP/1.1 404 Not Found'; Content-Type ['application/json; charset=utf-8']; Cache-Control ['no-store']; ETag absent; body 70 bytes, exactly the governed ERR_NOT_FOUND body plus one LF | PASS
+- request 2, HEAD /api/compat/v1: 404, Content-Type application/json; charset=utf-8, Cache-Control no-store, no ETag; not text/html, 403 or 2xx | observed: 404 1.1 (curl exit 0); 'HTTP/1.1 404 Not Found'; Content-Type ['application/json; charset=utf-8']; Cache-Control ['no-store']; ETag absent; HEAD body not observable with curl -I (limit recorded) | PASS
+- request 3, POST /api/compat/v1 (body {}, Content-Type: application/json): 404, Content-Type application/json; charset=utf-8, Cache-Control no-store, no ETag, body exactly {"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"} plus one LF; not text/html, 403 or 2xx | observed: 404 1.1 (curl exit 0); 'HTTP/1.1 404 Not Found'; Content-Type ['application/json; charset=utf-8']; Cache-Control ['no-store']; ETag absent; body 70 bytes, exactly the governed ERR_NOT_FOUND body plus one LF | PASS
+- request 4, OPTIONS /api/compat/v1: 404, Content-Type application/json; charset=utf-8, Cache-Control no-store, no ETag, body exactly {"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"} plus one LF; not text/html, 403 or 2xx | observed: 404 1.1 (curl exit 0); 'HTTP/1.1 404 Not Found'; Content-Type ['application/json; charset=utf-8']; Cache-Control ['no-store']; ETag absent; body 70 bytes, exactly the governed ERR_NOT_FOUND body plus one LF | PASS
+- request 5, GET /api/compat/v1/qa-hde-crd-0003: 404, Content-Type application/json; charset=utf-8, Cache-Control no-store, no ETag, body exactly {"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"} plus one LF; not text/html, 403 or 2xx | observed: 404 1.1 (curl exit 0); 'HTTP/1.1 404 Not Found'; Content-Type ['application/json; charset=utf-8']; Cache-Control ['no-store']; ETag absent; body 70 bytes, exactly the governed ERR_NOT_FOUND body plus one LF | PASS
+- five requests, each once | observed: 5 curl invocations | PASS
+- overall: every predicate met; status PASS
+=== NOTES ===
+- nonclaims: step 2 of the compat gate (the 403 gate) is not observable in production, because step 1 answers first; its proof is S03-a, bound through the binding check qa-17 (Plan CHECK 12).
+- normalizations: none. Execution forms, recorded as run: qa-11's protocol (curl --http1.1 -sS, no -L, no credential header, -D, -o, -w); POST sends --data '{}' with -H 'Content-Type: application/json'; OPTIONS uses -X OPTIONS.
+- request 2 (HEAD, curl -I): curl writes the response headers to its -o file, so r2.body (298 bytes) holds the header block, not a response body; HEAD's body is not observable with curl -I (limit recorded).
+- observation: the four bodies read are byte-identical (one SHA-256, 80c608ed33e9592b3e268e6ab8f66dd4444df3328ad379edae087530c77f6629, command 21 of this body).
+- LF normalization: the five captured header files use CRLF line ends, normalized to LF here (collection §4.6).
+- recording: each argv ran unchanged through the scratch recorder /tmp/hde-crd-0003-qa/qarun.py; the PREDICATES section was generated mechanically from the captured bytes by a scratch evaluator.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body before publication: NO_HIT in the check's shell; and NO_HIT in the venue's parent shell, which holds the vendor and database values (a stricter second scan; comparison only, no value printed).
+- LF normalization (collection §4.6): command 11 stdout: 11 line-end CR removed, 0 other CR shown as \r; command 12 stdout: 11 line-end CR removed, 0 other CR shown as \r; command 13 stdout: 11 line-end CR removed, 0 other CR shown as \r; command 14 stdout: 11 line-end CR removed, 0 other CR shown as \r; command 15 stdout: 11 line-end CR removed, 0 other CR shown as \r
