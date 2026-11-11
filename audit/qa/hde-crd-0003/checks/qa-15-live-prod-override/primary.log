@@ -1,0 +1,240 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"prod","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"qa-15-live-prod-override","check_name":"S01's live admitted path and S02's live terminal-v2 route","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","rev-parse","--is-shallow-repository"],["git","status","--porcelain"],["python","--version"],["python","-c","import engine; print(engine.__file__)"],["hdctl","--version"],["python","-c","import os; ws=' \\t\\n\\r\\x0b\\x0c'; s=lambda k: 'SET' if os.environ.get(k,'').strip() else 'UNSET'; u=os.environ.get('HD_API_BASE_URL','').strip().rstrip('/'); l=os.environ.get('HDAPI_BASE_URL','').strip().rstrip('/'); a=os.environ.get('APP_ENV','').strip(ws).lower(); g=os.environ.get('ENGINE_ENV','').strip(ws).lower(); print(*[k+'='+s(k) for k in ('HD_API_BASE_URL','HDAPI_BASE_URL','HD_API_KEY','GEO_API_KEY','HDE_VENDOR_OVERRIDE_AUDIT_PATH','DATABASE_URL')], 'BASE_CONFLICT='+str(bool(u and l and u!=l)), 'APP_ENV='+(a or 'UNSET'), 'ENGINE_ENV='+(g or 'UNSET'), 'P2_ENGINE_ENV='+('OK' if (not g or g==a) else 'CONFLICT'))"],["python3","-I","-c","import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"],["python","-c","import os, pathlib, engine; ws=' \\t\\n\\r\\x0b\\x0c'; root=pathlib.Path(engine.__file__).resolve().parents[1]; c=os.environ.get('HDE_VENDOR_OVERRIDE_AUDIT_PATH','').strip(ws); x=os.environ.get('XDG_STATE_HOME','').strip(ws); h=os.path.expanduser('~'); base=pathlib.Path(x) if x and pathlib.Path(x).is_absolute() else (pathlib.Path(h)/'.local'/'state' if h!='~' and pathlib.Path(h).is_absolute() else None); cand=pathlib.Path(c) if c else (base/'glow-hdengine'/'vendor_prod_override.jsonl' if base else None); ab=cand is not None and cand.is_absolute(); p=pathlib.Path(os.path.realpath(cand)) if ab else None; inrepo=p is not None and (p==root or root in p.parents); ok=ab and not inrepo; ok and p.parent.mkdir(parents=True, exist_ok=True); print('ENGINE_ROOT='+str(root), 'SINK='+str(p or cand), 'ABSOLUTE_AS_CONFIGURED='+str(ab), 'IN_REPOSITORY='+str(inrepo), 'DIR_WRITABLE='+str(bool(ok) and os.access(p.parent, os.W_OK)), 'FILE_WRITABLE='+str(bool(ok) and ((not p.exists()) or os.access(p, os.W_OK))), 'LINES='+str(sum(1 for _ in open(p, 'rb')) if ok and p.exists() else 0))"],["python","-c","import os, pwd; print(pwd.getpwuid(os.geteuid()).pw_name)"],["python","-c","import os; from engine.bodygraph.resolver import _classify_env_route_policy as c; p=c(dict(os.environ)); print('SUPPORTED=' + str(p['supported']), 'ROUTE_FAMILY=' + str(p['route_family']), 'RESOURCE_PATH=' + str(p['resource_path']))"],["bash","-c","S=$1; shift; hdctl showcompat --source vendor \"$@\" >\"$S/V1.stdout\" 2>\"$S/V1.stderr\"; rc=$?; printf \"child: hdctl showcompat --source vendor (P1 AB flags, no --allow-prod-vendor)\\nchild_exit_code: %s (expected 1)\\nchild_stdout (%s bytes):\\n\" \"$rc\" \"$(wc -c <\"$S/V1.stdout\")\"; cat \"$S/V1.stdout\"; printf \"child_stderr (%s bytes):\\n\" \"$(wc -c <\"$S/V1.stderr\")\"; cat \"$S/V1.stderr\"; [ \"$rc\" -eq 1 ]","_","/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap","--birthdate-a","1990-01-01","--birthtime-a","12:00","--location-a","Amsterdam, Netherlands","--birthdate-b","1985-07-15","--birthtime-b","08:30","--location-b","London, United Kingdom"],["python3","-I","-c","import json,sys; p=sys.argv[1]; n=int(sys.argv[2]); ls=open(p,'rb').read().decode('utf-8').splitlines(); print('NEW_SINK_LINES='+str(len(ls)-n)); print('\\n'.join(ls[n:]))","/home/nathan/.local/state/glow-hdengine/vendor_prod_override.jsonl","0"],["hdctl","showcompat","--source","vendor","--birthdate-a","1990-01-01","--birthtime-a","12:00","--location-a","Amsterdam, Netherlands","--birthdate-b","1985-07-15","--birthtime-b","08:30","--location-b","London, United Kingdom","--allow-prod-vendor","HDE-CRD-0003/qa/qa-15-live-prod-override"],["python3","-I","-c","import json,sys; p=sys.argv[1]; n=int(sys.argv[2]); ls=open(p,'rb').read().decode('utf-8').splitlines(); print('NEW_SINK_LINES='+str(len(ls)-n)); print('\\n'.join(ls[n:]))","/home/nathan/.local/state/glow-hdengine/vendor_prod_override.jsonl","0"],["git","status","--porcelain"],["python","-c","import json,sys,jsonschema; s=json.load(open('schemas/magic10_compat_result_v1.schema.json')); V=jsonschema.validators.validator_for(s); V.check_schema(s); v=V(s); [print(p.rsplit('/',1)[1], 'VALID' if not list(v.iter_errors(json.loads(open(p,'rb').read().decode('utf-8')))) else 'INVALID', 'schema='+str(json.load(open(p)).get('schema')), 'release_id='+str(json.load(open(p)).get('release_id')), 'ONE_DOC_ONE_LF='+str(open(p,'rb').read().endswith(b'\\n') and not open(p,'rb').read().endswith(b'\\n\\n') and open(p,'rb').read().count(b'\\n')==1)) for p in sys.argv[1:]]","/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout"],["wc","-c","/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V1.stdout","/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V1.stderr","/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout","/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stderr"],["sha256sum","/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout"],["cmp","/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout","/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout"],["bash","-c","f=/home/nathan/.local/state/glow-hdengine/vendor_prod_override.jsonl; echo \"sink lines now: $(wc -l < \"$f\")\"; stat -c \"mode %a owner %U size %s\" \"$f\""],["sha256sum","/tmp/v1","/tmp/v2","/tmp/hde-crd-0003-qa/qa15","/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/gate.py"],["cat","/tmp/v1","/tmp/v2"]],"command_provenance":"QA Plan v1.2 check qa-15; QA-90 task T10 attempt 1; venue V-A; initiator the Product Owner, who started V1 and V2 by typing ! /tmp/v1 and ! /tmp/v2 (agent-prepared command text) and attested to it; normalizations: none","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-15-live-prod-override/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-11T08:18:27Z"}
+=== CONTEXT ===
+check_id: qa-15-live-prod-override
+check_name: S01's live admitted path and S02's live terminal-v2 route
+task: QA-90 task T10, attempt 1; QA Plan v1.2 CHECK 15 (criteria S01-b, S02-b); dependency qa-01 (V-A) PASS (published 2026-11-11T07:56:23Z)
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+venue: V-A, the Product Owner's operator console (this workstation), whose environment holds HD_API_KEY, GEO_API_KEY and HD_API_BASE_URL; EI-1 and EI-4 recorded 2026-11-11T07:46Z
+initiator: the Product Owner (EI-3, recorded 2026-11-11T07:46Z), who started V1 and V2 himself by typing ! /tmp/v1 and ! /tmp/v2 in this Claude Code session (bash-input mode, run in this session's shell as account nathan); the agent never ran V1 or V2
+attestation (P5; given by the Product Owner at 2026-11-11T08:17:14Z in this session, by selecting the option worded as this line): "I, the Product Owner, typed and ran ! /tmp/v1 (V1) and ! /tmp/v2 (V2) myself in this session on 2026-11-11."
+authorization_reference: HDE-CRD-0003/qa/qa-15-live-prod-override (names this approved work item; not a credential)
+environment_class: E-V V-A; the E-L clone /tmp/hde-crd-0003-qa/clone (full history, detached at T) with CI's install; interpreter /tmp/hde-crd-0003-qa/venv/bin/python (Python 3.12.15); hdctl from that venv
+rails: SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod with LC_ALL=C LANG=C TZ=UTC PYTHONDONTWRITEBYTECODE=1, for this check only (Plan §3.1, qa-15 row); XDG_STATE_HOME and HDE_VENDOR_OVERRIDE_AUDIT_PATH unset, so the sink is the operator's own durable state directory
+audit sink: /home/nathan/.local/state/glow-hdengine/vendor_prod_override.jsonl (absolute, outside every repository; P4); never deleted (Plan §9)
+synthetic inputs: pair P1 AB of qa-14: A 1990-01-01 12:00 "Amsterdam, Netherlands", B 1985-07-15 08:30 "London, United Kingdom"; no real person
+request limit: V1 no vendor request; V2 at most two acquisitions; no --upsert; no other vendor command; stop after V2 whatever its result
+start_utc: 2026-11-11T08:14:44Z
+end_utc: 2026-11-11T08:15:00Z (the initiator's runs); post-run reads 17 to 23 by the agent at 2026-11-11T08:16Z
+=== READINESS ===
+P1 to P6 (the check's own preflight is its readiness, Plan §7 common rule A for E-V), run inside the initiator's V1 command (/tmp/v1) before V1, in the same shell:
+--- command 1: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:44Z; ended_utc: 2026-11-11T08:14:44Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- command 2: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:44Z; ended_utc: 2026-11-11T08:14:44Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command 3: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:44Z; ended_utc: 2026-11-11T08:14:44Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 4: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:44Z; ended_utc: 2026-11-11T08:14:44Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 5: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:44Z; ended_utc: 2026-11-11T08:14:44Z; exit_code: 0
+stdout (149 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py
+stderr (0 bytes):
+(empty)
+--- command 6: ["hdctl", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:44Z; ended_utc: 2026-11-11T08:14:44Z; exit_code: 0
+stdout (93 bytes):
+hdctl 0.0.0 (hdengine@prod;2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129)
+stderr (0 bytes):
+(empty)
+--- command 7: ["python", "-c", "import os; ws=' \\t\\n\\r\\x0b\\x0c'; s=lambda k: 'SET' if os.environ.get(k,'').strip() else 'UNSET'; u=os.environ.get('HD_API_BASE_URL','').strip().rstrip('/'); l=os.environ.get('HDAPI_BASE_URL','').strip().rstrip('/'); a=os.environ.get('APP_ENV','').strip(ws).lower(); g=os.environ.get('ENGINE_ENV','').strip(ws).lower(); print(*[k+'='+s(k) for k in ('HD_API_BASE_URL','HDAPI_BASE_URL','HD_API_KEY','GEO_API_KEY','HDE_VENDOR_OVERRIDE_AUDIT_PATH','DATABASE_URL')], 'BASE_CONFLICT='+str(bool(u and l and u!=l)), 'APP_ENV='+(a or 'UNSET'), 'ENGINE_ENV='+(g or 'UNSET'), 'P2_ENGINE_ENV='+('OK' if (not g or g==a) else 'CONFLICT'))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:44Z; ended_utc: 2026-11-11T08:14:45Z; exit_code: 0
+stdout (195 bytes):
+HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET HD_API_KEY=SET GEO_API_KEY=SET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET DATABASE_URL=UNSET BASE_CONFLICT=False APP_ENV=prod ENGINE_ENV=UNSET P2_ENGINE_ENV=OK
+stderr (0 bytes):
+(empty)
+--- command 8: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:45Z; ended_utc: 2026-11-11T08:14:45Z; exit_code: 0
+stdout (64 bytes):
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod
+stderr (0 bytes):
+(empty)
+--- command 9: ["python", "-c", "import os, pathlib, engine; ws=' \\t\\n\\r\\x0b\\x0c'; root=pathlib.Path(engine.__file__).resolve().parents[1]; c=os.environ.get('HDE_VENDOR_OVERRIDE_AUDIT_PATH','').strip(ws); x=os.environ.get('XDG_STATE_HOME','').strip(ws); h=os.path.expanduser('~'); base=pathlib.Path(x) if x and pathlib.Path(x).is_absolute() else (pathlib.Path(h)/'.local'/'state' if h!='~' and pathlib.Path(h).is_absolute() else None); cand=pathlib.Path(c) if c else (base/'glow-hdengine'/'vendor_prod_override.jsonl' if base else None); ab=cand is not None and cand.is_absolute(); p=pathlib.Path(os.path.realpath(cand)) if ab else None; inrepo=p is not None and (p==root or root in p.parents); ok=ab and not inrepo; ok and p.parent.mkdir(parents=True, exist_ok=True); print('ENGINE_ROOT='+str(root), 'SINK='+str(p or cand), 'ABSOLUTE_AS_CONFIGURED='+str(ab), 'IN_REPOSITORY='+str(inrepo), 'DIR_WRITABLE='+str(bool(ok) and os.access(p.parent, os.W_OK)), 'FILE_WRITABLE='+str(bool(ok) and ((not p.exists()) or os.access(p, os.W_OK))), 'LINES='+str(sum(1 for _ in open(p, 'rb')) if ok and p.exists() else 0))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:45Z; ended_utc: 2026-11-11T08:14:45Z; exit_code: 0
+stdout (307 bytes):
+ENGINE_ROOT=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone SINK=/home/nathan/.local/state/glow-hdengine/vendor_prod_override.jsonl ABSOLUTE_AS_CONFIGURED=True IN_REPOSITORY=False DIR_WRITABLE=True FILE_WRITABLE=True LINES=0
+stderr (0 bytes):
+(empty)
+--- command 10: ["python", "-c", "import os, pwd; print(pwd.getpwuid(os.geteuid()).pw_name)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:45Z; ended_utc: 2026-11-11T08:14:45Z; exit_code: 0
+stdout (7 bytes):
+nathan
+stderr (0 bytes):
+(empty)
+--- command 11: ["python", "-c", "import os; from engine.bodygraph.resolver import _classify_env_route_policy as c; p=c(dict(os.environ)); print('SUPPORTED=' + str(p['supported']), 'ROUTE_FAMILY=' + str(p['route_family']), 'RESOURCE_PATH=' + str(p['resource_path']))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:45Z; ended_utc: 2026-11-11T08:14:45Z; exit_code: 0
+stdout (70 bytes):
+SUPPORTED=True ROUTE_FAMILY=recommended_v2_chart RESOURCE_PATH=charts
+stderr (0 bytes):
+(empty)
+=== COMMANDS ===
+--- command 12: ["bash", "-c", "S=$1; shift; hdctl showcompat --source vendor \"$@\" >\"$S/V1.stdout\" 2>\"$S/V1.stderr\"; rc=$?; printf \"child: hdctl showcompat --source vendor (P1 AB flags, no --allow-prod-vendor)\\nchild_exit_code: %s (expected 1)\\nchild_stdout (%s bytes):\\n\" \"$rc\" \"$(wc -c <\"$S/V1.stdout\")\"; cat \"$S/V1.stdout\"; printf \"child_stderr (%s bytes):\\n\" \"$(wc -c <\"$S/V1.stderr\")\"; cat \"$S/V1.stderr\"; [ \"$rc\" -eq 1 ]", "_", "/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam, Netherlands", "--birthdate-b", "1985-07-15", "--birthtime-b", "08:30", "--location-b", "London, United Kingdom"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:45Z; ended_utc: 2026-11-11T08:14:46Z; exit_code: 0
+stdout (191 bytes):
+child: hdctl showcompat --source vendor (P1 AB flags, no --allow-prod-vendor)
+child_exit_code: 1 (expected 1)
+child_stdout (0 bytes):
+child_stderr (32 bytes):
+PROVIDER_PROD_OVERRIDE_REQUIRED
+stderr (0 bytes):
+(empty)
+--- command 13: ["python3", "-I", "-c", "import json,sys; p=sys.argv[1]; n=int(sys.argv[2]); ls=open(p,'rb').read().decode('utf-8').splitlines(); print('NEW_SINK_LINES='+str(len(ls)-n)); print('\\n'.join(ls[n:]))", "/home/nathan/.local/state/glow-hdengine/vendor_prod_override.jsonl", "0"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:46Z; ended_utc: 2026-11-11T08:14:46Z; exit_code: 0
+stdout (484 bytes):
+NEW_SINK_LINES=1
+{"actor_principal":"nathan","authorization_ref":null,"command":"showcompat","correlation_id":"686576e7-0b72-481c-a79e-c7466d1c63b6","environment":"prod","error_code":"PROVIDER_PROD_OVERRIDE_REQUIRED","event":"vendor_prod_override","network_open":true,"occurred_at":"2026-11-11T08:14:45.943306Z","outbound_attempted":false,"outcome":"refused","resource_path":null,"route_family":null,"safe_mode_open":true,"schema_version":"vendor_prod_override.v1","source":"vendor"}
+stderr (0 bytes):
+(empty)
+--- command 14: ["hdctl", "showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam, Netherlands", "--birthdate-b", "1985-07-15", "--birthtime-b", "08:30", "--location-b", "London, United Kingdom", "--allow-prod-vendor", "HDE-CRD-0003/qa/qa-15-live-prod-override"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:14:58Z; ended_utc: 2026-11-11T08:15:00Z; exit_code: 0
+stdout (3302 bytes):
+{"categories":[{"band":"Cool","category_id":"harmony","personal_hi_to_lo_key":"nar.harmony.cool.b_to_a.1.sage-01","personal_lo_to_hi_key":"nar.harmony.cool.a_to_b.1.sage-01","score":10,"shared_key":"nar.harmony.cool.shared.1.sage-01"},{"band":"Cool","category_id":"heat","personal_hi_to_lo_key":"nar.heat.cool.b_to_a.1.spark-01","personal_lo_to_hi_key":"nar.heat.cool.a_to_b.1.spark-01","score":22,"shared_key":"nar.heat.cool.shared.1.spark-01"},{"band":"Cool","category_id":"communication","personal_hi_to_lo_key":"nar.communication.cool.b_to_a.1.voice-01","personal_lo_to_hi_key":"nar.communication.cool.a_to_b.1.voice-01","score":10,"shared_key":"nar.communication.cool.shared.1.voice-01"},{"band":"Open","category_id":"alignment","personal_hi_to_lo_key":"nar.alignment.open.b_to_a.1.face-01","personal_lo_to_hi_key":"nar.alignment.open.a_to_b.1.face-01","score":32,"shared_key":"nar.alignment.open.shared.1.face-01"},{"band":"Cool","category_id":"comfort","personal_hi_to_lo_key":"nar.comfort.cool.b_to_a.1.safe-01","personal_lo_to_hi_key":"nar.comfort.cool.a_to_b.1.safe-01","score":10,"shared_key":"nar.comfort.cool.shared.1.safe-01"},{"band":"Open","category_id":"consistency","personal_hi_to_lo_key":"nar.consistency.open.b_to_a.1.rhythm-01","personal_lo_to_hi_key":"nar.consistency.open.a_to_b.1.rhythm-01","score":27,"shared_key":"nar.consistency.open.shared.1.rhythm-01"},{"band":"Open","category_id":"expansion","personal_hi_to_lo_key":"nar.expansion.open.b_to_a.1.wide-01","personal_lo_to_hi_key":"nar.expansion.open.a_to_b.1.wide-01","score":25,"shared_key":"nar.expansion.open.shared.1.wide-01"},{"band":"Cool","category_id":"creativity","personal_hi_to_lo_key":"nar.creativity.cool.b_to_a.1.make-01","personal_lo_to_hi_key":"nar.creativity.cool.a_to_b.1.make-01","score":20,"shared_key":"nar.creativity.cool.shared.1.make-01"},{"band":"Open","category_id":"drive","personal_hi_to_lo_key":"nar.drive.open.b_to_a.1.move-01","personal_lo_to_hi_key":"nar.drive.open.a_to_b.1.move-01","score":40,"shared_key":"nar.drive.open.shared.1.move-01"},{"band":"Cool","category_id":"balance","personal_hi_to_lo_key":"nar.balance.cool.b_to_a.1.fair-01","personal_lo_to_hi_key":"nar.balance.cool.a_to_b.1.fair-01","score":0,"shared_key":"nar.balance.cool.shared.1.fair-01"}],"config_id":"m10-channel-state-v1.0.0","pair_key":"a55a5eefd785f65b1a30eef7d3f0e81f2101bf0b6b9a7982af2d34c5ae92928a","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129","schema":"magic10_compat_result.v1","signals":[{"q":38,"signal_id":"rapport_delta"},{"q":0,"signal_id":"resonance_strength"},{"q":88,"signal_id":"spark_intensity"},{"q":0,"signal_id":"momentum_flux"},{"q":40,"signal_id":"signal_clarity"},{"q":0,"signal_id":"exchange_density"},{"q":13,"signal_id":"vector_cohesion"},{"q":113,"signal_id":"axis_agreement"},{"q":38,"signal_id":"soothe_index"},{"q":0,"signal_id":"buffer_resilience"},{"q":70,"signal_id":"pattern_integrity"},{"q":38,"signal_id":"variance_stability"},{"q":50,"signal_id":"growth_tendency"},{"q":50,"signal_id":"horizon_reach"},{"q":38,"signal_id":"novelty_factor"},{"q":40,"signal_id":"expression_flow"},{"q":90,"signal_id":"willpower_current"},{"q":70,"signal_id":"focus_pressure"},{"q":0,"signal_id":"equilibrium_score"},{"q":0,"signal_id":"counterweight_ratio"}]}
+stderr (0 bytes):
+(empty)
+--- command 15: ["python3", "-I", "-c", "import json,sys; p=sys.argv[1]; n=int(sys.argv[2]); ls=open(p,'rb').read().decode('utf-8').splitlines(); print('NEW_SINK_LINES='+str(len(ls)-n)); print('\\n'.join(ls[n:]))", "/home/nathan/.local/state/glow-hdengine/vendor_prod_override.jsonl", "0"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:15:00Z; ended_utc: 2026-11-11T08:15:00Z; exit_code: 0
+stdout (1958 bytes):
+NEW_SINK_LINES=4
+{"actor_principal":"nathan","authorization_ref":null,"command":"showcompat","correlation_id":"686576e7-0b72-481c-a79e-c7466d1c63b6","environment":"prod","error_code":"PROVIDER_PROD_OVERRIDE_REQUIRED","event":"vendor_prod_override","network_open":true,"occurred_at":"2026-11-11T08:14:45.943306Z","outbound_attempted":false,"outcome":"refused","resource_path":null,"route_family":null,"safe_mode_open":true,"schema_version":"vendor_prod_override.v1","source":"vendor"}
+{"actor_principal":"nathan","authorization_ref":"HDE-CRD-0003/qa/qa-15-live-prod-override","command":"showcompat","correlation_id":"4c4bdbe8-f762-42fb-af96-2c84a3af8c4d","environment":"prod","error_code":null,"event":"vendor_prod_override","network_open":true,"occurred_at":"2026-11-11T08:14:58.722556Z","outbound_attempted":false,"outcome":"allowed","resource_path":null,"route_family":null,"safe_mode_open":true,"schema_version":"vendor_prod_override.v1","source":"vendor"}
+{"actor_principal":"nathan","authorization_ref":"HDE-CRD-0003/qa/qa-15-live-prod-override","command":"showcompat","correlation_id":"4c4bdbe8-f762-42fb-af96-2c84a3af8c4d","environment":"prod","error_code":null,"event":"vendor_prod_override","network_open":true,"occurred_at":"2026-11-11T08:14:59.284187Z","outbound_attempted":true,"outcome":"completed","resource_path":"charts","route_family":"recommended_v2_chart","safe_mode_open":true,"schema_version":"vendor_prod_override.v1","source":"vendor"}
+{"actor_principal":"nathan","authorization_ref":"HDE-CRD-0003/qa/qa-15-live-prod-override","command":"showcompat","correlation_id":"4c4bdbe8-f762-42fb-af96-2c84a3af8c4d","environment":"prod","error_code":null,"event":"vendor_prod_override","network_open":true,"occurred_at":"2026-11-11T08:14:59.671102Z","outbound_attempted":true,"outcome":"completed","resource_path":"charts","route_family":"recommended_v2_chart","safe_mode_open":true,"schema_version":"vendor_prod_override.v1","source":"vendor"}
+stderr (0 bytes):
+(empty)
+--- command 16: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:15:00Z; ended_utc: 2026-11-11T08:15:00Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 17: ["python", "-c", "import json,sys,jsonschema; s=json.load(open('schemas/magic10_compat_result_v1.schema.json')); V=jsonschema.validators.validator_for(s); V.check_schema(s); v=V(s); [print(p.rsplit('/',1)[1], 'VALID' if not list(v.iter_errors(json.loads(open(p,'rb').read().decode('utf-8')))) else 'INVALID', 'schema='+str(json.load(open(p)).get('schema')), 'release_id='+str(json.load(open(p)).get('release_id')), 'ONE_DOC_ONE_LF='+str(open(p,'rb').read().endswith(b'\\n') and not open(p,'rb').read().endswith(b'\\n\\n') and open(p,'rb').read().count(b'\\n')==1)) for p in sys.argv[1:]]", "/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:15:54Z; ended_utc: 2026-11-11T08:15:54Z; exit_code: 0
+stdout (144 bytes):
+V2.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True
+stderr (0 bytes):
+(empty)
+--- command 18: ["wc", "-c", "/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V1.stdout", "/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V1.stderr", "/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout", "/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stderr"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:15:54Z; ended_utc: 2026-11-11T08:15:54Z; exit_code: 0
+stdout (299 bytes):
+   0 /tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V1.stdout
+  32 /tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V1.stderr
+3302 /tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout
+   0 /tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stderr
+3334 total
+stderr (0 bytes):
+(empty)
+--- command 19: ["sha256sum", "/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:15:54Z; ended_utc: 2026-11-11T08:15:54Z; exit_code: 0
+stdout (263 bytes):
+9c08bebe20f6e2396ebfc09a897bea59cbea56d20b33abc32a9fbd1b102f9f81  /tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout
+9c08bebe20f6e2396ebfc09a897bea59cbea56d20b33abc32a9fbd1b102f9f81  /tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout
+stderr (0 bytes):
+(empty)
+--- command 20: ["cmp", "/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/cap/V2.stdout", "/tmp/hde-crd-0003-qa/checks/qa-14-live-compat-cli/cap/L1.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:15:54Z; ended_utc: 2026-11-11T08:15:54Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 21: ["bash", "-c", "f=/home/nathan/.local/state/glow-hdengine/vendor_prod_override.jsonl; echo \"sink lines now: $(wc -l < \"$f\")\"; stat -c \"mode %a owner %U size %s\" \"$f\""]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:15:55Z; ended_utc: 2026-11-11T08:15:55Z; exit_code: 0
+stdout (50 bytes):
+sink lines now: 4
+mode 600 owner nathan size 1941
+stderr (0 bytes):
+(empty)
+--- command 22: ["sha256sum", "/tmp/v1", "/tmp/v2", "/tmp/hde-crd-0003-qa/qa15", "/tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/gate.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:15:55Z; ended_utc: 2026-11-11T08:15:55Z; exit_code: 0
+stdout (367 bytes):
+917caff62234bb8f9d19e536c42a8b63489dd6b8ee5e58c32a4f1bc8ac7b2e23  /tmp/v1
+8fd98d0d28c9d100a454f96b9b65a59c266757775b66d776ea1f296e230afc46  /tmp/v2
+cb7d18e9e628ab841eb49fd059b8d34aa08f0ea13c9abed7bf092e35e295ffa9  /tmp/hde-crd-0003-qa/qa15
+16c512be3ca097a36787d7c1b884e8b2b8d4c92885244ab304853e7da6334081  /tmp/hde-crd-0003-qa/checks/qa-15-live-prod-override/gate.py
+stderr (0 bytes):
+(empty)
+--- command 23: ["cat", "/tmp/v1", "/tmp/v2"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:15:55Z; ended_utc: 2026-11-11T08:15:55Z; exit_code: 0
+stdout (418 bytes):
+#!/bin/bash
+# HDE-CRD-0003 QA-100 task T10 launcher V1 (agent-prepared command text; the Product Owner starts it). No override flag.
+exec bash /tmp/hde-crd-0003-qa/qa15 v1
+#!/bin/bash
+# HDE-CRD-0003 QA-100 task T10 launcher V2 (agent-prepared command text; the Product Owner starts it). Passes the approved reference.
+exec bash /tmp/hde-crd-0003-qa/qa15 v2 --allow-prod-vendor HDE-CRD-0003/qa/qa-15-live-prod-override
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- P1 candidate (V-A): HEAD equals T, not shallow, status empty, Python 3.12.x, engine inside the clone, hdctl --version prints qa-01's line | observed: b687c813866befa5ee911a14b00ad21c1841e967; shallow false; status 0 bytes; Python 3.12.15; engine in clone True; hdctl 0.0.0 (hdengine@prod;2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129) | PASS
+- P2 presence (with APP_ENV=prod): HD_API_BASE_URL, HD_API_KEY, GEO_API_KEY SET; BASE_CONFLICT=False; P2_ENGINE_ENV=OK | observed: HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET HD_API_KEY=SET GEO_API_KEY=SET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET DATABASE_URL=UNSET BASE_CONFLICT=False APP_ENV=prod ENGINE_ENV=UNSET P2_ENGINE_ENV=OK | PASS
+- P3 rails: exactly SAFE_MODE=0, ALLOW_NETWORK=1, APP_ENV=prod, and the pins | observed: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod | PASS
+- P4 sink (the delivered rule, engine/bodygraph/vendor_audit.py:88-111): ABSOLUTE_AS_CONFIGURED=True, IN_REPOSITORY=False, DIR_WRITABLE=True, FILE_WRITABLE=True; ENGINE_ROOT and SINK recorded; LINES is P4's count | observed: ENGINE_ROOT=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone SINK=/home/nathan/.local/state/glow-hdengine/vendor_prod_override.jsonl ABSOLUTE_AS_CONFIGURED=True IN_REPOSITORY=False DIR_WRITABLE=True FILE_WRITABLE=True LINES=0 | PASS
+- P5 actor: a non-empty account name, and the initiator's attestation names their role and states that they ran V1 and V2 themselves | observed: account nathan; attestation given by the Product Owner at 2026-11-11T08:17:14Z: "I, the Product Owner, typed and ran ! /tmp/v1 (V1) and ! /tmp/v2 (V2) myself in this session on 2026-11-11." | PASS
+- P6 route label with P1's interpreter: SUPPORTED=True ROUTE_FAMILY=recommended_v2_chart RESOURCE_PATH=charts (terminal-v2 base) | observed: SUPPORTED=True ROUTE_FAMILY=recommended_v2_chart RESOURCE_PATH=charts | PASS
+- V1 exits 1 (one asserting bash -c expecting exit 1); stdout empty; stderr exactly PROVIDER_PROD_OVERRIDE_REQUIRED plus LF | observed: asserting bash -c exit 0; child_exit_code: 1 (expected 1); stdout 0 bytes; stderr b'PROVIDER_PROD_OVERRIDE_REQUIRED\n' | PASS
+- V1 adds exactly one new sink line: event vendor_prod_override, command showcompat, outcome refused, error_code PROVIDER_PROD_OVERRIDE_REQUIRED, authorization_ref null, outbound_attempted false, route_family and resource_path null | observed: 1 new line(s); event vendor_prod_override, command showcompat, outcome refused, error_code PROVIDER_PROD_OVERRIDE_REQUIRED, authorization_ref None, outbound_attempted False, route_family None, resource_path None | PASS
+- V2 (with --allow-prod-vendor HDE-CRD-0003/qa/qa-15-live-prod-override) exits 0; stderr empty; stdout validates against schemas/magic10_compat_result_v1.schema.json with release_id 2d5a4ec485fd... | observed: argv ends ['--allow-prod-vendor', 'HDE-CRD-0003/qa/qa-15-live-prod-override']; exit 0; stderr 0 bytes; V2.stdout VALID schema=magic10_compat_result.v1 release_id=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 ONE_DOC_ONE_LF=True | PASS
+- exactly three further sink lines sharing one correlation_id: first outcome allowed (authorization_ref the reference, outbound_attempted false, route_family and resource_path null, error_code null), then two outcome completed (outbound_attempted true, route_family recommended_v2_chart, resource_path charts, error_code null) | observed: 3 further line(s); correlation_ids ['4c4bdbe8-f762-42fb-af96-2c84a3af8c4d']; outcomes ['allowed', 'completed', 'completed']; allowed ref HDE-CRD-0003/qa/qa-15-live-prod-override; completed routes [('recommended_v2_chart', 'charts', True), ('recommended_v2_chart', 'charts', True)] | PASS
+- every new sink line has the sixteen keys of HDE CLI/API/Vendor Ref §7.1.11f, source vendor, environment the normalized production label, safe_mode_open and network_open true, actor_principal equal to P5's account, and no birth date, time, location, coordinates, URL, header value, key or raw provider text | observed: 4 new lines; sixteen keys exactly True; source/environment/rails/actor True (environment ['prod', 'prod', 'prod', 'prod'], actor ['nathan', 'nathan', 'nathan', 'nathan']); forbidden substrings found none | PASS
+- V-A git status --porcelain empty | observed: exit 0, 0 bytes | PASS
+- request limits: V1 makes no vendor request; V2 at most two acquisitions; no --upsert; no other vendor command | observed: V1 event outbound_attempted False; V2 completed events 2; --upsert in any argv False; hdctl invocations 2 (V1 inside the asserting bash -c, V2) | PASS
+- secret scan NO_HIT over stdout, stderr and the new sink lines: recorded in NOTES (the scan runs on this assembled body, which holds them all verbatim)
+- overall: every predicate met; status PASS
+=== NOTES ===
+- classification: PASS. Every predicate of CHECK 15 is met (PREDICATES). S01-b: V1 refused with PROVIDER_PROD_OVERRIDE_REQUIRED and its refused event, then V2 made the admitted acquisition, with its pre-I/O allowed event and two completed events, human-initiated. S02-b: the completed events carry recommended_v2_chart and charts on a base P6 classified as terminal v2.
+- how the initiator started the runs, recorded as it happened: the Product Owner cannot paste in this session and declined to type the full commands. He chose, by a multiple-choice answer in this session, to type two short commands instead. The agent prepared two launcher files outside every repository, /tmp/v1 and /tmp/v2 (verbatim in command 23; SHA-256 in command 22). Each runs the agent-prepared wrapper /tmp/hde-crd-0003-qa/qa15 (SHA-256 in command 22). /tmp/v2 passes --allow-prod-vendor HDE-CRD-0003/qa/qa-15-live-prod-override to the wrapper, which refuses any other text and runs V2 once, only after a V1 that behaved as expected. The Product Owner typed and ran ! /tmp/v1 and then ! /tmp/v2. This is the Plan §2 form "an agent may prepare command text": the agent wrote the command text and never ran V1, V2 or any command carrying the flag. The flag and reference reached hdctl from the command the initiator started.
+- V1 ran as one asserting bash -c (command 12), expecting exit 1: its own status is 0, and the child's exit 1, empty stdout and stderr are in its stdout. V1's new sink line is command 13. V2 is command 14, with its stdout verbatim. All four new sink lines since P4's count of 0 are verbatim in command 15: V1's refused line, then V2's allowed line and two completed lines, which share correlation_id 4c4bdbe8-f762-42fb-af96-2c84a3af8c4d. They are keys-only by contract.
+- observation: V2's stdout (3,302 bytes, SHA-256 9c08bebe20f6e2396ebfc09a897bea59cbea56d20b33abc32a9fbd1b102f9f81, command 19) is byte-identical to qa-14's L1 stdout for the same pair P1 AB under posture P-N (cmp exit 0, command 20). The production-posture admitted path returns the same canonical result as the non-production path.
+- the sink after the run holds 4 lines, mode 600, owner nathan (command 21). It is the operator's append-only record and is never deleted (Plan §9; HDE CLI/API/Vendor Ref §7.1.11f).
+- before the initiator's run, the agent dry-tested only the wrapper's preflight half, with a scratch XDG_STATE_HOME, to check the QA-created gate: no V1, no V2, no vendor I/O, and not the real sink. Its transcript is scratch, not this check's evidence.
+- rails restored: the initiator's command shells set the production posture for this check only and exited; every later check sets the default rails itself (collection §4.4).
+- normalizations: none. The post-run reads (commands 17 to 23: the schema validation of V2's stdout, sizes, digests, the cmp with qa-14 L1, the sink's line count and mode, and the launcher texts) ran in the agent's shell under the same production posture, with no vendor I/O.
+- nonclaims: proves only that the gate admits and audits one live, human-initiated invocation on a terminal-v2 base. No broad vendor conformance, deployment, QA PASS or closure. The refusal matrix is S01-a, bound through the binding check qa-17 (Plan CHECK 15).
+- recording: each argv ran unchanged through the scratch recorder /tmp/hde-crd-0003-qa/qarun.py; the PREDICATES section was generated mechanically from this check's transcript, captures and sink lines by a scratch evaluator.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body, which holds V1's and V2's stdout and stderr and the four new sink lines verbatim, before publication: NO_HIT in the check's shell, which held HD_API_KEY, GEO_API_KEY and HD_API_BASE_URL; and NO_HIT in the venue's parent shell, which also holds DATABASE_URL (comparison only; no value printed).
+- LF normalization (collection §4.6): no CR byte in any capture
