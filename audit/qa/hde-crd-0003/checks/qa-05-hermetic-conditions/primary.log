@@ -1,0 +1,912 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-05-hermetic-conditions","check_name":"The S07 named tests under each pinned condition, and FND-037","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","rev-parse","--is-shallow-repository"],["git","status","--porcelain"],["python","--version"],["python","-m","pytest","--version"],["python","-c","import engine; print(engine.__file__)"],["ruby","--version"],["bash","--version"],["curl","--version"],["bash","/tmp/hde-crd-0003-qa/presence.sh","HD_API_KEY","GEO_API_KEY","HD_API_BASE_URL","HDAPI_BASE_URL","DATABASE_URL","GH_TOKEN","GITHUB_TOKEN","HDE_VENDOR_OVERRIDE_AUDIT_PATH","ENGINE_ENV"],["cat","/tmp/hde-crd-0003-qa/cfg/gitconfig-c1"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","APP_ENV=dev","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-c1","GIT_TRACE2_EVENT=/tmp/hde-crd-0003-qa/trace-c1","python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c1","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/adapter/test_jsonschema.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["git","status","--porcelain"],["python3","-I","-c","import json,os,sys; d=sys.argv[1]; fs=sorted(os.listdir(d)); n=0; ev=0; hits=[]\nfor f in fs:\n    for ln in open(os.path.join(d,f),encoding='utf-8',errors='replace'):\n        try: e=json.loads(ln)\n        except Exception: continue\n        if e.get('event')!='child_start': continue\n        ev+=1; a=e.get('argv') or []\n        if 'maintenance' in a or ('gc' in a and '--auto' in a): hits.append(a)\nprint('TRACE_FILES='+str(len(fs)), 'CHILD_START_EVENTS='+str(ev), 'MATCHING_CHILD_START='+str(len(hits))); [print('MATCH', json.dumps(h)) for h in hits]","/tmp/hde-crd-0003-qa/trace-c1"],["stat","-f","-c","%T","/dev/shm/hde-crd-0003-c2"],["stat","-c","%d","/dev/shm/hde-crd-0003-c2"],["stat","-f","-c","%T","/tmp/hde-crd-0003-qa/clone"],["stat","-c","%d","/tmp/hde-crd-0003-qa/clone"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","APP_ENV=dev","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty","python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/dev/shm/hde-crd-0003-c2","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/adapter/test_jsonschema.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["git","status","--porcelain"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","APP_ENV=dev","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty","HDAPI_BASE_URL=https://other.invalid/v2","python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c3","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/adapter/test_jsonschema.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["git","status","--porcelain"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty","python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c4a","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/adapter/test_jsonschema.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["git","status","--porcelain"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","APP_ENV=test","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty","python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c4b","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/adapter/test_jsonschema.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["git","status","--porcelain"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","APP_ENV=prod","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty","python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c4c","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/adapter/test_jsonschema.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["git","status","--porcelain"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","APP_ENV=dev","ENGINE_ENV=dev","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty","python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c5a","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/adapter/test_jsonschema.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["git","status","--porcelain"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","APP_ENV=dev","ENGINE_ENV=prod","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty","python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c5b","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/adapter/test_jsonschema.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["git","status","--porcelain"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","APP_ENV=dev","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty","python","-m","pytest","-q","-rfEsx","-p","no:cacheprovider","--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c6","tests/adapter/test_jsonschema.py","tests/qa/test_generate_epic_close_pack.py","tests/tools/test_prepush_check.py","tests/ops/test_hde_epic038_ops03.py","tests/bodygraph/test_vendor_prod_override.py","tests/bodygraph/test_bg_resolve_route_policy.py","tests/evidence/test_hdapi_v2_contract_inventory.py"],["git","status","--porcelain"],["env","-i","PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin","HOME=/tmp/hde-crd-0003-qa/home","LC_ALL=C","LANG=C","TZ=UTC","SAFE_MODE=1","ALLOW_NETWORK=0","PYTHONDONTWRITEBYTECODE=1","APP_ENV=dev","GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty","python","-c","import os, pytest; pytest.main(['-q','-p','no:cacheprovider','tests/adapter/test_jsonschema.py']); print('ENGINE_ENV' in os.environ, 'ENGINE_SERVICE_TOKEN' in os.environ)"],["git","status","--porcelain"],["bash","-c","ls -l /bin/ruby /usr/bin/ruby 2>&1; readlink -f /bin /usr/bin/ruby; command -v ruby; python3 -I -c \"import os, shutil; print(\\\"os.defpath=\\\"+os.defpath, \\\"which(ruby, path=os.defpath)=\\\"+str(shutil.which(\\\"ruby\\\", path=os.defpath)))\""],["bash","-c","\nV=$1; H=$2\necho \"### child 1: without PATH\"\nenv -i LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 HOME=$H $V/python -m pytest -q -rfE -p no:cacheprovider tests/evidence/test_hdapi_v2_contract_inventory.py; rc1=$?\necho \"child_1_exit_code: $rc1\"\necho \"### child 2: with PATH\"\nenv -i PATH=$V:/usr/local/bin:/usr/bin:/bin LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 HOME=$H $V/python -m pytest -q -rfE -p no:cacheprovider tests/evidence/test_hdapi_v2_contract_inventory.py; rc2=$?\necho \"child_2_exit_code: $rc2\"\nif [ -x /bin/ruby ] || [ -x /usr/bin/ruby ]; then exp1=0; echo \"ruby resolves in os.defpath (/bin:/usr/bin): the without-PATH part is not exercisable (Plan CHECK 5 stated limit); expected child 1 exit 0\"; else exp1=1; echo \"ruby outside os.defpath: expected child 1 exit 1 (nine typed MISSING_DEPENDENCY:ruby failures)\"; fi\n[ \"$rc1\" -eq \"$exp1\" ] && [ \"$rc2\" -eq 0 ]\n","_","/tmp/hde-crd-0003-qa/venv/bin","/tmp/hde-crd-0003-qa/home"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.2 check qa-05; QA-90 task T03 attempt 1; normalizations: N-1","evidence_artifacts":["audit/qa/hde-crd-0003/checks/qa-05-hermetic-conditions/primary.log"],"exit_code":1,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"TOOLING_BLOCKED","status_reason":"Causal precedence over two non-PASS children: C2 TOOLING_BLOCKED (two skips under common rule C, tests/qa/test_generate_epic_close_pack.py:1525 and :1571, which need a relatime mount; the only second filesystems here are tmpfs without relatime) and C3 FAIL_BEHAVIOR against S07-a (13 failures of tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential under an ambient HDAPI_BASE_URL: PROVIDER_CONFIG_INVALID instead of PROVIDER_ROUTE_UNSUPPORTED; condition-specific); C1, C4a to C6 and criterion 3 pass; for Kronos to classify (QA Plan v1.2 CHECK 5; QA-90 task T03)","timestamp_utc":"2026-11-11T09:37:28Z"}
+=== CONTEXT ===
+check_id: qa-05-hermetic-conditions
+check_name: The S07 named tests under each pinned condition, and FND-037
+task: QA-90 task T03, attempt 1; QA Plan v1.2 CHECK 5 (criteria S07-a, S07-c); dependency qa-01 PASS (published 2026-11-11T07:56:23Z)
+qa_plan: QA Plan v1.2 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-plan-v1.2.md, amthorn78/glow-docs, blob 021769ae06c4e090474fe086dad51487cca73bf6), approved by QA_PLAN_REVIEW v1.2 APPROVE (docs/ephemeral/HDE-CRD-0003-QA-70-qa-plan-review-v1.2.md); QA_AUDIT v1.0 (docs/ephemeral/HDE-CRD-0003-QA-50-qa-audit-v1.0.md)
+task_collection: docs/ephemeral/HDE-CRD-0003-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; TASK_READY; read from pull request amthorn78/glow-docs#80 head 908e0946669c0b235ca375c65e46074ae5830e2e while it is open; blob 3562cf79de51f31e0bbf01400cb068feea75c87f)
+tested_commit (T): b687c813866befa5ee911a14b00ad21c1841e967 (amthorn78/glow-hdengine-v2 origin/main at 2026-11-11T07:47Z, equal to the QA-90 baseline); tested_tree: 85a436fcb8344b56e9ef6c2e0e127f4bdc875bcc
+scratch_root: /tmp/hde-crd-0003-qa, a symbolic link to /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa on the root ext4 filesystem (here /tmp is a 3.7 GB tmpfs); outside every repository; nothing in it is evidence (collection §4.3)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 8199ea32-e024-40d8-83d4-09ad72fd3206, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+execution_inputs (collection §7; recorded at 2026-11-11T07:46Z from the Product Owner's answers in this session): EI-5 the instruction to commit the evidence paths of collection §4.8 on qa/hde-crd-0003-evidence in one pull request, given; EI-1 venue V-A (this workstation); EI-4 agreement to use this console as a vendor client, given with V-A; EI-2 posture P-N for qa-14 (agent-executed at the Product Owner's direction); EI-3 initiator of every override invocation: the Product Owner himself; arrangement: T01, then T06 to T10, then T02 to T05, then T11 (the Product Owner's choice; every dependency of collection §3 holds)
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET XDG_STATE_HOME=UNSET
+environment_class: E-C; the E-L clone /tmp/hde-crd-0003-qa/clone (full history, detached at T) and its venv; each condition run under env -i holding only PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin, HOME=/tmp/hde-crd-0003-qa/home, GIT_CONFIG_GLOBAL (the empty scratch file; C1 its own file), the pins, the default rails and PYTHONDONTWRITEBYTECODE=1, plus the one condition's setting, as each command's argv shows
+named set N: tests/qa/test_generate_epic_close_pack.py tests/tools/test_prepush_check.py tests/ops/test_hde_epic038_ops03.py tests/bodygraph/test_vendor_prod_override.py tests/bodygraph/test_bg_resolve_route_policy.py tests/adapter/test_jsonschema.py tests/evidence/test_hdapi_v2_contract_inventory.py (1,687 collected, qa-01)
+second filesystem for C2: /dev/shm/hde-crd-0003-c2 (tmpfs, device 27) beside the clone's ext4 filesystem (device 2052)
+interpreter: /tmp/hde-crd-0003-qa/venv/bin/python (Python 3.12.15)
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 (default rails) plus one condition per run; conditions run one after another in the same clone, each followed by git status --porcelain
+start_utc: 2026-11-11T08:27:42Z
+end_utc: 2026-11-11T09:33:24Z
+=== READINESS ===
+Plan v1.2 §7 common rule A for E-C (ruby, bash and curl are the further tools the named tests need):
+--- command 1: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:42Z; ended_utc: 2026-11-11T08:27:42Z; exit_code: 0
+stdout (41 bytes):
+b687c813866befa5ee911a14b00ad21c1841e967
+stderr (0 bytes):
+(empty)
+--- command 2: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:42Z; ended_utc: 2026-11-11T08:27:42Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command 3: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:42Z; ended_utc: 2026-11-11T08:27:42Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 4: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:42Z; ended_utc: 2026-11-11T08:27:42Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command 5: ["python", "-m", "pytest", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:42Z; ended_utc: 2026-11-11T08:27:43Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command 6: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:43Z; ended_utc: 2026-11-11T08:27:43Z; exit_code: 0
+stdout (149 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone/engine/__init__.py
+stderr (0 bytes):
+(empty)
+--- command 7: ["ruby", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:43Z; ended_utc: 2026-11-11T08:27:43Z; exit_code: 0
+stdout (63 bytes):
+ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]
+stderr (0 bytes):
+(empty)
+--- command 8: ["bash", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:43Z; ended_utc: 2026-11-11T08:27:43Z; exit_code: 0
+stdout (307 bytes):
+GNU bash, version 5.3.9(1)-release (x86_64-pc-linux-gnu)
+Copyright (C) 2025 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+stderr (0 bytes):
+(empty)
+--- command 9: ["curl", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:43Z; ended_utc: 2026-11-11T08:27:43Z; exit_code: 0
+stdout (579 bytes):
+curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+Release-Date: 2026-01-07, security patched: 8.18.0-1ubuntu2.8
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp ws wss
+Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
+stderr (0 bytes):
+(empty)
+--- command 10: ["bash", "/tmp/hde-crd-0003-qa/presence.sh", "HD_API_KEY", "GEO_API_KEY", "HD_API_BASE_URL", "HDAPI_BASE_URL", "DATABASE_URL", "GH_TOKEN", "GITHUB_TOKEN", "HDE_VENDOR_OVERRIDE_AUDIT_PATH", "ENGINE_ENV"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:43Z; ended_utc: 2026-11-11T08:27:43Z; exit_code: 0
+stdout (186 bytes):
+HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET 
+stderr (0 bytes):
+(empty)
+=== COMMANDS ===
+--- command 11: ["cat", "/tmp/hde-crd-0003-qa/cfg/gitconfig-c1"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:43Z; ended_utc: 2026-11-11T08:27:43Z; exit_code: 0
+stdout (80 bytes):
+[maintenance]
+	auto = true
+[gc]
+	auto = 1
+	autoPackLimit = 1
+	autoDetach = true
+stderr (0 bytes):
+(empty)
+--- command 12: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "APP_ENV=dev", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-c1", "GIT_TRACE2_EVENT=/tmp/hde-crd-0003-qa/trace-c1", "python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c1", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/adapter/test_jsonschema.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:27:43Z; ended_utc: 2026-11-11T08:34:30Z; exit_code: 0
+stdout (2284 bytes):
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+...............xx....................................................... [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+=========================== short test summary info ============================
+XFAIL tests/adapter/test_jsonschema.py::test_version_schema_ok_dev - /internal/version untouched in PR scope
+XFAIL tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod - /internal/version untouched in PR scope
+1685 passed, 2 xfailed in 406.23s (0:06:46)
+stderr (0 bytes):
+(empty)
+--- command 13: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:34:30Z; ended_utc: 2026-11-11T08:34:30Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 14: ["python3", "-I", "-c", "import json,os,sys; d=sys.argv[1]; fs=sorted(os.listdir(d)); n=0; ev=0; hits=[]\nfor f in fs:\n    for ln in open(os.path.join(d,f),encoding='utf-8',errors='replace'):\n        try: e=json.loads(ln)\n        except Exception: continue\n        if e.get('event')!='child_start': continue\n        ev+=1; a=e.get('argv') or []\n        if 'maintenance' in a or ('gc' in a and '--auto' in a): hits.append(a)\nprint('TRACE_FILES='+str(len(fs)), 'CHILD_START_EVENTS='+str(ev), 'MATCHING_CHILD_START='+str(len(hits))); [print('MATCH', json.dumps(h)) for h in hits]", "/tmp/hde-crd-0003-qa/trace-c1"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:34:30Z; ended_utc: 2026-11-11T08:34:32Z; exit_code: 0
+stdout (62 bytes):
+TRACE_FILES=4835 CHILD_START_EVENTS=64 MATCHING_CHILD_START=0
+stderr (0 bytes):
+(empty)
+--- command 15: ["stat", "-f", "-c", "%T", "/dev/shm/hde-crd-0003-c2"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:34:32Z; ended_utc: 2026-11-11T08:34:32Z; exit_code: 0
+stdout (6 bytes):
+tmpfs
+stderr (0 bytes):
+(empty)
+--- command 16: ["stat", "-c", "%d", "/dev/shm/hde-crd-0003-c2"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:34:32Z; ended_utc: 2026-11-11T08:34:32Z; exit_code: 0
+stdout (3 bytes):
+27
+stderr (0 bytes):
+(empty)
+--- command 17: ["stat", "-f", "-c", "%T", "/tmp/hde-crd-0003-qa/clone"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:34:32Z; ended_utc: 2026-11-11T08:34:32Z; exit_code: 0
+stdout (10 bytes):
+ext2/ext3
+stderr (0 bytes):
+(empty)
+--- command 18: ["stat", "-c", "%d", "/tmp/hde-crd-0003-qa/clone"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:34:32Z; ended_utc: 2026-11-11T08:34:32Z; exit_code: 0
+stdout (5 bytes):
+2052
+stderr (0 bytes):
+(empty)
+--- command 19: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "APP_ENV=dev", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty", "python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/dev/shm/hde-crd-0003-c2", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/adapter/test_jsonschema.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:34:32Z; ended_utc: 2026-11-11T08:40:47Z; exit_code: 0
+stdout (2509 bytes):
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+.....................................................ss................. [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+...............xx....................................................... [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/qa/test_generate_epic_close_pack.py:1525: test requires a relatime mount without noatime
+SKIPPED [1] tests/qa/test_generate_epic_close_pack.py:1571: test requires a relatime mount without noatime
+XFAIL tests/adapter/test_jsonschema.py::test_version_schema_ok_dev - /internal/version untouched in PR scope
+XFAIL tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod - /internal/version untouched in PR scope
+1683 passed, 2 skipped, 2 xfailed in 374.44s (0:06:14)
+stderr (0 bytes):
+(empty)
+--- command 20: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:40:47Z; ended_utc: 2026-11-11T08:40:48Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 21: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "APP_ENV=dev", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty", "HDAPI_BASE_URL=https://other.invalid/v2", "python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c3", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/adapter/test_jsonschema.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:40:48Z; ended_utc: 2026-11-11T08:47:28Z; exit_code: 1
+stdout (20409 bytes):
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+.....................................................................FFF [ 81%]
+FFFFFFFFFF.....xx....................................................... [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+=================================== FAILURES ===================================
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[case_variant_V2] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff79468ec0>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff7946a570>
+name = 'case_variant_V2'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[conflicting_markers] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff79468080>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff794694f0>
+name = 'conflicting_markers'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[empty_query] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff7946a480>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff7946bc50>
+name = 'empty_query'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[fragment] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff78a64110>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff78a645f0>
+name = 'fragment'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+___ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[http] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff78a67e30>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff78a64d40>
+name = 'http'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[no_host] __
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff78a66150>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff78a67350>
+name = 'no_host'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[nonterminal_v2] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff78a662a0>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff78a65130>
+name = 'nonterminal_v2'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+__ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[query] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff78a65cd0>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff78a66330>
+name = 'query'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[relative] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff7946b440>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff7946a4e0>
+name = 'relative'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[unversioned] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff78a67140>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff78a661e0>
+name = 'unversioned'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[unversioned_prefix] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff7946bb30>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff7946b4a0>
+name = 'unversioned_prefix'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+_ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[userinfo] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff78a67e00>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff78a64b00>
+name = 'userinfo'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+____ test_s02_showcompat_vendor_refuses_before_any_client_or_credential[v3] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74ff789fda60>
+capsys = <_pytest.capture.CaptureFixture object at 0x74ff789feab0>, name = 'v3'
+
+    @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
+    def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
+        _no_client(monkeypatch)
+        for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
+            monkeypatch.setenv(key, str(value))
+        argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
+                "--birthdate-b", "1991-02-02", "--birthtime-b", "13:00", "--location-b", "Berlin"]
+        assert cli(argv) == 1
+        captured = capsys.readouterr()
+>       assert (captured.out, captured.err) == ("", "PROVIDER_ROUTE_UNSUPPORTED\n")
+E       AssertionError: assert ('', 'PROVIDE...IG_INVALID\n') == ('', 'PROVIDE...NSUPPORTED\n')
+E         
+E         At index 1 diff: 'PROVIDER_CONFIG_INVALID\n' != 'PROVIDER_ROUTE_UNSUPPORTED\n'
+E         Use -v to get more diff
+
+tests/bodygraph/test_bg_resolve_route_policy.py:352: AssertionError
+=========================== short test summary info ============================
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[case_variant_V2]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[conflicting_markers]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[empty_query]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[fragment]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[http]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[no_host]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[nonterminal_v2]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[query]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[relative]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[unversioned]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[unversioned_prefix]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[userinfo]
+FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[v3]
+XFAIL tests/adapter/test_jsonschema.py::test_version_schema_ok_dev - /internal/version untouched in PR scope
+XFAIL tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod - /internal/version untouched in PR scope
+13 failed, 1672 passed, 2 xfailed in 398.94s (0:06:38)
+stderr (0 bytes):
+(empty)
+--- command 22: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:47:28Z; ended_utc: 2026-11-11T08:47:28Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 23: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty", "python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c4a", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/adapter/test_jsonschema.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:47:28Z; ended_utc: 2026-11-11T08:54:08Z; exit_code: 0
+stdout (2284 bytes):
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+...............xx....................................................... [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+=========================== short test summary info ============================
+XFAIL tests/adapter/test_jsonschema.py::test_version_schema_ok_dev - /internal/version untouched in PR scope
+XFAIL tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod - /internal/version untouched in PR scope
+1685 passed, 2 xfailed in 398.80s (0:06:38)
+stderr (0 bytes):
+(empty)
+--- command 24: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:54:08Z; ended_utc: 2026-11-11T08:54:08Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 25: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "APP_ENV=test", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty", "python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c4b", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/adapter/test_jsonschema.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T08:54:08Z; ended_utc: 2026-11-11T09:00:50Z; exit_code: 0
+stdout (2284 bytes):
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+...............xx....................................................... [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+=========================== short test summary info ============================
+XFAIL tests/adapter/test_jsonschema.py::test_version_schema_ok_dev - /internal/version untouched in PR scope
+XFAIL tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod - /internal/version untouched in PR scope
+1685 passed, 2 xfailed in 401.34s (0:06:41)
+stderr (0 bytes):
+(empty)
+--- command 26: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:00:50Z; ended_utc: 2026-11-11T09:00:50Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 27: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "APP_ENV=prod", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty", "python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c4c", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/adapter/test_jsonschema.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:00:50Z; ended_utc: 2026-11-11T09:07:36Z; exit_code: 0
+stdout (2284 bytes):
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+...............xx....................................................... [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+=========================== short test summary info ============================
+XFAIL tests/adapter/test_jsonschema.py::test_version_schema_ok_dev - /internal/version untouched in PR scope
+XFAIL tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod - /internal/version untouched in PR scope
+1685 passed, 2 xfailed in 404.64s (0:06:44)
+stderr (0 bytes):
+(empty)
+--- command 28: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:07:36Z; ended_utc: 2026-11-11T09:07:36Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 29: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "APP_ENV=dev", "ENGINE_ENV=dev", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty", "python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c5a", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/adapter/test_jsonschema.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:07:36Z; ended_utc: 2026-11-11T09:14:24Z; exit_code: 0
+stdout (2284 bytes):
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+...............xx....................................................... [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+=========================== short test summary info ============================
+XFAIL tests/adapter/test_jsonschema.py::test_version_schema_ok_dev - /internal/version untouched in PR scope
+XFAIL tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod - /internal/version untouched in PR scope
+1685 passed, 2 xfailed in 407.21s (0:06:47)
+stderr (0 bytes):
+(empty)
+--- command 30: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:14:24Z; ended_utc: 2026-11-11T09:14:24Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 31: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "APP_ENV=dev", "ENGINE_ENV=prod", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty", "python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c5b", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/adapter/test_jsonschema.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:14:24Z; ended_utc: 2026-11-11T09:21:19Z; exit_code: 0
+stdout (2284 bytes):
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+...............xx....................................................... [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+=========================== short test summary info ============================
+XFAIL tests/adapter/test_jsonschema.py::test_version_schema_ok_dev - /internal/version untouched in PR scope
+XFAIL tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod - /internal/version untouched in PR scope
+1685 passed, 2 xfailed in 413.29s (0:06:53)
+stderr (0 bytes):
+(empty)
+--- command 32: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:21:19Z; ended_utc: 2026-11-11T09:21:19Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 33: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "APP_ENV=dev", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty", "python", "-m", "pytest", "-q", "-rfEsx", "-p", "no:cacheprovider", "--basetemp=/tmp/hde-crd-0003-qa/bt/qa05-c6", "tests/adapter/test_jsonschema.py", "tests/qa/test_generate_epic_close_pack.py", "tests/tools/test_prepush_check.py", "tests/ops/test_hde_epic038_ops03.py", "tests/bodygraph/test_vendor_prod_override.py", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/evidence/test_hdapi_v2_contract_inventory.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:21:19Z; ended_utc: 2026-11-11T09:27:56Z; exit_code: 0
+stdout (2284 bytes):
+..xx.................................................................... [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+........................................................................ [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+=========================== short test summary info ============================
+XFAIL tests/adapter/test_jsonschema.py::test_version_schema_ok_dev - /internal/version untouched in PR scope
+XFAIL tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod - /internal/version untouched in PR scope
+1685 passed, 2 xfailed in 396.02s (0:06:36)
+stderr (0 bytes):
+(empty)
+--- command 34: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:27:56Z; ended_utc: 2026-11-11T09:27:56Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 35: ["env", "-i", "PATH=/tmp/hde-crd-0003-qa/venv/bin:/usr/local/bin:/usr/bin:/bin", "HOME=/tmp/hde-crd-0003-qa/home", "LC_ALL=C", "LANG=C", "TZ=UTC", "SAFE_MODE=1", "ALLOW_NETWORK=0", "PYTHONDONTWRITEBYTECODE=1", "APP_ENV=dev", "GIT_CONFIG_GLOBAL=/tmp/hde-crd-0003-qa/cfg/gitconfig-empty", "python", "-c", "import os, pytest; pytest.main(['-q','-p','no:cacheprovider','tests/adapter/test_jsonschema.py']); print('ENGINE_ENV' in os.environ, 'ENGINE_SERVICE_TOKEN' in os.environ)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:27:56Z; ended_utc: 2026-11-11T09:27:57Z; exit_code: 0
+stdout (121 bytes):
+..xx.                                                                    [100%]
+3 passed, 2 xfailed in 0.50s
+False False
+stderr (0 bytes):
+(empty)
+--- command 36: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:27:57Z; ended_utc: 2026-11-11T09:27:57Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command 37: ["bash", "-c", "ls -l /bin/ruby /usr/bin/ruby 2>&1; readlink -f /bin /usr/bin/ruby; command -v ruby; python3 -I -c \"import os, shutil; print(\\\"os.defpath=\\\"+os.defpath, \\\"which(ruby, path=os.defpath)=\\\"+str(shutil.which(\\\"ruby\\\", path=os.defpath)))\""]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:27:58Z; ended_utc: 2026-11-11T09:27:58Z; exit_code: 0
+stdout (226 bytes):
+lrwxrwxrwx 1 root root 7 Feb  2  2026 /bin/ruby -> ruby3.3
+lrwxrwxrwx 1 root root 7 Feb  2  2026 /usr/bin/ruby -> ruby3.3
+/usr/bin
+/usr/bin/ruby3.3
+/usr/bin/ruby
+os.defpath=/bin:/usr/bin which(ruby, path=os.defpath)=/bin/ruby
+stderr (0 bytes):
+(empty)
+--- command 38: ["bash", "-c", "\nV=$1; H=$2\necho \"### child 1: without PATH\"\nenv -i LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 HOME=$H $V/python -m pytest -q -rfE -p no:cacheprovider tests/evidence/test_hdapi_v2_contract_inventory.py; rc1=$?\necho \"child_1_exit_code: $rc1\"\necho \"### child 2: with PATH\"\nenv -i PATH=$V:/usr/local/bin:/usr/bin:/bin LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 HOME=$H $V/python -m pytest -q -rfE -p no:cacheprovider tests/evidence/test_hdapi_v2_contract_inventory.py; rc2=$?\necho \"child_2_exit_code: $rc2\"\nif [ -x /bin/ruby ] || [ -x /usr/bin/ruby ]; then exp1=0; echo \"ruby resolves in os.defpath (/bin:/usr/bin): the without-PATH part is not exercisable (Plan CHECK 5 stated limit); expected child 1 exit 0\"; else exp1=1; echo \"ruby outside os.defpath: expected child 1 exit 1 (nine typed MISSING_DEPENDENCY:ruby failures)\"; fi\n[ \"$rc1\" -eq \"$exp1\" ] && [ \"$rc2\" -eq 0 ]\n", "_", "/tmp/hde-crd-0003-qa/venv/bin", "/tmp/hde-crd-0003-qa/home"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:27:58Z; ended_utc: 2026-11-11T09:33:24Z; exit_code: 0
+stdout (1094 bytes):
+### child 1: without PATH
+........................................................................ [ 23%]
+........................................................................ [ 47%]
+........................................................................ [ 71%]
+........................................................................ [ 95%]
+.............                                                            [100%]
+301 passed in 162.83s (0:02:42)
+child_1_exit_code: 0
+### child 2: with PATH
+........................................................................ [ 23%]
+........................................................................ [ 47%]
+........................................................................ [ 71%]
+........................................................................ [ 95%]
+.............                                                            [100%]
+301 passed in 162.50s (0:02:42)
+child_2_exit_code: 0
+ruby resolves in os.defpath (/bin:/usr/bin): the without-PATH part is not exercisable (Plan CHECK 5 stated limit); expected child 1 exit 0
+stderr (0 bytes):
+(empty)
+--- command 39: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/8199ea32-e024-40d8-83d4-09ad72fd3206/scratchpad/hde-crd-0003-qa/clone
+started_utc: 2026-11-11T09:33:24Z; ended_utc: 2026-11-11T09:33:24Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness (Plan §7 common rule A, E-C): HEAD equals T, not shallow, status empty, Python 3.12.x, pytest, engine inside the clone, ruby, bash and curl versions, every E-L-unset name UNSET | observed: b687c813866befa5ee911a14b00ad21c1841e967; shallow false; status 0 bytes; Python 3.12.15; pytest 8.4.2; engine in clone True; ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]; presence all UNSET True | PASS
+- C1 (GIT_CONFIG_GLOBAL with auto-maintenance, GIT_TRACE2_EVENT directory): all pass under common rule C (1,687 collected: 1,685 passed and the two pre-existing xfail items of tests/adapter/test_jsonschema.py, no other non-pass); git status --porcelain empty after | observed: exit 0; final line '1685 passed, 2 xfailed in 406.23s (0:06:46)'; XFAIL ['tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod', 'tests/adapter/test_jsonschema.py::test_version_schema_ok_dev']; other non-pass none; status after: exit 0, 0 bytes | PASS
+- C2 (--basetemp on the second filesystem): all pass under common rule C (1,687 collected: 1,685 passed and the two pre-existing xfail items of tests/adapter/test_jsonschema.py, no other non-pass); git status --porcelain empty after | observed: exit 0; final line '1683 passed, 2 skipped, 2 xfailed in 374.44s (0:06:14)'; XFAIL ['tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod', 'tests/adapter/test_jsonschema.py::test_version_schema_ok_dev']; other non-pass ['SKIPPED [1] tests/qa/test_generate_epic_close_pack.py:1525: test requires a relatime mount without noatime', 'SKIPPED [1] tests/qa/test_generate_epic_close_pack.py:1571: test requires a relatime mount without noatime']; status after: exit 0, 0 bytes | FAIL
+- C3 (HDAPI_BASE_URL=https://other.invalid/v2): all pass under common rule C (1,687 collected: 1,685 passed and the two pre-existing xfail items of tests/adapter/test_jsonschema.py, no other non-pass); git status --porcelain empty after | observed: exit 1; final line '13 failed, 1672 passed, 2 xfailed in 398.94s (0:06:38)'; XFAIL ['tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod', 'tests/adapter/test_jsonschema.py::test_version_schema_ok_dev']; other non-pass ['FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[case_variant_V2]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[conflicting_markers]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[empty_query]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[fragment]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[http]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[no_host]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[nonterminal_v2]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[query]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[relative]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[unversioned]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[unversioned_prefix]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[userinfo]', 'FAILED tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential[v3]']; status after: exit 0, 0 bytes | FAIL
+- C4a (APP_ENV unset): all pass under common rule C (1,687 collected: 1,685 passed and the two pre-existing xfail items of tests/adapter/test_jsonschema.py, no other non-pass); git status --porcelain empty after | observed: exit 0; final line '1685 passed, 2 xfailed in 398.80s (0:06:38)'; XFAIL ['tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod', 'tests/adapter/test_jsonschema.py::test_version_schema_ok_dev']; other non-pass none; status after: exit 0, 0 bytes | PASS
+- C4b (APP_ENV=test): all pass under common rule C (1,687 collected: 1,685 passed and the two pre-existing xfail items of tests/adapter/test_jsonschema.py, no other non-pass); git status --porcelain empty after | observed: exit 0; final line '1685 passed, 2 xfailed in 401.34s (0:06:41)'; XFAIL ['tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod', 'tests/adapter/test_jsonschema.py::test_version_schema_ok_dev']; other non-pass none; status after: exit 0, 0 bytes | PASS
+- C4c (APP_ENV=prod): all pass under common rule C (1,687 collected: 1,685 passed and the two pre-existing xfail items of tests/adapter/test_jsonschema.py, no other non-pass); git status --porcelain empty after | observed: exit 0; final line '1685 passed, 2 xfailed in 404.64s (0:06:44)'; XFAIL ['tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod', 'tests/adapter/test_jsonschema.py::test_version_schema_ok_dev']; other non-pass none; status after: exit 0, 0 bytes | PASS
+- C5a (ENGINE_ENV=dev): all pass under common rule C (1,687 collected: 1,685 passed and the two pre-existing xfail items of tests/adapter/test_jsonschema.py, no other non-pass); git status --porcelain empty after | observed: exit 0; final line '1685 passed, 2 xfailed in 407.21s (0:06:47)'; XFAIL ['tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod', 'tests/adapter/test_jsonschema.py::test_version_schema_ok_dev']; other non-pass none; status after: exit 0, 0 bytes | PASS
+- C5b (ENGINE_ENV=prod): all pass under common rule C (1,687 collected: 1,685 passed and the two pre-existing xfail items of tests/adapter/test_jsonschema.py, no other non-pass); git status --porcelain empty after | observed: exit 0; final line '1685 passed, 2 xfailed in 413.29s (0:06:53)'; XFAIL ['tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod', 'tests/adapter/test_jsonschema.py::test_version_schema_ok_dev']; other non-pass none; status after: exit 0, 0 bytes | PASS
+- C6 (tests/adapter/test_jsonschema.py first, one process): all pass under common rule C (1,687 collected: 1,685 passed and the two pre-existing xfail items of tests/adapter/test_jsonschema.py, no other non-pass); git status --porcelain empty after | observed: exit 0; final line '1685 passed, 2 xfailed in 396.02s (0:06:36)'; XFAIL ['tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod', 'tests/adapter/test_jsonschema.py::test_version_schema_ok_dev']; other non-pass none; status after: exit 0, 0 bytes | PASS
+- C1: zero child_start events whose argv contains maintenance, or gc with --auto, across the trace files | observed: TRACE_FILES=4835 CHILD_START_EVENTS=64 MATCHING_CHILD_START=0 | PASS
+- C2: the two device ids differ (stat -c %d of the --basetemp directory and of the clone; stat -f -c %T recorded) | observed: /dev/shm/hde-crd-0003-c2: tmpfs, device 27; clone: ext2/ext3, device 2052 | PASS
+- C6: the leak probe prints False False | observed: last line 'False False' (exit 0) | PASS
+- criterion 3 (FND-037), one asserting bash -c: where ruby resolves is recorded; ruby resolves in /bin:/usr/bin here, so the without-PATH part is recorded as not exercisable (the Plan's stated limit) and the typed-failure test is its proof; with PATH all 301 pass | observed: ruby: lrwxrwxrwx 1 root root 7 Feb  2  2026 /bin/ruby -> ruby3.3; lrwxrwxrwx 1 root root 7 Feb  2  2026 /usr/bin/ruby -> ruby3.3; /usr/bin; /usr/bin/ruby3.3; /usr/bin/ruby; os.defpath=/bin:/usr/bin which(ruby, path=os.defpath)=/bin/ruby; child 1 (without PATH) exit 0, '301 passed in 162.83s (0:02:42)'; child 2 (with PATH) exit 0, '301 passed in 162.50s (0:02:42)'; asserting bash -c exit 0; test_missing_ruby_is_a_typed_failure_naming_the_dependency is collected in the file (qa-01's collection) and every one of its 301 tests passed in both children | PASS
+- git status --porcelain empty after criterion 3 | observed: exit 0, 0 bytes | PASS
+- criteria: S07-a (C1 to C6) NOT met: C2, C3; S07-c (criterion 3) recorded with the stated limit (without PATH not exercisable where ruby is in /bin:/usr/bin; the typed-failure test is its proof)
+- overall: a predicate is not met; see the FAIL rows and Plan CHECK 5 Outcomes
+- classification of each child (Plan CHECK 5 Outcomes; Plan §7 common rule B and C; Plan Templates "Exact status predicates"):
+  - C1, C4a, C4b, C4c, C5a, C5b, C6: PASS (each 1,685 passed and the two pre-existing xfail items; status empty after).
+  - C2: TOOLING_BLOCKED. Two tests did not run under this condition: SKIPPED tests/qa/test_generate_epic_close_pack.py:1525 and :1571, "test requires a relatime mount without noatime". The --basetemp filesystem, /dev/shm (tmpfs, mount options rw,nosuid,nodev,inode64,usrquota, no relatime), lacks the prerequisite. Common rule C: "Any other skip or xfail makes the check TOOLING_BLOCKED with its reason, for Kronos to classify." The device ids differ (C2's own predicate holds), and the same two tests ran and passed under every other condition (basetemp on the clone's ext4 relatime filesystem). This venue offers no other second filesystem (/tmp and /dev/shm are both tmpfs).
+  - C3: FAIL_BEHAVIOR against S07-a. 13 failures, all parametrizations of tests/bodygraph/test_bg_resolve_route_policy.py::test_s02_showcompat_vendor_refuses_before_any_client_or_credential: case_variant_V2, conflicting_markers, empty_query, fragment, http, no_host, nonterminal_v2, query, relative, unversioned, unversioned_prefix, userinfo, v3. Each asserts stderr PROVIDER_ROUTE_UNSUPPORTED and receives PROVIDER_CONFIG_INVALID (tests/bodygraph/test_bg_resolve_route_policy.py:352). The test sets HD_API_BASE_URL through monkeypatch.setenv and leaves the ambient HDAPI_BASE_URL=https://other.invalid/v2 in place, so the two base names conflict. The named test does not pass regardless of an ambient HDAPI_BASE_URL, which is S07's requirement. The failure is condition-specific: the test passes under the default condition in C1, C2, C4a to C6 (no ambient HDAPI_BASE_URL) and in the bound hosted run, so it is not recorded as not condition-specific.
+  - criterion 3 (S07-c): PASS with the stated limit. ruby resolves in /bin:/usr/bin here, so the without-PATH part is not exercisable (Plan CHECK 5), and test_missing_ruby_is_a_typed_failure_naming_the_dependency, collected in the file and passing in both children, is its proof. With PATH, all 301 pass.
+- rollup (Plan Templates "Causal precedence"; every child result kept): an unexecuted mandatory child (C2's two tests) controls as TOOLING_BLOCKED over C3's FAIL_BEHAVIOR, so the published status is TOOLING_BLOCKED. C3's FAIL_BEHAVIOR against S07-a is preserved here and in status_reason for Kronos's classification at QA-110. S07-a is not met; S07-c is met with the stated limit.
+=== NOTES ===
+- status TOOLING_BLOCKED by causal precedence, with a FAIL_BEHAVIOR child: see the classification and rollup at the end of PREDICATES. For Kronos at QA-110: C3's 13 failures are a finding against S07-a (the named tests must pass regardless of an ambient HDAPI_BASE_URL). The product's refusal itself follows canon: unequal HD_API_BASE_URL and HDAPI_BASE_URL fail closed as PROVIDER_CONFIG_INVALID (Glow QA Guide §3.5.7; HDE CLI/API/Vendor Ref §7.1.11b). The failing test, added by WU-PR-06 in 07519520 after WU-PR-02's condition matrix (Audit QA50-F05), sets HD_API_BASE_URL without clearing HDAPI_BASE_URL. QA does not edit or fix it (Plan §9); the route is Kronos's.
+- C2: the two skipped tests are environment-gated on the --basetemp mount's atime mode; this venue's only second filesystems are tmpfs without relatime. They ran and passed under every other condition. Whether C2 needs a relatime second filesystem in an attempt 2 is Kronos's decision (Plan §9); the executor did not rerun.
+- commands: C1 is command 12 (its trace count, command 14: 4,835 trace files, 64 child_start events, 0 matching); C2's stat reads are commands 15 to 18 and its run command 19; C3 command 21; C4a, C4b, C4c commands 23, 25, 27; C5a, C5b commands 29, 31; C6 command 33 and its leak probe command 35; where ruby resolves command 37; criterion 3's asserting bash -c command 38. Each condition run is followed by git status --porcelain, all empty.
+- exit_code 1 is C3's pytest status (command 21), the decisive failing child; C2's run (command 19) exited 0 with the two skips that select TOOLING_BLOCKED; every other decisive child exited 0.
+- normalizations: N-1 (each condition run is python -m pytest -q -rfEsx -p no:cacheprovider --basetemp=<fresh dir>; C2's own basetemp is the second filesystem). Criterion 3's two children use the Plan's own command, -q -rfE without --basetemp, verbatim. No other normalization.
+- execution forms, recorded as run: C1's configuration file holds [maintenance] auto = true and [gc] auto = 1, autoPackLimit = 1, autoDetach = true (command 11), and GIT_TRACE2_EVENT names an empty directory outside the clone; the child_start count (command 14) reads every trace file's JSON events. Criterion 3's asserting bash -c expects child 1 (without PATH) to exit 0 where ruby is executable in /bin or /usr/bin (the Plan's stated limit), else 1, and child 2 (with PATH) to exit 0; each child's output and status are in its stdout.
+- time: about 6.5 minutes per condition run on this 2-CPU venue; 2026-11-11T08:27:42Z to 09:33:24Z in all.
+- nonclaims: the hosted runner and the agent container are not emulated; the conditions are pinned (WU-PR-02 acceptance; Plan CHECK 5).
+- recording: each argv ran unchanged through the scratch recorder /tmp/hde-crd-0003-qa/qarun.py; pytest outputs are kept in full (the -q progress, the -rfEsx summary and every failure block); the PREDICATES section was generated mechanically from this check's transcript by a scratch evaluator, and its classification block applies Plan CHECK 5 Outcomes to those rows.
+- secret scan (collection §4.6, Plan §5.3 rule 3) on this body before publication: NO_HIT in the check's shell; and NO_HIT in the venue's parent shell, which holds the vendor and database values (a stricter second scan; comparison only, no value printed).
+- LF normalization (collection §4.6): no CR byte in any capture
