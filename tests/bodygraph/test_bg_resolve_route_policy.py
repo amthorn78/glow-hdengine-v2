@@ -343,6 +343,7 @@ def test_s02_bg_resolve_refuses_before_any_client_or_credential(monkeypatch, nam
 @pytest.mark.parametrize("name", sorted(UNSUPPORTED_BASES))
 def test_s02_showcompat_vendor_refuses_before_any_client_or_credential(monkeypatch, capsys, name):
     _no_client(monkeypatch)
+    monkeypatch.delenv("HDAPI_BASE_URL", raising=False)
     for key, value in _open_env(UNSUPPORTED_BASES[name]).items():
         monkeypatch.setenv(key, str(value))
     argv = ["showcompat", "--source", "vendor", "--birthdate-a", "1990-01-01", "--birthtime-a", "12:00", "--location-a", "Amsterdam",
