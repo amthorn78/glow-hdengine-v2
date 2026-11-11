@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0003/checks/qa-14-live-compat-cli/primary.log
+size_bytes: 67457
+sha256: 6bc576df85fa5e735366c2f704692d588f7f01fbed6df92f4a8ed4ba0be5a047
+mtime_utc: 2026-11-11T08:08:41Z
+produced_at_utc: 2026-09-22T14:25:29Z
