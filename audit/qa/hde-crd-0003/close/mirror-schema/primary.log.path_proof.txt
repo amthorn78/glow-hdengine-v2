@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0003/close/mirror-schema/primary.log
+size_bytes: 578
+sha256: bbefb0e7eeb85655d01e359e532cbb9653912aa49a419c4d6ffc8fc9fc6c75c3
+mtime_utc: 2026-11-12T03:10:34Z
+produced_at_utc: 2026-09-22T14:25:29Z

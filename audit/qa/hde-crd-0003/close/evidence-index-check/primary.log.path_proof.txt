@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0003/close/evidence-index-check/primary.log
+size_bytes: 703
+sha256: 4ec6d6f3b6e4e0b4648e2e1c799765e40e83cabe4fc568ffae5bf82153b7f6f1
+mtime_utc: 2026-11-12T03:10:34Z
+produced_at_utc: 2026-09-22T14:25:29Z

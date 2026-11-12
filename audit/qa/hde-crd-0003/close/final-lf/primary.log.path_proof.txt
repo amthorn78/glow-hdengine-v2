@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0003/close/final-lf/primary.log
+size_bytes: 558
+sha256: 3a6c1ad517edd019234bebdc4987eb4a95ac52560e27957cb4c4c38bd46af8e5
+mtime_utc: 2026-11-12T03:10:34Z
+produced_at_utc: 2026-09-22T14:25:29Z
