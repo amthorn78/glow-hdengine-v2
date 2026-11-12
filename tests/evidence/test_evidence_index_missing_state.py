@@ -1633,6 +1633,7 @@ def _write_epic_source(repo: Path, number: str, change_id: str, schema_version: 
 
 def test_s14_the_updater_publishes_and_validates_hde_crd_0003_qa_evidence(tmp_path: Path) -> None:
     repo = _copy_repo(tmp_path)
+    _strip_from_copy(repo, "audit/qa/hde-crd-0003")
     assert not (repo / "audit/qa/hde-crd-0003").exists()
     program = CRD_FIXTURE_PROGRAM.replace(
         'config = qa.HarnessConfig(crd_id="HDE-CRD-0001", repo_root=writer.ROOT)',
