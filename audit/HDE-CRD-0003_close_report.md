@@ -1,0 +1,278 @@
+# HDE-CRD-0003 Close Report
+
+This close report is derived only from exact tracked repository inputs.
+
+## QA Rails — Open/Close (Final PR)
+
+- Close mutation set rails: closed (`ALLOW_NETWORK=0`, `APP_ENV=dev`, `LANG=C`, `LC_ALL=C`, `SAFE_MODE=1`, `TZ=UTC`); the writer refuses any other posture.
+- Closure decision: SATISFIED
+- Decision posture: review-trace-only
+
+## Acceptance and evidence pointers
+
+- `audit/qa/hde-crd-0003/qa_step_logs_manifest.json`
+- `audit/docdeltas/hde-crd-0003_doc_deltas.md`
+- `audit/docdeltas/hde-crd-0003_drain_targets.md`
+- `audit/qa/hde-crd-0003/close/`
+
+## Exact-source acceptance
+
+Requirement source: HDE-CRD-0003 Specification v1.1 (HDE-CRD-0003-SPECIFICATION, approved; SHA-256 45c803422ef9c51ed21e92430036069fa2b5d3b1b49e5e7850556f7f29d0d6d3) with Specification Delta 01 v1.0 (HDE-CRD-0003-SPECIFICATION-DELTA-01, approved; SHA-256 0b484e7915598c49f732644e1215316e4bb5b801def8a59a63509f5446d1209a). Each criterion is one of its requirement IDs, as the candidate source records them: `S01`, `S02`, `S03`, `S04`, `S05`, `S06`, `S07`, `S11`, `S12`, `S13`, `S14`, `S15`, `S16`, `S17`; criterion text is not copied.
+
+Implementation plan: HDE-CRD-0003 Implementation Plan v1.1 (HDE-CRD-0003-IMPLEMENTATION-PLAN, approved by review v1.1; SHA-256 7364dc4235dc6b82415c46585ff7b107355a5b1d441f3f4f411e3e85fc2a6f66), unchanged, with the approved WU-REM-01 remediation overlay.
+
+Authorized decision: the QA report HDE-CRD-0003 final QA Report v1.0 (HDE-CRD-0003-QA-120-QA-REPORT, verdict PASS; SHA-256 01108ca60102b9701cdc16b31ea88fd91dea1a9b7c165060aa4c946909daddc1), verdict `PASS`. Each MET criterion binds the primary of a PASS check whose QA plan mapping names it.
+
+- `S01`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`), `qa_check_15` (`audit/qa/hde-crd-0003/checks/qa-15-live-prod-override/primary.log`); limitation: S01-a rests on the bound closed-rails matrix that check 17 confirms; check 15 proves one human-initiated admitted invocation under production posture, not the full refusal matrix.
+- `S02`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`), `qa_check_15` (`audit/qa/hde-crd-0003/checks/qa-15-live-prod-override/primary.log`); limitation: S02-a rests on the bound base matrix that check 17 confirms; check 15 records one live call on a terminal v2 base, its route recorded secret-free.
+- `S03`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`), `qa_check_12` (`audit/qa/hde-crd-0003/checks/qa-12-deployed-compat-not-found/primary.log`); limitation: S03-a rests on the bound compat lane; check 12 proves the deployed production 404, and a HEAD body is not observable with curl -I (QA Plan limit).
+- `S04`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`); limitation: Proven by bound closed-rails owner tests that check 17 confirms by membership, counts and scope; QA did not re-execute them.
+- `S05`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`); limitation: Proven by bound closed-rails owner tests that check 17 confirms; QA did not re-execute them.
+- `S06`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`); limitation: S19-R04 and X-03 are fixed and proven by bound owner tests; S19-R06, X-01, X-02 and X-04 are accepted unchanged by Product Owner decision P-1 with their recorded reasons and carry no criterion.
+- `S07`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`), `qa_check_05` (`audit/qa/hde-crd-0003/checks/qa-05-hermetic-conditions/primary.log`), `qa_check_06` (`audit/qa/hde-crd-0003/checks/qa-06-prepush-snapshot-ci-selection/primary.log`), `qa_check_07` (`audit/qa/hde-crd-0003/checks/qa-07-admission-and-close-pack/primary.log`); limitation: Check 5 attempt 2 proves conditions C1 to C6 after the one-line F-1 correction; its attempt 1 is preserved as TOOLING_BLOCKED; the without-PATH case is not exercisable where ruby is in the system path.
+- `S11`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`); limitation: The pre-push replay report is removed by Product Owner decision P-2, proven by bound owner tests that check 17 confirms.
+- `S12`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`); limitation: Regenerated and checked for currency by Product Owner decision P-3, proven by the bound product, evidence and rails lanes that check 17 confirms.
+- `S13`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`); limitation: Epic close runs are admitted by the identity rule of Product Owner decision P-4, proven by bound evidence-lane owner tests; CRD admission stays explicit.
+- `S14`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`), `qa_check_16` (`audit/qa/hde-crd-0003/checks/qa-16-evidence-admission/primary.log`); limitation: Check 16 proves the real HDE-CRD-0003 publication; the owner test precondition defect CF-1 was remedied after QA by WU-REM-01, with no QA check reopened.
+- `S15`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_07` (`audit/qa/hde-crd-0003/checks/qa-07-admission-and-close-pack/primary.log`); limitation: Check 7 proves the governance binding on the real committed close packs of HDE-CRD-0002 and HDE-EPIC041 on full history; no bound hosted lane executed that module.
+- `S16`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`); limitation: Bound owner tests run the utility on the pinned corpus twice; the hosted runtime of its exact-equality gate stays with the Product Owner (HDE Build Notes 2.13 R-4).
+- `S17`: MET; evidence `qa_manifest` (`audit/qa/hde-crd-0003/qa_step_logs_manifest.json`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`), `qa_check_07` (`audit/qa/hde-crd-0003/checks/qa-07-admission-and-close-pack/primary.log`); limitation: Six acceptance bullets rest on bound owner tests and one static read that check 17 confirms; check 7 proves a v2 close-pack write; the vendored HDE Build Notes copy is the expected 14.1.2.
+
+## Coverage versus the QA plan
+
+QA plan: HDE-CRD-0003 QA Plan v1.2 (HDE-CRD-0003-QA-PLAN, approved at QA-70 review v1.2; SHA-256 7a185a24038913e6775633a89e2faaa0fdda4eceabebf09ba54d618cfffa05bb). Each planned check, in plan order, with the criteria its mapping names, its QA ledger status as a coverage status and its closeout impact.
+
+- 1. `qa-01-preflight` (no criteria): PASS; closeout impact: closure gate met
+- 2. `qa-17-bound-ci-coverage` (`S01`, `S02`, `S03`, `S04`, `S05`, `S06`, `S07`, `S11`, `S12`, `S13`, `S14`, `S16`, `S17`): PASS; closeout impact: closure gate met
+- 3. `qa-05-hermetic-conditions` (`S07`): PASS; closeout impact: closure gate met
+- 4. `qa-06-prepush-snapshot-ci-selection` (`S07`): PASS; closeout impact: closure gate met
+- 5. `qa-07-admission-and-close-pack` (`S07`, `S15`, `S17`): PASS; closeout impact: closure gate met
+- 6. `qa-11-deployed-identity` (no criteria): PASS; closeout impact: closure gate met
+- 7. `qa-12-deployed-compat-not-found` (`S03`): PASS; closeout impact: closure gate met
+- 8. `qa-13-deployed-reader-syn` (no criteria): PASS; closeout impact: closure gate met
+- 9. `qa-14-live-compat-cli` (no criteria): PASS; closeout impact: closure gate met
+- 10. `qa-15-live-prod-override` (`S01`, `S02`): PASS; closeout impact: closure gate met
+- 11. `qa-16-evidence-admission` (`S14`): PASS; closeout impact: closure gate met
+
+## Delivered scope
+
+- S17: the PF tool inputs, a manifest of the glow-docs canon tree with digest-pinned copies of the PF documents the code repository's tools and tests read, and no PF-Canon tree of its own.
+- S07 and S11: the named tests are hermetic to git maintenance, filesystem layout and the ambient environment, test clones leave the checkout alone, and the pre-push replay report is removed.
+- S07 correction F-1: one named test clears an ambient HDAPI_BASE_URL, under the Product Owner-approved Extended Moon Loop.
+- S16: the closed-rails score-distribution utility with its reference corpus, exact-equality gate and frozen baseline.
+- S13, S14 and S15: the Epic close identity rule, the HDE-CRD-0003 QA admission and the close-pack governance binding at a recorded commit on main.
+- S14 owner test that sets its own precondition, so the evidence lane passes with the HDE-CRD-0003 QA root present (CF-1).
+- S04, S05 and S06 S19-R04: write safety of the release-sanity log path and the release bundle builder, closed gate-row tokens, and owner tools that parse arguments before any side effect.
+- S01, S02 and S06 X-03: the production vendor gate for showcompat, exact terminal-segment vendor route selection and exact rails readers.
+- S03: the compat route dev and admin gate.
+- S12: the regenerated architecture snapshot and its currency check.
+- Operative repository documentation brought to the delivered state.
+- Production placement of the QA candidate, established by one bounded Ops task.
+
+## PR-to-deliverable allocation
+
+- `WU-PR-01`: S17: the PF tool inputs, a manifest of the glow-docs canon tree with digest-pinned copies of the PF documents the code repository's tools and tests read, and no PF-Canon tree of its own.
+- `WU-PR-02`: S07 and S11: the named tests are hermetic to git maintenance, filesystem layout and the ambient environment, test clones leave the checkout alone, and the pre-push replay report is removed.
+- `#846`: S07 correction F-1: one named test clears an ambient HDAPI_BASE_URL, under the Product Owner-approved Extended Moon Loop.
+- `WU-PR-03`: S16: the closed-rails score-distribution utility with its reference corpus, exact-equality gate and frozen baseline.
+- `WU-PR-04`: S13, S14 and S15: the Epic close identity rule, the HDE-CRD-0003 QA admission and the close-pack governance binding at a recorded commit on main.
+- `WU-REM-01`: S14 owner test that sets its own precondition, so the evidence lane passes with the HDE-CRD-0003 QA root present (CF-1).
+- `WU-PR-05`: S04, S05 and S06 S19-R04: write safety of the release-sanity log path and the release bundle builder, closed gate-row tokens, and owner tools that parse arguments before any side effect.
+- `WU-PR-06`: S01, S02 and S06 X-03: the production vendor gate for showcompat, exact terminal-segment vendor route selection and exact rails readers.
+- `WU-PR-07`: S03: the compat route dev and admin gate.
+- `WU-PR-08`: S12: the regenerated architecture snapshot and its currency check.
+- `WU-DOC-01`: Operative repository documentation brought to the delivered state.
+- `WU-OPS-01`: Production placement of the QA candidate, established by one bounded Ops task.
+
+## Reuse boundary
+
+- Release 1.3.0 and its 45 members are inherited baseline, refreshed in place with no version cut by WU-PR-06 and WU-PR-07.
+- The v2 close-pack writer, the canonical evidence updater, the QA harness and the CRD close-run family are reused as HDE-CRD-0002 delivered them, with this change's S13, S14 and S15 amendments; this close adds no tool.
+
+## Deferrals
+
+- `MB-084`: ADR status Deferred to the Product Owner, then the GCFPE-MGMT-10 maintenance owner; rationale: No security review exists for any unit of the change (QA50-F20); a coverage limitation with no canon home.
+- `Q-A04`: ADR status Open question deferred to the Product Owner; rationale: Whether a later change registers the reader guard as an owner of the AGENTS.md citation check; current state passes.
+- `Q-A07`: ADR status Deferred to the Product Owner as a later documentation change; rationale: AGENTS.md lines 15, 16 and 40 name a deleted canon tree; the QA Guide and QA Plan carried the correction.
+- `Q-A13`: ADR status Open question deferred to the Product Owner; rationale: Whether the ingest and worker path classifies the vendor route before constructing the client; none observed.
+- `Q-A14`: ADR status Open canon question deferred to the Product Owner; rationale: Whether HDE CLI API Vendor Ref 7.1.2 means the exact byte value or the trimmed value for the rails; the trimmed reading stands.
+- `Q-A17`: ADR status Open question deferred to the Product Owner; rationale: Whether dev conjunction routes apply the 7.1.11b conflict check; the dev surface stays as is.
+- `WU-PR-03-R-1`: ADR status Deferred to the Product Owner, unanswered; rationale: The hosted runtime of the S16 exact-equality gate (HDE Build Notes 2.13 R-4).
+- `WU-PR-06-R-2`: ADR status Recorded follow-up deferred to the Product Owner; rationale: Vendor route selection on constructed bases only; canon and the approved base agree (HDE Build Notes 2.16).
+- `WU-PR-06-R-3`: ADR status Recorded follow-up deferred to the Product Owner; rationale: The lenient-readers observation of the WU-PR-06 lineage review.
+- `WU-PR-06-F-B`: ADR status Deferred to the CLI conformance family owner; rationale: Whether to re-capture the frozen showcompat help capture.
+- `WU-PR-06-O-2`: ADR status Tidy-up deferred to the Product Owner; rationale: Stray records branches in amthorn78/glow-docs.
+- `WU-PR-02-O-1`: ADR status Deferred to the Product Owner, expected state; rationale: The vendored PF set in the PF tool inputs carries HDE Build Notes 14.1.2, not the current version.
+- `WU-OPS-01-F-1`: ADR status Deferred to the Product Owner; rationale: Whether the automatic-deploy setting is observed or inferred before Glow Infrastructure records it.
+- `WU-OPS-01-F-7`: ADR status Deferred to the Product Owner; rationale: Any rule change for model identifiers in delegated executors' commits.
+- `WU-OPS-01-F-8`: ADR status Deferred to the GCFPE-MGMT-10 maintenance owner; rationale: The observation on Ops task intake at OPS-20.
+- `WU-OPS-01-F-9`: ADR status Doc-delta candidate deferred to the Product Owner as Glow Infrastructure owner, not adopted; rationale: The live start setting, build command, builder and deploy source of the production service.
+- `CR-1`: ADR status Proposed, deferred to Isis at IA-30 when invoked; rationale: Path proofs under the WU-OPS-01 Ops root; canon governs meanwhile and check 11 carried the proof; no requirement depends on it.
+- `WU-PR-04-F-D`: ADR status Drainage deferred to the Product Owner; rationale: Canon statements that HDE Build Notes 2.8 supersedes: HDE Schemas and Artifacts 1.2 and 8.17, HDE Mechanics Guide 1.6.3 and HDE Build Checklist Calcination.
+- `WU-PR-04-VD-1`: ADR status Drainage deferred to the Product Owner as ADR owner; rationale: The title-source lines of the close-pack decision record (WU-PR-01 F-C).
+- `WU-DOC-01-O-5`: ADR status Drainage deferred to the Product Owner; rationale: The implementation-state text of HDE CLI API Vendor Ref 5.5 and 7.1.11, now that S01 and S03 are delivered.
+- `WU-REM-01-F-1`: ADR status Recorded for information, observed on the next change that selects the release lane; rationale: The release lane has not executed on main since the change's last selection of it; the two test lines changed since are outside its modules.
+- `WU-REM-01-F-5`: ADR status Deferred to the HDE Build Notes owner; rationale: The form of HDE Build Notes 2.24: no status line, no drainage or evidence section, and a close-order statement.
+- `WU-REM-01-F-6`: ADR status Recorded for the QA lane owners, only if check 16 is re-executed; rationale: QA Plan v1.2 check 16 step 3 expected the S14 owner test to fail; a re-execution needs a successor QA Plan.
+- `N-4`: ADR status Recorded caveat for future QA Plans, Kronos authoring and Isis reviewing; rationale: The secret-scan raw-header pattern can match public test-fixture text; no PF target.
+- `MB-085`: ADR status Deferred to the GCFPE-MGMT-10 maintenance owner; rationale: Prompt defect PD-1: the selected CL-05, CL-C-10 and QA-120 order the close mutation set before the closure decision, against canon.
+- `PD-2`: ADR status Deferred to the GCFPE-MGMT-10 maintenance owner; rationale: Prompt defect: CL-05 step 3a names a plan path binding that the v2 source schema has no field for.
+
+## Later-drain PF-canon update statements
+
+- Affected PF canon homes: HDE CLI API Vendor Ref. Locators: 5.5 Implementation state; 7.1.11 Required-Now implementation gap. Current canon posture: Records the compat route gate and the showcompat production vendor gate as implementation gaps. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `qa_check_12` (`audit/qa/hde-crd-0003/checks/qa-12-deployed-compat-not-found/primary.log`), `qa_check_15` (`audit/qa/hde-crd-0003/checks/qa-15-live-prod-override/primary.log`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`). Close expectation: after a separate canon-only drain step
+- Affected PF canon homes: HDE Users Guide. Locators: Entries on the showcompat vendor gate and the compat route gate. Current canon posture: Not yet reviewed against the delivered S01 and S03 behavior. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`). Close expectation: after a separate canon-only drain step
+- Affected PF canon homes: HDE Build Checklist Separation; HDE Build Checklist Distillation; HDE Build Checklist Fermentation. Locators: HDE-SEPA007; HDE-DIST008.2; HDE-FERM009. Current canon posture: Name the score-distribution utility as a candidate. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`). Close expectation: after a separate canon-only drain step
+- Affected PF canon homes: HDE Build Checklist Distillation; HDE Mechanics Guide. Locators: HDE-DIST001; 37.17. Current canon posture: Carry the architecture snapshot repair note and the snapshot root of HDE Build Notes 2.1 R-3 undrained. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`). Close expectation: after a separate canon-only drain step
+- Affected PF canon homes: HDE Schemas and Artifacts; HDE Mechanics Guide. Locators: 1.2 Close-pack artifacts; 8.17 Close-run family exception; 1.6.3. Current canon posture: Name an Epic close admission table that admits HDE-EPIC041 only, and do not state the commit-bound close-pack governance binding. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `qa_check_07` (`audit/qa/hde-crd-0003/checks/qa-07-admission-and-close-pack/primary.log`), `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`). Close expectation: after a separate canon-only drain step
+- Affected PF canon homes: HDE Math Spec; Change Process Guide. Locators: 5.2.8; 5.3.5; Specification and QA stage requirements. Current canon posture: Carry no score-distribution report requirement for a change to the HDE Math Spec. Supported later-drain action: `No status change recommended`. Drain readiness: `Supportable from repo evidence`. Evidence basis: `qa_check_17` (`audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log`). Close expectation: after a separate canon-only drain step
+- Affected PF canon homes: Glow Infrastructure. Locators: Production service build, start and deploy source. Current canon posture: Build and start commands remain gaps, and the deploy source is a Product Owner-provided fact. Supported later-drain action: `No status change recommended`. Drain readiness: `Not yet supportable from repo evidence`. Evidence basis: `qa_check_11` (`audit/qa/hde-crd-0003/checks/qa-11-deployed-identity/primary.log`). Close expectation: after a separate canon-only drain step
+- Later-drain statements are support records for future canon maintenance; they are not prerequisites, required checks, acceptance conditions or blockers of this close.
+
+## Tracked-issue closeout mapping
+
+- No TI item is cited by this change.
+
+## ADR block
+
+- ADR — PF tool inputs for the code repository's readers: Tools and tests read digest-pinned copies of PF documents named by a manifest of the glow-docs canon tree, never a PF-Canon tree of the code repository and never the network.
+  - Decision point: The code repository's PF-Canon tree was removed, its readers failed, and no CI rule there can fire on a change in amthorn78/glow-docs (DQ-1).
+  - Bounding PF canon: HDE Build Notes; HDE Governance
+  - Final decision: Add the re-homing to this change (DQ-1; Specification delta 01; HDE Build Notes 2.7).
+  - Future work: canonical
+  - Doc Delta targets: HDE Build Notes
+- ADR — Epic close admission by an identity rule: An Epic close run and close pack are admitted when the Epic ID is well formed and its tracked v2 candidate source names it.
+  - Decision point: Each Epic close run needed a close-tooling pull request to add its admission row (S13; P-4).
+  - Options considered: Admit an Epic by its ID and a tracked v2 close candidate source; Keep one admission-table row per Epic
+  - Bounding PF canon: HDE Schemas and Artifacts; Glow QA Guide; Change Process Guide
+  - Final decision: Identity rule for Epics; CRD admission stays an explicit row, with one for HDE-CRD-0003 (P-4; HDE Build Notes 2.8).
+  - Future work: canonical
+  - Doc Delta targets: HDE Schemas and Artifacts; HDE Mechanics Guide
+- ADR — Close-pack governance binding at a recorded commit: A v2 manifest records the commit at which it bound the decision record and the v2 schema, and its check verifies those bytes there.
+  - Decision point: Amending the close-pack decision record or the v2 schema broke committed close packs, which bound both by SHA-256 at HEAD (S15).
+  - Options considered: Bind at a recorded commit on main; Check in write mode only; Make the documents immutable; Drop the decision-record input; Add a schema field
+  - Bounding PF canon: HDE Schemas and Artifacts; Change Process Guide
+  - Final decision: Bind both documents at a recorded commit on main (HDE Build Notes 2.9).
+  - Future work: canonical
+  - Doc Delta targets: HDE Schemas and Artifacts
+- ADR — S19 findings fixed or accepted: Two findings are fixed with regression tests; four are accepted, and no acceptance sets policy.
+  - Decision point: Six S19 findings needed a fix or an acceptance with a recorded reason (S06; P-1).
+  - Options considered: Fix the finding; Accept the finding with a recorded reason
+  - Bounding PF canon: HDE Governance; HDE CLI API Vendor Ref
+  - Final decision: Fix S19-R04 and X-03; accept S19-R06, X-01, X-02 and X-04 with the Specification's reasons (P-1).
+  - Future work: change-specific only
+  - Doc Delta targets: None
+- ADR — Score-distribution utility and the HDE Math Spec change rule: The utility scores through evaluate_pair with the admitted bundle, registers no route or hdctl command, and gates scoring changes on the reference population.
+  - Decision point: No governed instrument measured the compat band distribution before a scoring change shipped (S16; P-5 to P-7).
+  - Bounding PF canon: HDE Math Spec; Change Process Guide; HDE CLI API Vendor Ref
+  - Final decision: A standalone tool with a committed reference corpus, exact-equality gate and frozen baseline; every HDE Math Spec change carries its report (HDE Build Notes 2.10).
+  - Future work: canonical
+  - Doc Delta targets: HDE Math Spec; Change Process Guide
+- ADR — Architecture snapshot regenerated and checked: The snapshot is regenerated by its owner, and a stale snapshot now fails its lane.
+  - Decision point: The architecture snapshot was stale and nothing checked its currency (S12; P-3).
+  - Options considered: Regenerate and check currency; Declare the family frozen
+  - Bounding PF canon: HDE Mechanics Guide; HDE Build Notes
+  - Final decision: Regenerate the snapshot and check its currency in the product and evidence lanes (P-3).
+  - Future work: change-specific only
+  - Doc Delta targets: HDE Mechanics Guide; HDE Build Checklist Distillation
+- ADR — Live compat test for this CRD: The live compat test with SYN-A and SYN-B ran for this CRD.
+  - Decision point: Canon scopes the live compat test to Epics and leaves a CRD's to the Product Owner (P-8).
+  - Bounding PF canon: Glow QA Guide; HDE Governance
+  - Final decision: Run it (P-8); checks 11, 13 and 14 carry it, and the QA Report states Live test RAN.
+  - Future work: change-specific only
+  - Doc Delta targets: None
+- ADR — CF-1 remedied by its own work unit: The owner test now sets its own precondition, and the close stage made no close-tooling repair for it.
+  - Decision point: The S14 owner test failed on main once the QA root existed, so every close pull request's evidence lane would fail (QA50-F21; CF-1).
+  - Bounding PF canon: Change Process Guide; Glow QA Guide
+  - Final decision: Remediation route through ESC-30, ESC-40 and WU-REM-01; the close tooling is not changed for it (Product Owner decision B-2, 2026-11-11).
+  - Future work: change-specific only
+  - Doc Delta targets: None
+- ADR — Close mutation set after the closure decision: This close pack was written after Isis's closure decision of CLOSE, and the prompt defect is with the GCFPE-MGMT-10 maintenance owner.
+  - Decision point: Canon puts the close mutation set after a closure decision of CLOSE, while the selected prompts put it before (B-1).
+  - Options considered: Canon order, closure decision first; Prompt order, close pack first
+  - Bounding PF canon: Change Process Guide; Glow QA Guide; Plan Templates
+  - Final decision: Canon order: the closure decision first (Product Owner decision B-1, 2026-11-11; HDE Build Notes 2.24).
+  - Future work: change-specific only
+  - Doc Delta targets: None
+
+## Follow-ups
+
+- None; the decision is SATISFIED.
+
+## Superseded artifacts
+
+- HDE-CRD-0003 CRD Retrospective and Closure Decision v1.0 (HDE-CRD-0003-CL-C-10-CLOSURE-DECISION, DO_NOT_CLOSE on CF-1; SHA-256 04055b8c0506efa4b3a61a1408d391f0f5cbd8c2f582eb5c710fd5d794051296): Superseded by closure decision v1.1, CLOSE, after WU-REM-01 removed CF-1 and the evidence lane on main passed with the QA root present (HDE Build Notes 2.24, 2.25).
+- HDE-CRD-0003 CL-05 Close Mutation Set Result v1.0 (HDE-CRD-0003-CL-05-CLOSE-MUTATION-SET-RESULT, BLOCKED; SHA-256 577850c1d8aedff2c40b14cc939a56766765c898baffbefa9c40b70901994a03): Its blockers cleared: the closure decision of CLOSE exists (B-1), and the QA50-F21 remedy is merged on main (B-2).
+
+## QA RCA and Doc Delta summary
+
+- QA RCA of record: HDE-CRD-0003 Live QA RCA v1.0 (HDE-CRD-0003-QA-120-QA-RCA, verdict PASS; SHA-256 1ca1fb27d18dcaccbd4fe7799ebe86d956c509eb19587390d026c8870ab136c5), summarized here with the QA Report v1.0.
+- What ran: the eleven checks of approved QA Plan v1.2, ten at attempt 1 on the tested tree b687c813 and check 5 at attempt 2 on 2d696790, with the live compat test in checks 11, 13 and 14.
+- Outcome meaning: all eleven current statuses are PASS; check 5 attempt 1 was TOOLING_BLOCKED and is preserved; no FAIL_BEHAVIOR or FAIL_TOOLING status is recorded.
+- F-1, cause established: a named S07 test did not clear an ambient HDAPI_BASE_URL; one line corrected it under the Product Owner-approved Extended Moon Loop (#846).
+- Original versus accepted evidence, check 5: attempt 1, TOOLING_BLOCKED and preserved at f37d1c7e, is context; attempt 2, PASS on 2d696790, is the accepted final basis.
+- F-2, cause established: check 5 condition C2 needs a relatime second filesystem; attempt 2 used a relatime tmpfs.
+- Deviation note, check 14 (coverage PASS): a QA-created gate fault stopped segment 1 before any invocation; accepted at QA-110 as a PASS-only Moon Loop deviation; the acceptance target and the five-invocation limit are unchanged.
+- Deviation note, check 15 (coverage PASS): started by human-typed launchers under HDE CLI API Vendor Ref 7.1.11e, accepted at QA-110; the wrapper text is recorded by hash only; the acceptance target is unchanged.
+- Deviation note, check 5 attempt 2 (coverage PASS): normalization N-4 quarantined a secret-scan match on public fixture text, accepted at QA-110 with a caveat; no predicate byte was dropped.
+- Normalizations N-1 to N-3 are recorded per check in the QA Report and were accepted at QA-110; none changed an objective, target, rails or predicate.
+- F-5: a QA-90 helper dry branch defect, corrected before attempt 2; its recording cause is uncertain; no evidence was affected.
+- F-6, QA50-F21: the S14 owner test asserted the QA root absent; not a QA criterion; remedied after QA by WU-REM-01 (#848), accepted at PR-40, with the evidence lane on main passing.
+- Root causes: tests added after a condition matrix ran were never run under it, and an owner test asserted repository state instead of setting its own precondition.
+- Remediation loop: F-1 by an Extended Moon Loop and one rerun of check 5; CF-1 by ESC-30, ESC-40 and WU-REM-01; no accepted QA check was reopened.
+- Evidence hygiene: every primary was published through the canonical updater and validated, and failure history is preserved in git history.
+- Doc deltas: QA identifies no new PF-Canon delta for product behavior; the change's drain items are in the doc-deltas ledger.
+- Closeout readiness: the QA outcome supported closure, and Isis decided CLOSE at CL-C-10 v1.1; this close pack's decision is distinct from both.
+- Completion states: repo-supported QA completion holds; canon drainage, Product Owner closeout, board state and formal Ops action are not claimed.
+
+## Key outputs
+
+The close-pack manifest `audit/HDE-CRD-0003_MANIFEST.json` `key_outputs` map is the binding authority for primary artifacts and their canonical paths-of-record.
+
+- `close_manifest`: `audit/HDE-CRD-0003_MANIFEST.json`
+- `close_report`: `audit/HDE-CRD-0003_close_report.md`
+- `doc_deltas`: `audit/docdeltas/hde-crd-0003_doc_deltas.md`
+- `drain_targets`: `audit/docdeltas/hde-crd-0003_drain_targets.md`
+- `qa_step_logs_manifest`: `audit/qa/hde-crd-0003/qa_step_logs_manifest.json`
+
+## Close-pack verification
+
+- The close report `audit/HDE-CRD-0003_close_report.md` and close manifest `audit/HDE-CRD-0003_MANIFEST.json` are written at their canonical filenames; check mode accepts them only as one committed pair equal to a fresh derivation from the bound inputs.
+
+## Source bindings
+
+- Candidate source: `audit/HDE-CRD-0003_close_candidate_source.json` (`sha256=e0d739deff135d319ff098a5b5327fc098ca7780afc875c2d88a2fab7794c7d8`, `size_bytes=35434`)
+- Candidate-source schema: `schemas/close_candidate_source.v2.json` (`sha256=45d71575918238829e56d99d79709ea43dce3834425bb511d267b95503f9bce0`, `size_bytes=22925`)
+- Evidence `doc_deltas`: `audit/docdeltas/hde-crd-0003_doc_deltas.md` (`sha256=520acedb2918d3afad7e068ab45c3116d52b706d6b9e8df7e2de25cdc5fcc3bd`, `size_bytes=2945`)
+- Evidence `drain_targets`: `audit/docdeltas/hde-crd-0003_drain_targets.md` (`sha256=fcdffffbe978623fac0ccb557d76646ad0e50a4b1014c2661fec6f70af2d8bc2`, `size_bytes=3507`)
+- Evidence `qa_check_01`: `audit/qa/hde-crd-0003/checks/qa-01-preflight/primary.log` (`sha256=dcf73a266699e0210e4d8f09f1b920769c1bb9aa9dabd7e676c884df07d78876`, `size_bytes=53442`)
+- Evidence `qa_check_05`: `audit/qa/hde-crd-0003/checks/qa-05-hermetic-conditions/primary.log` (`sha256=a92037d88b428022ed3b0eeb5fe2b94def7a4fc0c4da950c6f04cabf8ab01612`, `size_bytes=76171`)
+- Evidence `qa_check_06`: `audit/qa/hde-crd-0003/checks/qa-06-prepush-snapshot-ci-selection/primary.log` (`sha256=859bde355fceb9fef4709a1168457a6af94f6788aafaf826568339e8eb428062`, `size_bytes=13699`)
+- Evidence `qa_check_07`: `audit/qa/hde-crd-0003/checks/qa-07-admission-and-close-pack/primary.log` (`sha256=fb0338dac3d85607c0967447d5590113f05e611d637f453ecfb7484b58695da1`, `size_bytes=18758`)
+- Evidence `qa_check_11`: `audit/qa/hde-crd-0003/checks/qa-11-deployed-identity/primary.log` (`sha256=a46bd5f119b96daa0d82792f6be2fe6233a468714dea02b8527d688ba6ef1aca`, `size_bytes=42773`)
+- Evidence `qa_check_12`: `audit/qa/hde-crd-0003/checks/qa-12-deployed-compat-not-found/primary.log` (`sha256=230133fe66b4f67f3adef3fb672f54c886fee6882b2fc08c0a0064ba95da3eb7`, `size_bytes=24218`)
+- Evidence `qa_check_13`: `audit/qa/hde-crd-0003/checks/qa-13-deployed-reader-syn/primary.log` (`sha256=6819e2a78751b9b0c6e7722b06cf6821a5e69e279ff8e30eb4d4cd51f726b552`, `size_bytes=28876`)
+- Evidence `qa_check_14`: `audit/qa/hde-crd-0003/checks/qa-14-live-compat-cli/primary.log` (`sha256=6bc576df85fa5e735366c2f704692d588f7f01fbed6df92f4a8ed4ba0be5a047`, `size_bytes=67457`)
+- Evidence `qa_check_15`: `audit/qa/hde-crd-0003/checks/qa-15-live-prod-override/primary.log` (`sha256=e14af6ccfb8f0eb45aa632b24fa2d75356c3b518946e6187310201d6f82aa851`, `size_bytes=40208`)
+- Evidence `qa_check_16`: `audit/qa/hde-crd-0003/checks/qa-16-evidence-admission/primary.log` (`sha256=f2f989e8b446c1e5e8006b2c17a28c2442e9a751c6abb8f8b6a9e3e7c3d9fbe8`, `size_bytes=32677`)
+- Evidence `qa_check_17`: `audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log` (`sha256=3a9d0379a4ca39ce24d6bbbf18c387b8aa9b7a64e54a1eac1e51d252999d5ed1`, `size_bytes=100973`)
+- Evidence `qa_manifest`: `audit/qa/hde-crd-0003/qa_step_logs_manifest.json` (`sha256=aff3e012ee1369ddb366adcf343e88fe250ff8930fdf5d32b53976c1e57f4a75`, `size_bytes=1820`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-01-preflight/primary.log` (`sha256=dcf73a266699e0210e4d8f09f1b920769c1bb9aa9dabd7e676c884df07d78876`, `size_bytes=53442`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-05-hermetic-conditions/primary.log` (`sha256=a92037d88b428022ed3b0eeb5fe2b94def7a4fc0c4da950c6f04cabf8ab01612`, `size_bytes=76171`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-06-prepush-snapshot-ci-selection/primary.log` (`sha256=859bde355fceb9fef4709a1168457a6af94f6788aafaf826568339e8eb428062`, `size_bytes=13699`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-07-admission-and-close-pack/primary.log` (`sha256=fb0338dac3d85607c0967447d5590113f05e611d637f453ecfb7484b58695da1`, `size_bytes=18758`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-11-deployed-identity/primary.log` (`sha256=a46bd5f119b96daa0d82792f6be2fe6233a468714dea02b8527d688ba6ef1aca`, `size_bytes=42773`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-12-deployed-compat-not-found/primary.log` (`sha256=230133fe66b4f67f3adef3fb672f54c886fee6882b2fc08c0a0064ba95da3eb7`, `size_bytes=24218`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-13-deployed-reader-syn/primary.log` (`sha256=6819e2a78751b9b0c6e7722b06cf6821a5e69e279ff8e30eb4d4cd51f726b552`, `size_bytes=28876`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-14-live-compat-cli/primary.log` (`sha256=6bc576df85fa5e735366c2f704692d588f7f01fbed6df92f4a8ed4ba0be5a047`, `size_bytes=67457`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-15-live-prod-override/primary.log` (`sha256=e14af6ccfb8f0eb45aa632b24fa2d75356c3b518946e6187310201d6f82aa851`, `size_bytes=40208`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-16-evidence-admission/primary.log` (`sha256=f2f989e8b446c1e5e8006b2c17a28c2442e9a751c6abb8f8b6a9e3e7c3d9fbe8`, `size_bytes=32677`)
+- QA primary: `audit/qa/hde-crd-0003/checks/qa-17-bound-ci-coverage/primary.log` (`sha256=3a9d0379a4ca39ce24d6bbbf18c387b8aa9b7a64e54a1eac1e51d252999d5ed1`, `size_bytes=100973`)
+
+## Explicit nonclaims
+
+- No PF-Canon drainage and no PF09 or PF30 status movement is performed by this close pack.
+- The writer executes no check, QA step, deployment or merge; it derives this pack from tracked inputs only.
+- No hosted result, receipt, later-commit result or external attestation is a causal input of this close pack.
+- This report claims nothing that its bound tracked inputs do not record.
+- This close pack establishes no formal close-pack completion, merge provenance, board state, PO closeout, Isis terminal closure decision or formal Ops action.
