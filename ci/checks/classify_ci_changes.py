@@ -732,6 +732,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     "tools/evidence/generate_v2_mapped_cache_evidence.py": (
         "tests/evidence/test_v2_mapped_cache_evidence.py",
     ),
+    # HDE-EPIC042 WU-PR-01: real-path tuning-run identity proof (HDE-DISS005.3).
+    "tools/evidence/generate_hde_epic042_tuning_identity_hash.py": (
+        "tests/evidence/test_hde_epic042_tuning_identity_hash.py",
+    ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
     "tests/evidence/test_evidence_tool_ownership.py"
