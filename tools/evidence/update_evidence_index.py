@@ -3505,6 +3505,17 @@ EPIC041_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC042_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic042.pr01.tuning_identity_hash",
+        "discovered_physical_path": "audit/qa/hde-epic042/pr-01/tuning_identity_hash.txt",
+        "epic_id": "HDE-EPIC042",
+        "record_type": "epic042_pr01_evidence",
+        "schema_version": "1.0",
+        "notes": "HDE-EPIC042 WU-PR-01 real-path compat-body identity hash per tuning run (HDE-DISS005.3)",
+    },
+]
+
 CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
     {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
@@ -4504,6 +4515,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC039_QA_PRIMARY_ARTIFACTS,
             *EPIC040_QA_PRIMARY_ARTIFACTS,
             *EPIC041_QA_PRIMARY_ARTIFACTS,
+            *EPIC042_PR01_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

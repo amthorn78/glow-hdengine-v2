@@ -1,0 +1,30 @@
+schema: hde_epic042_tuning_identity_hash.v1
+epic_id: HDE-EPIC042
+task_id: HDE-DISS005
+subtask_id: HDE-DISS005.3
+work_unit_id: WU-PR-01
+hash_basis: sha256 over the LF-terminated canonical magic10_compat_result.v1 body that hdctl showcompat prints (engine.compat.compute.evaluate_pair, which calls engine.core.core.compute_core, then engine.presenter.emitter.emit_public)
+canonical_form: UTF-8, no BOM, no CRLF, exactly one trailing LF, canonical re-serialization equal
+excluded_sources: artifacts/compat/AB.json, artifacts/compat/BA.json
+release_id: 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+config_id: m10-channel-state-v1.0.0
+compat_schema: magic10_compat_result.v1
+corpus: hde-epic042-pr01-complete-fixture-charts
+pair_count: 1
+pair.1.a: fixtures/charts/alice.json
+pair.1.b: fixtures/charts/bob.json
+pair.1.pair_key: 539f0210e6eba0aa4f73186146dca48bc617af1c980c099b75205d8a172800ef
+pair.1.body_size_bytes: 3298
+pair.1.run.ab.source: in-process evaluate_pair(a, b)
+pair.1.run.ab.sha256: 7475f8e44f2d8d9f60f7336fc3c80365ffaca8b633a91a431572e1eba0482f3c
+pair.1.run.ba.source: in-process evaluate_pair(b, a)
+pair.1.run.ba.sha256: 7475f8e44f2d8d9f60f7336fc3c80365ffaca8b633a91a431572e1eba0482f3c
+pair.1.run.ab_repeat.source: in-process evaluate_pair(a, b), second run
+pair.1.run.ab_repeat.sha256: 7475f8e44f2d8d9f60f7336fc3c80365ffaca8b633a91a431572e1eba0482f3c
+pair.1.run.cli.source: python -m engine.cli showcompat --a-file a --b-file b, stdout
+pair.1.run.cli.sha256: 7475f8e44f2d8d9f60f7336fc3c80365ffaca8b633a91a431572e1eba0482f3c
+pair.1.canonical_form_ok: true
+pair.1.ab_ba_equal: true
+pair.1.two_run_equal: true
+pair.1.cli_parity_equal: true
+status: PASS

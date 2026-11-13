@@ -111,7 +111,7 @@ The direction-native narrative pack has 360 keys in `catalog/narratives/keys.jso
 * PR-01 normalization: `audit/qa/hde-epic030/pr-01/zero_weight_handoff.json`, `audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log`, `audit/qa/hde-epic030/pr-01/normalization_canonical_compare.log`
 * PR-02 dev sampler harness: `audit/qa/hde-epic030/pr-02/dev_sampler_http_headers.txt`, `audit/qa/hde-epic030/pr-02/dev_sampler_http_body.json`, `audit/qa/hde-epic030/pr-02/dev_sampler_seed_only.json`, `audit/qa/hde-epic030/pr-02/dev_sampler_two_run_identity.json`
 * PR-03 compat bindings: `audit/qa/hde-epic030/pr-03/category_order_binding.log`, `audit/qa/hde-epic030/pr-03/compat_identity_binding.log`, `audit/qa/hde-epic030/pr-03/compat_parity_binding.log`
-* PR-04 band-threshold/tuning bindings: `audit/qa/hde-epic030/pr-04/band_edges_binding.log`, `audit/qa/hde-epic030/pr-04/band_thresholds_diff.json`, `audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt`
+* PR-04 band-threshold/tuning bindings: `audit/qa/hde-epic030/pr-04/band_edges_binding.log`, `audit/qa/hde-epic030/pr-04/band_thresholds_diff.json`, `audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt`. The identity-hash file hashes placeholder-era captures and is kept as written, as history; the real-path tuning-run identity is `audit/qa/hde-epic042/pr-01/tuning_identity_hash.txt` (HDE-EPIC042 WU-PR-01), written by `tools/evidence/generate_hde_epic042_tuning_identity_hash.py`.
 * PR-05 category-framework closure: `audit/qa/hde-epic030/pr-05/per_channel_mechanics.json`, `audit/qa/hde-epic030/pr-05/category_canonical_compare.log`, `audit/qa/hde-epic030/pr-05/category_framework_binding.log`
 * Path-proof discipline: each EPIC030 PR-slice artifact above has a sibling `.path_proof.txt`; index/mirror entries are in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`.
 
@@ -137,7 +137,7 @@ The direction-native narrative pack has 360 keys in `catalog/narratives/keys.jso
 * Sidecar artifact: `artifacts/cli/abba_sidecar.json` (plus `.sha256` + `.path_proof.txt`)
 
 ## Compat identity-hash + writer/readback artifacts (EPIC027)
-* Compat identity hash: `artifacts/compat/identity_hash.txt`
+* Compat identity hash: `artifacts/compat/identity_hash.txt`, a placeholder-era capture kept as history, not current proof. The real-path compat-body identity per tuning run is `audit/qa/hde-epic042/pr-01/tuning_identity_hash.txt`.
 * Writer readback log: `artifacts/writer/conjunction_write_readback.log`
 * Writer summary: `artifacts/writer/conjunction_writer_summary.json`
 * Generator posture: `python tools/evidence/generate_conjunction_writer_evidence.py` requires explicit open rails from the caller (`SAFE_MODE=0` and `ALLOW_NETWORK=1`) when resolver/provider acquisition is needed.
