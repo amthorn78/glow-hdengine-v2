@@ -74,6 +74,7 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/config/test_config_loader_unknown_ids_fail_closed.py",
     "tests/config/test_execution_coherence.py",
     "tests/config/test_magic10_contracts.py",
+    "tests/config/test_magic10_v2_contracts.py",
     "tests/config/test_manifest_schema.py",
     "tests/config/test_production_admission.py",
     "tests/config/test_registry_catalog_contract.py",
@@ -481,6 +482,14 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "schemas/magic10_mechanics_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
     "schemas/magic10_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
     "schemas/magic10_compat_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
+    "catalog/centers_v1.json": ("tests/config/test_magic10_v2_contracts.py",),
+    "catalog/type_pairing_v1.json": ("tests/config/test_magic10_v2_contracts.py",),
+    "schemas/centers_v1.schema.json": ("tests/config/test_magic10_v2_contracts.py",),
+    "schemas/type_pairing_v1.schema.json": ("tests/config/test_magic10_v2_contracts.py",),
+    "schemas/magic10_mechanics_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py",),
+    "schemas/thresholds_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py",),
+    "schemas/magic10_result_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py",),
+    "schemas/magic10_compat_result_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py",),
     "engine/config/registry_loader.py": (
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_magic10_contracts.py",
@@ -1018,6 +1027,9 @@ _TEST_SUPPORT_OWNER_PATHS = {
     "tests/fixtures/magic10/v1/goldens.json": (
         "tests/config/test_config_artifacts.py",
     ),
+    "tests/fixtures/magic10_v2/LABEL.txt": ("tests/config/test_magic10_v2_contracts.py",),
+    "tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py",),
+    "tests/fixtures/magic10_v2/thresholds_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py",),
 }
 _SAFE_TEST_SUPPORT_PREFIXES = {
     "tests/db/": ("tests/db",),

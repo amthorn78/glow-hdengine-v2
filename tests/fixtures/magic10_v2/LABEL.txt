@@ -1,0 +1,5 @@
+NON-CANON TEST FIXTURES - HDE-EPIC042 WU-PR-02 (HDE-SEPA007.2)
+thresholds_v2.fixture.json and magic10_mechanics_v2.fixture.json are non-canon test fixtures.
+Their per-category maxima [24,49,74,100] are not the Magic-10 v2 cut and assert no canon value.
+magic10_mechanics_v2.fixture.json equals canon except sources.thresholds.sha256, which binds thresholds_v2.fixture.json.
+The governed thresholds (math/thresholds.json, "version": "2") and configuration (catalog/magic10_mechanics_v2.json) are written at the v2 release cut by HDE-DIST008.2.
