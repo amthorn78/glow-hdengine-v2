@@ -1,0 +1,481 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-03-bound-ci-coverage","check_name":"Hosted run 43670726647 covers AC-01 to AC-06 at T","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","rev-parse","--is-shallow-repository"],["git","status","--porcelain"],["python","--version"],["python","-m","pytest","--version"],["python","-c","import engine; print(engine.__file__)"],["python3","-I","-c","import os; print(' '.join(k+'='+('SET' if os.environ.get(k,'').strip() else 'UNSET') for k in ('HD_API_KEY','GEO_API_KEY','HD_API_BASE_URL','HDAPI_BASE_URL','DATABASE_URL')))"],["python3","-I","-c","import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV','PYTHONDONTWRITEBYTECODE')))"],["sed","-n","/^_DOCUMENTATION_PREFIXES = (/,/^)/p","ci/checks/classify_ci_changes.py"],["bash","-c","git diff --name-only bdcf21d1c8ecb0657a66c786277f60e900933868 HEAD | tee \"$1/d.all\"","_","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req"],["bash","-c","python3 -I \"$1\" dset \"$2/d.all\" | tee \"$2/dset.out\"","_","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req"],["bash","-c","git diff --quiet bdcf21d1c8ecb0657a66c786277f60e900933868 HEAD -- ci/checks/classify_ci_changes.py; printf \"classifier_diff_exit=%s\\n\" \"$?\""],["python3","ci/checks/classify_ci_changes.py","--base","330a7e9124c360776fd3c5a2123b24421287c00e","--head","bdcf21d1c8ecb0657a66c786277f60e900933868","--event-name","push","--github-output","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/gho-bound.txt","--changed-tests-output","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"],["cat","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/gho-bound.txt"],["wc","-l","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"],["sha256sum","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"],["bash","-c","for f in tests/evidence/test_hde_epic042_tuning_identity_hash.py tests/config/test_magic10_v2_contracts.py tests/config/test_magic10_v2_loader.py tests/evidence/test_hde_epic042_v2_contract_evidence.py; do if grep -qxF \"$f\" \"$1\"; then echo \"LISTED $f\"; else echo \"NOT_LISTED $f\"; fi; done","_","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"],["bash","-c","python -m pytest --collect-only -qq -p no:cacheprovider -- $(cat \"$1\")","_","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"],["bash","-c","python -m pytest --collect-only -qq -p no:cacheprovider -- $(cat \"$1\") | python3 -I -c \"import sys; n=[int(l.rsplit(\\\": \\\",1)[1]) for l in sys.stdin if \\\": \\\" in l]; print(\\\"FILES\\\", len(n), \\\"TOTAL\\\", sum(n))\"","_","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"],["bash","-c","python -m pytest --collect-only -qq -p no:cacheprovider -- $(cat \"$1\") | grep -c \"::\"; printf \"pytest_exit=%s grep_exit=%s\\n\" \"${PIPESTATUS[0]}\" \"${PIPESTATUS[1]}\"","_","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"],["python3","ci/checks/classify_ci_changes.py","--base","bdcf21d1c8ecb0657a66c786277f60e900933868","--head","9ca0259c8fd0c36987e0e809a758a521beb0d045","--event-name","push","--github-output","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/gho-delta.txt","--changed-tests-output","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-delta.txt"],["cat","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/gho-delta.txt"],["cat","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-delta.txt"],["python3","-I","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py","rset","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/dset.out","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-delta.txt"],["python3","-I","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py","index","audit/qa/hde-epic042/pr-01/tuning_identity_hash.txt","audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.1 check qa-03-bound-ci-coverage; QA-90 task collection v1.0 task T03 attempt 1; normalizations: N-1, N-4, N-7, N-8","evidence_artifacts":["audit/qa/hde-epic042/checks/qa-03-bound-ci-coverage/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-15T16:23:37Z"}
+=== CONTEXT ===
+check: qa-03-bound-ci-coverage; task: T03; attempt: 1
+task collection: docs/ephemeral/HDE-EPIC042-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; QA_TASK_COLLECTION v1.0, TASK_READY; git blob 9d74d47fcb36e92c44b349ddd4ae60dc336507cd, read at glow-docs main d5af69582deb8a946e1c690066f224e3f65cdaad)
+QA Plan: docs/ephemeral/HDE-EPIC042-QA-50-qa-plan-v1.1.md (amthorn78/glow-docs; QA_PLAN v1.1; git blob 8b4ba0c490dc35d2193ceaec7e72c7e3cae90d70)
+QA Plan review: docs/ephemeral/HDE-EPIC042-QA-70-qa-plan-review-v1.1.md (amthorn78/glow-docs; QA_PLAN_REVIEW v1.1, APPROVE, Isis; git blob 4343f8d281de1bd03a19f7bbe0aebc291e2b54da)
+QA Audit: docs/ephemeral/HDE-EPIC042-QA-50-qa-audit-v1.0.md (amthorn78/glow-docs; QA_AUDIT v1.0, AUDIT_COMPLETE; git blob a9549955c56d67a407690a511d340dbf31e07735)
+executing prompt: QA-100 - Execute Bounded QA Task - 110226.1 (prompts/gcfpe/library/QA-100.md, amthorn78/glow-docs; git blob e609068fb873372fb2c13bedea225ddcdc343bd3; release GCFPE-20261113.1)
+candidate T: 9ca0259c8fd0c36987e0e809a758a521beb0d045 (origin/main of amthorn78/glow-hdengine-v2 when qa-01 started); tree 8a984a2b1047918b8c63a8c321449924c9f61de3; commit time 2026-11-15T04:24:31Z
+environment class: E-L (clone at $Q/clone, detached at T; classifier run from $Q/clone because it is unchanged since C)
+venue: the Product Owner's Glow DevOps VPS (Linux shell, glowenv profile of the operator shell: open; each check command runs under its own class prefix); scratch root Q=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q (outside both repositories; the collection's example /tmp/hde-epic042-qa replaced by the executor's choice, QA-90 v1.0 section 5.3)
+executor: this Claude Code agent session (Opus 5.5), directed by the Product Owner, who chose this session and venue for the QA-100 run on 2026-11-15 at about 16:12Z (EI-1 answer: "This session, your VPS (Recommended)")
+rails as set for this check: env -i: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1; the five vendor and database names absent (default rails)
+bound evidence (confirmed by QA-110 from GitHub, not by this check): push run 43670726647 of workflow ci on main at C bdcf21d1c8ecb0657a66c786277f60e900933868, job test (id 132679942733), conclusion success; 'Run affected behavioral tests in isolation' printed '4067 passed in 662.96s (0:11:02)'; 'Run governed evidence integrity lane' concluded success
+start: 2026-11-15T16:21:53Z; end: 2026-11-15T16:23:14Z
+=== READINESS ===
+--- command 1 ---
+argv: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:53Z end: 2026-11-15T16:21:53Z exit: 0
+stdout: 41 bytes sha256 a8129d7fcee78526630ba0c9e4221ff5288786240e5034ab5c8b474c4e474d83
+9ca0259c8fd0c36987e0e809a758a521beb0d045
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 2 ---
+argv: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:53Z end: 2026-11-15T16:21:53Z exit: 0
+stdout: 6 bytes sha256 2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0
+false
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 3 ---
+argv: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:53Z end: 2026-11-15T16:21:53Z exit: 0
+stdout: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 4 ---
+argv: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:53Z end: 2026-11-15T16:21:53Z exit: 0
+stdout: 15 bytes sha256 9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0
+Python 3.12.15
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 5 ---
+argv: ["python", "-m", "pytest", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:53Z end: 2026-11-15T16:21:54Z exit: 0
+stdout: 13 bytes sha256 685b9763c7c58cdbc18e815709783c8df7d25180b45147d87452e201d5532e49
+pytest 8.4.2
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 6 ---
+argv: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:54Z end: 2026-11-15T16:21:54Z exit: 0
+stdout: 135 bytes sha256 fe0c28d8b0f8a0e43aa170ee5bace2690557ed5067fe29577573b01a80f747c0
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone/engine/__init__.py
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 7 ---
+argv: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+('SET' if os.environ.get(k,'').strip() else 'UNSET') for k in ('HD_API_KEY','GEO_API_KEY','HD_API_BASE_URL','HDAPI_BASE_URL','DATABASE_URL')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:54Z end: 2026-11-15T16:21:54Z exit: 0
+stdout: 97 bytes sha256 eda73dd3757d35e942f53b0d6ccf2f8a82a9958543f733d41fdc3969bd357a63
+HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 8 ---
+argv: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV','PYTHONDONTWRITEBYTECODE')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:54Z end: 2026-11-15T16:21:54Z exit: 0
+stdout: 89 bytes sha256 8c9004d47917ec55760e2d1c79834b8f133c629e16534be67d2b4b2fa738ffbf
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+=== COMMANDS ===
+--- command 9 ---
+argv: ["sed", "-n", "/^_DOCUMENTATION_PREFIXES = (/,/^)/p", "ci/checks/classify_ci_changes.py"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:54Z end: 2026-11-15T16:21:54Z exit: 0
+stdout: 203 bytes sha256 6416f7d5aaaca3a94ae8c8a8867328f7b3ffe16b2df41868f1d6bdc97af4813b
+_DOCUMENTATION_PREFIXES = (
+    "docs/crd/",
+    "docs/ephemeral/",
+    "docs/graph/",
+    "docs/pfcanon/",
+    "docs/plans/",
+    "docs/prompt_ecosystem_management/",
+    "docs/qa/",
+    "docs/run/",
+)
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 10 ---
+argv: ["bash", "-c", "git diff --name-only bdcf21d1c8ecb0657a66c786277f60e900933868 HEAD | tee \"$1/d.all\"", "_", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:54Z end: 2026-11-15T16:21:54Z exit: 0
+stdout: 47 bytes sha256 b06275ac3066fe3957bc180c7b96b04dfc25cc67dd9de31d53761460f22a8e39
+AGENTS.md
+CHANGELOG.md
+README.md
+docs/INDEX.md
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 11 ---
+argv: ["bash", "-c", "python3 -I \"$1\" dset \"$2/d.all\" | tee \"$2/dset.out\"", "_", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:55Z end: 2026-11-15T16:21:55Z exit: 0
+stdout: 202 bytes sha256 e467621d0018c150df4971e5f25fa5775cae7fb43b684685a3ed1be2e8b020bf
+PREFIXES docs/crd/ docs/ephemeral/ docs/graph/ docs/pfcanon/ docs/plans/ docs/prompt_ecosystem_management/ docs/qa/ docs/run/
+DIFF_ALL 4
+D_COUNT 4
+D AGENTS.md
+D CHANGELOG.md
+D README.md
+D docs/INDEX.md
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 12 ---
+argv: ["bash", "-c", "git diff --quiet bdcf21d1c8ecb0657a66c786277f60e900933868 HEAD -- ci/checks/classify_ci_changes.py; printf \"classifier_diff_exit=%s\\n\" \"$?\""]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:21:55Z end: 2026-11-15T16:21:55Z exit: 0
+stdout: 23 bytes sha256 ad51dfdc7ea4b6d73cda40f8e9f3efac8f0448eb6c29b186723b57d91e57f8c3
+classifier_diff_exit=0
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 13 ---
+argv: ["python3", "ci/checks/classify_ci_changes.py", "--base", "330a7e9124c360776fd3c5a2123b24421287c00e", "--head", "bdcf21d1c8ecb0657a66c786277f60e900933868", "--event-name", "push", "--github-output", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/gho-bound.txt", "--changed-tests-output", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:22:03Z end: 2026-11-15T16:22:04Z exit: 0
+stdout: 117 bytes sha256 b73e90a814ead88bf9171c8df4e3b284c113fb5a1b3e6600b250a8e13a7ed908
+CI_CHANGE_CLASSIFICATION:event=push;reason=selected_lanes;paths=34;lanes=product,compat,db,rails,evidence,qa,release
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 14 ---
+argv: ["cat", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/gho-bound.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:22:04Z end: 2026-11-15T16:22:04Z exit: 0
+stdout: 152 bytes sha256 2e7267ecdc9a23fe3300171330c3cd9bab9c08569939c6e734277abec7fd3634
+product=true
+compat=true
+db=true
+rails=true
+evidence=true
+qa=true
+release=true
+needs_python=true
+changed_tests=true
+reason=selected_lanes
+path_count=34
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 15 ---
+argv: ["wc", "-l", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:22:04Z end: 2026-11-15T16:22:04Z exit: 0
+stdout: 165 bytes sha256 f67181360d0088b0b1c4e9cf23946d35ad333800278ae1df5ccc1a4dcf6daee5
+177 /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 16 ---
+argv: ["sha256sum", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:22:04Z end: 2026-11-15T16:22:04Z exit: 0
+stdout: 227 bytes sha256 0cd696889074c8bc19a5181325c60c1f54e865645946a8ad3a704584e105bca5
+30e32ba94abd9f9c3f07c7b73f22317517d4b93d75fd1f308344446eafaae070  /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 17 ---
+argv: ["bash", "-c", "for f in tests/evidence/test_hde_epic042_tuning_identity_hash.py tests/config/test_magic10_v2_contracts.py tests/config/test_magic10_v2_loader.py tests/evidence/test_hde_epic042_v2_contract_evidence.py; do if grep -qxF \"$f\" \"$1\"; then echo \"LISTED $f\"; else echo \"NOT_LISTED $f\"; fi; done", "_", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:22:04Z end: 2026-11-15T16:22:04Z exit: 0
+stdout: 221 bytes sha256 d02dc18480c10ea297091f6190a1e07c000579ca42a9f2bcf549a2a5ccf2ba30
+LISTED tests/evidence/test_hde_epic042_tuning_identity_hash.py
+LISTED tests/config/test_magic10_v2_contracts.py
+LISTED tests/config/test_magic10_v2_loader.py
+LISTED tests/evidence/test_hde_epic042_v2_contract_evidence.py
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 18 ---
+argv: ["bash", "-c", "python -m pytest --collect-only -qq -p no:cacheprovider -- $(cat \"$1\")", "_", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:22:13Z end: 2026-11-15T16:22:26Z exit: 0
+stdout: 8386 bytes sha256 15ae8f09f04808318d9cfde95fc3e12789ef70e1d044d94b441abb89d4355049
+tests/adapter/test_chart_orchestration.py: 20
+tests/adapter/test_compat_writer_transport.py: 3
+tests/adapter/test_dev_sampler_http.py: 7
+tests/adapter/test_diagnostic_writer.py: 21
+tests/adapter/test_env_guard_forbidden_matrix.py: 5
+tests/adapter/test_env_guard_import.py: 1
+tests/adapter/test_env_guard_import_purity.py: 2
+tests/adapter/test_env_guard_prod_variants.py: 5
+tests/adapter/test_env_guard_silence_and_idempotence.py: 2
+tests/adapter/test_gate_auth.py: 5
+tests/adapter/test_headers_and_determinism.py: 3
+tests/arch/test_arch_guards.py: 4
+tests/artifacts/test_env_guard_artifact_bytes.py: 1
+tests/bodygraph/test_bg_resolve_route_policy.py: 58
+tests/bodygraph/test_check_magic10_gate_readiness.py: 63
+tests/bodygraph/test_gates.py: 55
+tests/bodygraph/test_projection.py: 10
+tests/bodygraph/test_projection_gate_ingress.py: 35
+tests/bodygraph/test_resolve_compat_chart.py: 38
+tests/bodygraph/test_resolver_vendor.py: 120
+tests/bodygraph/test_v2_adapter.py: 17
+tests/bodygraph/test_v2_mapped_cache.py: 24
+tests/bodygraph/test_vendor_client.py: 35
+tests/bodygraph/test_vendor_prod_override.py: 156
+tests/categories/test_registry_and_purity.py: 2
+tests/charts/test_chart_loader_import_guard.py: 4
+tests/charts/test_chart_pure_interface.py: 8
+tests/charts/test_chart_pure_purity.py: 5
+tests/cli/test_aux_preview.py: 9
+tests/cli/test_bg_resolve.py: 39
+tests/cli/test_cli_file_inputs.py: 8
+tests/cli/test_cli_install_help.py: 1
+tests/cli/test_dev_sampler_cli.py: 3
+tests/cli/test_showcompat_sources.py: 17
+tests/compare/test_arrays_as_sets.py: 24
+tests/compat/test_abba_parity.py: 1
+tests/compat/test_compat_public_ab_ba_identity.py: 2
+tests/compat/test_compat_public_lf_bom.py: 1
+tests/compat/test_conjunction_no_user_boundary.py: 21
+tests/compat/test_evaluate_pair_eligibility.py: 29
+tests/compat/test_hde_epic037_v2_adapter_to_compat.py: 5
+tests/compat/test_thresholds_constants_pack.py: 1
+tests/compat/test_ts_import_no_io.py: 1
+tests/compliance/test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.py: 3
+tests/compliance/test_invocation_tag_accept_reject_and_roundtrip.py: 2
+tests/compliance/test_log_shape_snapshot.py: 1
+tests/compliance/test_logging_filter_keys_only_and_redactions.py: 1
+tests/compliance/test_reader_etag_and_conditional.py: 1
+tests/compliance/test_reader_etag_compression_invariance.py: 1
+tests/compliance/test_release_id_precedence_and_grep_guard.py: 3
+tests/config/test_alias_policy_enforcement.py: 10
+tests/config/test_config_artifacts.py: 154
+tests/config/test_config_loader_unknown_ids_fail_closed.py: 2
+tests/config/test_execution_coherence.py: 67
+tests/config/test_magic10_contracts.py: 104
+tests/config/test_magic10_v2_contracts.py: 145
+tests/config/test_magic10_v2_loader.py: 116
+tests/config/test_manifest_schema.py: 38
+tests/config/test_production_admission.py: 136
+tests/config/test_registry_catalog_contract.py: 67
+tests/config/test_registry_report.py: 2
+tests/config/test_registry_report_determinism.py: 6
+tests/config/test_registry_report_indexing.py: 2
+tests/config/test_typed_bundles.py: 21
+tests/core/test_engine_core_abba.py: 8
+tests/core/test_engine_core_determinism.py: 105
+tests/core/test_engine_core_purity.py: 6
+tests/epic003/test_error_message_map.py: 1
+tests/epic003/test_http_home_single_path.py: 1
+tests/epic003/test_legacy_imports_denied.py: 2
+tests/epic003/test_meta_invocation_ok.py: 1
+tests/evidence/test_aux_preview_identity_parity.py: 5
+tests/evidence/test_bodygraph_policy_proofs.py: 2
+tests/evidence/test_canonical_json_gate_check_outputs.py: 96
+tests/evidence/test_cli_conformance_artifacts.py: 5
+tests/evidence/test_d23_evidence_index_snapshot_contract.py: 3
+tests/evidence/test_db_runtime_posture.py: 4
+tests/evidence/test_determinism_gate_proofs.py: 15
+tests/evidence/test_dev_conjunction_identity.py: 10
+tests/evidence/test_engine_core_evidence.py: 12
+tests/evidence/test_env_matrix_snapshot_v3.py: 6
+tests/evidence/test_epic024_acceptance_map_viability.py: 3
+tests/evidence/test_epic024_evidence_path_binding_validation.py: 2
+tests/evidence/test_epic030_pr01_pr03_fail_closed_evidence.py: 3
+tests/evidence/test_epic030_pr04_band_thresholds_evidence.py: 1
+tests/evidence/test_epic030_pr05_category_framework_evidence.py: 6
+tests/evidence/test_evidence_index_env.py: 1
+tests/evidence/test_evidence_index_snapshot.py: 3
+tests/evidence/test_evidence_index_token_sets.py: 1
+tests/evidence/test_evidence_tool_ownership.py: 27
+tests/evidence/test_hdapi_v2_contract_inventory.py: 301
+tests/evidence/test_hde_epic037_v2_adapter.py: 5
+tests/evidence/test_hde_epic038_direct_db_selection.py: 19
+tests/evidence/test_hde_epic042_tuning_identity_hash.py: 16
+tests/evidence/test_hde_epic042_v2_contract_evidence.py: 23
+tests/evidence/test_http_reader_ci_ownership.py: 4
+tests/evidence/test_identity_provenance.py: 3
+tests/evidence/test_internal_version_manifest_captures.py: 1
+tests/evidence/test_open_rails_abba_proof.py: 78
+tests/evidence/test_po_006_token_registry_validity.py: 4
+tests/evidence/test_presenter_evidence_ownership.py: 9
+tests/evidence/test_refresh_epic024_step_logs_manifest.py: 2
+tests/evidence/test_refresh_policy_snapshot.py: 1
+tests/evidence/test_release_bindings.py: 3
+tests/evidence/test_retained_evidence_safety.py: 159
+tests/evidence/test_sanity_evidence_index.py: 1
+tests/evidence/test_v2_mapped_cache_evidence.py: 18
+tests/hdctl/test_cli_admin_sidecar_invariance.py: 1
+tests/hdctl/test_cli_showcompat_parity.py: 1
+tests/hdctl/test_cli_streams_and_exits.py: 2
+tests/hdctl/test_cli_two_run_identity.py: 1
+tests/http/test_dev_conjunction_http.py: 77
+tests/http/test_endpoint_catalog.py: 247
+tests/http/test_reader_a7_transport.py: 27
+tests/http/test_reader_post_v1.py: 71
+tests/http/test_reader_post_v2.py: 72
+tests/infra/test_hash_coupling.py: 1
+tests/infra/test_sercanon_bytes.py: 1
+tests/integration/test_normalized_fixture.py: 1
+tests/invariance/test_bytes_identity.py: 1
+tests/invariance/test_determinism_env_helper.py: 4
+tests/invariance/test_locale_tz.py: 1
+tests/loader/test_load_chart_fixture_only.py: 2
+tests/loader/test_loader_hdapi_ignores_tz.py: 1
+tests/loader/test_loader_logs_keys_only.py: 1
+tests/loader/test_pinned_lists_not_empty.py: 1
+tests/loader/test_validators_strict.py: 5
+tests/m10/test_defs_order.py: 2
+tests/m10/test_m10_symmetry_identity.py: 1
+tests/m10/test_thresholds_rounding.py: 33
+tests/mech/test_arrays_as_sets.py: 5
+tests/mech/test_constants.py: 2
+tests/ops/test_hde_epic038_ops03.py: 186
+tests/provider/test_hdapi_error_mapping.py: 2
+tests/provider/test_hdapi_json_headers.py: 1
+tests/provider/test_provider_interface_contract.py: 3
+tests/provider/test_prtest_precedence_and_artifact.py: 2
+tests/provider/test_resolve_log_correlation_id.py: 1
+tests/provider/test_secrets_dir_invalid.py: 2
+tests/provider/test_secrets_unknown_provider_is_misconfigured.py: 1
+tests/provider/test_startup_logging.py: 1
+tests/provider/test_vendor_and_prod_guard.py: 6
+tests/provider/test_vendor_and_prod_guard_min.py: 2
+tests/provider/test_vendor_call_rails_and_config.py: 41
+tests/provider/test_vendor_guard_min.py: 1
+tests/qa/test_cli_admin_dumps.py: 2
+tests/qa/test_cli_admin_parity.py: 1
+tests/qa/test_epic021_scaffolding.py: 3
+tests/qa/test_epic023_acceptance_alignment.py: 3
+tests/qa/test_epic024_bootstrap_status.py: 10
+tests/qa/test_qa_tool_ownership.py: 146
+tests/reader_v1/test_emitter.py: 29
+tests/reader_v1/test_goldens.py: 7
+tests/reader_v1/test_release_pack.py: 1
+tests/reader_v1/test_schema.py: 74
+tests/runtime/test_emit_public_legacy_helper.py: 5
+tests/scripts/test_cut_release_manifest.py: 46
+tests/scripts/test_dev_sampler_healthcheck.py: 3
+tests/scripts/test_dev_start_reader.py: 10
+tests/scripts/test_make_compat_determinism_artifacts.py: 1
+tests/scripts/test_release_id_recompute.py: 1
+tests/support/test_change_gates.py: 1
+tests/tools/test_epic020_bundle_tool.py: 6
+tests/tools/test_pf_document_reader_guard.py: 3
+tests/tools/test_pf_tool_inputs.py: 24
+tests/tools/test_prepush_check.py: 63
+tests/tools/test_score_distribution.py: 11
+tests/transport/test_a7_transport_proofs.py: 26
+tests/transport/test_aux_narrative.py: 10
+tests/transport/test_ops_rails_refusal.py: 4
+tests/transport/test_writers_errors_headers.py: 3
+tests/unit/test_narratives_composer.py: 3
+tests/unit/test_narratives_loader.py: 16
+tests/unit/test_narratives_router.py: 6
+tests/unit/test_no_io_guard.py: 1
+tests/unit/test_sampler_core.py: 4
+tests/unit/test_viewer_prefs_normalization.py: 5
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 19 ---
+argv: ["bash", "-c", "python -m pytest --collect-only -qq -p no:cacheprovider -- $(cat \"$1\") | python3 -I -c \"import sys; n=[int(l.rsplit(\\\": \\\",1)[1]) for l in sys.stdin if \\\": \\\" in l]; print(\\\"FILES\\\", len(n), \\\"TOTAL\\\", sum(n))\"", "_", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:22:26Z end: 2026-11-15T16:22:39Z exit: 0
+stdout: 21 bytes sha256 3d237693a0fe8f50ce1b235818b87d302e6cd07b11dd59da9e7165438597e503
+FILES 177 TOTAL 4067
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 20 ---
+argv: ["bash", "-c", "python -m pytest --collect-only -qq -p no:cacheprovider -- $(cat \"$1\") | grep -c \"::\"; printf \"pytest_exit=%s grep_exit=%s\\n\" \"${PIPESTATUS[0]}\" \"${PIPESTATUS[1]}\"", "_", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-bound.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:22:39Z end: 2026-11-15T16:22:51Z exit: 0
+stdout: 28 bytes sha256 7f9e66da27ce72c360e6b8b3cb0ad741cb4ed7ce02349e1344790a81ed3a15e1
+0
+pytest_exit=0 grep_exit=1
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 21 ---
+argv: ["python3", "ci/checks/classify_ci_changes.py", "--base", "bdcf21d1c8ecb0657a66c786277f60e900933868", "--head", "9ca0259c8fd0c36987e0e809a758a521beb0d045", "--event-name", "push", "--github-output", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/gho-delta.txt", "--changed-tests-output", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-delta.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:23:13Z end: 2026-11-15T16:23:14Z exit: 0
+stdout: 81 bytes sha256 df724d49225d3b4494d197d8e30809b92af2438b78906853fc998797d25db46b
+CI_CHANGE_CLASSIFICATION:event=push;reason=documentation_only;paths=4;lanes=none
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 22 ---
+argv: ["cat", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/gho-delta.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:23:14Z end: 2026-11-15T16:23:14Z exit: 0
+stdout: 164 bytes sha256 2bdc69f2a6e6329facc7c479d062580a2ef65b05521f22365c48501579f65547
+product=false
+compat=false
+db=false
+rails=false
+evidence=false
+qa=false
+release=false
+needs_python=false
+changed_tests=false
+reason=documentation_only
+path_count=4
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 23 ---
+argv: ["cat", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-delta.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:23:14Z end: 2026-11-15T16:23:14Z exit: 0
+stdout: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 24 ---
+argv: ["python3", "-I", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py", "rset", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/dset.out", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-03-bound-ci-coverage/req/tests-delta.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:23:14Z end: 2026-11-15T16:23:14Z exit: 0
+stdout: 10 bytes sha256 0ef624ab4708fa2ee0fe2ac651fd1003b7bca20eb7bf76790c7a18171cedf288
+R_COUNT 0
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 25 ---
+argv: ["python3", "-I", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py", "index", "audit/qa/hde-epic042/pr-01/tuning_identity_hash.txt", "audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:23:14Z end: 2026-11-15T16:23:14Z exit: 0
+stdout: 994 bytes sha256 f9a27448c98a114afb46dc0e8224e9aa9198685d75f0912d1be443b24d451732
+{"file_present": true, "file_sha256": "976a03b57aee244d0f1385f2400372ca77b95aa3c38e3f69891159a1af524f21", "file_size": 1681, "index_entries": 1, "mirror_rows": 1, "mirror_sha256": "976a03b57aee244d0f1385f2400372ca77b95aa3c38e3f69891159a1af524f21", "mirror_size_bytes": 1681, "path": "audit/qa/hde-epic042/pr-01/tuning_identity_hash.txt", "proof_anchor": "audit/qa/hde-epic042/pr-01/tuning_identity_hash.txt.path_proof.txt", "proof_anchor_exists": true, "sha256_equal": true, "size_equal": true}
+{"file_present": true, "file_sha256": "d70909c091718de0362637e89518ad4781b0de15e2f4b31578faadd4e3bfe93e", "file_size": 121912, "index_entries": 1, "mirror_rows": 1, "mirror_sha256": "d70909c091718de0362637e89518ad4781b0de15e2f4b31578faadd4e3bfe93e", "mirror_size_bytes": 121912, "path": "audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt", "proof_anchor": "audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt.path_proof.txt", "proof_anchor_exists": true, "sha256_equal": true, "size_equal": true}
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 26 ---
+argv: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:23:14Z end: 2026-11-15T16:23:14Z exit: 0
+stdout: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+=== PREDICATES ===
+rule A (R1 to R8): R1 equals T; R2 false; R3 empty; R4 Python 3.12.15; R5 pytest 8.4.2; R6 inside the clone; R7 all five UNSET; R8 default rails -> HOLDS
+action 1 (guard): the eight documentation prefixes re-read verbatim; git diff C..T names 4 paths; D = AGENTS.md, CHANGELOG.md, README.md, docs/INDEX.md (D_COUNT 4) -> recorded
+action 2 (classifier identity): classifier_diff_exit=0 (ci/checks/classify_ci_changes.py unchanged from C to T); action 3 run in E-L -> recorded
+action 3 (membership): bound classification reason=selected_lanes, path_count=34; target list 177 entries, SHA-256 30e32ba94abd9f9c3f07c7b73f22317517d4b93d75fd1f308344446eafaae070; all four owner test files LISTED -> HOLDS
+action 4 (counts): FILES 177 TOTAL 4067, equal to the hosted 4067; owner files collect tests/evidence/test_hde_epic042_tuning_identity_hash.py 16, tests/config/test_magic10_v2_contracts.py 145, tests/config/test_magic10_v2_loader.py 116, tests/evidence/test_hde_epic042_v2_contract_evidence.py 23; no '::' line (grep count 0, pytest_exit=0) -> HOLDS
+action 5 (scope equivalence): candidate-delta classification reason=documentation_only, path_count=4, zero targets; no R_BY_TARGET and no SEARCH_MATCH line; R_COUNT 0, so R is empty and nothing re-ran -> HOLDS
+action 6 (Index lookup): audit/qa/hde-epic042/pr-01/tuning_identity_hash.txt and audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt each index_entries 1, mirror_rows 1, sha256_equal true, size_equal true, proof_anchor_exists true -> HOLDS
+action 7: git status --porcelain empty -> HOLDS
+criteria: AC-01 to AC-06 (actions 1 to 5 for the owner files of Plan CHECK 3's table) and AC-01-e, AC-06-e (action 6) hold as stated; status: PASS
+=== NOTES ===
+normalizations: N-1, N-4 (separate --github-output files gho-bound.txt and gho-delta.txt), N-7, N-8; no other
+observation: every value equals the collection's planning-baseline value (A-3)
+nonclaims: does not re-prove the 4,067 hosted results; proves they apply at T; binds no hosted run other than 43670726647; AC-01's HDE-EPIC030 bullet and AC-05's HDE-SEPA005.4 bullet are qa-05's, AC-06's tested-source attribution is qa-04's

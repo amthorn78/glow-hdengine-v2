@@ -1,0 +1,213 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"qa-09-live-vendor-functional","check_name":"The mandatory bounded live vendor test","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","rev-parse","--is-shallow-repository"],["git","status","--porcelain"],["python","--version"],["python","-m","pytest","--version"],["python","-c","import engine; print(engine.__file__)"],["python3","-I","-c","import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV','PYTHONDONTWRITEBYTECODE')))"],["python3","-I","-c","import os; s=lambda k: 'SET' if os.environ.get(k,'').strip() else 'UNSET'; u=os.environ.get('HD_API_BASE_URL','').strip().rstrip('/'); l=os.environ.get('HDAPI_BASE_URL','').strip().rstrip('/'); a=os.environ.get('APP_ENV','').strip().lower(); g=os.environ.get('ENGINE_ENV','').strip().lower(); print(*[k+'='+s(k) for k in ('HD_API_KEY','GEO_API_KEY','HD_API_BASE_URL','HDAPI_BASE_URL','DATABASE_URL')], 'BASE_CONFLICT='+str(bool(u and l and u!=l)), 'ENGINE_ENV='+(g or 'UNSET'), 'ENGINE_ENV_OK='+str(not g or g==a))"],["python3","-I","-c","import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV','PYTHONDONTWRITEBYTECODE')))"],["bash","-c","hdctl showcompat --source vendor --birthdate-a 1990-01-01 --birthtime-a 12:00 --location-a \"Amsterdam, Netherlands\" --birthdate-b 1991-02-02 --birthtime-b 13:00 --location-b \"Berlin, DE\" > \"$1/F0.stdout\" 2> \"$1/F0.stderr\"; rc=$?; printf \"F0 exit=%s stdout_bytes=%s stderr=%s\\n\" \"$rc\" \"$(wc -c < \"$1/F0.stdout\")\" \"$(cat \"$1/F0.stderr\")\"; test \"$rc\" -eq 1 && test ! -s \"$1/F0.stdout\" && test \"$(cat \"$1/F0.stderr\")\" = PROVIDER_REFUSED","_","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req"],["bash","-c","hdctl showcompat --source vendor --birthdate-a 1990-01-01 --birthtime-a 12:00 --location-a \"Amsterdam, Netherlands\" --birthdate-b 1991-02-02 --birthtime-b 13:00 --location-b \"Berlin, DE\" > \"$1/F1.stdout\" 2> \"$1/F1.stderr\"; rc=$?; cat \"$1/F1.stdout\"; cat \"$1/F1.stderr\" >&2; exit $rc","_","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req"],["python","-c","from engine.config.registry_loader import load_active_mechanics_bundle as l; b=l(); print(b.release_id); print(b.mechanics['config_id'])"],["python","-c","import inspect; from engine.magic10.thresholds import THRESHOLD_EDGES, band_for_score; print(THRESHOLD_EDGES); print(inspect.signature(band_for_score))"],["cat","math/thresholds.json"],["python3","-I","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py","doc","schemas/magic10_compat_result_v1.schema.json","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/state/manifest.sha256","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req/F1.stdout"],["python","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py","surfaces","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req/F1.stdout"],["cat","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req/F1.stdout"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.1 check qa-09-live-vendor-functional; QA-90 task collection v1.0 task T09 attempt 1; normalizations: N-1, N-5, N-7","evidence_artifacts":["audit/qa/hde-epic042/checks/qa-09-live-vendor-functional/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF04-Canon-HDE-Governance","PF27-Canon-Plan-Templates","PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-11-15T16:31:39Z"}
+=== CONTEXT ===
+check: qa-09-live-vendor-functional; task: T09; attempt: 1
+task collection: docs/ephemeral/HDE-EPIC042-QA-90-qa-task-collection-v1.0.md (amthorn78/glow-docs; QA_TASK_COLLECTION v1.0, TASK_READY; git blob 9d74d47fcb36e92c44b349ddd4ae60dc336507cd, read at glow-docs main d5af69582deb8a946e1c690066f224e3f65cdaad)
+QA Plan: docs/ephemeral/HDE-EPIC042-QA-50-qa-plan-v1.1.md (amthorn78/glow-docs; QA_PLAN v1.1; git blob 8b4ba0c490dc35d2193ceaec7e72c7e3cae90d70)
+QA Plan review: docs/ephemeral/HDE-EPIC042-QA-70-qa-plan-review-v1.1.md (amthorn78/glow-docs; QA_PLAN_REVIEW v1.1, APPROVE, Isis; git blob 4343f8d281de1bd03a19f7bbe0aebc291e2b54da)
+QA Audit: docs/ephemeral/HDE-EPIC042-QA-50-qa-audit-v1.0.md (amthorn78/glow-docs; QA_AUDIT v1.0, AUDIT_COMPLETE; git blob a9549955c56d67a407690a511d340dbf31e07735)
+executing prompt: QA-100 - Execute Bounded QA Task - 110226.1 (prompts/gcfpe/library/QA-100.md, amthorn78/glow-docs; git blob e609068fb873372fb2c13bedea225ddcdc343bd3; release GCFPE-20261113.1)
+candidate T: 9ca0259c8fd0c36987e0e809a758a521beb0d045 (origin/main of amthorn78/glow-hdengine-v2 when qa-01 started); tree 8a984a2b1047918b8c63a8c321449924c9f61de3; commit time 2026-11-15T04:24:31Z
+environment class: E-V (the E-L clone at $Q/clone, detached at T, and its interpreter, in the venue's shell, whose environment holds HD_API_KEY, GEO_API_KEY and HD_API_BASE_URL; DATABASE_URL removed by the prefix)
+venue: the Product Owner's Glow DevOps VPS (Linux shell, glowenv profile of the operator shell: open; each check command runs under its own class prefix); scratch root Q=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q (outside both repositories; the collection's example /tmp/hde-epic042-qa replaced by the executor's choice, QA-90 v1.0 section 5.3)
+executor: this Claude Code agent session (Opus 5.5), directed by the Product Owner, who chose this session and venue for the QA-100 run on 2026-11-15 at about 16:12Z (EI-1 answer: "This session, your VPS (Recommended)")
+rails as set for this check: $VC (readiness, preflight, F0 and every read): env -u DATABASE_URL, LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1; $VO (F1 only): env -u DATABASE_URL, LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1; no override flag
+class: vendor-focused (class 3), the mandatory bounded live vendor test (HDE-Governance section 3.4; Glow QA Guide section 3.5.5), executed by a directed agent
+authorization reference (P4): HDE-EPIC042-QA-90 v1.0 section 3.2, Product Owner, 2026-11-15, "Authorize all four now"; limit for attempt 1: one vendor invocation (F1), at most two vendor acquisitions and at most six vendor requests
+EI-1 as the Product Owner gave it (QA-100 session, 2026-11-15, about 16:12Z): executor this Claude Code agent session (Opus 5.5), venue the Product Owner's Glow DevOps VPS; answer "This session, your VPS (Recommended)"; the Product Owner stays the authorizing and accountable principal
+EI-2 as the Product Owner gave it (QA-100 session, 2026-11-15, about 16:12Z): agreement to this console acting as the vendor client for T08 and T09, rails open only for the vendor invocations, APP_ENV=dev, no override flag, keys from the environment and never printed; answer "Agree (Recommended)"
+request description: hdctl showcompat --source vendor, CLI-local vendor target (Glow Infrastructure section 2.7), environment class E-V; synthetic birth-only pair P3 (party A of P1, party B of P2): 1990-01-01 12:00 Amsterdam, Netherlands with 1991-02-02 13:00 Berlin, DE; no real person, user or production data
+start: 2026-11-15T16:30:41Z; end: 2026-11-15T16:31:12Z; vendor invocations: 1 (F1, command 11); F0 made no request
+=== READINESS ===
+--- command 1 ---
+argv: ["git", "rev-parse", "HEAD"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:42Z end: 2026-11-15T16:30:42Z exit: 0
+stdout: 41 bytes sha256 a8129d7fcee78526630ba0c9e4221ff5288786240e5034ab5c8b474c4e474d83
+9ca0259c8fd0c36987e0e809a758a521beb0d045
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 2 ---
+argv: ["git", "rev-parse", "--is-shallow-repository"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:43Z end: 2026-11-15T16:30:43Z exit: 0
+stdout: 6 bytes sha256 2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0
+false
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 3 ---
+argv: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:43Z end: 2026-11-15T16:30:43Z exit: 0
+stdout: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 4 ---
+argv: ["python", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:43Z end: 2026-11-15T16:30:43Z exit: 0
+stdout: 15 bytes sha256 9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0
+Python 3.12.15
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 5 ---
+argv: ["python", "-m", "pytest", "--version"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:43Z end: 2026-11-15T16:30:44Z exit: 0
+stdout: 13 bytes sha256 685b9763c7c58cdbc18e815709783c8df7d25180b45147d87452e201d5532e49
+pytest 8.4.2
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 6 ---
+argv: ["python", "-c", "import engine; print(engine.__file__)"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:44Z end: 2026-11-15T16:30:44Z exit: 0
+stdout: 135 bytes sha256 fe0c28d8b0f8a0e43aa170ee5bace2690557ed5067fe29577573b01a80f747c0
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone/engine/__init__.py
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 7 ---
+argv: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV','PYTHONDONTWRITEBYTECODE')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:44Z end: 2026-11-15T16:30:44Z exit: 0
+stdout: 89 bytes sha256 8c9004d47917ec55760e2d1c79834b8f133c629e16534be67d2b4b2fa738ffbf
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 8 ---
+argv: ["python3", "-I", "-c", "import os; s=lambda k: 'SET' if os.environ.get(k,'').strip() else 'UNSET'; u=os.environ.get('HD_API_BASE_URL','').strip().rstrip('/'); l=os.environ.get('HDAPI_BASE_URL','').strip().rstrip('/'); a=os.environ.get('APP_ENV','').strip().lower(); g=os.environ.get('ENGINE_ENV','').strip().lower(); print(*[k+'='+s(k) for k in ('HD_API_KEY','GEO_API_KEY','HD_API_BASE_URL','HDAPI_BASE_URL','DATABASE_URL')], 'BASE_CONFLICT='+str(bool(u and l and u!=l)), 'ENGINE_ENV='+(g or 'UNSET'), 'ENGINE_ENV_OK='+str(not g or g==a))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:44Z end: 2026-11-15T16:30:44Z exit: 0
+stdout: 147 bytes sha256 d36f0bece9d8bfc89d64479c4ad5e426ec4548a59db3ca6850ba6025e59a40df
+HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET BASE_CONFLICT=False ENGINE_ENV=UNSET ENGINE_ENV_OK=True
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 9 ---
+argv: ["python3", "-I", "-c", "import os; print(' '.join(k+'='+os.environ.get(k,'UNSET') for k in ('LC_ALL','LANG','TZ','SAFE_MODE','ALLOW_NETWORK','APP_ENV','PYTHONDONTWRITEBYTECODE')))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:44Z end: 2026-11-15T16:30:44Z exit: 0
+stdout: 89 bytes sha256 180b432b1307c70de99e78c84ece5050b1450a82ec0bb6e987cb4ccd993e62d9
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+=== COMMANDS ===
+--- command 10 ---
+argv: ["bash", "-c", "hdctl showcompat --source vendor --birthdate-a 1990-01-01 --birthtime-a 12:00 --location-a \"Amsterdam, Netherlands\" --birthdate-b 1991-02-02 --birthtime-b 13:00 --location-b \"Berlin, DE\" > \"$1/F0.stdout\" 2> \"$1/F0.stderr\"; rc=$?; printf \"F0 exit=%s stdout_bytes=%s stderr=%s\\n\" \"$rc\" \"$(wc -c < \"$1/F0.stdout\")\" \"$(cat \"$1/F0.stderr\")\"; test \"$rc\" -eq 1 && test ! -s \"$1/F0.stdout\" && test \"$(cat \"$1/F0.stderr\")\" = PROVIDER_REFUSED", "_", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:44Z end: 2026-11-15T16:30:45Z exit: 0
+stdout: 49 bytes sha256 06d95b11125f36f1c90383154c74020d22725a0c896ab2482b732059fe4b34af
+F0 exit=1 stdout_bytes=0 stderr=PROVIDER_REFUSED
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 11 ---
+argv: ["bash", "-c", "hdctl showcompat --source vendor --birthdate-a 1990-01-01 --birthtime-a 12:00 --location-a \"Amsterdam, Netherlands\" --birthdate-b 1991-02-02 --birthtime-b 13:00 --location-b \"Berlin, DE\" > \"$1/F1.stdout\" 2> \"$1/F1.stderr\"; rc=$?; cat \"$1/F1.stdout\"; cat \"$1/F1.stderr\" >&2; exit $rc", "_", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:30:56Z end: 2026-11-15T16:30:58Z exit: 0
+stdout: 3297 bytes sha256 b44bf61315ba37ba7aa1296cad5016f6fd7d4eaf3dbda3a0f42b1186267dd50d
+{"categories":[{"band":"Cool","category_id":"harmony","personal_hi_to_lo_key":"nar.harmony.cool.b_to_a.1.sage-01","personal_lo_to_hi_key":"nar.harmony.cool.a_to_b.1.sage-01","score":19,"shared_key":"nar.harmony.cool.shared.1.sage-01"},{"band":"Cool","category_id":"heat","personal_hi_to_lo_key":"nar.heat.cool.b_to_a.1.spark-01","personal_lo_to_hi_key":"nar.heat.cool.a_to_b.1.spark-01","score":3,"shared_key":"nar.heat.cool.shared.1.spark-01"},{"band":"Cool","category_id":"communication","personal_hi_to_lo_key":"nar.communication.cool.b_to_a.1.voice-01","personal_lo_to_hi_key":"nar.communication.cool.a_to_b.1.voice-01","score":10,"shared_key":"nar.communication.cool.shared.1.voice-01"},{"band":"Cool","category_id":"alignment","personal_hi_to_lo_key":"nar.alignment.cool.b_to_a.1.face-01","personal_lo_to_hi_key":"nar.alignment.cool.a_to_b.1.face-01","score":22,"shared_key":"nar.alignment.cool.shared.1.face-01"},{"band":"Cool","category_id":"comfort","personal_hi_to_lo_key":"nar.comfort.cool.b_to_a.1.safe-01","personal_lo_to_hi_key":"nar.comfort.cool.a_to_b.1.safe-01","score":10,"shared_key":"nar.comfort.cool.shared.1.safe-01"},{"band":"Cool","category_id":"consistency","personal_hi_to_lo_key":"nar.consistency.cool.b_to_a.1.rhythm-01","personal_lo_to_hi_key":"nar.consistency.cool.a_to_b.1.rhythm-01","score":5,"shared_key":"nar.consistency.cool.shared.1.rhythm-01"},{"band":"Cool","category_id":"expansion","personal_hi_to_lo_key":"nar.expansion.cool.b_to_a.1.wide-01","personal_lo_to_hi_key":"nar.expansion.cool.a_to_b.1.wide-01","score":0,"shared_key":"nar.expansion.cool.shared.1.wide-01"},{"band":"Cool","category_id":"creativity","personal_hi_to_lo_key":"nar.creativity.cool.b_to_a.1.make-01","personal_lo_to_hi_key":"nar.creativity.cool.a_to_b.1.make-01","score":10,"shared_key":"nar.creativity.cool.shared.1.make-01"},{"band":"Cool","category_id":"drive","personal_hi_to_lo_key":"nar.drive.cool.b_to_a.1.move-01","personal_lo_to_hi_key":"nar.drive.cool.a_to_b.1.move-01","score":10,"shared_key":"nar.drive.cool.shared.1.move-01"},{"band":"Cool","category_id":"balance","personal_hi_to_lo_key":"nar.balance.cool.b_to_a.1.fair-01","personal_lo_to_hi_key":"nar.balance.cool.a_to_b.1.fair-01","score":17,"shared_key":"nar.balance.cool.shared.1.fair-01"}],"config_id":"m10-channel-state-v1.0.0","pair_key":"ef1a5a4629dc20610a387acea3254aee98ecaf4a1e723266630bcd0c82d6c1c5","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129","schema":"magic10_compat_result.v1","signals":[{"q":38,"signal_id":"rapport_delta"},{"q":38,"signal_id":"resonance_strength"},{"q":13,"signal_id":"spark_intensity"},{"q":0,"signal_id":"momentum_flux"},{"q":0,"signal_id":"signal_clarity"},{"q":40,"signal_id":"exchange_density"},{"q":50,"signal_id":"vector_cohesion"},{"q":38,"signal_id":"axis_agreement"},{"q":38,"signal_id":"soothe_index"},{"q":0,"signal_id":"buffer_resilience"},{"q":20,"signal_id":"pattern_integrity"},{"q":0,"signal_id":"variance_stability"},{"q":0,"signal_id":"growth_tendency"},{"q":0,"signal_id":"horizon_reach"},{"q":0,"signal_id":"novelty_factor"},{"q":40,"signal_id":"expression_flow"},{"q":10,"signal_id":"willpower_current"},{"q":30,"signal_id":"focus_pressure"},{"q":0,"signal_id":"equilibrium_score"},{"q":67,"signal_id":"counterweight_ratio"}]}
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 12 ---
+argv: ["python", "-c", "from engine.config.registry_loader import load_active_mechanics_bundle as l; b=l(); print(b.release_id); print(b.mechanics['config_id'])"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:31:08Z end: 2026-11-15T16:31:09Z exit: 0
+stdout: 90 bytes sha256 c28cf42c45b482ba77f0c8f25d60db751d5b59f07003af0df4ff4a615a402155
+2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+m10-channel-state-v1.0.0
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 13 ---
+argv: ["python", "-c", "import inspect; from engine.magic10.thresholds import THRESHOLD_EDGES, band_for_score; print(THRESHOLD_EDGES); print(inspect.signature(band_for_score))"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:31:09Z end: 2026-11-15T16:31:09Z exit: 0
+stdout: 42 bytes sha256 cec51cd27fe0988c52e8f15418d615c04d6344f6519ca11feb300e10969a8b12
+(24, 49, 74, 100)
+(score: 'int') -> 'str'
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 14 ---
+argv: ["cat", "math/thresholds.json"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:31:09Z end: 2026-11-15T16:31:09Z exit: 0
+stdout: 82 bytes sha256 5a9805ac3da14c1d7a9e693a52c7faa5b1e5b9b5fc7a62972e1a8a45561f25a4
+{"clamp":[0,100],"edges":[24,49,74,100],"rounding":"ROUND_HALF_UP","version":"1"}
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 15 ---
+argv: ["python3", "-I", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py", "doc", "schemas/magic10_compat_result_v1.schema.json", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/state/manifest.sha256", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req/F1.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:31:09Z end: 2026-11-15T16:31:09Z exit: 0
+stdout: 621 bytes sha256 4b3862b6f31ef2d3f42495e7a343fff9fdf7c0d9a075b98c800e938ef0cc8107
+{"bands": {"alignment": "Cool", "balance": "Cool", "comfort": "Cool", "communication": "Cool", "consistency": "Cool", "creativity": "Cool", "drive": "Cool", "expansion": "Cool", "harmony": "Cool", "heat": "Cool"}, "bytes": 3297, "categories_count": 10, "config_id": "m10-channel-state-v1.0.0", "file": "F1.stdout", "json": true, "one_doc_one_lf": true, "release_id": "2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129", "release_id_equals_manifest_digest_at_T": true, "schema": "magic10_compat_result.v1", "schema_valid": true, "sha256": "b44bf61315ba37ba7aa1296cad5016f6fd7d4eaf3dbda3a0f42b1186267dd50d"}
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 16 ---
+argv: ["python", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/tool/qa_helper.py", "surfaces", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req/F1.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:31:09Z end: 2026-11-15T16:31:11Z exit: 0
+stdout: 769 bytes sha256 8c85235f6f82a224222cd0540ed15d8e4660696243de9342e4f5c2d27b2ddac4
+RELEASE_ID doc=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 bundle=2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129 equal=True
+CONFIG_ID doc=m10-channel-state-v1.0.0 bundle=m10-channel-state-v1.0.0 equal=True is_v1=True
+EDGES module=[24, 49, 74, 100] data=[24, 49, 74, 100] equal_as_sequences=True
+CATEGORY | score | band | band_for_score(score) | equal
+harmony | 19 | Cool | Cool | True
+heat | 3 | Cool | Cool | True
+communication | 10 | Cool | Cool | True
+alignment | 22 | Cool | Cool | True
+comfort | 10 | Cool | Cool | True
+consistency | 5 | Cool | Cool | True
+expansion | 0 | Cool | Cool | True
+creativity | 10 | Cool | Cool | True
+drive | 10 | Cool | Cool | True
+balance | 17 | Cool | Cool | True
+ALL_BANDS_EQUAL=True COUNT=10
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 17 ---
+argv: ["cat", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/checks/qa-09-live-vendor-functional/req/F1.stdout"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:31:11Z end: 2026-11-15T16:31:11Z exit: 0
+stdout: 3297 bytes sha256 b44bf61315ba37ba7aa1296cad5016f6fd7d4eaf3dbda3a0f42b1186267dd50d
+{"categories":[{"band":"Cool","category_id":"harmony","personal_hi_to_lo_key":"nar.harmony.cool.b_to_a.1.sage-01","personal_lo_to_hi_key":"nar.harmony.cool.a_to_b.1.sage-01","score":19,"shared_key":"nar.harmony.cool.shared.1.sage-01"},{"band":"Cool","category_id":"heat","personal_hi_to_lo_key":"nar.heat.cool.b_to_a.1.spark-01","personal_lo_to_hi_key":"nar.heat.cool.a_to_b.1.spark-01","score":3,"shared_key":"nar.heat.cool.shared.1.spark-01"},{"band":"Cool","category_id":"communication","personal_hi_to_lo_key":"nar.communication.cool.b_to_a.1.voice-01","personal_lo_to_hi_key":"nar.communication.cool.a_to_b.1.voice-01","score":10,"shared_key":"nar.communication.cool.shared.1.voice-01"},{"band":"Cool","category_id":"alignment","personal_hi_to_lo_key":"nar.alignment.cool.b_to_a.1.face-01","personal_lo_to_hi_key":"nar.alignment.cool.a_to_b.1.face-01","score":22,"shared_key":"nar.alignment.cool.shared.1.face-01"},{"band":"Cool","category_id":"comfort","personal_hi_to_lo_key":"nar.comfort.cool.b_to_a.1.safe-01","personal_lo_to_hi_key":"nar.comfort.cool.a_to_b.1.safe-01","score":10,"shared_key":"nar.comfort.cool.shared.1.safe-01"},{"band":"Cool","category_id":"consistency","personal_hi_to_lo_key":"nar.consistency.cool.b_to_a.1.rhythm-01","personal_lo_to_hi_key":"nar.consistency.cool.a_to_b.1.rhythm-01","score":5,"shared_key":"nar.consistency.cool.shared.1.rhythm-01"},{"band":"Cool","category_id":"expansion","personal_hi_to_lo_key":"nar.expansion.cool.b_to_a.1.wide-01","personal_lo_to_hi_key":"nar.expansion.cool.a_to_b.1.wide-01","score":0,"shared_key":"nar.expansion.cool.shared.1.wide-01"},{"band":"Cool","category_id":"creativity","personal_hi_to_lo_key":"nar.creativity.cool.b_to_a.1.make-01","personal_lo_to_hi_key":"nar.creativity.cool.a_to_b.1.make-01","score":10,"shared_key":"nar.creativity.cool.shared.1.make-01"},{"band":"Cool","category_id":"drive","personal_hi_to_lo_key":"nar.drive.cool.b_to_a.1.move-01","personal_lo_to_hi_key":"nar.drive.cool.a_to_b.1.move-01","score":10,"shared_key":"nar.drive.cool.shared.1.move-01"},{"band":"Cool","category_id":"balance","personal_hi_to_lo_key":"nar.balance.cool.b_to_a.1.fair-01","personal_lo_to_hi_key":"nar.balance.cool.a_to_b.1.fair-01","score":17,"shared_key":"nar.balance.cool.shared.1.fair-01"}],"config_id":"m10-channel-state-v1.0.0","pair_key":"ef1a5a4629dc20610a387acea3254aee98ecaf4a1e723266630bcd0c82d6c1c5","release_id":"2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129","schema":"magic10_compat_result.v1","signals":[{"q":38,"signal_id":"rapport_delta"},{"q":38,"signal_id":"resonance_strength"},{"q":13,"signal_id":"spark_intensity"},{"q":0,"signal_id":"momentum_flux"},{"q":0,"signal_id":"signal_clarity"},{"q":40,"signal_id":"exchange_density"},{"q":50,"signal_id":"vector_cohesion"},{"q":38,"signal_id":"axis_agreement"},{"q":38,"signal_id":"soothe_index"},{"q":0,"signal_id":"buffer_resilience"},{"q":20,"signal_id":"pattern_integrity"},{"q":0,"signal_id":"variance_stability"},{"q":0,"signal_id":"growth_tendency"},{"q":0,"signal_id":"horizon_reach"},{"q":0,"signal_id":"novelty_factor"},{"q":40,"signal_id":"expression_flow"},{"q":10,"signal_id":"willpower_current"},{"q":30,"signal_id":"focus_pressure"},{"q":0,"signal_id":"equilibrium_score"},{"q":67,"signal_id":"counterweight_ratio"}]}
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+--- command 18 ---
+argv: ["git", "status", "--porcelain"]
+cwd: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/faf7e503-4920-4fef-9058-d33e7f082388/scratchpad/q/clone
+start: 2026-11-15T16:31:11Z end: 2026-11-15T16:31:12Z exit: 0
+stdout: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stdout ---
+stderr: 0 bytes sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+--- end stderr ---
+=== PREDICATES ===
+rule A / P1 (R-V under $VC): R1 equals T; R2 false; R3 empty; R4 Python 3.12.15; R5 pytest 8.4.2; R6 inside the clone; R8 default rails -> HOLDS
+P2 (presence only): HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET BASE_CONFLICT=False ENGINE_ENV=UNSET ENGINE_ENV_OK=True -> HOLDS
+P3 (rails of F1 under $VO): LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 -> HOLDS
+P4: CONTEXT carries the section 3.2 authorization reference with this check's limit and EI-2 as the Product Owner gave it, recorded before F1 -> HOLDS
+LV-1-r, F0 (default rails): exit 1, stdout 0 bytes, stderr PROVIDER_REFUSED; asserting bash -c exit 0 -> HOLDS
+F1 exits 0 with empty stderr; stdout one_doc_one_lf true, schema_valid true, categories_count 10 (3,297 bytes, SHA-256 b44bf61315ba37ba7aa1296cad5016f6fd7d4eaf3dbda3a0f42b1186267dd50d) -> HOLDS
+registry loader surface: 'RELEASE_ID ... equal=True'; 'CONFIG_ID doc=m10-channel-state-v1.0.0 bundle=m10-channel-state-v1.0.0 equal=True is_v1=True' -> HOLDS
+thresholds surfaces: 'EDGES module=[24, 49, 74, 100] data=[24, 49, 74, 100] equal_as_sequences=True'; 'ALL_BANDS_EQUAL=True COUNT=10' (each band equals band_for_score(score)) -> HOLDS
+secret scan ($VC python3 -I $H scan $K, before assembly): NO_HIT files=41 names_held=3 -> HOLDS; git status --porcelain empty -> HOLDS
+classification: no provider-side, configuration or credential failure; criteria LV-1-r and LV-1 hold; status: PASS
+=== NOTES ===
+normalizations: N-1, N-5 (THRESHOLD_EDGES tuple compared with the data file's edges list as sequences), N-7 (F0 inside one asserting bash -c; F1 inside bash -c with its redirections); no other. N-6 not applied (no proxy)
+request limit: exactly one vendor invocation F1; under the client's unchanged retry policy, at most two acquisitions and six vendor requests; the exact request count is not observable from the CLI output and is not claimed. No other vendor command, no override flag
+observation (not a predicate): all ten F1 scores lie between 0 and 22 and every band is Cool, so the per-category band_for_score comparison exercised only the lowest band region (below the first edge 24); the edge equality covers all four edges
+what it proves: the unchanged v1 path works live and its result agrees with engine/config/registry_loader.py (load_active_mechanics_bundle), engine/magic10/thresholds.py and math/thresholds.json. Nonclaims: nothing about which code computed a band, Magic10 v2, the cutover, score correctness, vendor conformance, deployment, QA PASS for the change or closure; byte identity of the three surfaces is qa-05's (action 1); T09 does not replace T08 and T08 does not replace T09
