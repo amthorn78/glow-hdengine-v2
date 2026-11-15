@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic042/checks/qa-07-deployed-reader-syn/primary.log
+size_bytes: 29298
+sha256: 71ab752ac14797e9650cee94558d7330930ef8cb738af883950ac95f805101c8
+mtime_utc: 2026-11-15T17:32:18Z
+produced_at_utc: 2026-09-22T14:25:29Z

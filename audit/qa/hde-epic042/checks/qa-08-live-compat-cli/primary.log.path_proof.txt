@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic042/checks/qa-08-live-compat-cli/primary.log
+size_bytes: 81599
+sha256: 4de2fadcc63eb951797ad124a4b18201952eee4fbfaee64af7e530f6519b9e2e
+mtime_utc: 2026-11-15T17:32:18Z
+produced_at_utc: 2026-09-22T14:25:29Z

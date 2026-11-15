@@ -3527,6 +3527,64 @@ EPIC042_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC042_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic042.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic042/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.00_meta.doc_deltas.md",
+        "discovered_physical_path": "audit/qa/hde-epic042/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.checks.qa_01_d0_discovery.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic042/checks/qa-01-d0-discovery/primary.log",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.checks.qa_02_step_0b_doc_delta_capture.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic042/checks/qa-02-step-0b-doc-delta-capture/primary.log",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.checks.qa_03_bound_ci_coverage.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic042/checks/qa-03-bound-ci-coverage/primary.log",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.checks.qa_04_contract_record_attribution.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic042/checks/qa-04-contract-record-attribution/primary.log",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.checks.qa_05_ac08_v1_identity.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic042/checks/qa-05-ac08-v1-identity/primary.log",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.checks.qa_06_deployed_identity.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic042/checks/qa-06-deployed-identity/primary.log",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.checks.qa_07_deployed_reader_syn.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic042/checks/qa-07-deployed-reader-syn/primary.log",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.checks.qa_08_live_compat_cli.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic042/checks/qa-08-live-compat-cli/primary.log",
+        "epic_id": "HDE-EPIC042",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic042.checks.qa_09_live_vendor_functional.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic042/checks/qa-09-live-vendor-functional/primary.log",
+        "epic_id": "HDE-EPIC042",
+    },
+]
+
 CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
     {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
@@ -4528,6 +4586,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC041_QA_PRIMARY_ARTIFACTS,
             *EPIC042_PR01_PRIMARY_ARTIFACTS,
             *EPIC042_PR04_PRIMARY_ARTIFACTS,
+            *EPIC042_QA_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
