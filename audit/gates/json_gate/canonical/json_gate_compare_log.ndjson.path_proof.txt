@@ -1,5 +1,5 @@
 path: audit/gates/json_gate/canonical/json_gate_compare_log.ndjson
-size_bytes: 12155
-sha256: c7eaad60a40b1be7f52816cea56f12cf3debfc3e81130baecde1b04c3808e56f
-mtime_utc: 2026-11-10T05:40:55Z
+size_bytes: 15279
+sha256: e420c9d43553361f633a2db1338330a4105de8bef44e6a60bee86e07c517d8cb
+mtime_utc: 2026-11-15T02:25:37Z
 produced_at_utc: 2025-12-26T00:00:00Z

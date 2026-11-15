@@ -32,6 +32,7 @@ from adapter.http_reader import create_app
 from engine.cli.main import _candidate_from_payload
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import band_for
+from engine.config.magic10_v2_loader import _validate_v2_instance
 from engine.config.registry_loader import (
     ADMITTED_RELEASE_ROSTER,
     _LocalCapture,
@@ -231,6 +232,15 @@ TARGETS: Sequence[Target] = _GENERATED + (
     ),
     Target("schema_gates", "schemas/gates_v1.schema.json", "jsonschema.Draft202012Validator.check_schema"),
     Target("schema_channels", "schemas/channels_v1.schema.json", "jsonschema.Draft202012Validator.check_schema"),
+    # HDE-EPIC042 WU-PR-04 (EC-09): the new governed v2 contract files.
+    Target("catalog_centers_v1", "catalog/centers_v1.json", "engine.config.magic10_v2_loader._validate_v2_instance"),
+    Target("catalog_type_pairing_v1", "catalog/type_pairing_v1.json", "engine.config.magic10_v2_loader._validate_v2_instance"),
+    Target("schema_centers_v1", "schemas/centers_v1.schema.json", "jsonschema.Draft202012Validator.check_schema"),
+    Target("schema_magic10_compat_result_v2", "schemas/magic10_compat_result_v2.schema.json", "jsonschema.Draft202012Validator.check_schema"),
+    Target("schema_magic10_mechanics_v2", "schemas/magic10_mechanics_v2.schema.json", "jsonschema.Draft202012Validator.check_schema"),
+    Target("schema_magic10_result_v2", "schemas/magic10_result_v2.schema.json", "jsonschema.Draft202012Validator.check_schema"),
+    Target("schema_thresholds_v2", "schemas/thresholds_v2.schema.json", "jsonschema.Draft202012Validator.check_schema"),
+    Target("schema_type_pairing_v1", "schemas/type_pairing_v1.schema.json", "jsonschema.Draft202012Validator.check_schema"),
 )
 
 EXPECTED_TARGET_PATHS = (
@@ -247,6 +257,7 @@ EXPECTED_TARGET_PATHS = (
     "artifacts/cli/showcompat/args.json",
     "artifacts/cli/showcompat/stdout.json",
     "artifacts/cli/summary.json",
+    "catalog/centers_v1.json",
     "catalog/channels_v1.json",
     "catalog/gates_v1.json",
     "catalog/magic10.json",
@@ -258,8 +269,15 @@ EXPECTED_TARGET_PATHS = (
     "catalog/narratives/palettes.json",
     "catalog/narratives/suppression_map.json",
     "catalog/narratives/templates.json",
+    "catalog/type_pairing_v1.json",
+    "schemas/centers_v1.schema.json",
     "schemas/channels_v1.schema.json",
     "schemas/gates_v1.schema.json",
+    "schemas/magic10_compat_result_v2.schema.json",
+    "schemas/magic10_mechanics_v2.schema.json",
+    "schemas/magic10_result_v2.schema.json",
+    "schemas/thresholds_v2.schema.json",
+    "schemas/type_pairing_v1.schema.json",
 )
 
 EXPECTED_TARGET_BINDINGS = (
@@ -276,6 +294,7 @@ EXPECTED_TARGET_BINDINGS = (
     ("artifacts/cli/showcompat/args.json", "canonical_json.generated.showcompat_args.v1", None),
     ("artifacts/cli/showcompat/stdout.json", "canonical_json.generated.showcompat_capture.v1", None),
     ("artifacts/cli/summary.json", "canonical_json.generated.cli_conformance_summary.v1", None),
+    ("catalog/centers_v1.json", "engine.config.magic10_v2_loader._validate_v2_instance", None),
     ("catalog/channels_v1.json", "engine.config.registry_loader.load_registry_config", "schemas/channels_v1.schema.json"),
     ("catalog/gates_v1.json", "engine.config.registry_loader.load_registry_config", "schemas/gates_v1.schema.json"),
     ("catalog/magic10.json", "engine.config.registry_loader.load_registry_config", None),
@@ -287,8 +306,15 @@ EXPECTED_TARGET_BINDINGS = (
     ("catalog/narratives/palettes.json", "tools.evidence.generate_narrative_registry_diff.validate_registry_snapshot", None),
     ("catalog/narratives/suppression_map.json", "tools.evidence.generate_narrative_registry_diff.validate_registry_snapshot", None),
     ("catalog/narratives/templates.json", "tools.evidence.generate_narrative_registry_diff.validate_registry_snapshot", None),
+    ("catalog/type_pairing_v1.json", "engine.config.magic10_v2_loader._validate_v2_instance", None),
+    ("schemas/centers_v1.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
     ("schemas/channels_v1.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
     ("schemas/gates_v1.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
+    ("schemas/magic10_compat_result_v2.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
+    ("schemas/magic10_mechanics_v2.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
+    ("schemas/magic10_result_v2.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
+    ("schemas/thresholds_v2.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
+    ("schemas/type_pairing_v1.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
 )
 
 EXPECTED_SET_RULES = (
@@ -305,9 +331,15 @@ _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 _EXPECTED_SCHEMA_SHA256 = {
     "schemas/channels_v1.schema.json": "33cd685e671b1ee44b93ce3b8ac5119a8d63ae18394f6b899e51f1e172107979",
     "schemas/gates_v1.schema.json": "b3308ca513a1f3e4490ce6c526124675fad1fdcdb5c6abce7257af99d76ed13a",
+    "schemas/centers_v1.schema.json": "e947000e9791ef36cdd7cbd67969a8c523a1b0466fff8c1c4d44654da6065169",
+    "schemas/magic10_compat_result_v2.schema.json": "e27895de7130a32612b521550d731e2f271d198255494cc535d9fde07ea843cf",
+    "schemas/magic10_mechanics_v2.schema.json": "f92f29d72b05733b28f1ec73eeb585e7b57dc9a7db2a1e007ad1722de87d91ef",
+    "schemas/magic10_result_v2.schema.json": "eb58967875bf39b828bec3843a37192afe633e3d061fb33ebd2cb6c39e908167",
+    "schemas/thresholds_v2.schema.json": "b88a0af9592703a2a5446c4dfcc5656fa1848fbaa61b2064d2b71e9e43e56ead",
+    "schemas/type_pairing_v1.schema.json": "b52495cb636559f0f4e62d461c5044c1ea238de563f61344022b0020dd8fd72c",
 }
 # HDE-EPIC040-PR06: the release manifest validator binds the admission owner's
-# complete roster; the 26-target inventory and the six set rules are separate.
+# complete roster; the 34-target inventory and the six set rules are separate.
 _EXPECTED_RELEASE_MANIFEST_PATHS = tuple(ADMITTED_RELEASE_ROSTER)
 _READER_COUNTERPARTS = {
     "artifacts/cli/out.json": "artifacts/cli/out_ba.json",
@@ -918,6 +950,14 @@ def _validate_schema_document(target: Target, obj: object) -> None:
         raise ValueError("schema_document_contract_mismatch")
 
 
+def _validate_magic10_v2_catalog(target: Target, obj: object) -> None:
+    # The v2 owning schema, applied strictly by the WU-PR-03 module's validator
+    # (the v1 owning-schema set _LOCAL_SCHEMAS is a release member).
+    capture = _LocalCapture(ROOT)
+    _validate_v2_instance(capture, target.rel_path, obj)
+    capture.verify_unchanged()
+
+
 _VALIDATOR_REGISTRY: Mapping[str, Callable[[Target, object], None]] = {
     "canonical_json.generated.showcompat_capture.v1": _validate_showcompat_capture,
     "canonical_json.generated.showcompat_args.v1": _validate_showcompat_args,
@@ -930,6 +970,7 @@ _VALIDATOR_REGISTRY: Mapping[str, Callable[[Target, object], None]] = {
     "engine.config.registry_loader.load_registry_config": _validate_registry_snapshot,
     "tools.evidence.generate_narrative_registry_diff.validate_registry_snapshot": _validate_narrative_snapshot,
     "jsonschema.Draft202012Validator.check_schema": _validate_schema_document,
+    "engine.config.magic10_v2_loader._validate_v2_instance": _validate_magic10_v2_catalog,
 }
 
 

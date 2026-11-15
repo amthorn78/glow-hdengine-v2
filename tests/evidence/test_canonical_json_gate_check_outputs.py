@@ -248,8 +248,8 @@ def test_manifest_evidence_projection_binds_root_and_files_not_cut_metadata():
 
 def test_d1_inventory_is_complete_unique_sorted_and_bound():
     targets = sorted(run_canonical_json_gate.TARGETS, key=lambda target: target.rel_path)
-    assert len(targets) == 26
-    assert len({target.rel_path for target in targets}) == 26
+    assert len(targets) == 34
+    assert len({target.rel_path for target in targets}) == 34
     assert run_canonical_json_gate.EXPECTED_TARGET_PATHS == tuple(
         sorted(run_canonical_json_gate.EXPECTED_TARGET_PATHS)
     )
@@ -1475,7 +1475,7 @@ def test_manifest_validator_binds_the_admitted_roster():
     gate = run_canonical_json_gate
     assert gate._EXPECTED_RELEASE_MANIFEST_PATHS == ADMITTED_RELEASE_ROSTER
     assert len(gate._EXPECTED_RELEASE_MANIFEST_PATHS) == 45
-    assert len(gate.EXPECTED_TARGET_PATHS) == 26
+    assert len(gate.EXPECTED_TARGET_PATHS) == 34
     assert len(gate.EXPECTED_SET_RULES) == 6
     target = _target("catalog/manifest.json")
     payload = json.loads((gate.ROOT / "catalog/manifest.json").read_bytes())
