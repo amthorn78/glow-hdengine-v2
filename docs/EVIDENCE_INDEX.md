@@ -5,7 +5,7 @@
 
 ### Canonical JSON inventory
 
-`tools/evidence/run_canonical_json_gate.py` rejects incomplete, duplicate, or unexpected scope against this exact 26-target `EXPECTED_TARGET_PATHS` inventory:
+`tools/evidence/run_canonical_json_gate.py` rejects incomplete, duplicate, or unexpected scope against this exact 34-target `EXPECTED_TARGET_PATHS` inventory:
 
 1. `artifacts/audit/cli/pair.json`
 2. `artifacts/audit/cli/pair_ba.json`
@@ -20,19 +20,27 @@
 11. `artifacts/cli/showcompat/args.json`
 12. `artifacts/cli/showcompat/stdout.json`
 13. `artifacts/cli/summary.json`
-14. `catalog/channels_v1.json`
-15. `catalog/gates_v1.json`
-16. `catalog/magic10.json`
-17. `catalog/magic10_caps.json`
-18. `catalog/magic10_seeds.json`
-19. `catalog/manifest.json`
-20. `catalog/narratives/keys.json`
-21. `catalog/narratives/manifest.json`
-22. `catalog/narratives/palettes.json`
-23. `catalog/narratives/suppression_map.json`
-24. `catalog/narratives/templates.json`
-25. `schemas/channels_v1.schema.json`
-26. `schemas/gates_v1.schema.json`
+14. `catalog/centers_v1.json`
+15. `catalog/channels_v1.json`
+16. `catalog/gates_v1.json`
+17. `catalog/magic10.json`
+18. `catalog/magic10_caps.json`
+19. `catalog/magic10_seeds.json`
+20. `catalog/manifest.json`
+21. `catalog/narratives/keys.json`
+22. `catalog/narratives/manifest.json`
+23. `catalog/narratives/palettes.json`
+24. `catalog/narratives/suppression_map.json`
+25. `catalog/narratives/templates.json`
+26. `catalog/type_pairing_v1.json`
+27. `schemas/centers_v1.schema.json`
+28. `schemas/channels_v1.schema.json`
+29. `schemas/gates_v1.schema.json`
+30. `schemas/magic10_compat_result_v2.schema.json`
+31. `schemas/magic10_mechanics_v2.schema.json`
+32. `schemas/magic10_result_v2.schema.json`
+33. `schemas/thresholds_v2.schema.json`
+34. `schemas/type_pairing_v1.schema.json`
 
 Only these six `EXPECTED_SET_RULES` entries are normalized as sets; other arrays remain ordered:
 
@@ -56,6 +64,10 @@ The direction-native narrative pack has 360 keys in `catalog/narratives/keys.jso
 - Active HDE-EPIC038-specific closeout generation, validation, receipt, private-variable, network, and source-feedback bindings are removed; historical records and nonclaims remain. `schemas/epic_close_candidate_source.v1.json` and `tools/qa/generate_epic_close_pack.py` define a deterministic, feedback-free candidate writer/checker. The command requires exactly one `--source` and exactly one of `--write` or `--check`, publishes `audit/EPIC-<NNN>_close_report.md` before committing `audit/EPIC-<NNN>_MANIFEST.json`, validates stable manifest→report→manifest state, rejects mixed or unstable publication, verifies exact tracked symlink bytes, and permits only the implementation-documented kernel-managed symlink-atime effect.
 - `.github/workflows/epic-closeout-validation.yml` is an isolated lane that runs on a pull request that changes a writer close pack or the close tooling, and on `workflow_dispatch`, with read-only contents permission, exact-ref checkout, non-writing checks, clean-tree enforcement, no persisted credentials, and no receipt or source writeback. It complements rather than replaces ordinary `test` CI.
 - HDE-EPIC039 delivered reusable capability and companion evidence only. It did not create a real HDE-EPIC039 close candidate, close report, manifest, acceptance map, token matrix, or QA log and did not execute OPS, Live QA, acceptance, PF09 movement, deployment, Product Owner closeout, or epic closeout.
+
+## HDE-EPIC042 Separation v2 contract evidence (WU-PR-04; PR evidence, not QA)
+
+- `audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt`, with its `.path_proof.txt` sibling, is written only by `python tools/evidence/generate_hde_epic042_v2_contract_evidence.py --actor <actor>` and indexed by the updater; `--check` validates it read-only. It records the Magic-10 v2 schema mutation matrix, the catalog, caps and thresholds closure checks, the identity rows and the canonical-byte checks, run on actual bundles through `engine/config/magic10_v2_loader.py`, with the tested commit, actor, time, limitations and the AC-08 checks (HDE-SEPA007.1 to HDE-SEPA007.4). The configuration and thresholds it exercises are the labelled non-canon fixtures of `tests/fixtures/magic10_v2/`; its identity values are procedure proofs, not the cutover identity.
 
 ## HDE-CRD-0002 evidence orientation (CRD admission, Mirror labels, close-run family)
 

@@ -771,9 +771,15 @@ def test_pr01_channel_sources_select_complete_catalog_and_gate_owners(source: st
         "tests/config/test_typed_bundles.py",
         "tests/evidence/test_canonical_json_gate_check_outputs.py",
     )
+    if source == "catalog/channels_v1.json":
+        # HDE-EPIC042 WU-PR-04 (O-1): the v2 fixture configuration binds it by hash.
+        owners += (
+            "tests/config/test_magic10_v2_loader.py",
+            "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
+        )
     if source in S16_TRIGGER_FILES:
         owners += (S16_OWNER_TEST,)
-    assert classifier.changed_test_targets(ROOT, (source,)) == owners
+    assert classifier.changed_test_targets(ROOT, (source,)) == tuple(sorted(owners))
     assert classifier._lanes_for_path(source) == {"product", "compat", "release"}
 
 
@@ -800,10 +806,12 @@ def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
         "tests/config/test_config_loader_unknown_ids_fail_closed.py",
         "tests/config/test_execution_coherence.py",
         "tests/config/test_magic10_contracts.py",
+        "tests/config/test_magic10_v2_loader.py",
         "tests/config/test_manifest_schema.py",
         "tests/config/test_production_admission.py",
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
+        "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
         S16_OWNER_TEST,
     )
     assert classifier.changed_test_targets(ROOT, ("engine/config/bundles.py",)) == (
@@ -944,10 +952,12 @@ def test_pr02_changed_paths_keep_all_lanes_and_exact_new_test_targets() -> None:
         "tests/config/test_config_loader_unknown_ids_fail_closed.py",
         "tests/config/test_execution_coherence.py",
         "tests/config/test_magic10_contracts.py",
+        "tests/config/test_magic10_v2_loader.py",
         "tests/config/test_manifest_schema.py",
         "tests/config/test_production_admission.py",
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
+        "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
         S16_OWNER_TEST,
     )
 

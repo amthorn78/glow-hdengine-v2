@@ -451,8 +451,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "catalog/gates_v1.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
-    "catalog/magic10.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
-    "catalog/magic10_caps.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "catalog/magic10.json": ("tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py", _SCORE_DISTRIBUTION_OWNER_TEST),
+    "catalog/magic10_caps.json": ("tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py", _SCORE_DISTRIBUTION_OWNER_TEST),
     "catalog/magic10_seeds.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
     "math/thresholds.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
     "engine/magic10/thresholds.py": (
@@ -468,6 +468,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/config/test_typed_bundles.py",
         "tests/compare/test_arrays_as_sets.py",
         "tests/evidence/test_canonical_json_gate_check_outputs.py",
+        "tests/config/test_magic10_v2_loader.py",
+        "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
         _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "schemas/channels_v1.schema.json": (
@@ -483,14 +485,14 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "schemas/magic10_mechanics_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
     "schemas/magic10_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
     "schemas/magic10_compat_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
-    "catalog/centers_v1.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
-    "catalog/type_pairing_v1.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
-    "schemas/centers_v1.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
-    "schemas/type_pairing_v1.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
-    "schemas/magic10_mechanics_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
-    "schemas/thresholds_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
-    "schemas/magic10_result_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
-    "schemas/magic10_compat_result_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
+    "catalog/centers_v1.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "catalog/type_pairing_v1.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "schemas/centers_v1.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "schemas/type_pairing_v1.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "schemas/magic10_mechanics_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "schemas/thresholds_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "schemas/magic10_result_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "schemas/magic10_compat_result_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
     "engine/config/registry_loader.py": (
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_magic10_contracts.py",
@@ -500,9 +502,11 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/config/test_production_admission.py",
         "tests/config/test_execution_coherence.py",
         "tests/config/test_typed_bundles.py",
+        "tests/config/test_magic10_v2_loader.py",
+        "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
         _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
-    "engine/config/magic10_v2_loader.py": ("tests/config/test_magic10_v2_loader.py",),
+    "engine/config/magic10_v2_loader.py": ("tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
     "engine/serializer/canon.py": (
         "tests/cli/test_serializer_guards.py",
         "tests/config/test_execution_coherence.py",
@@ -746,6 +750,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     # HDE-EPIC042 WU-PR-01: real-path tuning-run identity proof (HDE-DISS005.3).
     "tools/evidence/generate_hde_epic042_tuning_identity_hash.py": (
         "tests/evidence/test_hde_epic042_tuning_identity_hash.py",
+    ),
+    # HDE-EPIC042 WU-PR-04: Separation v2 contract evidence (HDE-SEPA007.5).
+    "tools/evidence/generate_hde_epic042_v2_contract_evidence.py": (
+        "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
     ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
@@ -1030,8 +1038,8 @@ _TEST_SUPPORT_OWNER_PATHS = {
         "tests/config/test_config_artifacts.py",
     ),
     "tests/fixtures/magic10_v2/LABEL.txt": ("tests/config/test_magic10_v2_contracts.py",),
-    "tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
-    "tests/fixtures/magic10_v2/thresholds_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py"),
+    "tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "tests/fixtures/magic10_v2/thresholds_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
 }
 _SAFE_TEST_SUPPORT_PREFIXES = {
     "tests/db/": ("tests/db",),

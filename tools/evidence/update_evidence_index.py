@@ -3516,6 +3516,17 @@ EPIC042_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC042_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic042.pr04.v2_contract_evidence",
+        "discovered_physical_path": "audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt",
+        "epic_id": "HDE-EPIC042",
+        "record_type": "epic042_pr04_evidence",
+        "schema_version": "1.0",
+        "notes": "HDE-EPIC042 WU-PR-04 Separation v2 contract tests and governed evidence (HDE-SEPA007.5)",
+    },
+]
+
 CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
     {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
@@ -4516,6 +4527,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC040_QA_PRIMARY_ARTIFACTS,
             *EPIC041_QA_PRIMARY_ARTIFACTS,
             *EPIC042_PR01_PRIMARY_ARTIFACTS,
+            *EPIC042_PR04_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

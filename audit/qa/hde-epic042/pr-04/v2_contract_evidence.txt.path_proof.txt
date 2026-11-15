@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt
+size_bytes: 121912
+sha256: d70909c091718de0362637e89518ad4781b0de15e2f4b31578faadd4e3bfe93e
+mtime_utc: 2026-11-15T02:28:07Z
+produced_at_utc: 2026-09-22T14:25:29Z
