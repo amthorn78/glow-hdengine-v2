@@ -1,5 +1,18 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC042: Separation v2 contract (WU-PR-02 to WU-PR-04) and final repository documentation (WU-DOC-01)
+
+### Added
+- Governed catalogs `catalog/centers_v1.json` (nine Centers) and `catalog/type_pairing_v1.json` (four aura classes, six rules, 60 explicit offsets), and six strict schemas: `schemas/centers_v1.schema.json`, `schemas/type_pairing_v1.schema.json`, `schemas/magic10_mechanics_v2.schema.json`, `schemas/thresholds_v2.schema.json`, `schemas/magic10_result_v2.schema.json` and `schemas/magic10_compat_result_v2.schema.json` (WU-PR-02).
+- Labelled non-canon fixtures under `tests/fixtures/magic10_v2/` (a v2 thresholds and a v2 configuration instance, and `LABEL.txt`) (WU-PR-02).
+- The fail-closed loader `engine/config/magic10_v2_loader.py`, outside `engine/core/` and not a release member: it admits a complete v2 bundle from a root, beside the active release, with stable `M10V2_*` refusal codes and no default; the v2 `config_id` `m10-relevance-centers-type-v2.0.0`, canonical configuration and source-bundle digests, and the cache-key prefix `magic10:v2:` (WU-PR-03).
+- The contract evidence record `audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt` (273 rows), written only by `tools/evidence/generate_hde_epic042_v2_contract_evidence.py` and verified by its `--check`, with its owner test and Index and Mirror rows (WU-PR-04).
+
+### Changed
+- The canonical JSON gate `tools/evidence/run_canonical_json_gate.py` covers 34 targets, the earlier 26 plus the two catalogs and six schemas; its six arrays-as-sets rules are unchanged (WU-PR-04). The classifier registrations, the updater row (`EPIC042_PR04_PRIMARY_ARTIFACTS`) and the regenerated outputs of these units are as their pull requests recorded.
+- This documentation pass changes `docs/INDEX.md`, `README.md`, `AGENTS.md` and `CHANGELOG.md` (WU-DOC-01): it adds the v2 contract files and their inactive posture, and corrects the three statements of the gate's target count.
+- Nonclaims: no release member, `release_id`, active configuration or Reader shape changed; v1 stays active. No maxima value is canon, and the fixture identity values prove the procedure only. No QA verdict, acceptance, PF09 movement, canon drainage or closure is claimed.
+
 Unreleased — HDE-EPIC042 WU-PR-01: real-path tuning-run identity proof (HDE-DISS005.3; Dissolution)
 
 ### Added
