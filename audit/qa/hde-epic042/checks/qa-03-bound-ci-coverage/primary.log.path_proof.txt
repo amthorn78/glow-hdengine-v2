@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic042/checks/qa-03-bound-ci-coverage/primary.log
+size_bytes: 39301
+sha256: e596309ded819a384d4db18d89daa95e6ec1fad01f1dfe96b3e68fcd86472964
+mtime_utc: 2026-11-15T17:32:18Z
+produced_at_utc: 2026-09-22T14:25:29Z

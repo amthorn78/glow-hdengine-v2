@@ -171,6 +171,36 @@ EPIC041_TARGETS = [
     ),
 ]
 
+EPIC042_QA_CHECK_IDS = [
+    "qa-01-d0-discovery",
+    "qa-02-step-0b-doc-delta-capture",
+    "qa-03-bound-ci-coverage",
+    "qa-04-contract-record-attribution",
+    "qa-05-ac08-v1-identity",
+    "qa-06-deployed-identity",
+    "qa-07-deployed-reader-syn",
+    "qa-08-live-compat-cli",
+    "qa-09-live-vendor-functional",
+]
+
+EPIC042_QA_TARGETS = [
+    (
+        "epic042.qa_step_logs_manifest",
+        "audit/qa/hde-epic042/qa_step_logs_manifest.json",
+    ),
+    (
+        "audit.qa.hde_epic042.00_meta.doc_deltas.md",
+        "audit/qa/hde-epic042/00_meta/doc_deltas.md",
+    ),
+    *(
+        (
+            f"audit.qa.hde_epic042.checks.{check_id.replace('-', '_')}.primary.log",
+            f"audit/qa/hde-epic042/checks/{check_id}/primary.log",
+        )
+        for check_id in EPIC042_QA_CHECK_IDS
+    ),
+]
+
 EPIC027_TARGETS = [
     ("epic027.acceptance_map", "docs/acceptance_map_epic027.json"),
     (
@@ -430,6 +460,30 @@ def test_epic041_qa_roster_matches_canonical_bindings():
     assert sorted(manifest) == EPIC041_CHECK_IDS
     assert {manifest[check_id]["log_path"] for check_id in EPIC041_CHECK_IDS} == {
         path for _, path in EPIC041_TARGETS if path.endswith("/primary.log")
+    }
+
+
+def test_evidence_index_has_required_epic042_qa_artifacts():
+    _assert_targets_present(EPIC042_QA_TARGETS)
+
+
+def test_epic042_qa_roster_matches_canonical_bindings():
+    roster = update_evidence_index.EPIC042_QA_PRIMARY_ARTIFACTS
+    actual = [
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in roster
+    ]
+
+    assert actual == EPIC042_QA_TARGETS
+    assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC042"}
+    assert len({key for key, _ in actual}) == len(actual)
+    assert len({path for _, path in actual}) == len(actual)
+    manifest = json.loads(
+        Path("audit/qa/hde-epic042/qa_step_logs_manifest.json").read_text(encoding="utf-8")
+    )
+    assert sorted(manifest) == EPIC042_QA_CHECK_IDS
+    assert {manifest[check_id]["log_path"] for check_id in EPIC042_QA_CHECK_IDS} == {
+        path for _, path in EPIC042_QA_TARGETS if path.endswith("/primary.log")
     }
 
 
