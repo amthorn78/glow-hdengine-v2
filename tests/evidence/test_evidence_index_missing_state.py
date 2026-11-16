@@ -1510,6 +1510,61 @@ def test_epic_close_pack_row_of_another_shape_is_refused(epic_close_repo: Path) 
     assert _whole_tree_state(repo, metadata=True) == before
 
 
+# HDE-EPIC042 CL-05 close-tooling repair B-1: the writer's epic acceptance map and its
+# viability log are a second absent-tolerant pair of an admitted Epic.
+EPIC_ACCEPTANCE_MAP_PAIR = (
+    "docs/acceptance_map_epic041.json",
+    "audit/qa/hde-epic041/acceptance_map_viability.log",
+)
+
+
+def test_epic_acceptance_map_rows_are_absent_tolerant(epic_close_repo: Path) -> None:
+    repo = epic_close_repo
+    before = _snapshot(repo)
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert _snapshot(repo) == before
+    assert not set(EPIC_ACCEPTANCE_MAP_PAIR) & set(_index_rows(repo))
+
+    acceptance_map, viability = (repo / rel for rel in EPIC_ACCEPTANCE_MAP_PAIR)
+    acceptance_map.write_text('{"epic_id":"HDE-EPIC041","tokens":[]}\n', encoding="utf-8")
+    one = _run(repo, "tools/evidence/update_evidence_index.py")
+    assert one.returncode != 0 and "EPIC_CLOSE_ACCEPTANCE_MAP_INCOMPLETE:HDE-EPIC041" in one.stderr
+    assert _snapshot(repo) == before
+
+    viability.write_text("HDE-EPIC041 acceptance-map viability\nsummary:PASS\n", encoding="utf-8")
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    rows = _index_rows(repo)
+    for rel, suffix in zip(EPIC_ACCEPTANCE_MAP_PAIR, ("acceptance_map", "acceptance_map_viability")):
+        assert rows[rel] == {
+            "artifact_key": f"epic041.{suffix}",
+            "discovered_physical_path": rel,
+            "epic_id": EPIC_CLOSE,
+        }
+        assert (repo / f"{rel}.path_proof.txt").is_file()
+    # The close pack pair stays absent and unregistered; the pairs are independent.
+    assert not set(EPIC_CLOSE_PACK) & set(rows)
+    _checks(repo)
+
+    acceptance_map.unlink()
+    viability.unlink()
+    gone = _run(repo, "tools/evidence/update_evidence_index.py", "--check")
+    assert gone.returncode != 0 and "EPIC_CLOSE_ACCEPTANCE_MAP_INDEXED_BUT_ABSENT:HDE-EPIC041" in gone.stderr
+
+
+def test_epic_acceptance_map_row_of_another_shape_is_refused(epic_close_repo: Path) -> None:
+    repo = epic_close_repo
+    for rel in EPIC_ACCEPTANCE_MAP_PAIR:
+        (repo / rel).write_text("{}\n", encoding="utf-8")
+    index = repo / "docs/evidence/INDEX.json"
+    rows = json.loads(index.read_bytes())
+    rows.append({"artifact_key": "epic041.acceptance_map", "discovered_physical_path": EPIC_ACCEPTANCE_MAP_PAIR[0]})
+    index.write_text(json.dumps(rows, sort_keys=True, separators=(",", ":")) + "\n")
+    before = _whole_tree_state(repo, metadata=True)
+    result = _run(repo, "tools/evidence/update_evidence_index.py")
+    assert result.returncode != 0 and "EPIC_CLOSE_PACK_REGISTRATION_COLLISION" in result.stderr
+    assert _whole_tree_state(repo, metadata=True) == before
+
+
 def test_epic_close_run_family_publishes_without_touching_the_qa_family(epic_close_repo: Path) -> None:
     repo = epic_close_repo
     qa_family = _epic_qa_family(repo)
