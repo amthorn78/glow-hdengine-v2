@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic042/close/evidence-paths/primary.log
+size_bytes: 597
+sha256: 4ba2f3131fa5ec56e640f35fa7ee9a49ef907f30e988b97c2954dcdca9db81d5
+mtime_utc: 2026-11-16T02:49:57Z
+produced_at_utc: 2026-09-22T14:25:29Z

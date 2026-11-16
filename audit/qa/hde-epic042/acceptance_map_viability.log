@@ -1,0 +1,28 @@
+HDE-EPIC042 acceptance-map viability
+schema_version=epic_acceptance_map_viability.v1
+epic_id=HDE-EPIC042
+acceptance_map=docs/acceptance_map_epic042.json
+acceptance_map_sha256=6873c3888e844d520bee875ece13460343674768fdcb1f3bdad909800873656c
+candidate_source=audit/EPIC-042_close_candidate_source.json
+candidate_source_sha256=6cb64f08445c133998bf28b343f6ad811fefe708dc083613f96a271517f33ded
+qa_step_logs_manifest=audit/qa/hde-epic042/qa_step_logs_manifest.json
+qa_step_logs_manifest_sha256=ac0ff495ce8ae815001438fa830e4f300ae591b4bb868f5f9a54cd8d2d9109ec
+acceptance_claims_mode=exact_source_requirement_rows_no_token_roster
+token_roster=none
+requirement_ids=R-01,R-02,R-03,R-04,R-05,R-06
+criterion:R-01 viability=PASS result=MET evidence_bindings=4 passing_checks=qa-03-bound-ci-coverage,qa-05-ac08-v1-identity
+criterion:R-02 viability=PASS result=MET evidence_bindings=3 passing_checks=qa-03-bound-ci-coverage,qa-05-ac08-v1-identity
+criterion:R-03 viability=PASS result=MET evidence_bindings=3 passing_checks=qa-03-bound-ci-coverage,qa-05-ac08-v1-identity
+criterion:R-04 viability=PASS result=MET evidence_bindings=3 passing_checks=qa-03-bound-ci-coverage,qa-05-ac08-v1-identity
+criterion:R-05 viability=PASS result=MET evidence_bindings=3 passing_checks=qa-03-bound-ci-coverage,qa-05-ac08-v1-identity
+criterion:R-06 viability=PASS result=MET evidence_bindings=5 passing_checks=qa-03-bound-ci-coverage,qa-04-contract-record-attribution,qa-05-ac08-v1-identity
+requirement_coverage=6/6
+summary:PASS
+nonclaim:epic_closeout_claimed=false
+nonclaim:ops_completion_claimed=false
+nonclaim:pf09_status_movement_claimed=false
+nonclaim:pf_canon_drainage_claimed=false
+nonclaim:public_reader_scope_claimed=false
+nonclaim:public_route_or_flag_expansion_claimed=false
+nonclaim:qa_pass_claimed=false
+nonclaim:runtime_conformance_claimed=false

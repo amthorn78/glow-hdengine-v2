@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic042/close/acceptance-map-write/primary.log
+size_bytes: 883
+sha256: 9ae323a245e65f7c6b5ea221ef4d0a58954720b32754b0a29af1025969273cdb
+mtime_utc: 2026-11-16T02:49:57Z
+produced_at_utc: 2026-09-22T14:25:29Z
