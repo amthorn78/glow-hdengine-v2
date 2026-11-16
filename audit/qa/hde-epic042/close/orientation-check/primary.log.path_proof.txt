@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic042/close/orientation-check/primary.log
+size_bytes: 609
+sha256: 094f65a642d3dce8e54f886b0f114b54acab89552c27da55a2ab882b220d7638
+mtime_utc: 2026-11-16T02:49:57Z
+produced_at_utc: 2026-09-22T14:25:29Z

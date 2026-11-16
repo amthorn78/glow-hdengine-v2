@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic042/close/final-lf/primary.log
+size_bytes: 556
+sha256: d7470f9bb955402f662c485af11145254b3d68f07db2e7122635910072b45675
+mtime_utc: 2026-11-16T02:49:57Z
+produced_at_utc: 2026-09-22T14:25:29Z

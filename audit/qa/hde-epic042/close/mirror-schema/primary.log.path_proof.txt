@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic042/close/mirror-schema/primary.log
+size_bytes: 576
+sha256: ecef2e46f9d9acfbcbf138a1b2566f2b40527b190f5aef850181ff7a044d8e96
+mtime_utc: 2026-11-16T02:49:57Z
+produced_at_utc: 2026-09-22T14:25:29Z
