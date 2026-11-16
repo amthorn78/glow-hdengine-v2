@@ -4312,6 +4312,15 @@ def _epic_close_pack_pair(epic_id: str) -> tuple[str, str]:
     return f"audit/EPIC-{number}_close_report.md", f"audit/EPIC-{number}_MANIFEST.json"
 
 
+def _epic_acceptance_map_pair(epic_id: str) -> tuple[str, str]:
+    """The writer's epic acceptance map and viability log (HDE-EPIC042 CL-05, B-1)."""
+    number = epic_id.removeprefix("HDE-EPIC")
+    return (
+        f"docs/acceptance_map_epic{number}.json",
+        f"audit/qa/hde-epic{number}/acceptance_map_viability.log",
+    )
+
+
 def _epic_close_run_entry(epic_id: str, check_id: str) -> dict[str, object]:
     root_rel, key_prefix = epic_close_admission(epic_id)
     qa_harness.validate_check_id(check_id)
@@ -4378,11 +4387,13 @@ def _epic_close_entries(
     """Admitted Epics' close-pack rows (absent-tolerant) and close-run rows.
 
     Close pack: neither file present, no rows; both present, one row each; one
-    present, or a row whose file is absent, refused. Close run: the rows are the
-    validated primaries on disk; a retained row of another shape is refused.
+    present, or a row whose file is absent, refused. The writer's acceptance map
+    and viability log are a second pair with the same absent-tolerant rule
+    (HDE-EPIC042 CL-05, B-1). Close run: the rows are the validated primaries on
+    disk; a retained row of another shape is refused.
     """
     pack: dict[str, dict[str, object]] = {}
-    pairs: list[tuple[str, tuple[str, str]]] = []
+    pairs: list[tuple[str, tuple[str, str], str]] = []
     admitted = admitted_epic_close()
     for epic_id in sorted(admitted):
         key = "epic" + epic_id.removeprefix("HDE-EPIC")
@@ -4393,7 +4404,15 @@ def _epic_close_entries(
                 "discovered_physical_path": rel,
                 "epic_id": epic_id,
             }
-        pairs.append((epic_id, (report, manifest)))
+        pairs.append((epic_id, (report, manifest), "PACK"))
+        acceptance_map, viability = _epic_acceptance_map_pair(epic_id)
+        for suffix, rel in (("acceptance_map", acceptance_map), ("acceptance_map_viability", viability)):
+            pack[rel] = {
+                "artifact_key": f"{key}.{suffix}",
+                "discovered_physical_path": rel,
+                "epic_id": epic_id,
+            }
+        pairs.append((epic_id, (acceptance_map, viability), "ACCEPTANCE_MAP"))
     pack_keys = {str(row["artifact_key"]) for row in pack.values()}
     unrelated: list[Mapping[str, object]] = []
     indexed: set[str] = set()
@@ -4426,16 +4445,18 @@ def _epic_close_entries(
             raise ValueError("EPIC_CLOSE_PACK_REGISTRATION_COLLISION")
         indexed.add(normalized_path)
     current: list[dict[str, object]] = []
-    for epic_id, pair in pairs:
+    for epic_id, pair, kind in pairs:
         present = {rel for rel in pair if _path_exists(ROOT / rel)}
         if present and present != set(pair):
-            raise ValueError(f"EPIC_CLOSE_PACK_INCOMPLETE:{epic_id}")
+            raise ValueError(f"EPIC_CLOSE_{kind}_INCOMPLETE:{epic_id}")
         if indexed & set(pair) - present:
-            raise ValueError(f"EPIC_CLOSE_PACK_INDEXED_BUT_ABSENT:{epic_id}")
+            raise ValueError(f"EPIC_CLOSE_{kind}_INDEXED_BUT_ABSENT:{epic_id}")
         current.extend(pack[rel] for rel in pair if rel in present)
-        current.extend(
-            _epic_close_run_entry(epic_id, check_id) for check_id in _epic_close_run_check_ids(epic_id)
-        )
+        if kind == "PACK":
+            current.extend(
+                _epic_close_run_entry(epic_id, check_id)
+                for check_id in _epic_close_run_check_ids(epic_id)
+            )
     return unrelated, current
 
 

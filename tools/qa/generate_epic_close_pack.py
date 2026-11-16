@@ -2000,6 +2000,7 @@ def _load_model(
     verify_canon: bool = False,
     governance_commit: str | None = None,
     check: bool = False,
+    pending_map_pair: bool = False,
 ) -> tuple[CandidateModel, tuple[FileSnapshot, ...]]:
     store = _GitObjectStore(context)
     tree = _tree_entries(context, store)
@@ -2025,7 +2026,10 @@ def _load_model(
             tree,
             verify_canon=verify_canon,
             governance=governance,
+            pending_map_pair=pending_map_pair,
         )
+    if pending_map_pair:
+        raise _fail("ACCEPTANCE_MAP_V2_ONLY")
     if governance_commit is not None:
         raise _fail("GOVERNANCE_COMMIT_UNEXPECTED")
     remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
@@ -2362,6 +2366,8 @@ class CandidateModelV2:
     manifest_path: str
     qa_primaries: tuple[FileSnapshot, ...] = ()
     governance: GovernanceBinding | None = None
+    # The rendered acceptance-map pair, path -> bytes, when the source names it (B-1).
+    acceptance_map: tuple[tuple[str, bytes], ...] = ()
 
 
 def _require_full_history(context: GitContext) -> None:
@@ -2513,6 +2519,199 @@ def _supporting_paths_v2(change_id: str) -> dict[str, str]:
         "drain_targets": f"audit/docdeltas/{directory}_drain_targets.md",
         "qa_step_logs_manifest": f"audit/qa/{directory}/qa_step_logs_manifest.json",
     }
+
+
+# The epic acceptance map and its viability log (HDE-EPIC042 CL-05, close-tooling repair B-1).
+# An Epic whose approved Specification lists them among its close-pack artifacts names both in
+# its v2 source's key_outputs, at their canonical paths (Plan Templates, Specification Preflight
+# B). The writer renders both from the source and the bound QA ledger and evidence, with no
+# token roster, in its --acceptance-map write; they are then tracked evidence inputs of the close
+# pack, and every v2 write or check re-renders them and refuses stale bytes.
+ACCEPTANCE_MAP_KEYS = ("acceptance_map", "acceptance_map_viability")
+ACCEPTANCE_MAP_SCHEMA_VERSION = "epic_acceptance_map.v1"
+ACCEPTANCE_MAP_VIABILITY_SCHEMA_VERSION = "epic_acceptance_map_viability.v1"
+ACCEPTANCE_MAP_CLAIMS_MODE = "exact_source_requirement_rows_no_token_roster"
+ACCEPTANCE_MAP_NONCLAIMS = (
+    "epic_closeout_claimed",
+    "ops_completion_claimed",
+    "pf09_status_movement_claimed",
+    "pf_canon_drainage_claimed",
+    "public_reader_scope_claimed",
+    "public_route_or_flag_expansion_claimed",
+    "qa_pass_claimed",
+    "runtime_conformance_claimed",
+)
+
+
+def _acceptance_map_paths_v2(change_id: str) -> dict[str, str]:
+    match = CHANGE_RE.fullmatch(change_id)
+    if match is None:
+        raise _fail("CHANGE_ID_INVALID")
+    number = match.group("epic")
+    if number is None:
+        raise _fail("ACCEPTANCE_MAP_EPIC_ONLY")
+    return {
+        "acceptance_map": f"docs/acceptance_map_epic{number}.json",
+        "acceptance_map_viability": f"audit/qa/hde-epic{number}/acceptance_map_viability.log",
+    }
+
+
+def _acceptance_map_request(source: Mapping[str, Any]) -> dict[str, tuple[str, str]] | None:
+    """The source's acceptance-map pair as key -> (binding, path), or None when not named."""
+    key_outputs = source["key_outputs"]
+    named = [key for key in ACCEPTANCE_MAP_KEYS if key in key_outputs]
+    if not named:
+        return None
+    if len(named) != len(ACCEPTANCE_MAP_KEYS):
+        raise _fail("ACCEPTANCE_MAP_INCOMPLETE")
+    expected = _acceptance_map_paths_v2(str(source["change_id"]))
+    if any(key_outputs[key] != expected[key] for key in ACCEPTANCE_MAP_KEYS):
+        raise _fail("ACCEPTANCE_MAP_PATH_INVALID")
+    request: dict[str, tuple[str, str]] = {}
+    for item in source["evidence_inputs"]:
+        for key in ACCEPTANCE_MAP_KEYS:
+            if item["path"] == expected[key]:
+                request[key] = (str(item["binding"]), expected[key])
+    if set(request) != set(ACCEPTANCE_MAP_KEYS):
+        raise _fail("OUTPUT_BINDING_MISMATCH")
+    # The pair is rendered from the other inputs; no claim may bind it (no self-reference).
+    referenced: set[str] = set()
+    for item in source["acceptance"]:
+        referenced.update(item["evidence_bindings"])
+    for item in source["later_drain_statements"]:
+        referenced.update(item["evidence_bindings"])
+    referenced.update(item["binding"] for item in source["superseded"] if "binding" in item)
+    for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", []):
+        referenced.update(gap["evidence_bindings"])
+    if "binding" in source["qa_rca"]:
+        referenced.add(source["qa_rca"]["binding"])
+    if referenced & {binding for binding, _ in request.values()}:
+        raise _fail("ACCEPTANCE_MAP_SELF_BINDING")
+    return request
+
+
+def _without_acceptance_map(
+    source: Mapping[str, Any], request: Mapping[str, tuple[str, str]]
+) -> dict[str, Any]:
+    """The source as the close pack reads it before the acceptance-map pair exists."""
+    bindings = {binding for binding, _ in request.values()}
+    paths = {rel for _, rel in request.values()}
+    reduced = json.loads(json.dumps(source))
+    reduced["evidence_inputs"] = [
+        item for item in reduced["evidence_inputs"] if item["binding"] not in bindings
+    ]
+    reduced["key_outputs"] = {
+        key: value for key, value in reduced["key_outputs"].items() if key not in request
+    }
+    reduced["pointers"] = [pointer for pointer in reduced["pointers"] if pointer not in paths]
+    return reduced
+
+
+def _render_acceptance_map_v2(
+    source: Mapping[str, Any],
+    source_rel: str,
+    source_input: FileSnapshot,
+    evidence: Sequence[tuple[str, FileSnapshot]],
+    ledger: Mapping[str, Mapping[str, str]],
+    request: Mapping[str, tuple[str, str]],
+) -> dict[str, bytes]:
+    """Render the tokenless acceptance map and its viability log; refuse a non-viable map."""
+    change_id = str(source["change_id"])
+    pair = {binding for binding, _ in request.values()}
+    snapshots = {binding: snapshot for binding, snapshot in evidence if binding not in pair}
+    ledger_rel = _supporting_paths_v2(change_id)["qa_step_logs_manifest"]
+    ledger_snapshot = next(
+        (snapshot for snapshot in snapshots.values() if snapshot.rel == ledger_rel), None
+    )
+    if ledger_snapshot is None:
+        raise _fail("ACCEPTANCE_MAP_NOT_VIABLE")
+    recorded = {entry["log_path"]: (check_id, entry["status"]) for check_id, entry in ledger.items()}
+    mapping = _qa_plan_mapping(source)
+    plan_order = _qa_plan_checks(source)
+    map_rel = request["acceptance_map"][1]
+    log_rel = request["acceptance_map_viability"][1]
+
+    def digest(snapshot: FileSnapshot) -> str:
+        return hashlib.sha256(snapshot.payload).hexdigest()
+
+    criteria: list[dict[str, object]] = []
+    criterion_lines: list[str] = []
+    for item in source["acceptance"]:
+        criterion = str(item["criterion_id"])
+        rows: list[dict[str, str]] = []
+        passing: list[str] = []
+        for binding in item["evidence_bindings"]:
+            snapshot = snapshots.get(str(binding))
+            if snapshot is None:
+                raise _fail("ACCEPTANCE_MAP_NOT_VIABLE")
+            row = {"binding": str(binding), "path": snapshot.rel, "sha256": digest(snapshot)}
+            if snapshot.rel in recorded:
+                check_id, status = recorded[snapshot.rel]
+                row["check_id"] = check_id
+                row["status"] = status
+                if status == "PASS" and criterion in mapping.get(check_id, frozenset()):
+                    passing.append(check_id)
+            rows.append(row)
+        # A MET row binds the PASS primary of a check whose recorded QA plan mapping names it.
+        if item["result"] == "MET" and not passing:
+            raise _fail("ACCEPTANCE_MAP_NOT_VIABLE")
+        passing = [check_id for check_id in plan_order if check_id in passing]
+        checks = [check_id for check_id in plan_order if criterion in mapping.get(check_id, frozenset())]
+        criteria.append(
+            {
+                "criterion_id": criterion,
+                "evidence": rows,
+                "passing_checks": passing,
+                "qa_checks": checks,
+                "result": str(item["result"]),
+            }
+        )
+        criterion_lines.append(
+            f"criterion:{criterion} viability=PASS result={item['result']}"
+            f" evidence_bindings={len(rows)} passing_checks={','.join(passing) or 'none'}"
+        )
+    requirement_ids = [str(identifier) for identifier in source["requirement_ids"]]
+    if sorted(requirement_ids) != sorted(str(row["criterion_id"]) for row in criteria):
+        raise _fail("ACCEPTANCE_MAP_NOT_VIABLE")
+    document = {
+        "acceptance_claims_mode": ACCEPTANCE_MAP_CLAIMS_MODE,
+        "candidate_source": {"path": source_rel, "sha256": digest(source_input)},
+        "criteria": criteria,
+        "epic_id": change_id,
+        "nonclaims": {name: False for name in ACCEPTANCE_MAP_NONCLAIMS},
+        "qa_step_logs_manifest": {"path": ledger_rel, "sha256": digest(ledger_snapshot)},
+        "qa_verdict_recorded": str(source["qa_verdict"]),
+        "requirement_ids": requirement_ids,
+        "schema_version": ACCEPTANCE_MAP_SCHEMA_VERSION,
+        "slices": [
+            {"deliverable": str(item["deliverable"]), "slice": str(item["slice"])}
+            for item in source["allocation"]
+        ],
+        "tokens": [],
+        "viability_log": log_rel,
+    }
+    map_bytes = (
+        json.dumps(document, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
+    ).encode("utf-8")
+    log_lines = [
+        f"{change_id} acceptance-map viability",
+        f"schema_version={ACCEPTANCE_MAP_VIABILITY_SCHEMA_VERSION}",
+        f"epic_id={change_id}",
+        f"acceptance_map={map_rel}",
+        f"acceptance_map_sha256={hashlib.sha256(map_bytes).hexdigest()}",
+        f"candidate_source={source_rel}",
+        f"candidate_source_sha256={digest(source_input)}",
+        f"qa_step_logs_manifest={ledger_rel}",
+        f"qa_step_logs_manifest_sha256={digest(ledger_snapshot)}",
+        f"acceptance_claims_mode={ACCEPTANCE_MAP_CLAIMS_MODE}",
+        "token_roster=none",
+        f"requirement_ids={','.join(requirement_ids)}",
+        *criterion_lines,
+        f"requirement_coverage={len(criteria)}/{len(requirement_ids)}",
+        "summary:PASS",
+        *(f"nonclaim:{name}=false" for name in ACCEPTANCE_MAP_NONCLAIMS),
+    ]
+    return {map_rel: map_bytes, log_rel: ("\n".join(log_lines) + "\n").encode("utf-8")}
 
 
 def _source_selects_v2(
@@ -3065,6 +3264,7 @@ def _load_model_v2(
     *,
     verify_canon: bool,
     governance: GovernanceBinding,
+    pending_map_pair: bool = False,
 ) -> tuple[CandidateModelV2, tuple[FileSnapshot, ...]]:
     remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
     _require_admitted_causal_input(source_rel)
@@ -3094,6 +3294,13 @@ def _load_model_v2(
         raise _fail("REPORT_SECTION_AMBIGUOUS")
     if set(source["nonclaims"]) != set(NONCLAIM_TEXT_V2):
         raise _fail("SOURCE_SCHEMA_INVALID")
+    # The acceptance-map pair (B-1). Before it exists, its --acceptance-map write reads the
+    # source without it; every other rule applies unchanged.
+    acceptance_map_request = _acceptance_map_request(source)
+    if pending_map_pair:
+        if acceptance_map_request is None:
+            raise _fail("ACCEPTANCE_MAP_NOT_REQUESTED")
+        source = _without_acceptance_map(source, acceptance_map_request)
     report_path, manifest_path = _derived_paths_v2(str(source["change_id"]))
 
     evidence: list[tuple[str, FileSnapshot]] = []
@@ -3152,6 +3359,22 @@ def _load_model_v2(
             raise _fail("QA_LEDGER_INVALID")
         qa_primaries.append(primary)
 
+    acceptance_map: tuple[tuple[str, bytes], ...] = ()
+    if acceptance_map_request is not None:
+        rendered = _render_acceptance_map_v2(
+            _strict_json(source_input.payload, code="SOURCE_JSON_INVALID"),
+            source_rel,
+            source_input,
+            evidence,
+            ledger,
+            acceptance_map_request,
+        )
+        if not pending_map_pair and any(
+            bindings[binding].payload != rendered[rel]
+            for binding, rel in acceptance_map_request.values()
+        ):
+            raise _fail("ACCEPTANCE_MAP_STALE")
+        acceptance_map = tuple(sorted(rendered.items()))
     if _head(context, store) != head:
         raise _fail("GIT_HEAD_CHANGED")
     model = CandidateModelV2(
@@ -3164,6 +3387,7 @@ def _load_model_v2(
         manifest_path=manifest_path,
         qa_primaries=tuple(qa_primaries),
         governance=governance,
+        acceptance_map=acceptance_map,
     )
     snapshots = (
         source_input,
@@ -5009,6 +5233,86 @@ def _run_write(
     return model.report_path, model.manifest_path
 
 
+def _run_write_acceptance_map(
+    root: Path,
+    context: GitContext,
+    head: str,
+    source_rel: str,
+    index_state: Mapping[
+        str, tuple[int, int, int, int, int, int, int, str] | None
+    ],
+    governance_commit: str | None,
+) -> tuple[str, str]:
+    """Write the acceptance-map pair from a clean HEAD (HDE-EPIC042 CL-05, B-1).
+
+    Both files must be absent from HEAD and the working tree; each is staged and
+    installed without replacing anything. A run interrupted between the two
+    leaves one untracked file, which the next run refuses as a dirty tree until
+    it is removed. Nothing else is written.
+    """
+    _require_clean(root, context)
+    if _git_control_state((context.git_dir / "index",)) != index_state:
+        raise _fail("GIT_CONTROL_STATE_CHANGED")
+    if _head(context) != head:
+        raise _fail("GIT_HEAD_CHANGED")
+    model, snapshots = _load_model(
+        root,
+        context,
+        head,
+        source_rel,
+        verify_canon=False,
+        governance_commit=governance_commit,
+        pending_map_pair=True,
+    )
+    if not isinstance(model, CandidateModelV2) or len(model.acceptance_map) != 2:
+        raise _fail("ACCEPTANCE_MAP_NOT_REQUESTED")
+    again, _ = _load_model(
+        root,
+        context,
+        head,
+        source_rel,
+        verify_canon=False,
+        governance_commit=governance_commit,
+        pending_map_pair=True,
+    )
+    if not isinstance(again, CandidateModelV2) or again.acceptance_map != model.acceptance_map:
+        raise _fail("NONDETERMINISTIC_RENDER")
+    outputs = dict(model.acceptance_map)
+    if any(not payload.endswith(b"\n") or len(payload) > MAX_OUTPUT_BYTES for payload in outputs.values()):
+        raise _fail("OUTPUT_BYTES_INVALID")
+    _verify_snapshots(root, context, head, snapshots)
+    tree = _tree_entries(context)
+    for rel in outputs:
+        _require_output_case_unambiguous(tree, rel)
+        if rel in tree or _validate_output_target(root, rel).existed:
+            raise _fail("ACCEPTANCE_MAP_PRESENT")
+    for rel, payload in sorted(outputs.items()):
+        anchor = _open_output_anchor(root, rel)
+        try:
+            if anchor.preimage.existed:
+                raise _fail("ACCEPTANCE_MAP_PRESENT")
+            staged = _write_temp(anchor, payload, OUTPUT_MODE)
+            try:
+                _install_staged_output(anchor, staged, payload, [], set())
+            except BaseException:
+                _unlink_anchored(anchor, staged)
+                raise
+            _sync_output_directory(anchor)
+        finally:
+            os.close(anchor.parent_fd)
+    for rel, payload in outputs.items():
+        _require_output_bytes(root, rel, payload)
+    _verify_snapshots(root, context, head, snapshots)
+    if _head(context) != head:
+        raise _fail("GIT_HEAD_CHANGED")
+    if _git_control_state((context.git_dir / "index",)) != index_state:
+        raise _fail("GIT_CONTROL_STATE_CHANGED")
+    if _worktree_changes(root, context) != set(outputs):
+        raise _fail("UNEXPECTED_WRITE_RESIDUE")
+    paths = _acceptance_map_paths_v2(str(model.source["change_id"]))
+    return paths["acceptance_map"], paths["acceptance_map_viability"]
+
+
 def _run_check(
     root: Path,
     context: GitContext,
@@ -5098,6 +5402,11 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         default=None,
         help="v2 --write only: the commit on main at which the pack binds its governance documents",
     )
+    parser.add_argument(
+        "--acceptance-map",
+        action="store_true",
+        help="v2 Epic --write only: write the acceptance map and its viability log the source names, not the pair",
+    )
     governance_arguments = sum(
         argument == "--governance-commit" or argument.startswith("--governance-commit=")
         for argument in arguments
@@ -5106,6 +5415,10 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         parser.error("at most one --governance-commit is allowed")
     if governance_arguments and "--check" in arguments:
         parser.error("--governance-commit applies to --write only")
+    if "--acceptance-map" in arguments and "--check" in arguments:
+        parser.error("--acceptance-map applies to --write only")
+    if arguments.count("--acceptance-map") > 1:
+        parser.error("at most one --acceptance-map is allowed")
     if sum(
         argument == "--source" or argument.startswith("--source=")
         for argument in arguments
@@ -5130,7 +5443,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 raise _fail("GIT_CONTROL_STATE_CHANGED")
             if _head(context) != head:
                 raise _fail("GIT_HEAD_CHANGED")
-            paths = _run_write(
+            paths = (_run_write_acceptance_map if args.acceptance_map else _run_write)(
                 root,
                 context,
                 head,
@@ -5157,7 +5470,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         code = str(exc) if isinstance(exc, ClosePackError) else "UNSAFE_STATE"
         print(f"EPIC_CLOSE_PACK_ERROR:{code}", file=sys.stderr)
         return 1
-    mode = "WRITE" if args.write else "CHECK"
+    mode = ("ACCEPTANCE_MAP_WRITE" if args.acceptance_map else "WRITE") if args.write else "CHECK"
     print(f"EPIC_CLOSE_PACK_{mode}_OK:{paths[0]}:{paths[1]}")
     return 0
 

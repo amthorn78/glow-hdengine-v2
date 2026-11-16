@@ -3652,14 +3652,16 @@ def test_source_commit_hash_and_feedback_dependencies_do_not_enter_outputs(
     # inputs, and derives the canonical QA-manifest pointer. Everything else
     # stays forbidden in both models.
     v1_text, v2_text = source_text.split("# --- close_candidate_source.v2", 1)
-    for v2_only in ("orientation_demo", "path_proof", "audit/qa/"):
+    # HDE-EPIC042 CL-05 close-tooling repair B-1 narrows this rule for v2 only: the v2 block
+    # renders the epic acceptance map and its viability log that a source names, from the
+    # source and its bound tracked inputs, never from the Index. v1 stays neutral.
+    for v2_only in ("orientation_demo", "path_proof", "audit/qa/", "acceptance_map"):
         assert v2_only in v2_text
     for forbidden in (
         "HDE-EPIC" + "038",
         "update_evidence_index",
         "release_id",
         "build_release_attestation",
-        "acceptance_map",
         "token_evidence_matrix",
         "requests.",
         "urllib.",
@@ -6457,3 +6459,190 @@ def test_s15_an_evidence_input_naming_the_decision_record_binds_it_at_the_govern
     assert (repo / close_pack.GOVERNANCE_DECISION_RECORD_REL).read_bytes() != bound
     _commit_all(repo, "commit the close pack")
     assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
+
+
+# --- HDE-EPIC042 CL-05 close-tooling repair: B-1 (the epic acceptance map and its viability log) ---
+# The approved Specification lists the epic acceptance map and its viability log among the
+# close-pack artifacts (Plan Templates, Specification Preflight B); before this repair no
+# canonical writer produced them, so a source naming them could only fail (INPUT_UNTRACKED).
+EPIC_MAP_REL = "docs/acceptance_map_epic041.json"
+EPIC_VIABILITY_REL = "audit/qa/hde-epic041/acceptance_map_viability.log"
+
+
+def _epic_source_with_acceptance_map() -> dict[str, object]:
+    source = _v2_source("HDE-EPIC041")
+    source["evidence_inputs"] += [  # type: ignore[operator]
+        {"binding": "acceptance_map", "path": EPIC_MAP_REL},
+        {"binding": "acceptance_map_viability", "path": EPIC_VIABILITY_REL},
+    ]
+    source["key_outputs"]["acceptance_map"] = EPIC_MAP_REL  # type: ignore[index]
+    source["key_outputs"]["acceptance_map_viability"] = EPIC_VIABILITY_REL  # type: ignore[index]
+    source["pointers"] += [EPIC_MAP_REL, EPIC_VIABILITY_REL]  # type: ignore[operator]
+    return source
+
+
+def _init_epic_map_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tuple[Path, str]:
+    repo, source_rel = _init_v2_repo(tmp_path, source or _epic_source_with_acceptance_map())
+    (repo / "docs").mkdir(exist_ok=True)
+    (repo / "docs/README.md").write_text("Docs home.\n", encoding="utf-8")
+    _commit_all(repo, "the docs home the acceptance map is written into")
+    return repo, source_rel
+
+
+def _run_map_write(repo: Path, monkeypatch: pytest.MonkeyPatch, source_rel: str) -> int:
+    head = _git(repo, "rev-parse", "HEAD")
+    return _run(
+        repo, monkeypatch, "--source", source_rel, "--write", "--acceptance-map", "--governance-commit", head
+    )
+
+
+def test_b1_042_reproduces_the_missing_writer_and_writes_a_viable_tokenless_map(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo, source_rel = _init_epic_map_repo(tmp_path)
+    # The defect: the close pack cannot be written while nothing writes the pair it names.
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:INPUT_UNTRACKED"
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+    # The fix: the writer's --acceptance-map write produces exactly the two files.
+    assert _run_map_write(repo, monkeypatch, source_rel) == 0
+    assert capsys.readouterr().out.strip() == (
+        f"EPIC_CLOSE_PACK_ACCEPTANCE_MAP_WRITE_OK:{EPIC_MAP_REL}:{EPIC_VIABILITY_REL}"
+    )
+    status = _git(repo, "status", "--porcelain=v1", "--untracked-files=all").splitlines()
+    assert sorted(status) == sorted([f"?? {EPIC_MAP_REL}", f"?? {EPIC_VIABILITY_REL}"])
+    map_bytes = (repo / EPIC_MAP_REL).read_bytes()
+    document = json.loads(map_bytes)
+    assert map_bytes == (json.dumps(document, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n").encode()
+    assert document["epic_id"] == "HDE-EPIC041"
+    assert document["tokens"] == []
+    assert document["acceptance_claims_mode"] == "exact_source_requirement_rows_no_token_roster"
+    assert set(document["nonclaims"].values()) == {False}
+    requirement_ids = [row[0] for row in _requirement_rows("HDE-EPIC041")]
+    assert [row["criterion_id"] for row in document["criteria"]] == requirement_ids
+    for row in document["criteria"]:
+        assert row["passing_checks"] == ["qa-01-setup"]
+        primary = next(item for item in row["evidence"] if item["binding"] == "qa_primary")
+        assert primary["status"] == "PASS"
+        assert primary["sha256"] == hashlib.sha256((repo / primary["path"]).read_bytes()).hexdigest()
+    log = (repo / EPIC_VIABILITY_REL).read_text(encoding="utf-8")
+    assert f"acceptance_map_sha256={hashlib.sha256(map_bytes).hexdigest()}\n" in log
+    assert "token_roster=none\n" in log
+    assert f"requirement_coverage={len(requirement_ids)}/{len(requirement_ids)}\n" in log
+    assert log.endswith("nonclaim:runtime_conformance_claimed=false\n")
+    assert "\nsummary:PASS\n" in log
+    for rel in (EPIC_MAP_REL, EPIC_VIABILITY_REL):
+        assert stat.S_IMODE((repo / rel).stat().st_mode) == close_pack.OUTPUT_MODE
+    # The pair is then a tracked input of the close pack, bound as key outputs.
+    _commit_all(repo, "commit the acceptance map and viability log")
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
+    manifest = json.loads((repo / "audit/EPIC-041_MANIFEST.json").read_text(encoding="utf-8"))
+    assert manifest["key_outputs"]["acceptance_map"] == EPIC_MAP_REL
+    assert manifest["key_outputs"]["acceptance_map_viability"] == EPIC_VIABILITY_REL
+    report = (repo / "audit/EPIC-041_close_report.md").read_text(encoding="utf-8")
+    assert f"- `{EPIC_MAP_REL}`" in report and f"- `{EPIC_VIABILITY_REL}`" in report
+    _commit_all(repo, "commit the close pack")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
+
+
+def test_b1_042_write_is_deterministic_across_fresh_repositories(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    outputs = []
+    for name in ("first", "second"):
+        repo, source_rel = _init_epic_map_repo(tmp_path / name)
+        assert _run_map_write(repo, monkeypatch, source_rel) == 0
+        outputs.append(((repo / EPIC_MAP_REL).read_bytes(), (repo / EPIC_VIABILITY_REL).read_bytes()))
+    assert outputs[0] == outputs[1]
+
+
+def test_b1_042_a_stale_pair_is_refused_by_write_and_check(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo, source_rel = _init_epic_map_repo(tmp_path)
+    assert _run_map_write(repo, monkeypatch, source_rel) == 0
+    _commit_all(repo, "commit the pair")
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
+    _commit_all(repo, "commit the close pack")
+    log = repo / EPIC_VIABILITY_REL
+    log.write_text(log.read_text(encoding="utf-8").replace("summary:PASS", "summary:FAIL"), encoding="utf-8")
+    _commit_all(repo, "tamper with the viability log")
+    capsys.readouterr()
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:ACCEPTANCE_MAP_STALE"
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:ACCEPTANCE_MAP_STALE"
+
+
+def test_b1_042_the_pair_is_never_rewritten_once_present(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo, source_rel = _init_epic_map_repo(tmp_path)
+    assert _run_map_write(repo, monkeypatch, source_rel) == 0
+    # Untracked output left in the tree: a dirty tree.
+    assert _run_map_write(repo, monkeypatch, source_rel) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:DIRTY_TREE"
+    _commit_all(repo, "commit the pair")
+    assert _run_map_write(repo, monkeypatch, source_rel) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:ACCEPTANCE_MAP_PRESENT"
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+
+def _mutated(mutation: str) -> dict[str, object]:
+    source = _epic_source_with_acceptance_map()
+    if mutation == "one_key":
+        del source["key_outputs"]["acceptance_map_viability"]  # type: ignore[attr-defined]
+    elif mutation == "wrong_path":
+        source["key_outputs"]["acceptance_map"] = "docs/acceptance_map_epic041_v2.json"  # type: ignore[index]
+    elif mutation == "unbound":
+        source["evidence_inputs"] = [  # type: ignore[assignment]
+            item for item in source["evidence_inputs"] if item["binding"] != "acceptance_map"  # type: ignore[attr-defined]
+        ]
+    elif mutation == "self_binding":
+        source["acceptance"][0]["evidence_bindings"].append("acceptance_map")  # type: ignore[index]
+    return source
+
+
+@pytest.mark.parametrize(
+    ("mutation", "code"),
+    (
+        ("one_key", "ACCEPTANCE_MAP_INCOMPLETE"),
+        ("wrong_path", "ACCEPTANCE_MAP_PATH_INVALID"),
+        ("unbound", "OUTPUT_BINDING_MISMATCH"),
+        ("self_binding", "ACCEPTANCE_MAP_SELF_BINDING"),
+    ),
+)
+def test_b1_042_malformed_requests_are_refused_without_outputs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], mutation: str, code: str
+) -> None:
+    repo, source_rel = _init_epic_map_repo(tmp_path, _mutated(mutation))
+    assert _run_map_write(repo, monkeypatch, source_rel) == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+
+def test_b1_042_a_crd_cannot_name_an_epic_acceptance_map(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    source = _v2_source()
+    source["key_outputs"]["acceptance_map"] = "docs/acceptance_map_crd0002.json"  # type: ignore[index]
+    source["key_outputs"]["acceptance_map_viability"] = "audit/qa/hde-crd-0002/acceptance_map_viability.log"  # type: ignore[index]
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert _run_map_write(repo, monkeypatch, source_rel) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:ACCEPTANCE_MAP_EPIC_ONLY"
+
+
+def test_b1_042_a_source_without_the_pair_keeps_the_close_pack_unchanged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path, _v2_source("HDE-EPIC041"))
+    assert _run_map_write(repo, monkeypatch, source_rel) == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:ACCEPTANCE_MAP_NOT_REQUESTED"
+    assert _run_v2_write(repo, monkeypatch, source_rel) == 0
+    assert not (repo / EPIC_MAP_REL).exists() and not (repo / EPIC_VIABILITY_REL).exists()
+
+
+def test_b1_042_acceptance_map_applies_to_write_only() -> None:
+    with pytest.raises(SystemExit) as raised:
+        close_pack._parse_args(["--source", "audit/x.json", "--check", "--acceptance-map"])
+    assert raised.value.code == 2
