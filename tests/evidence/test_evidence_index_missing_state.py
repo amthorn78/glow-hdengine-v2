@@ -1720,6 +1720,12 @@ def test_s13_a_new_epic_with_a_v2_source_is_admitted_without_a_table_edit(tmp_pa
 
     assert not hasattr(writer, "ADMITTED_EPIC_CLOSE")
     repo = _copy_repo(tmp_path)
+    # The Epics already admitted by their committed sources (HDE-EPIC041, and every Epic
+    # closed since); the new source adds exactly one (HDE-EPIC042 CL-05, B-2).
+    baseline = _epic_close_program(repo, "print(sorted(writer.admitted_epic_close()))")
+    _success(baseline)
+    admitted_before = json.loads(baseline.stdout.strip().replace("'", '"'))
+    assert "HDE-EPIC041" in admitted_before and "HDE-EPIC999" not in admitted_before
     _write_epic_source(repo, "999", "HDE-EPIC999")
     report, manifest = "audit/EPIC-999_close_report.md", "audit/EPIC-999_MANIFEST.json"
     (repo / report).write_text("# HDE-EPIC999 Close Report\n", encoding="utf-8")
@@ -1742,7 +1748,7 @@ publish_epic_close(("close-pack-check",))
         [sys.executable, "-c", program], cwd=repo, env=ENV, capture_output=True, text=True, check=False
     )
     _success(result)
-    assert "['HDE-EPIC041', 'HDE-EPIC999']" in result.stdout
+    assert f"{sorted([*admitted_before, 'HDE-EPIC999'])}" in result.stdout
     close_rel = "audit/qa/hde-epic999/close/close-pack-check/primary.log"
     assert _index_rows(repo)[close_rel] == {
         "artifact_key": "audit.qa.hde_epic999.close.close-pack-check.primary.log",
@@ -1777,7 +1783,12 @@ for epic_id, reason in cases:
         assert str(exc) == f"EPIC_CLOSE_NOT_ADMITTED:{epic_id}: {reason}"
     else:
         raise AssertionError(f"{epic_id} was admitted")
-assert writer.admitted_epic_close() == {"HDE-EPIC041": ("audit/qa/hde-epic041", "audit.qa.hde_epic041")}
+admitted = writer.admitted_epic_close()
+assert admitted["HDE-EPIC041"] == ("audit/qa/hde-epic041", "audit.qa.hde_epic041")
+assert not {epic_id for epic_id, _ in cases} & set(admitted)
+for epic_id, (root_rel, key_prefix) in admitted.items():
+    number = epic_id.removeprefix("HDE-EPIC")
+    assert (root_rel, key_prefix) == (f"audit/qa/hde-epic{number}", f"audit.qa.hde_epic{number}")
 for epic_id, reason in cases:
     if epic_id in ("HDE-EPIC41", "HDE-EPIC0410", "HDE-CRD-0002"):
         continue
