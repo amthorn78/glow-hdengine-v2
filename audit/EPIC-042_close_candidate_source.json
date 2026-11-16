@@ -1,0 +1,633 @@
+{
+  "acceptance": [
+    {
+      "criterion_id": "R-01",
+      "evidence_bindings": [
+        "qa_manifest",
+        "qa_check_03",
+        "qa_check_05",
+        "tuning_identity_proof"
+      ],
+      "limitation": "AC-01 and AC-01-e through check 3 (bound hosted CI covering the owner file at the tested commit; proof indexed) and AC-01-d through check 5 (HDE-EPIC030 records unchanged); the proof covers the tuning runs it lists and is not a cutover value.",
+      "result": "MET"
+    },
+    {
+      "criterion_id": "R-02",
+      "evidence_bindings": [
+        "qa_manifest",
+        "qa_check_03",
+        "qa_check_05"
+      ],
+      "limitation": "AC-02 through check 3 (owner tests of the catalogs and their loader refusals in bound hosted CI) and AC-08 through check 5; behaviour of the catalogs in a v2 calculation is not claimed before the cutover.",
+      "result": "MET"
+    },
+    {
+      "criterion_id": "R-03",
+      "evidence_bindings": [
+        "qa_manifest",
+        "qa_check_03",
+        "qa_check_05"
+      ],
+      "limitation": "AC-03 through check 3 and AC-08 through check 5; no per-category maxima value is asserted as canon and the governed v2 configuration file is written only at the release cut.",
+      "result": "MET"
+    },
+    {
+      "criterion_id": "R-04",
+      "evidence_bindings": [
+        "qa_manifest",
+        "qa_check_03",
+        "qa_check_05"
+      ],
+      "limitation": "AC-04 through check 3 (67 named adverse cases and the L-01 to L-13 enumeration) and AC-08 through check 5; engine/config/bundles.py line 78 is outside the enumeration clause and routed to the Product Owner as A-07.",
+      "result": "MET"
+    },
+    {
+      "criterion_id": "R-05",
+      "evidence_bindings": [
+        "qa_manifest",
+        "qa_check_03",
+        "qa_check_05"
+      ],
+      "limitation": "AC-05 through check 3 and AC-05-e with AC-08 through check 5; the v2 identity is computed over labelled non-canon fixtures and is not the cutover identity.",
+      "result": "MET"
+    },
+    {
+      "criterion_id": "R-06",
+      "evidence_bindings": [
+        "qa_manifest",
+        "qa_check_03",
+        "qa_check_04",
+        "qa_check_05",
+        "v2_contract_evidence"
+      ],
+      "limitation": "AC-06 and AC-06-e through check 3, AC-06-attr through check 4 (tested commit present) and AC-08 through check 5; 66 out-of-domain rows of the contract record are counted, not re-derived.",
+      "result": "MET"
+    }
+  ],
+  "adr_block": {
+    "decisions": [
+      {
+        "bounding_canon": [
+          "Change Process Guide",
+          "HDE Build Checklist Dissolution",
+          "HDE Build Checklist Separation"
+        ],
+        "decision_point": "Whether HDE-DISS005.3 and HDE-SEPA007 may be delivered by one Epic across two phases.",
+        "doc_delta_targets": [
+          "HDE Build Notes"
+        ],
+        "final_decision": "Published as HDE Build Notes addendum 2.1 by the Product Owner on 2026-11-13; no phase is declared exit-ready.",
+        "label": "D-1 phase-mixing exception",
+        "options_considered": [],
+        "scope": "change_specific",
+        "statement": "One Epic spans Dissolution and Separation while each PR work unit stays within one phase and PF09 moves under each phase's own rules."
+      },
+      {
+        "bounding_canon": [
+          "HDE Math Spec",
+          "HDE Schemas and Artifacts"
+        ],
+        "decision_point": "Which offset values the catalog carries while permanent canon says they are not set.",
+        "doc_delta_targets": [
+          "HDE Math Spec",
+          "HDE Schemas and Artifacts",
+          "HDE Build Checklist Separation"
+        ],
+        "final_decision": "HDE Build Notes addendum 2.2 governs the offsets until drained (D-1 to D-13).",
+        "label": "Adopted Magic10 v2 pair-rule offsets",
+        "options_considered": [],
+        "scope": "canonical",
+        "statement": "The Type-pairing catalog carries the 60 decided offsets with every cell explicit and no default."
+      },
+      {
+        "bounding_canon": [
+          "HDE Schemas and Artifacts"
+        ],
+        "decision_point": "How the v2 bundle exists beside the active v1 files without becoming active (TI-01, TI-03).",
+        "doc_delta_targets": [
+          "HDE Schemas and Artifacts"
+        ],
+        "final_decision": "Alternative A, chosen by Isis at the Implementation Plan approval.",
+        "label": "Fixture-only home for maxima-dependent instances",
+        "options_considered": [
+          "A fixture-only home for the maxima-dependent instances.",
+          "Governed v2 files beside the v1 files."
+        ],
+        "scope": "change_specific",
+        "statement": "The v2 configuration and thresholds instances live only as labelled non-canon test fixtures until the release cut."
+      },
+      {
+        "bounding_canon": [
+          "HDE Build Checklist Separation"
+        ],
+        "decision_point": "When the Separation rows may be recorded Done before the release cut.",
+        "doc_delta_targets": [
+          "HDE Build Checklist Separation"
+        ],
+        "final_decision": "Decided by the Product Owner on 2026-11-13; the PF09 update itself is the Product Owner's separate act.",
+        "label": "D-3 structure Done",
+        "options_considered": [],
+        "scope": "change_specific",
+        "statement": "HDE-SEPA007 and its subtasks can be recorded Done when the v2 contract is delivered and verified with the per-category maxima still unset."
+      },
+      {
+        "bounding_canon": [
+          "Glow QA Guide",
+          "HDE Governance"
+        ],
+        "decision_point": "Whether the live vendor test applies when no byte of the production-functional surfaces changes.",
+        "doc_delta_targets": [],
+        "final_decision": "The Product Owner answered a, confirmed at the QA Plan review; both ran within his authorization of 2026-11-15.",
+        "label": "Both live tests stand",
+        "options_considered": [],
+        "scope": "change_specific",
+        "statement": "The live compat test and the mandatory bounded live vendor test both run for this Epic, with synthetic data only."
+      },
+      {
+        "bounding_canon": [
+          "Plan Templates",
+          "HDE Schemas and Artifacts"
+        ],
+        "decision_point": "Who writes the epic-scoped doc-delta capture.",
+        "doc_delta_targets": [
+          "HDE Build Notes"
+        ],
+        "final_decision": "Disposition (A), approved by Isis at the QA Plan review v1.0.",
+        "label": "CCR-E042-01 epic-scoped doc-delta capture",
+        "options_considered": [],
+        "scope": "change_specific",
+        "statement": "The QA run's Step-0B writes audit/qa/hde-epic042/00_meta/doc_deltas.md; the close writes the two audit/docdeltas/ ledgers and does not overwrite the capture."
+      },
+      {
+        "bounding_canon": [
+          "Change Process Guide",
+          "HDE Schemas and Artifacts"
+        ],
+        "decision_point": "How the QA evidence landed unindexed is brought into the Index and Mirror.",
+        "doc_delta_targets": [
+          "Change Process Guide"
+        ],
+        "final_decision": "Product Owner route (a): one pull request, #857, in one authorized mutation set; the prompt gap is MB-096.",
+        "label": "QA evidence registration by the canonical writer",
+        "options_considered": [],
+        "scope": "change_specific",
+        "statement": "The QA evidence is registered in the evidence index through a writer registration list for this Epic."
+      },
+      {
+        "bounding_canon": [
+          "Plan Templates",
+          "HDE Governance",
+          "HDE Schemas and Artifacts"
+        ],
+        "decision_point": "How the Specification's declared acceptance map and viability log are written when no canonical writer produced them (TI-07).",
+        "doc_delta_targets": [
+          "Plan Templates",
+          "HDE Governance"
+        ],
+        "final_decision": "Written by the close-pack writer after the CL-05 close-tooling repair; the canon question stays the Product Owner's.",
+        "label": "Acceptance map for a tokenless Epic",
+        "options_considered": [],
+        "scope": "change_specific",
+        "statement": "The close-pack writer writes docs/acceptance_map_epic042.json and its viability log from the candidate source, binding each requirement to its QA evidence with no token roster."
+      },
+      {
+        "bounding_canon": [
+          "HDE Schemas and Artifacts"
+        ],
+        "decision_point": "Where the Doc-Delta record of the v2 paths goes when the capture may not be overwritten.",
+        "doc_delta_targets": [
+          "HDE Schemas and Artifacts"
+        ],
+        "final_decision": "Carried as DELTA-005 in the drain-targets ledger; drain target HDE Schemas and Artifacts section 2.9.",
+        "label": "C-09 record of the v2 paths",
+        "options_considered": [],
+        "scope": "change_specific",
+        "statement": "The nine Magic10 v2 paths are recorded in the drain-targets ledger because the doc-deltas ledger stays byte-identical to the Step-0B capture."
+      }
+    ]
+  },
+  "allocation": [
+    {
+      "deliverable": "D1: real-path identity proof for each tuning run, with its generator (HDE-DISS005.3; R-01).",
+      "slice": "WU-PR-01"
+    },
+    {
+      "deliverable": "D2: centers and Type-pairing catalogs with the v2 configuration, thresholds and result schemas (HDE-SEPA007.1, HDE-SEPA007.2; R-02, R-03).",
+      "slice": "WU-PR-02"
+    },
+    {
+      "deliverable": "D2: centers and Type-pairing catalogs with the v2 configuration, thresholds and result schemas (HDE-SEPA007.1, HDE-SEPA007.2; R-02, R-03).",
+      "slice": "WU-PR-03"
+    },
+    {
+      "deliverable": "D3: fail-closed v2 loader and v2 configuration identity (HDE-SEPA007.3, HDE-SEPA007.4; R-04, R-05).",
+      "slice": "WU-PR-03"
+    },
+    {
+      "deliverable": "D4: Separation v2 contract tests and governed evidence (HDE-SEPA007.5; R-06).",
+      "slice": "WU-PR-04"
+    },
+    {
+      "deliverable": "D5: final repository documentation for the Magic-10 v2 contract.",
+      "slice": "WU-DOC-01"
+    },
+    {
+      "deliverable": "D6: the close preparation baseline, this close pack with its ledgers, acceptance map, viability log and close-run family (all requirements).",
+      "slice": "WU-CL-05"
+    }
+  ],
+  "change_id": "HDE-EPIC042",
+  "closure_decision": {
+    "decision": "SATISFIED",
+    "posture": "review_trace_only"
+  },
+  "deferrals": [
+    {
+      "drain_target": {
+        "heading": "**Task HDE-DISS005 \u2014 Band Thresholds & Tuning (admin)**",
+        "register": "HDE Build Checklist Dissolution"
+      },
+      "id": "HDE-DISS005"
+    },
+    {
+      "drain_target": {
+        "heading": "**Task HDE-SEPA007 \u2014 Magic10 v2 mechanics configuration contract**",
+        "register": "HDE Build Checklist Separation"
+      },
+      "id": "HDE-SEPA007"
+    },
+    {
+      "adr_status": "Deferred to the Product Owner, pending drainage",
+      "id": "DELTA-001",
+      "rationale": "README.md line 115 gives POST-only wording for the compat route against four catalogued methods; non-mandatory; never a close blocker."
+    },
+    {
+      "adr_status": "Deferred to the Product Owner, pending drainage",
+      "id": "DELTA-002",
+      "rationale": "AGENTS.md still names docs/pfcanon on five lines; non-mandatory; never a close blocker."
+    },
+    {
+      "adr_status": "Deferred to the Product Owner to assign, ordinary maintenance",
+      "id": "DELTA-003",
+      "rationale": "The pre-push tool's documentation_only note (triage finding A-18); non-mandatory."
+    },
+    {
+      "adr_status": "Deferred to the Product Owner, pending drainage",
+      "id": "DELTA-004",
+      "rationale": "HDE Build Notes text points: triage finding A-19, the offsets' implementation-status line and two points on addendum 2.8; non-mandatory."
+    },
+    {
+      "adr_status": "Recorded by this close, drainage deferred to the Product Owner",
+      "id": "DELTA-005",
+      "rationale": "C-09: the nine Magic10 v2 paths are recorded in the drain-targets ledger, because the doc-deltas ledger stays byte-identical to the Step-0B capture; drain target HDE Schemas and Artifacts section 2.9."
+    },
+    {
+      "adr_status": "Approved disposition (A), wording deferred to the Product Owner",
+      "id": "CCR-E042-01",
+      "rationale": "Step-0B writes the epic-scoped capture and the close writes the two ledgers without overwriting it; the HDE Build Notes wording is the Product Owner's."
+    },
+    {
+      "adr_status": "Deferred to the Product Owner, cutover-row assignment",
+      "id": "A-07",
+      "rationale": "engine/config/bundles.py line 78 is a v1-edges consumer missing from the cutover list (Implementation Plan Q-02; triage Question 2); v1 is unaffected."
+    },
+    {
+      "adr_status": "Deferred to HDE-DIST008.2 at the cut",
+      "id": "O-1",
+      "rationale": "The INV-4 guard fails by design at the cut and is retired then, and the contract-evidence generator is re-run at the cut."
+    },
+    {
+      "adr_status": "Deferred to the Product Owner, ordinary pull request",
+      "id": "O-5",
+      "rationale": "The vendored HDE Build Notes copy lags canon; the PF23 Reality Audits update is the Product Owner's too."
+    },
+    {
+      "adr_status": "Deferred to GCFPE-MGMT-10, backlog",
+      "id": "MB-096",
+      "rationale": "A step that a PASS verdict needs belongs in the QA Plan (QA RCA root cause RC-1); non-gating."
+    }
+  ],
+  "deliverables": [
+    "D1: real-path identity proof for each tuning run, with its generator (HDE-DISS005.3; R-01).",
+    "D2: centers and Type-pairing catalogs with the v2 configuration, thresholds and result schemas (HDE-SEPA007.1, HDE-SEPA007.2; R-02, R-03).",
+    "D3: fail-closed v2 loader and v2 configuration identity (HDE-SEPA007.3, HDE-SEPA007.4; R-04, R-05).",
+    "D4: Separation v2 contract tests and governed evidence (HDE-SEPA007.5; R-06).",
+    "D5: final repository documentation for the Magic-10 v2 contract.",
+    "D6: the close preparation baseline, this close pack with its ledgers, acceptance map, viability log and close-run family (all requirements)."
+  ],
+  "evidence_inputs": [
+    {
+      "binding": "doc_deltas",
+      "path": "audit/docdeltas/hde-epic042_doc_deltas.md"
+    },
+    {
+      "binding": "drain_targets",
+      "path": "audit/docdeltas/hde-epic042_drain_targets.md"
+    },
+    {
+      "binding": "qa_manifest",
+      "path": "audit/qa/hde-epic042/qa_step_logs_manifest.json"
+    },
+    {
+      "binding": "tuning_identity_proof",
+      "path": "audit/qa/hde-epic042/pr-01/tuning_identity_hash.txt"
+    },
+    {
+      "binding": "v2_contract_evidence",
+      "path": "audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt"
+    },
+    {
+      "binding": "qa_check_01",
+      "path": "audit/qa/hde-epic042/checks/qa-01-d0-discovery/primary.log"
+    },
+    {
+      "binding": "qa_check_02",
+      "path": "audit/qa/hde-epic042/checks/qa-02-step-0b-doc-delta-capture/primary.log"
+    },
+    {
+      "binding": "qa_check_03",
+      "path": "audit/qa/hde-epic042/checks/qa-03-bound-ci-coverage/primary.log"
+    },
+    {
+      "binding": "qa_check_04",
+      "path": "audit/qa/hde-epic042/checks/qa-04-contract-record-attribution/primary.log"
+    },
+    {
+      "binding": "qa_check_05",
+      "path": "audit/qa/hde-epic042/checks/qa-05-ac08-v1-identity/primary.log"
+    },
+    {
+      "binding": "qa_check_06",
+      "path": "audit/qa/hde-epic042/checks/qa-06-deployed-identity/primary.log"
+    },
+    {
+      "binding": "qa_check_07",
+      "path": "audit/qa/hde-epic042/checks/qa-07-deployed-reader-syn/primary.log"
+    },
+    {
+      "binding": "qa_check_08",
+      "path": "audit/qa/hde-epic042/checks/qa-08-live-compat-cli/primary.log"
+    },
+    {
+      "binding": "qa_check_09",
+      "path": "audit/qa/hde-epic042/checks/qa-09-live-vendor-functional/primary.log"
+    },
+    {
+      "binding": "acceptance_map",
+      "path": "docs/acceptance_map_epic042.json"
+    },
+    {
+      "binding": "acceptance_map_viability",
+      "path": "audit/qa/hde-epic042/acceptance_map_viability.log"
+    }
+  ],
+  "follow_ups": [],
+  "key_outputs": {
+    "acceptance_map": "docs/acceptance_map_epic042.json",
+    "acceptance_map_viability": "audit/qa/hde-epic042/acceptance_map_viability.log",
+    "close_manifest": "audit/EPIC-042_MANIFEST.json",
+    "close_report": "audit/EPIC-042_close_report.md",
+    "doc_deltas": "audit/docdeltas/hde-epic042_doc_deltas.md",
+    "drain_targets": "audit/docdeltas/hde-epic042_drain_targets.md",
+    "qa_step_logs_manifest": "audit/qa/hde-epic042/qa_step_logs_manifest.json"
+  },
+  "later_drain_statements": [
+    {
+      "action": "change to Done",
+      "canon_homes": [
+        "HDE Build Checklist Dissolution"
+      ],
+      "close_expectation": "at epic close",
+      "current_posture": "Task HDE-DISS005 and Subtask HDE-DISS005.3 are recorded Partial.",
+      "evidence_bindings": [
+        "qa_manifest",
+        "qa_check_03",
+        "qa_check_04",
+        "qa_check_05",
+        "tuning_identity_proof"
+      ],
+      "locators": [
+        "Task HDE-DISS005",
+        "Subtask HDE-DISS005.3"
+      ],
+      "readiness": "Supportable from repo evidence"
+    },
+    {
+      "action": "change to Done",
+      "canon_homes": [
+        "HDE Build Checklist Separation"
+      ],
+      "close_expectation": "at epic close",
+      "current_posture": "Task HDE-SEPA007 and Subtasks HDE-SEPA007.1 to .5 are recorded Not done; the Required-When-Landed tag stays until the cutover.",
+      "evidence_bindings": [
+        "qa_manifest",
+        "qa_check_03",
+        "qa_check_04",
+        "qa_check_05",
+        "v2_contract_evidence"
+      ],
+      "locators": [
+        "Task HDE-SEPA007",
+        "Subtask HDE-SEPA007.1",
+        "Subtask HDE-SEPA007.2",
+        "Subtask HDE-SEPA007.3",
+        "Subtask HDE-SEPA007.4",
+        "Subtask HDE-SEPA007.5"
+      ],
+      "readiness": "Supportable from repo evidence"
+    },
+    {
+      "action": "No status change recommended",
+      "canon_homes": [
+        "HDE Schemas and Artifacts"
+      ],
+      "close_expectation": "after a separate canon-only drain step",
+      "current_posture": "Section 2.9 leaves the paths of the v2 configuration and of its schemas and catalogs unset, for the implementing change to record through its Doc-Delta.",
+      "evidence_bindings": [
+        "doc_deltas",
+        "drain_targets",
+        "qa_check_02"
+      ],
+      "locators": [
+        "2.9 Magic-10 v1 mechanics configuration and result contracts"
+      ],
+      "readiness": "Supportable from repo evidence"
+    },
+    {
+      "action": "No status change recommended",
+      "canon_homes": [
+        "HDE Math Spec",
+        "HDE Schemas and Artifacts",
+        "HDE Build Checklist Separation"
+      ],
+      "close_expectation": "after a separate canon-only drain step",
+      "current_posture": "Permanent canon still says the pair-rule offsets are not set; HDE Build Notes addendum 2.2 governs that scope until drained.",
+      "evidence_bindings": [],
+      "evidence_records": [
+        "HDE Build Notes addendum 2.2, the adopted Magic10 v2 pair-rule offsets, with its drain targets D-1 to D-13."
+      ],
+      "locators": [
+        "HDE Math Spec 5.2.11",
+        "HDE Schemas and Artifacts 2.9",
+        "Task HDE-SEPA007 dependencies",
+        "Subtask HDE-SEPA007.1 integration"
+      ],
+      "readiness": "Supportable from repo evidence"
+    }
+  ],
+  "nonclaims": [
+    "no_canon_drainage_or_register_movement",
+    "no_execution_by_writer",
+    "no_hosted_feedback_inputs",
+    "no_unbound_claim"
+  ],
+  "planning_records": {
+    "implementation_plan": "HDE-EPIC042 Implementation Plan v1.1 (approved at IA-30 review v1.1; SHA-256 7140473fed56c5826aef52f6504d6df92ef14bc983bb0e7e3967c1cf1485363d)",
+    "qa_plan": "HDE-EPIC042 QA Plan v1.1 (approved at QA-70 review v1.1; SHA-256 0d4d5d2cd1ab2dd4da74b9b5163ce1d81dfa385d9f3f3a7a2880ddcc4484613a)",
+    "qa_report": "HDE-EPIC042 final QA Report v1.0 (HDE-EPIC042-QA-120-QA-REPORT, verdict PASS; SHA-256 46782e4fc3c68777a8a593c1ffc9132066f01a8f6fbcc893f7d960abc18e4af7)",
+    "specification": "HDE-EPIC042 Epic Specification v1.1 (HDE-EPIC042-EPIC-SPECIFICATION, approved at CF-E-30 review v1.1; no approved delta; SHA-256 b49cda0ddee37c430a3f309a96562b03c0aa0524bfb92978fe4d5779c03891c0)"
+  },
+  "pointers": [
+    "audit/qa/hde-epic042/qa_step_logs_manifest.json",
+    "audit/docdeltas/hde-epic042_doc_deltas.md",
+    "audit/docdeltas/hde-epic042_drain_targets.md",
+    "docs/acceptance_map_epic042.json",
+    "audit/qa/hde-epic042/acceptance_map_viability.log",
+    "audit/qa/hde-epic042/close/"
+  ],
+  "qa_checks": [
+    {
+      "check_id": "qa-01-d0-discovery",
+      "criteria": []
+    },
+    {
+      "check_id": "qa-02-step-0b-doc-delta-capture",
+      "criteria": []
+    },
+    {
+      "check_id": "qa-03-bound-ci-coverage",
+      "criteria": [
+        "R-01",
+        "R-02",
+        "R-03",
+        "R-04",
+        "R-05",
+        "R-06"
+      ]
+    },
+    {
+      "check_id": "qa-04-contract-record-attribution",
+      "criteria": [
+        "R-06"
+      ]
+    },
+    {
+      "check_id": "qa-05-ac08-v1-identity",
+      "criteria": [
+        "R-01",
+        "R-02",
+        "R-03",
+        "R-04",
+        "R-05",
+        "R-06"
+      ]
+    },
+    {
+      "check_id": "qa-06-deployed-identity",
+      "criteria": []
+    },
+    {
+      "check_id": "qa-07-deployed-reader-syn",
+      "criteria": []
+    },
+    {
+      "check_id": "qa-08-live-compat-cli",
+      "criteria": []
+    },
+    {
+      "check_id": "qa-09-live-vendor-functional",
+      "criteria": []
+    }
+  ],
+  "qa_rca": {
+    "summary_lines": [
+      "QA RCA of record: HDE-EPIC042 QA RCA v1.0 (HDE-EPIC042-QA-120-QA-RCA; SHA-256 311b31be54b1afde7d2a76a51f1748e1161afb43900ef9ee0a85e06f02a69c91), summarized here.",
+      "What ran: QA Plan v1.1 checks 1 to 9, attempt 1 each, against the tested commit; checks 1 to 5 under closed rails, checks 6 and 7 against the deployed service, checks 8 and 9 under open rails for their live vendor steps only; every check recorded PASS.",
+      "Outcome meaning: no FAIL_BEHAVIOR, FAIL_TOOLING or TOOLING_BLOCKED occurred; no product defect was found.",
+      "Live test RAN: checks 6 to 8 are the live compat test and check 9 the mandatory bounded live vendor test; eight production requests and six vendor invocations, within the Product Owner's authorization of 2026-11-15.",
+      "Evidence: under audit/qa/hde-epic042/ the manifest, nine checks/ primaries and 00_meta/doc_deltas.md, each with a path proof and indexed by #857.",
+      "Coverage vs QA Plan, in plan order: checks 1 to 9 each Fully evidenced with governed evidence pointers; criterion AC-07 is not a QA item.",
+      "Root cause RC-1: the evidence-index registration was not a planned step, so #856 landed the evidence without the index trio; corrected by #857; prevention is MB-096.",
+      "Root cause RC-2: two task-collection authoring defects, F-1 and F-2, normalized in execution and accepted at QA-110; no evidence lost and no second attempt.",
+      "Accepted deviation R-1: #856 merged without the index trio, a departure from the Change Process Guide landing-parity rule; the trio landed in #857; recorded, not undone.",
+      "Accepted deviation X-1 (F-1): an empty-string argument refused by the recorder was replaced by an equivalent form before any recording; the capture was byte-identical.",
+      "Accepted deviation F-2: the collection's interpreter prefix on the mirror-schema check was dropped and the Plan's direct form used.",
+      "Accepted deviations D-1 and D-2 of the registration step: its pre-push check ran on the committed head, and its branch names followed its prompt.",
+      "Same operator and reviewer for the final publication lookup, by the Product Owner's choice; QA-110 v1.1 re-derived it independently.",
+      "Proof limits: check 9 binds bands only in the Cool region; single-pair coverage in checks 5 and 9; vendor request counts are not observable.",
+      "Doc deltas DELTA-001 to DELTA-005 are non-mandatory drain candidates; DELTA-006 is resolved by #857.",
+      "Source-of-truth posture: the governed evidence under audit/qa/hde-epic042/ and the HDE Build Notes record of the QA-110 acceptance; canon homes Glow QA Guide, Change Process Guide, Plan Templates, HDE Schemas and Artifacts.",
+      "Closeout readiness: repo-supported QA completion is proven; canon-drain completion and formal close-pack completion are not claimed."
+    ]
+  },
+  "qa_verdict": "PASS",
+  "requirement_ids": [
+    "R-01",
+    "R-02",
+    "R-03",
+    "R-04",
+    "R-05",
+    "R-06"
+  ],
+  "reuse_boundary": [
+    "The canonical evidence-index updater, the QA harness and the close-pack writer are reused as delivered, with the HDE-EPIC042 close-tooling repair of CL-05; product code is unchanged by this close.",
+    "The QA evidence of record under audit/qa/hde-epic042/ is reused unchanged, as landed by #856 and indexed by #857.",
+    "The WU-PR-01 tuning identity proof and the WU-PR-04 contract evidence are reused as delivered and indexed by #851 and #854.",
+    "The active release and Magic10 v1 are inherited baseline; no touched path is a release member and no release is cut."
+  ],
+  "schema_version": "close_candidate_source.v2",
+  "superseded": [
+    {
+      "evidence_change": "Superseded by QA-100 execution results v1.1 after #857 registered the evidence in the evidence index.",
+      "record": "HDE-EPIC042 QA-100 execution results v1.0 (nine PASS, publication pending)"
+    },
+    {
+      "evidence_change": "Superseded by QA-110 evidence review v1.1 (ACCEPT) after #857 indexed the eleven QA paths.",
+      "record": "HDE-EPIC042 QA-110 evidence review v1.0 (nine members accepted, INCOMPLETE on publication)"
+    }
+  ],
+  "tracked_issues": [
+    {
+      "adr_status": "Completed under this epic: fixture-only home for the v2 bundle beside v1 (Implementation Audit Q-01, alternative A); v1 unchanged.",
+      "id": "ISSUE-EPIC042-TI-01"
+    },
+    {
+      "adr_status": "Completed under this epic: the WU-PR-01 generator produces the HDE-DISS005.3 proof.",
+      "id": "ISSUE-EPIC042-TI-02"
+    },
+    {
+      "adr_status": "Completed under this epic: labelled non-canon fixtures evidence admission with the maxima unset; C-07 held.",
+      "id": "ISSUE-EPIC042-TI-03"
+    },
+    {
+      "adr_status": "Carried forward to the Product Owner: permanent canon still reads offsets not set; drained through HDE Build Notes 2.2, D-1 to D-13.",
+      "id": "ISSUE-EPIC042-TI-04"
+    },
+    {
+      "adr_status": "Completed under this epic: no tool-input refresh was a deliverable; the PF09.2 and PF09.3 copies lag once PF09 moves, owner the Product Owner.",
+      "id": "ISSUE-EPIC042-TI-05"
+    },
+    {
+      "adr_status": "Completed under this epic: Thoth found every business case meets the rule (Specification review v1.1).",
+      "id": "ISSUE-EPIC042-TI-06"
+    },
+    {
+      "adr_status": "Carried forward to the Product Owner as a canon question; this close writes the acceptance map and viability log through the close-pack writer.",
+      "id": "ISSUE-EPIC042-TI-07"
+    },
+    {
+      "adr_status": "Carried forward to the Product Owner: records after closure, HDE Build Notes 2.1 retire or keep, drainage of 2.1 and 2.2, PF09 updates and Board Card.",
+      "id": "ISSUE-EPIC042-TI-08"
+    }
+  ]
+}
