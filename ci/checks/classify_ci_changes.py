@@ -676,6 +676,21 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "scripts/make_compat_determinism_artifacts.py": (
         "tests/scripts/test_make_compat_determinism_artifacts.py",
     ),
+    # HDE-EPIC043 WU-PR-01 (HDE-CONJ010.1): the Magic10 v2 kernel package and its owner tests.
+    "engine/magic10_v2/__init__.py": (
+        "tests/m10_v2/test_kernel_channel_states.py",
+        "tests/m10_v2/test_kernel_mechanics.py",
+        "tests/m10_v2/test_kernel_refusals.py",
+        "tests/m10_v2/test_kernel_static_guards.py",
+        "tests/m10_v2/test_v2_unreachable_from_production.py",
+    ),
+    "engine/magic10_v2/kernel.py": (
+        "tests/m10_v2/test_kernel_channel_states.py",
+        "tests/m10_v2/test_kernel_mechanics.py",
+        "tests/m10_v2/test_kernel_refusals.py",
+        "tests/m10_v2/test_kernel_static_guards.py",
+        "tests/m10_v2/test_v2_unreachable_from_production.py",
+    ),
 }
 _PRODUCT_TEST_OWNER_PREFIXES = (
     ("catalog/narratives/", _NARRATIVE_TEST_OWNERS),
@@ -1040,6 +1055,13 @@ _TEST_SUPPORT_OWNER_PATHS = {
     "tests/fixtures/magic10_v2/LABEL.txt": ("tests/config/test_magic10_v2_contracts.py",),
     "tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
     "tests/fixtures/magic10_v2/thresholds_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    # HDE-EPIC043 WU-PR-01: the admitted v2 fixture bundle shared by the kernel tests.
+    "tests/m10_v2/conftest.py": (
+        "tests/m10_v2/test_kernel_channel_states.py",
+        "tests/m10_v2/test_kernel_mechanics.py",
+        "tests/m10_v2/test_kernel_refusals.py",
+        "tests/m10_v2/test_kernel_static_guards.py",
+    ),
 }
 _SAFE_TEST_SUPPORT_PREFIXES = {
     "tests/db/": ("tests/db",),
