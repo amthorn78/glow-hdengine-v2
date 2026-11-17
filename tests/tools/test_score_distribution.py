@@ -10,11 +10,13 @@ import ast
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tomllib
 import uuid
 from collections import Counter
+from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
@@ -29,6 +31,7 @@ from engine.config.registry_loader import load_active_mechanics_bundle
 from engine.db.errors import PrimaryUnavailable, SqlExecError
 from engine.serializer.canon import sercanon
 from tests.support.pr04_fixtures import FakeCurrentViewDB, complete_chart
+from tools.config import artifacts as config_artifacts
 from tools.score_distribution import score_distribution as tool
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -387,3 +390,172 @@ def test_classifier_tool_block_fails_closed() -> None:
         assert classifier._lanes_for_path(path) == {"db", "product"}, path
     with pytest.raises(ValueError, match="CI_SCORE_DISTRIBUTION_OWNER_TEST_MISSING:tools/score_distribution/notes.txt"):
         classifier.changed_test_targets(ROOT, ("tools/score_distribution/notes.txt",))
+
+
+# --- HDE-EPIC043 WU-PR-05 (HDE-DIST008.2; HDE Math Spec 5.3.7): the cut mode ----------------
+# The cut rule is tested on constructed score lists; they are test inputs, not maxima. The one
+# real run scores the pinned corpus under the active release and records no maxima value.
+
+def _oracle(scores, targets=(30, 65, 90)):
+    """HDE Math Spec 5.3.7 restated independently: N(s) counted from the score list itself."""
+    n, previous, maxima = len(scores), -1, []
+    for p in targets:
+        candidates = range(previous + 1, 100)
+        best = min(candidates, key=lambda s: (abs(100 * sum(1 for x in scores if x <= s) - p * n), s))
+        maxima.append(best)
+        previous = best
+    return maxima + [100]
+
+
+def _cut(scores):
+    rows = tool.cut_maxima(tool.score_histogram(scores))
+    return [row["maximum"] for row in rows] + [100], rows
+
+
+def test_cut_targets_derive_from_the_target_mix() -> None:
+    assert tool.cut_targets() == (30, 65, 90)
+    assert tool.TARGET_MIX_PERCENT == {"Cool": 30, "Open": 35, "Warm": 25, "Glow": 10}
+
+
+def test_cut_compares_in_exact_integers_and_takes_the_lower_score_on_a_tie() -> None:
+    # n = 3: 100*N(s) against 30*3 = 90, 65*3 = 195, 90*3 = 270. A rounded share would see 33.3%.
+    maxima, rows = _cut([0, 1, 2])
+    assert maxima == [0, 1, 2, 100]
+    assert [(r["cumulative_count"], r["deviation"]) for r in rows] == [(1, 10), (2, 5), (3, 30)]
+    # n = 20: N(s) = 5 at s = 0..9 and 7 at s = 10: |500-600| = 100 = |700-600|; the lower (0) wins.
+    scores = [0] * 5 + [10, 10] + [50] * 13
+    maxima, rows = _cut(scores)
+    assert maxima[0] == 0 and rows[0]["deviation"] == 100
+    # A flat region above the previous maximum: the lowest s in it.
+    assert _cut([0] * 30 + [60] * 35 + [80] * 25 + [100] * 10)[0] == [0, 60, 80, 100]
+    assert _cut([5] * 30 + [40] * 35 + [70] * 25 + [99] * 10)[0] == [5, 40, 70, 100]
+
+
+def test_cut_rule_code_is_integer_only() -> None:
+    tree = ast.parse((ROOT / TOOL_PATH).read_text(encoding="utf-8"))
+    functions = {node.name: node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)}
+    for name in ("cut_targets", "score_histogram", "cut_maxima"):
+        for node in ast.walk(functions[name]):
+            assert not isinstance(node, (ast.Div, ast.Pow)), name
+            assert not (isinstance(node, ast.Constant) and type(node.value) is float), name
+            assert not (isinstance(node, ast.Name) and node.id in {"float", "Decimal", "decimal"}), name
+            assert not (isinstance(node, ast.Attribute) and node.attr in {"Decimal"}), name
+
+
+@pytest.mark.parametrize("scores", [
+    list(range(101)) * 3,                       # uniform
+    [50] * 99 + [7],                            # one spike
+    [10] * 40 + [90] * 60,                      # bimodal
+    [33] * 50,                                  # all equal
+    [0] * 10 + [100] * 90,                      # mass at the ends
+    [95, 96, 97, 98, 99, 100],                  # crowded at the top
+], ids=["uniform", "spike", "bimodal", "all-equal", "ends", "top"])
+def test_cut_order_bounds_and_cumulative_counts(scores) -> None:
+    maxima, rows = _cut(scores)
+    assert maxima == _oracle(scores)
+    assert maxima[0] < maxima[1] < maxima[2] <= 99 and maxima[3] == 100
+    for row in rows:
+        assert row["cumulative_count"] == sum(1 for x in scores if x <= row["maximum"])
+    # The search starts above the previous maximum, never at 0.
+    assert _cut([33] * 50)[0] == [0, 33, 34, 100]
+
+
+def test_cut_refuses_exhaustion_value_free(monkeypatch, capfdbinary, bundle) -> None:
+    scores = [0] * 40 + [99] * 25 + [100] * 35
+    with pytest.raises(tool.Refusal) as refused:
+        _cut(scores)
+    assert refused.value.code == tool.CUT_EXHAUSTED
+    distribution = SimpleNamespace(categories=("harmony",), scores={"harmony": scores})
+    monkeypatch.setattr(tool, "run_cut", lambda: tool.cut_report(bundle, {}, distribution))
+    assert _run(["cut"], capfdbinary) == (tool.REFUSAL_EXIT_CODE, b"", f"{tool.CUT_EXHAUSTED}\n".encode())
+
+
+@pytest.mark.parametrize("scores", [[], [1, True], [1, 2.0], [1, -1], [1, 101], [1, "5"]],
+                         ids=["empty", "bool", "float", "negative", "above-100", "string"])
+def test_cut_refuses_values_outside_the_domain(scores) -> None:
+    with pytest.raises(tool.Refusal) as refused:
+        tool.score_histogram(scores)
+    assert refused.value.code == tool.CUT_INVALID
+
+
+def test_cut_reads_scores_only(bundle) -> None:
+    categories = tuple(bundle.registry.magic10_order)
+
+    def distribution(band):
+        result = tool.Distribution(bundle)
+        for score in (0, 10, 20, 30, 40, 50, 60, 70, 80, 90):
+            result.add({"categories": [{"category_id": c, "score": score, "band": band} for c in categories]}, 0)
+        return result
+
+    population = {"corpus_sha256": "0" * 64, "people": 2, "pairs": 10, "synthetic": True}
+    first, second = (tool.cut_report(bundle, population, distribution(band)) for band in ("Cool", "Glow"))
+    assert first == second
+    assert first["categories"][0]["score_histogram"][10] == 1
+
+
+def test_cut_refuses_outside_closed_rails_or_the_repository_root(monkeypatch, capfdbinary, tmp_path) -> None:
+    monkeypatch.setattr(tool, "load_corpus", lambda *a, **k: pytest.fail("corpus read before a precondition"))
+    monkeypatch.setenv("SAFE_MODE", "0")
+    code, out, err = _run(["cut"], capfdbinary)
+    assert (code, out) == (tool.REFUSAL_EXIT_CODE, b"") and err.startswith(b"RAILS_CLOSED_REQUIRED:")
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.chdir(tmp_path)
+    assert _run(["cut"], capfdbinary) == (tool.REFUSAL_EXIT_CODE, b"", f"{tool.WORKING_DIRECTORY_INVALID}\n".encode())
+
+
+def test_cut_thresholds_object_builds_band_edges_v2(bundle, tmp_path) -> None:
+    # A temporary root with the inputs build_band_edges reads; no governed path is written.
+    for name in ("catalog/channels_v1.json", "catalog/gates_v1.json", "catalog/magic10.json",
+                 "catalog/magic10_caps.json", "catalog/magic10_seeds.json", "catalog/manifest.json",
+                 "catalog/magic10_mechanics_v1.json", "schemas/channels_v1.schema.json",
+                 "schemas/gates_v1.schema.json", "schemas/magic10_mechanics_v1.schema.json",
+                 "schemas/magic10_result_v1.schema.json", "schemas/magic10_compat_result_v1.schema.json",
+                 "schemas/thresholds_v2.schema.json"):
+        (tmp_path / name).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / name, tmp_path / name)
+    categories = tuple(bundle.registry.magic10_order)
+    distribution = SimpleNamespace(categories=categories, scores={
+        category: [i % 101 for i in range(k, k + 400)] for k, category in enumerate(categories)})
+    report = tool.cut_report(bundle, {}, distribution)
+    thresholds = report["thresholds"]
+    assert list(thresholds) == ["categories", "version"] and thresholds["version"] == "2"
+    (tmp_path / "math").mkdir()
+    (tmp_path / "math/thresholds.json").write_bytes(sercanon(thresholds, sort_keys=True))
+    edges = config_artifacts.build_band_edges(tmp_path)
+    assert edges["schema"] == "band_edges.v2"
+    assert edges["categories"] == [{"category_id": r["category_id"], "maxima": r["maxima"]} for r in report["categories"]]
+
+
+def test_cut_real_run_on_the_pinned_corpus(monkeypatch, capfdbinary, bundle, tmp_path) -> None:
+    before = _git_status()
+    captured = {}
+    real_score_pairs = tool.score_pairs
+
+    def spy(*args, **kwargs):
+        captured["distribution"] = real_score_pairs(*args, **kwargs)
+        return captured["distribution"]
+
+    monkeypatch.setattr(tool, "score_pairs", spy)
+    code, out, err = _run(["cut"], capfdbinary)
+    assert (code, err) == (0, b"") and out.endswith(b"\n") and out.count(b"\n") == 1
+    report = json.loads(out)
+    assert out == sercanon(report, sort_keys=True)
+    assert report["mode"] == "cut" and report["schema"] == tool.CUT_SCHEMA
+    assert report["release"]["release_id"] == bundle.release_id
+    assert report["population"] == {"corpus_sha256": tool.REFERENCE_CORPUS_SHA256, "people": 2000,
+                                    "pairs": 20000, "synthetic": True}
+    distribution = captured["distribution"]
+    assert [row["category_id"] for row in report["categories"]] == list(bundle.registry.magic10_order)
+    for row in report["categories"]:
+        scores = distribution.scores[row["category_id"]]
+        assert row["results"] == len(scores) == 20000
+        assert row["score_histogram"] == [scores.count(s) for s in range(101)]
+        assert row["maxima"] == _oracle(scores)
+    assert _git_status() == before
+    _assert_no_leak(out)
+    tampered = tmp_path / "corpus.json"
+    raw = bytearray((ROOT / "tools/score_distribution/reference_corpus_v1.json").read_bytes())
+    raw[-2] = ord(" ")
+    tampered.write_bytes(bytes(raw))
+    monkeypatch.setattr(tool, "CORPUS_PATH", tampered)
+    assert _run(["cut"], capfdbinary) == (tool.REFUSAL_EXIT_CODE, b"", f"{tool.CORPUS_INVALID}\n".encode())

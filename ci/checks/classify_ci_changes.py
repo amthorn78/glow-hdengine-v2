@@ -416,6 +416,11 @@ _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS = {
 # HDE-CRD-0003 S16 (WU-PR-03): the score-distribution utility's owner test. It owns the
 # tool's files and joins the owners of every scoring configuration and code path (EC-20).
 _SCORE_DISTRIBUTION_OWNER_TEST = "tests/tools/test_score_distribution.py"
+# HDE-EPIC043 WU-PR-05 (HDE-DIST008.3): the release-attestation contract test. It calls the
+# attestation verifier and reads the thresholds version that labels the active release, so it
+# joins the owners of the builder, the attestation schemas and math/thresholds.json. A
+# manifest-only change stays with the release lane, which builds the real bundle.
+_ATTESTATION_CONTRACT_TEST = "tests/tools/test_magic10_release_attestation_contract.py"
 _PRODUCT_TEST_OWNER_PATHS = {
     "engine/core/core.py": (
         "tests/core/test_engine_core_purity.py",
@@ -453,7 +458,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "catalog/magic10.json": ("tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py", _SCORE_DISTRIBUTION_OWNER_TEST),
     "catalog/magic10_caps.json": ("tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py", _SCORE_DISTRIBUTION_OWNER_TEST),
     "catalog/magic10_seeds.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
-    "math/thresholds.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "math/thresholds.json": (_SCORE_DISTRIBUTION_OWNER_TEST, _ATTESTATION_CONTRACT_TEST),
     "engine/magic10/thresholds.py": (
         "tests/compat/test_thresholds_constants_pack.py",
         _SCORE_DISTRIBUTION_OWNER_TEST,
@@ -777,6 +782,7 @@ _PRODUCT_TEST_OWNER_PREFIXES = (
         (
             "tests/evidence/test_release_attestation.py",
             "tests/evidence/test_release_manifest_content_binding.py",
+            _ATTESTATION_CONTRACT_TEST,
         ),
     ),
     ("schemas/architecture", ("tests/evidence/test_architecture_snapshot.py",)),
@@ -850,6 +856,7 @@ _EVIDENCE_HELPER_TEST_OWNERS = {
     "tools/evidence/build_release_attestation.py": (
         "tests/evidence/test_release_attestation.py",
         _EVIDENCE_HELPER_OWNERSHIP_TEST,
+        _ATTESTATION_CONTRACT_TEST,
     ),
     "tools/evidence/check_d23_evidence_index_snapshot_contract.py": (
         "tests/evidence/test_d23_evidence_index_snapshot_contract.py",

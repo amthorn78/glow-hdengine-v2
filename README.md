@@ -226,16 +226,19 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/score_distributi
 SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/score_distribution/score_distribution.py reference --compare target
 # an explicit selection of stored people, compared with the target mix (needs DATABASE_URL)
 SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/score_distribution/score_distribution.py stored --selection-file <path>
+# the same corpus, cut into per-category maxima by HDE Math Spec §5.3.7 (writes nothing)
+SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/score_distribution/score_distribution.py cut
 ```
 
 - Modes:
   - `reference` scores `reference_corpus_v1.json`: the score-range record's 2,000 synthetic people and 20,000 stored pairs, pinned by SHA-256 in the tool, with their provenance. `--compare baseline` (the default) checks exact band counts, overall and per category, against `reference_baseline_v1.json`, the release 1.3.0 mix frozen with the corpus. `--compare target` reports band shares against the target mix 30 / 35 / 25 / 10.
   - `stored` scores every pair of 2 to 1,000 stored people, given with `--user-id` (repeatable) or `--selection-file` (one canonical UUID per line, `#` comments; a regular file of at most 1 MiB). It reads each person read-only through `read_current_mapped_bodygraph` and the Reader's local resolution, and compares with the target mix, flagging a category band more than 5 points from the target. A person whose row is missing or refused is excluded and counted by reason.
+  - `cut` (HDE-EPIC043 WU-PR-05) scores the same pinned corpus and applies the maxima cut rule of HDE Math Spec §5.3.7 to each category's integer scores in exact integer arithmetic: the cumulative targets 30, 65 and 90 of the target mix, `c1`, `c2` and `c3` chosen in that order above the previous maximum and at most 99, the lower score on a tie, and the fourth maximum `100`. It reports (`score_distribution_cut.v1`) the release, the population, and per category the score histogram, the maxima and the counts behind them, plus the same maxima in the thresholds v2 shape. It reads no baseline.
 - Report: canonical JSON on stdout naming the release, the population (corpus digest, or the selection's SHA-256 and counts), band counts and shares overall and per category, distinct bands per pair (Reader v2's view), score percentiles, zero and tie shares, channels formed per pair, and the comparison. It carries aggregates only: no identity and no per-person or per-pair value. Two runs give identical bytes.
-- Exit status: 0 with a report; 5 when it refuses, with one value-free token on stderr (open rails, another working directory, a corpus or baseline that does not match, a selection outside its bounds, fewer than two scored people, the database unavailable); 2 for a usage error.
+- Exit status: 0 with a report; 5 when it refuses, with one value-free token on stderr (open rails, another working directory, a corpus or baseline that does not match, a selection outside its bounds, fewer than two scored people, the database unavailable, for `cut` a score outside `0..100` or no admissible maximum); 2 for a usage error.
 - Writes nothing, makes no network or vendor call, and registers no route, blueprint or `hdctl` command.
 - Owner test: `tests/tools/test_score_distribution.py`. CI selects it for the tool's files and for the scoring configuration and code (`ci/checks/classify_ci_changes.py`); its reference run is the gate on the frozen baseline.
-- Nonclaim: a report proves only the distribution it measures. It is not a QA verdict, and it cuts no band maxima.
+- Nonclaim: a report proves only the distribution it measures. It is not a QA verdict. `cut` computes maxima and commits nothing: maxima become governed only when a release cut freezes them into `math/thresholds.json`.
 
 ## Evidence & QA (HDE-EPIC039 + historical epics)
 

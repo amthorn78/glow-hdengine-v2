@@ -12,6 +12,10 @@ Modes:
   (``reference_corpus_v1.json``, pinned by SHA-256) and compares it with the frozen
   baseline (``reference_baseline_v1.json``, exact counts) or with the Magic10 v2
   target mix.
+* ``cut`` scores the same pinned corpus and applies the maxima cut rule of HDE Math
+  Spec 5.3.7 to each category's integer scores, in exact integer arithmetic. It
+  reports the maxima, the counts behind them and each category's score histogram,
+  and writes no file; it cuts nothing into the release.
 * ``stored`` scores every pair of an explicit selection of stored people, read through
   the production Reader's read-only path, and compares it with the target mix. It
   emits aggregates only: no identity and no per-person or per-pair value.
@@ -87,6 +91,13 @@ SELECTION_TOO_LARGE = "SCORE_DISTRIBUTION_SELECTION_TOO_LARGE"
 UNAVAILABLE = "SCORE_DISTRIBUTION_UNAVAILABLE"
 POPULATION_TOO_SMALL = "SCORE_DISTRIBUTION_POPULATION_TOO_SMALL"
 SCORING_FAILED = "SCORE_DISTRIBUTION_SCORING_FAILED"
+CUT_INVALID = "SCORE_DISTRIBUTION_CUT_INVALID"
+CUT_EXHAUSTED = "SCORE_DISTRIBUTION_CUT_EXHAUSTED"
+
+CUT_SCHEMA = "score_distribution_cut.v1"
+MAX_SCORE = 100
+LAST_CUT_SCORE = 99
+THRESHOLDS_VERSION = "2"
 
 _SHARE_QUANTUM = decimal.Decimal("0.000001")
 _POINTS_QUANTUM = decimal.Decimal("0.01")
@@ -432,6 +443,86 @@ def run_reference(compare: str) -> dict[str, object]:
     return build_report("reference", bundle, population, distribution, comparison)
 
 
+# --- cut mode (HDE Math Spec 5.3.7) -------------------------------------------------
+
+def cut_targets() -> tuple[int, ...]:
+    """The cumulative target shares of the target mix, in band order, without the last band."""
+    targets, running = [], 0
+    for band in BANDS[:-1]:
+        running += TARGET_MIX_PERCENT[band]
+        targets.append(running)
+    return tuple(targets)
+
+
+def score_histogram(scores: Sequence[object]) -> list[int]:
+    """Counts of each integer score ``0..100``; refuses any other value or no value."""
+    counts = [0] * (MAX_SCORE + 1)
+    for score in scores:
+        if not _is_int(score) or not 0 <= score <= MAX_SCORE:
+            raise Refusal(CUT_INVALID)
+        counts[score] += 1
+    if sum(counts) == 0:
+        raise Refusal(CUT_INVALID)
+    return counts
+
+
+def cut_maxima(counts: Sequence[int]) -> list[dict[str, int]]:
+    """HDE Math Spec 5.3.7: ``c1``, ``c2``, ``c3`` in order, each the integer ``s`` above the
+    previous maximum (``c0 = -1``) and at most 99 minimizing ``|100*N(s) - p*n|``, the lower
+    score on a tie, in exact integer arithmetic. No admissible ``s`` refuses."""
+    n = sum(counts)
+    cumulative, running = [], 0
+    for count in counts:
+        running += count
+        cumulative.append(running)
+    rows: list[dict[str, int]] = []
+    previous = -1
+    for target in cut_targets():
+        best_score, best_deviation = -1, -1
+        for score in range(previous + 1, LAST_CUT_SCORE + 1):
+            deviation = abs(100 * cumulative[score] - target * n)
+            if best_score < 0 or deviation < best_deviation:
+                best_score, best_deviation = score, deviation
+        if best_score < 0:
+            raise Refusal(CUT_EXHAUSTED)
+        rows.append({"target_percent": target, "maximum": best_score,
+                     "cumulative_count": cumulative[best_score], "deviation": best_deviation})
+        previous = best_score
+    return rows
+
+
+def cut_report(bundle: AdmittedMechanicsBundle, population: Mapping[str, object],
+               distribution: Distribution) -> dict[str, object]:
+    categories = []
+    for category in distribution.categories:
+        counts = score_histogram(distribution.scores[category])
+        rows = cut_maxima(counts)
+        categories.append({"category_id": category, "results": sum(counts), "score_histogram": counts,
+                           "cuts": rows, "maxima": [row["maximum"] for row in rows] + [MAX_SCORE]})
+    return {
+        "schema": CUT_SCHEMA,
+        "mode": "cut",
+        "read_only": True,
+        "release": {"release_id": bundle.release_id, "version": bundle.manifest.version,
+                    "config_id": bundle.mechanics["config_id"]},
+        "population": dict(population),
+        "target_mix_percent": dict(TARGET_MIX_PERCENT),
+        "cut_target_percent": list(cut_targets()),
+        "categories": categories,
+        "thresholds": {"categories": [{"category_id": row["category_id"], "maxima": row["maxima"]}
+                                      for row in categories], "version": THRESHOLDS_VERSION},
+    }
+
+
+def run_cut() -> dict[str, object]:
+    digest, people, pairs = load_corpus()
+    bundle = admit()
+    parties = [reference_party(person) for person in people]
+    distribution = score_pairs(bundle, parties, pairs)
+    population = {"corpus_sha256": digest, "people": len(people), "pairs": len(pairs), "synthetic": True}
+    return cut_report(bundle, population, distribution)
+
+
 # --- stored-population mode ----------------------------------------------------------
 
 def read_selection_file(path: Path) -> str:
@@ -573,6 +664,7 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
                         help="file with one canonical UUID per line; blank lines and '#' comments ignored")
     stored.add_argument("--compare", choices=("target",), default="target",
                         help="compare with the target mix")
+    modes.add_parser("cut", help="apply the maxima cut rule to the governed synthetic reference corpus")
     return parser.parse_args(argv)
 
 
@@ -583,6 +675,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         require_repository_root()
         if args.mode == "reference":
             report = run_reference(args.compare)
+        elif args.mode == "cut":
+            report = run_cut()
         else:
             report = run_stored(args.user_id, args.selection_file)
     except Refusal as exc:
