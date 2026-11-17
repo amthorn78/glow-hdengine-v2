@@ -38,7 +38,6 @@ INTERNAL_LOCI = (
     "engine/bodygraph/resolver.py",
     "engine/compat/compute.py",
     "engine/compat/ordering.py",
-    "engine/compat/ts_v0.py",
     "engine/runtime/public.py",
     "presenter/reader_v1/emitter.py",
     "adapter/http_reader.py",
