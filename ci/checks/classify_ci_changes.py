@@ -62,7 +62,6 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/cli/test_dev_sampler_cli.py",
     "tests/cli/test_showcompat_sources.py",
     "tests/compat/test_thresholds_constants_pack.py",
-    "tests/compat/test_ts_import_no_io.py",
     "tests/compliance/test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.py",
     "tests/compliance/test_invocation_tag_accept_reject_and_roundtrip.py",
     "tests/compliance/test_log_shape_snapshot.py",
@@ -717,7 +716,26 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/m10_v2/test_signals_calculation_static_guards.py",
         "tests/m10_v2/test_kernel_static_guards.py",
         "tests/m10_v2/test_v2_unreachable_from_production.py",
+        # HDE-EPIC043 WU-PR-03: the dormant integration layer's tests consume the calculation.
+        "tests/m10_v2/test_compat_result.py",
+        "tests/m10_v2/test_compat_reader_projection.py",
+        "tests/m10_v2/test_compat_refusals.py",
     ),
+    # HDE-EPIC043 WU-PR-03 (HDE-CONJ010.4): the Magic10 v2 dormant integration layer and its owner tests.
+    "engine/magic10_v2/compat.py": (
+        "tests/m10_v2/test_compat_result.py",
+        "tests/m10_v2/test_compat_reader_projection.py",
+        "tests/m10_v2/test_compat_refusals.py",
+        "tests/m10_v2/test_compat_static_guards.py",
+        "tests/m10_v2/test_no_legacy_scorers.py",
+        "tests/m10_v2/test_kernel_static_guards.py",
+        "tests/m10_v2/test_v2_unreachable_from_production.py",
+    ),
+    # HDE-EPIC043 WU-PR-03 (HDE-CONJ010.5): the removed Type-only scorers and the legacy script that
+    # imported one; their absence and the production no-import proof are owned by the no-legacy test.
+    "engine/compat/ts_v0.py": ("tests/m10_v2/test_no_legacy_scorers.py",),
+    "engine/compat/type_strategy_v0.py": ("tests/m10_v2/test_no_legacy_scorers.py",),
+    "scripts/hdctl.clean.py": ("tests/m10_v2/test_no_legacy_scorers.py",),
 }
 _PRODUCT_TEST_OWNER_PREFIXES = (
     ("catalog/narratives/", _NARRATIVE_TEST_OWNERS),
@@ -1094,6 +1112,10 @@ _TEST_SUPPORT_OWNER_PATHS = {
         "tests/m10_v2/test_calculation_bands.py",
         "tests/m10_v2/test_calculation_result.py",
         "tests/m10_v2/test_signals_calculation_refusals.py",
+        # HDE-EPIC043 WU-PR-03: the dormant integration layer's tests that use its fixtures.
+        "tests/m10_v2/test_compat_result.py",
+        "tests/m10_v2/test_compat_reader_projection.py",
+        "tests/m10_v2/test_compat_refusals.py",
     ),
 }
 _SAFE_TEST_SUPPORT_PREFIXES = {
