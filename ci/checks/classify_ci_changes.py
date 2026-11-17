@@ -690,6 +690,33 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/m10_v2/test_kernel_refusals.py",
         "tests/m10_v2/test_kernel_static_guards.py",
         "tests/m10_v2/test_v2_unreachable_from_production.py",
+        # HDE-EPIC043 WU-PR-02: the signals and calculation tests consume the kernel.
+        "tests/m10_v2/test_signals.py",
+        "tests/m10_v2/test_calculation_components.py",
+        "tests/m10_v2/test_calculation_bands.py",
+        "tests/m10_v2/test_calculation_result.py",
+        "tests/m10_v2/test_signals_calculation_refusals.py",
+    ),
+    # HDE-EPIC043 WU-PR-02 (HDE-CONJ010.2): the Magic10 v2 signal producers and their owner tests.
+    "engine/magic10_v2/signals.py": (
+        "tests/m10_v2/test_signals.py",
+        "tests/m10_v2/test_calculation_components.py",
+        "tests/m10_v2/test_calculation_bands.py",
+        "tests/m10_v2/test_calculation_result.py",
+        "tests/m10_v2/test_signals_calculation_refusals.py",
+        "tests/m10_v2/test_signals_calculation_static_guards.py",
+        "tests/m10_v2/test_kernel_static_guards.py",
+        "tests/m10_v2/test_v2_unreachable_from_production.py",
+    ),
+    # HDE-EPIC043 WU-PR-02 (HDE-CONJ010.3): the Magic10 v2 calculation and its owner tests.
+    "engine/magic10_v2/calculation.py": (
+        "tests/m10_v2/test_calculation_components.py",
+        "tests/m10_v2/test_calculation_bands.py",
+        "tests/m10_v2/test_calculation_result.py",
+        "tests/m10_v2/test_signals_calculation_refusals.py",
+        "tests/m10_v2/test_signals_calculation_static_guards.py",
+        "tests/m10_v2/test_kernel_static_guards.py",
+        "tests/m10_v2/test_v2_unreachable_from_production.py",
     ),
 }
 _PRODUCT_TEST_OWNER_PREFIXES = (
@@ -1061,6 +1088,12 @@ _TEST_SUPPORT_OWNER_PATHS = {
         "tests/m10_v2/test_kernel_mechanics.py",
         "tests/m10_v2/test_kernel_refusals.py",
         "tests/m10_v2/test_kernel_static_guards.py",
+        # HDE-EPIC043 WU-PR-02: the signals and calculation tests that use its fixtures.
+        "tests/m10_v2/test_signals.py",
+        "tests/m10_v2/test_calculation_components.py",
+        "tests/m10_v2/test_calculation_bands.py",
+        "tests/m10_v2/test_calculation_result.py",
+        "tests/m10_v2/test_signals_calculation_refusals.py",
     ),
 }
 _SAFE_TEST_SUPPORT_PREFIXES = {
