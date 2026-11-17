@@ -1646,3 +1646,133 @@ def test_s19_golden_report_refusal_covers_the_lexically_admitted_candidate_root(
     outside = tmp_path / "reports" / "report.json"
     outside.parent.mkdir()
     assert config_tools._golden_report_destination(outside, candidate, goldens) == outside
+
+
+# --- HDE-EPIC043 WU-PR-04 (HDE-DIST008.1; HDE Schemas and Artifacts §8.14.2): the version-2
+# band-edges shape. The roots are temporary copies; the labelled fixture
+# tests/fixtures/magic10_v2/thresholds_v2.fixture.json and the per-category maxima below are
+# test values, not canon and not the cutover maxima, and no maxima value is asserted as canon.
+# catalog_root does not copy the v2 owning schema, so each v2 root receives it explicitly. -------
+
+import shutil
+
+from engine.config.registry_loader import SchemaValidationError as _V2SchemaValidationError
+from engine.serializer import canon
+
+_V2_THRESHOLDS_FIXTURE = ROOT / "tests/fixtures/magic10_v2/thresholds_v2.fixture.json"
+_V2_SCHEMA = "schemas/thresholds_v2.schema.json"
+_V2_KEYS = ["bands", "categories", "schema", "source", "version"]
+
+
+def _v2_thresholds() -> dict:
+    return json.loads(_V2_THRESHOLDS_FIXTURE.read_bytes())
+
+
+def _v2_distinct(document: dict) -> dict:
+    """Per-category test maxima ``(5 + i, 20 + i, 40 + i, 100)`` by catalog index."""
+    index = {category: position for position, category in enumerate(FROZEN_MAGIC10_ORDER)}
+    for entry in document["categories"]:
+        offset = index[entry["category_id"]]
+        entry["maxima"] = [5 + offset, 20 + offset, 40 + offset, 100]
+    return document
+
+
+def _v2_root(root: Path, document: object) -> Path:
+    write_canonical(root / "math/thresholds.json", document)
+    (root / "schemas").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / _V2_SCHEMA, root / _V2_SCHEMA)
+    return root
+
+
+def _v2_expected(document: dict) -> dict:
+    by_category = {entry["category_id"]: entry["maxima"] for entry in document["categories"]}
+    return {
+        "bands": ["Cool", "Open", "Warm", "Glow"],
+        "categories": [{"category_id": category, "maxima": by_category[category]} for category in FROZEN_MAGIC10_ORDER],
+        "schema": "band_edges.v2",
+        "source": "math/thresholds.json",
+        "version": "2",
+    }
+
+
+@pytest.mark.parametrize("distinct", [False, True], ids=["fixture", "distinct-maxima"])
+def test_v2_band_edges_have_the_exact_shape(writer_root, distinct) -> None:
+    document = _v2_distinct(_v2_thresholds()) if distinct else _v2_thresholds()
+    result = artifact_tools.build_band_edges(_v2_root(writer_root, document))
+    assert sorted(result) == _V2_KEYS
+    assert result == _v2_expected(document)
+    assert artifact_tools.BAND_EDGES_V2_SCHEMA == "band_edges.v2"
+    assert all(list(entry) == ["category_id", "maxima"] for entry in result["categories"])
+
+
+def test_v2_band_edges_follow_catalog_order_not_input_order(writer_root) -> None:
+    document = _v2_distinct(_v2_thresholds())
+    document["categories"].reverse()
+    assert [entry["category_id"] for entry in document["categories"]] != list(FROZEN_MAGIC10_ORDER)
+    result = artifact_tools.build_band_edges(_v2_root(writer_root, document))
+    assert [entry["category_id"] for entry in result["categories"]] == list(FROZEN_MAGIC10_ORDER)
+    assert result == _v2_expected(document)
+
+
+def test_v2_band_edges_are_two_run_identical(writer_root) -> None:
+    root = _v2_root(writer_root, _v2_distinct(_v2_thresholds()))
+    first = canon.sercanon(artifact_tools.build_band_edges(root), sort_keys=True)
+    second = canon.sercanon(artifact_tools.build_band_edges(root), sort_keys=True)
+    assert first == second
+
+
+def _v2_mutate(change):
+    document = _v2_distinct(_v2_thresholds())
+    change(document)
+    return document
+
+
+def _v2_v1_shaped(document: dict) -> None:
+    document.clear()
+    document.update({"clamp": [0, 100], "edges": [24, 49, 74, 100], "rounding": "ROUND_HALF_UP", "version": "2"})
+
+
+_V2_REFUSALS = {
+    "not-ascending": (lambda d: d["categories"][0].__setitem__("maxima", [49, 24, 74, 100]), "M10V2_MAXIMA_NOT_ASCENDING"),
+    "equal-neighbours": (lambda d: d["categories"][1].__setitem__("maxima", [24, 24, 74, 100]), "M10V2_MAXIMA_NOT_ASCENDING"),
+    "not-ending-at-100": (lambda d: d["categories"][0].__setitem__("maxima", [24, 49, 74, 99]), "M10V2_SCHEMA_VALIDATION_FAILED"),
+    "missing-category": (lambda d: d["categories"].pop(), "M10V2_SCHEMA_VALIDATION_FAILED"),
+    "duplicated-category": (lambda d: d["categories"].__setitem__(9, copy.deepcopy(d["categories"][0])), "M10V2_SCHEMA_VALIDATION_FAILED"),
+    "extra-key": (lambda d: d.__setitem__("clamp", [0, 100]), "M10V2_SCHEMA_VALIDATION_FAILED"),
+    "extra-category-key": (lambda d: d["categories"][0].__setitem__("note", "x"), "M10V2_SCHEMA_VALIDATION_FAILED"),
+    "bool-maximum": (lambda d: d["categories"][0]["maxima"].__setitem__(0, True), "M10V2_SCHEMA_VALIDATION_FAILED"),
+    "float-maximum": (lambda d: d["categories"][0]["maxima"].__setitem__(0, 5.5), "M10V2_SCHEMA_VALIDATION_FAILED"),
+    "v1-shape-at-version-2": (_v2_v1_shaped, "M10V2_SCHEMA_VALIDATION_FAILED"),
+    "unknown-version": (lambda d: d.__setitem__("version", "3"), "INVALID_THRESHOLDS"),
+}
+
+
+@pytest.mark.parametrize("case", sorted(_V2_REFUSALS))
+def test_v2_band_edges_refuse_an_invalid_document(writer_root, case) -> None:
+    change, code = _V2_REFUSALS[case]
+    document = _v2_mutate(change)
+    root = _v2_root(writer_root, document)
+    with pytest.raises(_V2SchemaValidationError) as caught:
+        artifact_tools.build_band_edges(root)
+    assert caught.value.code == code
+    # The refusal names a rule, a path or a category, never a maxima value.
+    assert all(isinstance(value, str) for value in caught.value.details.values())
+    shown = str(caught.value) + json.dumps(caught.value.details, sort_keys=True)
+    for entry in document.get("categories", ()):
+        assert json.dumps(entry.get("maxima")) not in shown
+    assert "[" not in str(caught.value) and "99" not in shown and "5.5" not in shown
+
+
+def test_v1_band_edges_bytes_are_unchanged() -> None:
+    committed = (ROOT / "artifacts/thresholds/band_edges.json").read_bytes()
+    assert len(committed) == 177
+    assert canon.sercanon(artifact_tools.build_band_edges(), sort_keys=True) == committed
+    assert json.loads(committed)["schema"] == "band_edges.v1"
+
+
+def test_v2_band_edges_are_written_by_the_existing_writer(writer_root) -> None:
+    document = _v2_distinct(_v2_thresholds())
+    root = _v2_root(writer_root, document)
+    target = artifact_tools.write_band_edges(root)
+    assert target == root / "artifacts/thresholds/band_edges.json"
+    assert target.read_bytes() == canon.sercanon(_v2_expected(document), sort_keys=True)
