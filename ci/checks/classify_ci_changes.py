@@ -505,7 +505,12 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
         _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
-    "engine/config/magic10_v2_loader.py": ("tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "engine/config/magic10_v2_loader.py": (
+        "tests/config/test_magic10_v2_loader.py",
+        "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_config_rejection.py",
+    ),
     "engine/serializer/canon.py": (
         "tests/cli/test_serializer_guards.py",
         "tests/config/test_execution_coherence.py",
@@ -574,6 +579,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/compat/test_conjunction_no_user_boundary.py",
         "tests/compat/test_hde_epic037_v2_adapter_to_compat.py",
         _SCORE_DISTRIBUTION_OWNER_TEST,
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_surface.py",
     ),
     "engine/bodygraph/resolver.py": (
         "tests/bodygraph/test_resolve_compat_chart.py",
@@ -605,6 +612,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/runtime/test_identity.py",
         "tests/http/test_reader_post_v1.py",
         "tests/http/test_reader_post_v2.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_surface.py",
     ),
     "engine/emit_public.py": ("tests/runtime/test_emit_public_legacy_helper.py",),
     "engine/config/__init__.py": (
@@ -619,12 +628,16 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/cli/test_cli_canonical_bytes.py",
         "tests/qa/test_cli_admin_dumps.py",
         "tests/qa/test_cli_admin_parity.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_surface.py",
     ),
     "engine/http/compat_handler.py": (
         "tests/http/test_compat_endpoint_contract.py",
         "tests/adapter/test_compat_http_dev.py",
         "tests/adapter/test_compat_http_parity.py",
         "tests/adapter/test_compat_writer_transport.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_surface.py",
     ),
     "presenter/reader_v1/emitter.py": (
         "tests/reader_v1/test_goldens.py",
@@ -635,6 +648,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "engine/compat/error_tokens.py": (
         "tests/cli/test_errors_parity.py",
         "tests/http/test_reader_post_v1.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_surface.py",
     ),
     "engine/__init__.py": ("tests/runtime/test_identity.py",),
     "engine/constants.py": ("tests/mech/test_constants.py",),
@@ -682,6 +697,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/m10_v2/test_kernel_refusals.py",
         "tests/m10_v2/test_kernel_static_guards.py",
         "tests/m10_v2/test_v2_unreachable_from_production.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_proof_family_index.py",
     ),
     "engine/magic10_v2/kernel.py": (
         "tests/m10_v2/test_kernel_channel_states.py",
@@ -695,6 +712,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/m10_v2/test_calculation_bands.py",
         "tests/m10_v2/test_calculation_result.py",
         "tests/m10_v2/test_signals_calculation_refusals.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_kernel.py",
     ),
     # HDE-EPIC043 WU-PR-02 (HDE-CONJ010.2): the Magic10 v2 signal producers and their owner tests.
     "engine/magic10_v2/signals.py": (
@@ -706,6 +725,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/m10_v2/test_signals_calculation_static_guards.py",
         "tests/m10_v2/test_kernel_static_guards.py",
         "tests/m10_v2/test_v2_unreachable_from_production.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_signals_calculation.py",
     ),
     # HDE-EPIC043 WU-PR-02 (HDE-CONJ010.3): the Magic10 v2 calculation and its owner tests.
     "engine/magic10_v2/calculation.py": (
@@ -720,6 +741,10 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/m10_v2/test_compat_result.py",
         "tests/m10_v2/test_compat_reader_projection.py",
         "tests/m10_v2/test_compat_refusals.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_signals_calculation.py",
+        "tests/m10_v2/test_family_identity_and_reader.py",
+        "tests/m10_v2/test_family_goldens.py",
     ),
     # HDE-EPIC043 WU-PR-03 (HDE-CONJ010.4): the Magic10 v2 dormant integration layer and its owner tests.
     "engine/magic10_v2/compat.py": (
@@ -730,6 +755,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/m10_v2/test_no_legacy_scorers.py",
         "tests/m10_v2/test_kernel_static_guards.py",
         "tests/m10_v2/test_v2_unreachable_from_production.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_identity_and_reader.py",
     ),
     # HDE-EPIC043 WU-PR-03 (HDE-CONJ010.5): the removed Type-only scorers and the legacy script that
     # imported one; their absence and the production no-import proof are owned by the no-legacy test.
@@ -1097,9 +1124,13 @@ _TEST_SUPPORT_OWNER_PATHS = {
     "tests/fixtures/magic10/v1/goldens.json": (
         "tests/config/test_config_artifacts.py",
     ),
+    # HDE-EPIC043 WU-PR-04: the v2 goldens (M10-G001 only) are consumed by the family's goldens test.
+    "tests/fixtures/magic10/v2/goldens.json": (
+        "tests/m10_v2/test_family_goldens.py",
+    ),
     "tests/fixtures/magic10_v2/LABEL.txt": ("tests/config/test_magic10_v2_contracts.py",),
     "tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
-    "tests/fixtures/magic10_v2/thresholds_v2.fixture.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
+    "tests/fixtures/magic10_v2/thresholds_v2.fixture.json": ("tests/config/test_config_artifacts.py", "tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
     # HDE-EPIC043 WU-PR-01: the admitted v2 fixture bundle shared by the kernel tests.
     "tests/m10_v2/conftest.py": (
         "tests/m10_v2/test_kernel_channel_states.py",
@@ -1116,6 +1147,11 @@ _TEST_SUPPORT_OWNER_PATHS = {
         "tests/m10_v2/test_compat_result.py",
         "tests/m10_v2/test_compat_reader_projection.py",
         "tests/m10_v2/test_compat_refusals.py",
+        # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
+        "tests/m10_v2/test_family_kernel.py",
+        "tests/m10_v2/test_family_signals_calculation.py",
+        "tests/m10_v2/test_family_identity_and_reader.py",
+        "tests/m10_v2/test_family_goldens.py",
     ),
 }
 _SAFE_TEST_SUPPORT_PREFIXES = {

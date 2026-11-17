@@ -10,9 +10,10 @@ import os
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
+from engine.config.magic10_v2_loader import _validate_v2_instance
 from engine.config.registry_loader import (
-    ADMITTED_RELEASE_ROSTER, RegistryConfig, RegistryConfigError, _capture_registry_config,
-    _load_active_mechanics_bundle_from_root, _validate_thresholds,
+    ADMITTED_RELEASE_ROSTER, RegistryConfig, RegistryConfigError, SchemaValidationError,
+    _capture_registry_config, _load_active_mechanics_bundle_from_root, _validate_thresholds,
 )
 from engine.serializer import canon
 
@@ -68,6 +69,11 @@ def build_band_edges(root: Path | None = None, *, _capture=None) -> Mapping[str,
     """Build the lower-level projection from exact selected-root thresholds."""
     capture = _capture or _capture_registry_config(root or ROOT)
     raw = capture.read("math/thresholds.json").data
+    if isinstance(raw, dict) and raw.get("version") == "2":
+        payload = _band_edges_v2(capture, raw)
+        if _capture is None:
+            capture.verify_unchanged()
+        return payload
     _validate_thresholds(raw)
     payload = {
         "schema": "band_edges.v1",
@@ -81,6 +87,39 @@ def build_band_edges(root: Path | None = None, *, _capture=None) -> Mapping[str,
     if _capture is None:
         capture.verify_unchanged()
     return payload
+
+
+# HDE-EPIC043 WU-PR-04 (HDE-DIST008.1; HDE Schemas and Artifacts §8.14.2): the
+# version-2 band-edges shape. Version-2 thresholds carry one set of inclusive
+# maxima per category; they are validated against their owning schema by the
+# v2 loader's validator through the same capture, and each set must be strictly
+# ascending. Any document that is not version 2 keeps the v1 path above, whose
+# bytes are unchanged. Refusals never echo a maxima value.
+BAND_EDGES_V2_SCHEMA = "band_edges.v2"
+
+
+def _band_edges_v2(capture, raw: Mapping[str, object]) -> Mapping[str, object]:
+    """Per-category inclusive maxima from version-2 thresholds, in catalog order."""
+    _validate_v2_instance(capture, "math/thresholds.json", raw)
+    by_category = {}
+    for entry in raw["categories"]:
+        maxima = entry["maxima"]
+        if any(earlier >= later for earlier, later in zip(maxima, maxima[1:])):
+            raise SchemaValidationError(
+                "M10V2_MAXIMA_NOT_ASCENDING", "category maxima must be strictly ascending",
+                {"category": entry["category_id"]},
+            )
+        by_category[entry["category_id"]] = list(maxima)
+    return {
+        "bands": ["Cool", "Open", "Warm", "Glow"],
+        "categories": [
+            {"category_id": category, "maxima": by_category[category]}
+            for category in capture.config.magic10_order
+        ],
+        "schema": BAND_EDGES_V2_SCHEMA,
+        "source": "math/thresholds.json",
+        "version": "2",
+    }
 
 
 def _destination_state(root: Path, paths) -> dict[Path, object]:
