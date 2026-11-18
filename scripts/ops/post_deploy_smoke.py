@@ -951,8 +951,22 @@ def _manifest(
 
 
 def _create_file(path: Path, data: bytes) -> None:
-    with open(path, "xb") as handle:
-        handle.write(data)
+    """Create ``path`` exclusively and write ``data``.
+
+    Once the exclusive creation has succeeded the file is this run's: if its
+    write or close then fails, the partly written file is removed before the
+    error propagates, so nothing partial is left behind.
+    """
+    handle = open(path, "xb")
+    try:
+        with handle:
+            handle.write(data)
+    except OSError:
+        try:
+            path.unlink()
+        except OSError:
+            pass
+        raise
 
 
 def _write_all(evidence_dir: Path, files: Mapping[str, bytes]) -> bool:

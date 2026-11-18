@@ -10,10 +10,13 @@ none constructs a database provider.
 """
 from __future__ import annotations
 
+import errno
 import hashlib
 import http.client
 import json
+import os
 import subprocess
+import sys
 import threading
 from contextlib import contextmanager
 from pathlib import Path
@@ -669,6 +672,88 @@ def test_a_write_failure_removes_the_files_this_run_created(real_app, tmp_path, 
     assert rc == smoke.EXIT_WRITE_FAILED
     assert capsys.readouterr().err.splitlines() == ["OPS_REFUSED:EVIDENCE_WRITE_FAILED"]
     assert len(calls) == 5
+    assert not evidence.exists()
+
+
+class _FailingHandle:
+    """A real, exclusively created capture file whose write or close then fails,
+    as a full disk, a quota or a file-size limit fails it in the operator's shell."""
+
+    def __init__(self, real, fail_on):
+        self._real = real
+        self._fail_on = fail_on
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc_info):
+        self._real.close()
+        if self._fail_on == "close":
+            raise OSError(errno.ENOSPC, "No space left on device")
+        return False
+
+    def write(self, data):
+        if self._fail_on == "write":
+            self._real.write(data[: len(data) // 2])
+            self._real.flush()
+            raise OSError(errno.EFBIG, "File too large")
+        return self._real.write(data)
+
+
+@pytest.mark.parametrize("position", [0, 4])
+@pytest.mark.parametrize("fail_on", ["write", "close"])
+def test_a_failed_write_or_close_removes_the_partly_written_file(
+    real_app, tmp_path, monkeypatch, capsys, fail_on, position
+):
+    opened = []
+
+    def failing_open(path, mode):
+        handle = open(path, mode)
+        opened.append(Path(path).name)
+        return _FailingHandle(handle, fail_on if len(opened) == position + 1 else None)
+
+    monkeypatch.setattr(smoke, "open", failing_open, raising=False)
+    evidence = tmp_path / "smoke"
+    with _serve(real_app) as base:
+        rc = smoke.main(_argv(base, evidence), db_reader=_pinned())
+    assert rc == smoke.EXIT_WRITE_FAILED
+    assert capsys.readouterr().err.splitlines() == ["OPS_REFUSED:EVIDENCE_WRITE_FAILED"]
+    assert opened == list(smoke.CAPTURE_FILES[: position + 1])
+    assert not evidence.exists()
+
+
+_FSIZE_LIMIT_RUN = """
+import resource
+import sys
+from pathlib import Path
+
+from scripts.ops import post_deploy_smoke as smoke
+
+evidence = Path(sys.argv[1])
+files = {name: b"x" * 64 for name in smoke.CAPTURE_FILES}
+files[smoke.CAPTURE_FILES[0]] = b"x" * 65536
+soft, hard = resource.getrlimit(resource.RLIMIT_FSIZE)
+resource.setrlimit(resource.RLIMIT_FSIZE, (4096, hard))
+written = smoke._write_all(evidence, files)
+resource.setrlimit(resource.RLIMIT_FSIZE, (soft, hard))
+print("WRITTEN" if written else "WRITE_FAILED")
+"""
+
+
+def test_a_file_size_limit_leaves_no_truncated_capture(tmp_path):
+    # The kernel's own failure: under RLIMIT_FSIZE the write of the first file
+    # stops at the limit and raises EFBIG (CPython ignores SIGXFSZ).
+    evidence = tmp_path / "smoke"
+    result = subprocess.run(
+        [sys.executable, "-c", _FSIZE_LIMIT_RUN, str(evidence)],
+        cwd=ROOT,
+        env={**os.environ, "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1"},
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "WRITE_FAILED"
     assert not evidence.exists()
 
 
