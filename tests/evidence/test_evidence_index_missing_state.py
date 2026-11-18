@@ -1802,3 +1802,118 @@ for epic_id, reason in cases:
     assert _whole_tree_state(repo, metadata=True) == before
     _success(_run(repo, "tools/evidence/update_evidence_index.py", "--check"))
     assert not [rel for rel in _index_rows(repo) if rel.startswith(("audit/EPIC-99", "audit/qa/hde-epic99"))]
+
+
+# --- HDE-EPIC043 WU-PR-06: the WU-OPS-01 smoke capture family, registered absent-tolerant ---
+SMOKE_ROOT = "audit/ops/hde-epic043/wu-ops-01/smoke"
+SMOKE_FILES = (
+    "body_get.json",
+    "body_get.sha256",
+    "cond_if_modified_since_headers.txt",
+    "cond_if_none_match_headers.txt",
+    "db_posture_spot_check.json",
+    "env_pins.txt",
+    "headers_get.txt",
+    "headers_head.txt",
+    "provenance_note.md",
+    "reader_refusal_get.txt",
+    "retained_path_manifest.json",
+    "success_writers_errors.txt",
+)
+
+
+@pytest.fixture
+def smoke_repo(tmp_path: Path) -> Path:
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    assert not (repo / "audit/ops/hde-epic043").exists()
+    return repo
+
+
+def _write_smoke(repo: Path, names=SMOKE_FILES) -> None:
+    """Updater inputs with fixed placeholder bytes; not smoke evidence."""
+    root = repo / SMOKE_ROOT
+    root.mkdir(parents=True, exist_ok=True)
+    for name in names:
+        (root / name).write_bytes(b"{}\n" if name.endswith(".json") else b"fixture\n")
+
+
+def _smoke_row(name: str) -> dict[str, object]:
+    return {
+        "artifact_key": "hde_epic043.wu_ops_01.smoke." + name.replace(".", "_"),
+        "discovered_physical_path": f"{SMOKE_ROOT}/{name}",
+        "epic_id": "HDE-EPIC043",
+        "notes": (
+            "WU-OPS-01 post-deploy smoke capture (HDE-COAG003.5), indexed read-only; the three A7 "
+            "success-route proofs are not captured under C-16; no QA, acceptance-token, PF09, "
+            "deployment or closeout claim"
+        ),
+        "record_type": "hde_epic043_post_deploy_smoke_capture",
+        "schema_version": "1.0",
+    }
+
+
+def _refused(repo: Path, token: str, *args: str) -> None:
+    result = _run(repo, "tools/evidence/update_evidence_index.py", *args)
+    assert result.returncode != 0 and token in result.stderr, result.stdout + result.stderr
+
+
+def test_hde_epic043_smoke_rows_are_absent_tolerant(smoke_repo: Path) -> None:
+    repo = smoke_repo
+    before = _snapshot(repo)
+    _success(_run(repo, "tools/evidence/update_evidence_index.py", "--check"))
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert _snapshot(repo) == before
+    assert not [rel for rel in _index_rows(repo) if rel.startswith(SMOKE_ROOT)]
+
+    _write_smoke(repo, SMOKE_FILES[:1])
+    _refused(repo, "HDE_EPIC043_SMOKE_INCOMPLETE")
+    assert _snapshot(repo) == before
+
+    _write_smoke(repo)
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    rows = _index_rows(repo)
+    for name in SMOKE_FILES:
+        assert rows[f"{SMOKE_ROOT}/{name}"] == _smoke_row(name)
+        assert (repo / SMOKE_ROOT / f"{name}.path_proof.txt").is_file()
+    assert len([rel for rel in rows if rel.startswith(SMOKE_ROOT)]) == len(SMOKE_FILES)
+    _checks(repo)
+
+    (repo / SMOKE_ROOT / "env_pins.txt").unlink()
+    _refused(repo, "HDE_EPIC043_SMOKE_INCOMPLETE", "--check")
+    for name in SMOKE_FILES:
+        (repo / SMOKE_ROOT / name).unlink(missing_ok=True)
+    _refused(repo, "HDE_EPIC043_SMOKE_INDEXED_BUT_ABSENT", "--check")
+
+
+def test_hde_epic043_smoke_family_refuses_members_aliases_and_collisions(smoke_repo: Path) -> None:
+    repo = smoke_repo
+    before = _snapshot(repo)
+    root = repo / SMOKE_ROOT
+
+    _write_smoke(repo)
+    (root / "success_get.txt").write_bytes(b"fixture\n")
+    _refused(repo, "HDE_EPIC043_SMOKE_UNEXPECTED_MEMBER:success_get.txt")
+    assert _snapshot(repo) == before
+    (root / "success_get.txt").unlink()
+
+    (root / "env_pins.txt").unlink()
+    (root / "env_pins.txt").symlink_to(repo / "artifacts/proofs/env_pins.txt")
+    _refused(repo, "HDE_EPIC043_SMOKE_ALIASED")
+    assert _snapshot(repo) == before
+    (root / "env_pins.txt").unlink()
+    (root / "env_pins.txt").write_bytes(b"fixture\n")
+
+    moved = repo / "audit/ops/hde-epic043/wu-ops-01/smoke-real"
+    root.rename(moved)
+    root.symlink_to(moved, target_is_directory=True)
+    _refused(repo, "HDE_EPIC043_SMOKE_ALIASED")
+    assert _snapshot(repo) == before
+    root.unlink()
+    shutil.rmtree(moved)
+
+    index = repo / "docs/evidence/INDEX.json"
+    rows = json.loads(index.read_bytes())
+    rows.append({**_smoke_row("env_pins.txt"), "discovered_physical_path": "artifacts/proofs/env_pins.txt"})
+    index.write_bytes((json.dumps(rows, separators=(",", ":"), sort_keys=True) + "\n").encode())
+    _refused(repo, "HDE_EPIC043_SMOKE_REGISTRATION_COLLISION", "--check")
