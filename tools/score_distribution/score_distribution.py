@@ -19,6 +19,12 @@ Modes:
 * ``stored`` scores every pair of an explicit selection of stored people, read through
   the production Reader's read-only path, and compares it with the target mix. It
   emits aggregates only: no identity and no per-person or per-pair value.
+* ``observation`` scores the governed synthetic observation population
+  (``observation_population_v1.json``, pinned by SHA-256; HDE-FERM009, HDE-EPIC043
+  WU-PR-08), which is independent of the reference corpus, and compares it with the
+  target mix. Its report also states, in words, that a synthetic population cannot show
+  how real people fall. The population is written only by
+  ``generate_observation_population.py``, which this tool never imports.
 
 It runs only under the closed determinism rails and only from the repository root,
 and it writes nothing. Exit codes: ``0`` -- a report on stdout (canonical JSON, one
@@ -65,6 +71,15 @@ CORPUS_PATH = ROOT / "tools/score_distribution/reference_corpus_v1.json"
 BASELINE_PATH = ROOT / "tools/score_distribution/reference_baseline_v1.json"
 # P-5.5: the corpus is a governed input; only these bytes are accepted.
 REFERENCE_CORPUS_SHA256 = "740d1a3acc2557832431ac4fd14f69223ed6c2cb402329619af97e8e66c8a873"
+# HDE-FERM009 (the FERM009 addendum): the observation population is a second governed
+# input, independent of the corpus; only these bytes are accepted.
+OBSERVATION_SCHEMA = "score_distribution_observation_population.v1"
+OBSERVATION_POPULATION_PATH = ROOT / "tools/score_distribution/observation_population_v1.json"
+OBSERVATION_POPULATION_SHA256 = "e7d206a2c5a280992f2da1716236c961bf063b9649037605b8c9c4b55e004a85"
+# HDE Math Spec 5.2.11, "Synthetic calibration", as the FERM009 addendum quotes it (R-4).
+OBSERVATION_LIMIT = ("This report scores a synthetic population and cannot show how real people fall. "
+                     "A real population will fall differently, and that is the recalibration case of "
+                     "HDE Math Spec 5.3.7.")
 
 BANDS = ("Cool", "Open", "Warm", "Glow")
 # The Magic10 v2 target mix and its recalibration tolerance (HDE Build Notes, the
@@ -93,6 +108,7 @@ POPULATION_TOO_SMALL = "SCORE_DISTRIBUTION_POPULATION_TOO_SMALL"
 SCORING_FAILED = "SCORE_DISTRIBUTION_SCORING_FAILED"
 CUT_INVALID = "SCORE_DISTRIBUTION_CUT_INVALID"
 CUT_EXHAUSTED = "SCORE_DISTRIBUTION_CUT_EXHAUSTED"
+OBSERVATION_POPULATION_INVALID = "SCORE_DISTRIBUTION_OBSERVATION_POPULATION_INVALID"
 
 CUT_SCHEMA = "score_distribution_cut.v1"
 MAX_SCORE = 100
@@ -523,6 +539,52 @@ def run_cut() -> dict[str, object]:
     return cut_report(bundle, population, distribution)
 
 
+# --- observation mode (HDE-FERM009; the FERM009 addendum) ------------------------------
+
+def load_observation_population(path: Path | None = None) -> tuple[str, list[dict[str, object]], list[list[int]]]:
+    """Return the pinned observation population (digest, people, pairs) or refuse before
+    parsing other bytes."""
+    try:
+        raw = (OBSERVATION_POPULATION_PATH if path is None else path).read_bytes()
+    except OSError:
+        raise Refusal(OBSERVATION_POPULATION_INVALID) from None
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != OBSERVATION_POPULATION_SHA256:
+        raise Refusal(OBSERVATION_POPULATION_INVALID)
+    try:
+        population = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, ValueError):
+        raise Refusal(OBSERVATION_POPULATION_INVALID) from None
+    if (not isinstance(population, dict) or population.get("schema") != OBSERVATION_SCHEMA
+            or population.get("synthetic") is not True):
+        raise Refusal(OBSERVATION_POPULATION_INVALID)
+    people, pairs = population.get("people"), population.get("pairs")
+    if not isinstance(people, list) or not isinstance(pairs, list) or len(people) < MIN_SCORED_PEOPLE:
+        raise Refusal(OBSERVATION_POPULATION_INVALID)
+    for person in people:
+        if (not isinstance(person, dict) or not isinstance(person.get("id"), str)
+                or not isinstance(person.get("gates"), list)):
+            raise Refusal(OBSERVATION_POPULATION_INVALID)
+    for pair in pairs:
+        if (not isinstance(pair, list) or len(pair) != 2 or not all(_is_int(i) for i in pair)
+                or not all(0 <= i < len(people) for i in pair) or pair[0] == pair[1]):
+            raise Refusal(OBSERVATION_POPULATION_INVALID)
+    return digest, people, pairs
+
+
+def run_observation() -> dict[str, object]:
+    digest, people, pairs = load_observation_population()
+    bundle = admit()
+    parties = [reference_party(person) for person in people]
+    distribution = score_pairs(bundle, parties, pairs)
+    population = {"path": "tools/score_distribution/observation_population_v1.json", "population_sha256": digest,
+                  "people": len(people), "pairs": len(pairs), "synthetic": True}
+    report = build_report("observation", bundle, population, distribution,
+                          compare_target(distribution.band_counts()))
+    report["limit"] = OBSERVATION_LIMIT
+    return report
+
+
 # --- stored-population mode ----------------------------------------------------------
 
 def read_selection_file(path: Path) -> str:
@@ -665,6 +727,8 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
     stored.add_argument("--compare", choices=("target",), default="target",
                         help="compare with the target mix")
     modes.add_parser("cut", help="apply the maxima cut rule to the governed synthetic reference corpus")
+    modes.add_parser("observation",
+                     help="score the governed synthetic observation population against the target mix")
     return parser.parse_args(argv)
 
 
@@ -677,6 +741,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             report = run_reference(args.compare)
         elif args.mode == "cut":
             report = run_cut()
+        elif args.mode == "observation":
+            report = run_observation()
         else:
             report = run_stored(args.user_id, args.selection_file)
     except Refusal as exc:
