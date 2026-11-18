@@ -1,5 +1,7 @@
 # Test-only deps
 jsonschema==4.23.0
+# Chart calculation for the HDE-FERM009 observation-population generator (tools/score_distribution/)
+ephem==4.2.1
 
 # Testing framework
 pytest>=7.4,<9.0

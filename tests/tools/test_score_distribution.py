@@ -32,11 +32,16 @@ from engine.db.errors import PrimaryUnavailable, SqlExecError
 from engine.serializer.canon import sercanon
 from tests.support.pr04_fixtures import FakeCurrentViewDB, complete_chart
 from tools.config import artifacts as config_artifacts
+from tools.score_distribution import generate_observation_population as generator
 from tools.score_distribution import score_distribution as tool
 
 ROOT = Path(__file__).resolve().parents[2]
 TOOL_PATH = "tools/score_distribution/score_distribution.py"
+GENERATOR_PATH = "tools/score_distribution/generate_observation_population.py"
+OBSERVATION_PATH = "tools/score_distribution/observation_population_v1.json"
 TOOL_FILES = (
+    GENERATOR_PATH,
+    OBSERVATION_PATH,
     "tools/score_distribution/reference_baseline_v1.json",
     "tools/score_distribution/reference_corpus_v1.json",
     TOOL_PATH,
@@ -376,7 +381,9 @@ def test_the_tool_is_never_a_public_surface() -> None:
         text = (ROOT / path).read_text(encoding="utf-8", errors="replace")
         if "tools.score_distribution" in text or "tools/score_distribution" in text or "score_distribution import" in text:
             referencing.append(path)
-    assert referencing == ["ci/checks/classify_ci_changes.py"]
+    # HDE-EPIC043 WU-PR-08: the observation-population generator names its own output path;
+    # it is the one other allowed referencing file, and the tool never imports it.
+    assert referencing == ["ci/checks/classify_ci_changes.py", GENERATOR_PATH]
     scripts = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["scripts"]
     assert scripts == {"hdctl": "engine.cli.main:cli"}
     assert "score_distribution" not in (ROOT / "docs/ENDPOINTS_CATALOG.json").read_text(encoding="utf-8")
@@ -559,3 +566,213 @@ def test_cut_real_run_on_the_pinned_corpus(monkeypatch, capfdbinary, bundle, tmp
     tampered.write_bytes(bytes(raw))
     monkeypatch.setattr(tool, "CORPUS_PATH", tampered)
     assert _run(["cut"], capfdbinary) == (tool.REFUSAL_EXIT_CODE, b"", f"{tool.CORPUS_INVALID}\n".encode())
+
+
+# --- HDE-EPIC043 WU-PR-08 (HDE-FERM009; the FERM009 addendum): the observation population ----
+# The population is a second governed input, independent of the corpus. The generator is
+# rerun in memory or into tmp_path; the tracked file is never written. The one real run
+# scores the pinned population under the active release and pins no band value.
+
+GENERATOR_ALLOWED_IMPORTS = {"__future__", "argparse", "datetime", "hashlib", "math", "random", "sys", "uuid",
+                             "pathlib", "typing", "ephem", "engine.runtime.determinism_env",
+                             "engine.serializer.canon"}
+OBSERVATION_POPULATION_KEYS = {"path", "population_sha256", "people", "pairs", "synthetic"}
+PROVENANCE_KEYS = {"births", "chart_builder", "generator", "identities", "independence", "pairs", "record", "seed",
+                   "synthetic"}
+
+
+@pytest.fixture(scope="module")
+def observation():
+    return json.loads((ROOT / OBSERVATION_PATH).read_bytes())
+
+
+def _tampered_observation(tmp_path) -> Path:
+    tampered = tmp_path / "observation.json"
+    raw = bytearray((ROOT / OBSERVATION_PATH).read_bytes())
+    raw[-2] = ord(" ")
+    tampered.write_bytes(bytes(raw))
+    return tampered
+
+
+def test_observation_population_regenerates_to_the_pinned_bytes(monkeypatch, capfdbinary, tmp_path) -> None:
+    before = _git_status()
+    raw = (ROOT / OBSERVATION_PATH).read_bytes()
+    assert generator.population_bytes() == raw
+    assert hashlib.sha256(raw).hexdigest() == tool.OBSERVATION_POPULATION_SHA256
+    assert generator.main(["--check"]) == 0
+    assert capfdbinary.readouterr() == (b"", b"")
+    written = tmp_path / "observation_population_v1.json"
+    monkeypatch.setattr(generator, "OUTPUT_PATH", written)
+    assert generator.main(["--write"]) == 0
+    out, err = capfdbinary.readouterr()
+    assert (out, err) == (f"{generator.WRITTEN}:{tool.OBSERVATION_POPULATION_SHA256}\n".encode(), b"")
+    assert written.read_bytes() == raw
+    assert _git_status() == before
+
+
+def test_generator_follows_the_reference_corpus_recipe(corpus) -> None:
+    _births, people, pairs = generator.draw(generator.REFERENCE_SEED, "scorerange-synthetic")
+    assert people == corpus["people"]
+    assert pairs == corpus["pairs"]
+    assert hashlib.sha256(sercanon({"people": people, "pairs": pairs})).hexdigest() == POPULATION_SHA256
+
+
+def test_observation_population_is_independent_of_the_corpus(corpus, observation) -> None:
+    assert generator.REFERENCE_SEED == corpus["provenance"]["seed"] == 20261101
+    assert generator.SEED == observation["provenance"]["seed"] != generator.REFERENCE_SEED
+    corpus_ids = {person["id"] for person in corpus["people"]}
+    observation_ids = {person["id"] for person in observation["people"]}
+    assert not corpus_ids & observation_ids
+    assert not observation_ids <= corpus_ids
+    # The corpus file carries no birth instants; the recipe yields them for both seeds.
+    corpus_births = generator.birth_instants(generator.REFERENCE_SEED)
+    observation_births = generator.birth_instants(generator.SEED)
+    assert len(set(observation_births)) == len(observation["people"])
+    assert not set(corpus_births) & set(observation_births)
+
+
+def test_observation_population_shape_and_provenance(observation) -> None:
+    raw = (ROOT / OBSERVATION_PATH).read_bytes()
+    assert raw == sercanon(observation)
+    assert set(observation) == {"schema", "synthetic", "people", "pairs", "provenance"}
+    assert observation["schema"] == tool.OBSERVATION_SCHEMA == generator.SCHEMA
+    assert observation["synthetic"] is True
+    people, pairs = observation["people"], observation["pairs"]
+    assert len(people) == 2000 >= 400
+    assert [person["id"] for person in people] == [
+        str(uuid.uuid5(uuid.NAMESPACE_URL, f"observation-synthetic-20261118-{i}")) for i in range(2000)]
+    for person in people:
+        assert set(person) == {"id", "gates"}
+        gates = person["gates"]
+        assert gates and gates == sorted(set(gates)) and all(type(g) is int and 1 <= g <= 64 for g in gates)
+    assert len(pairs) == 20000
+    assert all(len(pair) == 2 and pair[0] != pair[1] and all(type(i) is int and 0 <= i < 2000 for i in pair)
+               for pair in pairs)
+    assert len({(min(pair), max(pair)) for pair in pairs}) == 20000
+    provenance = observation["provenance"]
+    assert provenance == generator.PROVENANCE
+    assert set(provenance) == PROVENANCE_KEYS
+    assert provenance["seed"] == 20261118
+    assert provenance["generator"] == GENERATOR_PATH
+    assert provenance["record"] == {"git_blob": "cbef6c7b4f9c787c60e81efee2c1053075644e81",
+                                    "path": "docs/ephemeral/HDE-EPIC041-POSTCLOSE-compat-score-range-v1.0.md",
+                                    "repository": "amthorn78/glow-docs"}
+    builder = provenance["chart_builder"]
+    assert builder["sha256"] == "5969513b1177b9b9086dc7abb2a38e0a7eca5f365d7ad3472bb6e25285d3b159"
+    assert builder["ephemeris"] == "PyEphem 4.2.1" and builder["lunar_node"] == "mean"
+    assert "observation-synthetic-20261118" in provenance["identities"]
+
+
+def test_observation_mode_refuses_before_scoring(monkeypatch, capfdbinary, tmp_path) -> None:
+    def refused(token):
+        assert _run(["observation"], capfdbinary) == (tool.REFUSAL_EXIT_CODE, b"", f"{token}\n".encode())
+
+    original = tool.load_observation_population
+    monkeypatch.setattr(tool, "load_observation_population",
+                        lambda *a, **k: pytest.fail("population read before the preconditions"))
+    monkeypatch.setenv("SAFE_MODE", "0")
+    code, out, err = _run(["observation"], capfdbinary)
+    assert (code, out) == (tool.REFUSAL_EXIT_CODE, b"") and err.startswith(b"RAILS_CLOSED_REQUIRED:")
+    assert b"'SAFE_MODE', '1'" in err and b"'0'" not in err
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.chdir(tmp_path)
+    refused(tool.WORKING_DIRECTORY_INVALID)
+    monkeypatch.chdir(ROOT)
+    monkeypatch.setattr(tool, "load_observation_population", original)
+    monkeypatch.setattr(tool, "OBSERVATION_POPULATION_PATH", _tampered_observation(tmp_path))
+    monkeypatch.setattr(tool.json, "loads", lambda *a, **k: pytest.fail("unpinned bytes parsed"))
+    monkeypatch.setattr(tool, "admit", lambda *a, **k: pytest.fail("release admitted for unpinned bytes"))
+    monkeypatch.setattr(tool, "score_pairs", lambda *a, **k: pytest.fail("unpinned bytes scored"))
+    refused(tool.OBSERVATION_POPULATION_INVALID)
+
+
+def test_generator_refuses_value_free(monkeypatch, capfdbinary, tmp_path) -> None:
+    output = tmp_path / "observation_population_v1.json"
+    monkeypatch.setattr(generator, "OUTPUT_PATH", output)
+
+    def refused(token):
+        assert generator.main(["--write"]) == generator.REFUSAL_EXIT_CODE
+        assert capfdbinary.readouterr() == (b"", f"{token}\n".encode())
+        assert not output.exists()
+
+    monkeypatch.setenv("ALLOW_NETWORK", "1")
+    assert generator.main(["--write"]) == generator.REFUSAL_EXIT_CODE
+    out, err = capfdbinary.readouterr()
+    assert out == b"" and err.startswith(b"RAILS_CLOSED_REQUIRED:") and b"'ALLOW_NETWORK', '0'" in err
+    assert b"'1'" not in err and not output.exists()
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    monkeypatch.chdir(tmp_path)
+    refused(generator.WORKING_DIRECTORY_INVALID)
+    monkeypatch.chdir(ROOT)
+    monkeypatch.setattr(generator.ephem, "__version__", "4.2.0")
+    refused(generator.EPHEMERIS_UNSUPPORTED)
+    monkeypatch.setattr(generator.ephem, "__version__", generator.EPHEM_VERSION)
+    monkeypatch.setattr(generator, "OUTPUT_PATH", _tampered_observation(tmp_path))
+    assert generator.main(["--check"]) == generator.STALE_EXIT_CODE
+    assert capfdbinary.readouterr() == (b"", f"{generator.STALE}\n".encode())
+
+
+def test_observation_mode_never_constructs_a_database_provider(monkeypatch, capfdbinary, observation) -> None:
+    small = (tool.OBSERVATION_POPULATION_SHA256, observation["people"][:3], [[0, 1], [1, 2], [0, 2]])
+    monkeypatch.setattr(tool, "load_observation_population", lambda *a, **k: small)
+    monkeypatch.setattr(tool.DBAccess, "for_current_env",
+                        classmethod(lambda cls, *a, **k: pytest.fail("observation mode constructed DBAccess")))
+    code, out, err = _run(["observation"], capfdbinary)
+    assert (code, err) == (0, b"")
+    report = json.loads(out)
+    assert report["mode"] == "observation" and report["population"]["pairs"] == 3
+    assert report["comparison"]["against"] == "target" and report["limit"] == tool.OBSERVATION_LIMIT
+
+
+def test_observation_real_run_on_the_pinned_population(monkeypatch, capfdbinary, bundle, observation) -> None:
+    before = _git_status()
+    monkeypatch.setattr(tool.DBAccess, "for_current_env",
+                        classmethod(lambda cls, *a, **k: pytest.fail("observation mode constructed DBAccess")))
+    code, out, err = _run(["observation"], capfdbinary)
+    assert (code, err) == (0, b"") and out.endswith(b"\n") and out.count(b"\n") == 1
+    report = json.loads(out)
+    assert out == sercanon(report, sort_keys=True)
+    assert set(report) == REPORT_KEYS | {"limit"}
+    assert report["schema"] == tool.REPORT_SCHEMA and report["mode"] == "observation" and report["read_only"] is True
+    assert set(report["population"]) == OBSERVATION_POPULATION_KEYS
+    assert report["population"] == {"path": OBSERVATION_PATH, "population_sha256": tool.OBSERVATION_POPULATION_SHA256,
+                                    "people": 2000, "pairs": 20000, "synthetic": True}
+    assert report["release"] == {"release_id": bundle.release_id, "version": bundle.manifest.version,
+                                 "config_id": bundle.mechanics["config_id"]}
+    assert report["category_results"] == 200000
+    variety = report["band_variety_per_pair"]
+    assert set(variety) == {"1", "2", "3", "4"} and sum(variety.values()) == 20000
+    comparison = report["comparison"]
+    categories = list(bundle.registry.magic10_order)
+    assert comparison["against"] == "target" and comparison["tolerance_points"] == tool.TOLERANCE_POINTS == 5
+    assert comparison["target_mix_percent"] == tool.TARGET_MIX_PERCENT
+    assert sorted(comparison["per_category"]) == sorted(categories)
+    for rows in comparison["per_category"].values():
+        assert set(rows) == set(tool.BANDS) and all(type(row["beyond_tolerance"]) is bool for row in rows.values())
+    assert set(comparison["categories_beyond_tolerance"]) <= set(categories)
+    assert report["limit"] == tool.OBSERVATION_LIMIT
+    _assert_no_leak(out, err)
+    text = out.decode("utf-8")
+    assert '"gates"' not in text and "observation-synthetic" not in text
+    assert not [person["id"] for person in observation["people"] if person["id"] in text]
+    assert _git_status() == before
+
+
+def test_the_generator_is_offline_and_outside_the_product() -> None:
+    tree = ast.parse((ROOT / GENERATOR_PATH).read_text(encoding="utf-8"))
+    imported = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            imported.add(node.module)
+    assert imported <= GENERATOR_ALLOWED_IMPORTS, sorted(imported - GENERATOR_ALLOWED_IMPORTS)
+    forbidden_roots = ("flask", "werkzeug", "adapter", "engine.cli", "engine.http", "engine.db", "presenter",
+                       "psycopg", "requests", "urllib", "http", "socket", "ssl", "subprocess", "tests",
+                       "tools.score_distribution")
+    assert not [name for name in imported if name.split(".")[0] in forbidden_roots or name.startswith(forbidden_roots)]
+    tracked = subprocess.run(["git", "ls-files", "-z", "--", "adapter/*.py", "engine/*.py", "presenter/*.py"],
+                             cwd=ROOT, capture_output=True, check=True).stdout.decode("utf-8").split("\0")
+    assert not [path for path in tracked
+                if path and "generate_observation_population" in (ROOT / path).read_text(encoding="utf-8",
+                                                                                         errors="replace")]

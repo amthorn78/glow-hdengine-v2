@@ -1068,6 +1068,8 @@ _CI_TOOL_TEST_OWNERS = {
 _SCORE_DISTRIBUTION_TOOL_PREFIX = "tools/score_distribution/"
 _SCORE_DISTRIBUTION_TOOL_LANES = frozenset({"db", "product"})
 _SCORE_DISTRIBUTION_TOOL_TEST_OWNERS = {
+    "tools/score_distribution/generate_observation_population.py": (_SCORE_DISTRIBUTION_OWNER_TEST,),
+    "tools/score_distribution/observation_population_v1.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
     "tools/score_distribution/reference_baseline_v1.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
     "tools/score_distribution/reference_corpus_v1.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
     "tools/score_distribution/score_distribution.py": (_SCORE_DISTRIBUTION_OWNER_TEST,),
