@@ -675,6 +675,12 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "scripts/ensure_env.py": ("tests/invariance/test_determinism_env_helper.py",),
     # HDE-CRD-0002 WU-PR-05 (S19-F06): the S9 ingest runner passes its own log paths.
     "scripts/ingest/run_vendor_ingest.py": ("tests/bodygraph/test_ingest.py",),
+    # HDE-EPIC043 WU-PR-07: the release runbook names the guard, so a guard
+    # change re-checks the runbooks' commands too.
+    "scripts/m10_cutover_guard.py": (
+        "tests/scripts/test_m10_cutover_guard.py",
+        "tests/ops/test_runbook_commands.py",
+    ),
     # HDE-EPIC043 WU-PR-06: the release runbook names the harness, so a harness
     # change re-checks the runbooks' commands too.
     "scripts/ops/post_deploy_smoke.py": (
