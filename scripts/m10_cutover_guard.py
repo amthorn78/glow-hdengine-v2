@@ -23,8 +23,9 @@ prior release's commit, resolved in the candidate's own repository. The guard pr
 
 Every step that executes a tree's code runs in a subprocess rooted at that tree, with an environment
 built from scratch under closed rails, because admission binds the executing root. The guard writes
-nothing in either tree or in any repository; its one temporary directory is removed. The report is
-canonical JSON on stdout. stderr is keys-only.
+nothing in either tree or in any repository; its one temporary directory, which also holds the
+children's temporary files (``TMPDIR``), is removed. The report is canonical JSON on stdout. stderr
+is keys-only.
 
 Exit codes: 0 all four proofs PASS; 1 a proof FAILED; 2 usage error; 3 a precondition refused and no
 proof was evaluated; 4 the candidate changed during the run; 5 internal error (no report).
@@ -159,9 +160,13 @@ except Exception as exc:
 '''
 
 
-def _child_env() -> dict[str, str]:
-    """The complete environment of every child: closed rails, nothing inherited but PATH."""
-    return {
+def _child_env(tmp: Path | None = None) -> dict[str, str]:
+    """The complete environment of every child: closed rails, nothing inherited but PATH.
+
+    A child that runs a tree's code also gets ``TMPDIR`` inside the guard's temporary directory, so
+    the temporary files of that code, pytest's base directory included, are removed with it.
+    """
+    env = {
         "PATH": os.environ.get("PATH", os.defpath),
         "LC_ALL": "C",
         "LANG": "C",
@@ -171,6 +176,9 @@ def _child_env() -> dict[str, str]:
         "APP_ENV": "dev",
         "PYTHONDONTWRITEBYTECODE": "1",
     }
+    if tmp is not None:
+        env["TMPDIR"] = str(tmp)
+    return env
 
 
 def _git(root: Path, *args: str) -> subprocess.CompletedProcess[bytes]:
@@ -180,18 +188,18 @@ def _git(root: Path, *args: str) -> subprocess.CompletedProcess[bytes]:
     )
 
 
-def _python(root: Path, *args: str) -> int:
+def _python(root: Path, tmp: Path, *args: str) -> int:
     done = subprocess.run(
         [sys.executable, "-B", *args],
-        cwd=root, env=_child_env(), stdin=subprocess.DEVNULL, capture_output=True, check=False,
+        cwd=root, env=_child_env(tmp), stdin=subprocess.DEVNULL, capture_output=True, check=False,
     )
     return done.returncode
 
 
-def _probe(root: Path, source: str) -> dict:
+def _probe(root: Path, tmp: Path, source: str) -> dict:
     done = subprocess.run(
         [sys.executable, "-B", "-c", source],
-        cwd=root, env=_child_env(), stdin=subprocess.DEVNULL, capture_output=True, check=False,
+        cwd=root, env=_child_env(tmp), stdin=subprocess.DEVNULL, capture_output=True, check=False,
     )
     lines = done.stdout.decode("utf-8", "replace").strip().splitlines()
     try:
@@ -205,8 +213,8 @@ def _probe(root: Path, source: str) -> dict:
     return payload
 
 
-def _admission(root: Path) -> dict:
-    payload = _probe(root, _ADMISSION_PROBE)
+def _admission(root: Path, tmp: Path) -> dict:
+    payload = _probe(root, tmp, _ADMISSION_PROBE)
     if payload["ok"] and not all(
         isinstance(payload.get(key), str) and _HEX64.fullmatch(payload[key])
         for key in ("release_id", "config_sha256")
@@ -215,8 +223,8 @@ def _admission(root: Path) -> dict:
     return payload
 
 
-def _v2_constants(root: Path) -> dict:
-    payload = _probe(root, _V2_CONSTANTS_PROBE)
+def _v2_constants(root: Path, tmp: Path) -> dict:
+    payload = _probe(root, tmp, _V2_CONSTANTS_PROBE)
     if payload["ok"] and not (
         all(
             isinstance(payload.get(key), list) and all(isinstance(item, str) for item in payload[key])
@@ -228,8 +236,8 @@ def _v2_constants(root: Path) -> dict:
     return payload
 
 
-def _v1_prefix(root: Path) -> dict:
-    payload = _probe(root, _V1_PREFIX_PROBE)
+def _v1_prefix(root: Path, tmp: Path) -> dict:
+    payload = _probe(root, tmp, _V1_PREFIX_PROBE)
     if payload["ok"] and not isinstance(payload.get("prefix"), str):
         return {"ok": False, "code": "PROBE_INVALID_RESULT"}
     return payload
@@ -570,16 +578,18 @@ def run_guard(candidate_arg: str, prior_arg: str) -> dict:
 
     work = Path(tempfile.mkdtemp(prefix="m10_cutover_guard_"))
     try:
-        candidate_admission = _admission(root)
-        constants = _v2_constants(root)
+        child_tmp = work / "tmp"
+        child_tmp.mkdir()
+        candidate_admission = _admission(root, child_tmp)
+        constants = _v2_constants(root, child_tmp)
         closure, unreadable = static_closure(root)
         prior_root = work / "prior"
         extracted = _extract_prior(root, prior, prior_root)
-        prior_admission = _admission(prior_root) if extracted else None
-        prior_prefix = _v1_prefix(prior_root) if extracted else None
+        prior_admission = _admission(prior_root, child_tmp) if extracted else None
+        prior_prefix = _v1_prefix(prior_root, child_tmp) if extracted else None
         prior_manifest = _read_manifest(prior_root) if extracted else None
-        pair = {name: _python(root, *command) for name, command in VALIDATION_PAIR}
-        contract = _python(root, "-m", "pytest", "-q", "-p", "no:cacheprovider", CONTRACT_TEST)
+        pair = {name: _python(root, child_tmp, *command) for name, command in VALIDATION_PAIR}
+        contract = _python(root, child_tmp, "-m", "pytest", "-q", "-p", "no:cacheprovider", CONTRACT_TEST)
         manifest = _read_manifest(root)
         p1, admitted_config_id = _p1(root, candidate_admission, manifest)
         proofs = {

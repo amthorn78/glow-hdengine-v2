@@ -456,6 +456,27 @@ def test_a_run_leaves_the_repository_and_the_temporary_directory_unchanged(
     assert list(guard_tmp.iterdir()) == []
 
 
+def test_the_candidates_checks_keep_their_temporary_files_in_the_guard_directory(tmp_path, capsysbinary, guard_tmp):
+    # The real contract test writes through pytest's tmp_path; children must not write to the shared
+    # temporary root. The constructed contract test fails unless its tmp_path and a tempfile file are
+    # inside the guard's directory, and the guard removes that directory.
+    contract = (
+        "import os\nimport tempfile\nfrom pathlib import Path\n\n"
+        f"GUARD_TMP = Path({str(guard_tmp.resolve())!r})\n\n\n"
+        "def test_contract(tmp_path):\n"
+        "    (tmp_path / 'scratch.txt').write_text('x')\n"
+        "    handle, name = tempfile.mkstemp()\n"
+        "    os.close(handle)\n"
+        "    assert tmp_path.resolve().is_relative_to(GUARD_TMP)\n"
+        "    assert Path(name).resolve().is_relative_to(GUARD_TMP)\n"
+    ).encode()
+    root, prior, _ = build(tmp_path, candidate={guard.CONTRACT_TEST: contract})
+    code, report, _ = run(capsysbinary, root, prior)
+    assert report["contract_test"] == 0
+    assert (code, refusals(report)) == (0, NONE_REFUSED)
+    assert list(guard_tmp.iterdir()) == []
+
+
 _REPORT_KEYS = {
     "schema", "result", "exit_code", "refusal", "candidate", "prior", "candidate_release_id", "prior_release_id",
     "admitted_config_id", "admission_codes", "validation_pair", "contract_test", "proofs",
