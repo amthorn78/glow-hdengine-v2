@@ -4307,6 +4307,95 @@ def _crd_close_pack_entries(
     return unrelated, current
 
 
+# HDE-EPIC043 WU-PR-06 (HDE-COAG003.5; Specification delta 01, D14): the WU-OPS-01
+# post-deploy smoke capture, registered before it exists. The names are those that
+# scripts/ops/post_deploy_smoke.py writes; the subpath is the one the Ops Task Record
+# assigns (PR Instruction section 5). The three A7 success-route proofs are not
+# captured under C-16, so they are not in the family.
+HDE_EPIC043_SMOKE_ROOT = "audit/ops/hde-epic043/wu-ops-01/smoke"
+HDE_EPIC043_SMOKE_FILES = (
+    "body_get.json",
+    "body_get.sha256",
+    "cond_if_modified_since_headers.txt",
+    "cond_if_none_match_headers.txt",
+    "db_posture_spot_check.json",
+    "env_pins.txt",
+    "headers_get.txt",
+    "headers_head.txt",
+    "provenance_note.md",
+    "reader_refusal_get.txt",
+    "retained_path_manifest.json",
+    "success_writers_errors.txt",
+)
+HDE_EPIC043_SMOKE_NOTES = (
+    "WU-OPS-01 post-deploy smoke capture (HDE-COAG003.5), indexed read-only; the three A7 "
+    "success-route proofs are not captured under C-16; no QA, acceptance-token, PF09, "
+    "deployment or closeout claim"
+)
+
+
+def _hde_epic043_smoke_row(name: str) -> dict[str, object]:
+    return {
+        "artifact_key": "hde_epic043.wu_ops_01.smoke." + name.replace(".", "_"),
+        "discovered_physical_path": f"{HDE_EPIC043_SMOKE_ROOT}/{name}",
+        "epic_id": "HDE-EPIC043",
+        "notes": HDE_EPIC043_SMOKE_NOTES,
+        "record_type": "hde_epic043_post_deploy_smoke_capture",
+        "schema_version": "1.0",
+    }
+
+
+def _hde_epic043_smoke_entries(
+    retained: Sequence[Mapping[str, object]],
+) -> tuple[list[Mapping[str, object]], list[dict[str, object]]]:
+    """Absent-tolerant HDE-EPIC043 smoke-capture rows (WU-PR-06).
+
+    No capture directory: no rows. All twelve files: one row each. A partial set,
+    a row whose file is absent, an unexpected or aliased member, or a row that
+    differs from its registration: refused.
+    """
+    expected = {
+        f"{HDE_EPIC043_SMOKE_ROOT}/{name}": _hde_epic043_smoke_row(name)
+        for name in HDE_EPIC043_SMOKE_FILES
+    }
+    keys = {str(row["artifact_key"]) for row in expected.values()}
+    unrelated: list[Mapping[str, object]] = []
+    indexed: set[str] = set()
+    for entry in retained:
+        key = entry.get("artifact_key") or entry.get("title")
+        path = entry.get("discovered_physical_path") or entry.get("path")
+        normalized_path = os.path.normpath(path) if isinstance(path, str) else ""
+        if key not in keys and normalized_path not in expected:
+            unrelated.append(entry)
+            continue
+        if normalized_path not in expected or dict(entry) != expected[normalized_path]:
+            raise ValueError("HDE_EPIC043_SMOKE_REGISTRATION_COLLISION")
+        indexed.add(normalized_path)
+
+    root = ROOT / HDE_EPIC043_SMOKE_ROOT
+    parts = Path(HDE_EPIC043_SMOKE_ROOT).parts
+    for depth in range(2, len(parts) + 1):
+        directory = ROOT.joinpath(*parts[:depth])
+        if directory.is_symlink() or (directory.exists() and not directory.is_dir()):
+            raise ValueError("HDE_EPIC043_SMOKE_ALIASED")
+    if root.is_dir():
+        allowed = set(HDE_EPIC043_SMOKE_FILES) | {
+            f"{name}.path_proof.txt" for name in HDE_EPIC043_SMOKE_FILES
+        }
+        for member in sorted(os.listdir(root)):
+            path = root / member
+            if path.is_symlink():
+                raise ValueError("HDE_EPIC043_SMOKE_ALIASED")
+            if member not in allowed or not path.is_file():
+                raise ValueError(f"HDE_EPIC043_SMOKE_UNEXPECTED_MEMBER:{member}")
+    present = {rel for rel in expected if _path_exists(ROOT / rel)}
+    if present and present != set(expected):
+        raise ValueError("HDE_EPIC043_SMOKE_INCOMPLETE")
+    if indexed - present:
+        raise ValueError("HDE_EPIC043_SMOKE_INDEXED_BUT_ABSENT")
+    return unrelated, [expected[rel] for rel in sorted(present)]
+
+
 def _epic_close_pack_pair(epic_id: str) -> tuple[str, str]:
     number = epic_id.removeprefix("HDE-EPIC")
     return f"audit/EPIC-{number}_close_report.md", f"audit/EPIC-{number}_MANIFEST.json"
@@ -4518,6 +4607,7 @@ def _load_human_index() -> list[dict[str, object]]:
     payload, crd_entries = _load_crd_qa_entries(payload)
     payload, crd_close_pack_entries = _crd_close_pack_entries(payload)
     payload, epic_close_entries = _epic_close_entries(payload)
+    payload, hde_epic043_smoke_entries = _hde_epic043_smoke_entries(payload)
     payload = [
         entry
         for entry in payload
@@ -4557,6 +4647,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *crd_entries,
             *crd_close_pack_entries,
             *epic_close_entries,
+            *hde_epic043_smoke_entries,
             *catalog_entries,
             *BASELINE_ENTRIES,
             *EPIC021_PRIMARY_ARTIFACTS,
