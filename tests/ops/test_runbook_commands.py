@@ -88,6 +88,7 @@ def test_the_release_runbook_names_the_harness_and_the_check_forms():
     paths, modules = named_commands((RUNBOOK_DIR / RUNBOOKS[0]).read_text(encoding="utf-8"))
     for path in (
         "scripts/ops/post_deploy_smoke.py",
+        "scripts/m10_cutover_guard.py",
         "scripts/release_id_recompute.py",
         "ci/checks/check_release_identity.sh",
         "tools/evidence/build_release_attestation.py",

@@ -70,9 +70,26 @@ A failing check is repaired in a pull request by its owning generator in write m
 
    Never edit `docs/evidence/INDEX.json`, `artifacts/evidence_index.jsonl`, their sentinels or any path proof by hand.
 
-3. **Deploy.** Commits landing on `main` of the HD Engine repository (amthorn78/glow-hdengine-v2) are the deploy source. The Railway redeploy procedure, its delegation and its authorization are **unknown here**: the Ops Task Record states them.
+3. **Cutover guard**, before the deploy of a release that changes the active Magic10 configuration. Run it from the root of a checkout, over a clean checkout of the release candidate and the prior release's commit, which is the head of `main` before promotion:
 
-4. **Post-deploy smoke**, immediately after the deploy. Set `SAFE_MODE` and `ALLOW_NETWORK` (each `0` or `1`), and set `DATABASE_URL` to the read-only database URL the Ops Task Record supplies; never echo it.
+   ```bash
+   LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 PYTHONDONTWRITEBYTECODE=1 python scripts/m10_cutover_guard.py --candidate <candidate checkout root> --prior <prior release commit>
+   ```
+
+   | Exit | Meaning |
+   | :- | :- |
+   | 0 | all four proofs passed: one active configuration; no reachable v1 configuration or legacy fallback; a new release identity that binds every new member; a compatible complete prior release |
+   | 1 | a proof failed; the JSON report on stdout names each failing proof and its refusal codes |
+   | 2 | usage error |
+   | 3 | a precondition refused (`M10_CUTOVER_GUARD_REFUSED:<token>` on stderr): closed rails are not set, the candidate is not the root of a clean git checkout, or the prior commit does not resolve in it |
+   | 4 | the candidate checkout changed during the run |
+   | 5 | the guard stopped on an internal error |
+
+   Any exit other than 0 stops the deployment. At the cutover the guard runs over the frozen candidate as the Ops Task Record's preflight, and the record captures its stdout report.
+
+4. **Deploy.** Commits landing on `main` of the HD Engine repository (amthorn78/glow-hdengine-v2) are the deploy source. The Railway redeploy procedure, its delegation and its authorization are **unknown here**: the Ops Task Record states them.
+
+5. **Post-deploy smoke**, immediately after the deploy. Set `SAFE_MODE` and `ALLOW_NETWORK` (each `0` or `1`), and set `DATABASE_URL` to the read-only database URL the Ops Task Record supplies; never echo it.
 
    ```bash
    LC_ALL=C LANG=C TZ=UTC python scripts/ops/post_deploy_smoke.py --base-url <base URL> --evidence-dir <evidence directory the Ops Task Record assigns> --ops-task-ref <Ops Task Record ID> --target-app-env prod
