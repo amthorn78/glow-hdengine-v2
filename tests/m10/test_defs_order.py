@@ -3,17 +3,17 @@ from pathlib import Path
 import pytest
 
 from engine.bodygraph.gates import normalize_gates
-from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
 from engine.core import compute_core
 from engine import magic10
 from engine.magic10 import calculators
-from tests.config.helpers import synthetic_complete_release_root
+from tests.config.helpers import admit_synthetic_v2_candidate
 
 pytestmark = pytest.mark.epic007
 
 
 def test_injected_bundle_closes_category_and_signal_order(tmp_path):
-    bundle = _load_active_mechanics_bundle_from_root(synthetic_complete_release_root(tmp_path))
+    # HDE-EPIC043 WU-PR-09: the switched core computes over the admitted v2 candidate bundle.
+    bundle = admit_synthetic_v2_candidate(tmp_path)
     a = normalize_gates([1])
     result = compute_core(a, a, bundle, bundle.release_id)
     assert tuple(r.category_id for r in result.categories) == bundle.registry.magic10_order

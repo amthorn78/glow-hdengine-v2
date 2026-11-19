@@ -18,9 +18,9 @@ is read from the admitted bundle at run time. The refused mutations patch one
 rule in-process; no release member file is edited. Identities are synthetic.
 
 Stated limits: the mapping of the v2 refusal codes to PF05 tokens (F-28) and
-"no fallback and no selector" belong to WU-PR-09; at WU-PR-09's head the cases
-that admit the repository root fail with the named refusal until WU-PR-10's
-admission.
+"no fallback and no selector" (F-18) are delivered by WU-PR-09's own tests,
+``tests/m10_v2/test_switch.py``; at WU-PR-09's head the cases that admit the
+repository root fail with the named refusal until WU-PR-10's admission.
 """
 from __future__ import annotations
 

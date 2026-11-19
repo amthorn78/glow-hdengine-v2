@@ -26,7 +26,7 @@ from engine.config.registry_loader import _load_active_mechanics_bundle_from_roo
 from engine.db import DBAccess
 from engine.db.errors import PrimaryUnavailable, SqlExecError
 from engine.serializer.canon import sercanon
-from tests.config.helpers import synthetic_complete_release_root
+from tests.config.helpers import synthetic_v2_candidate_root, v2_candidate_roster_admission
 from tests.support.pr04_fixtures import FakeCurrentViewDB, complete_chart
 from tools.bodygraph import check_magic10_gate_readiness as readiness
 
@@ -477,11 +477,14 @@ def test_module_imports_only_read_paths_and_is_a_valid_release_member(monkeypatc
 
 
 def test_synthetic_release_copies_the_real_tool_and_still_admits(tmp_path) -> None:
-    root = synthetic_complete_release_root(tmp_path)
+    # HDE-EPIC043 WU-PR-09: the switched admission admits the v2 candidate release
+    # (through the test-only roster route); the tool remains a copied, bound member.
+    root = synthetic_v2_candidate_root(tmp_path)
     assert (root / TOOL_PATH).read_bytes() == (ROOT / TOOL_PATH).read_bytes()
-    bundle = _load_active_mechanics_bundle_from_root(root)
+    with v2_candidate_roster_admission():
+        bundle = _load_active_mechanics_bundle_from_root(root)
     assert TOOL_PATH in {identity.path for identity in bundle.source_identities}
-    assert bundle.mechanics["config_id"] == "m10-channel-state-v1.0.0"
+    assert bundle.mechanics["config_id"] == "m10-relevance-centers-type-v2.0.0"
 
 
 # --- classifier ownership guard ---------------------------------------------------------

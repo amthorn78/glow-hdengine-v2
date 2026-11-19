@@ -16,14 +16,18 @@ Discovery notes:
 The sampler enforces zero-weight rules during pool construction, applies
 simple eligibility checks (compat threshold + allowed bands), and ranks
 eligible candidates deterministically using existing comparators.
+
+HDE-EPIC043 WU-PR-09: no band is derived from a score.  A candidate keeps the
+band its input carries; a candidate without one keeps none, ranks after every
+banded candidate, fails an ``allowed_bands`` filter and passes an
+``excluded_bands`` filter.  The band order is the Magic10 v2 calculation's.
 """
 
 from dataclasses import dataclass
 from functools import cmp_to_key
 from typing import Iterable, List, Sequence
 
-from engine.compat.compute import band_for
-from engine.compat.thresholds import BANDS
+from engine.magic10_v2.calculation import BANDS
 from engine.order.comparators import compare_ids
 
 
@@ -64,7 +68,7 @@ class CandidatePoolEntry:
     person_uid: str
     weight: float
     compat_score: int
-    band: str
+    band: str | None
     diversity_key: str | None
     is_recent: bool
 
@@ -80,7 +84,7 @@ class RankedCandidate:
     person_uid: str
     score: int
     weight: float
-    band: str
+    band: str | None
     rank: int
     diversity_key: str | None
     is_recent: bool
@@ -96,11 +100,11 @@ def _cmp(a, b) -> int:
     return (a > b) - (a < b)
 
 
-def _resolve_band(candidate: CandidateFeatures) -> str:
+def _resolve_band(candidate: CandidateFeatures) -> str | None:
     band = candidate.band
     if isinstance(band, str) and band:
         return band
-    return band_for(candidate.compat_score)
+    return None
 
 
 def _band_priority_map(priority: tuple[str, ...]) -> dict[str, int]:
@@ -111,7 +115,7 @@ def _is_zero_weight(candidate: CandidateFeatures) -> bool:
     return candidate.weight <= 0
 
 
-def _is_eligible(candidate: CandidateFeatures, band: str, config: SamplerConfig) -> bool:
+def _is_eligible(candidate: CandidateFeatures, band: str | None, config: SamplerConfig) -> bool:
     if candidate.compat_score < config.min_compat_score:
         return False
     if config.allowed_bands is not None and band not in config.allowed_bands:
@@ -151,7 +155,7 @@ def build_candidate_pool(
     return CandidatePool(viewer_id=viewer.person_uid, candidates=pool)
 
 
-def _band_rank(band: str, priority: tuple[str, ...]) -> int:
+def _band_rank(band: str | None, priority: tuple[str, ...]) -> int:
     mapping = _band_priority_map(priority)
     return mapping.get(band, len(mapping))
 

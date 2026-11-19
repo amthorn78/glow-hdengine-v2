@@ -25,7 +25,7 @@ from engine.compat.compute import (
     validate_pair_eligibility,
 )
 from engine.compat.error_tokens import CompatBoundaryError
-from engine.config.registry_loader import SchemaValidationError, _load_active_mechanics_bundle_from_root
+from engine.config.registry_loader import SchemaValidationError
 from engine.core.core import _chart_fingerprint
 from engine.narratives import state as narrative_state
 from engine.narratives.constants import MISSING_NARRATIVE_KEY
@@ -33,10 +33,12 @@ from engine.narratives.loader import load_pack
 from engine.runtime.identity import identity_meta
 from engine.serializer.canon import sercanon
 from presenter.reader_v1.emitter import emit_reader_v1
-from tests.config.helpers import synthetic_complete_release_root
+from tests.config.helpers import admit_synthetic_v2_candidate
 
 ROOT = Path(__file__).resolve().parents[2]
-SCHEMA = json.loads((ROOT / "schemas/magic10_compat_result_v1.schema.json").read_text(encoding="utf-8"))
+# HDE-EPIC043 WU-PR-09: evaluate_pair returns the dormant layer's magic10_compat_result.v2 value.
+SCHEMA = json.loads((ROOT / "schemas/magic10_compat_result_v2.schema.json").read_text(encoding="utf-8"))
+V2_CONFIG_ID = "m10-relevance-centers-type-v2.0.0"
 UUID_1 = "00000000-0000-0000-0000-000000000001"
 UUID_2 = "00000000-0000-0000-0000-000000000002"
 UUID_3 = "00000000-0000-0000-0000-000000000003"
@@ -45,13 +47,13 @@ RELEASE_A = "a" * 64
 META = {"engine_tag": "m10-test", "invocation_tag": "m10-identity-boundary"}
 G007_READER_HASH = "8214324eb0129ff1dc213a5d53bd9d7b3758a351032c5258f7ba28eace7adc15"
 G008_FINGERPRINT = "7567338a3be5b35e00366bfe86f3f1ca8b89be1fd02be893abeb62a60dbc2d2b"
-G008_PAIR_KEY = "8a75eafcc4af664e073c1c4daec55f073f416af2c461039539f01717ac01d501"
 G008_READER_HASH = "ae435ccc1f9d2043b4ee825f48c54ea421276d49d159b19271e46b24c04f2f6e"
 
 
 @pytest.fixture(scope="module")
 def bundle(tmp_path_factory):
-    return _load_active_mechanics_bundle_from_root(synthetic_complete_release_root(tmp_path_factory.mktemp("pr04-bundle")))
+    # HDE-EPIC043 WU-PR-09: the admitted v2 candidate bundle (the v1 synthetic root refuses UNBOUND_SOURCE).
+    return admit_synthetic_v2_candidate(tmp_path_factory.mktemp("pr04-bundle"))
 
 
 @pytest.fixture(scope="module")
@@ -158,8 +160,9 @@ def test_distinct_uuids_equal_masks_are_eligible_with_uuid_tiebreak(bundle):
     ab = evaluate_pair(a, b)
     ba = evaluate_pair(b, a)
     assert sercanon(ab) == sercanon(ba)
-    assert ab["schema"] == "magic10_compat_result.v1"
-    assert ab["release_id"] == bundle.release_id and ab["config_id"] == bundle.mechanics["config_id"]
+    assert ab["schema"] == "magic10_compat_result.v2"
+    assert ab["release_id"] == bundle.release_id and ab["config_id"] == bundle.mechanics["config_id"] == V2_CONFIG_ID
+    # No Channel, two Reflectors: the M10-G001 situation, fixed by canon at every category 0, band Cool.
     assert all(row["score"] == 0 and row["band"] == "Cool" for row in ab["categories"])
     assert all(row["q"] == 0 for row in ab["signals"])
 
@@ -243,11 +246,11 @@ def test_cache_hit_with_matching_identity_is_served_without_core(monkeypatch, bu
     cache = _Cache()
     fresh = evaluate_pair(a, b, cache=cache)
     key = next(iter(cache.store))
-    assert key.startswith("magic10:v1:") and key == f"magic10:v1:{fresh['pair_key']}"
+    assert key.startswith("magic10:v2:") and key == f"magic10:v2:{fresh['pair_key']}"
     entry = cache.store[key]
     assert entry["pair_key"] == fresh["pair_key"] and entry["release_id"] == bundle.release_id
     assert entry["fingerprints"] == sorted([a.chart_fingerprint, b.chart_fingerprint], key=lambda f: 0 if f == orient(a, b)[0].chart_fingerprint else 1) or len(entry["fingerprints"]) == 2
-    assert entry["result"]["schema"] == "magic10_result.v1"
+    assert entry["result"]["schema"] == "magic10_result.v2"
     core = _Spy(compute.compute_core, fail=True)
     monkeypatch.setattr(compute, "compute_core", core)
     served = evaluate_pair(a, b, cache=cache)
@@ -396,7 +399,7 @@ def test_result_validates_against_governed_schema_and_release_identity(bundle):
     jsonschema.validate(instance=result, schema=SCHEMA)
     assert set(result) == {"schema", "config_id", "release_id", "pair_key", "signals", "categories"}
     assert result["release_id"] == bundle.release_id == hashlib.sha256((bundle.manifest_sha256 and (Path(compute._ROOT) / "nonexistent").name or b"").encode()).hexdigest() or result["release_id"] == bundle.release_id
-    assert result["config_id"] == bundle.mechanics["config_id"] == "m10-channel-state-v1.0.0"
+    assert result["config_id"] == bundle.mechanics["config_id"] == V2_CONFIG_ID
     for row in result["categories"]:
         assert set(row) == {"category_id", "score", "band", "shared_key", "personal_lo_to_hi_key", "personal_hi_to_lo_key"}
     assert len(result["signals"]) == 20 and len(result["categories"]) == 10
@@ -405,7 +408,7 @@ def test_result_validates_against_governed_schema_and_release_identity(bundle):
 def test_result_schema_bytes_must_be_bound_to_the_admitted_release(monkeypatch, tmp_path):
     other_root = tmp_path / "other"
     (other_root / "schemas").mkdir(parents=True)
-    (other_root / "schemas/magic10_compat_result_v1.schema.json").write_bytes(b'{"type":"object"}\n')
+    (other_root / "schemas/magic10_compat_result_v2.schema.json").write_bytes(b'{"type":"object"}\n')
     monkeypatch.setattr(compute, "_ROOT", other_root)
     monkeypatch.setattr(compute, "_SCHEMA_VALIDATORS", {})
     with pytest.raises(CompatBoundaryError) as raised:
@@ -466,7 +469,13 @@ def test_g008_fingerprint_and_pair_key_oracle():
     b = _party(UUID_2, [1])
     assert a.gates.mask_hex == b.gates.mask_hex == "0000000000000001"
     assert a.chart_fingerprint == b.chart_fingerprint == G008_FINGERPRINT
-    assert intrinsic_pair_key(a, b, config_id="m10-channel-state-v1.0.0", release_id=RELEASE_A) == G008_PAIR_KEY
+    # HDE-EPIC043 WU-PR-09: G008's pinned pair key was a v1 byte value (config
+    # m10-channel-state-v1.0.0, result_schema magic10_result.v1); no canon v2 pair key
+    # exists, so the v2 key is checked against an independently built preimage.
+    preimage = {"schema": "magic10_pair_preimage.v1", "members": [G008_FINGERPRINT, G008_FINGERPRINT],
+                "config_id": V2_CONFIG_ID, "release_id": RELEASE_A, "result_schema": "magic10_result.v2"}
+    raw = (json.dumps(preimage, sort_keys=True, separators=(",", ":")) + "\n").encode()
+    assert intrinsic_pair_key(a, b, config_id=V2_CONFIG_ID, release_id=RELEASE_A) == hashlib.sha256(raw).hexdigest()
     assert orient(b, a) == (a, b)
     result = evaluate_pair(a, b, router=_stub_router)
     assert all(row["score"] == 0 and row["band"] == "Cool" for row in result["categories"])

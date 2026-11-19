@@ -16,7 +16,13 @@ from engine.config.registry_loader import (
 from engine.runtime.identity import _manifest_release_id_from_bytes
 from engine.serializer import canon
 from scripts import cut_release_manifest as cutter
-from tests.config.helpers import synthetic_complete_release_root, write_canonical
+from tests.config.helpers import (
+    synthetic_complete_release_root,
+    synthetic_v2_candidate_root,
+    v2_candidate_roster,
+    v2_candidate_roster_admission,
+    write_canonical,
+)
 
 # The fifteen members of the pre-PR06 release manifest (version 1.0.0), used
 # as the existing-row baseline that a roster cut must complete to 45 members.
@@ -357,11 +363,18 @@ def test_refresh_cut_validates_member_format_without_a_roster(tmp_path, monkeypa
     assert manifest.read_bytes() == original
 
 
-def test_roster_cut_constructs_exactly_the_admitted_roster(complete_root: Path) -> None:
+def test_roster_cut_constructs_exactly_the_admitted_roster(tmp_path, monkeypatch) -> None:
+    # HDE-EPIC043 WU-PR-09: the switched admission admits only the v2 candidate
+    # release (through the test-only roster route of tests/config/helpers.py); the
+    # 45-path v1 root refuses UNBOUND_SOURCE.  The cut is roster-parametric, so the
+    # admitted roster here is the 57-path v2 candidate roster.
+    _closed(monkeypatch)
+    complete_root = synthetic_v2_candidate_root(tmp_path)
+    roster = v2_candidate_roster()
     helper_manifest = (complete_root / "catalog/manifest.json").read_bytes()
     manifest = _baseline_manifest(complete_root)
-    assert cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, check=True, **_CUT) == 1
-    assert cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, **_CUT) == 0
+    assert cutter.cut_manifest(manifest, roster=roster, check=True, **_CUT) == 1
+    assert cutter.cut_manifest(manifest, roster=roster, **_CUT) == 0
 
     raw = manifest.read_bytes()
     payload = json.loads(raw)
@@ -369,8 +382,8 @@ def test_roster_cut_constructs_exactly_the_admitted_roster(complete_root: Path) 
     assert payload["root"] == "catalog/"
     assert payload["version"] == ADMITTED_RELEASE_VERSION
     assert payload["built_at_utc"] == ADMITTED_RELEASE_BUILT_AT_UTC
-    assert len(payload["files"]) == 45
-    assert tuple(row["path"] for row in payload["files"]) == ADMITTED_RELEASE_ROSTER
+    assert len(payload["files"]) == 57
+    assert tuple(row["path"] for row in payload["files"]) == roster
     assert "catalog/manifest.json" not in {row["path"] for row in payload["files"]}
     for row in payload["files"]:
         body = (complete_root / row["path"]).read_bytes()
@@ -382,13 +395,14 @@ def test_roster_cut_constructs_exactly_the_admitted_roster(complete_root: Path) 
     release_id = hashlib.sha256(raw).hexdigest()
     assert _manifest_release_id_from_bytes(raw) == release_id
     # Fixed point in both modes; a later member change breaks it.
-    assert cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, check=True, **_CUT) == 0
+    assert cutter.cut_manifest(manifest, roster=roster, check=True, **_CUT) == 0
     assert cutter.cut_manifest(manifest, check=True, **_CUT) == 0
     assert manifest.read_bytes() == raw
-    assert _load_active_mechanics_bundle_from_root(complete_root).release_id == release_id
+    with v2_candidate_roster_admission():
+        assert _load_active_mechanics_bundle_from_root(complete_root).release_id == release_id
     member = complete_root / "migrations/005_identity.sql"
     member.write_bytes(member.read_bytes() + b"-- changed\n")
-    assert cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, check=True, **_CUT) == 1
+    assert cutter.cut_manifest(manifest, roster=roster, check=True, **_CUT) == 1
 
 
 def test_roster_cut_refuses_each_missing_member_in_turn(complete_root: Path) -> None:

@@ -31,7 +31,6 @@ from tools.evidence.generate_narrative_registry_diff import (
 from adapter.http_reader import create_app
 from engine.cli.main import _candidate_from_payload
 from engine.compat.categories import CATEGORIES_ORDER_V1
-from engine.compat.compute import band_for
 from engine.config.magic10_v2_loader import _validate_v2_instance
 from engine.config.registry_loader import (
     ADMITTED_RELEASE_ROSTER,
@@ -427,6 +426,20 @@ def _validate_reader_meta(value: object) -> None:
     _require_string(meta["invocation_tag"], "reader_meta.invocation_tag")
 
 
+# HDE-EPIC043 WU-PR-09: the showcompat and conjunction captures validated below
+# are frozen capture-time records of the retired v1 scoring, so their band rule
+# is the v1 inclusive maxima they were produced with, pinned here for that
+# history.  It scores nothing; the supported scoring path reads the v2 maxima.
+_FROZEN_V1_CAPTURE_BAND_MAXIMA = ((24, "Cool"), (49, "Open"), (74, "Warm"))
+
+
+def _frozen_v1_capture_band(score: int) -> str:
+    for maximum, band in _FROZEN_V1_CAPTURE_BAND_MAXIMA:
+        if score <= maximum:
+            return band
+    return "Glow"
+
+
 def _validate_compat_payload(value: object) -> dict[str, object]:
     compat = _require_exact_keys(value, {"categories", "meta"}, "compat")
     categories = compat["categories"]
@@ -445,7 +458,7 @@ def _validate_compat_payload(value: object) -> dict[str, object]:
             raise ValueError(f"compat_category_{index}_band_invalid")
         if type(row["score"]) is not int or not 0 <= row["score"] <= 100:
             raise ValueError(f"compat_category_{index}_score_invalid")
-        if band != band_for(row["score"]):
+        if band != _frozen_v1_capture_band(row["score"]):
             raise ValueError(f"compat_category_{index}_score_band_mismatch")
         if row["personal_key"] != f"{category_id}_{band.lower()}_personal_v1":
             raise ValueError(f"compat_category_{index}_personal_key_invalid")

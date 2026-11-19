@@ -31,7 +31,18 @@ PAIR_ORDER = OUT / "hde_epic037_v2_to_compat_pair_order.json"
 BOUNDARY = OUT / "hde_epic037_admin_public_boundary.json"
 PF09_DOCUMENT = "PF09.5 — HDE Build Checklist Fermentation"
 REQUIRES_ADMITTED_RELEASE = "HDE_EPIC037_PR04_REQUIRES_ADMITTED_RELEASE"
-FROZEN_CHECK_LINE = "checked frozen HDE-EPIC037 PR-04 v2-to-compat artifacts (release not admitted; capture-time records with nonclaims)"
+FROZEN_CHECK_LINE = "checked frozen HDE-EPIC037 PR-04 v2-to-compat artifacts (pinned SHA-256 and size; capture-time records with nonclaims)"
+# HDE-EPIC043 WU-PR-09: frozen history.  The four records are capture-time v1
+# evaluations; write mode refuses and ``--check`` verifies these pins, admitting
+# no release.
+FROZEN_HISTORY_NOT_REGENERATED = "FROZEN_HISTORY_NOT_REGENERATED"
+FROZEN_RECORD_MISMATCH = "FROZEN_RECORD_MISMATCH"
+FROZEN_RECORDS = {
+    "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json": ("d85cc6edd01da237d67117163481bb78e3800d522d79d34d117f74832476f11d", 4517),
+    "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json": ("0fb18db647d6308811ce0aed9e19493baed286b987c2a36ce7c7eeda654c6a2b", 3567),
+    "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json": ("3ffc776431a163c0badafaf38715dbb7732328123ac50b603b7033543030f40f", 3629),
+    "artifacts/vendor/hdapi_v2/hde_epic037_admin_public_boundary.json": ("79f1c8b301d72fcd3226a10dae4e9fcfd749054d883d6199556412cdc37a8705", 4262),
+}
 CLOSED_RAILS_ENV = {"ALLOW_NETWORK": "0", "LANG": "C", "LC_ALL": "C", "SAFE_MODE": "1", "TZ": "UTC"}
 INTERNAL_LOCI = (
     "engine/bodygraph/v2_adapter.py",
@@ -348,6 +359,18 @@ def write_outputs(outputs: dict[Path, bytes], *, produced_at: str, check: bool) 
         raise SystemExit("STALE_HDE_EPIC037_PR04_V2_TO_COMPAT:" + ",".join(stale))
 
 
+def frozen_record_mismatches(root: Path | None = None) -> list[str]:
+    """Return the frozen records whose bytes differ from their pins."""
+    base = ROOT if root is None else root
+    mismatched = []
+    for name, (sha256, size) in FROZEN_RECORDS.items():
+        path = base / name
+        raw = path.read_bytes() if path.is_file() else None
+        if raw is None or len(raw) != size or hashlib.sha256(raw).hexdigest() != sha256:
+            mismatched.append(name)
+    return mismatched
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Generate HDE-EPIC037 PR-04 v2 adapter-to-compat evidence")
     parser.add_argument("--check", action="store_true")
@@ -356,22 +379,17 @@ def main(argv: list[str] | None = None) -> None:
         enforce_closed_rails()
     except DeterminismEnvError as exc:
         raise SystemExit(f"HDE_EPIC037_PR04_CLOSED_RAILS_REQUIRED:{exc}") from exc
-    produced_at = _existing_generated_at(PROOF) if args.check else None
-    if produced_at is None:
-        produced_at = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
-    try:
-        probe_release_admission()
-    except ReleaseNotAdmitted as exc:
-        # PF10 §2.15: no admitted release, so the current evaluation cannot be
-        # regenerated truthfully.  Check mode validates the frozen records; write
-        # mode refuses.  Neither claims a live result.
-        if not args.check:
-            raise SystemExit(REQUIRES_ADMITTED_RELEASE) from exc
-        validate_frozen_outputs(produced_at)
-        print(FROZEN_CHECK_LINE)
-        return
-    write_outputs(build_outputs(produced_at), produced_at=produced_at, check=args.check)
-    print("checked HDE-EPIC037 PR-04 v2-to-compat artifacts" if args.check else "generated HDE-EPIC037 PR-04 v2-to-compat artifacts")
+    # HDE-EPIC043 WU-PR-09: frozen history.  Write mode refuses; check mode
+    # verifies the pinned bytes and the frozen records' shape and path proofs,
+    # and admits no release.  Neither claims a live result.
+    if not args.check:
+        raise SystemExit(FROZEN_HISTORY_NOT_REGENERATED)
+    mismatched = frozen_record_mismatches()
+    if mismatched:
+        raise SystemExit(f"{FROZEN_RECORD_MISMATCH}:{','.join(mismatched)}")
+    produced_at = _existing_generated_at(PROOF) or _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+    validate_frozen_outputs(produced_at)
+    print(FROZEN_CHECK_LINE)
 
 
 if __name__ == "__main__":

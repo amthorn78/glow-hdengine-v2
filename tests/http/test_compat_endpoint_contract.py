@@ -26,7 +26,7 @@ from tests.support.pr04_fixtures import (
     inject_seams,
 )
 
-SCHEMA = json.loads(Path("schemas/magic10_compat_result_v1.schema.json").read_text(encoding="utf-8"))
+SCHEMA = json.loads(Path("schemas/magic10_compat_result_v2.schema.json").read_text(encoding="utf-8"))
 
 
 @pytest.fixture(scope="module")
@@ -147,7 +147,7 @@ def test_compat_post_stored_ids_resolve_read_only_through_current_rows(monkeypat
     resp = _post(_client(), {"a_id": "alice", "b_id": "bob", "viewer_prefs": _prefs()})
     assert resp.status_code == 200, resp.data
     payload = json.loads(resp.data.decode("utf-8"))
-    assert payload["schema"] == "magic10_compat_result.v1"
+    assert payload["schema"] == "magic10_compat_result.v2"
     assert {params[0] for _sql, params in db.queries} == {key_a, key_b}
     for sql, _params in db.queries:
         assert "public.hde_body_graphs_current" in sql and "vendor = 'hdapi'" in sql and "%s" in sql
@@ -201,7 +201,7 @@ def test_compat_post_self_pair_returns_carrier_and_admission_refusal_is_503(monk
     resp = _post(client, _payload())
     assert resp.status_code == 200, resp.data
     evaluated = json.loads(resp.data.decode("utf-8"))
-    assert evaluated["schema"] == "magic10_compat_result.v1"
+    assert evaluated["schema"] == "magic10_compat_result.v2"
     assert evaluated["release_id"] == identity_meta()["release_id"]
     assert resp.headers.get("Cache-Control") == "no-store"
 
@@ -314,7 +314,7 @@ def test_conjunction_resolved_local_hits_evaluate_without_provider():
     payload = conjunction_public_resolved({"user_id": "left-user"}, {"user_id": "right-user"}, env={"SAFE_MODE": "1", "ALLOW_NETWORK": "0"}, local_lookup=store.get)
     observed = {payload["conjunction"]["left"]["person_uid"], payload["conjunction"]["right"]["person_uid"]}
     assert observed == {key_left, key_right}
-    assert payload["conjunction"]["compat"]["schema"] == "magic10_compat_result.v1"
+    assert payload["conjunction"]["compat"]["schema"] == "magic10_compat_result.v2"
 
 
 # --- HDE-CRD-0002 WU-PR-05 (S19-F01): compat POST refuses JSON nested past the parser's recursion limit

@@ -1,13 +1,16 @@
 """EPIC037 v2 adapter-to-compat generator against the corrected evaluation seams.
 
 Positive matrix: the synthetic complete release is injected through the
-evaluation seam.  Check mode without an admitted release (reached through the
-seam now that the repository root admits) validates the frozen capture-time
-artifacts with their nonclaims and never regenerates them (PF10 §2.15); on the
-admitted root the owner's live comparison reports those PR-04 records stale and
-writes nothing.
+evaluation seam and the mapped adapter outputs evaluate to
+``magic10_compat_result.v2``.  Since HDE-EPIC043 WU-PR-09 the generator is
+frozen history: write mode refuses ``FROZEN_HISTORY_NOT_REGENERATED`` and check
+mode verifies the four capture-time records against their pinned SHA-256 and
+size (``FROZEN_RECORDS``), admitting no release and never regenerating them
+(PF10 §2.15).
 """
+import hashlib
 import json
+import shutil
 
 import pytest
 
@@ -15,6 +18,7 @@ from engine.categories.registry import FROZEN_MAGIC10_ORDER
 from engine.compat import compute
 from engine.compat.compute import orient
 from engine.config.registry_loader import SchemaValidationError
+from engine.magic10_v2.calculation import assign_band
 from tests.support.pr04_fixtures import CLOSED_RAILS, build_bundle, build_pack, inject_seams
 from tools.evidence import generate_hde_epic037_v2_to_compat as generator
 
@@ -44,9 +48,13 @@ def test_mapped_v2_adapter_outputs_feed_evaluate_pair(admitted) -> None:
     assert pair["a"]["cache"]["user_id"] == UUID_A
     compat = generator._compat(pair["a"], pair["b"])
 
-    assert compat["schema"] == "magic10_compat_result.v1"
+    assert compat["schema"] == "magic10_compat_result.v2"
     assert compat["release_id"] == admitted.release_id
+    assert compat["config_id"] == admitted.mechanics["config_id"]
     assert [item["category_id"] for item in compat["categories"]] == list(FROZEN_MAGIC10_ORDER)
+    assert all(type(row["q"]) is int and 0 <= row["q"] <= 1000 for row in compat["signals"])
+    for row in compat["categories"]:
+        assert row["band"] == assign_band(row["score"], admitted.magic10_v2.maxima[row["category_id"]])
     lo, hi = orient(generator._party(pair["a"]), generator._party(pair["b"]))
     assert (lo.canonical_person_id, hi.canonical_person_id) == (UUID_A, UUID_B)
     assert compat["pair_key"] == generator._compat(pair["b"], pair["a"])["pair_key"]
@@ -58,7 +66,7 @@ def test_v2_to_compat_two_run_and_pair_order_identity(admitted) -> None:
     assert first == second
     proof = json.loads(first)
     assert proof["compat_acceptance"]["function"] == "engine.compat.compute.evaluate_pair"
-    assert proof["compat_acceptance"]["result_schema"] == "magic10_compat_result.v1"
+    assert proof["compat_acceptance"]["result_schema"] == "magic10_compat_result.v2"
 
     pair = generator._mapped_pair()
     ab = generator.canonical_json_bytes(generator._compat(pair["a"], pair["b"]))
@@ -84,12 +92,17 @@ def test_v2_to_compat_public_reader_boundary_fixture(admitted) -> None:
 
 
 def _refuse_admission(monkeypatch) -> None:
-    """The repository root is admitted; the non-admitted branch is reached through the seam."""
+    """Check mode admits no release: a refusing provider seam must not affect it."""
 
     def refuse():
         raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
 
     monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
+
+
+def _tracked_records() -> list:
+    tracked = [generator.PROOF, generator.TWO_RUN, generator.PAIR_ORDER, generator.BOUNDARY]
+    return tracked + [path.with_name(path.name + ".path_proof.txt") for path in list(tracked)]
 
 
 def test_check_mode_without_admission_validates_frozen_records_and_write_mode_refuses(monkeypatch, capsys) -> None:
@@ -98,27 +111,44 @@ def test_check_mode_without_admission_validates_frozen_records_and_write_mode_re
     _refuse_admission(monkeypatch)
     monkeypatch.setattr(generator, "build_outputs", lambda *a, **k: pytest.fail("live regeneration attempted"))
     monkeypatch.setattr(generator, "write_outputs", lambda *a, **k: pytest.fail("write attempted"))
+    monkeypatch.setattr(generator, "evaluate_pair", lambda *a, **k: pytest.fail("live evaluation attempted"))
+    before = {path: path.read_bytes() for path in _tracked_records() if path.exists()}
 
+    assert generator.frozen_record_mismatches() == []
     generator.main(["--check"])
     assert capsys.readouterr().out.strip() == generator.FROZEN_CHECK_LINE
     frozen = json.loads(generator.PROOF.read_bytes())
     assert frozen["compat_acceptance"]["function"] == "engine.compat.compute.conjunction_public"  # frozen capture-time record
 
-    with pytest.raises(SystemExit, match=generator.REQUIRES_ADMITTED_RELEASE):
+    with pytest.raises(SystemExit, match=generator.FROZEN_HISTORY_NOT_REGENERATED):
         generator.main([])
+    assert {path: path.read_bytes() for path in before} == before
 
 
-def test_check_mode_on_the_admitted_root_reports_the_frozen_records_stale_without_writing(monkeypatch) -> None:
-    """On the admitted repository root the owner compares a live evaluation with the tracked
-    PR-04 records.  Those capture-time records predate admission, so check mode reports them
-    stale and writes nothing; regenerating them is the EPIC037 evidence owner's decision."""
+def test_frozen_record_mismatches_names_an_altered_record_under_a_temp_root(monkeypatch, tmp_path) -> None:
+    """The frozen records are pinned by SHA-256 and size: a copy with one altered record
+    under a temporary root is named, the untouched records are not, and check mode over
+    that root refuses ``FROZEN_RECORD_MISMATCH`` without writing."""
     for key, value in CLOSED_RAILS.items():
         monkeypatch.setenv(key, value)
-    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", compute.load_active_mechanics_bundle)
-    tracked = [generator.PROOF, generator.TWO_RUN, generator.PAIR_ORDER, generator.BOUNDARY]
-    tracked += [path.with_name(path.name + ".path_proof.txt") for path in list(tracked)]
-    before = {path: path.read_bytes() for path in tracked if path.exists()}
+    for name in generator.FROZEN_RECORDS:
+        destination = tmp_path / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(generator.ROOT / name, destination)
+    assert generator.frozen_record_mismatches(tmp_path) == []
+
+    altered = sorted(generator.FROZEN_RECORDS)[0]
+    original = (tmp_path / altered).read_bytes()
+    changed = original.replace(b"HDE-EPIC037", b"HDE-EPIC03X", 1)
+    assert changed != original and len(changed) == len(original)
+    assert hashlib.sha256(changed).hexdigest() != generator.FROZEN_RECORDS[altered][0]
+    (tmp_path / altered).write_bytes(changed)
+    assert generator.frozen_record_mismatches(tmp_path) == [altered]
+
+    before = {path: path.read_bytes() for path in _tracked_records() if path.exists()}
+    monkeypatch.setattr(generator, "ROOT", tmp_path)
     with pytest.raises(SystemExit) as raised:
         generator.main(["--check"])
-    assert str(raised.value).startswith("STALE_HDE_EPIC037_PR04_V2_TO_COMPAT:")
+    assert str(raised.value) == f"{generator.FROZEN_RECORD_MISMATCH}:{altered}"
+    assert (tmp_path / altered).read_bytes() == changed
     assert {path: path.read_bytes() for path in before} == before

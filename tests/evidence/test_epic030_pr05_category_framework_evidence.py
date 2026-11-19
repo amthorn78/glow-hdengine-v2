@@ -38,121 +38,41 @@ def _write(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def test_pr05_binding_passes_when_index_and_mirror_include_pr05_artifacts(admitted, monkeypatch, tmp_path):
+# HDE-EPIC043 WU-PR-09: the PR-05 records are frozen history. Retired with their
+# subject (regenerating capture-time v1 evaluations):
+# test_pr05_binding_passes_when_index_and_mirror_include_pr05_artifacts and
+# test_pr05_binding_fails_when_canonical_compare_fails. The tests below pin the
+# frozen bytes instead.
+
+
+def test_pr05_generation_refuses_as_frozen_history_and_writes_nothing(monkeypatch):
     mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
-
-    test_root = tmp_path / "pytest_epic030_pr05_binding"  # never under the repository tree
-    out_dir = test_root / "audit" / "qa" / "hde-epic030" / "pr-05"
-
-    _write(
-        test_root / "catalog" / "channels_v1.json",
-        '{"channels":[{"id":"20-10","gates":[20,10],"circuit_primary":"collective"}]}' + "\n",
-    )
-    _write(
-        test_root / "artifacts" / "compat" / "AB.json",
-        json.dumps(
-            {
-                "categories": [{"id": category, "band": "Cool", "score": 1, "personal_key": "a", "shared_key": "b"} for category in mod.FROZEN_MAGIC10_ORDER],
-                "meta": {"engine_tag": "dev", "release_id": "dev", "invocation_tag": "INV-DEV"},
-            },
-            separators=(",", ":"),
-            sort_keys=True,
-        )
-        + "\n",
-    )
-    _write(
-        test_root / "artifacts" / "audit" / "a7" / "reader_200_body.json",
-        '{"categories":[{"band":"Warm","id":"harmony"}],"eligible":true,"idempotence_hash":"x","meta":{"engine_tag":"d","invocation_tag":"i"},"reader_version":"v1","release_id":"r"}'
-        + "\n",
-    )
-
-    index_rows = [{"artifact_key": key, "discovered_physical_path": "x"} for key in mod.PR05_ARTIFACT_KEYS]
-    _write(test_root / "docs" / "evidence" / "INDEX.json", json.dumps(index_rows, separators=(",", ":"), sort_keys=True) + "\n")
-    mirror_rows = "\n".join(json.dumps({"artifact_key": key}, separators=(",", ":"), sort_keys=True) for key in mod.PR05_ARTIFACT_KEYS) + "\n"
-    _write(test_root / "artifacts" / "evidence_index.jsonl", mirror_rows)
-
-    # The generator renders compare lines relative to its own ROOT; the test root is
-    # outside the repository, so ROOT must move with the other path constants.
-    monkeypatch.setattr(mod, "ROOT", test_root)
-    monkeypatch.setattr(mod, "OUT_DIR", out_dir)
-    monkeypatch.setattr(mod, "CHANNELS_PATH", test_root / "catalog" / "channels_v1.json")
-    monkeypatch.setattr(mod, "COMPAT_AB_PATH", test_root / "artifacts" / "compat" / "AB.json")
-    monkeypatch.setattr(mod, "READER_A7_PATH", test_root / "artifacts" / "audit" / "a7" / "reader_200_body.json")
-    monkeypatch.setattr(mod, "INDEX_PATH", test_root / "docs" / "evidence" / "INDEX.json")
-    monkeypatch.setattr(mod, "MIRROR_PATH", test_root / "artifacts" / "evidence_index.jsonl")
-    monkeypatch.setattr(mod, "ensure_determinism_env", lambda: None)
-
-    mod.generate()
-
-    binding = (out_dir / "category_framework_binding.log").read_text(encoding="utf-8")
-    mechanics = json.loads((out_dir / "per_channel_mechanics.json").read_text(encoding="utf-8"))
-
-    assert "status: PASS\n" in binding
-    assert "canonical_compare_status: PASS\n" in binding
-    assert "magic10_order_preserved_admin_compat: True\n" in binding
-    assert mechanics["channels"][0]["channel_id"] == "10-20"
-    assert mechanics["channels"][0]["compromise_direction"] == "10->20"
-
-
-def test_pr05_binding_fails_when_canonical_compare_fails(admitted, monkeypatch, tmp_path):
-    mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
-
-    test_root = tmp_path / "pytest_epic030_pr05_binding_compare_fail"  # never under the repository tree
-    out_dir = test_root / "audit" / "qa" / "hde-epic030" / "pr-05"
-
-    _write(
-        test_root / "catalog" / "channels_v1.json",
-        '{"channels":[{"id":"20-10","gates":[20,10],"circuit_primary":"collective"}]}' + "\n",
-    )
-    _write(
-        test_root / "artifacts" / "compat" / "AB.json",
-        '{"meta":{"release_id":"dev","invocation_tag":"INV-DEV","engine_tag":"dev"},"categories":[{"shared_key":"b","personal_key":"a","score":1,"band":"Cool","id":"harmony"}]}'
-        + "\n",
-    )
-    _write(
-        test_root / "artifacts" / "audit" / "a7" / "reader_200_body.json",
-        '{"categories":[{"band":"Warm","id":"harmony"}],"eligible":true,"idempotence_hash":"x","meta":{"engine_tag":"d","invocation_tag":"i"},"reader_version":"v1","release_id":"r"}'
-        + "\n",
-    )
-
-    index_rows = [{"artifact_key": key, "discovered_physical_path": "x"} for key in mod.PR05_ARTIFACT_KEYS]
-    _write(test_root / "docs" / "evidence" / "INDEX.json", json.dumps(index_rows, separators=(",", ":"), sort_keys=True) + "\n")
-    mirror_rows = "\n".join(json.dumps({"artifact_key": key}, separators=(",", ":"), sort_keys=True) for key in mod.PR05_ARTIFACT_KEYS) + "\n"
-    _write(test_root / "artifacts" / "evidence_index.jsonl", mirror_rows)
-
-    # The generator renders compare lines relative to its own ROOT; the test root is
-    # outside the repository, so ROOT must move with the other path constants.
-    monkeypatch.setattr(mod, "ROOT", test_root)
-    monkeypatch.setattr(mod, "OUT_DIR", out_dir)
-    monkeypatch.setattr(mod, "CHANNELS_PATH", test_root / "catalog" / "channels_v1.json")
-    monkeypatch.setattr(mod, "COMPAT_AB_PATH", test_root / "artifacts" / "compat" / "AB.json")
-    monkeypatch.setattr(mod, "READER_A7_PATH", test_root / "artifacts" / "audit" / "a7" / "reader_200_body.json")
-    monkeypatch.setattr(mod, "INDEX_PATH", test_root / "docs" / "evidence" / "INDEX.json")
-    monkeypatch.setattr(mod, "MIRROR_PATH", test_root / "artifacts" / "evidence_index.jsonl")
-    monkeypatch.setattr(mod, "ensure_determinism_env", lambda: None)
-
-    mod.generate()
-
-    binding = (out_dir / "category_framework_binding.log").read_text(encoding="utf-8")
-    compare_log = (out_dir / "category_canonical_compare.log").read_text(encoding="utf-8")
-
-    assert "status: FAIL\n" in compare_log
-    assert "canonical_compare_status: FAIL\n" in binding
-    assert "status: FAIL\n" in binding
-
-
-def test_pr05_generation_refuses_truthfully_without_an_admitted_release(monkeypatch):
-    mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
-    monkeypatch.setattr(mod, "ensure_determinism_env", lambda: None)
     monkeypatch.setattr(mod, "_write_bytes", lambda *a, **k: pytest.fail("write attempted"))
-
-    def refuse():
-        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
-
-    # The repository root is admitted (PF10 §2.15 interval ended); the refusal branch is reached through the seam.
-    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
-    with pytest.raises(SystemExit, match=mod.REQUIRES_ADMITTED_RELEASE):
+    with pytest.raises(SystemExit, match=mod.FROZEN_HISTORY_NOT_REGENERATED):
         mod.generate()
+    with pytest.raises(SystemExit, match=mod.FROZEN_HISTORY_NOT_REGENERATED):
+        mod.main([])
+
+
+def test_pr05_frozen_pins_equal_the_committed_records(capsys):
+    mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
+    for name, (sha256, size) in mod.FROZEN_RECORDS.items():
+        raw = (mod.OUT_DIR / name).read_bytes()
+        assert (hashlib.sha256(raw).hexdigest(), len(raw)) == (sha256, size), name
+    assert mod.main(["--check"]) == 0
+    assert "pinned SHA-256 and size" in capsys.readouterr().out
+
+
+def test_pr05_check_names_an_altered_record(tmp_path, monkeypatch, capsys):
+    mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
+    copy = tmp_path / "pr-05"
+    shutil.copytree(mod.OUT_DIR, copy)
+    target = copy / "category_framework_binding.log"
+    target.write_bytes(target.read_bytes() + b"x")
+    assert mod.frozen_record_mismatches(copy) == ["category_framework_binding.log"]
+    monkeypatch.setattr(mod, "OUT_DIR", copy)
+    assert mod.main(["--check"]) == 1
+    assert capsys.readouterr().err == "FROZEN_RECORD_MISMATCH:category_framework_binding.log\n"
 
 
 def test_pr05_admission_probe_admits_the_repository_root(monkeypatch):

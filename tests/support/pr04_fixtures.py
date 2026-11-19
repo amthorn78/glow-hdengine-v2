@@ -15,10 +15,9 @@ from typing import Any, Mapping
 
 from engine.bodygraph.mapped_cache import MappedBodyGraphRow
 from engine.compat import compute
-from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
 from engine.narratives import state as narrative_state
 from engine.narratives.loader import load_pack
-from tests.config.helpers import synthetic_complete_release_root
+from tests.config.helpers import admit_synthetic_v2_candidate
 
 ROOT = Path(__file__).resolve().parents[2]
 CLOSED_RAILS = {
@@ -71,9 +70,14 @@ def current_row(uid: str, chart: Mapping[str, Any] | None = None, *, vendor_vers
 
 
 def build_bundle(tmp_root: Path):
-    """Admit the synthetic complete release from an isolated copy (never the repo)."""
+    """Admit the synthetic v2 candidate release from an isolated copy (never the repo).
 
-    return _load_active_mechanics_bundle_from_root(synthetic_complete_release_root(tmp_root))
+    HDE-EPIC043 WU-PR-09: the switched admission admits the v2 bundle, so the
+    shared bundle is the 57-member v2 candidate admitted through the test-only
+    roster route (``tests/config/helpers.py``).
+    """
+
+    return admit_synthetic_v2_candidate(tmp_root)
 
 
 def build_pack(tmp_root: Path):

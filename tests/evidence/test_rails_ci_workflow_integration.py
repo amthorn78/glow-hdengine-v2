@@ -812,6 +812,7 @@ def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
         "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
+        "tests/m10_v2/test_switch.py",
         S16_OWNER_TEST,
     )
     assert classifier.changed_test_targets(ROOT, ("engine/config/bundles.py",)) == (
@@ -958,6 +959,7 @@ def test_pr02_changed_paths_keep_all_lanes_and_exact_new_test_targets() -> None:
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
         "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
+        "tests/m10_v2/test_switch.py",
         S16_OWNER_TEST,
     )
 
@@ -998,6 +1000,7 @@ def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
         "tests/http/test_reader_a7_transport.py",
         "tests/http/test_reader_post_v1.py",
         "tests/http/test_reader_post_v2.py",
+        "tests/m10_v2/test_switch.py",
         "tests/runtime/test_emit_public_legacy_helper.py",
         "tests/transport/test_aux_narrative.py",
         "tests/transport/test_ops_rails_refusal.py",
@@ -2395,7 +2398,7 @@ def test_open_rails_producer_check_mode_has_no_repo_residue(capsys: pytest.Captu
 
 
 @pytest.mark.parametrize('source,expected', [
-    ('engine/core/core.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_abba.py', 'tests/core/test_engine_core_determinism.py', S16_OWNER_TEST}),
+    ('engine/core/core.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_abba.py', 'tests/core/test_engine_core_determinism.py', S16_OWNER_TEST, 'tests/m10_v2/test_switch.py'}),
     ('engine/core/__init__.py', {'tests/core/test_engine_core_purity.py', S16_OWNER_TEST}),
     ('engine/magic10/composite.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_abba.py', 'tests/core/test_engine_core_determinism.py', S16_OWNER_TEST}),
     ('engine/magic10/signals.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_determinism.py', S16_OWNER_TEST}),

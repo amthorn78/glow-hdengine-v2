@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate EPIC030 PR-05 category-framework carry-forward evidence artifacts."""
+"""EPIC030 PR-05 category-framework carry-forward evidence: frozen history since HDE-EPIC043 WU-PR-09 (never regenerated)."""
 from __future__ import annotations
 
 import argparse
@@ -31,6 +31,15 @@ MIRROR_PATH = ROOT / "artifacts" / "evidence_index.jsonl"
 # Complete mapped fixture charts for the internal-admin compat evaluation.
 ADMIN_FIXTURE_PATHS = (ROOT / "fixtures" / "charts" / "alice.json", ROOT / "fixtures" / "charts" / "bob.json")
 REQUIRES_ADMITTED_RELEASE = "HDE_EPIC030_PR05_REQUIRES_ADMITTED_RELEASE"
+# HDE-EPIC043 WU-PR-09: frozen history.  The PR-05 records are capture-time v1
+# evaluations; write mode refuses and ``--check`` verifies these pins.
+FROZEN_HISTORY_NOT_REGENERATED = "FROZEN_HISTORY_NOT_REGENERATED"
+FROZEN_RECORD_MISMATCH = "FROZEN_RECORD_MISMATCH"
+FROZEN_RECORDS = {
+    "category_canonical_compare.log": ("a59d727047aecfe9c443fa654d64d288b42318cf3f50e9284d70734cc062f0ec", 496),
+    "category_framework_binding.log": ("4d6530b77e4aac9fb89476f7e818b1111c97c9715c3f4071879b62e05dee3e42", 549),
+    "per_channel_mechanics.json": ("1d7eb1b31469468b9482a588f0bc5632c93f0d51ee2df455679fdfa8bdb762c7", 12873),
+}
 
 PR05_ARTIFACT_KEYS = (
     "epic030.pr05.category_framework_binding",
@@ -173,86 +182,43 @@ def _admin_compat_result() -> dict[str, Any]:
     return evaluate_pair(parties[0], parties[1])
 
 
+def frozen_record_mismatches(out_dir: Path | None = None) -> list[str]:
+    """Return the names of frozen records whose bytes differ from their pins."""
+    base = OUT_DIR if out_dir is None else out_dir
+    mismatched = []
+    for name, (sha256, size) in FROZEN_RECORDS.items():
+        path = base / name
+        raw = path.read_bytes() if path.is_file() else None
+        if raw is None or len(raw) != size or hashlib.sha256(raw).hexdigest() != sha256:
+            mismatched.append(name)
+    return mismatched
+
+
 def generate() -> None:
-    ensure_determinism_env()
-    try:
-        probe_release_admission()
-    except ReleaseNotAdmitted as exc:
-        # PF10 §2.15: the admin compat evaluation needs an admitted release; refuse truthfully.
-        raise SystemExit(REQUIRES_ADMITTED_RELEASE) from exc
+    """Frozen history since HDE-EPIC043 WU-PR-09: the records are never regenerated."""
 
-    produced_at = _iso_now()
-    per_channel = _build_per_channel_mechanics(produced_at)
-    per_channel_path = OUT_DIR / "per_channel_mechanics.json"
-    _write_bytes(per_channel_path, sercanon(per_channel, sort_keys=True))
-
-    compat_admin = _admin_compat_result()
-    compat_categories = compat_admin.get("categories") if isinstance(compat_admin, dict) else None
-    category_order_ok = isinstance(compat_categories, list) and [
-        str(item.get("category_id", "")) for item in compat_categories if isinstance(item, dict)
-    ] == list(FROZEN_MAGIC10_ORDER)
-
-    compare_targets = [per_channel_path, COMPAT_AB_PATH]
-    compare_lines = [
-        "schema: hde_epic030.pr05.category_canonical_compare.v1",
-        f"produced_at_utc: {produced_at}",
-        "epic_id: HDE-EPIC030",
-        "task_id: HDE-DISS006",
-        "subtask_id: HDE-DISS006.4",
-    ]
-    compare_ok = True
-    for target in compare_targets:
-        rel, same, detail = _canonical_compare_line(target)
-        compare_ok = compare_ok and same
-        compare_lines.append(f"target: {rel} canonical_roundtrip_equal={same} {detail}")
-    compare_lines.append("status: PASS" if compare_ok else "status: FAIL")
-    _write_text(OUT_DIR / "category_canonical_compare.log", "\n".join(compare_lines))
-
-    reader_public_ok = _reader_public_posture_ok()
-    index_ok = _index_has_pr05_bindings()
-    mirror_ok = _mirror_has_pr05_bindings()
-
-    binding_status = all(
-        (
-            per_channel.get("status") == "PASS",
-            compare_ok,
-            category_order_ok,
-            reader_public_ok,
-            index_ok,
-            mirror_ok,
-        )
-    )
-    binding_lines = [
-        "schema: hde_epic030.pr05.category_framework_binding.v1",
-        f"produced_at_utc: {produced_at}",
-        "epic_id: HDE-EPIC030",
-        "task_id: HDE-DISS006",
-        "subtask_ids: HDE-DISS006.3,HDE-DISS006.4,HDE-DISS006.5",
-        "binding_family: category_framework_internal_admin",
-        f"magic10_order_preserved_admin_compat: {category_order_ok}",
-        f"public_reader_bands_only_numeric_free: {reader_public_ok}",
-        f"index_binding_present: {index_ok}",
-        f"mirror_binding_present: {mirror_ok}",
-        f"per_channel_mechanics_status: {per_channel.get('status')}",
-        "canonical_compare_artifact: audit/qa/hde-epic030/pr-05/category_canonical_compare.log",
-        f"canonical_compare_status: {'PASS' if compare_ok else 'FAIL'}",
-        "status: PASS" if binding_status else "status: FAIL",
-    ]
-    _write_text(OUT_DIR / "category_framework_binding.log", "\n".join(binding_lines))
+    raise SystemExit(FROZEN_HISTORY_NOT_REGENERATED)
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Regenerate the HDE-EPIC030 PR-05 category-framework evidence family."
+        description="Check the frozen HDE-EPIC030 PR-05 category-framework records (never regenerated)."
     )
+    parser.add_argument("--check", action="store_true", help="verify the frozen records against their pins")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Parse arguments before any write (HDE-CRD-0003 S19-R04)."""
+    """Parse arguments before anything else (HDE-CRD-0003 S19-R04); write mode refuses."""
 
-    parse_args([] if argv is None else list(argv))
-    generate()
+    args = parse_args([] if argv is None else list(argv))
+    if not args.check:
+        generate()
+    mismatched = frozen_record_mismatches()
+    if mismatched:
+        print(f"{FROZEN_RECORD_MISMATCH}:{','.join(mismatched)}", file=sys.stderr)
+        return 1
+    print("checked frozen HDE-EPIC030 PR-05 category-framework records (pinned SHA-256 and size)")
     return 0
 
 

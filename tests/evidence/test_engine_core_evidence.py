@@ -132,8 +132,26 @@ def test_current_proofs_bind_actual_sources_and_behavior():
     assert compare["size_bytes"] == len(raw)
 
 
+def _governed_schemas_bind_the_writer_inputs(writer) -> bool:
+    return all(
+        _load_json(path)["properties"]["source_sha256"]["required"] == list(writer.SOURCE_PATHS)
+        for path in CORE_SCHEMAS.values()
+    )
+
+
 def test_writer_repeated_proofs_preserve_bytes_and_mtimes(tmp_path, monkeypatch):
+    """Stage-adaptive (HDE-EPIC043 WU-PR-09).
+
+    While the governed proof schemas still bind the v1 writer's input list (until
+    the cut regenerates the proofs and moves their schemas, WU-PR-10), the
+    re-targeted writer refuses before publication with its stable token. Once
+    they bind its inputs, repeated proofs preserve bytes and mtimes.
+    """
     from tools.evidence import generate_engine_core_evidence as writer
+    if not _governed_schemas_bind_the_writer_inputs(writer):
+        with pytest.raises(ValueError, match=writer.SCHEMA_SOURCE_LIST_MISMATCH):
+            writer._build_payloads()
+        return
     payloads = writer._build_payloads()
     writer._validate_payloads(payloads)
     monkeypatch.setattr(writer, "ROOT", tmp_path)
@@ -167,7 +185,7 @@ def test_evidence_reuses_closed_owning_result_schema():
         _validate(payload, _load_json(ARTIFACT_SCHEMA_MAPPING[key]))
 
 
-def test_writer_refuses_a_schema_valid_wrong_g004_before_publication(monkeypatch):
+def test_writer_refuses_a_schema_valid_wrong_g001_before_publication(monkeypatch):
     import dataclasses
     from tools.evidence import generate_engine_core_evidence as writer
     original = writer.compute_core
@@ -176,7 +194,7 @@ def test_writer_refuses_a_schema_valid_wrong_g004_before_publication(monkeypatch
         categories = (dataclasses.replace(result.categories[0], score=23), *result.categories[1:])
         return dataclasses.replace(result, categories=categories)
     monkeypatch.setattr(writer, "compute_core", wrong)
-    with pytest.raises(ValueError, match="fixed G004 oracle mismatch"):
+    with pytest.raises(ValueError, match="fixed G001 oracle mismatch"):
         writer._build_payloads()
 
 

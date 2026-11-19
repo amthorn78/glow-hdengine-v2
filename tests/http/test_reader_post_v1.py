@@ -401,7 +401,10 @@ def test_dev_get_route_refuses_legacy_or_incomplete_fixtures(tmp_path, monkeypat
 
 # Recorded at the planning baseline (main 547dc5b, before any PR06a change): the dev GET /reader
 # bytes for fixtures/charts/{alice,bob}.json through the pre-change emitter under the fixed
-# synthetic identity (Isis5 / INV-000000 / release_id "a"*64).
+# synthetic identity (Isis5 / INV-000000 / release_id "a"*64).  The pin binds the Reader v1
+# emitter for the ``Cool`` harmony band.  Since HDE-EPIC043 WU-PR-09 the fixture pair's band
+# comes from the Magic10 v2 calculation over the injected bundle, whose maxima are not canon,
+# so the route's bytes are asserted as the unchanged emitter's bytes for that derived band.
 PRE_CHANGE_DEV_GET_BYTES = (
     b'{"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,'
     b'"idempotence_hash":"400041025cdb2c8e4b14bb428abc2a43eb182b6126b9d69b6f614f6257731145",'
@@ -410,9 +413,35 @@ PRE_CHANGE_DEV_GET_BYTES = (
 )
 
 
-def test_dev_get_bytes_for_the_fixture_pair_are_unchanged():
+def _fixture_harmony_band(bundle, params) -> str:
+    """The fixture pair's harmony band from the v2 calculation over the injected bundle."""
+
+    from engine.bodygraph.resolver import resolve_compat_chart
+    from engine.compat.compute import evaluation_party, orient
+    from engine.core.core import compute_core
+    from engine.magic10_v2.calculation import assign_band
+
+    parties = [
+        evaluation_party(resolve_compat_chart(json.loads(Path(params[side]).read_text(encoding="utf-8")), source_policy="local", env=None))
+        for side in ("a", "b")
+    ]
+    lo, hi = orient(*parties)
+    core = compute_core(lo.gates, hi.gates, bundle, bundle.release_id)
+    assert core.schema == "magic10_result.v2"
+    harmony = next(row for row in core.categories if row.category_id == "harmony")
+    assert harmony.band == assign_band(harmony.score, bundle.magic10_v2.maxima["harmony"])
+    return harmony.band
+
+
+def test_dev_get_bytes_for_the_fixture_pair_are_unchanged(bundle):
     from flask import Flask
     from engine.runtime.public import emit_reader_public_bytes
+
+    def fixed_bytes(harmony_band):
+        return emit_reader_public_bytes(None, None, engine_tag="Isis5", invocation_tag="INV-000000", release_id="a" * 64, eligible=True, harmony_band=harmony_band)
+
+    # The Reader v1 emitter itself is byte-for-byte pre-change.
+    assert fixed_bytes("Cool") == PRE_CHANGE_DEV_GET_BYTES
 
     seen = {}
 
@@ -426,10 +455,15 @@ def test_dev_get_bytes_for_the_fixture_pair_are_unchanged():
     params = _fixture_params()
     resp = client.get("/reader", query_string=params, headers={"Accept-Encoding": "identity"})
     assert resp.status_code == 200, resp.data
-    assert resp.data == PRE_CHANGE_DEV_GET_BYTES
-    assert seen == {"eligible": True, "harmony_band": "Cool"}
+    band = _fixture_harmony_band(bundle, params)
+    assert resp.data == fixed_bytes(band)
+    assert seen == {"eligible": True, "harmony_band": band}
+    body = json.loads(resp.data.decode("utf-8"))
+    assert list(body) == SIX_KEYS and body["categories"] == [{"band": band, "id": "harmony"}]
+    assert sercanon(body, sort_keys=True) == resp.data
+    _validates_v1(resp.data)
     swapped = client.get("/reader", query_string=_fixture_params(a=params["b"], b=params["a"]), headers={"Accept-Encoding": "identity"})
-    assert swapped.data == PRE_CHANGE_DEV_GET_BYTES
+    assert swapped.data == resp.data
 
 
 # --- HDE-CRD-0002 WU-PR-05 (S19-F01): a body nested past the JSON parser's recursion limit is

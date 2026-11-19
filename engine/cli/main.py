@@ -22,6 +22,7 @@ from engine.bodygraph.resolver import (
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import (
     EvaluationParty,
+    admitted_bundle,
     conjunction_public_resolved,
     evaluate_pair,
     evaluation_party,
@@ -30,7 +31,6 @@ from engine.compat.compute import (
     orient,
 )
 from engine.compat.error_tokens import CompatBoundaryError
-from engine.compat.thresholds import THRESHOLDS_V1
 from engine.config.registry_loader import RegistryConfigError
 from engine.db import DBAccess
 from engine.db.errors import AdapterError
@@ -101,7 +101,7 @@ def _build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
     show = sub.add_parser(
         "showcompat",
-        help="Emit the canonical magic10_compat_result.v1 document for a pair (stdin or files); Reader v1 bytes only via --dump-reader",
+        help="Emit the canonical magic10_compat_result.v2 document for a pair (stdin or files); Reader v1 bytes only via --dump-reader",
         allow_abbrev=False,
     )
     show.add_argument("--pair-file", help="Path to JSON with left/right payloads")
@@ -559,15 +559,14 @@ def _compat_proof(result: Mapping[str, Any]) -> Dict[str, Any]:
         "pair_key": result["pair_key"],
         "signals": [dict(row) for row in result["signals"]],
         "categories": [dict(row) for row in result["categories"]],
+        # HDE-EPIC043 WU-PR-09: the admitted release's per-category maxima, in
+        # catalog order, from the provider seam ``evaluate_pair`` used.
         "thresholds": {
-            "edges": [
-                THRESHOLDS_V1["cool_max"],
-                THRESHOLDS_V1["open_max"],
-                THRESHOLDS_V1["warm_max"],
-                100,
+            "bands": ["Cool", "Open", "Warm", "Glow"],
+            "categories": [
+                {"category_id": category, "maxima": list(maxima)}
+                for category, maxima in admitted_bundle().magic10_v2.maxima.items()
             ],
-            "rounding": "round_half_up",
-            "clamp": "0..100",
         },
     }
 
@@ -617,7 +616,7 @@ def aux_preview(args: argparse.Namespace) -> int:
     pack = get_pack()
 
     def _resolve_from_pair_file() -> Tuple[str, str, str, str, Dict[str, Any]]:
-        # The pair file is the canonical ``magic10_compat_result.v1`` document
+        # The pair file is the canonical ``magic10_compat_result.v2`` document
         # written by ``showcompat`` (or a conjunction payload carrying one).
         raw = _read_file(args.pair_file)
         data = _parse_input(raw)
@@ -872,7 +871,7 @@ def showcompat(_: argparse.Namespace) -> int:
 
     _emit_admin_dumps(_, _case_name(_), lo, hi, result)
 
-    # PF05 §4.1.3: stdout is exactly the canonical ``magic10_compat_result.v1``
+    # PF05 §4.1.3: stdout is exactly the canonical ``magic10_compat_result.v2``
     # document (or the PF01 §4.7 carrier for a valid self-pair) plus one LF.
     _emit_stdout_bytes(emitter.emit_public(result))
     return 0

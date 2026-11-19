@@ -13,9 +13,11 @@ from engine import core
 from engine.core import compute_core
 
 ROOT = Path(__file__).resolve().parents[2]
+# HDE-EPIC043 WU-PR-09: the switched core executes the Magic10 v2 modules; the v1
+# scorers (engine/magic10/{composite,signals,calculators}.py) left the scoring path.
 PURE_PATHS = (
-    "engine/core/core.py", "engine/magic10/composite.py",
-    "engine/magic10/signals.py", "engine/magic10/calculators.py",
+    "engine/core/core.py", "engine/magic10_v2/kernel.py",
+    "engine/magic10_v2/signals.py", "engine/magic10_v2/calculation.py",
 )
 FORBIDDEN_ROOTS = {
     "os", "time", "datetime", "random", "secrets", "uuid", "socket", "subprocess",
@@ -28,6 +30,9 @@ TYPE_IMPORTS = {
     "Magic10Caps", "Magic10Seed", "Manifest", "ManifestEntry", "RegistryConfig",
     "SourceIdentity", "FROZEN_CHANNEL_IDS",
 }
+# The v2 modules also import the refusal type and the passive provenance helper
+# (their last top-level statement); neither reads a file, the environment or a clock.
+V2_REGISTRY_IMPORTS = {"SchemaValidationError", "_capture_module_execution"}
 
 
 @pytest.mark.parametrize("path", PURE_PATHS)
@@ -42,11 +47,16 @@ def test_all_pure_modules_have_no_forbidden_dependency_or_call(path):
                 "compat", "cli", "http", "cache", "narratives", "db", "vendor", "runtime",
             ))
             if node.module == "engine.config.registry_loader":
-                assert {a.name for a in node.names} <= TYPE_IMPORTS
+                allowed = TYPE_IMPORTS | (V2_REGISTRY_IMPORTS if path.startswith("engine/magic10_v2/") else set())
+                assert {a.name for a in node.names} <= allowed
         elif isinstance(node, ast.Call):
             name = node.func.id if isinstance(node.func, ast.Name) else (
                 node.func.attr if isinstance(node.func, ast.Attribute) else ""
             )
+            # ``re.compile`` builds a regular expression, not code; builtin ``compile`` stays forbidden.
+            if name == "compile" and isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name) \
+                    and node.func.value.id == "re":
+                continue
             assert name not in FORBIDDEN_CALLS
 
 
@@ -59,7 +69,7 @@ from unittest.mock import patch
 from engine.bodygraph.gates import normalize_gates
 from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
 from engine.serializer.canon import sercanon
-from tests.config.helpers import synthetic_complete_release_root
+from tests.config.helpers import admit_synthetic_v2_candidate
 def forbidden(*args, **kwargs):
     raise AssertionError("external side effect")
 def no_external_effects():
@@ -74,15 +84,17 @@ def no_external_effects():
         guards.enter_context(patch.object(owner, name, forbidden))
     return guards
 pure_names = {
-    "engine.core.core", "engine.magic10.composite", "engine.magic10.signals",
-    "engine.magic10.calculators",
+    "engine.core.core", "engine.magic10_v2.kernel", "engine.magic10_v2.signals",
+    "engine.magic10_v2.calculation",
 }
 assert pure_names.isdisjoint(sys.modules)
 captured = []
 original_frame = sys._getframe
 def observe_frame(depth=0):
     frame = original_frame(depth + 1)
-    if depth == 0 and frame.f_code.co_name == "<module>" and frame.f_globals.get("__name__") in pure_names:
+    # core.core reads its own frame (depth 0); each v2 module records it through
+    # registry_loader._capture_module_execution (depth 1).
+    if frame.f_code.co_name == "<module>" and frame.f_globals.get("__name__") in pure_names:
         captured.append(frame.f_globals["__name__"])
     return frame
 # Import must be genuinely fresh: admission now resolves the pure modules itself.
@@ -90,7 +102,7 @@ with no_external_effects(), patch.object(sys, "_getframe", observe_frame):
     from engine.core import compute_core
 assert set(captured) == pure_names and len(captured) == 4
 with TemporaryDirectory() as tmp:
-    bundle = _load_active_mechanics_bundle_from_root(synthetic_complete_release_root(pathlib.Path(tmp)))
+    bundle = admit_synthetic_v2_candidate(pathlib.Path(tmp))
     a, b = normalize_gates([1, 8]), normalize_gates([1, 64])
     with no_external_effects(), ExitStack() as guards:
         for owner, name in (
@@ -100,7 +112,7 @@ with TemporaryDirectory() as tmp:
             guards.enter_context(patch.object(owner, name, forbidden))
         result = compute_core(a, b, bundle, bundle.release_id)
         assert len(result.signals) == 20 and len(result.categories) == 10
-        assert sercanon(result.to_payload())
+        assert sercanon(result.as_payload())
 '''
     env = dict(os.environ, PYTHONPATH=str(ROOT), PYTHONDONTWRITEBYTECODE="1")
     result = subprocess.run([sys.executable, "-c", script], cwd=ROOT, env=env, text=True, capture_output=True)

@@ -189,7 +189,7 @@ def post_json():
         return _writer_payload(error_envelope(exc.token), status=_boundary_status(exc))
     except RegistryConfigError as exc:
         return _writer_payload(error_envelope(_admission_token(exc)), status=503)
-    # PF05 §5.5: the canonical ``magic10_compat_result.v1`` document (or the PF01
+    # PF05 §5.5: the canonical ``magic10_compat_result.v2`` document (or the PF01
     # §4.7 carrier for a valid self-pair); no ``keys`` list and no Reader bytes.
     return _writer_payload(dict(body), status=200)
 

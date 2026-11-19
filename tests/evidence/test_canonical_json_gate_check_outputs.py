@@ -1260,9 +1260,10 @@ def test_magic10_caps_binding_rejects_coercions_and_open_entries():
 
 
 def test_magic10_frozen_input_sentry_matches_admitted_caps(tmp_path):
-    from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
-    from tests.config.helpers import synthetic_complete_release_root
-    bundle = _load_active_mechanics_bundle_from_root(synthetic_complete_release_root(tmp_path))
+    # HDE-EPIC043 WU-PR-09: the v1 synthetic root no longer admits; the admitted caps come
+    # from the synthetic v2 candidate admitted through the test-only roster route.
+    from tests.config.helpers import admit_synthetic_v2_candidate
+    bundle = admit_synthetic_v2_candidate(tmp_path)
     assert {key: caps.inputs for key, caps in bundle.registry.magic10_caps.items()} == FROZEN_MAGIC10_INPUTS
 
 

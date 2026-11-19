@@ -15,33 +15,34 @@ from engine.bodygraph.resolver import (
     resolve_compat_chart,
 )
 from engine.compat.error_tokens import CompatBoundaryError
-from engine.compat.thresholds import THRESHOLDS_V1
-from engine.config.registry_loader import AdmittedMechanicsBundle, load_active_mechanics_bundle
+from engine.config.magic10_v2_loader import (
+    MAGIC10_V2_COMPAT_RESULT_SCHEMA,
+    MAGIC10_V2_INTRINSIC_CACHE_PREFIX,
+    MAGIC10_V2_RESULT_SCHEMA,
+)
+from engine.config.registry_loader import AdmittedMechanicsBundle, SchemaValidationError, load_active_mechanics_bundle
 from engine.core.core import _chart_fingerprint, _digest, _validate_member, compute_core
-from engine.narratives.constants import MISSING_NARRATIVE_KEY
+from engine.magic10_v2 import compat as magic10_v2_compat
+from engine.magic10_v2.calculation import CategoryResult, Magic10V2Result, assign_band
+from engine.magic10_v2.signals import PER_MILLE, SignalValue
 from engine.narratives.router import route_keys
 from engine.serializer.canon import sercanon
-
-def band_for(score: int) -> str:
-    """Inclusive band maxima from the constants pack (PF01 §5.3); consumed by the sampler."""
-    if score <= THRESHOLDS_V1["cool_max"]: return "Cool"
-    if score <= THRESHOLDS_V1["open_max"]: return "Open"
-    if score <= THRESHOLDS_V1["warm_max"]: return "Warm"
-    return "Glow"
 
 
 # ---------------------------------------------------------------------------
 # HDE-EPIC040-PR04: eligibility, orientation and complete Gate-based evaluation
 # (PF01 §4, §5.2.2; PF05 §4.1.3, §5.1.0).  The only mechanics entry is the PR03
 # pure core; consumers obtain the immutable typed bundle solely through the
-# provider seam below and never re-admit, reload or bypass it.
+# provider seam below and never re-admit, reload or bypass it.  Since
+# HDE-EPIC043 WU-PR-09 the core is the Magic10 v2 calculation and the value is
+# the dormant layer's ``magic10_compat_result.v2``.
 # ---------------------------------------------------------------------------
 
 _ROOT = Path(__file__).resolve().parents[2]
-_COMPAT_RESULT_SCHEMA_PATH = "schemas/magic10_compat_result_v1.schema.json"
-COMPAT_RESULT_SCHEMA = "magic10_compat_result.v1"
-PURE_RESULT_SCHEMA = "magic10_result.v1"
-INTRINSIC_CACHE_PREFIX = "magic10:v1:"
+_COMPAT_RESULT_SCHEMA_PATH = "schemas/magic10_compat_result_v2.schema.json"
+COMPAT_RESULT_SCHEMA = MAGIC10_V2_COMPAT_RESULT_SCHEMA
+PURE_RESULT_SCHEMA = MAGIC10_V2_RESULT_SCHEMA
+INTRINSIC_CACHE_PREFIX = MAGIC10_V2_INTRINSIC_CACHE_PREFIX
 INELIGIBLE_SELF = "ineligible_self"
 ELIGIBLE = "eligible"
 
@@ -162,10 +163,6 @@ def intrinsic_pair_key(lo: EvaluationParty, hi: EvaluationParty, *, config_id: s
     })
 
 
-def _band_for_score(score: int) -> str:
-    return "Cool" if score <= 24 else "Open" if score <= 49 else "Warm" if score <= 74 else "Glow"
-
-
 def _pure_result_matches(candidate: object, *, bundle: AdmittedMechanicsBundle, pair_key: str, config_id: str, release_id: str) -> bool:
     """Structural check of a cached pure result against the active release."""
 
@@ -185,14 +182,15 @@ def _pure_result_matches(candidate: object, *, bundle: AdmittedMechanicsBundle, 
     if [row.get("signal_id") if isinstance(row, Mapping) else None for row in signals] != signal_order:
         return False
     for row in signals:
-        if set(row) != {"signal_id", "q"} or type(row["q"]) is not int or not 0 <= row["q"] <= 200:
+        if set(row) != {"signal_id", "q"} or type(row["q"]) is not int or not 0 <= row["q"] <= PER_MILLE:
             return False
     if [row.get("category_id") if isinstance(row, Mapping) else None for row in categories] != list(registry.magic10_order):
         return False
+    maxima = bundle.magic10_v2.maxima
     for row in categories:
         if set(row) != {"category_id", "score", "band"} or type(row["score"]) is not int or not 0 <= row["score"] <= 100:
             return False
-        if row["band"] != _band_for_score(row["score"]):
+        if row["band"] != assign_band(row["score"], maxima[row["category_id"]]):
             return False
     return True
 
@@ -212,50 +210,30 @@ def _cached_pure_result(hit: object, *, bundle, pair_key: str, config_id: str, r
     return result
 
 
-def _route(router: Callable[..., Mapping[str, str]], category: str, band: str, perspective: str) -> Mapping[str, str]:
-    keys = router(category, band, perspective)
-    if not isinstance(keys, Mapping):
-        raise CompatBoundaryError("narrative_key", detail=category)
-    return keys
+def _result_from_payload(payload: Mapping[str, Any]) -> Magic10V2Result:
+    """Rebuild the pure ``magic10_result.v2`` value of a verified cache hit."""
+
+    return Magic10V2Result(
+        schema=payload["schema"],
+        config_id=payload["config_id"],
+        release_id=payload["release_id"],
+        pair_key=payload["pair_key"],
+        signals=tuple(SignalValue(row["signal_id"], row["q"]) for row in payload["signals"]),
+        categories=tuple(CategoryResult(row["category_id"], row["score"], row["band"]) for row in payload["categories"]),
+    )
 
 
-def _key(value: object, category: str) -> str:
-    if not isinstance(value, str) or not value or value == MISSING_NARRATIVE_KEY:
-        raise CompatBoundaryError("narrative_key", detail=category)
-    return value
+def _compat_value(pure: Magic10V2Result, bundle: AdmittedMechanicsBundle, router: Callable[..., Mapping[str, str]] | None) -> Dict[str, Any]:
+    """The dormant layer's ``magic10_compat_result.v2`` value, with its refusals mapped (F-28)."""
 
-
-def _augment(pure: Mapping[str, Any], router: Callable[..., Mapping[str, str]]) -> Dict[str, Any]:
-    """Router augmentation in both normalized directions (PF05 §4.1.3).
-
-    ``a_to_b`` is the normalized lo→hi direction and ``b_to_a`` the hi→lo
-    direction; both calls must agree on ``shared_key``.  Nothing is rescored.
-    """
-
-    rows: List[Dict[str, Any]] = []
-    for row in pure["categories"]:
-        category, band = row["category_id"], row["band"]
-        lo_to_hi = _route(router, category, band, "a_to_b")
-        hi_to_lo = _route(router, category, band, "b_to_a")
-        shared = _key(lo_to_hi.get("shared_key"), category)
-        if shared != _key(hi_to_lo.get("shared_key"), category):
-            raise CompatBoundaryError("narrative_key", detail=category)
-        rows.append({
-            "category_id": category,
-            "score": row["score"],
-            "band": band,
-            "shared_key": shared,
-            "personal_lo_to_hi_key": _key(lo_to_hi.get("personal_key"), category),
-            "personal_hi_to_lo_key": _key(hi_to_lo.get("personal_key"), category),
-        })
-    return {
-        "schema": COMPAT_RESULT_SCHEMA,
-        "config_id": pure["config_id"],
-        "release_id": pure["release_id"],
-        "pair_key": pure["pair_key"],
-        "signals": [{"signal_id": row["signal_id"], "q": row["q"]} for row in pure["signals"]],
-        "categories": rows,
-    }
+    try:
+        return magic10_v2_compat.compat_result_v2(pure, bundle.magic10_v2, router=router)
+    except SchemaValidationError as exc:
+        if exc.code == magic10_v2_compat.NARRATIVE_KEY_INVALID:
+            raise CompatBoundaryError("narrative_key", detail=str(exc.details.get("category_id"))) from None
+        if exc.code == magic10_v2_compat.RESULT_INVALID:
+            raise CompatBoundaryError("result_schema", detail=str(exc.details.get("check"))) from None
+        raise CompatBoundaryError("admission_config", detail=exc.code) from None
 
 
 def _compat_result_validator(bundle: AdmittedMechanicsBundle):
@@ -316,8 +294,10 @@ def evaluate_pair(
 
     1. eligibility; 2. orientation; 3. admitted bundle from the provider seam
     (refusal propagates unchanged); 4. intrinsic cache lookup only through an
-    injected seam; 5. pure core; 6. router augmentation in both normalized
-    directions; 7. structural validation; 8. the canonical result mapping.
+    injected seam; 5. pure core (``magic10_result.v2``); 6. the dormant layer's
+    ``magic10_compat_result.v2`` value, with router keys in both normalized
+    directions; 7. structural validation against the release-bound schema;
+    8. the canonical result mapping.
     A valid self-pair returns the PF01 §4.7 carrier and touches no core, cache,
     router or ``pair_key``.
     """
@@ -334,16 +314,22 @@ def evaluate_pair(
     pair_key = intrinsic_pair_key(lo, hi, config_id=config_id, release_id=release_id)
     fingerprints = [member.chart_fingerprint for member in sorted((lo, hi), key=lambda party: party.gates.mask)]
     cache_key = f"{INTRINSIC_CACHE_PREFIX}{pair_key}"
-    pure: Mapping[str, Any] | None = None
+    pure: Magic10V2Result | None = None
     stale_hit = False
     if cache is not None:
         hit = cache.get(cache_key)
         if hit is not None:
-            pure = _cached_pure_result(hit, bundle=bundle, pair_key=pair_key, config_id=config_id, release_id=release_id, fingerprints=fingerprints)
-            stale_hit = pure is None
+            cached = _cached_pure_result(hit, bundle=bundle, pair_key=pair_key, config_id=config_id, release_id=release_id, fingerprints=fingerprints)
+            stale_hit = cached is None
+            if cached is not None:
+                pure = _result_from_payload(cached)
     if pure is None:
         try:
             core = compute_core(lo.gates, hi.gates, bundle, release_id)
+        except SchemaValidationError as exc:
+            # The members were validated first; a v2 calculation, kernel or
+            # signals refusal is a configuration defect (HDE-EPIC043 WU-PR-09, F-28).
+            raise CompatBoundaryError("admission_config", detail=exc.code) from None
         except ValueError:
             # ``compute_core`` validates both members before it reads the bundle,
             # registry or mechanics, so member validity is what separates a chart
@@ -365,18 +351,18 @@ def evaluate_pair(
                     "stale_result" if stale_hit else "gates_invalid", detail="core"
                 ) from None
             raise CompatBoundaryError("admission_config", detail="core") from None
-        pure = core.to_payload()
-        if pure["pair_key"] != pair_key:
+        pure = core
+        if pure.pair_key != pair_key:
             raise CompatBoundaryError("result_schema", detail="pair_key")
         if cache is not None and hasattr(cache, "put"):
             cache.put(cache_key, {
                 "pair_key": pair_key, "config_id": config_id, "release_id": release_id,
                 "result_schema": PURE_RESULT_SCHEMA, "fingerprints": list(fingerprints),
-                "result": deepcopy(dict(pure)),
+                "result": deepcopy(pure.as_payload()),
             })
-    augmented = _augment(pure, route_keys if router is None else router)
-    validate_compat_result(augmented, bundle, pair_key=pair_key)
-    return augmented
+    value = _compat_value(pure, bundle, route_keys if router is None else router)
+    validate_compat_result(value, bundle, pair_key=pair_key)
+    return value
 
 
 def harmony_band(result: Mapping[str, Any]) -> str:

@@ -80,7 +80,7 @@ def test_dev_vs_wsgi_compat_parity_minimal_valid_payload():
         assert dev_resp.headers.get("Content-Type") == response.headers.get("Content-Type")
         assert dev_resp.headers.get("Cache-Control") == response.headers.get("Cache-Control")
         assert dev_resp.data == response.data
-    assert json.loads(dev_resp.data)["schema"] == "magic10_compat_result.v1"
+    assert json.loads(dev_resp.data)["schema"] == "magic10_compat_result.v2"
 
 
 def test_selected_factory_compat_routing_errors_match_existing_factories():

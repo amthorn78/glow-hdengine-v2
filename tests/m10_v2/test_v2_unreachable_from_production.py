@@ -1,25 +1,29 @@
-"""HDE-EPIC043 INV-5 for WU-PR-01: Stage A v2 code is unreachable from production.
+"""HDE-EPIC043 INV-5 for WU-PR-01: Stage A v2 code was unreachable from production.
 
-The static import closure of the three production entry points
-(``adapter/factory.py``, ``engine/cli/main.py``, ``engine/http/compat_handler.py``)
-contains no module of ``engine.magic10_v2``, and ``_BUNDLE_PROVIDER`` stays
-``load_active_mechanics_bundle``.
+Retired at the switch (HDE-EPIC043 WU-PR-09). INV-5 held "until WU-PR-09": the
+switch re-targets the production entry points to the v2 layer, so its two
+assertions -- no production entry point reaches ``engine.magic10_v2``, and
+``_BUNDLE_PROVIDER`` is ``load_active_mechanics_bundle`` unchanged -- end here.
+They are replaced by acceptance item 2's static proof in
+``tests/m10_v2/test_switch.py`` (no retired module, fallback or selector is
+reached, and the v2 package is).
 
-Stated limit: the closure is static. It follows ``import`` and ``from … import``
-at any depth (module level and inside functions) and resolves relative imports;
-a name joins the closure when ``<name>.py`` or ``<name>/__init__.py`` exists under
-the repository root, so third-party and standard-library modules are not
-followed. A dynamic import through a computed string is not followed; the test
-also refuses any string constant naming the package in a closure module. Entry
-points are parsed, never imported, and module names are derived from file paths.
+``_static_closure`` and its helpers stay in place under their names:
+``tests/scripts/test_m10_cutover_guard.py`` loads ``_static_closure`` from this
+file for its closure-equality check.
+
+Stated limit (of the helpers): the closure is static. It follows ``import`` and
+``from … import`` at any depth (module level and inside functions) and resolves
+relative imports; a name joins the closure when ``<name>.py`` or
+``<name>/__init__.py`` exists under the repository root, so third-party and
+standard-library modules are not followed. A dynamic import through a computed
+string is not followed. Entry points are parsed, never imported, and module
+names are derived from file paths.
 """
 from __future__ import annotations
 
 import ast
 from pathlib import Path
-
-from engine.compat import compute
-from engine.config.registry_loader import load_active_mechanics_bundle
 
 ROOT = Path(__file__).resolve().parents[2]
 ENTRY_POINTS = ("adapter/factory.py", "engine/cli/main.py", "engine/http/compat_handler.py")
@@ -81,23 +85,3 @@ def _static_closure() -> dict[str, Path]:
             if target is not None and _module_name(target) not in seen:
                 queue.append(target)
     return seen
-
-
-def test_no_production_entry_point_reaches_the_v2_package() -> None:
-    closure = _static_closure()
-    assert {"engine.compat.compute", "engine.magic10.composite", "engine.cli.main"} <= set(closure)
-    reached = sorted(name for name in closure if name == V2_PACKAGE or name.startswith(V2_PACKAGE + "."))
-    assert reached == []
-    naming = []
-    for name, path in sorted(closure.items()):
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Constant) and isinstance(node.value, str) and any(
-                text in node.value for text in V2_TEXT
-            ):
-                naming.append((name, node.lineno))
-    assert naming == []
-
-
-def test_active_bundle_provider_is_unchanged() -> None:
-    assert compute._BUNDLE_PROVIDER is load_active_mechanics_bundle

@@ -1,42 +1,32 @@
-"""Four-argument, data-in/data-out Gate kernel (PF01 §5.2 / PF14 §6.7)."""
+"""Four-argument, data-in/data-out Gate kernel (PF01 §5.2 / PF14 §6.7).
+
+HDE-EPIC043 WU-PR-09: the supported core computes ``magic10_result.v2`` through
+the Magic10 v2 calculation over the admitted bundle's ``magic10_v2`` member.
+"""
 from __future__ import annotations
 
 import sys as _sys
-from dataclasses import dataclass, fields
+from dataclasses import fields
 from hashlib import sha256
 from types import MappingProxyType
 
 from engine.bodygraph.gates import NormalizedGates
 from engine.categories.registry import FROZEN_MAGIC10_ORDER
+from engine.config.magic10_v2_loader import (
+    MAGIC10_V2_CONFIGURATION_PATH, MAGIC10_V2_RESULT_SCHEMA, Magic10V2Bundle,
+)
 from engine.config.registry_loader import (
-    ADMITTED_RELEASE_ROSTER, AdmittedMechanicsBundle, Channel, Gate,
+    AdmittedMechanicsBundle, Channel, Gate,
     Magic10Caps, Magic10Seed, Manifest, ManifestEntry, RegistryConfig, SourceIdentity,
     FROZEN_CHANNEL_IDS,
 )
-from engine.magic10.calculators import CategoryValue, _reduce_category
-from engine.magic10.composite import _classify_channels
-from engine.magic10.signals import SignalValue, _compute_signals
+from engine.magic10_v2.calculation import CategoryResult, Magic10V2Result, assign_band, compute_magic10_v2
+from engine.magic10_v2.signals import PER_MILLE, SignalValue
 from engine.serializer.canon import sercanon
 
 
-@dataclass(frozen=True, slots=True)
-class CoreResult:
-    schema: str
-    config_id: str
-    release_id: str
-    pair_key: str
-    signals: tuple[SignalValue, ...]
-    categories: tuple[CategoryValue, ...]
-
-    def to_payload(self) -> dict:
-        """Project immutable ordered values for the owning serializer/schema."""
-        return {
-            "schema": self.schema, "config_id": self.config_id,
-            "release_id": self.release_id, "pair_key": self.pair_key,
-            "signals": [{"signal_id": row.signal_id, "q": row.q} for row in self.signals],
-            "categories": [{"category_id": row.category_id, "score": row.score,
-                            "band": row.band} for row in self.categories],
-        }
+# The supported core result is the Magic10 v2 result (``magic10_result.v2``).
+CoreResult = Magic10V2Result
 
 
 def _hex_digest(value) -> bool:
@@ -51,7 +41,7 @@ def _plain(value, depth=0):
     """
     if depth > 12:
         raise ValueError("invalid immutable graph")
-    if type(value) in (str, int) or value is None:
+    if type(value) in (str, int, bool) or value is None:
         return value
     if type(value) is tuple:
         return [_plain(v, depth + 1) for v in value]
@@ -61,7 +51,7 @@ def _plain(value, depth=0):
         return {k: _plain(v, depth + 1) for k, v in value.items()}
     if type(value) in (
         AdmittedMechanicsBundle, RegistryConfig, Gate, Channel, Magic10Caps,
-        Magic10Seed, Manifest, ManifestEntry, SourceIdentity,
+        Magic10Seed, Manifest, ManifestEntry, SourceIdentity, Magic10V2Bundle,
     ):
         return {f.name: _plain(getattr(value, f.name), depth + 1) for f in fields(value)}
     raise ValueError("invalid immutable value")
@@ -96,8 +86,8 @@ def _validate_bundle(bundle, release_id):
     manifest = bundle.manifest
     identities = bundle.source_identities
     if (type(manifest) is not Manifest or type(bundle.registry) is not RegistryConfig
-            or tuple(row.path for row in manifest.files) != ADMITTED_RELEASE_ROSTER
-            or tuple(row.path for row in identities) != ADMITTED_RELEASE_ROSTER):
+            or type(identities) is not tuple or not identities
+            or tuple(row.path for row in manifest.files) != tuple(row.path for row in identities)):
         raise ValueError("incomplete admitted source identities")
     for entry, source in zip(manifest.files, identities):
         if (type(entry) is not ManifestEntry or type(source) is not SourceIdentity
@@ -105,34 +95,21 @@ def _validate_bundle(bundle, release_id):
                 or (entry.path, entry.sha256, entry.size) != (source.path, source.sha256, source.size)):
             raise ValueError("incoherent source identity")
     by_path = {row.path: row for row in identities}
+    magic10_v2 = bundle.magic10_v2
     mechanics = bundle.mechanics
-    if set(mechanics) != {
-        "schema", "config_id", "result_schema", "signal_scale", "response_scale",
-        "rounding", "sources", "profiles", "signals", "category_weights",
-    }:
-        raise ValueError("invalid mechanics fields")
-    if (mechanics["schema"] != "magic10_mechanics_config.v1"
-            or mechanics["result_schema"] != "magic10_result.v1"
-            or type(mechanics["config_id"]) is not str or not mechanics["config_id"]
-            or type(mechanics["signal_scale"]) is not int or mechanics["signal_scale"] != 2
-            or type(mechanics["response_scale"]) is not int or mechanics["response_scale"] != 10000
-            or dict(mechanics["rounding"]) != {"category": "round_half_up_once",
-                                              "signal": "round_half_up_to_half_score_unit"}):
-        raise ValueError("invalid mechanics invariants")
+    if type(magic10_v2) is not Magic10V2Bundle or mechanics != magic10_v2.configuration:
+        raise ValueError("incoherent v2 bundle")
     config_bytes = sercanon(plain["mechanics"], sort_keys=True)
-    config_source = by_path["catalog/magic10_mechanics_v1.json"]
-    if (sha256(config_bytes).hexdigest() != bundle.config_sha256
-            or bundle.config_sha256 != config_source.sha256 or len(config_bytes) != config_source.size):
+    config_source = by_path.get(MAGIC10_V2_CONFIGURATION_PATH)
+    if (config_source is None or sha256(config_bytes).hexdigest() != bundle.config_sha256
+            or bundle.config_sha256 != config_source.sha256 or len(config_bytes) != config_source.size
+            or magic10_v2.config_sha256 != bundle.config_sha256):
         raise ValueError("incoherent configuration bytes")
-    source_paths = (
-        ("caps", "catalog/magic10_caps.json"), ("categories", "catalog/magic10.json"),
-        ("channels", "catalog/channels_v1.json"), ("thresholds", "math/thresholds.json"),
-    )
-    if set(mechanics["sources"]) != {name for name, _ in source_paths}:
-        raise ValueError("invalid mechanics source roster")
-    for name, path in source_paths:
-        source = mechanics["sources"][name]
-        if set(source) != {"path", "sha256"} or source["path"] != path or source["sha256"] != by_path[path].sha256:
+    if mechanics["result_schema"] != MAGIC10_V2_RESULT_SCHEMA:
+        raise ValueError("invalid mechanics invariants")
+    for name, source in mechanics["sources"].items():
+        if (type(source) is not MappingProxyType or set(source) != {"path", "sha256"}
+                or source["path"] not in by_path or source["sha256"] != by_path[source["path"]].sha256):
             raise ValueError("incoherent mechanics source")
     registry = bundle.registry
     if (registry.magic10_order != FROZEN_MAGIC10_ORDER
@@ -161,7 +138,7 @@ def _validate_bundle(bundle, release_id):
         "catalog/magic10.json": {"order": list(registry.magic10_order)},
         "catalog/magic10_caps.json": plain["registry"]["magic10_caps"],
     }
-    if any(_digest(value) != by_path[path].sha256 for path, value in projections.items()):
+    if any(path not in by_path or _digest(value) != by_path[path].sha256 for path, value in projections.items()):
         raise ValueError("incoherent typed source projection")
     order = []
     for category in registry.magic10_order:
@@ -172,12 +149,6 @@ def _validate_bundle(bundle, release_id):
         order.extend(caps.inputs)
     if len(order) != 20 or len(set(order)) != 20:
         raise ValueError("invalid caps closure")
-    weights = mechanics["category_weights"]
-    if len(weights) != 10 or tuple(row["category_id"] for row in weights) != registry.magic10_order:
-        raise ValueError("invalid category weight order")
-    if any(set(row) != {"category_id", "reducer", "weights"} or
-           row["reducer"] != "weighted_mean_half_unit_v1" for row in weights):
-        raise ValueError("invalid category reducer")
     return tuple(order)
 
 
@@ -185,57 +156,44 @@ def _chart_fingerprint(member) -> str:
     return _digest({"schema": "magic10_chart_fingerprint.v1", "gate_mask_hex": member.mask_hex})
 
 
-def _validate_result(result, signal_order, category_order):
-    if (type(result) is not CoreResult or result.schema != "magic10_result.v1"
-            or type(result.config_id) is not str or not result.config_id
-            or not _hex_digest(result.release_id) or not _hex_digest(result.pair_key)
+def _validate_result(result, bundle, release_id, signal_order, category_order):
+    maxima = bundle.magic10_v2.maxima
+    if (type(result) is not Magic10V2Result or result.schema != MAGIC10_V2_RESULT_SCHEMA
+            or result.config_id != bundle.mechanics["config_id"]
+            or result.release_id != release_id or not _hex_digest(result.pair_key)
             or type(result.signals) is not tuple or type(result.categories) is not tuple
             or len(result.signals) != 20 or len(result.categories) != 10):
         raise ValueError("invalid result closure")
     for row, expected in zip(result.signals, signal_order):
         if (type(row) is not SignalValue or row.signal_id != expected
-                or type(row.q) is not int or not 0 <= row.q <= 200):
+                or type(row.q) is not int or not 0 <= row.q <= PER_MILLE):
             raise ValueError("invalid result signal")
     for row, expected in zip(result.categories, category_order):
-        if (type(row) is not CategoryValue or row.category_id != expected
+        if (type(row) is not CategoryResult or row.category_id != expected
                 or type(row.score) is not int or not 0 <= row.score <= 100):
             raise ValueError("invalid result category")
-        band = ("Cool" if row.score <= 24 else "Open" if row.score <= 49
-                else "Warm" if row.score <= 74 else "Glow")
-        if type(row.band) is not str or row.band != band:
+        if type(row.band) is not str or row.band != assign_band(row.score, maxima[expected]):
             raise ValueError("invalid result band")
 
 
 def compute_core(member_a, member_b, mechanics_bundle, release_id) -> CoreResult:
-    """Compute one complete intrinsic result; eligibility belongs to the caller."""
+    """Compute one complete intrinsic ``magic10_result.v2``; eligibility belongs to the caller.
+
+    Member and bundle defects raise ``ValueError``.  A refusal of the Magic10 v2
+    calculation (``SchemaValidationError``) propagates unchanged.
+    """
     try:
         _validate_member(member_a)
         _validate_member(member_b)
         signal_order = _validate_bundle(mechanics_bundle, release_id)
-        registry, mechanics = mechanics_bundle.registry, mechanics_bundle.mechanics
-        classified = _classify_channels(member_a.mask, member_b.mask, registry.channels)
-        signals = _compute_signals(classified, mechanics, signal_order)
-        values = {row.signal_id: row.q for row in signals}
-        categories = tuple(
-            _reduce_category(
-                category, tuple(values[s] for s in registry.magic10_caps[category].inputs),
-                registry.magic10_caps[category].bounds, row["weights"],
-            )
-            for category, row in zip(registry.magic10_order, mechanics["category_weights"])
-        )
-        members = sorted((member_a, member_b), key=lambda member: member.mask)
-        pair_key = _digest({
-            "schema": "magic10_pair_preimage.v1",
-            "members": [_chart_fingerprint(member) for member in members],
-            "config_id": mechanics["config_id"], "release_id": release_id,
-            "result_schema": "magic10_result.v1",
-        })
-        result = CoreResult("magic10_result.v1", mechanics["config_id"], release_id,
-                            pair_key, signals, categories)
-        _validate_result(result, signal_order, registry.magic10_order)
-        return result
     except (KeyError, TypeError, AttributeError, ValueError, RecursionError):
         raise ValueError("invalid pure core contract") from None
+    result = compute_magic10_v2(member_a.mask, member_b.mask, mechanics_bundle.magic10_v2, release_id)
+    try:
+        _validate_result(result, mechanics_bundle, release_id, signal_order, mechanics_bundle.registry.magic10_order)
+    except (KeyError, TypeError, AttributeError, ValueError, RecursionError):
+        raise ValueError("invalid pure core contract") from None
+    return result
 
 
 # Retain passive top-level execution provenance only after definitions complete.

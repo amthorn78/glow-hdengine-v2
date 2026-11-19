@@ -84,7 +84,7 @@ def test_showcompat_db_source_reads_current_rows_only(monkeypatch, capsys, spies
     assert exit_code == 0, captured.err
     assert captured.err == ""
     payload = _result(captured)
-    assert payload["schema"] == "magic10_compat_result.v1"
+    assert payload["schema"] == "magic10_compat_result.v2"
     assert set(payload) == {"schema", "config_id", "release_id", "pair_key", "signals", "categories"}
     assert len(payload["categories"]) == 10
     assert {params[0] for _sql, params in db.queries} == set(_user_charts())
@@ -145,7 +145,7 @@ def test_showcompat_db_source_type_only_row_is_incomplete(monkeypatch, capsys, s
 def test_showcompat_auto_is_db_only_and_never_falls_back_to_vendor(monkeypatch, capsys, spies):
     _install_db(monkeypatch, _user_charts())
     assert cli(["showcompat", "--source", "auto", "--user-a", "user-1", "--user-b", "user-2"]) == 0
-    assert _result(capsys.readouterr())["schema"] == "magic10_compat_result.v1"
+    assert _result(capsys.readouterr())["schema"] == "magic10_compat_result.v2"
     monkeypatch.setenv("SAFE_MODE", "0")
     monkeypatch.setenv("ALLOW_NETWORK", "1")
     exit_code = cli(["showcompat", "--source", "auto", *BIRTH_ARGS])
@@ -196,7 +196,7 @@ def test_showcompat_vendor_dry_run_uses_the_v2_adapter_path_without_persistence(
     captured = capsys.readouterr()
     assert exit_code == 0, captured.err
     payload = _result(captured)
-    assert payload["schema"] == "magic10_compat_result.v1"
+    assert payload["schema"] == "magic10_compat_result.v2"
     assert len(fetches) == 2
     assert captured.err == ""
     assert "1990-01-01" not in captured.out and "Amsterdam" not in captured.out
@@ -221,7 +221,7 @@ def test_showcompat_file_input_complete_charts_use_no_db_or_vendor(monkeypatch, 
     pair.write_text(json.dumps({"left": complete_chart(UUID_A, GATES_A), "right": complete_chart(UUID_B, GATES_B)}), encoding="utf-8")
     assert cli(["showcompat", "--pair-file", str(pair)]) == 0
     payload = _result(capsys.readouterr())
-    assert payload["schema"] == "magic10_compat_result.v1"
+    assert payload["schema"] == "magic10_compat_result.v2"
 
 
 def test_showcompat_self_pair_carrier_exit_zero(monkeypatch, capsys, tmp_path, spies):
@@ -265,7 +265,7 @@ def test_showcompat_conjunction_local_first_hit_needs_no_vendor(monkeypatch, cap
     payload = _result(captured)
     assert set(payload["conjunction"]) == {"left", "right", "compat"}
     assert {payload["conjunction"]["left"]["person_uid"], payload["conjunction"]["right"]["person_uid"]} == set(_user_charts())
-    assert payload["conjunction"]["compat"]["schema"] == "magic10_compat_result.v1"
+    assert payload["conjunction"]["compat"]["schema"] == "magic10_compat_result.v2"
 
 
 def test_showcompat_conjunction_db_source_miss_is_missing_chart_not_refusal(monkeypatch, capsys, spies):

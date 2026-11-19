@@ -35,6 +35,22 @@ except Exception:
     _MODULE_EXECUTION = None
 
 
+def _capture_module_execution(namespace):
+    """Passive provenance for a covered module, called once as its last top-level statement.
+
+    HDE-EPIC043 WU-PR-09: the Magic10 v2 modules the switched core executes record
+    the same six-field provenance as the block above, through this helper, so that
+    they need no new import of ``sys``.
+    """
+    try:
+        return (
+            _sys._getframe(1).f_code, namespace['__name__'], namespace['__file__'],
+            namespace['__spec__'].origin, _sys.flags.optimize, _sys.implementation.cache_tag,
+        )
+    except Exception:
+        return None
+
+
 # PF12 — HDE Schemas & Artifacts, §2.1 owns the closed Gate domain 1..64,
 # while §4.2 preserves array order unless an owning contract declares set
 # semantics.  The Gate catalog rows are ordered source data, not a declared
@@ -273,6 +289,9 @@ class AdmittedMechanicsBundle:
     source_identities: tuple[SourceIdentity, ...]
     manifest_sha256: str
     release_id: str
+    # HDE-EPIC043 WU-PR-09: the admitted Magic10 v2 bundle.  ``mechanics`` is its
+    # configuration and ``config_sha256`` the digest of its configuration bytes.
+    magic10_v2: "Magic10V2Bundle"
 
 
 
@@ -1186,36 +1205,6 @@ def _validate_mechanics_domain(capture: _LocalCapture, data: object, registry: R
     _validate_thresholds(capture.read('math/thresholds.json').data)
 
 
-def _validate_initial_mechanics(capture: _LocalCapture, data: object, registry: RegistryConfig) -> None:
-    _validate_mechanics_domain(capture, data, registry)
-    if data['config_id'] != 'm10-channel-state-v1.0.0':
-        raise SchemaValidationError('INITIAL_CONFIG_ID_MISMATCH', 'initial mechanics config identity mismatch')
-    if data['profiles'] != [{'profile_id': name, 'responses': responses} for name, responses in sorted(_PROFILE_RESPONSES.items())]:
-        raise SchemaValidationError('INITIAL_PROFILE_MISMATCH', 'initial mechanics responses differ from the adopted defaults')
-    for signal in data['signals']:
-        _, ids = _SIGNAL_MEMBERSHIP[signal['signal_id']]
-        expected = [{'channel_id': name, 'weight': 1} for name in ids]
-        if signal['channels'] != expected:
-            raise SchemaValidationError('INITIAL_SIGNAL_MAP_MISMATCH', 'initial membership/default weights differ from the adopted map')
-    if sum(len(signal['channels']) for signal in data['signals']) != 90:
-        raise SchemaValidationError('INITIAL_MEMBERSHIP_COUNT_MISMATCH', 'initial map must contain ninety memberships')
-    if any(row['weights'] != [1, 1] for row in data['category_weights']):
-        raise SchemaValidationError('INITIAL_CATEGORY_WEIGHTS_MISMATCH', 'initial category weights must be [1,1]')
-    if capture.read('math/thresholds.json').data['edges'] != [24, 49, 74, 100]:
-        raise SchemaValidationError('INITIAL_THRESHOLDS_MISMATCH', 'initial mechanics thresholds differ from the adopted maxima')
-
-
-def _capture_mechanics_config(root: Path | str | None = None) -> _MechanicsCapture:
-    """Validate the complete initial candidate; never return an active release handle."""
-    base = _capture_registry_config(root)
-    capture = _MechanicsCapture(base.root, base.sources, registry=base.config)
-    data = capture.read('catalog/magic10_mechanics_v1.json').data
-    _validate_initial_mechanics(capture, data, base.config)
-    capture.config = data
-    capture.verify_unchanged()
-    return capture
-
-
 def _validate_admitted_manifest(manifest: Manifest) -> None:
     paths = tuple(entry.path for entry in manifest.files)
     if paths != ADMITTED_RELEASE_ROSTER:
@@ -1264,7 +1253,7 @@ def _capture_admitted_members(
 
 def _admission_execution_provenance(
 ) -> tuple[Path, tuple[tuple[str, CodeType, int], ...]]:
-    """Validate the eight actual consumers' passive import provenance.
+    """Validate the nine actual consumers' passive import provenance.
 
     This proves neither historical imported bytes nor arbitrary in-process
     tamper resistance. It establishes safe common origin and compilation
@@ -1274,8 +1263,9 @@ def _admission_execution_provenance(
     # These are ordinary imports from the executing installation, never imports
     # of captured release bytes. Keeping them here avoids core/type import cycles.
     try:
+        from engine.config import magic10_v2_loader
         from engine.core import core as pure_core
-        from engine.magic10 import calculators, composite, signals
+        from engine.magic10_v2 import calculation, kernel, signals
     except Exception as exc:
         raise SchemaValidationError(
             'EXECUTION_PROVENANCE_UNAVAILABLE', 'covered mechanics module is unavailable',
@@ -1286,9 +1276,10 @@ def _admission_execution_provenance(
         ('engine/stable/sercanon.py', 'engine.stable.sercanon', getattr(canon, 'stable_sercanon', None)),
         ('engine/categories/registry.py', 'engine.categories.registry', category_registry),
         ('engine/core/core.py', 'engine.core.core', pure_core),
-        ('engine/magic10/composite.py', 'engine.magic10.composite', composite),
-        ('engine/magic10/signals.py', 'engine.magic10.signals', signals),
-        ('engine/magic10/calculators.py', 'engine.magic10.calculators', calculators),
+        ('engine/config/magic10_v2_loader.py', 'engine.config.magic10_v2_loader', magic10_v2_loader),
+        ('engine/magic10_v2/kernel.py', 'engine.magic10_v2.kernel', kernel),
+        ('engine/magic10_v2/signals.py', 'engine.magic10_v2.signals', signals),
+        ('engine/magic10_v2/calculation.py', 'engine.magic10_v2.calculation', calculation),
     )
     root: Path | None = None
     executions: list[tuple[str, CodeType, int]] = []
@@ -1338,7 +1329,7 @@ def _admission_execution_provenance(
             raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'covered admission modules have different roots')
         _safe_source_path(module_root, relative_path)
         executions.append((relative_path, code, optimization))
-    assert root is not None  # the fixed eight-owner set is nonempty
+    assert root is not None  # the fixed nine-owner set is nonempty
     return root, tuple(executions)
 
 
@@ -1371,12 +1362,11 @@ def _validate_executing_admission_sources(
 
 def _validate_admitted_schema_documents(capture: _MechanicsCapture) -> None:
     draft_2020 = 'https://json-schema.org/draft/2020-12/schema'
+    # HDE-EPIC043 WU-PR-09: the v2 loader validates the v2 result schemas as
+    # documents (its C11); admission keeps the topology and transport documents.
     for path in (
         'schemas/channels_v1.schema.json',
         'schemas/gates_v1.schema.json',
-        'schemas/magic10_mechanics_v1.schema.json',
-        'schemas/magic10_result_v1.schema.json',
-        'schemas/magic10_compat_result_v1.schema.json',
     ):
         _validate_release_schema_document(
             capture,
@@ -1477,17 +1467,26 @@ def _load_active_mechanics_bundle_from_root(root: Path) -> AdmittedMechanicsBund
     )
     capture.registry = registry
 
-    mechanics_source = capture.read('catalog/magic10_mechanics_v1.json')
-    mechanics = mechanics_source.data
-    _validate_initial_mechanics(capture, mechanics, registry)
-    capture.config = mechanics
+    # HDE-EPIC043 WU-PR-09: the release's one mechanics configuration is admitted
+    # through the v2 loader's rules over this same capture and manifest rows, so
+    # each file is read once and bound by the final verification below.  A
+    # manifest selecting the v1 configuration refuses M10V2_CONFIGURATION_ROW_MISSING.
+    from engine.config.magic10_v2_loader import _magic10_v2_bundle_from_capture
+
+    magic10_v2 = _magic10_v2_bundle_from_capture(capture, manifest.files, verify=False)
+    capture.config = magic10_v2.configuration
     _validate_admitted_schema_documents(capture)
+    members = {identity.path: identity for identity in source_identities}
+    for identity in magic10_v2.source_identities:
+        member = members.get(identity.path)
+        if member is not None and (member.sha256, member.size) != (identity.sha256, identity.size):
+            raise SchemaValidationError(
+                'SOURCE_CHANGED', f'v2 source differs from the captured member: {identity.path}',
+            )
 
     frozen_manifest = _freeze_manifest(manifest)
     frozen_registry = _freeze_registry(registry, frozen_manifest)
-    frozen_mechanics = _deep_freeze(mechanics)
-    if not isinstance(frozen_mechanics, Mapping):  # guarded by mechanics schema
-        raise SchemaValidationError('INVALID_MECHANICS', 'mechanics config must be an object')
+    frozen_mechanics = magic10_v2.configuration
     manifest_sha256 = manifest_source.sha256
     capture.verify_unchanged(
         identity_only=frozenset({'catalog/manifest.json'}),
@@ -1496,10 +1495,11 @@ def _load_active_mechanics_bundle_from_root(root: Path) -> AdmittedMechanicsBund
         registry=frozen_registry,
         mechanics=frozen_mechanics,
         manifest=frozen_manifest,
-        config_sha256=mechanics_source.sha256,
+        config_sha256=magic10_v2.config_sha256,
         source_identities=source_identities,
         manifest_sha256=manifest_sha256,
         release_id=manifest_sha256,
+        magic10_v2=magic10_v2,
     )
 
 
