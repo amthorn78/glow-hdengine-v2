@@ -16,7 +16,11 @@ from engine.serializer import canon
 from tests.config.helpers import (
     closed_rails_env,
     synthetic_complete_release_root,
+    synthetic_v2_candidate_root,
+    v2_candidate_roster,
+    v2_candidate_roster_admission,
     write_canonical,
+    write_release_manifest,
     write_synthetic_release_manifest,
 )
 
@@ -29,11 +33,34 @@ COVERED = (
     ("engine/categories/registry.py", category_registry),
 )
 HELPERS = ("engine/stable/sercanon.py", "engine/categories/registry.py")
+# HDE-EPIC043 WU-PR-09: the executing-admission source set is nine modules; the
+# five mechanics modules beyond the four owners above are covered by
+# tests/config/test_production_admission.py.
+EXECUTING = (
+    *(path for path, _ in COVERED),
+    "engine/core/core.py", "engine/config/magic10_v2_loader.py",
+    "engine/magic10_v2/kernel.py", "engine/magic10_v2/signals.py", "engine/magic10_v2/calculation.py",
+)
+V2_CANDIDATE_MEMBERS = 57
 
 
 @pytest.fixture
 def release_root(tmp_path: Path) -> Path:
+    # The 45-member v1 root no longer admits (UNBOUND_SOURCE); it serves only the
+    # refusals raised earlier in the admission order.
     return synthetic_complete_release_root(tmp_path)
+
+
+@pytest.fixture
+def candidate_root(tmp_path: Path):
+    """The 57-member v2 candidate root, with the test-only roster route active for the test."""
+    root = synthetic_v2_candidate_root(tmp_path)
+    with v2_candidate_roster_admission():
+        yield root
+
+
+def _rewrite_candidate_manifest(root: Path) -> None:
+    write_release_manifest(root, v2_candidate_roster())
 
 
 def _refuses(root: Path, code: str) -> None:
@@ -51,8 +78,10 @@ def _importable(root: Path) -> None:
 
 def _child(root: Path, script: str, *, optimization: int = 0) -> dict:
     options = ["-I"] + (["-" + "O" * optimization] if optimization else [])
+    # argv[2] carries the v2 candidate roster: the isolated child cannot import
+    # tests/config/helpers.py, so _IMPORT repeats its one-constant roster swap.
     result = subprocess.run(
-        [sys.executable, *options, "-c", script, str(root)],
+        [sys.executable, *options, "-c", script, str(root), json.dumps(v2_candidate_roster())],
         cwd=root, env=closed_rails_env(), text=True, capture_output=True,
         check=False, timeout=30,
     )
@@ -69,6 +98,7 @@ sys.path.insert(0, str(root))
 from engine.config import registry_loader as loader
 from engine.serializer import canon
 from engine.categories import registry as category_registry
+loader.ADMITTED_RELEASE_ROSTER = tuple(json.loads(sys.argv[2]))
 owners = {
     'engine/config/registry_loader.py': loader,
     'engine/serializer/canon.py': canon,
@@ -95,15 +125,15 @@ def admit():
 
 @pytest.mark.parametrize("optimization", [0, 1, 2])
 def test_public_fresh_execution_admits_all_four_modules_under_matching_semantics(
-    release_root: Path, optimization: int,
+    candidate_root: Path, optimization: int,
 ) -> None:
-    _importable(release_root)
-    result = _child(release_root, _IMPORT + "print(json.dumps(admit()))\n", optimization=optimization)
+    _importable(candidate_root)
+    result = _child(candidate_root, _IMPORT + "print(json.dumps(admit()))\n", optimization=optimization)
     assert result["state"] == "admitted"
-    assert result["members"] == 45
-    assert result["release_id"] == hashlib.sha256((release_root / "catalog/manifest.json").read_bytes()).hexdigest()
-    for path, _ in COVERED:
-        assert result["sources"][path] == hashlib.sha256((release_root / path).read_bytes()).hexdigest()
+    assert result["members"] == V2_CANDIDATE_MEMBERS
+    assert result["release_id"] == hashlib.sha256((candidate_root / "catalog/manifest.json").read_bytes()).hexdigest()
+    for path in EXECUTING:
+        assert result["sources"][path] == hashlib.sha256((candidate_root / path).read_bytes()).hexdigest()
 
 
 @pytest.mark.parametrize("path,owner", COVERED, ids=[p for p, _ in COVERED])
@@ -118,22 +148,23 @@ def test_each_materially_different_captured_module_refuses_without_execution(
 
 @pytest.mark.parametrize("path,owner", COVERED, ids=[p for p, _ in COVERED])
 def test_public_execution_refuses_source_replaced_after_import(
-    release_root: Path, path: str, owner,
+    candidate_root: Path, path: str, owner,
 ) -> None:
-    _importable(release_root)
+    _importable(candidate_root)
     script = _IMPORT + f"""
 path = root / {path!r}
 path.write_bytes(path.read_bytes() + b"raise RuntimeError('not executed')\\n")
 refresh_manifest()
 print(json.dumps(admit()))
 """
-    assert _child(release_root, script) == {"state": "refused", "code": "EXECUTING_SOURCE_MISMATCH"}
+    assert _child(candidate_root, script) == {"state": "refused", "code": "EXECUTING_SOURCE_MISMATCH"}
 
 
 @pytest.mark.parametrize("path,owner", COVERED, ids=[p for p, _ in COVERED])
 def test_timestamp_valid_stale_bytecode_refuses_but_fresh_b_admits(
-    release_root: Path, path: str, owner,
+    candidate_root: Path, path: str, owner,
 ) -> None:
+    release_root = candidate_root
     _importable(release_root)
     source = release_root / path
     raw_a = source.read_bytes() + b"\ndef _f02_behavior():\n    return 'A'\n"
@@ -147,7 +178,7 @@ def test_timestamp_valid_stale_bytecode_refuses_but_fresh_b_admits(
     source.write_bytes(raw_b)
     os.utime(source, ns=(before.st_atime_ns, before.st_mtime_ns))
     assert source.stat().st_mtime_ns == before.st_mtime_ns
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     script = _IMPORT + f"""
 result = admit()
 result['behavior'] = owners[{path!r}]._f02_behavior()
@@ -158,18 +189,18 @@ print(json.dumps(result))
     cached.unlink()
     fresh = _child(release_root, script)
     assert fresh["state"] == "admitted"
-    assert fresh["members"] == 45
+    assert fresh["members"] == V2_CANDIDATE_MEMBERS
     assert fresh["behavior"] == "B"
     assert fresh["sources"][path] == hashlib.sha256(raw_b).hexdigest()
 
 
-def test_code_equivalence_does_not_claim_historical_raw_source_identity(release_root: Path) -> None:
+def test_code_equivalence_does_not_claim_historical_raw_source_identity(candidate_root: Path) -> None:
     path = "engine/config/registry_loader.py"
-    source = release_root / path
+    source = candidate_root / path
     old_digest = hashlib.sha256(source.read_bytes()).hexdigest()
     source.write_bytes(source.read_bytes() + b"# Nonexecuting trailing source comment.\n")
-    write_synthetic_release_manifest(release_root)
-    bundle = loader._load_active_mechanics_bundle_from_root(release_root)
+    _rewrite_candidate_manifest(candidate_root)
+    bundle = loader._load_active_mechanics_bundle_from_root(candidate_root)
     identity = next(row for row in bundle.source_identities if row.path == path)
     assert identity.sha256 != old_digest
     assert identity.sha256 == hashlib.sha256(source.read_bytes()).hexdigest()
@@ -243,16 +274,16 @@ except loader.RegistryConfigError as exc:
 
 @pytest.mark.parametrize("retarget", [False, True])
 def test_real_public_import_through_deployment_symlink_refuses(
-    tmp_path: Path, release_root: Path, retarget: bool,
+    tmp_path: Path, candidate_root: Path, retarget: bool,
 ) -> None:
-    _importable(release_root)
+    _importable(candidate_root)
     alias = tmp_path / "current"
-    alias.symlink_to(release_root, target_is_directory=True)
+    alias.symlink_to(candidate_root, target_is_directory=True)
     script = _IMPORT
     if retarget:
         parent = tmp_path / "replacement"
         parent.mkdir()
-        replacement = synthetic_complete_release_root(parent)
+        replacement = synthetic_v2_candidate_root(parent)
         _importable(replacement)
         script += f"root.unlink(); root.symlink_to({str(replacement)!r}, target_is_directory=True)\n"
     assert _child(alias, script + "print(json.dumps(admit()))\n") == {"state": "refused", "code": "UNSAFE_SOURCE_PATH"}
@@ -311,7 +342,7 @@ def test_both_added_helper_sources_have_full_member_protection(
 
 
 @pytest.mark.parametrize("path", HELPERS)
-def test_added_helper_changed_after_capture_is_refused(release_root: Path, monkeypatch, path: str) -> None:
+def test_added_helper_changed_after_capture_is_refused(candidate_root: Path, monkeypatch, path: str) -> None:
     original = loader._read_captured_file
     changed = False
     def mutate_after_capture(root, relative):
@@ -322,20 +353,22 @@ def test_added_helper_changed_after_capture_is_refused(release_root: Path, monke
             (root / path).write_bytes(b"raise RuntimeError('changed after capture')\n")
         return result
     monkeypatch.setattr(loader, "_read_captured_file", mutate_after_capture)
-    _refuses(release_root, "SOURCE_CHANGED")
+    _refuses(candidate_root, "SOURCE_CHANGED")
 
 
 @pytest.mark.parametrize("path", HELPERS)
-def test_execution_check_cannot_read_an_uncaptured_helper(release_root: Path, monkeypatch, path: str) -> None:
+def test_execution_check_cannot_read_an_uncaptured_helper(candidate_root: Path, monkeypatch, path: str) -> None:
+    # On the v2 candidate root (which otherwise admits); the v1 root refuses
+    # UNBOUND_SOURCE whether or not the helper is omitted.
     original = loader._validate_executing_admission_sources
     def omit_captured_source(capture, executions):
         capture.sources.pop(path)
         return original(capture, executions)
     monkeypatch.setattr(loader, "_validate_executing_admission_sources", omit_captured_source)
-    _refuses(release_root, "UNBOUND_SOURCE")
+    _refuses(candidate_root, "UNBOUND_SOURCE")
 
 
-def test_admission_exercises_the_existing_serializer_and_category_owners(release_root: Path, monkeypatch) -> None:
+def test_admission_exercises_the_existing_serializer_and_category_owners(candidate_root: Path, monkeypatch) -> None:
     calls = 0
     original = canon.stable_sercanon.serialize
     def observe(value, *, sort_keys=True):
@@ -343,7 +376,7 @@ def test_admission_exercises_the_existing_serializer_and_category_owners(release
         calls += 1
         return original(value, sort_keys=sort_keys)
     monkeypatch.setattr(canon.stable_sercanon, "serialize", observe)
-    bundle = loader._load_active_mechanics_bundle_from_root(release_root)
+    bundle = loader._load_active_mechanics_bundle_from_root(candidate_root)
     assert calls > 0
     assert loader.FROZEN_MAGIC10_ORDER is category_registry.FROZEN_MAGIC10_ORDER
     assert bundle.registry.magic10_order == category_registry.all_ids()
@@ -351,8 +384,9 @@ def test_admission_exercises_the_existing_serializer_and_category_owners(release
 
 @pytest.mark.parametrize("outcome", ["success", "malformed_manifest", "member_hash", "manifest_changed"])
 def test_packaged_manifest_has_one_physical_open_on_success_and_adverse_paths(
-    release_root: Path, monkeypatch, outcome: str,
+    candidate_root: Path, monkeypatch, outcome: str,
 ) -> None:
+    release_root = candidate_root
     manifest_path = release_root / "catalog/manifest.json"
     if outcome == "malformed_manifest":
         manifest_path.write_bytes(b"{invalid\n")

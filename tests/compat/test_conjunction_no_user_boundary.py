@@ -127,7 +127,7 @@ def test_birth_only_no_user_success_through_real_boundary(monkeypatch):
         assert len(party.chart_fingerprint) == 64
     assert core.calls and len(core.calls) == 2
     assert {ab["conjunction"]["left"]["person_uid"], ab["conjunction"]["right"]["person_uid"]} == expected_keys
-    assert ab["conjunction"]["compat"]["schema"] == "magic10_compat_result.v1"
+    assert ab["conjunction"]["compat"]["schema"] == "magic10_compat_result.v2"
     ab_bytes, ba_bytes = emit_public(ab), emit_public(ba)
     assert ab_bytes == ba_bytes
     assert emit_public(conjunction_public_resolved(dict(BIRTH_LEFT), dict(BIRTH_RIGHT), env=CLOSED, local_lookup=store)) == ab_bytes
@@ -170,7 +170,7 @@ def test_local_miss_permitted_acquisition_returns_complete_chart(monkeypatch):
     assert dict(os.environ) == before
     ids = {payload["conjunction"]["left"]["person_uid"], payload["conjunction"]["right"]["person_uid"]}
     assert ids == {_birth_key(BIRTH_LEFT), _birth_key(BIRTH_RIGHT)}
-    assert payload["conjunction"]["compat"]["schema"] == "magic10_compat_result.v1"
+    assert payload["conjunction"]["compat"]["schema"] == "magic10_compat_result.v2"
     assert seed_left != seed_right
 
 

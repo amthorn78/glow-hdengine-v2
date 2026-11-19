@@ -25,7 +25,9 @@ calculation passes one bundle to both), and ``rhu`` does not check its
 arguments, because every caller in the package has ``N >= 0`` and ``D > 0`` by
 construction.
 
-Not reachable from production until the switch (HDE-EPIC043 WU-PR-09).
+Reached from production since the switch (HDE-EPIC043 WU-PR-09), through the
+engine core; its last top-level statement records passive execution provenance
+for release admission.
 """
 from __future__ import annotations
 
@@ -33,7 +35,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from engine.config.magic10_v2_loader import Magic10V2Bundle
-from engine.config.registry_loader import SchemaValidationError
+from engine.config.registry_loader import SchemaValidationError, _capture_module_execution
 from engine.magic10_v2.kernel import CHANNEL_STATES, KernelResult
 
 # HDE Math Spec §5.2.11, "Integer arithmetic": signals and components are per-mille.
@@ -207,3 +209,7 @@ def _signal_value(row: _SignalRow, states: Mapping, saturation: int) -> int:
         if state in _MUTUAL_STATES:
             mutual += weight
     return 0 if filled == 0 else rhu(PER_MILLE * mutual, filled)
+
+
+# HDE-EPIC043 WU-PR-09: passive provenance for release admission (last top-level statement).
+_MODULE_EXECUTION = _capture_module_execution(globals())

@@ -39,7 +39,7 @@ def _assert_mode_0600(path: pathlib.Path) -> None:
     assert mode == 0o600
 
 
-def test_file_inputs_and_admin_dumps(tmp_path: pathlib.Path, capsys):
+def test_file_inputs_and_admin_dumps(tmp_path: pathlib.Path, capsys, bundle):
     left = complete_chart(UUID_A, GATES_A)
     right = complete_chart(UUID_B, GATES_B)
     pair_path = tmp_path / "pair.json"
@@ -83,11 +83,19 @@ def test_file_inputs_and_admin_dumps(tmp_path: pathlib.Path, capsys):
         assert _sha256(json_path) == sha_path.read_text(encoding="utf-8").strip()
 
     proof = json.loads((admin_dir / "pair.compat.proof.json").read_text(encoding="utf-8"))
-    assert proof["schema"] == "magic10_compat_result.v1"
+    assert proof["schema"] == "magic10_compat_result.v2"
     assert proof["categories"] == result["categories"]
     assert proof["signals"] == result["signals"]
     assert proof["pair_key"] == result["pair_key"] and proof["release_id"] == result["release_id"]
-    assert proof["thresholds"]["edges"] == [24, 49, 74, 100]
+    # HDE-EPIC043 WU-PR-09: the admitted release's per-category v2 maxima, in catalog order.
+    assert proof["thresholds"] == {
+        "bands": ["Cool", "Open", "Warm", "Glow"],
+        "categories": [
+            {"category_id": category, "maxima": list(bundle.magic10_v2.maxima[category])}
+            for category in bundle.registry.magic10_order
+        ],
+    }
+    assert all(row["maxima"][-1] == 100 and len(row["maxima"]) == 4 for row in proof["thresholds"]["categories"])
     assert "constants" not in proof and "overall" not in proof
 
     composite = json.loads((admin_dir / "pair.composite.bodygraph.json").read_text(encoding="utf-8"))

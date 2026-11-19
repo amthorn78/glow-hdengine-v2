@@ -386,6 +386,8 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/http/test_reader_a7_transport.py",
     "tests/http/test_reader_post_v1.py",
     "tests/http/test_reader_post_v2.py",
+    # HDE-EPIC043 WU-PR-09: the switch posts to the Reader route over a candidate root.
+    "tests/m10_v2/test_switch.py",
     "tests/runtime/test_emit_public_legacy_helper.py",
     "tests/runtime/test_identity.py",
     "tests/transport/test_aux_narrative.py",
@@ -427,6 +429,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/core/test_engine_core_abba.py",
         "tests/core/test_engine_core_determinism.py",
         _SCORE_DISTRIBUTION_OWNER_TEST,
+        # HDE-EPIC043 WU-PR-09: the switch (HDE-CONJ010.4, HDE-CONJ010.5).
+        "tests/m10_v2/test_switch.py",
     ),
     "engine/core/__init__.py": (
         "tests/core/test_engine_core_purity.py",
@@ -509,6 +513,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/config/test_magic10_v2_loader.py",
         "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
         _SCORE_DISTRIBUTION_OWNER_TEST,
+        # HDE-EPIC043 WU-PR-09: the switch (HDE-CONJ010.4, HDE-CONJ010.5).
+        "tests/m10_v2/test_switch.py",
     ),
     "engine/config/magic10_v2_loader.py": (
         "tests/config/test_magic10_v2_loader.py",
@@ -586,6 +592,13 @@ _PRODUCT_TEST_OWNER_PATHS = {
         _SCORE_DISTRIBUTION_OWNER_TEST,
         # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
         "tests/m10_v2/test_family_surface.py",
+        # HDE-EPIC043 WU-PR-09: the switch (HDE-CONJ010.4, HDE-CONJ010.5).
+        "tests/m10_v2/test_switch.py",
+    ),
+    # HDE-EPIC043 WU-PR-09: the sampler fallback removal (HDE-CONJ010.5).
+    "engine/sampler/core.py": (
+        "tests/unit/test_sampler_core.py",
+        "tests/adapter/test_dev_sampler_http.py",
     ),
     "engine/bodygraph/resolver.py": (
         "tests/bodygraph/test_resolve_compat_chart.py",
@@ -635,6 +648,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/qa/test_cli_admin_parity.py",
         # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
         "tests/m10_v2/test_family_surface.py",
+        # HDE-EPIC043 WU-PR-09: the switch (HDE-CONJ010.4, HDE-CONJ010.5).
+        "tests/m10_v2/test_switch.py",
     ),
     "engine/http/compat_handler.py": (
         "tests/http/test_compat_endpoint_contract.py",
@@ -643,6 +658,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/adapter/test_compat_writer_transport.py",
         # HDE-EPIC043 WU-PR-04: the v2 proof family (HDE-DIST008.1).
         "tests/m10_v2/test_family_surface.py",
+        # HDE-EPIC043 WU-PR-09: the switch (HDE-CONJ010.4, HDE-CONJ010.5).
+        "tests/m10_v2/test_switch.py",
     ),
     "presenter/reader_v1/emitter.py": (
         "tests/reader_v1/test_goldens.py",
@@ -806,6 +823,10 @@ _PRODUCT_TEST_OWNER_PREFIXES = (
 _EVIDENCE_GENERATOR_TEST_OWNERS = {
     "tools/evidence/generate_engine_core_evidence.py": (
         "tests/evidence/test_engine_core_evidence.py",
+    ),
+    # HDE-EPIC043 WU-PR-09: frozen history; the owner test pins the frozen bytes.
+    "tools/evidence/generate_epic030_pr04_band_thresholds_evidence.py": (
+        "tests/evidence/test_epic030_pr04_band_thresholds_evidence.py",
     ),
     "tools/evidence/generate_arrays_as_sets_report.py": (
         "tests/compare/test_arrays_as_sets.py",
@@ -1146,7 +1167,9 @@ _TEST_SUPPORT_OWNER_PATHS = {
         "tests/config/test_config_artifacts.py",
     ),
     # HDE-EPIC043 WU-PR-04: the v2 goldens (M10-G001 only) are consumed by the family's goldens test.
+    # HDE-EPIC043 WU-PR-09: they are also the golden comparator's default input.
     "tests/fixtures/magic10/v2/goldens.json": (
+        "tests/config/test_config_artifacts.py",
         "tests/m10_v2/test_family_goldens.py",
     ),
     "tests/fixtures/magic10_v2/LABEL.txt": ("tests/config/test_magic10_v2_contracts.py",),

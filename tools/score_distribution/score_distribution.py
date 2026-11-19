@@ -60,7 +60,7 @@ from engine.config.registry_loader import (  # noqa: E402
 )
 from engine.db import DBAccess  # noqa: E402
 from engine.db.errors import AdapterError  # noqa: E402
-from engine.magic10.composite import _classify_channels  # noqa: E402
+from engine.magic10_v2.kernel import compute_kernel  # noqa: E402
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, expected_env  # noqa: E402
 from engine.serializer.canon import sercanon  # noqa: E402
 
@@ -334,7 +334,6 @@ def admit() -> AdmittedMechanicsBundle:
 def score_pairs(bundle: AdmittedMechanicsBundle, parties: Sequence[EvaluationParty],
                 pairs: Sequence[Sequence[int]]) -> Distribution:
     distribution = Distribution(bundle)
-    channels = bundle.registry.channels
 
     def provider() -> AdmittedMechanicsBundle:
         return bundle
@@ -347,7 +346,9 @@ def score_pairs(bundle: AdmittedMechanicsBundle, parties: Sequence[EvaluationPar
             raise Refusal(f"{SCORING_FAILED}:{exc.token}") from None
         if result.get("eligible") is False:
             raise Refusal(f"{SCORING_FAILED}:ineligible_self")
-        formed = sum(1 for row in _classify_channels(left.gates.mask, right.gates.mask, channels)
+        # Channels formed per pair: a Channel in any non-``none`` state of the v2
+        # kernel, the statistic's unchanged definition (HDE-EPIC043 WU-PR-09).
+        formed = sum(1 for row in compute_kernel(left.gates.mask, right.gates.mask, bundle.magic10_v2).channels
                      if row.state != "none")
         distribution.add(result, formed)
     return distribution

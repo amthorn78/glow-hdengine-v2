@@ -19,7 +19,7 @@ from tests.support.pr04_fixtures import (
     inject_seams,
 )
 
-SCHEMA = json.loads(Path("schemas/magic10_compat_result_v1.schema.json").read_text(encoding="utf-8"))
+SCHEMA = json.loads(Path("schemas/magic10_compat_result_v2.schema.json").read_text(encoding="utf-8"))
 
 
 def _client():
@@ -75,6 +75,6 @@ def test_internal_compat_ab_ba_parity_is_canonical_bytes_identical(monkeypatch, 
     # The switched handler emits the canonical magic10 compat result, not the
     # legacy ``{categories, keys, meta}`` envelope; bind the shape to its schema.
     assert set(ab_payload) == {"schema", "config_id", "release_id", "pair_key", "signals", "categories"}
-    assert ab_payload["schema"] == "magic10_compat_result.v1"
+    assert ab_payload["schema"] == "magic10_compat_result.v2"
     jsonschema.validate(instance=ab_payload, schema=SCHEMA)
     jsonschema.validate(instance=ba_payload, schema=SCHEMA)

@@ -12,6 +12,7 @@ from adapter import wsgi as _wsgi
 from adapter.http_reader import create_app
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.http import compat_handler as _compat_handler
+from engine.magic10_v2.calculation import assign_band
 from tests.support.pr04_fixtures import GATES_A, GATES_B, UUID_A, UUID_B, build_bundle, build_pack, complete_chart, inject_seams
 
 
@@ -68,9 +69,13 @@ def test_dev_compat_minimal_valid_payload_success_behavior(bundle):
     body_bytes = resp.data
     assert body_bytes.endswith(b"\n")
     data = json.loads(body_bytes.decode("utf-8"))
-    assert data["schema"] == "magic10_compat_result.v1"
+    assert data["schema"] == "magic10_compat_result.v2"
     assert data["release_id"] == bundle.release_id
+    assert data["config_id"] == bundle.mechanics["config_id"]
     assert "meta" not in data and "keys" not in data
+    assert all(type(row["q"]) is int and 0 <= row["q"] <= 1000 for row in data["signals"])
+    for row in data["categories"]:
+        assert row["band"] == assign_band(row["score"], bundle.magic10_v2.maxima[row["category_id"]])
 
 
 # --- HDE-CRD-0003 S03: the compat namespace's dev/admin gate (step 2)
@@ -194,7 +199,7 @@ def test_s03_compat_namespace_admits_exact_dev_test_local(monkeypatch, compat_sp
     assert descendant.status_code == 404 and descendant.get_json()["code"] == "ERR_NOT_FOUND"
     result = client.post("/api/compat/v1", json=_minimal_payload())
     assert result.status_code == 200
-    assert result.get_json()["schema"] == "magic10_compat_result.v1"
+    assert result.get_json()["schema"] == "magic10_compat_result.v2"
     assert compat_spies["resolve"] == 2 and compat_spies["evaluate"] == 1
     # The stored-id path reaches the governed database seam (no database is configured here).
     client.post("/api/compat/v1", json=_stored_payload())

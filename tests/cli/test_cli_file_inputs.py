@@ -70,7 +70,7 @@ def test_pair_file_and_ab_file_modes(tmp_path: pathlib.Path, capsys):
         out = captured.out
         assert out.endswith("\n") and "\n\n" not in out
         obj = json.loads(out)
-        assert obj["schema"] == "magic10_compat_result.v1"
+        assert obj["schema"] == "magic10_compat_result.v2"
         assert isinstance(obj["categories"], list) and len(obj["categories"]) == 10
         assert not any(key in obj for key in ("a", "b", "viewer_prefs", "compat", "meta"))
         outputs.append(out)

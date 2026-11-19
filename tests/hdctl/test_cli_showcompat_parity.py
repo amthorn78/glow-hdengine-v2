@@ -22,6 +22,6 @@ def test_ab_ba_parity_bytes_identical(tmp_path: Path):
     assert err1 == err2 == b""
     assert out1.endswith(b"\n") and out2.endswith(b"\n")
     assert out1 == out2
-    # PF05 §4.1.3: stdout is the canonical magic10_compat_result.v1 document
+    # PF05 §4.1.3: stdout is the canonical magic10_compat_result.v2 document
     obj = json.loads(out1)
-    assert obj["schema"] == "magic10_compat_result.v1" and "categories" in obj
+    assert obj["schema"] == "magic10_compat_result.v2" and "categories" in obj

@@ -31,7 +31,8 @@ Stated limits:
 * Importing this module reads no file. The first Reader projection imports
   ``engine.runtime.public``, which reads the packaged manifest at import.
 
-Not reachable from production until the switch (HDE-EPIC043 WU-PR-09).
+Reached from production since the switch (HDE-EPIC043 WU-PR-09), through
+``engine/compat/compute.py``.
 """
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Fail-closed Magic-10 v2 loader and v2 configuration identity (inactive).
+"""Fail-closed Magic-10 v2 loader and v2 configuration identity.
 
 HDE-EPIC042 WU-PR-03; HDE Build Checklist — Separation, HDE-SEPA007.3 and
 HDE-SEPA007.4. The loader admits the complete Magic-10 v2 bundle from a
@@ -10,9 +10,11 @@ v2 loader closure of HDE Schemas and Artifacts §2.9 and HDE Math Spec §5.2.11:
 the v1 rules v2 keeps, the four relaxed rules, the added rules, and the pinned
 v2.0.0 content (the analogue of the v1 ``_validate_initial_mechanics``).
 
-Nothing on the v1 path imports this module, and Magic-10 v1 stays the one
-active configuration until the v2 cutover release (C-03). Before the cut the
-governed configuration ``catalog/magic10_mechanics_v2.json`` and the v2
+Since the switch (HDE-EPIC043 WU-PR-09), release admission
+(``load_active_mechanics_bundle``) admits the release's one mechanics
+configuration through this loader, and no repository root admits until the v2
+cutover release cuts the manifest (C-03). Before the cut the governed
+configuration ``catalog/magic10_mechanics_v2.json`` and the v2
 thresholds do not exist; tests admit labelled non-canon fixtures from temporary
 roots, and an identity computed over them proves the procedure only. The new
 ``release_id``, the manifest cut and activation belong to HDE-DIST008.2 and
@@ -51,6 +53,7 @@ from engine.config.registry_loader import (
     _parse_manifest,
     _reject_schema_retrieval,
     _schema_references,
+    _capture_module_execution,
     _validate_release_schema_document,
 )
 from engine.serializer import canon
@@ -370,7 +373,18 @@ def load_magic10_v2_bundle_from_root(root: Path | str, manifest_rows: Sequence[M
     ``SchemaValidationError`` with a stable code.
     """
     # C0: one capture; every file is read once and verified again at the end.
-    capture = _LocalCapture(Path(root))
+    return _magic10_v2_bundle_from_capture(_LocalCapture(Path(root)), manifest_rows, verify=True)
+
+
+def _magic10_v2_bundle_from_capture(
+    capture: _LocalCapture, manifest_rows: Sequence[ManifestEntry], *, verify: bool
+) -> Magic10V2Bundle:
+    """C1 to C12 over one capture.
+
+    HDE-EPIC043 WU-PR-09: release admission passes its own capture, so every file
+    the v2 rules read is the byte sequence admission captured and binds, read once;
+    admission's final verification then covers them, and ``verify`` is false.
+    """
     # C1: the release selects exactly one mechanics configuration, the v2 one.
     config_row = _check_manifest_rows(manifest_rows)
     # C2: the configuration's bytes match the manifest row.
@@ -431,7 +445,8 @@ def load_magic10_v2_bundle_from_root(root: Path | str, manifest_rows: Sequence[M
     for path in _RESULT_SCHEMA_PATHS:
         _validate_release_schema_document(capture, path, expected_draft=_DRAFT_2020_12, expected_identity=path)
     # C12: nothing changed during capture; freeze and identify.
-    capture.verify_unchanged()
+    if verify:
+        capture.verify_unchanged()
     identities = tuple(sorted(
         (
             SourceIdentity(path, capture.sources[path].sha256, capture.sources[path].size_bytes)
@@ -451,3 +466,7 @@ def load_magic10_v2_bundle_from_root(root: Path | str, manifest_rows: Sequence[M
         source_identities=identities,
         source_bundle_sha256=magic10_v2_source_bundle_sha256(identities),
     )
+
+
+# HDE-EPIC043 WU-PR-09: passive provenance for release admission (last top-level statement).
+_MODULE_EXECUTION = _capture_module_execution(globals())

@@ -72,7 +72,7 @@ def test_showcompat_stdout_is_canonical(monkeypatch, capsys):
     payload = _assert_canonical_bytes(stdout)
     assert stdout == emitter.emit_public(payload)
     assert set(payload) == {"schema", "config_id", "release_id", "pair_key", "signals", "categories"}
-    assert payload["schema"] == "magic10_compat_result.v1"
+    assert payload["schema"] == "magic10_compat_result.v2"
     assert len(payload["release_id"]) == 64
 
 

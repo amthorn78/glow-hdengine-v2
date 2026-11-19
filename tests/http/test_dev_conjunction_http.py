@@ -110,7 +110,7 @@ def test_dev_conjunction_endpoints_open_rails_success(monkeypatch, app_env):
         conjunction_payload = payload.get("result", payload)
         assert "conjunction" in conjunction_payload
         assert {conjunction_payload["conjunction"]["left"]["person_uid"], conjunction_payload["conjunction"]["right"]["person_uid"]} == expected
-        assert conjunction_payload["conjunction"]["compat"]["schema"] == "magic10_compat_result.v1"
+        assert conjunction_payload["conjunction"]["compat"]["schema"] == "magic10_compat_result.v2"
         assert "meta" not in conjunction_payload["conjunction"]["compat"]
     assert len(fetches) == 6
 
@@ -226,7 +226,7 @@ def test_dev_routes_serve_the_seam_under_closed_rails_with_the_admitted_identity
         conjunction_payload = payload.get("result", payload)
         assert {conjunction_payload["conjunction"]["left"]["person_uid"], conjunction_payload["conjunction"]["right"]["person_uid"]} == expected
         compat = conjunction_payload["conjunction"]["compat"]
-        assert compat["schema"] == "magic10_compat_result.v1"
+        assert compat["schema"] == "magic10_compat_result.v2"
         assert compat["release_id"] == bundle.release_id
         assert "meta" not in compat
     assert set(rows.lookups) == expected

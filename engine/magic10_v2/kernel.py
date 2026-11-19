@@ -22,7 +22,9 @@ v2 loader validated it, and applies no eligibility rule (HDE Math Spec §4 is
 applied upstream). Signals, components, scores, bands, ``pair_key`` and
 ``gives_lo`` / ``gives_hi`` are not computed here (HDE-CONJ010.2 and .3).
 
-Not reachable from production until the switch (HDE-EPIC043 WU-PR-09).
+Reached from production since the switch (HDE-EPIC043 WU-PR-09), through the
+engine core; its last top-level statement records passive execution provenance
+for release admission.
 """
 from __future__ import annotations
 
@@ -31,7 +33,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 
 from engine.config.magic10_v2_loader import Magic10V2Bundle
-from engine.config.registry_loader import SchemaValidationError
+from engine.config.registry_loader import SchemaValidationError, _capture_module_execution
 
 CHANNEL_STATES = ("none", "companionship", "dominance", "compromise", "electromagnetic")
 CENTER_OUTCOMES = ("open", "shared", "one_sided", "mutual")
@@ -312,3 +314,7 @@ def _outcome(in_lo: bool, in_hi: bool, in_union: bool) -> tuple[str, str | None]
     if in_hi:
         return "one_sided", "member_hi"
     return "mutual", None
+
+
+# HDE-EPIC043 WU-PR-09: passive provenance for release admission (last top-level statement).
+_MODULE_EXECUTION = _capture_module_execution(globals())

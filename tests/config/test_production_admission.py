@@ -15,11 +15,11 @@ from types import MappingProxyType
 
 import pytest
 
-from engine.config import registry_loader
+from engine.config import magic10_v2_loader, registry_loader
 from engine.core import core as pure_core
 from engine.runtime.identity import identity_meta
 from engine.serializer import canon
-from engine.magic10 import calculators, composite, signals
+from engine.magic10_v2 import calculation, kernel, signals
 from engine.config.registry_loader import (
     ADMITTED_RELEASE_BUILT_AT_UTC,
     ADMITTED_RELEASE_ROSTER,
@@ -34,40 +34,64 @@ from engine.config.registry_loader import (
 from tests.config.helpers import (
     closed_rails_env,
     synthetic_complete_release_root,
+    synthetic_v2_candidate_root,
+    v2_candidate_roster,
+    v2_candidate_roster_admission,
     write_canonical,
+    write_release_manifest,
     write_synthetic_release_manifest,
 )
 
 
+# HDE-EPIC043 WU-PR-09: the switched core executes the Magic10 v2 loader and the
+# v2 kernel, signals and calculation; the v1 scorers left the executing set.  With
+# the four admission owners (tests/config/test_execution_coherence.py) these five
+# make the nine-module executing-admission source set.
 MECHANICS_EXECUTION_PATHS = (
-    "engine/core/core.py", "engine/magic10/composite.py",
-    "engine/magic10/signals.py", "engine/magic10/calculators.py",
+    "engine/core/core.py", "engine/config/magic10_v2_loader.py",
+    "engine/magic10_v2/kernel.py", "engine/magic10_v2/signals.py", "engine/magic10_v2/calculation.py",
 )
-MECHANICS_OWNERS = dict(zip(MECHANICS_EXECUTION_PATHS, (pure_core, composite, signals, calculators)))
+MECHANICS_OWNERS = dict(zip(MECHANICS_EXECUTION_PATHS, (pure_core, magic10_v2_loader, kernel, signals, calculation)))
+V2_CANDIDATE_MEMBERS = 57
 
 
 @pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
-def test_pr03_r02_rehashed_different_mechanics_refuse(release_root: Path, path: str) -> None:
+def test_pr03_r02_rehashed_different_mechanics_refuse(candidate_root: Path, path: str) -> None:
+    release_root = candidate_root
     source = release_root / path
     raw = source.read_bytes()
-    if path == "engine/magic10/signals.py":
-        old = b"numerator += weight * responses[row.state]"
+    if path == "engine/magic10_v2/signals.py":
+        old = b"mutual += weight"
         assert raw.count(old) == 1
-        changed = raw.replace(old, b"numerator -= weight * responses[row.state]")
+        changed = raw.replace(old, b"mutual -= weight")
     else:
         changed = raw + b"raise RuntimeError('captured mechanics must never execute')\n"
     compile(changed, str(source), "exec")
     source.write_bytes(changed)
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     _expect_code(release_root, "EXECUTING_SOURCE_MISMATCH")
 
 
 @pytest.fixture
 def release_root(tmp_path: Path) -> Path:
+    # The 45-member v1 root no longer admits (UNBOUND_SOURCE); it serves only the
+    # refusals raised earlier in the admission order.
     return synthetic_complete_release_root(tmp_path)
 
 
-def test_execution_roster_preserves_four_accepted_owners_and_adds_exactly_four() -> None:
+@pytest.fixture
+def candidate_root(tmp_path: Path):
+    """The 57-member v2 candidate root, with the test-only roster route active for the test."""
+    root = synthetic_v2_candidate_root(tmp_path)
+    with v2_candidate_roster_admission():
+        yield root
+
+
+def _rewrite_candidate_manifest(root: Path) -> None:
+    write_release_manifest(root, v2_candidate_roster())
+
+
+def test_execution_roster_preserves_four_accepted_owners_and_adds_exactly_five() -> None:
     root, executions = registry_loader._admission_execution_provenance()
     assert root == Path(__file__).resolve().parents[2]
     assert tuple(path for path, _, _ in executions) == (
@@ -89,8 +113,9 @@ def test_execution_roster_preserves_four_accepted_owners_and_adds_exactly_four()
     ("live_origin", "UNSAFE_SOURCE_PATH"),
 ])
 def test_mechanics_provenance_refuses_before_admission(
-    release_root: Path, monkeypatch, path: str, defect: str, expected: str,
+    candidate_root: Path, monkeypatch, path: str, defect: str, expected: str,
 ) -> None:
+    release_root = candidate_root
     owner = MECHANICS_OWNERS[path]
     provenance = list(owner._MODULE_EXECUTION)
     if defect == "missing":
@@ -123,15 +148,16 @@ def test_mechanics_provenance_refuses_before_admission(
 
 @pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
 def test_mechanics_same_executable_different_bytes_preserve_math_not_release_identity(
-    release_root: Path, path: str,
+    candidate_root: Path, path: str,
 ) -> None:
     from engine.bodygraph.gates import normalize_gates
     from engine.serializer.canon import sercanon
 
+    release_root = candidate_root
     before = _load_active_mechanics_bundle_from_root(release_root)
     source = release_root / path
     source.write_bytes(source.read_bytes() + b"# Nonexecuting trailing comment.\n")
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     after = _load_active_mechanics_bundle_from_root(release_root)
     a = normalize_gates([5, 19, 20, 34, 43, 49])
     b = normalize_gates([9, 12, 15, 22, 23, 52])
@@ -140,13 +166,16 @@ def test_mechanics_same_executable_different_bytes_preserve_math_not_release_ide
     assert old.signals == new.signals and old.categories == new.categories
     assert old.config_id == new.config_id
     assert old.release_id != new.release_id and old.pair_key != new.pair_key
-    assert sercanon(new.to_payload()) == sercanon(
-        pure_core.compute_core(b, a, after, after.release_id).to_payload(),
+    assert sercanon(new.as_payload()) == sercanon(
+        pure_core.compute_core(b, a, after, after.release_id).as_payload(),
     )
 
 
 @pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
-def test_mechanics_uncaptured_source_has_no_fallback_read(release_root: Path, monkeypatch, path: str) -> None:
+def test_mechanics_uncaptured_source_has_no_fallback_read(candidate_root: Path, monkeypatch, path: str) -> None:
+    # On the v2 candidate root (which otherwise admits); the v1 root refuses
+    # UNBOUND_SOURCE whether or not the source is omitted.
+    release_root = candidate_root
     original = registry_loader._validate_executing_admission_sources
 
     def omit_source(capture, executions):
@@ -158,17 +187,18 @@ def test_mechanics_uncaptured_source_has_no_fallback_read(release_root: Path, mo
 
 
 @pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
-def test_mechanics_capture_that_parses_but_cannot_compile_refuses(release_root: Path, path: str) -> None:
+def test_mechanics_capture_that_parses_but_cannot_compile_refuses(candidate_root: Path, path: str) -> None:
     # ast.parse accepts this module-level statement; passive compile must refuse.
-    (release_root / path).write_bytes(b"return\n")
-    write_synthetic_release_manifest(release_root)
-    _expect_code(release_root, "EXECUTION_COMPILATION_FAILED")
+    (candidate_root / path).write_bytes(b"return\n")
+    _rewrite_candidate_manifest(candidate_root)
+    _expect_code(candidate_root, "EXECUTION_COMPILATION_FAILED")
 
 
 @pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
 def test_mechanics_changed_after_capture_is_not_reread_or_executed(
-    release_root: Path, monkeypatch, path: str,
+    candidate_root: Path, monkeypatch, path: str,
 ) -> None:
+    release_root = candidate_root
     original = registry_loader._read_captured_file
     changed = False
 
@@ -190,8 +220,10 @@ def _isolated_mechanics_script(root: Path, script: str, *, optimization: int = 0
     for package in ("engine", "engine/config", "engine/serializer", "engine/stable", "engine/categories"):
         (root / package / "__init__.py").write_bytes(b"")
     options = ["-I"] + (["-" + "O" * optimization] if optimization else [])
+    # argv[2] carries the v2 candidate roster: the isolated child cannot import
+    # tests/config/helpers.py, so _MECHANICS_ADMIT_SCRIPT repeats its roster swap.
     result = subprocess.run(
-        [sys.executable, *options, "-c", script, str(root)], cwd=root,
+        [sys.executable, *options, "-c", script, str(root), json.dumps(v2_candidate_roster())], cwd=root,
         env=closed_rails_env(), text=True, capture_output=True, timeout=30,
     )
     assert result.returncode == 0, result.stderr
@@ -206,6 +238,7 @@ root = Path(sys.argv[1])
 sys.path.insert(0, str(root))
 """
 _MECHANICS_ADMIT_SCRIPT = """
+loader.ADMITTED_RELEASE_ROSTER = tuple(json.loads(sys.argv[2]))
 try:
     bundle = loader.load_active_mechanics_bundle()
 except loader.RegistryConfigError as exc:
@@ -218,22 +251,24 @@ else:
 @pytest.mark.parametrize("first", ["loader", "core"])
 @pytest.mark.parametrize("optimization", [0, 1, 2])
 def test_mechanics_fresh_startup_and_optimization_semantics(
-    release_root: Path, first: str, optimization: int,
+    candidate_root: Path, first: str, optimization: int,
 ) -> None:
+    release_root = candidate_root
     script = _MECHANICS_IMPORT_SCRIPT
     if first == "core":
         script += "from engine.core import core\n"
     script += "from engine.config import registry_loader as loader\n"
     script += _MECHANICS_ADMIT_SCRIPT + "print(json.dumps(result))\n"
     assert _isolated_mechanics_script(release_root, script, optimization=optimization) == {
-        "state": "admitted", "members": 45,
+        "state": "admitted", "members": V2_CANDIDATE_MEMBERS,
     }
 
 
 @pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
 def test_mechanics_timestamp_valid_stale_bytecode_refuses_and_fresh_source_admits(
-    release_root: Path, path: str,
+    candidate_root: Path, path: str,
 ) -> None:
+    release_root = candidate_root
     source = release_root / path
     raw_a = source.read_bytes() + b"\ndef _r02_behavior():\n    return 'A'\n"
     source.write_bytes(raw_a)
@@ -245,7 +280,7 @@ def test_mechanics_timestamp_valid_stale_bytecode_refuses_and_fresh_source_admit
     assert raw_a != raw_b and len(raw_a) == len(raw_b)
     source.write_bytes(raw_b)
     os.utime(source, ns=(before.st_atime_ns, before.st_mtime_ns))
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     script = _MECHANICS_IMPORT_SCRIPT + "from engine.config import registry_loader as loader\n"
     script += _MECHANICS_ADMIT_SCRIPT
     name = path.removesuffix(".py").replace("/", ".")
@@ -255,21 +290,24 @@ def test_mechanics_timestamp_valid_stale_bytecode_refuses_and_fresh_source_admit
     }
     cached.unlink()
     assert _isolated_mechanics_script(release_root, script) == {
-        "state": "admitted", "members": 45, "behavior": "B",
+        "state": "admitted", "members": V2_CANDIDATE_MEMBERS, "behavior": "B",
     }
 
 
 @pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
 def test_mechanics_unavailable_import_frame_fails_closed_without_breaking_candidates(
-    release_root: Path, path: str,
+    candidate_root: Path, path: str,
 ) -> None:
+    release_root = candidate_root
     name = path.removesuffix(".py").replace("/", ".")
+    # engine.core.core reads its own frame (depth 0); the v2 loader and the v2
+    # modules record theirs through registry_loader._capture_module_execution (depth 1).
     script = _MECHANICS_IMPORT_SCRIPT + f"""
 from engine.config import registry_loader as loader
 original_frame = sys._getframe
 def unavailable_frame(depth=0):
     frame = original_frame(depth + 1)
-    if depth == 0 and frame.f_code.co_name == '<module>' and frame.f_globals.get('__name__') == {name!r}:
+    if frame.f_code.co_name == '<module>' and frame.f_globals.get('__name__') == {name!r}:
         raise RuntimeError('frame provenance unavailable')
     return frame
 sys._getframe = unavailable_frame
@@ -285,8 +323,9 @@ assert len(loader.load_registry_config(root).gates) == 64
 
 @pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
 def test_mechanics_origin_cannot_come_from_a_different_installation(
-    release_root: Path, monkeypatch, path: str,
+    candidate_root: Path, monkeypatch, path: str,
 ) -> None:
+    release_root = candidate_root
     owner = MECHANICS_OWNERS[path]
     provenance = list(owner._MODULE_EXECUTION)
     filename = str(release_root / path)
@@ -312,12 +351,17 @@ def _expect_code(root: Path, code: str) -> None:
     assert caught.value.code == code
 
 
-def test_synthetic_complete_release_is_labeled_and_admits_exact_identities(release_root: Path) -> None:
+def test_synthetic_complete_release_is_labeled_and_admits_exact_identities(candidate_root: Path) -> None:
+    # HDE-EPIC043 WU-PR-09: the switched admission admits the labelled v2 candidate
+    # release through the test-only roster route; the production roster constant
+    # keeps its 45-path v1 value until the cut (WU-PR-10).
+    release_root = candidate_root
     bundle = _load_active_mechanics_bundle_from_root(release_root)
     manifest_raw = (release_root / "catalog/manifest.json").read_bytes()
-    mechanics_raw = (release_root / "catalog/magic10_mechanics_v1.json").read_bytes()
+    mechanics_raw = (release_root / "catalog/magic10_mechanics_v2.json").read_bytes()
+    roster = v2_candidate_roster()
 
-    assert "synthetic-complete-release-only" in release_root.name
+    assert "synthetic-v2-candidate-only" in release_root.name
     assert isinstance(bundle, AdmittedMechanicsBundle)
     assert bundle.manifest.version == ADMITTED_RELEASE_VERSION
     assert bundle.manifest.built_at_utc == ADMITTED_RELEASE_BUILT_AT_UTC
@@ -326,8 +370,12 @@ def test_synthetic_complete_release_is_labeled_and_admits_exact_identities(relea
     assert "schemas/reader.v2.schema.json" in ADMITTED_RELEASE_ROSTER
     assert "engine/stable/sercanon.py" in ADMITTED_RELEASE_ROSTER
     assert "engine/categories/registry.py" in ADMITTED_RELEASE_ROSTER
-    assert tuple(row.path for row in bundle.manifest.files) == ADMITTED_RELEASE_ROSTER
-    assert tuple(row.path for row in bundle.source_identities) == ADMITTED_RELEASE_ROSTER
+    assert len(roster) == V2_CANDIDATE_MEMBERS
+    assert "catalog/magic10_mechanics_v1.json" not in roster
+    assert {"catalog/magic10_mechanics_v2.json", *MECHANICS_EXECUTION_PATHS} <= set(roster)
+    assert tuple(row.path for row in bundle.manifest.files) == roster
+    assert tuple(row.path for row in bundle.source_identities) == roster
+    assert bundle.mechanics["config_id"] == "m10-relevance-centers-type-v2.0.0"
     assert bundle.config_sha256 == hashlib.sha256(mechanics_raw).hexdigest()
     assert bundle.manifest_sha256 == hashlib.sha256(manifest_raw).hexdigest()
     assert bundle.release_id == bundle.manifest_sha256
@@ -396,8 +444,11 @@ def test_baseline_partial_manifest_still_refuses(release_root: Path) -> None:
 
 
 def test_candidate_apis_do_not_return_release_bearing_handles() -> None:
+    # HDE-EPIC043 WU-PR-09: the v1 candidate validator moved to the config tool.
+    from tools.config.generate_config_artifacts import _capture_mechanics_config
+
     root = Path(__file__).resolve().parents[2]
-    candidate = registry_loader._capture_mechanics_config(root)
+    candidate = _capture_mechanics_config(root)
     registry = registry_loader.load_registry_config(root)
     assert not isinstance(candidate, AdmittedMechanicsBundle)
     assert not hasattr(candidate, "release_id")
@@ -444,7 +495,8 @@ def test_public_admission_refuses_file_only_root_substitution(
     assert caught.value.code == "UNSAFE_SOURCE_PATH"
 
 
-def test_source_changed_after_its_verification_read_is_refused(release_root: Path, monkeypatch) -> None:
+def test_source_changed_after_its_verification_read_is_refused(candidate_root: Path, monkeypatch) -> None:
+    release_root = candidate_root
     original = registry_loader._read_captured_file
     reads = 0
     target = "adapter/http_reader.py"
@@ -466,8 +518,9 @@ def test_source_changed_after_its_verification_read_is_refused(release_root: Pat
 
 
 def test_packaged_manifest_is_physically_read_once_per_admission(
-    release_root: Path, monkeypatch
+    candidate_root: Path, monkeypatch
 ) -> None:
+    release_root = candidate_root
     original = registry_loader._read_captured_file
     reads = 0
 
@@ -701,33 +754,38 @@ def test_selected_root_itself_cannot_be_a_symlink(tmp_path: Path) -> None:
 
 
 def test_two_valid_roots_never_cross_read(tmp_path: Path) -> None:
-    first_root = synthetic_complete_release_root(tmp_path / "first")
-    second_root = synthetic_complete_release_root(tmp_path / "second")
-    second_member = second_root / "engine/magic10/signals.py"
+    # HDE-EPIC043 WU-PR-09: two v2 candidate roots (test-only roster route); the
+    # distinct member is the executing v2 signal module.
+    member = "engine/magic10_v2/signals.py"
+    first_root = synthetic_v2_candidate_root(tmp_path / "first")
+    second_root = synthetic_v2_candidate_root(tmp_path / "second")
+    second_member = second_root / member
     second_member.write_bytes(second_member.read_bytes() + b"# Distinct bytes; equivalent executable.\n")
-    write_synthetic_release_manifest(second_root)
+    _rewrite_candidate_manifest(second_root)
 
-    first = _load_active_mechanics_bundle_from_root(first_root)
-    second = _load_active_mechanics_bundle_from_root(second_root)
+    with v2_candidate_roster_admission():
+        first = _load_active_mechanics_bundle_from_root(first_root)
+        second = _load_active_mechanics_bundle_from_root(second_root)
     assert first.config_sha256 == second.config_sha256
     assert first.manifest_sha256 != second.manifest_sha256
-    first_signals = next(row for row in first.source_identities if row.path == "engine/magic10/signals.py")
-    second_signals = next(row for row in second.source_identities if row.path == "engine/magic10/signals.py")
+    first_signals = next(row for row in first.source_identities if row.path == member)
+    second_signals = next(row for row in second.source_identities if row.path == member)
     assert first_signals.sha256 != second_signals.sha256
 
 
-def test_schema_identity_remote_reference_and_relation_fail_closed(release_root: Path) -> None:
+def test_schema_identity_remote_reference_and_relation_fail_closed(candidate_root: Path) -> None:
+    release_root = candidate_root
     schema_path = release_root / "schemas/reader.v1.schema.json"
     schema = json.loads(schema_path.read_bytes())
     schema["$id"] = "https://example.invalid/changed"
     write_canonical(schema_path, schema)
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     _expect_code(release_root, "SCHEMA_IDENTITY_MISMATCH")
 
     schema["$id"] = "https://example.org/schemas/reader.v1.schema.json"
     schema["$defs"]["category"]["$ref"] = "https://example.invalid/remote.json"
     write_canonical(schema_path, schema)
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     _expect_code(release_root, "NONLOCAL_SCHEMA_REFERENCE")
 
     schema = json.loads((Path(__file__).resolve().parents[2] / "schemas/reader.v1.schema.json").read_bytes())
@@ -736,11 +794,12 @@ def test_schema_identity_remote_reference_and_relation_fail_closed(release_root:
     gates = json.loads(gates_path.read_bytes())
     gates["gates"][0]["center"] = "head"
     write_canonical(gates_path, gates)
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     _expect_code(release_root, "GATE_CENTER_COUNTS_MISMATCH")
 
 
-def test_manifest_bound_gate_schema_is_executed(release_root: Path) -> None:
+def test_manifest_bound_gate_schema_is_executed(candidate_root: Path) -> None:
+    release_root = candidate_root
     schema_path = release_root / "schemas/gates_v1.schema.json"
     write_canonical(
         schema_path,
@@ -750,53 +809,60 @@ def test_manifest_bound_gate_schema_is_executed(release_root: Path) -> None:
             "not": {},
         },
     )
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     _expect_code(release_root, "SCHEMA_VALIDATION_FAILED")
 
 
 def test_gate_schema_remote_reference_and_source_change_fail_closed(
-    release_root: Path, monkeypatch
+    candidate_root: Path, monkeypatch
 ) -> None:
+    release_root = candidate_root
     schema_path = release_root / "schemas/gates_v1.schema.json"
     schema = json.loads(schema_path.read_bytes())
     schema["$ref"] = "https://example.invalid/gates.json"
     write_canonical(schema_path, schema)
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     _expect_code(release_root, "NONLOCAL_SCHEMA_REFERENCE")
 
     source_schema = Path(__file__).resolve().parents[2] / "schemas/gates_v1.schema.json"
     schema_path.write_bytes(source_schema.read_bytes())
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     original = registry_loader._read_captured_file
     reads = 0
+    # Admission captures the member (read 1) and its final verification reads it
+    # again (read 2); the v2 loader shares admission's capture (HDE-EPIC043 WU-PR-09).
+    verification_read = 2
 
     def change_gate_schema_on_verify(root, relative_path):
         nonlocal reads
         result = original(root, relative_path)
         if relative_path == "schemas/gates_v1.schema.json":
             reads += 1
-            if reads == 2:
+            if reads == verification_read:
                 (root / relative_path).write_bytes(b"{}\n")
         return result
 
     monkeypatch.setattr(registry_loader, "_read_captured_file", change_gate_schema_on_verify)
     _expect_code(release_root, "SOURCE_CHANGED")
-    assert reads == 2
+    assert reads == verification_read
 
 
-def test_mechanics_defaults_and_source_bindings_remain_closed(release_root: Path) -> None:
-    path = release_root / "catalog/magic10_mechanics_v1.json"
+def test_mechanics_defaults_and_source_bindings_remain_closed(candidate_root: Path) -> None:
+    # HDE-EPIC043 WU-PR-09: the release's mechanics configuration is the v2 one,
+    # admitted through the v2 loader's rules (the v1 initial-mechanics pins retired).
+    release_root = candidate_root
+    path = release_root / "catalog/magic10_mechanics_v2.json"
     mechanics = json.loads(path.read_bytes())
     mechanics["config_id"] = "unapproved-config"
     write_canonical(path, mechanics)
-    write_synthetic_release_manifest(release_root)
-    _expect_code(release_root, "INITIAL_CONFIG_ID_MISMATCH")
+    _rewrite_candidate_manifest(release_root)
+    _expect_code(release_root, "M10V2_PINNED_CONTENT_MISMATCH")
 
-    mechanics["config_id"] = "m10-channel-state-v1.0.0"
+    mechanics["config_id"] = "m10-relevance-centers-type-v2.0.0"
     mechanics["sources"]["caps"]["sha256"] = "0" * 64
     write_canonical(path, mechanics)
-    write_synthetic_release_manifest(release_root)
-    _expect_code(release_root, "MECHANICS_SOURCE_MISMATCH")
+    _rewrite_candidate_manifest(release_root)
+    _expect_code(release_root, "M10V2_SOURCE_MISMATCH")
 
 
 @pytest.mark.parametrize(
@@ -808,27 +874,30 @@ def test_mechanics_defaults_and_source_bindings_remain_closed(release_root: Path
     ],
 )
 def test_result_schema_references_must_resolve_without_constructing_a_result(
-    release_root: Path, reference: str, code: str
+    candidate_root: Path, reference: str, code: str
 ) -> None:
+    release_root = candidate_root
     path = release_root / "schemas/reader.v1.schema.json"
     schema = json.loads(path.read_bytes())
     # F05 (PF10 §2.23): the success branch is the closed object $defs.success.
     schema["$defs"]["success"]["properties"]["categories"]["items"]["$ref"] = reference
     write_canonical(path, schema)
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     _expect_code(release_root, code)
 
 
-def test_nested_schema_identity_cannot_redirect_local_resolution(release_root: Path) -> None:
+def test_nested_schema_identity_cannot_redirect_local_resolution(candidate_root: Path) -> None:
+    release_root = candidate_root
     path = release_root / "schemas/reader.v1.schema.json"
     schema = json.loads(path.read_bytes())
     schema["$defs"]["category"]["$id"] = "https://example.invalid/alternate.json"
     write_canonical(path, schema)
-    write_synthetic_release_manifest(release_root)
+    _rewrite_candidate_manifest(release_root)
     _expect_code(release_root, "NESTED_SCHEMA_ID_FORBIDDEN")
 
 
-def test_admitted_graph_is_recursively_immutable(release_root: Path) -> None:
+def test_admitted_graph_is_recursively_immutable(candidate_root: Path) -> None:
+    release_root = candidate_root
     bundle = _load_active_mechanics_bundle_from_root(release_root)
     assert isinstance(bundle.registry.gates, MappingProxyType)
     assert isinstance(bundle.registry.magic10_caps["harmony"].bounds, MappingProxyType)
@@ -851,8 +920,9 @@ def test_admitted_graph_is_recursively_immutable(release_root: Path) -> None:
 
 
 def test_source_replacement_during_final_verification_returns_no_handle(
-    release_root: Path, monkeypatch
+    candidate_root: Path, monkeypatch
 ) -> None:
+    release_root = candidate_root
     original = registry_loader._read_captured_file
     target = "engine/magic10/signals.py"
     calls = 0
@@ -871,7 +941,8 @@ def test_source_replacement_during_final_verification_returns_no_handle(
     assert calls == 2
 
 
-def test_no_stale_success_fallback_and_fresh_repair_can_succeed(release_root: Path) -> None:
+def test_no_stale_success_fallback_and_fresh_repair_can_succeed(candidate_root: Path) -> None:
+    release_root = candidate_root
     first = _load_active_mechanics_bundle_from_root(release_root)
     target = release_root / "engine/magic10/signals.py"
     original = target.read_bytes()
@@ -884,17 +955,19 @@ def test_no_stale_success_fallback_and_fresh_repair_can_succeed(release_root: Pa
     assert repaired == first
 
 
-def test_post_return_source_mutation_cannot_mutate_the_prior_bundle(release_root: Path) -> None:
+def test_post_return_source_mutation_cannot_mutate_the_prior_bundle(candidate_root: Path) -> None:
+    release_root = candidate_root
     bundle = _load_active_mechanics_bundle_from_root(release_root)
     original_config_id = bundle.mechanics["config_id"]
-    path = release_root / "catalog/magic10_mechanics_v1.json"
+    path = release_root / "catalog/magic10_mechanics_v2.json"
     mechanics = json.loads(path.read_bytes())
     mechanics["config_id"] = "changed-after-return"
     write_canonical(path, mechanics)
     assert bundle.mechanics["config_id"] == original_config_id
 
 
-def test_every_reachable_container_and_record_is_immutable(release_root: Path) -> None:
+def test_every_reachable_container_and_record_is_immutable(candidate_root: Path) -> None:
+    release_root = candidate_root
     bundle = _load_active_mechanics_bundle_from_root(release_root)
     visited = set()
     counts = {"mapping": 0, "tuple": 0, "record": 0}
@@ -933,7 +1006,8 @@ def test_every_reachable_container_and_record_is_immutable(release_root: Path) -
     assert counts["record"] > 150
 
 
-def test_parser_and_registry_aliases_cannot_mutate_admitted_values(release_root: Path, monkeypatch) -> None:
+def test_parser_and_registry_aliases_cannot_mutate_admitted_values(candidate_root: Path, monkeypatch) -> None:
+    release_root = candidate_root
     captures = []
     original = registry_loader._MechanicsCapture.verify_unchanged
 
@@ -944,10 +1018,17 @@ def test_parser_and_registry_aliases_cannot_mutate_admitted_values(release_root:
     monkeypatch.setattr(registry_loader._MechanicsCapture, "verify_unchanged", retain_capture)
     bundle = _load_active_mechanics_bundle_from_root(release_root)
     capture = captures[-1]
-    capture.config["profiles"][0]["responses"]["none"] = 99
-    capture.config["signals"][0]["channels"][0]["weight"] = 99
-    capture.config["category_weights"][0]["weights"][0] = 99
-    capture.config["sources"]["caps"]["sha256"] = "0" * 64
+    # HDE-EPIC043 WU-PR-09: the retained configuration alias is the v2 loader's
+    # frozen configuration, so each attempted write through it is refused.
+    config = capture.config
+    for container, key, value in (
+        (config["profiles"][0]["responses"], "none", 99),
+        (config["signals"][0]["channels"][0], "weight", 99),
+        (config["center_map"][0]["weights"], "g", 99),
+        (config["sources"]["caps"], "sha256", "0" * 64),
+    ):
+        with pytest.raises(TypeError):
+            container[key] = value
     capture.registry.magic10_caps["harmony"].bounds["max"] = 99
     # The admitted graph owns new records, even if privileged test machinery
     # mutates a retained candidate record through frozen-dataclass internals.
@@ -966,7 +1047,7 @@ def test_parser_and_registry_aliases_cannot_mutate_admitted_values(release_root:
     capture.registry.channels.clear()
     assert bundle.mechanics["profiles"][0]["responses"]["none"] == 0
     assert bundle.mechanics["signals"][0]["channels"][0]["weight"] == 1
-    assert bundle.mechanics["category_weights"][0]["weights"] == (1, 1)
+    assert bundle.mechanics["center_map"][0]["weights"]["g"] == 3
     assert bundle.mechanics["sources"]["caps"]["sha256"] != "0" * 64
     assert bundle.registry.magic10_caps["harmony"].bounds["max"] == 100
     assert bundle.registry.gates[1].center == gate_before

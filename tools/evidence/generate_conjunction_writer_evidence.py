@@ -33,6 +33,7 @@ from adapter.http_reader import create_app
 from engine.bodygraph.ingest import resolve_db_user_id
 from engine.bodygraph.mapped_cache import MappedBodyGraphRow
 from engine.bodygraph.projection import project_bodygraph
+from engine.compat.compute import COMPAT_RESULT_SCHEMA
 from engine.runtime.identity import identity_meta
 from engine.serializer import canon
 
@@ -106,7 +107,7 @@ def _admitted_identity(payload: object, release_id: str) -> bool:
     return (
         compat is not None
         and compat.get("release_id") == release_id
-        and compat.get("schema") == "magic10_compat_result.v1"
+        and compat.get("schema") == COMPAT_RESULT_SCHEMA
     )
 
 

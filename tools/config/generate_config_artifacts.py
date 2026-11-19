@@ -15,7 +15,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.config.registry_loader import (  # noqa: E402
-    RegistryConfigError, _capture_registry_config, _capture_mechanics_config, load_active_mechanics_bundle,
+    RegistryConfigError, SchemaValidationError, _MechanicsCapture, _PROFILE_RESPONSES, _SIGNAL_MEMBERSHIP,
+    _capture_registry_config, _validate_mechanics_domain, load_active_mechanics_bundle,
 )
 from engine.serializer import canon  # noqa: E402
 from tools.config.artifacts import (  # noqa: E402
@@ -24,6 +25,41 @@ from tools.config.artifacts import (  # noqa: E402
     require_closed_rails, _destination_state, _publish_prepared,
 )
 from tools.generate_registry_report import REPORT_PATH, _build_registry_report, _verify_report_source  # noqa: E402
+
+
+# HDE-EPIC043 WU-PR-09: the v1 candidate validators moved here from the admission
+# owner (engine/config/registry_loader.py), whose switched admission no longer
+# admits a v1 configuration.  This tool is their only production caller; it keeps
+# its v1 config-family publication until the cut re-targets it (WU-PR-10).
+
+def _validate_initial_mechanics(capture: _LocalCapture, data: object, registry: RegistryConfig) -> None:
+    _validate_mechanics_domain(capture, data, registry)
+    if data['config_id'] != 'm10-channel-state-v1.0.0':
+        raise SchemaValidationError('INITIAL_CONFIG_ID_MISMATCH', 'initial mechanics config identity mismatch')
+    if data['profiles'] != [{'profile_id': name, 'responses': responses} for name, responses in sorted(_PROFILE_RESPONSES.items())]:
+        raise SchemaValidationError('INITIAL_PROFILE_MISMATCH', 'initial mechanics responses differ from the adopted defaults')
+    for signal in data['signals']:
+        _, ids = _SIGNAL_MEMBERSHIP[signal['signal_id']]
+        expected = [{'channel_id': name, 'weight': 1} for name in ids]
+        if signal['channels'] != expected:
+            raise SchemaValidationError('INITIAL_SIGNAL_MAP_MISMATCH', 'initial membership/default weights differ from the adopted map')
+    if sum(len(signal['channels']) for signal in data['signals']) != 90:
+        raise SchemaValidationError('INITIAL_MEMBERSHIP_COUNT_MISMATCH', 'initial map must contain ninety memberships')
+    if any(row['weights'] != [1, 1] for row in data['category_weights']):
+        raise SchemaValidationError('INITIAL_CATEGORY_WEIGHTS_MISMATCH', 'initial category weights must be [1,1]')
+    if capture.read('math/thresholds.json').data['edges'] != [24, 49, 74, 100]:
+        raise SchemaValidationError('INITIAL_THRESHOLDS_MISMATCH', 'initial mechanics thresholds differ from the adopted maxima')
+
+
+def _capture_mechanics_config(root: Path | str | None = None) -> _MechanicsCapture:
+    """Validate the complete initial candidate; never return an active release handle."""
+    base = _capture_registry_config(root)
+    capture = _MechanicsCapture(base.root, base.sources, registry=base.config)
+    data = capture.read('catalog/magic10_mechanics_v1.json').data
+    _validate_initial_mechanics(capture, data, base.config)
+    capture.config = data
+    capture.verify_unchanged()
+    return capture
 
 _CONFIG_PATHS = (
     "artifacts/registry/registry_report.json",

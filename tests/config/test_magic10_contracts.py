@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from engine.config.registry_loader import SchemaValidationError, _capture_mechanics_config, _validate_mechanics_domain, _validate_initial_mechanics, _validate_local_schema, _validate_result_fixture, _validate_result_augmentation, _validate_thresholds
+from engine.config.registry_loader import SchemaValidationError, _validate_mechanics_domain, _validate_local_schema, _validate_result_fixture, _validate_result_augmentation, _validate_thresholds
+from tools.config.generate_config_artifacts import _capture_mechanics_config, _validate_initial_mechanics
 from tests.config.helpers import catalog_root, write_canonical
 
 # Independently transcribed from the approved complete Instruction §6 table.

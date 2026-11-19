@@ -10,13 +10,23 @@ import jsonschema
 import pytest
 
 from engine.bodygraph.gates import NormalizedGates, normalize_gates
-from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
+from engine.config.registry_loader import SchemaValidationError, _load_active_mechanics_bundle_from_root
 from engine.core import compute_core
 from engine.core.core import _plain
-from engine.magic10.composite import ChannelClassification, _classify_channel, _classify_channels
-from engine.magic10.signals import _compute_signals, _signal_q
+from engine.magic10.composite import ChannelClassification, _classify_channel
+from engine.magic10.signals import _signal_q
+from engine.magic10_v2 import signals as v2_signals
+from engine.magic10_v2.calculation import assign_band
+from engine.magic10_v2.kernel import compute_kernel
+from engine.magic10_v2.signals import compute_signals
 from engine.serializer.canon import sercanon
-from tests.config.helpers import synthetic_complete_release_root
+from tests.config.helpers import (
+    admit_synthetic_v2_candidate,
+    synthetic_v2_candidate_root,
+    v2_candidate_roster,
+    v2_candidate_roster_admission,
+    write_release_manifest,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 SIGNALS = (
@@ -34,8 +44,22 @@ SPARSE_B = [9, 12, 15, 22, 23, 52]
 
 @pytest.fixture(scope="module")
 def bundle(tmp_path_factory):
-    root = synthetic_complete_release_root(tmp_path_factory.mktemp("core"))
-    return _load_active_mechanics_bundle_from_root(root)
+    # HDE-EPIC043 WU-PR-09: the switched core computes magic10_result.v2 over the
+    # admitted v2 candidate bundle (the v1 synthetic root refuses UNBOUND_SOURCE).
+    return admit_synthetic_v2_candidate(tmp_path_factory.mktemp("core"))
+
+
+def _assert_v2_shape(result, bundle):
+    """magic10_result.v2 closure: governed orders, q in 0..1000, bands from the admitted maxima."""
+    assert result.schema == "magic10_result.v2"
+    assert result.config_id == bundle.mechanics["config_id"] == "m10-relevance-centers-type-v2.0.0"
+    assert result.release_id == bundle.release_id
+    assert tuple(r.signal_id for r in result.signals) == SIGNALS
+    assert all(type(r.q) is int and 0 <= r.q <= 1000 for r in result.signals)
+    assert tuple(r.category_id for r in result.categories) == CATEGORIES
+    for row in result.categories:
+        assert type(row.score) is int and 0 <= row.score <= 100
+        assert row.band == assign_band(row.score, bundle.magic10_v2.maxima[row.category_id])
 
 
 def test_exact_four_required_arguments():
@@ -90,16 +114,23 @@ def test_catalog_integration_exceptions(bundle):
 
 
 def test_g001_none_and_g002_homogeneous_companionship(bundle):
-    for gates, scores, bands in [
-        ([1], [0] * 10, ["Cool"] * 10),
-        (list(range(1, 65)), [100, 50, 75, 100, 100, 100, 50, 63, 50, 50],
-         ["Glow", "Warm", "Glow", "Glow", "Glow", "Glow", "Warm", "Warm", "Warm", "Warm"]),
-    ]:
-        result = compute_core(normalize_gates(gates), normalize_gates(gates), bundle, bundle.release_id)
-        assert [c.score for c in result.categories] == scores
-        assert [c.band for c in result.categories] == bands
-        if gates == [1]:
-            assert [s.q for s in result.signals] == [0] * 20
+    # M10-G001 is the one canon v2 value before the cut (PF01 §9.5): gates [1] vs [2],
+    # no Channel, two Reflectors -> every category 0, band Cool (so every q is 0).
+    result = compute_core(normalize_gates([1]), normalize_gates([2]), bundle, bundle.release_id)
+    _assert_v2_shape(result, bundle)
+    assert [c.score for c in result.categories] == [0] * 10
+    assert [c.band for c in result.categories] == ["Cool"] * 10
+    assert [s.q for s in result.signals] == [0] * 20
+    # G002 (all 64 Gates both sides): no canon v2 score exists, so the v1 score and
+    # band vectors are not re-derived; the homogeneous-companionship state and the
+    # v2 result closure are asserted instead.
+    full = normalize_gates(list(range(1, 65)))
+    kernel = compute_kernel(full.mask, full.mask, bundle.magic10_v2)
+    assert len(kernel.channels) == 36
+    assert {(c.state, c.owner) for c in kernel.channels} == {("companionship", None)}
+    result = compute_core(full, full, bundle, bundle.release_id)
+    _assert_v2_shape(result, bundle)
+    assert result == compute_core(full, full, bundle, bundle.release_id)
 
 
 def test_g004_fixed_oracle_complete_result_and_two_runs(bundle):
@@ -107,54 +138,22 @@ def test_g004_fixed_oracle_complete_result_and_two_runs(bundle):
     first = compute_core(a, b, bundle, bundle.release_id)
     second = compute_core(a, b, bundle, bundle.release_id)
     assert first == second
-    assert sercanon(first.to_payload()) == sercanon(second.to_payload())
-    assert tuple(r.signal_id for r in first.signals) == SIGNALS
-    assert [r.q for r in first.signals] == [25, 63, 0, 38, 40, 20, 0, 25, 50, 38, 50, 0, 0, 0, 50, 20, 0, 60, 0, 33]
-    assert tuple(r.category_id for r in first.categories) == CATEGORIES
-    assert [r.score for r in first.categories] == [22, 10, 15, 6, 22, 13, 0, 18, 15, 8]
-    assert all(r.band == "Cool" for r in first.categories)
+    assert sercanon(first.as_payload()) == sercanon(second.as_payload())
+    # HDE-EPIC043 WU-PR-09: the v1 q and score vectors were v1 scoring values (retired
+    # with the v1 scorers); no canon v2 value exists for this pair, so the v2 closure
+    # and the two-run identity are asserted instead.
+    _assert_v2_shape(first, bundle)
     assert tuple(f.name for f in dataclasses.fields(first)) == (
         "schema", "config_id", "release_id", "pair_key", "signals", "categories",
     )
-    jsonschema.validate(first.to_payload(), json.loads((ROOT / "schemas/magic10_result_v1.schema.json").read_bytes()))
-    active = {r.channel_id: (r.state, r.owner) for r in _classify_channels(a.mask, b.mask, bundle.registry.channels) if r.state != "none"}
+    jsonschema.validate(first.as_payload(), json.loads((ROOT / "schemas/magic10_result_v2.schema.json").read_bytes()))
+    kernel = compute_kernel(a.mask, b.mask, bundle.magic10_v2)
+    active = {r.channel_id: (r.state, r.owner) for r in kernel.channels if r.state != "none"}
     assert active == {
         "05-15": ("electromagnetic", None), "09-52": ("dominance", "member_hi"),
         "12-22": ("dominance", "member_hi"), "19-49": ("dominance", "member_lo"),
         "20-34": ("dominance", "member_lo"), "23-43": ("electromagnetic", None),
     }
-
-
-@pytest.mark.parametrize("profile,expected", [
-    ("activation_bp_v1", [0, 100, 150, 50, 200]),
-    ("coherence_bp_v1", [0, 200, 100, 50, 150]),
-    ("expression_bp_v1", [0, 150, 100, 50, 200]),
-])
-def test_ordinary_profiles_exact_responses(bundle, profile, expected):
-    responses = next(r["responses"] for r in bundle.mechanics["profiles"] if r["profile_id"] == profile)
-    for state, q in zip(("none", "companionship", "dominance", "compromise", "electromagnetic"), expected):
-        row = ChannelClassification("01-08", state, "member_hi" if state in ("dominance", "compromise") else None)
-        assert _signal_q("weighted_state_sum_v1", ({"channel_id": "01-08", "weight": 1},),
-                         {"01-08": row}, responses) == q
-
-
-def test_g003_balance_mass_and_weighted_rounding(bundle):
-    channels = bundle.mechanics["signals"][18]["channels"]
-    ids = [r["channel_id"] for r in channels]
-    for split, expected in [(0, 0), (1, 67), (2, 133), (3, 200), (6, 0)]:
-        rows = {name: ChannelClassification(name, "dominance", "member_lo" if i < split else "member_hi") for i, name in enumerate(ids)}
-        assert _signal_q("twice_min_owner_mass_v1", channels, rows) == expected
-        reversed_rows = {name: dataclasses.replace(row, owner="member_hi" if row.owner == "member_lo" else "member_lo") for name, row in rows.items()}
-        assert _signal_q("twice_min_owner_mass_v1", channels, reversed_rows) == expected
-    for state in ("none", "companionship", "electromagnetic"):
-        rows = {name: ChannelClassification(name, state, None) for name in ids}
-        assert _signal_q("twice_min_owner_mass_v1", channels, rows) == 0
-        assert _signal_q("companionship_em_mass_v1", channels, rows) == (0 if state == "none" else 200)
-    pair = ({"channel_id": "01-08", "weight": 1}, {"channel_id": "02-14", "weight": 3})
-    rows = {"01-08": ChannelClassification("01-08", "none", None),
-            "02-14": ChannelClassification("02-14", "compromise", "member_lo")}
-    responses = next(r["responses"] for r in bundle.mechanics["profiles"] if r["profile_id"] == "coherence_bp_v1")
-    assert _signal_q("weighted_state_sum_v1", pair, rows, responses) == 38
 
 
 @pytest.mark.parametrize("bad", [None, {}, [1], NormalizedGates((), 0, "0000000000000000"),
@@ -202,9 +201,9 @@ def test_forged_bundle_and_mutable_graph_refuse(bundle):
     lambda m: m["signals"][0]["channels"][0].update(weight=0),
     lambda m: m["signals"][0]["channels"][0].update(weight=4),
     lambda m: m["signals"][0]["channels"][0].update(channel_id="00-00"),
-    lambda m: m["category_weights"][0].update(weights=[1, True]),
-    lambda m: m["category_weights"].reverse(),
-    lambda m: m.update(result_schema="magic10_compat_result.v1"),
+    lambda m: m["center_map"][0]["weights"].update(g=True),
+    lambda m: m["center_map"].reverse(),
+    lambda m: m.update(result_schema="magic10_compat_result.v2"),
 ])
 def test_changed_frozen_mechanics_cannot_reuse_admitted_identity(bundle, mutate):
     from engine.config.registry_loader import _deep_freeze
@@ -244,41 +243,42 @@ def test_result_and_source_immutability(bundle):
         bundle.mechanics["config_id"] = "changed"
     with pytest.raises(dataclasses.FrozenInstanceError):
         a.mask = 2
-    payload = result.to_payload()
+    payload = result.as_payload()
     payload["signals"][0]["q"] = 200
     assert result.signals[0].q == 0
 
 
-@pytest.mark.parametrize('mutate', [
-    lambda m: m['signals'][0].update(operation='unknown'),
-    lambda m: m['signals'][0].update(profile_id='unknown'),
-    lambda m: m['signals'][0].update(extra='unowned'),
-    lambda m: m['signals'][0]['channels'].append(m['signals'][0]['channels'][0]),
-    lambda m: m['signals'][0]['channels'].reverse(),
-    lambda m: m['signals'][0]['channels'][0].update(channel_id='00-00'),
-    lambda m: m['signals'][18].update(profile_id='coherence_bp_v1'),
-    lambda m: m['signals'][19].update(operation='twice_min_owner_mass_v1'),
-    lambda m: m['profiles'].reverse(),
-    lambda m: m['profiles'][0]['responses'].update(extra=0),
-    lambda m: m['profiles'][0]['responses'].update(none=True),
-    lambda m: m['profiles'][0]['responses'].update(none=10001),
-    lambda m: m['profiles'][0]['responses'].update(dominance=10000),
+# HDE-EPIC043 WU-PR-09: re-targeted from the v1 signal module (_compute_signals) to the
+# v2 signal producers the switched core executes.  The v1 parametrizations whose guard
+# has no compute-time v2 counterpart (extra key, duplicate or reversed Channel rows, a
+# profile on a Balance signal, reversed profiles, an extra or out-of-range response)
+# were retired: v2 leaves those structural checks to the v2 loader at admission.
+@pytest.mark.parametrize('mutate,code', [
+    (lambda m: m['signals'][0].update(operation='unknown'), v2_signals.OPERATION_UNKNOWN),
+    (lambda m: m['signals'][0].update(profile_id='unknown'), v2_signals.PROFILE_MISSING),
+    (lambda m: m['signals'][0]['channels'][0].update(channel_id='00-00'), v2_signals.CHANNEL_UNKNOWN),
+    (lambda m: m['signals'][19].update(operation='twice_min_owner_mass_v1'), v2_signals.OPERATION_UNKNOWN),
+    (lambda m: m['profiles'][0]['responses'].update(none=True), v2_signals.PROFILE_MISSING),
 ])
-def test_signal_operation_profile_and_membership_guards(bundle, mutate):
+def test_signal_operation_profile_and_membership_guards(bundle, mutate, code):
     from engine.config.registry_loader import _deep_freeze
     mechanics = json.loads(sercanon(_plain(bundle.mechanics)))
     mutate(mechanics)
-    classified = _classify_channels(1, 128, bundle.registry.channels)
-    with pytest.raises((ValueError, KeyError)):
-        _compute_signals(classified, _deep_freeze(mechanics), SIGNALS)
+    kernel = compute_kernel(1, 128, bundle.magic10_v2)
+    forged = dataclasses.replace(bundle.magic10_v2, configuration=_deep_freeze(mechanics))
+    with pytest.raises(SchemaValidationError) as caught:
+        compute_signals(kernel, forged)
+    assert caught.value.code == code
 
 
 def test_invalid_result_band_is_refused_at_core_boundary(bundle, monkeypatch):
     import engine.core.core as module
-    original = module._reduce_category
+    original = module.compute_magic10_v2
     def wrong_band(*args):
-        return dataclasses.replace(original(*args), band='Glow')
-    monkeypatch.setattr(module, '_reduce_category', wrong_band)
+        result = original(*args)
+        first = dataclasses.replace(result.categories[0], band='Glow')
+        return dataclasses.replace(result, categories=(first, *result.categories[1:]))
+    monkeypatch.setattr(module, 'compute_magic10_v2', wrong_band)
     with pytest.raises(ValueError, match='^invalid pure core contract$'):
         compute_core(normalize_gates([1]), normalize_gates([1]), bundle, bundle.release_id)
 
@@ -293,13 +293,16 @@ def test_cyclic_forged_mapping_is_bounded(bundle):
 
 
 def test_new_coherent_admitted_release_changes_pair_identity(tmp_path):
-    from tests.config.helpers import write_synthetic_release_manifest
-    root = synthetic_complete_release_root(tmp_path)
-    first_bundle = _load_active_mechanics_bundle_from_root(root)
-    path = root / 'engine/magic10/signals.py'
+    # HDE-EPIC043 WU-PR-09: the v2 candidate root, admitted through the test-only roster
+    # route; the changed member is the v2 signal module the switched core executes.
+    root = synthetic_v2_candidate_root(tmp_path)
+    with v2_candidate_roster_admission():
+        first_bundle = _load_active_mechanics_bundle_from_root(root)
+    path = root / 'engine/magic10_v2/signals.py'
     path.write_bytes(path.read_bytes() + b'# synthetic later release member bytes\n')
-    write_synthetic_release_manifest(root)
-    second_bundle = _load_active_mechanics_bundle_from_root(root)
+    write_release_manifest(root, v2_candidate_roster())
+    with v2_candidate_roster_admission():
+        second_bundle = _load_active_mechanics_bundle_from_root(root)
     a, b = normalize_gates([1]), normalize_gates([8])
     first = compute_core(a, b, first_bundle, first_bundle.release_id)
     second = compute_core(a, b, second_bundle, second_bundle.release_id)

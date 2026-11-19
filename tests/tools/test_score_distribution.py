@@ -366,7 +366,7 @@ def test_the_tool_is_never_a_public_surface() -> None:
     allowed = {"__future__", "argparse", "decimal", "hashlib", "json", "os", "stat", "sys", "collections", "pathlib",
                "typing", "engine.bodygraph.mapped_cache", "engine.bodygraph.projection", "engine.bodygraph.resolver",
                "engine.compat.compute", "engine.compat.error_tokens", "engine.config.registry_loader", "engine.db",
-               "engine.db.errors", "engine.magic10.composite", "engine.runtime.determinism_env",
+               "engine.db.errors", "engine.magic10_v2.kernel", "engine.runtime.determinism_env",
                "engine.serializer.canon"}
     assert imported <= allowed, sorted(imported - allowed)
     forbidden_roots = ("flask", "werkzeug", "adapter", "engine.cli", "engine.http", "presenter", "psycopg",

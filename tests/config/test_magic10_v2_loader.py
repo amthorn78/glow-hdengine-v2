@@ -653,14 +653,10 @@ def _imported_modules(tree: ast.AST) -> set[str]:
     return names
 
 
-def test_no_v1_release_member_or_the_config_package_imports_the_v2_loader() -> None:
-    paths = [path for path in ADMITTED_RELEASE_ROSTER if path.endswith(".py")] + ["engine/config/__init__.py"]
-    assert len(paths) == 24
-    for path in paths:
-        tree = ast.parse((ROOT / path).read_text(encoding="utf-8"), filename=path)
-        assert not any(name.endswith("magic10_v2_loader") for name in _imported_modules(tree)), path
-        strings = [node.value for node in ast.walk(tree) if isinstance(node, ast.Constant) and isinstance(node.value, str)]
-        assert not any("magic10_v2_loader" in value for value in strings), path
+# Retired at HDE-EPIC043 WU-PR-09: the HDE-EPIC042 dormancy assertion that no v1
+# release member imports the v2 loader held only until the switch, which makes the
+# loader the admission path of release members (engine/config/registry_loader.py,
+# engine/core/core.py, engine/compat/compute.py).
 
 
 def test_the_v2_loader_imports_no_v1_threshold_engine_core_or_compat_module(admitted_in_two_processes) -> None:

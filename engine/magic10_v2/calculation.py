@@ -28,7 +28,9 @@ pinned offsets keep ``500 + Σ I`` in ``450..550`` and the score in ``0..93``);
 they are implemented as canon states them. The cache key, the compat envelope
 and every surface belong to later work units.
 
-Not reachable from production until the switch (HDE-EPIC043 WU-PR-09).
+Reached from production since the switch (HDE-EPIC043 WU-PR-09), through the
+engine core; its last top-level statement records passive execution provenance
+for release admission.
 """
 from __future__ import annotations
 
@@ -38,7 +40,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from engine.config.magic10_v2_loader import MAGIC10_V2_CONFIG_ID, MAGIC10_V2_RESULT_SCHEMA, Magic10V2Bundle
-from engine.config.registry_loader import SchemaValidationError
+from engine.config.registry_loader import SchemaValidationError, _capture_module_execution
 from engine.magic10_v2.kernel import CENTER_OUTCOMES, KernelResult, compute_kernel
 from engine.magic10_v2.signals import PER_MILLE, SignalValue, compute_signals, rhu
 from engine.serializer.canon import sercanon
@@ -461,3 +463,7 @@ def _check_maxima(maxima: object, order: tuple[str, ...]) -> Mapping[str, tuple[
                 MAXIMA_INVALID, "category maxima must be [c1, c2, c3, 100] ascending", {"category_id": category}
             )
     return maxima
+
+
+# HDE-EPIC043 WU-PR-09: passive provenance for release admission (last top-level statement).
+_MODULE_EXECUTION = _capture_module_execution(globals())

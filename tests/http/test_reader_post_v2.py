@@ -38,7 +38,10 @@ FORBIDDEN = (
     UUID_A, UUID_B, "bodygraph", "prompt",
 )
 V2_SCHEMA = json.loads(Path("schemas/reader.v2.schema.json").read_text(encoding="utf-8"))
-GOLDENS = json.loads(Path("tests/fixtures/magic10/v1/goldens.json").read_text(encoding="utf-8"))["cases"]
+# HDE-EPIC043 WU-PR-09: the band-vector cases read the Magic10 v2 goldens, whose only case
+# before the cut is the canon M10-G001; the v1 goldens are read only by the self-pair case.
+GOLDENS = json.loads(Path("tests/fixtures/magic10/v2/goldens.json").read_text(encoding="utf-8"))["cases"]
+V1_GOLDENS_PATH = Path("tests/fixtures/magic10/v1/goldens.json")
 
 
 @pytest.fixture(scope="module")
@@ -186,18 +189,15 @@ def test_v2_bodies_validate_against_the_v2_schema(db):
 
 # --- 5. golden-derived pairs ---------------------------------------------------------------------
 
-def _case(case_id: str) -> dict:
-    return next(case for case in GOLDENS if case["case_id"] == case_id)
+def _case(case_id: str, cases=None) -> dict:
+    return next(case for case in (GOLDENS if cases is None else cases) if case["case_id"] == case_id)
 
 
 def _golden_pairs():
-    g004 = _case("M10-G004")
-    yield "M10-G004", g004["inputs"]["member_a_gates"], g004["inputs"]["member_b_gates"], g004["expected"]["categories"]
-    g005 = _case("M10-G005")
-    for pair in g005["inputs"]["pairs"]:
-        yield f"M10-G005:{pair['pair_id']}", pair["a"]["gates"], pair["b"]["gates"], g005["expected"]["intrinsic"]["categories"]
-    g008 = _case("M10-G008")
-    yield "M10-G008", g008["inputs"]["a"]["gates"], g008["inputs"]["b"]["gates"], g008["expected"]["categories"]
+    # The v1-golden-derived pairs (M10-G004, M10-G005 pair_1/pair_2, M10-G008) are retired with
+    # the v1 band vectors they pinned; the v2 goldens M10-G002..G008 land at WU-PR-10.
+    g001 = _case("M10-G001")
+    yield "M10-G001", g001["inputs"]["gates_a"], g001["inputs"]["gates_b"], g001["expected"]["categories"]
 
 
 @pytest.mark.parametrize(("case_id", "a_gates", "b_gates", "expected"), list(_golden_pairs()), ids=lambda value: value if isinstance(value, str) else None)
@@ -211,7 +211,7 @@ def test_v2_golden_derived_pairs_reproduce_the_expected_band_vector(monkeypatch,
 
 
 def test_v2_golden_self_pair_is_ineligible(monkeypatch):
-    g007 = _case("M10-G007")
+    g007 = _case("M10-G007", json.loads(V1_GOLDENS_PATH.read_text(encoding="utf-8"))["cases"])
     assert g007["inputs"]["a"]["person_uid"] == g007["inputs"]["b"]["person_uid"]
     _install_db(monkeypatch, {UUID_A: complete_chart(UUID_A, [str(g) for g in g007["inputs"]["a"]["gates"]])})
     monkeypatch.setattr(compute, "compute_core", lambda *a, **k: pytest.fail("core reached for a self-pair"))
