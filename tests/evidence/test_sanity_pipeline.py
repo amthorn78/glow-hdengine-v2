@@ -246,11 +246,11 @@ def test_distinct_code_and_gated_stages_are_pinned_across_pipeline_gate_and_runn
 
 def test_probe_classifies_exactly_the_incomplete_roster_refusal(monkeypatch):
     from engine.compat import compute
-    from engine.config.registry_loader import SchemaValidationError
+    from engine.config.registry_loader import ADMITTED_RELEASE_ROSTER, SchemaValidationError
 
     # Real admission owner: the repository root is the admitted complete release.
     admitted = run_sanity_pipeline.probe_release_admission()
-    assert admitted is not None and len(admitted.source_identities) == 45
+    assert admitted is not None and len(admitted.source_identities) == len(ADMITTED_RELEASE_ROSTER)
     assert run_sanity_pipeline.release_not_admitted_observed() is False
 
     # The non-admitted state stays reachable through the seam and is classified exactly.

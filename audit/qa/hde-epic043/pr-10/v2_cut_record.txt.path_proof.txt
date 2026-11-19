@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic043/pr-10/v2_cut_record.txt
+size_bytes: 17126
+sha256: 122ca1df07776f01829f02d1c1c7a9523212cea49711643be0bedcaeb1875bba
+mtime_utc: 2026-11-19T18:55:47Z
+produced_at_utc: 2026-09-22T14:25:29Z

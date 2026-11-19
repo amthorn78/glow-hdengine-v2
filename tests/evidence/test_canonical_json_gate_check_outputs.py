@@ -1475,7 +1475,7 @@ def test_duplicate_channel_gate_endpoints_fail_schema_and_loader():
 def test_manifest_validator_binds_the_admitted_roster():
     gate = run_canonical_json_gate
     assert gate._EXPECTED_RELEASE_MANIFEST_PATHS == ADMITTED_RELEASE_ROSTER
-    assert len(gate._EXPECTED_RELEASE_MANIFEST_PATHS) == 45
+    assert len(gate._EXPECTED_RELEASE_MANIFEST_PATHS) == len(ADMITTED_RELEASE_ROSTER)
     assert len(gate.EXPECTED_TARGET_PATHS) == 34
     assert len(gate.EXPECTED_SET_RULES) == 6
     target = _target("catalog/manifest.json")

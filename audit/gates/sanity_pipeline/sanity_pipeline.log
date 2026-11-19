@@ -3,19 +3,32 @@ pipeline_identity:hde-release-sanity-v1
 env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
 env_pins:audit/gates/determinism/env_pins.log
 check 01 Environment pins:OK
-check 02 Identity and release provenance:OK
-check 03 Canonical JSON:OK
-check 04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks:OK
-check 05 A7 Catalog transport:OK
-check 06 CI rails:OK
-check 07 Direct DB selection contract:OK
-check 08 Direct DB posture artifacts:OK
-check 09 BodyGraph policy:OK
-check 10 Configured-v2 mapped-cache behavior:OK
-check 11 Human Index and Machine Mirror refresh:OK
-check 12 Evidence-path validation:OK
-check 13 Mirror schema and index/mirror hash validation:OK
-check 14 Topology orientation validation:OK
-check 15 Final-LF validation:OK
-first_failed_stage:NONE
-summary:PASS
+check 02 Identity and release provenance:FAIL
+check 03 Canonical JSON:FAIL
+not_executed 03 Canonical JSON:earlier_mandatory_failure=02 Identity and release provenance
+check 04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks:FAIL
+not_executed 04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks:earlier_mandatory_failure=02 Identity and release provenance
+check 05 A7 Catalog transport:FAIL
+not_executed 05 A7 Catalog transport:earlier_mandatory_failure=02 Identity and release provenance
+check 06 CI rails:FAIL
+not_executed 06 CI rails:earlier_mandatory_failure=02 Identity and release provenance
+check 07 Direct DB selection contract:FAIL
+not_executed 07 Direct DB selection contract:earlier_mandatory_failure=02 Identity and release provenance
+check 08 Direct DB posture artifacts:FAIL
+not_executed 08 Direct DB posture artifacts:earlier_mandatory_failure=02 Identity and release provenance
+check 09 BodyGraph policy:FAIL
+not_executed 09 BodyGraph policy:earlier_mandatory_failure=02 Identity and release provenance
+check 10 Configured-v2 mapped-cache behavior:FAIL
+not_executed 10 Configured-v2 mapped-cache behavior:earlier_mandatory_failure=02 Identity and release provenance
+check 11 Human Index and Machine Mirror refresh:FAIL
+not_executed 11 Human Index and Machine Mirror refresh:earlier_mandatory_failure=02 Identity and release provenance
+check 12 Evidence-path validation:FAIL
+not_executed 12 Evidence-path validation:earlier_mandatory_failure=02 Identity and release provenance
+check 13 Mirror schema and index/mirror hash validation:FAIL
+not_executed 13 Mirror schema and index/mirror hash validation:earlier_mandatory_failure=02 Identity and release provenance
+check 14 Topology orientation validation:FAIL
+not_executed 14 Topology orientation validation:earlier_mandatory_failure=02 Identity and release provenance
+check 15 Final-LF validation:FAIL
+not_executed 15 Final-LF validation:earlier_mandatory_failure=02 Identity and release provenance
+first_failed_stage:02 Identity and release provenance
+summary:FAIL

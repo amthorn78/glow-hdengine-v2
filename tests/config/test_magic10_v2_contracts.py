@@ -651,28 +651,6 @@ def test_v2_result_schemas_refuse_the_v1_identity(v1_path: str, v2_path: str, id
     assert not _accepts(v2_path, _complete_result(v1_identity, 0))
 
 
-# --- T-11: INV-4 guard -----------------------------------------------------------------------
-
-def test_no_v2_thresholds_or_configuration_is_governed_data_before_the_cut() -> None:
-    """INV-4 (HDE-EPIC042 Plan v1.1 §4): no maxima value is canon before the Magic-10 v2 cut.
-
-    This guard fails by design once HDE-DIST008.2 writes the cut thresholds to
-    math/thresholds.json and the configuration to catalog/magic10_mechanics_v2.json;
-    that row retires it.
-    """
-    assert not (ROOT / "catalog/magic10_mechanics_v2.json").exists()
-    assert _load("math/thresholds.json")["version"] == "1"
-    offenders = []
-    for base in ("catalog", "math"):
-        for path in sorted((ROOT / base).rglob("*.json")):
-            data = json.loads(path.read_bytes())
-            if isinstance(data, dict) and (
-                data.get("version") == "2" or data.get("schema") == "magic10_mechanics_config.v2"
-            ):
-                offenders.append(path.relative_to(ROOT).as_posix())
-    assert offenders == []
-
-
 # --- T-12: the label ---------------------------------------------------------------------------
 
 def test_fixture_family_is_labelled_non_canon() -> None:

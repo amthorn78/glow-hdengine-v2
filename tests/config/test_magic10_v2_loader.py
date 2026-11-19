@@ -584,7 +584,11 @@ def test_identity_repeats_byte_for_byte_in_one_and_two_processes(tmp_path: Path,
 
 
 def test_v2_configuration_identity_differs_from_v1(tmp_path: Path) -> None:
-    assert _admit(_root(tmp_path)).config_sha256 != load_active_mechanics_bundle().config_sha256
+    # Since the cut the admitted configuration is the v2 one, so the v1 identity is
+    # read from the v1 file itself, which stays in the tree outside the roster.
+    v1_sha256 = hashlib.sha256((ROOT / "catalog/magic10_mechanics_v1.json").read_bytes()).hexdigest()
+    assert _admit(_root(tmp_path)).config_sha256 != v1_sha256
+    assert load_active_mechanics_bundle().config_sha256 != v1_sha256
 
 
 def test_a_one_byte_change_to_any_covered_source_changes_the_source_bundle_identity(tmp_path: Path) -> None:
@@ -631,9 +635,10 @@ def test_v2_identity_constants() -> None:
 
 def test_declared_members_are_the_new_governed_files_and_the_cut_written_configuration() -> None:
     assert v2.MAGIC10_V2_DECLARED_MEMBERS == EXPECTED_DECLARED_MEMBERS
+    # The cut (HDE-EPIC043 WU-PR-10) wrote the configuration and admitted every declared member.
     for path in EXPECTED_DECLARED_MEMBERS:
-        assert path not in ADMITTED_RELEASE_ROSTER
-        assert (ROOT / path).is_file() == (path != CONFIG), path
+        assert path in ADMITTED_RELEASE_ROSTER, path
+        assert (ROOT / path).is_file(), path
     assert v2.MAGIC10_V2_REBOUND_MEMBERS == (THRESHOLDS,)
     assert THRESHOLDS in ADMITTED_RELEASE_ROSTER
 

@@ -31,17 +31,19 @@
       "type": "object",
       "required": [
         "engine/core/core.py",
-        "engine/magic10/composite.py",
-        "engine/magic10/signals.py",
-        "engine/magic10/calculators.py",
+        "engine/magic10_v2/kernel.py",
+        "engine/magic10_v2/signals.py",
+        "engine/magic10_v2/calculation.py",
         "engine/core/__init__.py",
-        "engine/magic10/__init__.py",
+        "engine/magic10_v2/__init__.py",
         "engine/bodygraph/gates.py",
         "engine/config/registry_loader.py",
+        "engine/config/magic10_v2_loader.py",
         "engine/serializer/canon.py",
         "engine/stable/sercanon.py",
-        "catalog/magic10_mechanics_v1.json",
-        "schemas/magic10_result_v1.schema.json"
+        "catalog/magic10_mechanics_v2.json",
+        "math/thresholds.json",
+        "schemas/magic10_result_v2.schema.json"
       ],
       "properties": {
         "engine/core/core.py": {
@@ -50,19 +52,19 @@
           "minLength": 64,
           "maxLength": 64
         },
-        "engine/magic10/composite.py": {
+        "engine/magic10_v2/kernel.py": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
           "minLength": 64,
           "maxLength": 64
         },
-        "engine/magic10/signals.py": {
+        "engine/magic10_v2/signals.py": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
           "minLength": 64,
           "maxLength": 64
         },
-        "engine/magic10/calculators.py": {
+        "engine/magic10_v2/calculation.py": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
           "minLength": 64,
@@ -74,7 +76,7 @@
           "minLength": 64,
           "maxLength": 64
         },
-        "engine/magic10/__init__.py": {
+        "engine/magic10_v2/__init__.py": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
           "minLength": 64,
@@ -92,6 +94,12 @@
           "minLength": 64,
           "maxLength": 64
         },
+        "engine/config/magic10_v2_loader.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
         "engine/serializer/canon.py": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
@@ -104,13 +112,19 @@
           "minLength": 64,
           "maxLength": 64
         },
-        "catalog/magic10_mechanics_v1.json": {
+        "catalog/magic10_mechanics_v2.json": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
           "minLength": 64,
           "maxLength": 64
         },
-        "schemas/magic10_result_v1.schema.json": {
+        "math/thresholds.json": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "schemas/magic10_result_v2.schema.json": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
           "minLength": 64,
@@ -178,7 +192,7 @@
       "additionalProperties": false
     },
     "core_result": {
-      "$ref": "schemas/magic10_result_v1.schema.json"
+      "$ref": "schemas/magic10_result_v2.schema.json"
     },
     "canonical_sha256": {
       "type": "string",

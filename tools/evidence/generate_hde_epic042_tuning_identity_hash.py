@@ -5,10 +5,16 @@ Each tuning run is one evaluation of one corpus pair, in one order, under the
 admitted release's thresholds.  Per pair the proof covers four runs: AB in
 process, BA in process, AB again in process, and AB through
 ``python -m engine.cli showcompat --a-file ... --b-file ...`` stdout.  Each run
-hashes the LF-terminated canonical ``magic10_compat_result.v1`` body that
+hashes the LF-terminated canonical ``magic10_compat_result.v2`` body that
 ``hdctl showcompat`` prints: ``engine.compat.compute.evaluate_pair`` (which calls
-``engine.core.core.compute_core``), then ``engine.presenter.emitter.emit_public``.
-The proof passes only when all four bodies are canonical and equal.
+``engine.core.core.compute_core`` and ``engine.magic10_v2.compat.compat_result_v2``),
+then ``engine.presenter.emitter.emit_public``.  The proof passes only when all
+four bodies are canonical and equal.  The one compat result schema that
+``HASH_BASIS`` names is checked against every pair's AB body: a body of any
+other schema (or a basis naming none, or more than one) refuses with
+``TUNING_IDENTITY_HASH_BASIS_SCHEMA_MISMATCH`` and nothing is written, so the
+record cannot name one schema while it hashes another (re-targeted at the v2
+cut, HDE-EPIC043 WU-PR-10).
 
 The fixtures resolve as release-sanity stage 04 resolves them
 (``_normalize_party`` and ``_resolve_party`` with ``source_policy='local'``).
@@ -61,9 +67,10 @@ RUN_SOURCES = {
     "cli": "python -m engine.cli showcompat --a-file a --b-file b, stdout",
 }
 HASH_BASIS = (
-    "sha256 over the LF-terminated canonical magic10_compat_result.v1 body that "
+    "sha256 over the LF-terminated canonical magic10_compat_result.v2 body that "
     "hdctl showcompat prints (engine.compat.compute.evaluate_pair, which calls "
-    "engine.core.core.compute_core, then engine.presenter.emitter.emit_public)"
+    "engine.core.core.compute_core and engine.magic10_v2.compat.compat_result_v2, "
+    "then engine.presenter.emitter.emit_public)"
 )
 CANONICAL_FORM = (
     "UTF-8, no BOM, no CRLF, exactly one trailing LF, canonical re-serialization equal"
@@ -71,6 +78,24 @@ CANONICAL_FORM = (
 EXCLUDED_SOURCES = "artifacts/compat/AB.json, artifacts/compat/BA.json"
 NOT_ADMITTED_LINE = "HDE_EPIC042_TUNING_IDENTITY_CHECK:RELEASE_NOT_ADMITTED"
 FAILED_EXIT = "TUNING_IDENTITY_FAILED"
+HASH_BASIS_SCHEMA_MISMATCH = "TUNING_IDENTITY_HASH_BASIS_SCHEMA_MISMATCH"
+COMPAT_SCHEMA_PREFIX = "magic10_compat_result."
+
+
+class HashBasisSchemaMismatch(ValueError):
+    """A compat body whose schema is not the one ``HASH_BASIS`` names."""
+
+    def __init__(self, observed: object, named: str | None) -> None:
+        super().__init__(f"{HASH_BASIS_SCHEMA_MISMATCH}: body schema {observed!r}, hash basis names {named!r}")
+        self.observed = observed
+        self.named = named
+
+
+def hash_basis_schema() -> str | None:
+    """The one compat result schema ``HASH_BASIS`` names; None unless exactly one."""
+
+    named = {token for token in HASH_BASIS.split() if token.startswith(COMPAT_SCHEMA_PREFIX)}
+    return named.pop() if len(named) == 1 else None
 
 
 def sha256_hex(data: bytes) -> str:
@@ -175,7 +200,9 @@ def build(*, overrides: Mapping[str, bytes] | None = None) -> tuple[bool, bytes]
     """Probe admission, compute every run, and return (passed, record bytes).
 
     ``overrides`` maps a run ID to bytes that replace that run's computed body;
-    only the owner test uses it, to prove the record fails.
+    only the owner test uses it, to prove the record fails.  Raises
+    ``HashBasisSchemaMismatch`` when a pair's AB body is not of the schema
+    ``HASH_BASIS`` names.
     """
 
     probe_release_admission()  # raises ReleaseNotAdmitted before any body is computed
@@ -199,6 +226,9 @@ def build(*, overrides: Mapping[str, bytes] | None = None) -> tuple[bool, bytes]
         bodies.update(overrides)
         ab = bodies["ab"]
         fields = _body_fields(ab)
+        named = hash_basis_schema()
+        if named is None or fields.get("schema") != named:
+            raise HashBasisSchemaMismatch(fields.get("schema"), named)
         if header is None:
             header = fields
         canonical = all(canonical_ok(bodies[run]) for run in RUN_IDS)
@@ -257,6 +287,10 @@ def main(argv: list[str] | None = None) -> None:
         # No body was computed and nothing is written; the distinct code is never 0.
         print(NOT_ADMITTED_LINE)
         raise SystemExit(RELEASE_NOT_ADMITTED_EXIT_CODE)
+    except HashBasisSchemaMismatch as exc:
+        # The record would name one schema and hash another; nothing is written.
+        print(exc, file=sys.stderr)
+        raise SystemExit(HASH_BASIS_SCHEMA_MISMATCH)
     if not passed:
         raise SystemExit(FAILED_EXIT)
     if args.check:

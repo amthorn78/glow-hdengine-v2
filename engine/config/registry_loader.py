@@ -412,59 +412,67 @@ _LOCAL_SCHEMAS = frozenset({
     "schemas/magic10_compat_result_v1.schema.json", *_CONSUMER_SCHEMAS,
 })
 
-# HDE-EPIC040's adopted complete mechanics release.  The active loader accepts
-# this exact sorted union only; catalog/manifest.json itself is never a member.
-ADMITTED_RELEASE_VERSION = "1.3.0"
-ADMITTED_RELEASE_BUILT_AT_UTC = "2026-08-24T18:04:49Z"
+# The Magic-10 v2 release, cut by HDE-EPIC043 WU-PR-10 (HDE-DIST008.2) with the
+# Product Owner's version and timestamp.  The active loader accepts this exact
+# sorted union only; catalog/manifest.json itself is never a member.
+ADMITTED_RELEASE_VERSION = "2.0.0"
+ADMITTED_RELEASE_BUILT_AT_UTC = "2026-11-19T05:48:28Z"
 ADMITTED_RELEASE_ROSTER = tuple(sorted({
     "adapter/http_reader.py",
     "adapter/schemas/error_v1.schema.json",
+    "catalog/centers_v1.json",
     "catalog/channels_v1.json",
     "catalog/gates_v1.json",
     "catalog/magic10.json",
     "catalog/magic10_caps.json",
-    "catalog/magic10_mechanics_v1.json",
+    "catalog/magic10_mechanics_v2.json",
     "catalog/magic10_seeds.json",
     "catalog/narratives/keys.json",
     "catalog/narratives/manifest.json",
     "catalog/narratives/palettes.json",
     "catalog/narratives/suppression_map.json",
     "catalog/narratives/templates.json",
+    "catalog/type_pairing_v1.json",
     "engine/bodygraph/gates.py",
     "engine/bodygraph/mapped_cache.py",
     "engine/bodygraph/projection.py",
     "engine/bodygraph/resolver.py",
     "engine/bodygraph/v2_adapter.py",
-    "engine/cli/main.py",
     "engine/categories/registry.py",
+    "engine/cli/main.py",
     "engine/compat/compute.py",
     "engine/compat/error_tokens.py",
+    "engine/config/magic10_v2_loader.py",
     "engine/config/registry_loader.py",
     "engine/core/core.py",
     "engine/http/compat_handler.py",
-    "engine/magic10/calculators.py",
-    "engine/magic10/composite.py",
-    "engine/magic10/signals.py",
+    "engine/magic10_v2/calculation.py",
+    "engine/magic10_v2/compat.py",
+    "engine/magic10_v2/kernel.py",
+    "engine/magic10_v2/signals.py",
     "engine/narratives/router.py",
     "engine/presenter/emitter.py",
     "engine/runtime/public.py",
+    "engine/serializer/canon.py",
+    "engine/stable/sercanon.py",
     "errors/token_map/token_map.json",
     "math/thresholds.json",
     "migrations/005_identity.sql",
     "presenter/reader_v1/emitter.py",
+    "schemas/centers_v1.schema.json",
     "schemas/channels_v1.schema.json",
     "schemas/gates_v1.schema.json",
-    "schemas/magic10_compat_result_v1.schema.json",
-    "schemas/magic10_mechanics_v1.schema.json",
-    "schemas/magic10_result_v1.schema.json",
+    "schemas/magic10_compat_result_v2.schema.json",
+    "schemas/magic10_mechanics_v2.schema.json",
+    "schemas/magic10_result_v2.schema.json",
     "schemas/reader.v1.schema.json",
     "schemas/reader.v2.schema.json",
+    "schemas/thresholds_v2.schema.json",
+    "schemas/type_pairing_v1.schema.json",
     "tools/bodygraph/check_magic10_gate_readiness.py",
-    "engine/serializer/canon.py",
-    "engine/stable/sercanon.py",
 }))
 
-if len(ADMITTED_RELEASE_ROSTER) != 45:  # pragma: no cover - import-time invariant
+if len(ADMITTED_RELEASE_ROSTER) != 52:  # pragma: no cover - import-time invariant
     raise RuntimeError("ADMITTED_RELEASE_ROSTER_INVALID")
 
 @dataclass(frozen=True)

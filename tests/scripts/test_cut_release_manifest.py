@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import re
@@ -16,6 +17,7 @@ from engine.config.registry_loader import (
 from engine.runtime.identity import _manifest_release_id_from_bytes
 from engine.serializer import canon
 from scripts import cut_release_manifest as cutter
+from scripts import m10_cutover_guard
 from tests.config.helpers import (
     synthetic_complete_release_root,
     synthetic_v2_candidate_root,
@@ -25,7 +27,7 @@ from tests.config.helpers import (
 )
 
 # The fifteen members of the pre-PR06 release manifest (version 1.0.0), used
-# as the existing-row baseline that a roster cut must complete to 45 members.
+# as the existing-row baseline that a roster cut must complete to the admitted roster.
 _PRE_PR06_MEMBERS = (
     "adapter/http_reader.py",
     "catalog/channels_v1.json",
@@ -365,9 +367,9 @@ def test_refresh_cut_validates_member_format_without_a_roster(tmp_path, monkeypa
 
 def test_roster_cut_constructs_exactly_the_admitted_roster(tmp_path, monkeypatch) -> None:
     # HDE-EPIC043 WU-PR-09: the switched admission admits only the v2 candidate
-    # release (through the test-only roster route of tests/config/helpers.py); the
-    # 45-path v1 root refuses UNBOUND_SOURCE.  The cut is roster-parametric, so the
-    # admitted roster here is the 57-path v2 candidate roster.
+    # release (through the test-only roster route of tests/config/helpers.py).  The
+    # cut is roster-parametric; since the v2 cut (WU-PR-10) the candidate roster is
+    # the admitted roster, so the pin reads its length rather than a literal.
     _closed(monkeypatch)
     complete_root = synthetic_v2_candidate_root(tmp_path)
     roster = v2_candidate_roster()
@@ -382,7 +384,7 @@ def test_roster_cut_constructs_exactly_the_admitted_roster(tmp_path, monkeypatch
     assert payload["root"] == "catalog/"
     assert payload["version"] == ADMITTED_RELEASE_VERSION
     assert payload["built_at_utc"] == ADMITTED_RELEASE_BUILT_AT_UTC
-    assert len(payload["files"]) == 57
+    assert len(payload["files"]) == len(roster)
     assert tuple(row["path"] for row in payload["files"]) == roster
     assert "catalog/manifest.json" not in {row["path"] for row in payload["files"]}
     for row in payload["files"]:
@@ -596,3 +598,138 @@ def test_s19_cutter_refuses_a_row_with_a_control_character_without_echoing_it(pa
     with pytest.raises(ValueError) as caught:
         cutter.cut_manifest(manifest, version="1.3.0", built_at_utc="2026-08-24T18:04:49Z", check=True, roster=["catalog/b.json"])
     assert str(caught.value) == "release_manifest_entry_path_unsafe"
+
+
+# --- HDE-EPIC043 WU-PR-10 (HDE-DIST008.2): the roster mode drops only a declared retired row -------
+# The cutter's closed RETIRED_RELEASE_MEMBERS list is applied only with a roster; a retired path
+# absent from the existing manifest is a no-op, and a retired row's bytes are never read.
+
+_RETIRED = "retired/old_member.json"
+
+
+def _retired_root(complete_root: Path) -> Path:
+    retired = complete_root / _RETIRED
+    retired.parent.mkdir(parents=True, exist_ok=True)
+    retired.write_bytes(b"{}\n")
+    return _baseline_manifest(complete_root, (*_PRE_PR06_MEMBERS, _RETIRED))
+
+
+def _rows(manifest: Path) -> tuple[str, ...]:
+    return tuple(row["path"] for row in json.loads(manifest.read_bytes())["files"])
+
+
+def test_roster_cut_drops_a_declared_retired_row_and_reaches_a_fixed_point(complete_root: Path) -> None:
+    manifest = _retired_root(complete_root)
+    assert cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, retired={_RETIRED}, check=True, **_CUT) == 1
+    assert cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, retired={_RETIRED}, **_CUT) == 0
+    raw = manifest.read_bytes()
+    assert _rows(manifest) == ADMITTED_RELEASE_ROSTER and _RETIRED not in _rows(manifest)
+    assert raw == canon.sercanon(json.loads(raw), sort_keys=True)
+    # The retired row's bytes are never read: the drop and its fixed point survive the file's deletion.
+    (complete_root / _RETIRED).unlink()
+    assert cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, retired={_RETIRED}, check=True, **_CUT) == 0
+    assert cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, retired={_RETIRED}, **_CUT) == 0
+    assert cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, check=True, **_CUT) == 0
+    assert cutter.cut_manifest(manifest, check=True, **_CUT) == 0
+    assert manifest.read_bytes() == raw
+
+
+def test_roster_cut_with_a_retirement_still_refuses_an_undeclared_extra_row(complete_root: Path) -> None:
+    extra = complete_root / "extra/member.sql"
+    extra.parent.mkdir()
+    extra.write_bytes(b"select 1;\n")
+    (complete_root / _RETIRED).parent.mkdir(parents=True, exist_ok=True)
+    (complete_root / _RETIRED).write_bytes(b"{}\n")
+    manifest = _baseline_manifest(complete_root, (*_PRE_PR06_MEMBERS, _RETIRED, "extra/member.sql"))
+    before = manifest.read_bytes()
+    for check in (False, True):
+        with pytest.raises(ValueError) as caught:
+            cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, retired={_RETIRED}, check=check, **_CUT)
+        assert str(caught.value) == "release_manifest_extra_member:extra/member.sql"
+    assert manifest.read_bytes() == before
+
+
+def test_roster_cut_refuses_a_retired_path_the_roster_still_lists(complete_root: Path) -> None:
+    manifest = _baseline_manifest(complete_root)
+    before = manifest.read_bytes()
+    listed = ADMITTED_RELEASE_ROSTER[0]
+    with pytest.raises(ValueError) as caught:
+        cutter.cut_manifest(manifest, roster=ADMITTED_RELEASE_ROSTER, retired={listed}, **_CUT)
+    assert str(caught.value) == f"release_manifest_retired_member_in_roster:{listed}"
+    assert manifest.read_bytes() == before
+
+
+def test_refresh_cut_never_drops_a_row(complete_root: Path) -> None:
+    manifest = _retired_root(complete_root)
+    before = manifest.read_bytes()
+    for check in (False, True):
+        with pytest.raises(ValueError) as caught:
+            cutter.cut_manifest(manifest, retired={_RETIRED}, check=check, **_CUT)
+        assert str(caught.value) == "release_manifest_retired_requires_roster"
+    assert manifest.read_bytes() == before
+    assert cutter.cut_manifest(manifest, **_CUT) == 0
+    assert _RETIRED in _rows(manifest)
+
+
+@pytest.mark.parametrize(
+    "retired",
+    (
+        ("/abs.json",),
+        ("../outside.json",),
+        ("catalog/manifest.json",),
+        ("a\\b.json",),
+        ("",),
+        ("schemas/\u00fc.json",),
+        (42,),
+        ("a.json", "a.json"),
+    ),
+    ids=("absolute", "traversal", "self_listing", "backslash", "empty_path", "non_ascii", "non_string", "duplicate"),
+)
+def test_roster_cut_refuses_an_invalid_retirement_list(complete_root: Path, retired) -> None:
+    manifest = _baseline_manifest(complete_root)
+    before = manifest.read_bytes()
+    for roster in (ADMITTED_RELEASE_ROSTER, None):
+        with pytest.raises(ValueError) as caught:
+            cutter.cut_manifest(manifest, roster=roster, retired=retired, **_CUT)
+        assert str(caught.value) == "release_manifest_retired_invalid"
+    assert manifest.read_bytes() == before
+
+
+def test_cutter_retirement_list_is_closed_and_disjoint_from_the_admitted_roster() -> None:
+    assert cutter.RETIRED_RELEASE_MEMBERS == (
+        "catalog/magic10_mechanics_v1.json",
+        "engine/magic10/calculators.py",
+        "engine/magic10/composite.py",
+        "engine/magic10/signals.py",
+        "schemas/magic10_compat_result_v1.schema.json",
+        "schemas/magic10_mechanics_v1.schema.json",
+        "schemas/magic10_result_v1.schema.json",
+    )
+    assert list(cutter.RETIRED_RELEASE_MEMBERS) == sorted(set(cutter.RETIRED_RELEASE_MEMBERS))
+    assert not set(cutter.RETIRED_RELEASE_MEMBERS) & set(ADMITTED_RELEASE_ROSTER)
+    # The cut manifest carries none of them (the real cut applied the list).
+    admitted = json.loads((Path(cutter.ROOT) / "catalog/manifest.json").read_bytes())
+    assert not set(cutter.RETIRED_RELEASE_MEMBERS) & {row["path"] for row in admitted["files"]}
+    # The cutter is in the production import closure; its list is a set display, so the cutover
+    # guard's P2 does not read it as naming the v1 configuration.
+    assert not m10_cutover_guard._names_v1_configuration(ast.parse(Path(cutter.__file__).read_text(encoding="utf-8")))
+
+
+def test_cli_applies_the_retirement_list_only_with_the_roster_flag(complete_root: Path) -> None:
+    # The real closed list, over synthetic bytes in its seven paths of the prior release.
+    for name in cutter.RETIRED_RELEASE_MEMBERS:
+        member = complete_root / name
+        member.parent.mkdir(parents=True, exist_ok=True)
+        member.write_bytes(b"{}\n" if name.endswith(".json") else b"# retired release member\n")
+    manifest = _baseline_manifest(complete_root, (*_PRE_PR06_MEMBERS, *cutter.RETIRED_RELEASE_MEMBERS))
+    argv = ["--manifest", str(manifest), "--version", ADMITTED_RELEASE_VERSION,
+            "--built-at-utc", ADMITTED_RELEASE_BUILT_AT_UTC]
+    assert cutter.main(argv) == 0
+    assert set(cutter.RETIRED_RELEASE_MEMBERS) <= set(_rows(manifest))
+    assert cutter.main([*argv, "--check", "--roster-from-admission"]) == 1
+    assert cutter.main([*argv, "--roster-from-admission"]) == 0
+    assert _rows(manifest) == ADMITTED_RELEASE_ROSTER
+    for name in cutter.RETIRED_RELEASE_MEMBERS:
+        (complete_root / name).unlink()
+    assert cutter.main([*argv, "--check", "--roster-from-admission"]) == 0
+    assert cutter.main([*argv, "--check"]) == 0

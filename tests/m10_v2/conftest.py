@@ -5,8 +5,9 @@ The v2 bundle is admitted from a temporary root assembled exactly as
 ``catalog/``, ``math/`` and ``schemas/`` bytes, with the labelled non-canon
 fixtures of ``tests/fixtures/magic10_v2/`` at ``math/thresholds.json`` and
 ``catalog/magic10_mechanics_v2.json``. Those fixtures are non-canon: this bundle
-is not the cutover configuration, and no maxima value is asserted. Nothing is
-written under the repository's own tree.
+is not the cutover configuration, and no maxima value is asserted. The goldens
+run over ``v2_cut_bundle``, the governed cut bytes (HDE-EPIC043 WU-PR-10).
+Nothing is written under the repository's own tree.
 
 Masks are built by the repository's own Gate normalizer, so every constructed
 mask is a value the HDE Math Spec §5.2.1 representation admits.
@@ -39,6 +40,24 @@ def v2_bundle(tmp_path_factory: pytest.TempPathFactory) -> v2.Magic10V2Bundle:
     shutil.copyfile(FIXTURES / "thresholds_v2.fixture.json", root / THRESHOLDS)
     shutil.copyfile(FIXTURES / "magic10_mechanics_v2.fixture.json", root / CONFIG)
     raw = (root / CONFIG).read_bytes()
+    rows = (ManifestEntry(CONFIG, hashlib.sha256(raw).hexdigest(), len(raw)),)
+    return v2.load_magic10_v2_bundle_from_root(root, rows)
+
+
+@pytest.fixture(scope="session")
+def v2_cut_bundle(tmp_path_factory: pytest.TempPathFactory) -> v2.Magic10V2Bundle:
+    """HDE-EPIC043 WU-PR-10: an admitted v2 bundle over the governed cut bytes.
+
+    The same temporary-root assembly as ``v2_bundle`` without the fixture overlay: the
+    repository's own ``catalog/magic10_mechanics_v2.json`` and the cut maxima in
+    ``math/thresholds.json``.  The goldens' positive cases run here, never at the
+    fixture maxima.
+    """
+    root = tmp_path_factory.mktemp("m10_v2_cut") / "root"
+    for directory in ("catalog", "math", "schemas"):
+        shutil.copytree(ROOT / directory, root / directory)
+    raw = (root / CONFIG).read_bytes()
+    assert raw == (ROOT / CONFIG).read_bytes() and (root / THRESHOLDS).read_bytes() == (ROOT / THRESHOLDS).read_bytes()
     rows = (ManifestEntry(CONFIG, hashlib.sha256(raw).hexdigest(), len(raw)),)
     return v2.load_magic10_v2_bundle_from_root(root, rows)
 

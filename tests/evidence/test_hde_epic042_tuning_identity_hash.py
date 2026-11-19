@@ -31,6 +31,14 @@ from tools.evidence import run_sanity_pipeline as release_sanity
 ROOT = Path(__file__).resolve().parents[2]
 CLOSED_RAILS = {"LC_ALL": "C", "LANG": "C", "TZ": "UTC", "SAFE_MODE": "1", "ALLOW_NETWORK": "0"}
 COMPAT_DIR = (ROOT / "artifacts" / "compat").resolve()
+# Transcribed, not read from the generator (HDE-EPIC043 WU-PR-10 plan v1.0 §6.11; the
+# P-08 hazard: the record's text once named v1 while it hashed a v2 body).
+COMPAT_SCHEMA = "magic10_compat_result.v2"
+HASH_BASIS = (
+    "sha256 over the LF-terminated canonical magic10_compat_result.v2 body that hdctl showcompat prints "
+    "(engine.compat.compute.evaluate_pair, which calls engine.core.core.compute_core and "
+    "engine.magic10_v2.compat.compat_result_v2, then engine.presenter.emitter.emit_public)"
+)
 EXPECTED_KEYS = [
     "schema",
     "epic_id",
@@ -164,8 +172,9 @@ def test_record_hashes_the_real_compat_body_of_every_run(rails):
     bundle = load_active_mechanics_bundle()
     assert fields["release_id"] == bundle.release_id
     assert fields["config_id"] == bundle.mechanics["config_id"]
-    assert fields["compat_schema"] == "magic10_compat_result.v1"
-    assert fields["hash_basis"] == g.HASH_BASIS
+    assert fields["compat_schema"] == COMPAT_SCHEMA == json.loads(_real_body(*_left_right()))["schema"]
+    assert fields["hash_basis"] == HASH_BASIS == g.HASH_BASIS
+    assert g.hash_basis_schema() == COMPAT_SCHEMA
     assert fields["excluded_sources"] == "artifacts/compat/AB.json, artifacts/compat/BA.json"
     left, right = _left_right()
     ab, ba = _real_body(left, right), _real_body(right, left)
@@ -219,6 +228,62 @@ def test_a_non_canonical_body_fails_the_record(rails, mutation):
     assert not passed
     assert fields["pair.1.canonical_form_ok"] == "false"
     assert fields["status"] == "FAIL"
+
+
+def _body_of_schema(schema: str) -> bytes:
+    """The real AB body under another schema tag, still canonical."""
+
+    left, right = _left_right()
+    parsed = json.loads(_real_body(left, right))
+    parsed["schema"] = schema
+    body = canon.sercanon(parsed)
+    assert g.canonical_ok(body)
+    return body
+
+
+def test_a_body_of_another_schema_than_the_hash_basis_names_is_refused(rails):
+    v1_body = _body_of_schema("magic10_compat_result.v1")
+    with pytest.raises(g.HashBasisSchemaMismatch) as excinfo:
+        g.build(overrides={run: v1_body for run in g.RUN_IDS})
+    assert str(excinfo.value).startswith("TUNING_IDENTITY_HASH_BASIS_SCHEMA_MISMATCH: ")
+    assert (excinfo.value.observed, excinfo.value.named) == ("magic10_compat_result.v1", COMPAT_SCHEMA)
+
+
+# The hash basis as HDE-EPIC042 WU-PR-01 wrote it: it named v1 (the P-08 hazard).
+V1_HASH_BASIS = (
+    "sha256 over the LF-terminated canonical magic10_compat_result.v1 body that "
+    "hdctl showcompat prints (engine.compat.compute.evaluate_pair, which calls "
+    "engine.core.core.compute_core, then engine.presenter.emitter.emit_public)"
+)
+
+
+@pytest.mark.parametrize(
+    ("basis", "named"),
+    [
+        (V1_HASH_BASIS, "magic10_compat_result.v1"),
+        ("sha256 over the canonical compat body", None),
+        ("magic10_compat_result.v1 or magic10_compat_result.v2", None),
+    ],
+)
+def test_a_hash_basis_naming_another_schema_than_the_body_is_refused(rails, monkeypatch, basis, named):
+    monkeypatch.setattr(g, "HASH_BASIS", basis)
+    assert g.hash_basis_schema() == named
+    with pytest.raises(g.HashBasisSchemaMismatch) as excinfo:
+        g.build()
+    assert str(excinfo.value).startswith("TUNING_IDENTITY_HASH_BASIS_SCHEMA_MISMATCH: ")
+    assert (excinfo.value.observed, excinfo.value.named) == (COMPAT_SCHEMA, named)
+
+
+@pytest.mark.parametrize("argv", [["--check"], []])
+def test_both_modes_refuse_a_hash_basis_schema_mismatch_and_write_nothing(rails, out, monkeypatch, tmp_path, argv):
+    real_build = g.build
+    v1_body = _body_of_schema("magic10_compat_result.v1")
+    monkeypatch.setattr(g, "build", lambda: real_build(overrides={run: v1_body for run in g.RUN_IDS}))
+    with pytest.raises(SystemExit) as excinfo:
+        g.main(argv)
+    assert excinfo.value.code == "TUNING_IDENTITY_HASH_BASIS_SCHEMA_MISMATCH"
+    assert not out.exists()
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_write_mode_refuses_a_failing_record_and_writes_nothing(rails, out, monkeypatch, tmp_path):

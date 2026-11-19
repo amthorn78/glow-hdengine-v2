@@ -24,7 +24,8 @@ from engine.magic10_v2 import compat
 from engine.narratives.constants import MISSING_NARRATIVE_KEY
 from engine.narratives.router import route_keys
 
-RID = "2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"
+# An arbitrary well-formed release_id, not any release's (re-pinned at the v2 cut).
+RID = "0123456789abcdef" * 4
 FULL = (1 << 64) - 1
 
 

@@ -39,6 +39,15 @@ def catalog_root(tmp_path: Path, *, source_root: Path | None = None) -> Path:
         "schemas/channels_v1.schema.json", "schemas/gates_v1.schema.json",
         "schemas/magic10_mechanics_v1.schema.json", "schemas/magic10_result_v1.schema.json",
         "schemas/magic10_compat_result_v1.schema.json",
+        # HDE-EPIC043 WU-PR-10: the v2 release's configuration, its sources and
+        # their owning schemas, and the v2 result schemas.  The version-2
+        # thresholds at math/thresholds.json validate only against
+        # schemas/thresholds_v2.schema.json.  The v1 inputs above stay in the
+        # tree outside the roster, and v1-contrast tests still read them.
+        "catalog/magic10_mechanics_v2.json", "catalog/centers_v1.json", "catalog/type_pairing_v1.json",
+        "schemas/magic10_mechanics_v2.schema.json", "schemas/thresholds_v2.schema.json",
+        "schemas/centers_v1.schema.json", "schemas/type_pairing_v1.schema.json",
+        "schemas/magic10_result_v2.schema.json", "schemas/magic10_compat_result_v2.schema.json",
         "docs/schemas/config_bundle_be.json", "docs/schemas/config_bundle_fe.json",
     )
     for name in paths:
@@ -100,7 +109,7 @@ def synthetic_complete_release_root(
     *,
     source_root: Path | None = None,
 ) -> Path:
-    """Build a labeled, non-production 45-member admission fixture."""
+    """Build a labeled, non-production admission fixture of the admitted roster's member bytes."""
     from engine.config.registry_loader import (
         ADMITTED_RELEASE_BUILT_AT_UTC,
         ADMITTED_RELEASE_ROSTER,
@@ -134,13 +143,18 @@ def synthetic_complete_release_root(
 
 
 # ---------------------------------------------------------------------------
-# HDE-EPIC043 WU-PR-09: the test-only v2 candidate roster route.
+# HDE-EPIC043 WU-PR-09 introduced a test-only v2 candidate roster route: until the
+# cut, a temporary candidate root admitted only while a test swapped
+# ``registry_loader.ADMITTED_RELEASE_ROSTER`` for the candidate roster.
 #
-# The switch admits the v2 bundle through the v2 loader's rules, but the release
-# roster constant keeps its v1 value until the cut (WU-PR-10).  A temporary
-# candidate root therefore admits only while a test swaps
-# ``registry_loader.ADMITTED_RELEASE_ROSTER`` for the candidate roster below.
-# The version and timestamp constants are not touched, no rule is relaxed, and
+# HDE-EPIC043 WU-PR-10 (the cut) made that roster the admitted one, so:
+# * ``v2_candidate_roster()`` returns ``ADMITTED_RELEASE_ROSTER`` itself;
+# * ``v2_candidate_roster_admission()`` swaps nothing and yields that constant.
+#   Both keep their names for their existing callers.
+# * ``release_roster_route(roster)`` is the one remaining swap.  It is for
+#   negative controls that need a roster other than the admitted one, such as
+#   a roster without an executing source (``UNBOUND_SOURCE``).
+# The version and timestamp constants are never touched, no rule is relaxed, and
 # no production path reaches this module (tests/m10_v2/test_switch.py proves it).
 # The two labelled fixtures are non-canon; nothing here is the cutover release.
 # ---------------------------------------------------------------------------
@@ -152,6 +166,9 @@ V2_CANDIDATE_EXECUTING_MODULES = (
     "engine/magic10_v2/signals.py",
 )
 _V1_CONFIGURATION_PATH = "catalog/magic10_mechanics_v1.json"
+# The labelled fixtures stand in for the two governed files by default.  HDE-EPIC043
+# WU-PR-10: the goldens' positive runs pass ``fixture_maxima=False`` and copy the
+# governed cut bytes of both files instead, so they run at the cut's maxima.
 _V2_CANDIDATE_FIXTURES = {
     "catalog/magic10_mechanics_v2.json": "tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json",
     "math/thresholds.json": "tests/fixtures/magic10_v2/thresholds_v2.fixture.json",
@@ -159,22 +176,27 @@ _V2_CANDIDATE_FIXTURES = {
 
 
 def v2_candidate_roster() -> tuple[str, ...]:
-    """The 45-path roster without the v1 configuration, plus the v2 members (57 paths)."""
-    from engine.config.magic10_v2_loader import MAGIC10_V2_DECLARED_MEMBERS
-    from engine.config.registry_loader import ADMITTED_RELEASE_ROSTER
+    """The admitted v2 release roster: ``ADMITTED_RELEASE_ROSTER``, read when called."""
+    from engine.config import registry_loader
 
-    paths = set(ADMITTED_RELEASE_ROSTER) - {_V1_CONFIGURATION_PATH}
-    paths |= set(MAGIC10_V2_DECLARED_MEMBERS) | set(V2_CANDIDATE_EXECUTING_MODULES)
-    return tuple(sorted(paths))
+    return registry_loader.ADMITTED_RELEASE_ROSTER
 
 
 @contextlib.contextmanager
 def v2_candidate_roster_admission():
-    """Swap only the admission roster constant for the v2 candidate roster, then restore it."""
+    """Yield the admitted roster; since the cut the candidate roster needs no swap."""
+    from engine.config import registry_loader
+
+    yield registry_loader.ADMITTED_RELEASE_ROSTER
+
+
+@contextlib.contextmanager
+def release_roster_route(roster: tuple[str, ...]):
+    """Swap only the admission roster constant for ``roster``, then restore it (test-only)."""
     from engine.config import registry_loader
 
     original = registry_loader.ADMITTED_RELEASE_ROSTER
-    registry_loader.ADMITTED_RELEASE_ROSTER = v2_candidate_roster()
+    registry_loader.ADMITTED_RELEASE_ROSTER = tuple(roster)
     try:
         yield registry_loader.ADMITTED_RELEASE_ROSTER
     finally:
@@ -202,8 +224,13 @@ def write_release_manifest(root: Path, roster: tuple[str, ...]) -> Path:
     return path
 
 
-def synthetic_v2_candidate_root(tmp_path: Path, *, source_root: Path | None = None) -> Path:
-    """Build a labelled, non-production 57-member v2 candidate admission fixture."""
+def synthetic_v2_candidate_root(
+    tmp_path: Path, *, source_root: Path | None = None, fixture_maxima: bool = True,
+) -> Path:
+    """Build a labelled, non-production v2 candidate admission fixture over the admitted roster.
+
+    ``fixture_maxima=False`` copies the governed configuration and thresholds bytes.
+    """
     source = (source_root or Path(__file__).resolve().parents[2]).resolve()
     root = (tmp_path / "synthetic-v2-candidate-only").resolve()
     assert root != source
@@ -212,7 +239,7 @@ def synthetic_v2_candidate_root(tmp_path: Path, *, source_root: Path | None = No
     for relative_path in roster:
         target = root / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
-        if relative_path in _V2_CANDIDATE_FIXTURES:
+        if fixture_maxima and relative_path in _V2_CANDIDATE_FIXTURES:
             target.write_bytes((source / _V2_CANDIDATE_FIXTURES[relative_path]).read_bytes())
             continue
         raw = (source / relative_path).read_bytes()
@@ -227,7 +254,7 @@ def synthetic_v2_candidate_root(tmp_path: Path, *, source_root: Path | None = No
 
 
 def admit_synthetic_v2_candidate(tmp_path: Path, *, source_root: Path | None = None):
-    """Admit a fresh v2 candidate root through the unchanged admission path and the roster route."""
+    """Admit a fresh v2 candidate root through the unchanged admission path and the admitted roster."""
     from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
 
     root = synthetic_v2_candidate_root(tmp_path, source_root=source_root)

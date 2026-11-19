@@ -5,10 +5,10 @@ subtask_id: HDE-SEPA007.5
 evidences: HDE-SEPA007.1, HDE-SEPA007.2, HDE-SEPA007.3, HDE-SEPA007.4
 work_unit_id: WU-PR-04
 evidence_class: PR evidence, not QA evidence
-run.tested_commit: 567f6e9af57e6b221deef078e745e19cd0ba9ff3
-run.time_utc: 2026-11-15T02:27:47Z
-run.actor: HDE-EPIC042 WU-PR-04 dedicated PR session (PR-30), https://claude.ai/code/session_01Q789u3oKvv19sLjJs1S89r
-run.python: 3.13.18
+run.tested_commit: 01f3fc86c48b0a190b281d570b75df470a7d2780
+run.time_utc: 2026-11-19T19:17:44Z
+run.actor: HDE-EPIC043 WU-PR-10 dedicated PR session (PR-30), https://claude.ai/code/session_01Q789u1oYmXwHCSyizQkKg3
+run.python: 3.12.3
 config.env: ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC
 config.jsonschema: 4.23.0
 config.bundle_root: temporary root: catalog/, math/ and schemas/ copied from the tested tree; tests/fixtures/magic10_v2/thresholds_v2.fixture.json at math/thresholds.json; tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json at catalog/magic10_mechanics_v2.json
@@ -37,10 +37,10 @@ tested_input.3: catalog/gates_v1.json 2bbf28bb031859e3e20c1a932c57d54e4eae431375
 tested_input.4: catalog/magic10.json ef4ec8dd591294f15ca870f038678116b7932782023301fd8885b1a870b07e64
 tested_input.5: catalog/magic10_caps.json cfeab8efc1715b39cb8085999978ab3707bb9e5aad50fc01c5da70bf98a17dd9
 tested_input.6: catalog/magic10_seeds.json 3b8342c367b38ef7177559f8a30fdb2f26633db0cb39bd48fdd4d6f84d28a700
-tested_input.7: catalog/manifest.json 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+tested_input.7: catalog/manifest.json be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
 tested_input.8: catalog/type_pairing_v1.json 033b39181dabeeed7a6e8869c752f594f064f585d0f7b63dd8919b20525d822d
-tested_input.9: engine/config/magic10_v2_loader.py 47dbb5edb02763c35304712367903237b2ee33bd6c9fcc5a523800f851f67a3c
-tested_input.10: engine/config/registry_loader.py cdad1f04c3ce38a155b5168c660e21328f0483ca9220d3df0350db6ddb65eaf8
+tested_input.9: engine/config/magic10_v2_loader.py c21fe26db7218f938554baf1ff20c52a9e7bb9cc446ef061ac259ad8915c80d5
+tested_input.10: engine/config/registry_loader.py 78cae24c78c6aed4e2c6744adb2ac61321833d1ec37c031a041c6de8c0331520
 tested_input.11: fixtures/charts/alice.json 9e4237b9cc406d2fc21d83789536a3dd892c808f68a18bb1a21ee569fa4a87ed
 tested_input.12: fixtures/charts/bob.json 18b5240c60fd631258c5fb90cd6b0cdcb81342d0e6f3480c280c3dcb424bd4c9
 tested_input.13: schemas/centers_v1.schema.json e947000e9791ef36cdd7cbd67969a8c523a1b0466fff8c1c4d44654da6065169
@@ -53,20 +53,21 @@ tested_input.19: schemas/thresholds_v2.schema.json b88a0af9592703a2a5446c4dfcc56
 tested_input.20: schemas/type_pairing_v1.schema.json b52495cb636559f0f4e62d461c5044c1ea238de563f61344022b0020dd8fd72c
 tested_input.21: tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json 8aaaa0c37d545fc267eb3816967b33547562b3f19c804fe963dabb2429c44d41
 tested_input.22: tests/fixtures/magic10_v2/thresholds_v2.fixture.json 058a0b11032180e40ccfeddda3228290af994d5e6d828a92a4a2ef2a27903576
-tested_input.23: tools/evidence/generate_hde_epic042_v2_contract_evidence.py 9140f03ce7fda6400e3051f2519875731b4bd447579c147b0424da88d63e9e1b
+tested_input.23: tools/evidence/generate_hde_epic042_v2_contract_evidence.py 449b8e5a6ab4cb6b101ff1d00a60ae646dfd3930f733376e368e860583b89abe
 tested_inputs.count: 23
-tested_inputs.sha256: bdabfb966907cbf3852acdb15dbe29a4180c52254218953da459effb5bdf078a
+tested_inputs.sha256: 3ae6ce32c57297a9ce32de9b2b07df1889c113db800d37190d84bf295e3c14dc
 command.1: in-process load_magic10_v2_bundle_from_root(<temporary root>, (ManifestEntry(catalog/magic10_mechanics_v2.json, <sha256 of the root's bytes>, <size>),)), once per row's root
 command.2: in-process evaluate_pair(fixtures/charts/alice.json, fixtures/charts/bob.json, cache=<recording cache>), resolved with source_policy local
 command.3: in-process strict Draft 2020-12 validation of each result instance against the admitted root's result schema
-command.4: git diff --quiet 330a7e9124c360776fd3c5a2123b24421287c00e -- catalog/manifest.json <45 ADMITTED_RELEASE_ROSTER paths> (working tree)
-command.5: git diff --quiet a0b796bc64fe0f058e69ec81f79e2561a840c71d -- catalog/manifest.json <45 ADMITTED_RELEASE_ROSTER paths> (working tree)
-command.6: git diff --name-only a0b796bc64fe0f058e69ec81f79e2561a840c71d HEAD
-command.7: python tools/ci/prepush_check.py --path <each changed path> membership
-command.8: python tools/evidence/generate_determinism_gate_proofs.py --check
-command.9: python tools/evidence/generate_hde_epic042_tuning_identity_hash.py --check
-command.10: in-process load_active_mechanics_bundle()
-command.11: python tools/evidence/generate_hde_epic042_v2_contract_evidence.py --actor <run.actor>
+command.4: git show a9cf2356360ff93d413396381c3ae8089cc4f631:catalog/manifest.json (the prior release: its sha256 and its member paths)
+command.5: git diff --quiet 330a7e9124c360776fd3c5a2123b24421287c00e bdcf21d1c8ecb0657a66c786277f60e900933868 -- catalog/manifest.json <the member paths of a9cf2356360ff93d413396381c3ae8089cc4f631:catalog/manifest.json>
+command.6: git diff --quiet a0b796bc64fe0f058e69ec81f79e2561a840c71d a9cf2356360ff93d413396381c3ae8089cc4f631 -- catalog/manifest.json <the member paths of a9cf2356360ff93d413396381c3ae8089cc4f631:catalog/manifest.json>
+command.7: git diff --name-only a0b796bc64fe0f058e69ec81f79e2561a840c71d a9cf2356360ff93d413396381c3ae8089cc4f631
+command.8: in-process membership of each changed path in the member paths of a9cf2356360ff93d413396381c3ae8089cc4f631:catalog/manifest.json
+command.9: python tools/evidence/generate_determinism_gate_proofs.py --check
+command.10: python tools/evidence/generate_hde_epic042_tuning_identity_hash.py --check
+command.11: in-process load_active_mechanics_bundle(), against the sha256 of catalog/manifest.json and MAGIC10_V2_CONFIG_ID
+command.12: python tools/evidence/generate_hde_epic042_v2_contract_evidence.py --actor <run.actor>
 row.0001: family=schema_matrix; subtasks=HDE-SEPA007.1,HDE-SEPA007.3; input=catalog/centers_v1.json; mutation=actual; expected=admitted; observed=admitted; result=pass
 row.0002: family=schema_matrix; subtasks=HDE-SEPA007.1,HDE-SEPA007.3; input=catalog/centers_v1.json; mutation=unknown_field /; expected=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/centers_v1.schema.json; observed=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/centers_v1.schema.json instance_path=/ keyword=additionalProperties; result=pass
 row.0003: family=schema_matrix; subtasks=HDE-SEPA007.1,HDE-SEPA007.3; input=catalog/centers_v1.json; mutation=required_dropped /centers; expected=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/centers_v1.schema.json; observed=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/centers_v1.schema.json instance_path=/ keyword=required; result=pass
@@ -248,51 +249,51 @@ row.0178: family=schema_matrix; subtasks=HDE-SEPA007.2,HDE-SEPA007.3; input=test
 row.0179: family=schema_matrix; subtasks=HDE-SEPA007.2,HDE-SEPA007.3; input=tests/fixtures/magic10_v2/thresholds_v2.fixture.json at math/thresholds.json; mutation=out_of_domain /categories/0/maxima/2; expected=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/thresholds_v2.schema.json; observed=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/thresholds_v2.schema.json instance_path=/categories/0/maxima/2 keyword=maximum; result=pass
 row.0180: family=schema_matrix; subtasks=HDE-SEPA007.2,HDE-SEPA007.3; input=tests/fixtures/magic10_v2/thresholds_v2.fixture.json at math/thresholds.json; mutation=out_of_domain /categories/0/maxima/3; expected=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/thresholds_v2.schema.json; observed=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/thresholds_v2.schema.json instance_path=/categories/0/maxima/3 keyword=const; result=pass
 row.0181: family=schema_matrix; subtasks=HDE-SEPA007.2,HDE-SEPA007.3; input=tests/fixtures/magic10_v2/thresholds_v2.fixture.json at math/thresholds.json; mutation=out_of_domain /version; expected=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/thresholds_v2.schema.json; observed=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/thresholds_v2.schema.json instance_path=/version keyword=const; result=pass
-row.0182: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=actual; expected=accepted; observed=accepted; result=pass
-row.0183: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=unknown_field /; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=additionalProperties; result=pass
-row.0184: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /schema; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0185: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /config_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0186: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /release_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0187: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /pair_key; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0188: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /signals; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0189: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0190: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=unknown_field /categories/0; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0 keyword=additionalProperties; result=pass
-row.0191: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories/0/category_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
-row.0192: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories/0/score; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
-row.0193: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories/0/band; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
-row.0194: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /categories/0/band; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0/band keyword=enum; result=pass
-row.0195: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /categories/0/category_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0/category_id keyword=enum; result=pass
-row.0196: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /categories/0/score; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0/score keyword=maximum; result=pass
-row.0197: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /schema; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/schema keyword=const; result=pass
-row.0198: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=unknown_field /signals/0; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0 keyword=additionalProperties; result=pass
-row.0199: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /signals/0/signal_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0 keyword=required; result=pass
-row.0200: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /signals/0/q; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0 keyword=required; result=pass
-row.0201: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /signals/0/q; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0/q keyword=maximum; result=pass
-row.0202: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /signals/0/signal_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0/signal_id keyword=enum; result=pass
-row.0203: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=actual; expected=accepted; observed=accepted; result=pass
-row.0204: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=unknown_field /; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=additionalProperties; result=pass
-row.0205: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /schema; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0206: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /config_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0207: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /release_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0208: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /pair_key; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0209: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /signals; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0210: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
-row.0211: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=unknown_field /categories/0; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=additionalProperties; result=pass
-row.0212: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories/0/category_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
-row.0213: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories/0/score; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
-row.0214: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories/0/band; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
-row.0215: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories/0/shared_key; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
-row.0216: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories/0/personal_lo_to_hi_key; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
-row.0217: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /categories/0/personal_hi_to_lo_key; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
-row.0218: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /categories/0/band; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0/band keyword=enum; result=pass
-row.0219: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /categories/0/category_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0/category_id keyword=enum; result=pass
-row.0220: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /categories/0/score; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0/score keyword=maximum; result=pass
-row.0221: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /schema; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/schema keyword=const; result=pass
-row.0222: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=unknown_field /signals/0; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0 keyword=additionalProperties; result=pass
-row.0223: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /signals/0/signal_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0 keyword=required; result=pass
-row.0224: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=required_dropped /signals/0/q; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0 keyword=required; result=pass
-row.0225: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /signals/0/q; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0/q keyword=maximum; result=pass
-row.0226: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v1 real-path result re-identified as v2; mutation=out_of_domain /signals/0/signal_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0/signal_id keyword=enum; result=pass
+row.0182: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=actual; expected=accepted; observed=accepted; result=pass
+row.0183: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=unknown_field /; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=additionalProperties; result=pass
+row.0184: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /schema; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0185: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /config_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0186: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /release_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0187: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /pair_key; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0188: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /signals; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0189: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0190: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=unknown_field /categories/0; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0 keyword=additionalProperties; result=pass
+row.0191: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories/0/category_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
+row.0192: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories/0/score; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
+row.0193: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories/0/band; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
+row.0194: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /categories/0/band; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0/band keyword=enum; result=pass
+row.0195: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /categories/0/category_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0/category_id keyword=enum; result=pass
+row.0196: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /categories/0/score; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/categories/0/score keyword=maximum; result=pass
+row.0197: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /schema; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/schema keyword=const; result=pass
+row.0198: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=unknown_field /signals/0; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0 keyword=additionalProperties; result=pass
+row.0199: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /signals/0/signal_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0 keyword=required; result=pass
+row.0200: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /signals/0/q; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0 keyword=required; result=pass
+row.0201: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /signals/0/q; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0/q keyword=maximum; result=pass
+row.0202: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /signals/0/signal_id; expected=refused schema=schemas/magic10_result_v2.schema.json; observed=refused schema=schemas/magic10_result_v2.schema.json instance_path=/signals/0/signal_id keyword=enum; result=pass
+row.0203: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=actual; expected=accepted; observed=accepted; result=pass
+row.0204: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=unknown_field /; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=additionalProperties; result=pass
+row.0205: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /schema; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0206: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /config_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0207: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /release_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0208: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /pair_key; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0209: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /signals; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0210: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/ keyword=required; result=pass
+row.0211: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=unknown_field /categories/0; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=additionalProperties; result=pass
+row.0212: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories/0/category_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
+row.0213: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories/0/score; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
+row.0214: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories/0/band; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
+row.0215: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories/0/shared_key; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
+row.0216: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories/0/personal_lo_to_hi_key; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
+row.0217: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /categories/0/personal_hi_to_lo_key; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0 keyword=required; result=pass
+row.0218: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /categories/0/band; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0/band keyword=enum; result=pass
+row.0219: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /categories/0/category_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0/category_id keyword=enum; result=pass
+row.0220: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /categories/0/score; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/categories/0/score keyword=maximum; result=pass
+row.0221: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /schema; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/schema keyword=const; result=pass
+row.0222: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=unknown_field /signals/0; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0 keyword=additionalProperties; result=pass
+row.0223: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /signals/0/signal_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0 keyword=required; result=pass
+row.0224: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=required_dropped /signals/0/q; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0 keyword=required; result=pass
+row.0225: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /signals/0/q; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0/q keyword=maximum; result=pass
+row.0226: family=schema_matrix; subtasks=HDE-SEPA007.2; input=v2 real-path result; mutation=out_of_domain /signals/0/signal_id; expected=refused schema=schemas/magic10_compat_result_v2.schema.json; observed=refused schema=schemas/magic10_compat_result_v2.schema.json instance_path=/signals/0/signal_id keyword=enum; result=pass
 row.0227: family=catalog_closure; subtasks=HDE-SEPA007.1,HDE-SEPA007.3; input=the actual bundle; mutation=actual; expected=pass; observed=pass; result=pass
 row.0228: family=catalog_closure; subtasks=HDE-SEPA007.1,HDE-SEPA007.3; input=catalog/centers_v1.json; mutation=g marked motor, rebound; expected=refused M10V2_CENTER_MOTOR_MISMATCH; observed=refused M10V2_CENTER_MOTOR_MISMATCH; result=pass
 row.0229: family=catalog_closure; subtasks=HDE-SEPA007.1,HDE-SEPA007.3; input=catalog/centers_v1.json; mutation=first center_id replaced, rebound; expected=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/centers_v1.schema.json; observed=refused M10V2_SCHEMA_VALIDATION_FAILED schema=schemas/centers_v1.schema.json instance_path=/centers keyword=contains; result=pass
@@ -351,57 +352,128 @@ rows.canonical_bytes: 16
 ac08.unchanged_since_unit_base: pass
 ac08.unchanged_since_pre_delivery: pass
 ac08.membership.changed_since: a0b796bc64fe0f058e69ec81f79e2561a840c71d
-ac08.membership.count: 40
-ac08.membership.1: not-member artifacts/architecture/architecture_snapshot.keys_only.json
-ac08.membership.2: not-member artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt
-ac08.membership.3: not-member artifacts/evidence_index.jsonl
-ac08.membership.4: not-member artifacts/evidence_index.jsonl.path_proof.txt
-ac08.membership.5: not-member artifacts/evidence_index.jsonl.sha256
-ac08.membership.6: not-member artifacts/evidence_index.jsonl.sha256.path_proof.txt
-ac08.membership.7: not-member audit/gates/canonical_json/canonical_json.gate.json
-ac08.membership.8: not-member audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt
-ac08.membership.9: not-member audit/gates/canonical_json/json_canon_compare.log
-ac08.membership.10: not-member audit/gates/canonical_json/json_canon_compare.log.path_proof.txt
-ac08.membership.11: not-member audit/gates/canonical_json/json_canonical_check.log
-ac08.membership.12: not-member audit/gates/canonical_json/json_canonical_check.log.path_proof.txt
-ac08.membership.13: not-member audit/gates/json_gate/canonical/json_gate_check_log.ndjson
-ac08.membership.14: not-member audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt
-ac08.membership.15: not-member audit/gates/json_gate/canonical/json_gate_compare_log.ndjson
-ac08.membership.16: not-member audit/gates/json_gate/canonical/json_gate_compare_log.ndjson.path_proof.txt
-ac08.membership.17: not-member audit/gates/json_gate/canonical/json_gate_structured_record.json
-ac08.membership.18: not-member audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt
-ac08.membership.19: not-member catalog/centers_v1.json
-ac08.membership.20: not-member catalog/type_pairing_v1.json
-ac08.membership.21: not-member ci/checks/classify_ci_changes.py
-ac08.membership.22: not-member docs/EVIDENCE_INDEX.md
-ac08.membership.23: not-member engine/config/magic10_v2_loader.py
-ac08.membership.24: not-member schemas/centers_v1.schema.json
-ac08.membership.25: not-member schemas/magic10_compat_result_v2.schema.json
-ac08.membership.26: not-member schemas/magic10_mechanics_v2.schema.json
-ac08.membership.27: not-member schemas/magic10_result_v2.schema.json
-ac08.membership.28: not-member schemas/thresholds_v2.schema.json
-ac08.membership.29: not-member schemas/type_pairing_v1.schema.json
-ac08.membership.30: not-member tests/config/test_magic10_v2_contracts.py
-ac08.membership.31: not-member tests/config/test_magic10_v2_loader.py
-ac08.membership.32: not-member tests/evidence/test_canonical_json_gate_check_outputs.py
-ac08.membership.33: not-member tests/evidence/test_hde_epic042_v2_contract_evidence.py
-ac08.membership.34: not-member tests/evidence/test_rails_ci_workflow_integration.py
-ac08.membership.35: not-member tests/fixtures/magic10_v2/LABEL.txt
-ac08.membership.36: not-member tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json
-ac08.membership.37: not-member tests/fixtures/magic10_v2/thresholds_v2.fixture.json
-ac08.membership.38: not-member tools/evidence/generate_hde_epic042_v2_contract_evidence.py
-ac08.membership.39: not-member tools/evidence/run_canonical_json_gate.py
-ac08.membership.40: not-member tools/evidence/update_evidence_index.py
+ac08.membership.count: 110
+ac08.membership.1: not-member AGENTS.md
+ac08.membership.2: not-member CHANGELOG.md
+ac08.membership.3: not-member README.md
+ac08.membership.4: not-member artifacts/architecture/architecture_snapshot.keys_only.json
+ac08.membership.5: not-member artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt
+ac08.membership.6: not-member artifacts/evidence_index.jsonl
+ac08.membership.7: not-member artifacts/evidence_index.jsonl.path_proof.txt
+ac08.membership.8: not-member artifacts/evidence_index.jsonl.sha256
+ac08.membership.9: not-member artifacts/evidence_index.jsonl.sha256.path_proof.txt
+ac08.membership.10: not-member audit/EPIC-042_MANIFEST.json
+ac08.membership.11: not-member audit/EPIC-042_MANIFEST.json.path_proof.txt
+ac08.membership.12: not-member audit/EPIC-042_close_candidate_source.json
+ac08.membership.13: not-member audit/EPIC-042_close_report.md
+ac08.membership.14: not-member audit/EPIC-042_close_report.md.path_proof.txt
+ac08.membership.15: not-member audit/docdeltas/hde-epic042_doc_deltas.md
+ac08.membership.16: not-member audit/docdeltas/hde-epic042_drain_targets.md
+ac08.membership.17: not-member audit/gates/canonical_json/canonical_json.gate.json
+ac08.membership.18: not-member audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt
+ac08.membership.19: not-member audit/gates/canonical_json/json_canon_compare.log
+ac08.membership.20: not-member audit/gates/canonical_json/json_canon_compare.log.path_proof.txt
+ac08.membership.21: not-member audit/gates/canonical_json/json_canonical_check.log
+ac08.membership.22: not-member audit/gates/canonical_json/json_canonical_check.log.path_proof.txt
+ac08.membership.23: not-member audit/gates/json_gate/canonical/json_gate_check_log.ndjson
+ac08.membership.24: not-member audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt
+ac08.membership.25: not-member audit/gates/json_gate/canonical/json_gate_compare_log.ndjson
+ac08.membership.26: not-member audit/gates/json_gate/canonical/json_gate_compare_log.ndjson.path_proof.txt
+ac08.membership.27: not-member audit/gates/json_gate/canonical/json_gate_structured_record.json
+ac08.membership.28: not-member audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt
+ac08.membership.29: not-member audit/gates/topology/orientation_demo.txt
+ac08.membership.30: not-member audit/gates/topology/orientation_demo.txt.path_proof.txt
+ac08.membership.31: not-member audit/qa/hde-epic042/00_meta/doc_deltas.md
+ac08.membership.32: not-member audit/qa/hde-epic042/00_meta/doc_deltas.md.path_proof.txt
+ac08.membership.33: not-member audit/qa/hde-epic042/acceptance_map_viability.log
+ac08.membership.34: not-member audit/qa/hde-epic042/acceptance_map_viability.log.path_proof.txt
+ac08.membership.35: not-member audit/qa/hde-epic042/checks/qa-01-d0-discovery/primary.log
+ac08.membership.36: not-member audit/qa/hde-epic042/checks/qa-01-d0-discovery/primary.log.path_proof.txt
+ac08.membership.37: not-member audit/qa/hde-epic042/checks/qa-02-step-0b-doc-delta-capture/primary.log
+ac08.membership.38: not-member audit/qa/hde-epic042/checks/qa-02-step-0b-doc-delta-capture/primary.log.path_proof.txt
+ac08.membership.39: not-member audit/qa/hde-epic042/checks/qa-03-bound-ci-coverage/primary.log
+ac08.membership.40: not-member audit/qa/hde-epic042/checks/qa-03-bound-ci-coverage/primary.log.path_proof.txt
+ac08.membership.41: not-member audit/qa/hde-epic042/checks/qa-04-contract-record-attribution/primary.log
+ac08.membership.42: not-member audit/qa/hde-epic042/checks/qa-04-contract-record-attribution/primary.log.path_proof.txt
+ac08.membership.43: not-member audit/qa/hde-epic042/checks/qa-05-ac08-v1-identity/primary.log
+ac08.membership.44: not-member audit/qa/hde-epic042/checks/qa-05-ac08-v1-identity/primary.log.path_proof.txt
+ac08.membership.45: not-member audit/qa/hde-epic042/checks/qa-06-deployed-identity/primary.log
+ac08.membership.46: not-member audit/qa/hde-epic042/checks/qa-06-deployed-identity/primary.log.path_proof.txt
+ac08.membership.47: not-member audit/qa/hde-epic042/checks/qa-07-deployed-reader-syn/primary.log
+ac08.membership.48: not-member audit/qa/hde-epic042/checks/qa-07-deployed-reader-syn/primary.log.path_proof.txt
+ac08.membership.49: not-member audit/qa/hde-epic042/checks/qa-08-live-compat-cli/primary.log
+ac08.membership.50: not-member audit/qa/hde-epic042/checks/qa-08-live-compat-cli/primary.log.path_proof.txt
+ac08.membership.51: not-member audit/qa/hde-epic042/checks/qa-09-live-vendor-functional/primary.log
+ac08.membership.52: not-member audit/qa/hde-epic042/checks/qa-09-live-vendor-functional/primary.log.path_proof.txt
+ac08.membership.53: not-member audit/qa/hde-epic042/close/acceptance-map-write/primary.log
+ac08.membership.54: not-member audit/qa/hde-epic042/close/acceptance-map-write/primary.log.path_proof.txt
+ac08.membership.55: not-member audit/qa/hde-epic042/close/close-pack-check/primary.log
+ac08.membership.56: not-member audit/qa/hde-epic042/close/close-pack-check/primary.log.path_proof.txt
+ac08.membership.57: not-member audit/qa/hde-epic042/close/close-pack-write/primary.log
+ac08.membership.58: not-member audit/qa/hde-epic042/close/close-pack-write/primary.log.path_proof.txt
+ac08.membership.59: not-member audit/qa/hde-epic042/close/evidence-index-check/primary.log
+ac08.membership.60: not-member audit/qa/hde-epic042/close/evidence-index-check/primary.log.path_proof.txt
+ac08.membership.61: not-member audit/qa/hde-epic042/close/evidence-index-hash/primary.log
+ac08.membership.62: not-member audit/qa/hde-epic042/close/evidence-index-hash/primary.log.path_proof.txt
+ac08.membership.63: not-member audit/qa/hde-epic042/close/evidence-index-write/primary.log
+ac08.membership.64: not-member audit/qa/hde-epic042/close/evidence-index-write/primary.log.path_proof.txt
+ac08.membership.65: not-member audit/qa/hde-epic042/close/evidence-paths/primary.log
+ac08.membership.66: not-member audit/qa/hde-epic042/close/evidence-paths/primary.log.path_proof.txt
+ac08.membership.67: not-member audit/qa/hde-epic042/close/final-lf/primary.log
+ac08.membership.68: not-member audit/qa/hde-epic042/close/final-lf/primary.log.path_proof.txt
+ac08.membership.69: not-member audit/qa/hde-epic042/close/mirror-schema/primary.log
+ac08.membership.70: not-member audit/qa/hde-epic042/close/mirror-schema/primary.log.path_proof.txt
+ac08.membership.71: not-member audit/qa/hde-epic042/close/orientation-check/primary.log
+ac08.membership.72: not-member audit/qa/hde-epic042/close/orientation-check/primary.log.path_proof.txt
+ac08.membership.73: not-member audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt
+ac08.membership.74: not-member audit/qa/hde-epic042/pr-04/v2_contract_evidence.txt.path_proof.txt
+ac08.membership.75: not-member audit/qa/hde-epic042/qa_step_logs_manifest.json
+ac08.membership.76: not-member audit/qa/hde-epic042/qa_step_logs_manifest.json.path_proof.txt
+ac08.membership.77: not-member catalog/centers_v1.json
+ac08.membership.78: not-member catalog/type_pairing_v1.json
+ac08.membership.79: not-member ci/checks/classify_ci_changes.py
+ac08.membership.80: not-member docs/EVIDENCE_INDEX.md
+ac08.membership.81: not-member docs/INDEX.md
+ac08.membership.82: not-member docs/acceptance_map_epic042.json
+ac08.membership.83: not-member docs/acceptance_map_epic042.json.path_proof.txt
+ac08.membership.84: not-member docs/adr/hde/close_pack_writer_adr.md
+ac08.membership.85: not-member docs/evidence/INDEX.json
+ac08.membership.86: not-member docs/evidence/INDEX.json.path_proof.txt
+ac08.membership.87: not-member docs/evidence/INDEX.sha256
+ac08.membership.88: not-member docs/evidence/INDEX.sha256.path_proof.txt
+ac08.membership.89: not-member engine/config/magic10_v2_loader.py
+ac08.membership.90: not-member schemas/centers_v1.schema.json
+ac08.membership.91: not-member schemas/magic10_compat_result_v2.schema.json
+ac08.membership.92: not-member schemas/magic10_mechanics_v2.schema.json
+ac08.membership.93: not-member schemas/magic10_result_v2.schema.json
+ac08.membership.94: not-member schemas/thresholds_v2.schema.json
+ac08.membership.95: not-member schemas/type_pairing_v1.schema.json
+ac08.membership.96: not-member tests/config/test_magic10_v2_contracts.py
+ac08.membership.97: not-member tests/config/test_magic10_v2_loader.py
+ac08.membership.98: not-member tests/evidence/test_canonical_json_gate_check_outputs.py
+ac08.membership.99: not-member tests/evidence/test_evidence_index_missing_state.py
+ac08.membership.100: not-member tests/evidence/test_hde_epic042_v2_contract_evidence.py
+ac08.membership.101: not-member tests/evidence/test_rails_ci_workflow_integration.py
+ac08.membership.102: not-member tests/fixtures/magic10_v2/LABEL.txt
+ac08.membership.103: not-member tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json
+ac08.membership.104: not-member tests/fixtures/magic10_v2/thresholds_v2.fixture.json
+ac08.membership.105: not-member tests/ops/test_evidence_index.py
+ac08.membership.106: not-member tests/qa/test_generate_epic_close_pack.py
+ac08.membership.107: not-member tools/evidence/generate_hde_epic042_v2_contract_evidence.py
+ac08.membership.108: not-member tools/evidence/run_canonical_json_gate.py
+ac08.membership.109: not-member tools/evidence/update_evidence_index.py
+ac08.membership.110: not-member tools/qa/generate_epic_close_pack.py
 ac08.membership: pass
 ac08.determinism_gate_check: pass
 ac08.pr01_generator_check: pass
-ac08.active_release_id: 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
-ac08.active_config_id: m10-channel-state-v1.0.0
+ac08.active_release_id: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+ac08.active_config_id: m10-relevance-centers-type-v2.0.0
+ac08.prior_release_id: 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
 ac08.active_identity: pass
-limitation.1: the result-schema instances are a v1 real-path result (evaluate_pair on fixtures/charts/alice.json and bob.json) re-identified as v2 by schema and config_id only; they prove the result schemas' refusals, not v2 scoring; result-instance validation is this generator's strict Draft 2020-12 validator, since no v2 result validator exists before HDE-CONJ010.3
+limitation.1: the result-schema instances are the admitted release's real-path result (evaluate_pair on fixtures/charts/alice.json and bob.json), magic10_result.v2 and magic10_compat_result.v2 under m10-relevance-centers-type-v2.0.0 as produced; they prove the result schemas' acceptance and refusals, not the score values; the matrix validates them with this generator's strict Draft 2020-12 validator
 limitation.2: the configuration and thresholds under test are the labelled non-canon fixtures of tests/fixtures/magic10_v2/; no maxima value is canon (C-07) and the identity values are procedure proofs, not the cutover identity (TI-03)
 limitation.3: this record is PR evidence, not QA evidence
-limitation.4: the ac08 lines hold before the v2 cutover only; HDE-DIST008.2 re-runs this generator against the cut's files
-limitation.5: no user, vendor or HTTP interface reaches the v2 contract before the cutover
+limitation.4: the ac08 history and membership lines cover HDE-EPIC042's fixed ranges 330a7e9124c360776fd3c5a2123b24421287c00e..bdcf21d1c8ecb0657a66c786277f60e900933868 and a0b796bc64fe0f058e69ec81f79e2561a840c71d..a9cf2356360ff93d413396381c3ae8089cc4f631, judged against the release of a9cf2356360ff93d413396381c3ae8089cc4f631:catalog/manifest.json, not the tested tree's roster; the ac08 active identity is the tested tree's admitted release (the v2 cut, HDE-DIST008.2), which must differ from that prior release
+limitation.5: the only interface exercised is the in-process evaluate_pair call; the CLI, HTTP and vendor interfaces that reach the v2 contract are not exercised by this record
 limitation.6: when the tested commit object is absent (after a squash merge whose branch was deleted), its consistency check is not applicable and the recomputed tested-inputs digest binds the tested files
 status: PASS

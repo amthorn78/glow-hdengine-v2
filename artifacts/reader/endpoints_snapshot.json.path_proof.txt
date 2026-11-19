@@ -1,5 +1,5 @@
 path: artifacts/reader/endpoints_snapshot.json
 size_bytes: 170
-sha256: 8718b93736f103aecfd1cd8c76009189626a4ff0e057b1d4bbe61194a0746f43
-mtime_utc: 2026-09-25T18:21:27Z
-produced_at_utc: 2026-09-25T18:21:27Z
+sha256: 3d16ae5315e1f5c9bb91e7c7b64c6842da8a0d0f36bfb5f0b7f56186dd9e4928
+mtime_utc: 2026-11-19T18:47:48Z
+produced_at_utc: 2026-11-19T18:47:48Z

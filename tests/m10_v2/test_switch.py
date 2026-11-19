@@ -57,10 +57,12 @@ from engine.config.registry_loader import (
 from engine.magic10_v2 import compat as magic10_v2_compat
 from engine.presenter.emitter import emit_public
 from tests.config.helpers import (
+    release_roster_route,
     synthetic_complete_release_root,
     synthetic_v2_candidate_root,
     v2_candidate_roster,
     v2_candidate_roster_admission,
+    write_release_manifest,
 )
 from tests.support.pr04_fixtures import FakeCurrentViewDB, build_pack, complete_chart, inject_seams
 
@@ -105,9 +107,10 @@ SCORING_PATH = (
     "engine/magic10_v2/signals.py",
 )
 V1_CONFIGURATION = ("catalog/magic10_mechanics_v1.json", "m10-channel-state-v1.0.0")
-# The one closure module still naming the v1 configuration, recorded with its owner:
-# the config tool's v1 config-family publication is re-targeted at the cut (WU-PR-10).
-V1_CONFIGURATION_OWNERS = {"tools.config.generate_config_artifacts": "WU-PR-10"}
+# Closure modules still naming the v1 configuration, each recorded with its owner.  None
+# remains: the cut (HDE-EPIC043 WU-PR-10) re-targeted the config tool's config family to
+# the v2 configuration, so item 2 exempts no module.
+V1_CONFIGURATION_OWNERS: dict[str, str] = {}
 
 
 # --- shared seams -----------------------------------------------------------------------------
@@ -177,11 +180,12 @@ def test_temporary_root_admits_the_v2_bundle_through_the_v2_rules(candidate) -> 
     assert bundle.config_sha256 == bundle.magic10_v2.config_sha256 == config_row["sha256"]
     assert bundle.release_id == bundle.manifest_sha256 == hashlib.sha256(manifest_raw).hexdigest()
     assert tuple(row.path for row in bundle.manifest.files) == v2_candidate_roster()
-    assert len(bundle.manifest.files) == 57
+    assert len(bundle.manifest.files) == len(registry_loader.ADMITTED_RELEASE_ROSTER)
     assert "catalog/magic10_mechanics_v1.json" not in rows
-    # The roster route restored the constant: production admission is unchanged.
-    assert len(registry_loader.ADMITTED_RELEASE_ROSTER) == 45
-    assert "catalog/magic10_mechanics_v1.json" in registry_loader.ADMITTED_RELEASE_ROSTER
+    # Since the cut (WU-PR-10) the candidate roster is the production roster constant,
+    # which no longer lists the v1 configuration.
+    assert v2_candidate_roster() == registry_loader.ADMITTED_RELEASE_ROSTER
+    assert "catalog/magic10_mechanics_v1.json" not in registry_loader.ADMITTED_RELEASE_ROSTER
 
 
 def test_every_seam_reader_reads_the_admitted_object(candidate) -> None:
@@ -410,6 +414,22 @@ def test_item_2_proof_fails_on_its_named_check_for_a_retired_import(tmp_path) ->
     assert item_2_findings(copy) == ["retired:engine.compat.thresholds", "retired:engine.magic10.thresholds"]
 
 
+def test_item_2_proof_checks_the_config_tool_now_its_exemption_is_gone(tmp_path) -> None:
+    # HDE-EPIC043 WU-PR-10: the cut emptied V1_CONFIGURATION_OWNERS, so the config tool is
+    # checked like every closure module; naming the v1 configuration again fails by name.
+    assert V1_CONFIGURATION_OWNERS == {}
+    copy = tmp_path / "tree"
+    for top in ("adapter", "engine", "presenter", "scripts", "tools"):
+        for path in (ROOT / top).rglob("*.py"):
+            target = copy / path.relative_to(ROOT)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, target)
+    tool = copy / "tools" / "config" / "generate_config_artifacts.py"
+    tool.write_text(tool.read_text(encoding="utf-8") + f"\n_V1_CONFIGURATION = {V1_CONFIGURATION[0]!r}\n",
+                    encoding="utf-8")
+    assert item_2_findings(copy) == ["names_v1_configuration:tools.config.generate_config_artifacts"]
+
+
 # --- 6. the real-root refusal, stage-adaptive -------------------------------------------------
 
 def test_real_root_admission_refuses_by_name_until_the_cut() -> None:
@@ -424,15 +444,32 @@ def test_real_root_admission_refuses_by_name_until_the_cut() -> None:
 # --- 7. the order of admission checks ---------------------------------------------------------
 
 def test_member_hashes_are_checked_before_executing_sources(tmp_path) -> None:
+    # Since the cut (WU-PR-10) the admitted roster binds every executing source, so
+    # the unbound case uses a roster without engine/magic10_v2/kernel.py through the
+    # test-only roster route; each root's manifest lists exactly that roster.
+    unbound = tuple(path for path in registry_loader.ADMITTED_RELEASE_ROSTER
+                    if path != "engine/magic10_v2/kernel.py")
+    assert len(unbound) == len(registry_loader.ADMITTED_RELEASE_ROSTER) - 1
     unchanged = synthetic_complete_release_root(tmp_path / "unchanged")
-    with pytest.raises(SchemaValidationError) as caught:
-        _load_active_mechanics_bundle_from_root(unchanged)
-    assert caught.value.code == "UNBOUND_SOURCE"
+    write_release_manifest(unchanged, unbound)
     changed = synthetic_complete_release_root(tmp_path / "changed")
+    write_release_manifest(changed, unbound)
     member = changed / "tools" / "bodygraph" / "check_magic10_gate_readiness.py"
     member.write_bytes(member.read_bytes().replace(b"Gate", b"gate", 1))
+    with release_roster_route(unbound):
+        with pytest.raises(SchemaValidationError) as caught:
+            _load_active_mechanics_bundle_from_root(unchanged)
+        assert caught.value.code == "UNBOUND_SOURCE"
+        with pytest.raises(SchemaValidationError) as caught:
+            _load_active_mechanics_bundle_from_root(changed)
+        assert caught.value.code == "MANIFEST_MEMBER_HASH_MISMATCH"
+    # Under the admitted roster the same root admits, and the same member change refuses.
+    admitted = synthetic_complete_release_root(tmp_path / "admitted")
+    assert type(_load_active_mechanics_bundle_from_root(admitted)) is AdmittedMechanicsBundle
+    member = admitted / "tools" / "bodygraph" / "check_magic10_gate_readiness.py"
+    member.write_bytes(member.read_bytes().replace(b"Gate", b"gate", 1))
     with pytest.raises(SchemaValidationError) as caught:
-        _load_active_mechanics_bundle_from_root(changed)
+        _load_active_mechanics_bundle_from_root(admitted)
     assert caught.value.code == "MANIFEST_MEMBER_HASH_MISMATCH"
 
 

@@ -26,7 +26,7 @@ from engine.core import compute_core
 from engine.magic10_v2.kernel import compute_kernel
 from engine.runtime.determinism_env import ensure_determinism_env
 from engine.serializer.canon import sercanon
-from tests.config.helpers import synthetic_v2_candidate_root, v2_candidate_roster_admission
+from tests.config.helpers import synthetic_complete_release_root
 
 CORE_ARTIFACTS = {
     "engine_core_purity_report": "artifacts/core/purity/purity_report.json",
@@ -42,14 +42,14 @@ PURE_PATHS = (
     "engine/core/core.py", "engine/magic10_v2/kernel.py",
     "engine/magic10_v2/signals.py", "engine/magic10_v2/calculation.py",
 )
-# The governed v2 configuration does not exist before the cut; the labelled
-# fixture stands in for it, and its ``sources`` bind the other inputs by digest.
+# HDE-EPIC043 WU-PR-10 (D-7): the governed v2 configuration and the cut maxima,
+# from which every recorded band comes, are release members since the cut.
 SOURCE_PATHS = PURE_PATHS + (
     "engine/core/__init__.py", "engine/magic10_v2/__init__.py",
     "engine/bodygraph/gates.py", "engine/config/registry_loader.py",
     "engine/config/magic10_v2_loader.py",
     "engine/serializer/canon.py", "engine/stable/sercanon.py",
-    "tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json", "schemas/magic10_result_v2.schema.json",
+    "catalog/magic10_mechanics_v2.json", "math/thresholds.json", "schemas/magic10_result_v2.schema.json",
 )
 FORBIDDEN_ROOTS = frozenset((
     "os", "time", "datetime", "random", "secrets", "uuid", "socket", "subprocess",
@@ -60,13 +60,18 @@ FORBIDDEN_CALLS = frozenset((
     "open", "eval", "exec", "compile", "__import__", "getenv",
     "read_text", "read_bytes", "write_text", "write_bytes",
 ))
-# HDE Math Spec §9.5 (v2): M10-G001 (no Channel, two Reflectors) is the one v2
-# golden canon fixes before the cut: every category scores 0, band Cool.
-G001_GATES = ((1,), (2,))
-G001_SCORES = (0,) * 10
-# Refusal while the governed proof schemas still bind another input list (they
-# move to v2 with the proofs' regeneration at the cut, WU-PR-10).
+# HDE Math Spec §9.5 (v2); HDE-EPIC043 WU-PR-10 (D-21): the proofs' pair is M10-G004's.
+# Its expected Channel states, signals, scores and bands, set at the cut, are read from
+# the v2 goldens as the single source; the proofs are published only when they agree.
+GOLDENS_PATH = "tests/fixtures/magic10/v2/goldens.json"
+G004_CASE_ID = "M10-G004"
+G004_GATES = ((5, 19, 20, 34, 43, 49), (9, 12, 15, 22, 23, 52))
+G004_ORACLE_MISMATCH = "fixed G004 oracle mismatch"
+# Refusal when a governed proof schema binds another input list than ``SOURCE_PATHS``.
 SCHEMA_SOURCE_LIST_MISMATCH = "CORE_PROOF_SCHEMA_SOURCE_LIST_MISMATCH"
+# Refusal when the synthetic release is not the admitted release (its manifest digest
+# differs from catalog/manifest.json's), so no proof binds another release_id or band.
+RELEASE_MISMATCH = "CORE_PROOF_RELEASE_MISMATCH"
 
 
 def _sha(raw):
@@ -99,11 +104,24 @@ def _purity_rows():
 
 
 def _schema_registry():
-    """Resolve every result schema a governed proof schema may reference."""
+    """Resolve the one result schema a governed proof schema may reference (v2 since the cut)."""
     registry = Registry()
-    for path in ("schemas/magic10_result_v1.schema.json", "schemas/magic10_result_v2.schema.json"):
+    for path in ("schemas/magic10_result_v2.schema.json",):
         registry = registry.with_resource(path, Resource.from_contents(json.loads((ROOT / path).read_bytes())))
     return registry
+
+
+def _g004_expected():
+    """The M10-G004 expected values of the v2 goldens, for the proofs' own pair."""
+    try:
+        document = json.loads((ROOT / GOLDENS_PATH).read_bytes())
+        case = next(row for row in document["cases"] if row["case_id"] == G004_CASE_ID)
+        if case["inputs"] != {"gates_a": list(G004_GATES[0]), "gates_b": list(G004_GATES[1])}:
+            raise ValueError(G004_ORACLE_MISMATCH)
+        expected = case["expected"]
+        return {key: expected[key] for key in ("channel_states", "signals", "categories")}
+    except (OSError, ValueError, KeyError, TypeError, StopIteration):
+        raise ValueError(G004_ORACLE_MISMATCH) from None
 
 
 def _validate_payloads(payloads):
@@ -133,31 +151,36 @@ def _build_payloads():
         "source_sha256": {path: _sha((ROOT / path).read_bytes()) for path in SOURCE_PATHS},
         "env": env,
     }
+    expected_g004 = _g004_expected()
     with TemporaryDirectory(prefix="hde-pr03-core-evidence-") as tmp:
-        candidate = synthetic_v2_candidate_root(Path(tmp), source_root=ROOT)
-        with v2_candidate_roster_admission():
-            bundle = _load_active_mechanics_bundle_from_root(candidate)
-        a, b = normalize_gates([5, 19, 20, 34, 43, 49]), normalize_gates([9, 12, 15, 22, 23, 52])
+        # HDE-EPIC043 WU-PR-10 (D-7): the synthetic release copies the real roster bytes,
+        # so it is the admitted release and the proofs bind its release_id and bands.
+        candidate = synthetic_complete_release_root(Path(tmp), source_root=ROOT)
+        if _sha((candidate / "catalog/manifest.json").read_bytes()) != _sha((ROOT / "catalog/manifest.json").read_bytes()):
+            raise ValueError(RELEASE_MISMATCH)
+        bundle = _load_active_mechanics_bundle_from_root(candidate)
+        a, b = normalize_gates(list(G004_GATES[0])), normalize_gates(list(G004_GATES[1]))
         first = compute_core(a, b, bundle, bundle.release_id)
         second = compute_core(a, b, bundle, bundle.release_id)
         reverse = compute_core(b, a, bundle, bundle.release_id)
         equal = compute_core(a, a, bundle, bundle.release_id)
-        oracle = compute_core(normalize_gates(list(G001_GATES[0])), normalize_gates(list(G001_GATES[1])),
-                              bundle, bundle.release_id)
         first_payload, second_payload = first.as_payload(), second.as_payload()
         reverse_payload, equal_payload = reverse.as_payload(), equal.as_payload()
         schema = json.loads((ROOT / "schemas/magic10_result_v2.schema.json").read_bytes())
-        for result in (first_payload, second_payload, reverse_payload, equal_payload, oracle.as_payload()):
+        for result in (first_payload, second_payload, reverse_payload, equal_payload):
             jsonschema.Draft202012Validator(schema).validate(result)
-        if (tuple(r.score for r in oracle.categories) != G001_SCORES
-                or any(r.band != "Cool" for r in oracle.categories)):
-            raise ValueError("fixed G001 oracle mismatch")
         canonical = sercanon(first_payload, sort_keys=True)
         repeated = sercanon(second_payload, sort_keys=True)
         reversed_bytes = sercanon(reverse_payload, sort_keys=True)
         reparsed = sercanon(json.loads(canonical), sort_keys=True)
         ab_states = compute_kernel(a.mask, b.mask, bundle.magic10_v2).channels
         ba_states = compute_kernel(b.mask, a.mask, bundle.magic10_v2).channels
+        observed_g004 = {
+            "channel_states": [{"channel_id": r.channel_id, "state": r.state, "owner": r.owner} for r in ab_states],
+            "signals": first_payload["signals"], "categories": first_payload["categories"],
+        }
+        if observed_g004 != expected_g004:
+            raise ValueError(G004_ORACLE_MISMATCH)
         owners = {r.channel_id: r.owner for r in ab_states if r.owner is not None}
         owner_ok = owners == {"09-52": "member_hi", "12-22": "member_hi",
                               "19-49": "member_lo", "20-34": "member_lo"}
@@ -169,7 +192,7 @@ def _build_payloads():
             "engine_core_two_run_logs": dict(common, schema="engine_core_two_run_logs.v1",
                 inputs=inputs, first_run=first_payload, second_run=second_payload,
                 identical=first_payload == second_payload, canonical_bytes_equal=canonical == repeated,
-                fixed_g001_oracle_passed=True),
+                fixed_g004_oracle_passed=True),
             "engine_core_abba_logs": dict(common, schema="engine_core_abba_logs.v1",
                 inputs=inputs, ab_run=first_payload, ba_run=reverse_payload,
                 equal_mask_run=equal_payload, complete_result_equal=first_payload == reverse_payload,
