@@ -68,6 +68,12 @@ def _load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _g004_expected() -> dict:
+    """HDE-EPIC043 WU-PR-10 (D-21): the v2 M10-G004 values, the single source of the G004 pins."""
+    goldens = _load_json(Path("tests/fixtures/magic10/v2/goldens.json"))
+    return next(case for case in goldens["cases"] if case["case_id"] == "M10-G004")["expected"]
+
+
 def _validate(instance: object, schema: dict) -> None:
     from tools.evidence.generate_engine_core_evidence import _schema_registry
     jsonschema.Draft202012Validator(schema, registry=_schema_registry()).validate(instance)
@@ -112,6 +118,9 @@ def test_engine_core_artifacts_match_schemas():
 
 def test_current_proofs_bind_actual_sources_and_behavior():
     from tools.evidence import generate_engine_core_evidence as writer
+    # HDE-EPIC043 WU-PR-10 (D-7): the governed configuration and the cut maxima are bound inputs.
+    assert {"catalog/magic10_mechanics_v2.json", "math/thresholds.json"} <= set(writer.SOURCE_PATHS)
+    assert not any(path.startswith("tests/") for path in writer.SOURCE_PATHS)
     for artifact in CORE_ARTIFACTS.values():
         payload = _load_json(artifact)
         assert payload["fixture_kind"] == "synthetic_complete_release_only"
@@ -120,8 +129,12 @@ def test_current_proofs_bind_actual_sources_and_behavior():
             assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest
     two_run = _load_json(CORE_ARTIFACTS["engine_core_two_run_logs"])
     assert two_run["first_run"] == two_run["second_run"]
-    assert [r["q"] for r in two_run["first_run"]["signals"]] == [25, 63, 0, 38, 40, 20, 0, 25, 50, 38, 50, 0, 0, 0, 50, 20, 0, 60, 0, 33]
-    assert [r["score"] for r in two_run["first_run"]["categories"]] == [22, 10, 15, 6, 22, 13, 0, 18, 15, 8]
+    # D-21: the G004 pins are the v2 M10-G004 values, set at the cut maxima.
+    expected = _g004_expected()
+    assert [r["q"] for r in two_run["first_run"]["signals"]] == [r["q"] for r in expected["signals"]]
+    assert [r["score"] for r in two_run["first_run"]["categories"]] == [r["score"] for r in expected["categories"]]
+    assert [r["band"] for r in two_run["first_run"]["categories"]] == [r["band"] for r in expected["categories"]]
+    assert two_run["fixed_g004_oracle_passed"] is True
     abba = _load_json(CORE_ARTIFACTS["engine_core_abba_logs"])
     assert abba["ab_run"] == abba["ba_run"]
     assert all(abba[k] is True for k in ("complete_result_equal", "canonical_bytes_equal",
@@ -132,26 +145,50 @@ def test_current_proofs_bind_actual_sources_and_behavior():
     assert compare["size_bytes"] == len(raw)
 
 
-def _governed_schemas_bind_the_writer_inputs(writer) -> bool:
-    return all(
-        _load_json(path)["properties"]["source_sha256"]["required"] == list(writer.SOURCE_PATHS)
-        for path in CORE_SCHEMAS.values()
-    )
+def _schema_refs(value: object) -> list[object]:
+    if isinstance(value, dict):
+        return [item for key, child in value.items() for item in ([child] if key == "$ref" else _schema_refs(child))]
+    if isinstance(value, list):
+        return [item for child in value for item in _schema_refs(child)]
+    return []
+
+
+def test_governed_schemas_bind_the_writer_inputs_and_the_v2_result():
+    """HDE-EPIC043 WU-PR-10 (D-7): the four proof schemas moved with the writer."""
+    from tools.evidence import generate_engine_core_evidence as writer
+    for path in CORE_SCHEMAS.values():
+        raw = path.read_bytes()
+        schema = json.loads(raw)
+        assert raw == (json.dumps(schema, indent=2) + "\n").encode("utf-8")
+        source = schema["properties"]["source_sha256"]
+        assert source["required"] == list(source["properties"]) == list(writer.SOURCE_PATHS)
+        assert source["additionalProperties"] is False
+        assert set(_schema_refs(schema)) <= {"schemas/magic10_result_v2.schema.json"}
+    assert {path: len(_schema_refs(_load_json(path))) for path in CORE_SCHEMAS.values()} == {
+        CORE_SCHEMAS["engine_core_purity_report_schema"]: 0, CORE_SCHEMAS["engine_core_two_run_logs_schema"]: 2,
+        CORE_SCHEMAS["engine_core_abba_logs_schema"]: 3, CORE_SCHEMAS["engine_core_json_compare_logs_schema"]: 1}
+    purity = _load_json(CORE_SCHEMAS["engine_core_purity_report_schema"])
+    assert purity["properties"]["modules"]["items"]["properties"]["module"]["enum"] == list(writer.PURE_PATHS)
+    two_run = _load_json(CORE_SCHEMAS["engine_core_two_run_logs_schema"])
+    assert "fixed_g004_oracle_passed" in two_run["required"]
+    assert two_run["properties"]["fixed_g004_oracle_passed"] == {"type": "boolean", "const": True}
+
+
+def test_writer_refuses_a_schema_bound_to_another_source_list_before_publication(tmp_path, monkeypatch):
+    from tools.evidence import generate_engine_core_evidence as writer
+    key = "engine_core_two_run_logs_schema"
+    schema = _load_json(CORE_SCHEMAS[key])
+    schema["properties"]["source_sha256"]["required"] = schema["properties"]["source_sha256"]["required"][:-1]
+    stale = tmp_path / "stale.schema.json"
+    stale.write_text(json.dumps(schema, indent=2) + "\n", encoding="utf-8")
+    monkeypatch.setitem(writer.CORE_SCHEMAS, key, str(stale))
+    monkeypatch.setattr(writer, "_write_payloads", lambda payloads: pytest.fail("proofs published"))
+    with pytest.raises(ValueError, match=writer.SCHEMA_SOURCE_LIST_MISMATCH):
+        writer.main(["--skip-index"])
 
 
 def test_writer_repeated_proofs_preserve_bytes_and_mtimes(tmp_path, monkeypatch):
-    """Stage-adaptive (HDE-EPIC043 WU-PR-09).
-
-    While the governed proof schemas still bind the v1 writer's input list (until
-    the cut regenerates the proofs and moves their schemas, WU-PR-10), the
-    re-targeted writer refuses before publication with its stable token. Once
-    they bind its inputs, repeated proofs preserve bytes and mtimes.
-    """
     from tools.evidence import generate_engine_core_evidence as writer
-    if not _governed_schemas_bind_the_writer_inputs(writer):
-        with pytest.raises(ValueError, match=writer.SCHEMA_SOURCE_LIST_MISMATCH):
-            writer._build_payloads()
-        return
     payloads = writer._build_payloads()
     writer._validate_payloads(payloads)
     monkeypatch.setattr(writer, "ROOT", tmp_path)
@@ -166,6 +203,7 @@ def test_writer_repeated_proofs_preserve_bytes_and_mtimes(tmp_path, monkeypatch)
 
 @pytest.mark.parametrize("key,field,bad", [
     ("engine_core_two_run_logs", "identical", False),
+    ("engine_core_two_run_logs", "fixed_g004_oracle_passed", False),
     ("engine_core_abba_logs", "normalized_owners_verified", False),
     ("engine_core_json_compare_logs", "result_schema_valid", False),
     ("engine_core_purity_report", "behavioral_guard_exit_code", 1),
@@ -185,7 +223,15 @@ def test_evidence_reuses_closed_owning_result_schema():
         _validate(payload, _load_json(ARTIFACT_SCHEMA_MAPPING[key]))
 
 
-def test_writer_refuses_a_schema_valid_wrong_g001_before_publication(monkeypatch):
+def test_evidence_refuses_a_v1_result_under_the_v2_binding():
+    key = "engine_core_two_run_logs"
+    payload = _load_json(CORE_ARTIFACTS[key])
+    payload["first_run"]["schema"] = "magic10_result.v1"
+    with pytest.raises(jsonschema.ValidationError):
+        _validate(payload, _load_json(ARTIFACT_SCHEMA_MAPPING[key]))
+
+
+def test_writer_refuses_a_schema_valid_wrong_g004_before_publication(monkeypatch):
     import dataclasses
     from tools.evidence import generate_engine_core_evidence as writer
     original = writer.compute_core
@@ -194,8 +240,37 @@ def test_writer_refuses_a_schema_valid_wrong_g001_before_publication(monkeypatch
         categories = (dataclasses.replace(result.categories[0], score=23), *result.categories[1:])
         return dataclasses.replace(result, categories=categories)
     monkeypatch.setattr(writer, "compute_core", wrong)
-    with pytest.raises(ValueError, match="fixed G001 oracle mismatch"):
+    monkeypatch.setattr(writer, "_write_payloads", lambda payloads: pytest.fail("proofs published"))
+    with pytest.raises(ValueError, match=writer.G004_ORACLE_MISMATCH):
+        writer.main(["--skip-index"])
+
+
+def test_writer_refuses_a_g004_golden_for_another_pair(tmp_path, monkeypatch):
+    from tools.evidence import generate_engine_core_evidence as writer
+    goldens = _load_json(Path(writer.GOLDENS_PATH))
+    next(case for case in goldens["cases"] if case["case_id"] == "M10-G004")["inputs"]["gates_b"] = [9, 12, 15, 22, 23]
+    other = tmp_path / "goldens.json"
+    other.write_text(json.dumps(goldens), encoding="utf-8")
+    monkeypatch.setattr(writer, "GOLDENS_PATH", str(other))
+    with pytest.raises(ValueError, match=writer.G004_ORACLE_MISMATCH):
         writer._build_payloads()
+
+
+def test_writer_refuses_a_synthetic_release_that_is_not_the_admitted_release(monkeypatch):
+    from tests.config import helpers
+    from tools.evidence import generate_engine_core_evidence as writer
+
+    def other_release(tmp_path, *, source_root=None):
+        root = helpers.synthetic_complete_release_root(tmp_path, source_root=source_root)
+        member = root / "tools/bodygraph/check_magic10_gate_readiness.py"
+        member.write_bytes(member.read_bytes() + b"# another release\n")
+        helpers.write_synthetic_release_manifest(root)
+        return root
+
+    monkeypatch.setattr(writer, "synthetic_complete_release_root", other_release)
+    monkeypatch.setattr(writer, "_write_payloads", lambda payloads: pytest.fail("proofs published"))
+    with pytest.raises(ValueError, match=writer.RELEASE_MISMATCH):
+        writer.main(["--skip-index"])
 
 
 def test_core_evidence_binds_the_admitted_release_id():

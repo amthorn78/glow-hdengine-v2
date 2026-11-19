@@ -114,16 +114,17 @@ def test_catalog_integration_exceptions(bundle):
 
 
 def test_g001_none_and_g002_homogeneous_companionship(bundle):
-    # M10-G001 is the one canon v2 value before the cut (PF01 §9.5): gates [1] vs [2],
-    # no Channel, two Reflectors -> every category 0, band Cool (so every q is 0).
+    # M10-G001 is fixed by canon (PF01 §9.5): gates [1] vs [2], no Channel, two
+    # Reflectors -> every category 0, band Cool (so every q is 0).
     result = compute_core(normalize_gates([1]), normalize_gates([2]), bundle, bundle.release_id)
     _assert_v2_shape(result, bundle)
     assert [c.score for c in result.categories] == [0] * 10
     assert [c.band for c in result.categories] == ["Cool"] * 10
     assert [s.q for s in result.signals] == [0] * 20
-    # G002 (all 64 Gates both sides): no canon v2 score exists, so the v1 score and
-    # band vectors are not re-derived; the homogeneous-companionship state and the
-    # v2 result closure are asserted instead.
+    # G002 (all 64 Gates both sides): its v2 values were set at the cut maxima
+    # (tests/fixtures/magic10/v2/goldens.json, compared over the cut release by
+    # tools/config/artifacts.py); this bundle carries the labelled fixture maxima,
+    # so the homogeneous-companionship state and the v2 result closure are asserted.
     full = normalize_gates(list(range(1, 65)))
     kernel = compute_kernel(full.mask, full.mask, bundle.magic10_v2)
     assert len(kernel.channels) == 36
@@ -140,8 +141,9 @@ def test_g004_fixed_oracle_complete_result_and_two_runs(bundle):
     assert first == second
     assert sercanon(first.as_payload()) == sercanon(second.as_payload())
     # HDE-EPIC043 WU-PR-09: the v1 q and score vectors were v1 scoring values (retired
-    # with the v1 scorers); no canon v2 value exists for this pair, so the v2 closure
-    # and the two-run identity are asserted instead.
+    # with the v1 scorers). WU-PR-10 set this pair's v2 values (M10-G004) at the cut
+    # maxima, compared over the cut release by tools/config/artifacts.py; over this
+    # fixture-maxima bundle the v2 closure and the two-run identity are asserted.
     _assert_v2_shape(first, bundle)
     assert tuple(f.name for f in dataclasses.fields(first)) == (
         "schema", "config_id", "release_id", "pair_key", "signals", "categories",

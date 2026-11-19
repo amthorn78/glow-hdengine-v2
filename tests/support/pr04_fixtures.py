@@ -73,8 +73,8 @@ def build_bundle(tmp_root: Path):
     """Admit the synthetic v2 candidate release from an isolated copy (never the repo).
 
     HDE-EPIC043 WU-PR-09: the switched admission admits the v2 bundle, so the
-    shared bundle is the 57-member v2 candidate admitted through the test-only
-    roster route (``tests/config/helpers.py``).
+    shared bundle is the v2 candidate (``tests/config/helpers.py``).  Since the
+    cut (WU-PR-10) its roster is the admitted roster itself.
     """
 
     return admit_synthetic_v2_candidate(tmp_root)

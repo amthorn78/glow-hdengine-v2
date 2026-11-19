@@ -41,19 +41,20 @@ EXECUTING = (
     "engine/core/core.py", "engine/config/magic10_v2_loader.py",
     "engine/magic10_v2/kernel.py", "engine/magic10_v2/signals.py", "engine/magic10_v2/calculation.py",
 )
-V2_CANDIDATE_MEMBERS = 57
+# HDE-EPIC043 WU-PR-10: the cut made the v2 candidate roster the admitted roster.
+RELEASE_MEMBERS = len(loader.ADMITTED_RELEASE_ROSTER)
 
 
 @pytest.fixture
 def release_root(tmp_path: Path) -> Path:
-    # The 45-member v1 root no longer admits (UNBOUND_SOURCE); it serves only the
-    # refusals raised earlier in the admission order.
+    # The admitted roster over the repository's own member bytes; since the cut
+    # (HDE-EPIC043 WU-PR-10) it admits.
     return synthetic_complete_release_root(tmp_path)
 
 
 @pytest.fixture
 def candidate_root(tmp_path: Path):
-    """The 57-member v2 candidate root, with the test-only roster route active for the test."""
+    """The v2 candidate root over the admitted roster (the roster route swaps nothing since the cut)."""
     root = synthetic_v2_candidate_root(tmp_path)
     with v2_candidate_roster_admission():
         yield root
@@ -78,10 +79,10 @@ def _importable(root: Path) -> None:
 
 def _child(root: Path, script: str, *, optimization: int = 0) -> dict:
     options = ["-I"] + (["-" + "O" * optimization] if optimization else [])
-    # argv[2] carries the v2 candidate roster: the isolated child cannot import
-    # tests/config/helpers.py, so _IMPORT repeats its one-constant roster swap.
+    # Since the cut the isolated child admits through the root's own, unswapped
+    # roster constant, which is the admitted roster.
     result = subprocess.run(
-        [sys.executable, *options, "-c", script, str(root), json.dumps(v2_candidate_roster())],
+        [sys.executable, *options, "-c", script, str(root)],
         cwd=root, env=closed_rails_env(), text=True, capture_output=True,
         check=False, timeout=30,
     )
@@ -98,7 +99,6 @@ sys.path.insert(0, str(root))
 from engine.config import registry_loader as loader
 from engine.serializer import canon
 from engine.categories import registry as category_registry
-loader.ADMITTED_RELEASE_ROSTER = tuple(json.loads(sys.argv[2]))
 owners = {
     'engine/config/registry_loader.py': loader,
     'engine/serializer/canon.py': canon,
@@ -130,7 +130,7 @@ def test_public_fresh_execution_admits_all_four_modules_under_matching_semantics
     _importable(candidate_root)
     result = _child(candidate_root, _IMPORT + "print(json.dumps(admit()))\n", optimization=optimization)
     assert result["state"] == "admitted"
-    assert result["members"] == V2_CANDIDATE_MEMBERS
+    assert result["members"] == RELEASE_MEMBERS
     assert result["release_id"] == hashlib.sha256((candidate_root / "catalog/manifest.json").read_bytes()).hexdigest()
     for path in EXECUTING:
         assert result["sources"][path] == hashlib.sha256((candidate_root / path).read_bytes()).hexdigest()
@@ -189,7 +189,7 @@ print(json.dumps(result))
     cached.unlink()
     fresh = _child(release_root, script)
     assert fresh["state"] == "admitted"
-    assert fresh["members"] == V2_CANDIDATE_MEMBERS
+    assert fresh["members"] == RELEASE_MEMBERS
     assert fresh["behavior"] == "B"
     assert fresh["sources"][path] == hashlib.sha256(raw_b).hexdigest()
 
@@ -289,19 +289,21 @@ def test_real_public_import_through_deployment_symlink_refuses(
     assert _child(alias, script + "print(json.dumps(admit()))\n") == {"state": "refused", "code": "UNSAFE_SOURCE_PATH"}
 
 
-@pytest.mark.parametrize("count", [43, 44, 46])
-def test_only_the_exact_45_member_roster_admits(release_root: Path, count: int) -> None:
+@pytest.mark.parametrize("offset", [-2, -1, 1], ids=["minus_2", "minus_1", "plus_1"])
+def test_only_the_exact_admitted_roster_admits(release_root: Path, offset: int) -> None:
+    # Counts are relative to the admitted roster (HDE-EPIC043 WU-PR-10), not a literal.
     path = release_root / "catalog/manifest.json"
     manifest = json.loads(path.read_bytes())
-    if count < 45:
-        omitted = HELPERS[:45 - count]
+    assert len(manifest["files"]) == RELEASE_MEMBERS
+    if offset < 0:
+        omitted = HELPERS[:-offset]
         manifest["files"] = [row for row in manifest["files"] if row["path"] not in omitted]
         expected = "INCOMPLETE_RELEASE_ROSTER"
     else:
         manifest["files"].append({"path": "engine/unapproved.py", "sha256": "0" * 64, "size": 1})
         manifest["files"].sort(key=lambda row: row["path"])
         expected = "RELEASE_ROSTER_MISMATCH"
-    assert len(manifest["files"]) == count
+    assert len(manifest["files"]) == RELEASE_MEMBERS + offset
     write_canonical(path, manifest)
     _refuses(release_root, expected)
 

@@ -125,7 +125,9 @@ def test_selected_root_bundles_preserve_complete_payload_and_schema_bytes(bundle
     # Domain-valid lower-level projection variation exposes payload/root leakage.
     threshold_path = bundle_root / "math/thresholds.json"
     thresholds = json.loads(threshold_path.read_bytes())
-    thresholds["edges"] = [20, 40, 60, 100]
+    # The cut's thresholds are version 2: vary one category's maxima (HDE-EPIC043 WU-PR-10).
+    assert thresholds["categories"][0]["maxima"] != [20, 40, 60, 100]
+    thresholds["categories"][0]["maxima"] = [20, 40, 60, 100]
     write_canonical(threshold_path, thresholds)
     config_tools.generate_config_artifacts(bundle_root)
     outputs = bundle_tools.generate_bundles(bundle_root)

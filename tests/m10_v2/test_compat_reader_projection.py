@@ -28,7 +28,8 @@ from engine.presenter.emitter import emit_public
 from engine.runtime.identity import identity_meta
 
 ROOT = Path(__file__).resolve().parents[2]
-RID = "2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"
+# An arbitrary well-formed release_id, not any release's (re-pinned at the v2 cut).
+RID = "0123456789abcdef" * 4
 HARMONY_PAIRS = {
     "Open": (0x7BF7EF3DFFE8F3BF, 0x7C5582D3B7EA6F37),
     "Warm": (0xB71FDFB09CE03C35, 0x9DACFBED5ACE5519),

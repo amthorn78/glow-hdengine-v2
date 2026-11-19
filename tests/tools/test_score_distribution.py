@@ -47,8 +47,9 @@ TOOL_FILES = (
     TOOL_PATH,
 )
 THIS_TEST = "tests/tools/test_score_distribution.py"
-# The S16 measure (Specification v1.1): the score-range record's counts at release 1.3.0.
-RECORD_COUNTS = {"Cool": 157045, "Open": 42093, "Warm": 859, "Glow": 3}
+# The frozen reference measure: the v2 release's mix over the pinned corpus, measured at the
+# HDE-EPIC043 WU-PR-10 cut (release 2.0.0) and re-frozen in reference_baseline_v1.json.
+RECORD_COUNTS = {"Cool": 59379, "Open": 70026, "Warm": 51360, "Glow": 19235}
 POPULATION_SHA256 = "cc31b34794f3d990b0fc98d8c9caee20d04b0610030c57839d0283caed9741e3"
 REPORT_KEYS = {
     "schema", "mode", "read_only", "release", "population", "category_results", "band_counts", "band_shares",
@@ -140,8 +141,8 @@ def test_frozen_baseline_is_the_records_measured_mix(bundle) -> None:
     assert raw == sercanon(baseline)
     assert baseline["schema"] == tool.BASELINE_SCHEMA
     assert baseline["corpus_sha256"] == tool.REFERENCE_CORPUS_SHA256
-    assert baseline["release"] == {"version": "1.3.0", "config_id": "m10-channel-state-v1.0.0",
-                                   "release_id": "77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e"}
+    assert baseline["release"] == {"version": "2.0.0", "config_id": "m10-relevance-centers-type-v2.0.0",
+                                   "release_id": bundle.release_id}
     counts = baseline["band_counts"]
     assert counts["overall"] == RECORD_COUNTS
     assert list(counts["per_category"]) == sorted(bundle.registry.magic10_order)
@@ -382,8 +383,10 @@ def test_the_tool_is_never_a_public_surface() -> None:
         if "tools.score_distribution" in text or "tools/score_distribution" in text or "score_distribution import" in text:
             referencing.append(path)
     # HDE-EPIC043 WU-PR-08: the observation-population generator names its own output path;
-    # it is the one other allowed referencing file, and the tool never imports it.
-    assert referencing == ["ci/checks/classify_ci_changes.py", GENERATOR_PATH]
+    # it is an allowed referencing file, and the tool never imports it.  HDE-EPIC043 WU-PR-10:
+    # the cut-record evidence writer reuses the tool's functions in process; it is not a surface.
+    assert referencing == ["ci/checks/classify_ci_changes.py", "tools/evidence/generate_hde_epic043_cut_record.py",
+                           GENERATOR_PATH]
     scripts = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["scripts"]
     assert scripts == {"hdctl": "engine.cli.main:cli"}
     assert "score_distribution" not in (ROOT / "docs/ENDPOINTS_CATALOG.json").read_text(encoding="utf-8")

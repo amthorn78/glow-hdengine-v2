@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from engine.config.registry_loader import RegistryConfigError, SchemaValidationError, _capture_registry_config, load_registry_config, validate_channel_gates
+from engine.config.registry_loader import ADMITTED_RELEASE_VERSION, RegistryConfigError, SchemaValidationError, _capture_registry_config, load_registry_config, validate_channel_gates
 from tests.config.helpers import catalog_root, write_canonical
 
 EXPECTED_CHANNELS = {'01-08': ([1, 8], ['g', 'throat'], 'individual', 'knowing'),
@@ -317,9 +317,11 @@ def test_selected_root_refuses_unsafe_or_missing_dependencies(tmp_path: Path, ki
 
 def test_source_capture_detects_later_change_and_base_needs_no_mechanics_release(tmp_path: Path) -> None:
     root = catalog_root(tmp_path)
+    # Neither mechanics configuration is needed by the base capture.
     (root / 'catalog/magic10_mechanics_v1.json').unlink()
+    (root / 'catalog/magic10_mechanics_v2.json').unlink()
     capture = _capture_registry_config(root)
-    assert capture.config.manifest.version == '1.3.0'
+    assert capture.config.manifest.version == ADMITTED_RELEASE_VERSION
     assert not any('mechanics' in name for name in capture.sources)
     path = root / 'catalog/magic10_seeds.json'
     data = json.loads(path.read_bytes())

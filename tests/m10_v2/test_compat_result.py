@@ -26,8 +26,8 @@ from engine.magic10_v2 import compat
 from engine.narratives.router import route_keys
 from engine.presenter.emitter import emit_public
 
-# A well-formed explicit release_id; the layer reads no active release.
-RID = "2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"
+# A well-formed explicit release_id, not any release's; the layer reads no active release.
+RID = "0123456789abcdef" * 4
 # All 64 Gates, paired with itself.
 FULL = (1 << 64) - 1
 # A real pair at which equilibrium_score reaches 1000 (seed 20261117 search).

@@ -537,8 +537,8 @@ def test_real_trees(tmp_path, capsysbinary):
     The prior is the same commit. Expectations follow the checkout's own state, read by two oracles
     independent of the guard, so the case holds at every stage: A while it admits and binds only the
     v1 configuration (Stage A); B while it does not admit (the switch head before the cut); C once it
-    admits and binds only the v2 configuration (after the cut). P2 is asserted only under A: after the
-    switch it is the switch's evidence.
+    admits and binds only the v2 configuration (after the cut). P2 is asserted under A (both findings)
+    and under C (none: the cut re-targeted the config tool, the last closure module naming v1).
     """
     candidate = tmp_path / "candidate"
     candidate.mkdir()
@@ -570,6 +570,7 @@ def test_real_trees(tmp_path, capsysbinary):
         assert "P4_PRIOR_NOT_ADMITTED" in found["P4"]
     elif configurations == {V2}:
         assert found["P1"] == []
+        assert found["P2"] == []
         assert "P3_RELEASE_ID_UNCHANGED" in found["P3"]
         assert report["admitted_config_id"] == guard.V2_CONFIG_ID
     else:

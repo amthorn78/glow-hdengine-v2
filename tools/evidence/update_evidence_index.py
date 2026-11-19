@@ -3527,6 +3527,17 @@ EPIC042_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC043_PR10_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic043.pr10.v2_cut_record",
+        "discovered_physical_path": "audit/qa/hde-epic043/pr-10/v2_cut_record.txt",
+        "epic_id": "HDE-EPIC043",
+        "record_type": "epic043_pr10_evidence",
+        "schema_version": "1.0",
+        "notes": "HDE-EPIC043 WU-PR-10 Magic-10 v2 cut record (HDE-DIST008.2)",
+    },
+]
+
 EPIC042_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic042.qa_step_logs_manifest",
@@ -4699,6 +4710,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC042_PR01_PRIMARY_ARTIFACTS,
             *EPIC042_PR04_PRIMARY_ARTIFACTS,
             *EPIC042_QA_PRIMARY_ARTIFACTS,
+            *EPIC043_PR10_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

@@ -14,9 +14,11 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from engine.config.magic10_v2_loader import (  # noqa: E402
+    MAGIC10_V2_CONFIGURATION_PATH, _magic10_v2_bundle_from_capture,
+)
 from engine.config.registry_loader import (  # noqa: E402
-    RegistryConfigError, SchemaValidationError, _MechanicsCapture, _PROFILE_RESPONSES, _SIGNAL_MEMBERSHIP,
-    _capture_registry_config, _validate_mechanics_domain, load_active_mechanics_bundle,
+    RegistryConfigError, _MechanicsCapture, _capture_registry_config, load_active_mechanics_bundle,
 )
 from engine.serializer import canon  # noqa: E402
 from tools.config.artifacts import (  # noqa: E402
@@ -27,39 +29,22 @@ from tools.config.artifacts import (  # noqa: E402
 from tools.generate_registry_report import REPORT_PATH, _build_registry_report, _verify_report_source  # noqa: E402
 
 
-# HDE-EPIC043 WU-PR-09: the v1 candidate validators moved here from the admission
-# owner (engine/config/registry_loader.py), whose switched admission no longer
-# admits a v1 configuration.  This tool is their only production caller; it keeps
-# its v1 config-family publication until the cut re-targets it (WU-PR-10).
-
-def _validate_initial_mechanics(capture: _LocalCapture, data: object, registry: RegistryConfig) -> None:
-    _validate_mechanics_domain(capture, data, registry)
-    if data['config_id'] != 'm10-channel-state-v1.0.0':
-        raise SchemaValidationError('INITIAL_CONFIG_ID_MISMATCH', 'initial mechanics config identity mismatch')
-    if data['profiles'] != [{'profile_id': name, 'responses': responses} for name, responses in sorted(_PROFILE_RESPONSES.items())]:
-        raise SchemaValidationError('INITIAL_PROFILE_MISMATCH', 'initial mechanics responses differ from the adopted defaults')
-    for signal in data['signals']:
-        _, ids = _SIGNAL_MEMBERSHIP[signal['signal_id']]
-        expected = [{'channel_id': name, 'weight': 1} for name in ids]
-        if signal['channels'] != expected:
-            raise SchemaValidationError('INITIAL_SIGNAL_MAP_MISMATCH', 'initial membership/default weights differ from the adopted map')
-    if sum(len(signal['channels']) for signal in data['signals']) != 90:
-        raise SchemaValidationError('INITIAL_MEMBERSHIP_COUNT_MISMATCH', 'initial map must contain ninety memberships')
-    if any(row['weights'] != [1, 1] for row in data['category_weights']):
-        raise SchemaValidationError('INITIAL_CATEGORY_WEIGHTS_MISMATCH', 'initial category weights must be [1,1]')
-    if capture.read('math/thresholds.json').data['edges'] != [24, 49, 74, 100]:
-        raise SchemaValidationError('INITIAL_THRESHOLDS_MISMATCH', 'initial mechanics thresholds differ from the adopted maxima')
-
+# HDE-EPIC043 WU-PR-10 (HDE-DIST008.2): the cut re-targets the config family to
+# the admitted Magic-10 v2 configuration.  The v1 candidate validators that
+# WU-PR-09 parked here are gone; the v2 loader's own rules (C1 to C12) validate
+# the configuration over this tool's capture, so the family fails closed on an
+# absent, invalid, ambiguous or hash-mismatched configuration and never
+# activates a candidate (HDE Schemas and Artifacts §8.14.1).
 
 def _capture_mechanics_config(root: Path | str | None = None) -> _MechanicsCapture:
-    """Validate the complete initial candidate; never return an active release handle."""
+    """Validate the complete v2 configuration through the v2 loader's rules; never return an active release handle."""
     base = _capture_registry_config(root)
     capture = _MechanicsCapture(base.root, base.sources, registry=base.config)
-    data = capture.read('catalog/magic10_mechanics_v1.json').data
-    _validate_initial_mechanics(capture, data, base.config)
-    capture.config = data
+    validated = _magic10_v2_bundle_from_capture(capture, base.config.manifest.files, verify=False)
+    capture.config = validated.configuration
     capture.verify_unchanged()
     return capture
+
 
 _CONFIG_PATHS = (
     "artifacts/registry/registry_report.json",
@@ -121,7 +106,7 @@ def _require_same_capture(capture, bundle) -> None:
         elif name in identities:
             identity = identities[name]
             mismatched |= (source.sha256, source.size_bytes) != (identity.sha256, identity.size)
-        if name == "catalog/magic10_mechanics_v1.json":
+        if name == MAGIC10_V2_CONFIGURATION_PATH:
             mismatched |= source.sha256 != bundle.config_sha256
     if mismatched:
         raise RuntimeError("CONFIG_PUBLICATION_CAPTURE_MISMATCH")
@@ -244,7 +229,7 @@ def publish_config_family(root: Path | None = None) -> None:
     immutable_paths.update(base / name for name in (
         "docs/schemas/config_bundle_be.json", "docs/schemas/config_bundle_fe.json",
         "engine/serializer/canon.py", "engine/stable/sercanon.py", "engine/mech/helpers.py",
-        "schemas/magic10_result_v1.schema.json", "schemas/magic10_compat_result_v1.schema.json",
+        "schemas/magic10_result_v2.schema.json", "schemas/magic10_compat_result_v2.schema.json",
         "artifacts/identity/service_identity.json"))
     immutable_before = _destination_state(base, immutable_paths)
     if any(value is None for value in immutable_before.values()):
@@ -426,7 +411,7 @@ def _main(argv: list[str] | None = None) -> int:
     modes.add_argument("--check", action="store_true", help="Validate committed three-primary bytes without writing")
     modes.add_argument("--publish-family", action="store_true", help="Publish the scoped config, catalog logs, bundles and required evidence companions from this checkout")
     modes.add_argument("--compare-goldens", metavar="CANDIDATE_ROOT", help="Read-only: admit the explicit candidate root and compare the PF01 §9.5 golden collection through the canonical entrypoints; exit 0 on match, 1 on mismatch, 5 on refusal")
-    parser.add_argument("--goldens", metavar="PATH", help="Golden collection for --compare-goldens (default: tests/fixtures/magic10/v1/goldens.json)")
+    parser.add_argument("--goldens", metavar="PATH", help="Golden collection for --compare-goldens (default: tests/fixtures/magic10/v2/goldens.json)")
     parser.add_argument("--report", metavar="PATH", help="With --compare-goldens: write the complete canonical report to this path outside the candidate root and the repository, never over the goldens file")
     args = parser.parse_args(argv)
     if args.compare_goldens is not None:

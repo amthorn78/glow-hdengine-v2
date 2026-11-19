@@ -28,6 +28,23 @@ _VERSION = re.compile(
 _BUILT_AT = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
 _TOP_LEVEL_KEYS = {"root", "version", "built_at_utc", "files"}
 _ENTRY_KEYS = {"path", "sha256", "size"}
+# HDE-EPIC043 WU-PR-10: the closed, ASCII-sorted list of rows the v2 cut
+# retires from the admitted release.  A release selects exactly one mechanics
+# configuration, and a row that is not a runtime input of the release is a
+# non-input extra (HDE Schemas and Artifacts §2.9, §5.1).  Only the roster mode
+# drops them; any other existing row outside the roster is still refused, and a
+# listed path absent from the manifest is a no-op.  Retired rows are never read.
+# The paths are a set display, like the admission roster's, so the cutover
+# guard's P2 does not read this membership list as naming the v1 configuration.
+RETIRED_RELEASE_MEMBERS = tuple(sorted({
+    "catalog/magic10_mechanics_v1.json",
+    "engine/magic10/calculators.py",
+    "engine/magic10/composite.py",
+    "engine/magic10/signals.py",
+    "schemas/magic10_compat_result_v1.schema.json",
+    "schemas/magic10_mechanics_v1.schema.json",
+    "schemas/magic10_result_v1.schema.json",
+}))
 _REQUIRED_RAILS = {
     "ALLOW_NETWORK": "0",
     "LANG": "C",
@@ -86,6 +103,18 @@ def _validate_roster(roster: Sequence[str], manifest_rel: str) -> tuple[str, ...
     return members
 
 
+def _validate_retired(retired, manifest_rel: str) -> frozenset[str]:
+    """Accept only a set of safe ASCII paths; empty is the default."""
+    members = tuple(retired)
+    if (
+        any(not isinstance(name, str) or not name.isascii() for name in members)
+        or len(set(members)) != len(members)
+        or any(_path_unsafe(name, manifest_rel) for name in members)
+    ):
+        raise ValueError("release_manifest_retired_invalid")
+    return frozenset(members)
+
+
 def cut_manifest(
     manifest_path: Path,
     *,
@@ -93,6 +122,7 @@ def cut_manifest(
     built_at_utc: str,
     check: bool = False,
     roster: Sequence[str] | None = None,
+    retired: frozenset[str] | Sequence[str] = frozenset(),
     _publish: Callable[[Path, bytes], None] | None = None,
 ) -> int:
     """Render or verify one canonical manifest without derived evidence writes.
@@ -139,11 +169,17 @@ def cut_manifest(
         if _path_unsafe(name, manifest_rel) or name in existing:
             raise ValueError("release_manifest_entry_path_unsafe")
         existing[name] = entry
+    retired_set = _validate_retired(retired, manifest_rel)
+    if retired_set and roster is None:
+        raise ValueError("release_manifest_retired_requires_roster")
     if roster is not None:
         members = _validate_roster(roster, manifest_rel)
         member_set = set(members)
+        for name in members:
+            if name in retired_set:
+                raise ValueError(f"release_manifest_retired_member_in_roster:{name}")
         for name in existing:
-            if name not in member_set:
+            if name not in member_set and name not in retired_set:
                 raise ValueError(f"release_manifest_extra_member:{name}")
         entries = [
             existing.get(name, {"path": name, "sha256": "", "size": 0})
@@ -194,6 +230,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
     roster = _admission.ADMITTED_RELEASE_ROSTER if args.roster_from_admission else None
+    retired = RETIRED_RELEASE_MEMBERS if args.roster_from_admission else ()
     try:
         return cut_manifest(
             args.manifest,
@@ -201,6 +238,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             built_at_utc=args.built_at_utc,
             check=args.check,
             roster=roster,
+            retired=retired,
         )
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
         print(f"RELEASE_MANIFEST_CUT_FAILED:{exc}", file=sys.stderr)

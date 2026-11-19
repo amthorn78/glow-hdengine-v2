@@ -15,12 +15,17 @@ mutation:
 
 * the schema mutation matrix over the six v2 schemas (an unknown field added,
   each required field dropped, each bounded field out of domain; the two result
-  schemas take a v1 real-path result re-identified as v2);
+  schemas take the admitted release's real-path v2 result, as produced);
 * catalog, caps and thresholds closure checks;
 * the configuration and source-bundle identity (HDE-SEPA007.4);
 * canonical bytes of the eight governed files.
 
-It also runs the AC-08 checks of the Implementation Audit's EC-13 at the head.
+It also runs the AC-08 checks of the Implementation Audit's EC-13, re-targeted
+at the v2 cut (HDE-EPIC043 WU-PR-10; HDE-DIST008.2): the unchanged-history and
+membership checks cover HDE-EPIC042's own fixed ranges, judged against the
+release of ``EPIC_END``'s manifest, not the tested tree's roster; the active
+identity is computed at run time (the SHA-256 of ``catalog/manifest.json`` and
+``MAGIC10_V2_CONFIG_ID``) and must differ from that prior release.
 The record names the tested commit, the responsible actor and the run time;
 ``--check`` byte-compares everything reproducible and checks those run-time
 fields for shape and consistency.  Nothing is written under the repository's
@@ -66,7 +71,6 @@ from engine.config.magic10_v2_loader import (  # noqa: E402
     magic10_v2_source_bundle_sha256,
 )
 from engine.config.registry_loader import (  # noqa: E402
-    ADMITTED_RELEASE_ROSTER,
     ManifestEntry,
     RegistryConfigError,
     load_active_mechanics_bundle,
@@ -79,12 +83,17 @@ OUT = ROOT / OUT_REL
 SCHEMA = "hde_epic042_v2_contract_evidence.v1"
 GENERATOR_REL = "tools/evidence/generate_hde_epic042_v2_contract_evidence.py"
 
-# AC-08 baselines (Implementation Audit EC-13): the unit base and the last commit
-# before any v2 contract file (WU-PR-02's base).
+# AC-08 ranges (Implementation Audit EC-13), fixed to HDE-EPIC042's own history at the
+# v2 cut (HDE-EPIC043 WU-PR-10): the unit base (WU-PR-03) to the unit's squash merge
+# (WU-PR-04), and the last commit before any v2 contract file (WU-PR-01, WU-PR-02's
+# base) to the Epic's close (CL-05).  The release they are judged against is the one
+# EPIC_END's manifest names; the active identity is computed at run time.
 UNIT_BASE = "330a7e9124c360776fd3c5a2123b24421287c00e"
+UNIT_END = "bdcf21d1c8ecb0657a66c786277f60e900933868"
 PRE_DELIVERY_BASE = "a0b796bc64fe0f058e69ec81f79e2561a840c71d"
-EXPECTED_ACTIVE_RELEASE_ID = "2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129"
-EXPECTED_ACTIVE_CONFIG_ID = "m10-channel-state-v1.0.0"
+EPIC_END = "a9cf2356360ff93d413396381c3ae8089cc4f631"
+HISTORY_COMMITS = (UNIT_BASE, UNIT_END, PRE_DELIVERY_BASE, EPIC_END)
+MANIFEST_REL = "catalog/manifest.json"
 
 # Procedure-proof identity of the fixture bundle (WU-PR-03 result v1.0 §5.3); not
 # the cutover identity (Specification TI-03).
@@ -185,22 +194,26 @@ RUN_FIELDS = ("run.tested_commit", "run.time_utc", "run.actor", "run.python")
 _HEX40 = re.compile(r"[0-9a-f]{40}")
 _TIME = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z")
 _PYTHON = re.compile(r"\d+\.\d+\.\d+")
-_MEMBERSHIP_LINE = re.compile(r"^membership: (member|not-member) (\S+)$")
 
 DIRTY_EXIT = "V2_CONTRACT_EVIDENCE_DIRTY_TREE"
 HISTORY_EXIT = "V2_CONTRACT_EVIDENCE_HISTORY_UNAVAILABLE"
 FAILED_EXIT = "V2_CONTRACT_EVIDENCE_FAILED"
+REAL_PATH_NOT_V2 = "REAL_PATH_RESULT_NOT_V2"
 
 LIMITATIONS = (
-    "the result-schema instances are a v1 real-path result (evaluate_pair on fixtures/charts/alice.json and "
-    "bob.json) re-identified as v2 by schema and config_id only; they prove the result schemas' refusals, not v2 "
-    "scoring; result-instance validation is this generator's strict Draft 2020-12 validator, since no v2 result "
-    "validator exists before HDE-CONJ010.3",
+    "the result-schema instances are the admitted release's real-path result (evaluate_pair on "
+    f"fixtures/charts/alice.json and bob.json), {MAGIC10_V2_RESULT_SCHEMA} and {MAGIC10_V2_COMPAT_RESULT_SCHEMA} "
+    f"under {MAGIC10_V2_CONFIG_ID} as produced; they prove the result schemas' acceptance and refusals, not the "
+    "score values; the matrix validates them with this generator's strict Draft 2020-12 validator",
     "the configuration and thresholds under test are the labelled non-canon fixtures of tests/fixtures/magic10_v2/; "
     "no maxima value is canon (C-07) and the identity values are procedure proofs, not the cutover identity (TI-03)",
     "this record is PR evidence, not QA evidence",
-    "the ac08 lines hold before the v2 cutover only; HDE-DIST008.2 re-runs this generator against the cut's files",
-    "no user, vendor or HTTP interface reaches the v2 contract before the cutover",
+    f"the ac08 history and membership lines cover HDE-EPIC042's fixed ranges {UNIT_BASE}..{UNIT_END} and "
+    f"{PRE_DELIVERY_BASE}..{EPIC_END}, judged against the release of {EPIC_END}:{MANIFEST_REL}, not the tested "
+    "tree's roster; the ac08 active identity is the tested tree's admitted release (the v2 cut, HDE-DIST008.2), "
+    "which must differ from that prior release",
+    "the only interface exercised is the in-process evaluate_pair call; the CLI, HTTP and vendor interfaces that "
+    "reach the v2 contract are not exercised by this record",
     "when the tested commit object is absent (after a squash merge whose branch was deleted), its consistency "
     "check is not applicable and the recomputed tested-inputs digest binds the tested files",
 )
@@ -520,7 +533,11 @@ def validate_result(schema: Mapping[str, object], schema_rel: str, instance: obj
 
 
 def result_instances() -> dict[str, dict]:
-    """The real v1 pure and compat results of the fixture pair, re-identified as v2."""
+    """The admitted release's real pure and compat v2 results of the fixture pair, as produced.
+
+    Refuses with ``REAL_PATH_RESULT_NOT_V2`` unless both carry the v2 schema and
+    ``MAGIC10_V2_CONFIG_ID``: nothing is re-identified.
+    """
 
     def party(rel: str, label: str):
         data = json.loads((ROOT / rel).read_text(encoding="utf-8"))
@@ -542,11 +559,12 @@ def result_instances() -> dict[str, dict]:
     if len(cache.entries) != 1:
         raise EvidenceError("the real path did not hand exactly one pure result to the cache")
     pure = copy.deepcopy(dict(cache.entries[0]["result"]))  # type: ignore[arg-type]
-    return {
-        RESULT_SCHEMAS[0]: {**pure, "schema": MAGIC10_V2_RESULT_SCHEMA, "config_id": MAGIC10_V2_CONFIG_ID},
-        RESULT_SCHEMAS[1]: {**copy.deepcopy(compat), "schema": MAGIC10_V2_COMPAT_RESULT_SCHEMA,
-                            "config_id": MAGIC10_V2_CONFIG_ID},
-    }
+    compat = copy.deepcopy(dict(compat))
+    if ((pure.get("schema"), pure.get("config_id")) != (MAGIC10_V2_RESULT_SCHEMA, MAGIC10_V2_CONFIG_ID)
+            or (compat.get("schema"), compat.get("config_id")) != (MAGIC10_V2_COMPAT_RESULT_SCHEMA,
+                                                                    MAGIC10_V2_CONFIG_ID)):
+        raise EvidenceError(REAL_PATH_NOT_V2)
+    return {RESULT_SCHEMAS[0]: pure, RESULT_SCHEMAS[1]: compat}
 
 
 def schema_matrix(base: Path, mutator: Mutator, results: Mapping[str, dict]) -> list[Row]:
@@ -555,7 +573,7 @@ def schema_matrix(base: Path, mutator: Mutator, results: Mapping[str, dict]) -> 
         schema = json.loads((base / schema_rel).read_bytes())
         if instance_rel is None:
             instance = results[schema_rel]
-            label = "v1 real-path result re-identified as v2"
+            label = "v2 real-path result"
             observed = validate_result(schema, schema_rel, instance)
             rows.append(Row("schema_matrix", subtasks, label, "actual", "accepted", observed))
         else:
@@ -812,37 +830,46 @@ def canonical_rows(mutator: Mutator) -> list[Row]:
 
 # --- AC-08 (Implementation Audit EC-13) -------------------------------------------------------
 
+def history_present() -> bool:
+    return all(commit_present(commit) for commit in HISTORY_COMMITS)
+
+
+def end_manifest_bytes() -> bytes:
+    """``catalog/manifest.json`` as HDE-EPIC042 closed it (``EPIC_END``)."""
+
+    return git("show", f"{EPIC_END}:{MANIFEST_REL}").stdout
+
+
+def end_release_paths() -> tuple[str, ...]:
+    """The release member paths of ``EPIC_END``'s manifest; never the tested tree's roster."""
+
+    try:
+        rows = json.loads(end_manifest_bytes())["files"]
+        return tuple(row["path"] for row in rows)
+    except (ValueError, KeyError, TypeError) as exc:
+        raise EvidenceError(f"{EPIC_END}:{MANIFEST_REL} is not a release manifest") from exc
+
+
+def prior_release_id() -> str:
+    return sha256_hex(end_manifest_bytes())
+
+
 def _diff_paths() -> tuple[str, ...]:
-    return ("catalog/manifest.json", *ADMITTED_RELEASE_ROSTER)
+    return (MANIFEST_REL, *end_release_paths())
 
 
-def ac08_unchanged(base: str) -> str:
-    proc = git("diff", "--quiet", base, "--", *_diff_paths(), check=False)
+def ac08_unchanged(base: str, end: str) -> str:
+    proc = git("diff", "--quiet", base, end, "--", *_diff_paths(), check=False)
     return "pass" if proc.returncode == 0 else f"fail rc={proc.returncode}"
 
 
-def changed_paths_since_pre_delivery() -> tuple[str, ...]:
-    out = git("diff", "--name-only", PRE_DELIVERY_BASE, "HEAD").stdout.decode("utf-8")
+def changed_paths_in_epic042() -> tuple[str, ...]:
+    out = git("diff", "--name-only", PRE_DELIVERY_BASE, EPIC_END).stdout.decode("utf-8")
     return tuple(sorted(line for line in out.splitlines() if line))
 
 
-def membership_by_prepush(paths: Sequence[str]) -> dict[str, str]:
-    args = ["tools/ci/prepush_check.py"]
-    for path in paths:
-        args += ["--path", path]
-    proc = run_tool(*args, "membership")
-    answers: dict[str, str] = {}
-    for line in proc.stdout.decode("utf-8").splitlines():
-        match = _MEMBERSHIP_LINE.match(line.strip())
-        if match:
-            answers[match.group(2)] = match.group(1)
-    if proc.returncode or set(answers) != set(paths):
-        raise EvidenceError(f"prepush membership failed rc={proc.returncode}")
-    return answers
-
-
 def membership_in_process(paths: Sequence[str]) -> dict[str, str]:
-    roster = set(ADMITTED_RELEASE_ROSTER)
+    roster = set(end_release_paths())
     return {path: "member" if path in roster else "not-member" for path in paths}
 
 
@@ -850,9 +877,13 @@ def ac08_lines(paths: Sequence[str], membership: Mapping[str, str]) -> list[tupl
     determinism = run_tool("tools/evidence/generate_determinism_gate_proofs.py", "--check").returncode
     pr01 = run_tool("tools/evidence/generate_hde_epic042_tuning_identity_hash.py", "--check").returncode
     active = load_active_mechanics_bundle()
+    expected_release_id = sha256_hex((ROOT / MANIFEST_REL).read_bytes())
+    prior = prior_release_id()
+    identity = (active.release_id == expected_release_id and active.mechanics["config_id"] == MAGIC10_V2_CONFIG_ID
+                and active.release_id != prior)
     lines = [
-        ("ac08.unchanged_since_unit_base", ac08_unchanged(UNIT_BASE)),
-        ("ac08.unchanged_since_pre_delivery", ac08_unchanged(PRE_DELIVERY_BASE)),
+        ("ac08.unchanged_since_unit_base", ac08_unchanged(UNIT_BASE, UNIT_END)),
+        ("ac08.unchanged_since_pre_delivery", ac08_unchanged(PRE_DELIVERY_BASE, EPIC_END)),
         ("ac08.membership.changed_since", PRE_DELIVERY_BASE),
         ("ac08.membership.count", str(len(paths))),
     ]
@@ -863,8 +894,8 @@ def ac08_lines(paths: Sequence[str], membership: Mapping[str, str]) -> list[tupl
         ("ac08.pr01_generator_check", "pass" if pr01 == 0 else f"fail rc={pr01}"),
         ("ac08.active_release_id", active.release_id),
         ("ac08.active_config_id", str(active.mechanics["config_id"])),
-        ("ac08.active_identity", "pass" if (active.release_id, active.mechanics["config_id"]) == (
-            EXPECTED_ACTIVE_RELEASE_ID, EXPECTED_ACTIVE_CONFIG_ID) else "fail"),
+        ("ac08.prior_release_id", prior),
+        ("ac08.active_identity", "pass" if identity else "fail"),
     ]
     return lines
 
@@ -897,14 +928,15 @@ COMMANDS = (
     "in-process evaluate_pair(fixtures/charts/alice.json, fixtures/charts/bob.json, cache=<recording cache>), "
     "resolved with source_policy local",
     "in-process strict Draft 2020-12 validation of each result instance against the admitted root's result schema",
-    f"git diff --quiet {UNIT_BASE} -- catalog/manifest.json <45 ADMITTED_RELEASE_ROSTER paths> (working tree)",
-    f"git diff --quiet {PRE_DELIVERY_BASE} -- catalog/manifest.json <45 ADMITTED_RELEASE_ROSTER paths> "
-    "(working tree)",
-    f"git diff --name-only {PRE_DELIVERY_BASE} HEAD",
-    "python tools/ci/prepush_check.py --path <each changed path> membership",
+    f"git show {EPIC_END}:{MANIFEST_REL} (the prior release: its sha256 and its member paths)",
+    f"git diff --quiet {UNIT_BASE} {UNIT_END} -- {MANIFEST_REL} <the member paths of {EPIC_END}:{MANIFEST_REL}>",
+    f"git diff --quiet {PRE_DELIVERY_BASE} {EPIC_END} -- {MANIFEST_REL} "
+    f"<the member paths of {EPIC_END}:{MANIFEST_REL}>",
+    f"git diff --name-only {PRE_DELIVERY_BASE} {EPIC_END}",
+    f"in-process membership of each changed path in the member paths of {EPIC_END}:{MANIFEST_REL}",
     "python tools/evidence/generate_determinism_gate_proofs.py --check",
     "python tools/evidence/generate_hde_epic042_tuning_identity_hash.py --check",
-    "in-process load_active_mechanics_bundle()",
+    f"in-process load_active_mechanics_bundle(), against the sha256 of {MANIFEST_REL} and MAGIC10_V2_CONFIG_ID",
     f"python {GENERATOR_REL} --actor <run.actor>",
 )
 
@@ -950,10 +982,10 @@ def compute_rows() -> tuple[tuple[Row, ...], tuple[tuple[str, str], ...]]:
     return tuple(rows), tuple(bundle_lines)
 
 
-def build(*, membership: Callable[[Sequence[str]], Mapping[str, str]],
-          paths: Sequence[str]) -> Evidence:
+def build() -> Evidence:
     rows, bundle_lines = compute_rows()
-    ac08 = ac08_lines(paths, membership(paths))
+    paths = changed_paths_in_epic042()
+    ac08 = ac08_lines(paths, membership_in_process(paths))
     return Evidence(rows, bundle_lines, tuple(ac08), tuple(tested_inputs_lines()))
 
 
@@ -1025,7 +1057,7 @@ def write(actor: str) -> bytes:
         raise SystemExit("V2_CONTRACT_EVIDENCE_INVALID_ACTOR")
     if not tree_is_clean():
         raise SystemExit(DIRTY_EXIT)
-    if not (commit_present(UNIT_BASE) and commit_present(PRE_DELIVERY_BASE)):
+    if not history_present():
         raise SystemExit(HISTORY_EXIT)
     run = {
         "run.tested_commit": head_commit(),
@@ -1033,7 +1065,7 @@ def write(actor: str) -> bytes:
         "run.actor": actor,
         "run.python": platform.python_version(),
     }
-    evidence = build(membership=membership_by_prepush, paths=changed_paths_since_pre_delivery())
+    evidence = build()
     if not evidence.passed:
         failing = [row.line() for row in evidence.rows if not row.passed]
         failing += [f"{key}: {value}" for key, value in evidence.ac08 if value.startswith("fail")]
@@ -1073,12 +1105,9 @@ def check() -> str:
     bad = _run_fields_valid(run)
     if bad:
         raise SystemExit(f"DRIFT:{OUT_REL}:{bad}")
-    count = int(dict(parsed).get("ac08.membership.count", "0") or 0)
-    paths = []
-    for index in range(1, count + 1):
-        value = dict(parsed).get(f"ac08.membership.{index}", "")
-        paths.append(value.partition(" ")[2])
-    evidence = build(membership=membership_in_process, paths=paths)
+    if not history_present():
+        raise SystemExit(HISTORY_EXIT)
+    evidence = build()
     expected = record_lines(evidence, run)
     for (want_key, want), (have_key, have) in zip(expected, parsed):
         if (want_key, want) != (have_key, have):

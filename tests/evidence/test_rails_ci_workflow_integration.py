@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parents[2]
 S16_OWNER_TEST = "tests/tools/test_score_distribution.py"
 S16_TRIGGER_FILES = (
     "catalog/magic10_mechanics_v1.json",
+    # HDE-EPIC043 WU-PR-10: the governed v2 configuration the cut writes.
+    "catalog/magic10_mechanics_v2.json",
     "catalog/magic10_caps.json",
     "catalog/magic10.json",
     "catalog/channels_v1.json",
@@ -783,17 +785,40 @@ def test_pr01_channel_sources_select_complete_catalog_and_gate_owners(source: st
     assert classifier._lanes_for_path(source) == {"product", "compat", "release"}
 
 
+# HDE-EPIC043 WU-PR-10: the v1 contract module retired with its subject at the v2 cut. The v1
+# configuration and the v1 result schemas are read by the v2 contract module; the v1 mechanics
+# schema has no reader left, so its change fails closed until an owner is registered.
 @pytest.mark.parametrize("source", [
     "catalog/magic10_mechanics_v1.json",
-    "schemas/magic10_mechanics_v1.schema.json",
     "schemas/magic10_result_v1.schema.json",
     "schemas/magic10_compat_result_v1.schema.json",
 ])
 def test_pr01_mechanics_sources_have_the_real_contract_owner(source: str) -> None:
-    owners = ("tests/config/test_magic10_contracts.py",)
+    owners = ("tests/config/test_magic10_v2_contracts.py",)
     if source in S16_TRIGGER_FILES:
         owners += (S16_OWNER_TEST,)
     assert classifier.changed_test_targets(ROOT, (source,)) == owners
+    assert classifier._lanes_for_path(source) == {"product", "compat", "release"}
+
+
+def test_pr01_retired_v1_mechanics_schema_has_no_owner_and_fails_closed() -> None:
+    source = "schemas/magic10_mechanics_v1.schema.json"
+    assert source not in classifier._PRODUCT_TEST_OWNER_PATHS
+    with pytest.raises(ValueError) as caught:
+        classifier.changed_test_targets(ROOT, (source,))
+    assert str(caught.value) == f"CI_PRODUCT_OWNER_TEST_MISSING:{source}"
+
+
+def test_v2_configuration_has_its_contract_loader_evidence_config_and_s16_owners() -> None:
+    source = "catalog/magic10_mechanics_v2.json"
+    assert classifier.changed_test_targets(ROOT, (source,)) == (
+        "tests/config/test_config_artifacts.py",
+        "tests/config/test_magic10_v2_contracts.py",
+        "tests/config/test_magic10_v2_loader.py",
+        "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
+        S16_OWNER_TEST,
+    )
+    assert classifier._lanes_for_path(source) == {"product", "compat", "release"}
 
 
 def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
@@ -805,7 +830,6 @@ def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
         "tests/config/test_alias_policy_enforcement.py",
         "tests/config/test_config_loader_unknown_ids_fail_closed.py",
         "tests/config/test_execution_coherence.py",
-        "tests/config/test_magic10_contracts.py",
         "tests/config/test_magic10_v2_loader.py",
         "tests/config/test_manifest_schema.py",
         "tests/config/test_production_admission.py",
@@ -880,10 +904,10 @@ def test_pr01_report_arrays_and_updater_keep_their_real_owners() -> None:
 
 @pytest.mark.parametrize("source,owner,error", [
     ("catalog/channels_v1.json", "tests/config/test_registry_catalog_contract.py", "CI_PRODUCT_OWNER_TEST_INVALID"),
-    ("catalog/magic10_mechanics_v1.json", "tests/config/test_magic10_contracts.py", "CI_PRODUCT_OWNER_TEST_INVALID"),
+    ("catalog/magic10_mechanics_v2.json", "tests/config/test_magic10_v2_contracts.py", "CI_PRODUCT_OWNER_TEST_INVALID"),
     ("tools/config/artifacts.py", "tests/config/test_config_artifacts.py", "CI_CONFIG_WRITER_OWNER_INVALID"),
     ("tools/evidence/generate_arrays_as_sets_report.py", "tests/compare/test_arrays_as_sets.py", "CI_EVIDENCE_OWNER_TEST_INVALID"),
-    ("tests/config/helpers.py", "tests/config/test_magic10_contracts.py", "CI_TEST_SUPPORT_OWNER_INVALID"),
+    ("tests/config/helpers.py", "tests/config/test_registry_catalog_contract.py", "CI_TEST_SUPPORT_OWNER_INVALID"),
 ])
 def test_pr01_missing_or_symlinked_behavioral_owner_refuses(
     tmp_path: Path, source: str, owner: str, error: str
@@ -909,7 +933,7 @@ def test_pr01_missing_or_symlinked_behavioral_owner_refuses(
 def test_pr01_support_mapping_is_exact_and_new_modules_join_full_validation(tmp_path: Path) -> None:
     owners = classifier.changed_test_targets(ROOT, ("tests/config/helpers.py",))
     assert set(owners) == {
-        "tests/config/test_registry_catalog_contract.py", "tests/config/test_magic10_contracts.py",
+        "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_alias_policy_enforcement.py", "tests/config/test_config_loader_unknown_ids_fail_closed.py",
         "tests/config/test_manifest_schema.py", "tests/config/test_production_admission.py", "tests/config/test_registry_report.py",
         "tests/config/test_registry_report_determinism.py", "tests/config/test_registry_report_indexing.py",
@@ -925,7 +949,6 @@ def test_pr01_support_mapping_is_exact_and_new_modules_join_full_validation(tmp_
     for new_test in (
         "tests/bodygraph/test_gates.py",
         "tests/config/test_registry_catalog_contract.py",
-        "tests/config/test_magic10_contracts.py",
         "tests/config/test_production_admission.py",
         "tests/config/test_execution_coherence.py",
     ):
@@ -952,7 +975,6 @@ def test_pr02_changed_paths_keep_all_lanes_and_exact_new_test_targets() -> None:
         "tests/config/test_alias_policy_enforcement.py",
         "tests/config/test_config_loader_unknown_ids_fail_closed.py",
         "tests/config/test_execution_coherence.py",
-        "tests/config/test_magic10_contracts.py",
         "tests/config/test_magic10_v2_loader.py",
         "tests/config/test_manifest_schema.py",
         "tests/config/test_production_admission.py",

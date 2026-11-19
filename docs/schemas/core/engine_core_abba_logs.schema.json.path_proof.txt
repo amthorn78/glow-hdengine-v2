@@ -1,5 +1,5 @@
 path: docs/schemas/core/engine_core_abba_logs.schema.json
-size_bytes: 5327
-sha256: f021843dfb6a284f60835150344b7145d9cd44a1a438707ed5c7e2ea1d9f93b4
+size_bytes: 5767
+sha256: bc23804afe56424aab1c3725972229f18a32787458710201dfb6156e14e31be3
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-30T03:58:47Z

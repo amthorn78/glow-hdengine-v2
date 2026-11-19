@@ -52,7 +52,12 @@ MECHANICS_EXECUTION_PATHS = (
     "engine/magic10_v2/kernel.py", "engine/magic10_v2/signals.py", "engine/magic10_v2/calculation.py",
 )
 MECHANICS_OWNERS = dict(zip(MECHANICS_EXECUTION_PATHS, (pure_core, magic10_v2_loader, kernel, signals, calculation)))
-V2_CANDIDATE_MEMBERS = 57
+# HDE-EPIC043 WU-PR-10: the cut made the v2 candidate roster the admitted roster.
+RELEASE_MEMBERS = len(ADMITTED_RELEASE_ROSTER)
+# A kept Python member outside the nine executing-admission sources.  It is the
+# sample for member-format, binding and replacement refusals; before the cut
+# these used the retired v1 scorer engine/magic10/signals.py.
+SAMPLE_PYTHON_MEMBER = "engine/narratives/router.py"
 
 
 @pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
@@ -74,14 +79,14 @@ def test_pr03_r02_rehashed_different_mechanics_refuse(candidate_root: Path, path
 
 @pytest.fixture
 def release_root(tmp_path: Path) -> Path:
-    # The 45-member v1 root no longer admits (UNBOUND_SOURCE); it serves only the
-    # refusals raised earlier in the admission order.
+    # The admitted roster over the repository's own member bytes; since the cut
+    # (HDE-EPIC043 WU-PR-10) it admits.
     return synthetic_complete_release_root(tmp_path)
 
 
 @pytest.fixture
 def candidate_root(tmp_path: Path):
-    """The 57-member v2 candidate root, with the test-only roster route active for the test."""
+    """The v2 candidate root over the admitted roster (the roster route swaps nothing since the cut)."""
     root = synthetic_v2_candidate_root(tmp_path)
     with v2_candidate_roster_admission():
         yield root
@@ -220,10 +225,10 @@ def _isolated_mechanics_script(root: Path, script: str, *, optimization: int = 0
     for package in ("engine", "engine/config", "engine/serializer", "engine/stable", "engine/categories"):
         (root / package / "__init__.py").write_bytes(b"")
     options = ["-I"] + (["-" + "O" * optimization] if optimization else [])
-    # argv[2] carries the v2 candidate roster: the isolated child cannot import
-    # tests/config/helpers.py, so _MECHANICS_ADMIT_SCRIPT repeats its roster swap.
+    # Since the cut the isolated child admits through the root's own, unswapped
+    # roster constant, which is the admitted roster.
     result = subprocess.run(
-        [sys.executable, *options, "-c", script, str(root), json.dumps(v2_candidate_roster())], cwd=root,
+        [sys.executable, *options, "-c", script, str(root)], cwd=root,
         env=closed_rails_env(), text=True, capture_output=True, timeout=30,
     )
     assert result.returncode == 0, result.stderr
@@ -238,7 +243,6 @@ root = Path(sys.argv[1])
 sys.path.insert(0, str(root))
 """
 _MECHANICS_ADMIT_SCRIPT = """
-loader.ADMITTED_RELEASE_ROSTER = tuple(json.loads(sys.argv[2]))
 try:
     bundle = loader.load_active_mechanics_bundle()
 except loader.RegistryConfigError as exc:
@@ -260,7 +264,7 @@ def test_mechanics_fresh_startup_and_optimization_semantics(
     script += "from engine.config import registry_loader as loader\n"
     script += _MECHANICS_ADMIT_SCRIPT + "print(json.dumps(result))\n"
     assert _isolated_mechanics_script(release_root, script, optimization=optimization) == {
-        "state": "admitted", "members": V2_CANDIDATE_MEMBERS,
+        "state": "admitted", "members": RELEASE_MEMBERS,
     }
 
 
@@ -290,7 +294,7 @@ def test_mechanics_timestamp_valid_stale_bytecode_refuses_and_fresh_source_admit
     }
     cached.unlink()
     assert _isolated_mechanics_script(release_root, script) == {
-        "state": "admitted", "members": V2_CANDIDATE_MEMBERS, "behavior": "B",
+        "state": "admitted", "members": RELEASE_MEMBERS, "behavior": "B",
     }
 
 
@@ -352,9 +356,9 @@ def _expect_code(root: Path, code: str) -> None:
 
 
 def test_synthetic_complete_release_is_labeled_and_admits_exact_identities(candidate_root: Path) -> None:
-    # HDE-EPIC043 WU-PR-09: the switched admission admits the labelled v2 candidate
-    # release through the test-only roster route; the production roster constant
-    # keeps its 45-path v1 value until the cut (WU-PR-10).
+    # HDE-EPIC043 WU-PR-09 admitted the labelled v2 candidate release through the
+    # test-only roster route; since the cut (WU-PR-10) the candidate roster is the
+    # production roster constant itself.
     release_root = candidate_root
     bundle = _load_active_mechanics_bundle_from_root(release_root)
     manifest_raw = (release_root / "catalog/manifest.json").read_bytes()
@@ -365,12 +369,12 @@ def test_synthetic_complete_release_is_labeled_and_admits_exact_identities(candi
     assert isinstance(bundle, AdmittedMechanicsBundle)
     assert bundle.manifest.version == ADMITTED_RELEASE_VERSION
     assert bundle.manifest.built_at_utc == ADMITTED_RELEASE_BUILT_AT_UTC
-    assert len(ADMITTED_RELEASE_ROSTER) == 45
+    assert roster == ADMITTED_RELEASE_ROSTER
     assert "schemas/gates_v1.schema.json" in ADMITTED_RELEASE_ROSTER
     assert "schemas/reader.v2.schema.json" in ADMITTED_RELEASE_ROSTER
     assert "engine/stable/sercanon.py" in ADMITTED_RELEASE_ROSTER
     assert "engine/categories/registry.py" in ADMITTED_RELEASE_ROSTER
-    assert len(roster) == V2_CANDIDATE_MEMBERS
+    assert len(roster) == RELEASE_MEMBERS
     assert "catalog/magic10_mechanics_v1.json" not in roster
     assert {"catalog/magic10_mechanics_v2.json", *MECHANICS_EXECUTION_PATHS} <= set(roster)
     assert tuple(row.path for row in bundle.manifest.files) == roster
@@ -420,9 +424,9 @@ def test_actual_repository_root_admits(monkeypatch, release_root: Path) -> None:
     root = Path(__file__).resolve().parents[2]
     raw = (root / "catalog/manifest.json").read_bytes()
     assert raw == canon.sercanon(json.loads(raw), sort_keys=True)
-    assert bundle.manifest.version == ADMITTED_RELEASE_VERSION == "1.3.0"
+    assert bundle.manifest.version == ADMITTED_RELEASE_VERSION
     assert bundle.manifest.built_at_utc == ADMITTED_RELEASE_BUILT_AT_UTC
-    assert len(bundle.source_identities) == 45
+    assert len(bundle.source_identities) == RELEASE_MEMBERS
     assert tuple(identity.path for identity in bundle.source_identities) == ADMITTED_RELEASE_ROSTER
     for identity in bundle.source_identities:
         body = (root / identity.path).read_bytes()
@@ -430,6 +434,58 @@ def test_actual_repository_root_admits(monkeypatch, release_root: Path) -> None:
         assert identity.size == len(body)
     assert bundle.release_id == hashlib.sha256(raw).hexdigest()
     assert bundle.release_id == identity_meta()["release_id"]
+
+
+# --- HDE-EPIC043 WU-PR-10 (D-3): the cut's membership and constants agreement --------
+# Admission refuses a manifest that differs from ADMITTED_RELEASE_ROSTER, but it does
+# not itself require the v2 loader's declared members in that constant: a roster
+# without catalog/centers_v1.json still admits.  The cutter does not compare the
+# manifest's version and timestamp with the constants either.  These owner pins hold
+# both at the cut.
+
+# The seven rows the v2 cut retired from the 1.3.0 roster (HDE Schemas and Artifacts
+# §2.9 and §5.1): the v1 configuration, the retired v1 scorers and the v1 schemas.
+RETIRED_AT_THE_V2_CUT = frozenset({
+    "catalog/magic10_mechanics_v1.json",
+    "engine/magic10/calculators.py",
+    "engine/magic10/composite.py",
+    "engine/magic10/signals.py",
+    "schemas/magic10_compat_result_v1.schema.json",
+    "schemas/magic10_mechanics_v1.schema.json",
+    "schemas/magic10_result_v1.schema.json",
+})
+
+
+def test_admitted_roster_holds_every_declared_rebound_and_executing_member() -> None:
+    _, executions = registry_loader._admission_execution_provenance()
+    executing = tuple(path for path, _, _ in executions)
+    assert len(executing) == len(set(executing)) == 9
+    declared = set(magic10_v2_loader.MAGIC10_V2_DECLARED_MEMBERS)
+    rebound = set(magic10_v2_loader.MAGIC10_V2_REBOUND_MEMBERS)
+    assert magic10_v2_loader.MAGIC10_V2_CONFIGURATION_PATH in declared
+    assert declared | rebound | set(executing) <= set(ADMITTED_RELEASE_ROSTER)
+    # The sample member of the format and binding refusals is a kept, non-executing member.
+    assert SAMPLE_PYTHON_MEMBER in ADMITTED_RELEASE_ROSTER and SAMPLE_PYTHON_MEMBER not in executing
+
+
+def test_admitted_roster_and_committed_manifest_exclude_the_retired_rows() -> None:
+    from scripts.cut_release_manifest import RETIRED_RELEASE_MEMBERS
+
+    assert set(RETIRED_RELEASE_MEMBERS) == RETIRED_AT_THE_V2_CUT
+    assert not RETIRED_AT_THE_V2_CUT & set(ADMITTED_RELEASE_ROSTER)
+    root = Path(__file__).resolve().parents[2]
+    rows = {row["path"] for row in json.loads((root / "catalog/manifest.json").read_bytes())["files"]}
+    assert not RETIRED_AT_THE_V2_CUT & rows
+
+
+def test_committed_manifest_carries_the_admitted_constants_and_roster() -> None:
+    root = Path(__file__).resolve().parents[2]
+    raw = (root / "catalog/manifest.json").read_bytes()
+    manifest = json.loads(raw)
+    assert raw == canon.sercanon(manifest, sort_keys=True)
+    assert manifest["version"] == ADMITTED_RELEASE_VERSION
+    assert manifest["built_at_utc"] == ADMITTED_RELEASE_BUILT_AT_UTC
+    assert tuple(row["path"] for row in manifest["files"]) == ADMITTED_RELEASE_ROSTER
 
 
 def test_baseline_partial_manifest_still_refuses(release_root: Path) -> None:
@@ -583,13 +639,13 @@ def test_json_member_bytes_fail_before_admission(release_root: Path, raw: bytes,
 @pytest.mark.parametrize(
     ("relative_path", "raw", "code"),
     [
-        ("engine/magic10/signals.py", b"if invalid syntax\n", "INVALID_PYTHON_MEMBER"),
-        ("engine/magic10/signals.py", b"\n", "EMPTY_MEMBER"),
-        ("engine/magic10/signals.py", b"pass\n\n", "INVALID_MEMBER_FINAL_LF"),
-        ("engine/magic10/signals.py", b"pass\r\n", "INVALID_MEMBER_FINAL_LF"),
-        ("engine/magic10/signals.py", b"pass", "INVALID_MEMBER_FINAL_LF"),
-        ("engine/magic10/signals.py", b"\xef\xbb\xbfpass\n", "INVALID_UTF8"),
-        ("engine/magic10/signals.py", b"\xff\n", "INVALID_UTF8"),
+        (SAMPLE_PYTHON_MEMBER, b"if invalid syntax\n", "INVALID_PYTHON_MEMBER"),
+        (SAMPLE_PYTHON_MEMBER, b"\n", "EMPTY_MEMBER"),
+        (SAMPLE_PYTHON_MEMBER, b"pass\n\n", "INVALID_MEMBER_FINAL_LF"),
+        (SAMPLE_PYTHON_MEMBER, b"pass\r\n", "INVALID_MEMBER_FINAL_LF"),
+        (SAMPLE_PYTHON_MEMBER, b"pass", "INVALID_MEMBER_FINAL_LF"),
+        (SAMPLE_PYTHON_MEMBER, b"\xef\xbb\xbfpass\n", "INVALID_UTF8"),
+        (SAMPLE_PYTHON_MEMBER, b"\xff\n", "INVALID_UTF8"),
         ("migrations/005_identity.sql", b"\n", "EMPTY_MEMBER"),
         ("migrations/005_identity.sql", b"select 1;\n\n", "INVALID_MEMBER_FINAL_LF"),
         ("migrations/005_identity.sql", b"select 1;\r\n", "INVALID_MEMBER_FINAL_LF"),
@@ -615,7 +671,7 @@ def test_capture_refuses_an_unapproved_extension(release_root: Path) -> None:
 
 
 def test_manifest_hash_and_size_bind_exact_unmodified_bytes(release_root: Path) -> None:
-    target = release_root / "engine/magic10/signals.py"
+    target = release_root / SAMPLE_PYTHON_MEMBER
     raw = target.read_bytes()
     # Corrupt exactly one byte without depending on the former PR03 placeholder.
     target.write_bytes(bytes([raw[0] ^ 1]) + raw[1:])
@@ -623,7 +679,7 @@ def test_manifest_hash_and_size_bind_exact_unmodified_bytes(release_root: Path) 
 
     write_synthetic_release_manifest(release_root)
     manifest = _manifest(release_root)
-    row = next(item for item in manifest["files"] if item["path"] == "engine/magic10/signals.py")
+    row = next(item for item in manifest["files"] if item["path"] == SAMPLE_PYTHON_MEMBER)
     row["size"] += 1
     _write_manifest(release_root, manifest)
     _expect_code(release_root, "MANIFEST_MEMBER_SIZE_MISMATCH")
@@ -658,14 +714,14 @@ def test_manifest_requires_exact_roster_version_and_timestamp(release_root: Path
     _expect_code(release_root, "RELEASE_TIMESTAMP_MISMATCH")
 
 
-def test_gate_schema_is_required_and_an_unlisted_44_member_release_is_incomplete(
+def test_gate_schema_is_required_and_a_release_without_it_is_incomplete(
     release_root: Path,
 ) -> None:
     manifest = _manifest(release_root)
     manifest["files"] = [
         row for row in manifest["files"] if row["path"] != "schemas/gates_v1.schema.json"
     ]
-    assert len(manifest["files"]) == 44
+    assert len(manifest["files"]) == RELEASE_MEMBERS - 1
     _write_manifest(release_root, manifest)
     _expect_code(release_root, "INCOMPLETE_RELEASE_ROSTER")
 
@@ -718,7 +774,7 @@ def test_manifest_member_paths_remain_canonical(release_root: Path, unsafe: str)
 
 
 def test_member_leaf_and_ancestor_symlinks_are_refused(release_root: Path, tmp_path: Path) -> None:
-    target = release_root / "engine/magic10/signals.py"
+    target = release_root / SAMPLE_PYTHON_MEMBER
     original = target.read_bytes()
     outside = tmp_path / "outside.py"
     outside.write_text("pass\n", encoding="utf-8")
@@ -739,7 +795,7 @@ def test_member_leaf_and_ancestor_symlinks_are_refused(release_root: Path, tmp_p
 
 
 def test_missing_and_nonregular_members_are_refused(release_root: Path) -> None:
-    target = release_root / "engine/magic10/signals.py"
+    target = release_root / SAMPLE_PYTHON_MEMBER
     target.unlink()
     _expect_code(release_root, "MISSING_FILE")
     target.mkdir()
@@ -924,7 +980,7 @@ def test_source_replacement_during_final_verification_returns_no_handle(
 ) -> None:
     release_root = candidate_root
     original = registry_loader._read_captured_file
-    target = "engine/magic10/signals.py"
+    target = SAMPLE_PYTHON_MEMBER
     calls = 0
 
     def replace_on_verify(root: Path, relative_path: str):
@@ -944,7 +1000,7 @@ def test_source_replacement_during_final_verification_returns_no_handle(
 def test_no_stale_success_fallback_and_fresh_repair_can_succeed(candidate_root: Path) -> None:
     release_root = candidate_root
     first = _load_active_mechanics_bundle_from_root(release_root)
-    target = release_root / "engine/magic10/signals.py"
+    target = release_root / SAMPLE_PYTHON_MEMBER
     original = target.read_bytes()
     target.write_text('"""Corrupts the manifest binding."""\n', encoding="utf-8")
     _expect_code(release_root, "MANIFEST_MEMBER_HASH_MISMATCH")

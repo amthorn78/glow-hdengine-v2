@@ -61,7 +61,6 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/cli/test_cli_install_help.py",
     "tests/cli/test_dev_sampler_cli.py",
     "tests/cli/test_showcompat_sources.py",
-    "tests/compat/test_thresholds_constants_pack.py",
     "tests/compliance/test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.py",
     "tests/compliance/test_invocation_tag_accept_reject_and_roundtrip.py",
     "tests/compliance/test_log_shape_snapshot.py",
@@ -72,7 +71,6 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/config/test_config_artifacts.py",
     "tests/config/test_config_loader_unknown_ids_fail_closed.py",
     "tests/config/test_execution_coherence.py",
-    "tests/config/test_magic10_contracts.py",
     "tests/config/test_magic10_v2_contracts.py",
     "tests/config/test_magic10_v2_loader.py",
     "tests/config/test_manifest_schema.py",
@@ -464,7 +462,6 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "catalog/magic10_seeds.json": (_SCORE_DISTRIBUTION_OWNER_TEST,),
     "math/thresholds.json": (_SCORE_DISTRIBUTION_OWNER_TEST, _ATTESTATION_CONTRACT_TEST),
     "engine/magic10/thresholds.py": (
-        "tests/compat/test_thresholds_constants_pack.py",
         _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
     "engine/bodygraph/gates.py": (
@@ -486,13 +483,25 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/compare/test_arrays_as_sets.py",
         "tests/evidence/test_canonical_json_gate_check_outputs.py",
     ),
+    # HDE-EPIC043 WU-PR-10: the v1 configuration and v1 result schemas left the release at the
+    # cut; the v2 contract module reads them (the v2 configuration's v1-derived content and the
+    # result-schema pairs). The v1 mechanics schema has no reader left outside the retired v1
+    # validators, so it has no owner and a change to it fails closed until one is registered.
     "catalog/magic10_mechanics_v1.json": (
-        "tests/config/test_magic10_contracts.py",
+        "tests/config/test_magic10_v2_contracts.py",
         _SCORE_DISTRIBUTION_OWNER_TEST,
     ),
-    "schemas/magic10_mechanics_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
-    "schemas/magic10_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
-    "schemas/magic10_compat_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
+    "schemas/magic10_result_v1.schema.json": ("tests/config/test_magic10_v2_contracts.py",),
+    "schemas/magic10_compat_result_v1.schema.json": ("tests/config/test_magic10_v2_contracts.py",),
+    # HDE-EPIC043 WU-PR-10 (HDE-DIST008.2): the governed v2 configuration the cut writes. The
+    # config tool's catalog logs validate it, and the S16 owner joins every scoring configuration.
+    "catalog/magic10_mechanics_v2.json": (
+        "tests/config/test_magic10_v2_contracts.py",
+        "tests/config/test_magic10_v2_loader.py",
+        "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
+        _SCORE_DISTRIBUTION_OWNER_TEST,
+        "tests/config/test_config_artifacts.py",
+    ),
     "catalog/centers_v1.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
     "catalog/type_pairing_v1.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
     "schemas/centers_v1.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
@@ -503,7 +512,6 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "schemas/magic10_compat_result_v2.schema.json": ("tests/config/test_magic10_v2_contracts.py", "tests/config/test_magic10_v2_loader.py", "tests/evidence/test_hde_epic042_v2_contract_evidence.py"),
     "engine/config/registry_loader.py": (
         "tests/config/test_registry_catalog_contract.py",
-        "tests/config/test_magic10_contracts.py",
         "tests/config/test_config_loader_unknown_ids_fail_closed.py",
         "tests/config/test_alias_policy_enforcement.py",
         "tests/config/test_manifest_schema.py",
@@ -881,6 +889,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     "tools/evidence/generate_hde_epic042_v2_contract_evidence.py": (
         "tests/evidence/test_hde_epic042_v2_contract_evidence.py",
     ),
+    # HDE-EPIC043 WU-PR-10: the Magic-10 v2 cut record (HDE-DIST008.2).
+    "tools/evidence/generate_hde_epic043_cut_record.py": (
+        "tests/evidence/test_hde_epic043_cut_record.py",
+    ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
     "tests/evidence/test_evidence_tool_ownership.py"
@@ -1150,7 +1162,6 @@ _TEST_SUPPORT_OWNER_PATHS = {
     "tests/config/helpers.py": (
         "tests/config/test_execution_coherence.py",
         "tests/config/test_registry_catalog_contract.py",
-        "tests/config/test_magic10_contracts.py",
         "tests/config/test_alias_policy_enforcement.py",
         "tests/config/test_config_loader_unknown_ids_fail_closed.py",
         "tests/config/test_manifest_schema.py",
@@ -1166,10 +1177,14 @@ _TEST_SUPPORT_OWNER_PATHS = {
     "tests/fixtures/magic10/v1/goldens.json": (
         "tests/config/test_config_artifacts.py",
     ),
-    # HDE-EPIC043 WU-PR-04: the v2 goldens (M10-G001 only) are consumed by the family's goldens test.
+    # HDE-EPIC043 WU-PR-04: the v2 goldens are consumed by the family's goldens test.
     # HDE-EPIC043 WU-PR-09: they are also the golden comparator's default input.
+    # HDE-EPIC043 WU-PR-10: M10-G001 to M10-G008; the engine-core writer's G004 oracle and the
+    # Reader v2 self-pair test read them too.
     "tests/fixtures/magic10/v2/goldens.json": (
         "tests/config/test_config_artifacts.py",
+        "tests/evidence/test_engine_core_evidence.py",
+        "tests/http/test_reader_post_v2.py",
         "tests/m10_v2/test_family_goldens.py",
     ),
     "tests/fixtures/magic10_v2/LABEL.txt": ("tests/config/test_magic10_v2_contracts.py",),

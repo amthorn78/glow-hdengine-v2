@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from engine.categories.registry import FROZEN_MAGIC10_ORDER
-from engine.magic10.thresholds import BANDS
+from engine.magic10_v2.calculation import BANDS
 from tools.config.generate_config_artifacts import expected_config_artifacts
 
 
@@ -35,17 +35,21 @@ def test_magic10_config_snapshot() -> None:
 
 
 def test_band_edges_config() -> None:
+    # HDE-EPIC043 WU-PR-10: the cut's version-2 thresholds project to band_edges.v2,
+    # one strictly ascending set of inclusive maxima per category, in catalog order.
     _, obj = _read_canonical(Path("artifacts/thresholds/band_edges.json"))
-    assert obj["schema"] == "band_edges.v1"
+    assert obj["schema"] == "band_edges.v2"
     assert obj["bands"] == list(BANDS)
-    edges = obj["edges"]
-    assert edges == sorted(edges)
-    assert len(edges) == len(obj["bands"])
-    clamp = obj["clamp"]
-    assert len(clamp) == 2
-    assert clamp[0] <= clamp[1]
-    assert edges[-1] == clamp[1]
-    assert obj["rounding"] == "ROUND_HALF_UP"
+    assert (obj["source"], obj["version"]) == ("math/thresholds.json", "2")
+    assert [entry["category_id"] for entry in obj["categories"]] == list(FROZEN_MAGIC10_ORDER)
+    thresholds = json.loads(Path("math/thresholds.json").read_bytes())
+    governed = {entry["category_id"]: entry["maxima"] for entry in thresholds["categories"]}
+    for entry in obj["categories"]:
+        maxima = entry["maxima"]
+        assert len(maxima) == len(obj["bands"])
+        assert all(earlier < later for earlier, later in zip(maxima, maxima[1:]))
+        assert maxima[-1] == 100
+        assert maxima == governed[entry["category_id"]]
 
 
 def test_config_artifact_check_mode_is_read_only() -> None:
@@ -82,13 +86,17 @@ def _file_state(root):
 
 
 def test_lower_level_threshold_projection_uses_selected_root(writer_root) -> None:
-    # This labels a legal lower-level domain fixture, not another initial mechanics config.
+    # This labels a legal lower-level domain fixture, not another mechanics configuration:
+    # one category's version-2 maxima change in the selected root only.
     path = writer_root / "math/thresholds.json"
     values = json.loads(path.read_bytes())
-    values["edges"] = [20, 40, 60, 100]
+    category = values["categories"][0]["category_id"]
+    assert values["categories"][0]["maxima"] != [20, 40, 60, 100]
+    values["categories"][0]["maxima"] = [20, 40, 60, 100]
     write_canonical(path, values)
     result = artifact_tools.build_band_edges(writer_root)
-    assert result["edges"] == [20, 40, 60, 100]
+    assert result["schema"] == "band_edges.v2"
+    assert {entry["category_id"]: entry["maxima"] for entry in result["categories"]}[category] == [20, 40, 60, 100]
     assert result["source"] == "math/thresholds.json"
     config_tools.generate_config_artifacts(writer_root)
     assert json.loads((writer_root / "artifacts/thresholds/band_edges.json").read_bytes()) == result
@@ -100,11 +108,13 @@ def test_threshold_writer_does_not_coerce_numeric_types(writer_root, bad) -> Non
 
     path = writer_root / "math/thresholds.json"
     values = json.loads(path.read_bytes())
-    values["edges"][0] = bad
+    values["categories"][0]["maxima"][0] = bad
     write_canonical(path, values)
     before = _file_state(writer_root)
-    with pytest.raises(RegistryConfigError):
+    with pytest.raises(RegistryConfigError) as caught:
         config_tools.generate_config_artifacts(writer_root)
+    # The owning schema's strict integers refuse each one; nothing is coerced.
+    assert caught.value.code == "M10V2_SCHEMA_VALIDATION_FAILED"
     assert _file_state(writer_root) == before
 
 
@@ -121,7 +131,8 @@ def test_config_source_race_restores_written_outputs(writer_root, monkeypatch) -
     original = updater._publish_staged
     source = writer_root / "math/thresholds.json"
     changed = json.loads(source.read_bytes())
-    changed["edges"] = [20, 40, 60, 100]
+    assert changed["categories"][0]["maxima"] != [20, 40, 60, 100]
+    changed["categories"][0]["maxima"] = [20, 40, 60, 100]
     calls = []
 
     def replace_then_change(payloads):
@@ -172,27 +183,125 @@ def test_config_check_never_repairs_missing_or_stale_outputs(writer_root) -> Non
     assert _file_state(writer_root) == before
 
 
-def test_catalog_logs_require_actual_initial_candidate_validation(writer_root) -> None:
-    from engine.config.registry_loader import RegistryConfigError
+# HDE-EPIC043 WU-PR-10 (HDE-DIST008.2): the catalog logs are rendered only after the
+# admitted v2 configuration validates through the v2 loader's rules over the tool's
+# own capture (HDE Schemas and Artifacts §8.14.1: fail closed on an absent, invalid,
+# ambiguous or hash-mismatched configuration).
 
-    config_tools.generate_catalog_logs(writer_root)
-    paths = [writer_root / name for name in config_tools._CATALOG_LOG_PATHS]
-    before = _file_state(writer_root)
+def _v2_configuration_inputs(root: Path) -> Path:
+    """Copy the governed v2 configuration and the JSON members its rules read into ``root``."""
+    import shutil
+
+    from engine.config.magic10_v2_loader import MAGIC10_V2_DECLARED_MEMBERS
+
+    for name in MAGIC10_V2_DECLARED_MEMBERS:
+        if name.endswith(".json"):
+            target = root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(config_tools.ROOT / name, target)
+    return root
+
+
+def _manifest_row(root: Path, name: str) -> dict:
+    import hashlib
+
+    raw = (root / name).read_bytes()
+    return {"path": name, "sha256": hashlib.sha256(raw).hexdigest(), "size": len(raw)}
+
+
+def _rebind_manifest(root: Path, rows) -> None:
+    manifest = json.loads((root / "catalog/manifest.json").read_bytes())
+    manifest["files"] = sorted(rows(manifest["files"]), key=lambda row: row["path"])
+    write_canonical(root / "catalog/manifest.json", manifest)
+
+
+def test_catalog_logs_require_actual_initial_candidate_validation(writer_root) -> None:
+    from engine.config.magic10_v2_loader import MAGIC10_V2_CONFIGURATION_PATH
+    from engine.config.registry_loader import SchemaValidationError
+
+    root = _v2_configuration_inputs(writer_root)
+    config_tools.generate_catalog_logs(root)
+    paths = [root / name for name in config_tools._CATALOG_LOG_PATHS]
+    before = _file_state(root)
+    sources = json.loads((root / MAGIC10_V2_CONFIGURATION_PATH).read_bytes())["sources"]
     for path in paths:
         body = path.read_text()
         assert "status: PASS" in body
-        assert "catalog/channels_v1.json sha256=" in body
-        assert "catalog/magic10_mechanics_v1.json sha256=" in body
-    config_tools.generate_catalog_logs(writer_root, check=True)
-    assert _file_state(writer_root) == before
-    candidate = writer_root / "catalog/magic10_mechanics_v1.json"
+        assert f"{MAGIC10_V2_CONFIGURATION_PATH} sha256=" in body
+        for source in sources.values():
+            assert f"source: {source['path']} sha256={source['sha256']} " in body
+        assert "magic10_mechanics_v1" not in body
+    config_tools.generate_catalog_logs(root, check=True)
+    assert _file_state(root) == before
+    candidate = root / MAGIC10_V2_CONFIGURATION_PATH
     data = json.loads(candidate.read_bytes())
     data["config_id"] = "unapproved-config"
     write_canonical(candidate, data)
-    before = _file_state(writer_root)
-    with pytest.raises(RegistryConfigError):
-        config_tools.generate_catalog_logs(writer_root)
-    assert _file_state(writer_root) == before
+    before = _file_state(root)
+    # The manifest row binds the governed bytes, so the edit refuses on its hash first;
+    # re-binding the row isolates the pinned v2.0.0 content rule.
+    with pytest.raises(SchemaValidationError) as caught:
+        config_tools.generate_catalog_logs(root)
+    assert caught.value.code == "M10V2_MANIFEST_HASH_MISMATCH"
+    assert _file_state(root) == before
+    _rebind_manifest(root, lambda rows: [
+        _manifest_row(root, MAGIC10_V2_CONFIGURATION_PATH) if row["path"] == MAGIC10_V2_CONFIGURATION_PATH else row
+        for row in rows])
+    before = _file_state(root)
+    for check in (False, True):
+        with pytest.raises(SchemaValidationError) as caught:
+            config_tools.generate_catalog_logs(root, check=check)
+        assert caught.value.code == "M10V2_PINNED_CONTENT_MISMATCH"
+    assert _file_state(root) == before
+
+
+def _v1_only_manifest(root: Path) -> None:
+    from engine.config.magic10_v2_loader import MAGIC10_V2_CONFIGURATION_PATH
+
+    _rebind_manifest(root, lambda rows: [
+        _manifest_row(config_tools.ROOT, "catalog/magic10_mechanics_v1.json") if row["path"] == MAGIC10_V2_CONFIGURATION_PATH
+        else row for row in rows])
+
+
+def _v1_and_v2_manifest(root: Path) -> None:
+    _rebind_manifest(root, lambda rows: [*rows, _manifest_row(config_tools.ROOT, "catalog/magic10_mechanics_v1.json")])
+
+
+def _absent_configuration(root: Path) -> None:
+    from engine.config.magic10_v2_loader import MAGIC10_V2_CONFIGURATION_PATH
+
+    (root / MAGIC10_V2_CONFIGURATION_PATH).unlink()
+
+
+def _duplicate_key_configuration(root: Path) -> None:
+    from engine.config.magic10_v2_loader import MAGIC10_V2_CONFIG_ID, MAGIC10_V2_CONFIGURATION_PATH
+
+    path = root / MAGIC10_V2_CONFIGURATION_PATH
+    raw = path.read_bytes()
+    assert raw.startswith(b"{")
+    path.write_bytes(b'{"config_id":"' + MAGIC10_V2_CONFIG_ID.encode() + b'",' + raw[1:])
+
+
+@pytest.mark.parametrize(("change", "code"), [
+    (_absent_configuration, "MISSING_FILE"),
+    (_v1_only_manifest, "M10V2_CONFIGURATION_ROW_MISSING"),
+    (_v1_and_v2_manifest, "M10V2_MULTIPLE_CONFIGURATIONS"),
+    (_duplicate_key_configuration, "DUPLICATE_JSON_KEY"),
+], ids=["absent", "v1_only", "v1_and_v2", "duplicate_key"])
+def test_catalog_logs_refuse_an_absent_unbound_ambiguous_or_duplicate_keyed_v2_configuration(
+    writer_root, change, code
+) -> None:
+    from engine.config.registry_loader import SchemaValidationError
+
+    root = _v2_configuration_inputs(writer_root)
+    change(root)
+    before = _file_state(root)
+    for check in (False, True):
+        with pytest.raises(SchemaValidationError) as caught:
+            config_tools.generate_catalog_logs(root, check=check)
+        assert caught.value.code == code
+    assert _file_state(root) == before
+    assert not any((root / name).exists() for name in config_tools._CATALOG_LOG_PATHS)
 
 
 def test_config_publication_refuses_another_root(writer_root) -> None:
@@ -286,8 +395,10 @@ def test_config_check_rechecks_sources_and_outputs_after_comparison(writer_root,
 
     def compare_then_concurrent_change(base, expected):
         state = original(base, expected)
+        # Both the version-2 thresholds and band_edges.v2 carry per-category maxima.
         values = json.loads(target.read_bytes())
-        values["edges"] = [20, 40, 60, 100]
+        assert values["categories"][0]["maxima"] != [20, 40, 60, 100]
+        values["categories"][0]["maxima"] = [20, 40, 60, 100]
         write_canonical(target, values)
         changed.append(target.read_bytes())
         return state
@@ -444,8 +555,11 @@ def test_manifest_cut_callback_recovers_actual_publication_failure(writer_root, 
 # comparator.  Since HDE-EPIC043 WU-PR-09 the comparator reads the Magic10 v2
 # collection (tests/fixtures/magic10/v2/goldens.json) and every positive run
 # admits a labelled synthetic v2 candidate root from an isolated copy through
-# the test-only roster route in tests/config/helpers.py; nothing here relaxes
-# admission or touches the repository tree.  These tests live in the config
+# the test-only roster route in tests/config/helpers.py.  Since WU-PR-10 the
+# collection holds M10-G001 to M10-G008, computed at the cut, and every positive
+# run's candidate carries the governed cut bytes (``fixture_maxima=False``), never
+# the labelled fixture maxima.  Nothing here relaxes admission or touches the
+# repository tree.  These tests live in the config
 # tooling's registered owner module so a change to ``tools/config/artifacts.py``
 # or ``generate_config_artifacts.py`` always runs them.
 # ---------------------------------------------------------------------------
@@ -481,9 +595,8 @@ from tools.evidence import update_evidence_index as updater
 ROOT = Path(__file__).resolve().parents[2]
 GOLDENS = ROOT / "tests/fixtures/magic10/v2/goldens.json"
 CLOSED_RAILS = {"LC_ALL": "C", "LANG": "C", "TZ": "UTC", "SAFE_MODE": "1", "ALLOW_NETWORK": "0"}
-# PF01 §9.5 (Magic10 v2): M10-G001, no Channel and two Reflectors, is the one canon v2
-# value before the cut: every category scores 0, band Cool.  The candidate's maxima are a
-# labelled non-canon fixture and are asserted nowhere as canon.
+# PF01 §9.5 (Magic10 v2): M10-G001, no Channel and two Reflectors, is fixed by canon: every
+# category scores 0, band Cool.  M10-G002 to M10-G008 were computed at the cut (WU-PR-10).
 G001_CATEGORIES = [{"category_id": category, "score": 0, "band": "Cool"} for category in FROZEN_MAGIC10_ORDER]
 FORBIDDEN_NAMES = {
     "write_magic10_config", "write_band_edges", "_publish_prepared", "generate_config_artifacts",
@@ -495,7 +608,7 @@ FORBIDDEN_NAMES = {
 
 @pytest.fixture(scope="module")
 def _candidate_root(tmp_path_factory) -> Path:
-    return synthetic_v2_candidate_root(tmp_path_factory.mktemp("pr05-goldens"))
+    return synthetic_v2_candidate_root(tmp_path_factory.mktemp("pr05-goldens"), fixture_maxima=False)
 
 
 @pytest.fixture
@@ -555,13 +668,59 @@ def test_fixture_bytes_are_canonical_and_agree_with_pf01() -> None:
     assert raw.endswith(b"\n") and not raw.endswith(b"\n\n") and b"\r" not in raw and not raw.startswith(b"\xef\xbb\xbf")
     assert GOLDENS == artifact_tools.GOLDENS_DEFAULT_PATH
     assert document["schema"] == artifact_tools.GOLDENS_SCHEMA == "magic10_goldens.v2"
-    # Before the cut the v2 collection holds M10-G001 only (WU-PR-10 adds M10-G002 to M10-G008).
-    assert [(case["case_id"], case["case_type"], case["kind"]) for case in document["cases"]] == [
-        ("M10-G001", "calculation", "category_vector")]
-    assert document["constants"] == {"config_id": "m10-relevance-centers-type-v2.0.0", "release_id": "a" * 64}
+    # PF01 §9.5 v2: the canon set is M10-G001 to M10-G008, in order, each with its kind (D-5, D-6).
+    assert artifact_tools.GOLDEN_CASE_TABLE == (
+        ("M10-G001", "calculation", "category_vector"),
+        ("M10-G002", "calculation", "core"),
+        ("M10-G003", "calculation", "signal_operation"),
+        ("M10-G004", "calculation", "core"),
+        ("M10-G005", "application", "identity_independence"),
+        ("M10-G006", "calculation", "band_boundary"),
+        ("M10-G007", "application", "self_pair"),
+        ("M10-G008", "application", "equal_mask_pair"),
+    )
+    assert artifact_tools.GOLDEN_CASE_IDS == tuple(f"M10-G00{number}" for number in range(1, 9))
+    assert [(case["case_id"], case["case_type"], case["kind"]) for case in document["cases"]] == list(
+        artifact_tools.GOLDEN_CASE_TABLE)
+    constants = document["constants"]
+    assert set(constants) == {"config_id", "release_id", "router_stub", "synthetic_projection_fields"}
+    assert (constants["config_id"], constants["release_id"]) == ("m10-relevance-centers-type-v2.0.0", "a" * 64)
+    # PF01 §9.5 (M10-G008): the router stub values.
+    assert constants["router_stub"] == {"personal_lo_to_hi": "m10.test.personal.lo_to_hi",
+                                        "personal_hi_to_lo": "m10.test.personal.hi_to_lo",
+                                        "shared": "m10.test.shared.equal_mask"}
     g001 = _case(document, "M10-G001")
     assert g001["inputs"] == {"gates_a": [1], "gates_b": [2]}
     assert g001["expected"] == {"categories": G001_CATEGORIES}
+    # PF01 §9.5: the M10-G004 Gate sets and their Channel states (the five-state rule is unchanged in v2).
+    g004 = _case(document, "M10-G004")
+    assert g004["inputs"] == {"gates_a": [5, 19, 20, 34, 43, 49], "gates_b": [9, 12, 15, 22, 23, 52]}
+    assert {row["channel_id"]: (row["state"], row["owner"]) for row in g004["expected"]["channel_states"]
+            if row["state"] != "none"} == {
+        "05-15": ("electromagnetic", None), "09-52": ("dominance", "member_hi"), "12-22": ("dominance", "member_hi"),
+        "19-49": ("dominance", "member_lo"), "20-34": ("dominance", "member_lo"), "23-43": ("electromagnetic", None)}
+    assert len(g004["expected"]["channel_states"]) == 36
+    # PF01 §9.5: the M10-G007 and M10-G008 inputs, and their values that no configuration or maxima reach.
+    uuid_1, uuid_2 = "00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000002"
+    meta = {"engine_tag": "m10-test", "invocation_tag": "m10-identity-boundary"}
+    g007, g008 = _case(document, "M10-G007"), _case(document, "M10-G008")
+    assert g007["inputs"]["a"] == g007["inputs"]["b"] == {"gates": [1], "person_uid": uuid_1}
+    assert (g007["inputs"]["meta"], g007["inputs"]["release_id"]) == (meta, "a" * 64)
+    assert g007["expected"]["reader"] == {
+        "categories": [], "eligible": False,
+        "idempotence_hash": "8214324eb0129ff1dc213a5d53bd9d7b3758a351032c5258f7ba28eace7adc15"}
+    assert (g008["inputs"]["a"], g008["inputs"]["b"]) == ({"gates": [1], "person_uid": uuid_1}, {"gates": [1], "person_uid": uuid_2})
+    assert (g008["inputs"]["meta"], g008["inputs"]["release_id"]) == (meta, "a" * 64)
+    assert {row["chart_fingerprint"] for row in g008["expected"]["members"]} == {
+        "7567338a3be5b35e00366bfe86f3f1ca8b89be1fd02be893abeb62a60dbc2d2b"}
+    assert g008["expected"]["orientation"] == {"lo": uuid_1, "hi": uuid_2}
+    assert g008["expected"]["reader"]["categories"] == [{"id": "harmony", "band": "Cool"}]
+    assert g008["expected"]["reader"]["idempotence_hash"] == "ae435ccc1f9d2043b4ee825f48c54ea421276d49d159b19271e46b24c04f2f6e"
+    assert g008["expected"]["reader_v2"]["categories"] == [{"id": category, "band": "Cool"} for category in FROZEN_MAGIC10_ORDER]
+    assert {(row["score"], row["band"]) for row in g008["expected"]["categories"]} == {(0, "Cool")}
+    # The v1 pair key was under m10-channel-state-v1.0.0; the v2 preimage includes the v2 config_id.
+    assert g008["expected"]["pair_key_under_release"]["config_id"] == "m10-relevance-centers-type-v2.0.0"
+    assert g008["expected"]["pair_key_under_release"]["pair_key"] != "8a75eafcc4af664e073c1c4daec55f073f416af2c461039539f01717ac01d501"
     for case in document["cases"]:
         provenance = case["input_provenance"]
         assert provenance and len(set(provenance)) == len(provenance) and all(isinstance(tag, str) and tag for tag in provenance)
@@ -578,7 +737,7 @@ def test_a_collection_for_another_configuration_never_matches(bundle_root, bundl
     assert result.ok is False
     assert [(row.case_id, row.path, row.expected, row.actual) for row in result.mismatches] == [
         ("constants", "constants.config_id", "m10-channel-state-v1.0.0", bundle.mechanics["config_id"])]
-    assert [row.outcome for row in result.cases] == ["match"]
+    assert [row.outcome for row in result.cases] == ["match"] * len(artifact_tools.GOLDEN_CASE_IDS)
 
 
 def test_positive_comparison_matches_every_case(bundle_root, bundle) -> None:
@@ -591,10 +750,23 @@ def test_positive_comparison_matches_every_case(bundle_root, bundle) -> None:
     observed = {row.case_id: row.observed for row in result.cases}
     assert observed["M10-G001"] == {"categories": G001_CATEGORIES}
     # Each band is the admitted candidate's own band for its score, never a literal rule.
-    for row in observed["M10-G001"]["categories"]:
-        assert row["band"] == assign_band(row["score"], bundle.magic10_v2.maxima[row["category_id"]])
+    for case_id in ("M10-G001", "M10-G002", "M10-G004"):
+        for row in observed[case_id]["categories"]:
+            assert row["band"] == assign_band(row["score"], bundle.magic10_v2.maxima[row["category_id"]])
+    # The boundary matrix is banded at the cut maxima: the governed thresholds, which the candidate carries.
+    cut = {row["category_id"]: row["maxima"] for row in json.loads((ROOT / "math/thresholds.json").read_bytes())["categories"]}
+    assert {row["category_id"]: row["maxima"] for row in observed["M10-G006"]["categories"]} == cut
     for row in result.cases:
         assert sercanon(row.observed) == sercanon(row.expected)
+
+
+def test_a_candidate_at_the_fixture_maxima_never_matches_the_cut_goldens(tmp_path, v2_roster) -> None:
+    """The cut's values belong to the cut maxima: the labelled fixture maxima mismatch every banded case."""
+    fixture_root = synthetic_v2_candidate_root(tmp_path / "fixture-maxima")
+    result = artifact_tools.compare_goldens(fixture_root, GOLDENS)
+    assert result.ok is False
+    assert [row.case_id for row in result.cases if row.outcome == "mismatch"] == ["M10-G002", "M10-G004", "M10-G005", "M10-G006"]
+    assert ("M10-G006", "expected.categories[0].maxima[0]") in {(row.case_id, row.path) for row in result.mismatches}
 
 
 # --- every mismatch is reported ---------------------------------------------------------
@@ -612,6 +784,25 @@ ALTERATIONS = {
                             {"expected.categories[0].category_id", "expected.categories[1].category_id"}),
     "g001_category_dropped": ("M10-G001", lambda case: case["expected"]["categories"].pop(),
                               {"expected.categories.length"}),
+    # HDE-EPIC043 WU-PR-10: one perturbed expected value per runner kind.
+    "g002_signal": ("M10-G002", lambda case: case["expected"]["signals"][0].__setitem__("q", case["expected"]["signals"][0]["q"] + 1),
+                    {"expected.signals[0].q"}),
+    "g003_swapped_q": ("M10-G003", lambda case: case["expected"]["scenarios"][0].__setitem__("q_owners_swapped", 999),
+                       {"expected.scenarios[0].q_owners_swapped"}),
+    "g004_band": ("M10-G004", lambda case: case["expected"]["categories"][0].__setitem__("band", "Cool"),
+                  {"expected.categories[0].band"}),
+    "g004_owner": ("M10-G004", lambda case: case["expected"]["channel_states"][7].__setitem__("owner", "member_lo"),
+                   {"expected.channel_states[7].owner"}),
+    "g005_pair_key_equality": ("M10-G005", lambda case: case["expected"].__setitem__("pair_key_equal_across_pairs", False),
+                               {"expected.pair_key_equal_across_pairs"}),
+    "g006_band": ("M10-G006", lambda case: case["expected"]["categories"][0]["results"][1].__setitem__("band", "Cool"),
+                  {"expected.categories[0].results[1].band"}),
+    "g007_reader_hash": ("M10-G007", lambda case: case["expected"]["reader"].__setitem__("idempotence_hash", "0" * 64),
+                         {"expected.reader.idempotence_hash"}),
+    "g008_pair_key": ("M10-G008", lambda case: case["expected"]["pair_key_under_release"].__setitem__("pair_key", "0" * 64),
+                      {"expected.pair_key_under_release.pair_key"}),
+    "g008_reader_v2_band": ("M10-G008", lambda case: case["expected"]["reader_v2"]["categories"][9].__setitem__("band", "Open"),
+                            {"expected.reader_v2.categories[9].band"}),
 }
 
 
@@ -656,17 +847,53 @@ def _failing_core(*args, **kwargs):
     raise ValueError("core refused")
 
 
+_ANY = object()  # a mismatch value this table does not restate
+
+
+def _swap_first_categories(case):
+    case["inputs"]["categories"][0:2] = case["inputs"]["categories"][0:2][::-1]
+
+
 # A gate list the core's members cannot be built from is reported at its input path; a core
-# that raises is the case's execution mismatch.  Neither aborts the comparison.
+# that raises is the case's execution mismatch; every other runner input a case cannot run
+# as stated is reported at its path.  None aborts the comparison.  A core that raises fails
+# each case that calls it directly; the application cases reach the core through
+# ``evaluate_pair``'s own binding, which this replacement does not touch.
+_CORE_REFUSED = ("execution", "completed", "ValueError: core refused")
 UNRUNNABLE = {
     "g001_invalid_gate": ("M10-G001", lambda case: case["inputs"].__setitem__("gates_a", [0]), None,
-                          ("inputs.gates_a", "normalized Gate list", "GATE_VALUE_INVALID")),
+                          [("M10-G001", "inputs.gates_a", "normalized Gate list", "GATE_VALUE_INVALID")]),
     "g001_duplicate_gate": ("M10-G001", lambda case: case["inputs"].__setitem__("gates_b", [2, 2]), None,
-                            ("inputs.gates_b", "normalized Gate list", "GATE_DUPLICATE")),
+                            [("M10-G001", "inputs.gates_b", "normalized Gate list", "GATE_DUPLICATE")]),
     "g001_no_gates": ("M10-G001", lambda case: case["inputs"].__setitem__("gates_a", []), None,
-                      ("inputs.gates_a", "normalized Gate list", "GATES_EMPTY")),
-    "g001_core_raises": ("M10-G001", lambda case: None, _failing_core,
-                         ("execution", "completed", "ValueError: core refused")),
+                      [("M10-G001", "inputs.gates_a", "normalized Gate list", "GATES_EMPTY")]),
+    "core_raises": ("M10-G001", lambda case: None, _failing_core,
+                    [(case_id, *_CORE_REFUSED) for case_id in ("M10-G001", "M10-G002", "M10-G004")]),
+    "g004_out_of_range_gate": ("M10-G004", lambda case: case["inputs"].__setitem__("gates_b", [65]), None,
+                               [("M10-G004", "inputs.gates_b", "normalized Gate list", "GATE_VALUE_INVALID")]),
+    "g003_roster_dropped": ("M10-G003", lambda case: case["inputs"]["channels"].pop(), None,
+                            [("M10-G003", "inputs.definition", _ANY, _ANY)]),
+    "g003_operation_renamed": ("M10-G003", lambda case: case["inputs"].__setitem__("operation", "twice_min_owner_mass_v1"), None,
+                               [("M10-G003", "inputs.definition", _ANY, _ANY)]),
+    "g003_unknown_signal": ("M10-G003", lambda case: case["inputs"].__setitem__("signal_id", "unknown_signal"), None,
+                            [("M10-G003", "inputs.signal_id", _ANY, "unknown_signal")]),
+    "g003_state_not_owned": ("M10-G003", lambda case: case["inputs"].__setitem__("state", "companionship"), None,
+                             [("M10-G003", "inputs.state", ["compromise", "dominance"], "companionship")]),
+    "g003_unknown_owner": ("M10-G003", lambda case: case["inputs"]["scenarios"][0]["owned"][0].__setitem__("owner", "member_x"), None,
+                           [("M10-G003", "inputs.scenarios[0].owned[0].owner", ["member_hi", "member_lo"], "member_x")]),
+    "g003_repeated_channel": ("M10-G003", lambda case: case["inputs"]["scenarios"][0]["owned"][1].__setitem__("channel_id", "02-14"), None,
+                              [("M10-G003", "inputs.scenarios[0].owned[1].channel_id", "a distinct roster Channel", "02-14")]),
+    "g006_category_order": ("M10-G006", _swap_first_categories, None,
+                            [("M10-G006", "inputs.categories.category_ids", list(FROZEN_MAGIC10_ORDER),
+                              [FROZEN_MAGIC10_ORDER[1], FROZEN_MAGIC10_ORDER[0], *FROZEN_MAGIC10_ORDER[2:]])]),
+    "g006_score_out_of_range": ("M10-G006", lambda case: case["inputs"]["categories"][0]["scores"].__setitem__(0, 101), None,
+                                [("M10-G006", "inputs.categories[0].scores", "non-empty list of integer scores 0..100", _ANY)]),
+    "g005_pair_label": ("M10-G005", lambda case: case["inputs"]["pairs"][0].__setitem__("pair_id", "pair_9"), None,
+                        [("M10-G005", "inputs.pairs.pair_id", ["pair_1", "pair_2"], ["pair_9", "pair_2"])]),
+    "g007_adverse_party": ("M10-G007", lambda case: case["inputs"]["adverse"][0].__setitem__("party", "c"), None,
+                           [("M10-G007", "inputs.adverse[0].party", ["a", "b"], "c")]),
+    "g008_invalid_identity": ("M10-G008", lambda case: case["inputs"]["a"].__setitem__("person_uid", "not-a-uuid"), None,
+                              [("M10-G008", "execution", "completed", _ANY)]),
 }
 
 
@@ -674,7 +901,7 @@ UNRUNNABLE = {
 def test_a_case_that_cannot_execute_is_its_own_mismatch_never_a_crash(bundle_root, tmp_path, capfdbinary, monkeypatch, name) -> None:
     from engine.core import core as engine_core
 
-    case_id, mutate, core, (path, expected, actual) = UNRUNNABLE[name]
+    case_id, mutate, core, rows = UNRUNNABLE[name]
     if core is not None:
         monkeypatch.setattr(engine_core, "compute_core", core)
     document = _document()
@@ -682,10 +909,54 @@ def test_a_case_that_cannot_execute_is_its_own_mismatch_never_a_crash(bundle_roo
     goldens = _write_document(tmp_path / f"{name}.json", document)
     result = artifact_tools.compare_goldens(bundle_root, goldens)
     assert result.ok is False
-    assert [(row.case_id, row.path, row.expected, row.actual) for row in result.mismatches] == [(case_id, path, expected, actual)]
-    assert [row.case_id for row in result.cases if row.outcome == "mismatch"] == [case_id]
+    observed = [(row.case_id, row.path, row.expected, row.actual) for row in result.mismatches]
+    assert [(row[0], row[1]) for row in observed] == [(row[0], row[1]) for row in rows]
+    for got, want in zip(observed, rows):
+        assert all(value is _ANY or value == actual for value, actual in zip(want[2:], got[2:])), got
+    assert [row.case_id for row in result.cases if row.outcome == "mismatch"] == sorted({row[0] for row in rows})
     code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
-    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE, b"", b"GOLDEN_COMPARISON_MISMATCH:1\n")
+    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE, b"",
+                                f"GOLDEN_COMPARISON_MISMATCH:{len(rows)}\n".encode())
+
+
+def _order_dependent_core(monkeypatch):
+    import dataclasses
+    from engine.core import core as engine_core
+
+    real = engine_core.compute_core
+
+    def order_dependent(member_a, member_b, bundle, release_id):
+        result = real(member_a, member_b, bundle, release_id)
+        return dataclasses.replace(result, pair_key="0" * 64) if member_a.mask > member_b.mask else result
+
+    monkeypatch.setattr(engine_core, "compute_core", order_dependent)
+
+
+def _order_dependent_evaluation(monkeypatch):
+    real = compute.evaluate_pair
+
+    def order_dependent(a, b, **seams):
+        result = real(a, b, **seams)
+        reversed_request = (a.gates.mask, a.canonical_person_id) > (b.gates.mask, b.canonical_person_id)
+        return {**result, "pair_key": "0" * 64} if reversed_request and "pair_key" in result else result
+
+    monkeypatch.setattr(compute, "evaluate_pair", order_dependent)
+
+
+# PF01 §9.5 v2: every case is checked in both pair orders.  A result that depends on member
+# order is each affected case's ``pair_order`` mismatch: the Gate-level cases through the core,
+# the application cases through ``evaluate_pair``.  M10-G002 has equal masks and M10-G007 is a
+# self-pair, so their reversal is vacuous; M10-G003 and M10-G006 have no member order.
+@pytest.mark.parametrize(("inject", "cases"), [
+    (_order_dependent_core, ("M10-G001", "M10-G004")),
+    (_order_dependent_evaluation, ("M10-G005", "M10-G008")),
+], ids=["core", "evaluate_pair"])
+def test_an_order_dependent_result_is_each_cases_pair_order_mismatch(bundle_root, monkeypatch, inject, cases) -> None:
+    inject(monkeypatch)
+    result = artifact_tools.compare_goldens(bundle_root, GOLDENS)
+    assert result.ok is False
+    assert [(row.case_id, row.path) for row in result.mismatches] == [(case_id, "pair_order") for case_id in cases]
+    assert [row.case_id for row in result.cases if row.outcome == "mismatch"] == list(cases)
 
 
 def _setter(*path, value):
@@ -700,10 +971,31 @@ def _setter(*path, value):
 # Every input field is consumed or closed: an unknown or missing input key is refused
 # with the document (below), and unknown content nested in a Gate list yields that
 # case's mismatch instead of silent equality.
+def _extra_key(*path):
+    def mutate(case):
+        target = case
+        for key in path:
+            target = target[key]
+        target["extra"] = 1
+    return mutate
+
+
 UNCONSUMED_INPUTS = {
     "g001_gate_row_object": ("M10-G001", _setter("inputs", "gates_a", value=[{"gate": 1, "extra": 1}]), "inputs.gates_a"),
     "g001_gate_row_list": ("M10-G001", _setter("inputs", "gates_b", value=[[2]]), "inputs.gates_b"),
     "g001_gates_object": ("M10-G001", _setter("inputs", "gates_b", value={"extra": 1, "gates": [2]}), "inputs.gates_b"),
+    # HDE-EPIC043 WU-PR-10: every nested input object of the new kinds is closed.
+    "g002_gates_object": ("M10-G002", _setter("inputs", "gates_a", value={"gates": [1]}), "inputs.gates_a"),
+    "g003_channel_row": ("M10-G003", _extra_key("inputs", "channels", 0), "inputs.channels[0]"),
+    "g003_scenario": ("M10-G003", _extra_key("inputs", "scenarios", 0), "inputs.scenarios[0]"),
+    "g003_owned_row": ("M10-G003", _extra_key("inputs", "scenarios", 0, "owned", 0), "inputs.scenarios[0].owned[0]"),
+    "g005_pair": ("M10-G005", _extra_key("inputs", "pairs", 0), "inputs.pairs[0]"),
+    "g005_party": ("M10-G005", _extra_key("inputs", "pairs", 1, "b"), "inputs.pairs[1].b"),
+    "g006_category_row": ("M10-G006", _extra_key("inputs", "categories", 0), "inputs.categories[0]"),
+    "g007_adverse": ("M10-G007", _extra_key("inputs", "adverse", 0), "inputs.adverse[0]"),
+    "g007_meta": ("M10-G007", _extra_key("inputs", "meta"), "inputs.meta"),
+    "g008_party": ("M10-G008", _extra_key("inputs", "a"), "inputs.a"),
+    "g008_meta": ("M10-G008", _extra_key("inputs", "meta"), "inputs.meta"),
 }
 
 
@@ -774,17 +1066,83 @@ def _document_missing_input_key() -> dict:
     return document
 
 
+# HDE-EPIC043 WU-PR-10 (D-6): the case table is closed and ordered.
+def _document_with_extra_case() -> dict:
+    document = _document()
+    extra = copy.deepcopy(_case(document, "M10-G001"))
+    extra["case_id"] = "M10-G999"
+    document["cases"].append(extra)
+    return document
+
+
+def _document_swapped() -> dict:
+    document = _document()
+    document["cases"][1:3] = document["cases"][1:3][::-1]
+    return document
+
+
+def _document_renamed() -> dict:
+    document = _document()
+    _case(document, "M10-G001")["case_id"] = "M10-G001-v2"
+    return document
+
+
+def _document_without_cases() -> dict:
+    document = _document()
+    document["cases"] = []
+    return document
+
+
+def _document_kind_relabeled() -> dict:
+    document = _document()
+    _case(document, "M10-G004")["kind"] = "signal_operation"
+    return document
+
+
+def _document_application_relabeled() -> dict:
+    document = _document()
+    _case(document, "M10-G005")["case_type"] = "calculation"
+    return document
+
+
+def _document_with_constants(mutate) -> dict:
+    document = _document()
+    mutate(document["constants"])
+    return document
+
+
 @pytest.mark.parametrize(
     ("build", "code"),
     [
-        (lambda: _document_without("M10-G001"), "GOLDENS_INVALID"),
+        (lambda: _document_without("M10-G001"), "GOLDENS_MEMBERSHIP_INVALID"),
+        (lambda: _document_without("M10-G005"), "GOLDENS_MEMBERSHIP_INVALID"),
         (lambda: _document_duplicating("M10-G001"), "GOLDENS_MEMBERSHIP_INVALID"),
+        (_document_with_extra_case, "GOLDENS_MEMBERSHIP_INVALID"),
+        (_document_swapped, "GOLDENS_MEMBERSHIP_INVALID"),
+        (_document_renamed, "GOLDENS_MEMBERSHIP_INVALID"),
+        (_document_without_cases, "GOLDENS_MEMBERSHIP_INVALID"),
         (_document_relabeled, "GOLDENS_CASE_TYPE_INVALID"),
+        (_document_kind_relabeled, "GOLDENS_CASE_TYPE_INVALID"),
+        (_document_application_relabeled, "GOLDENS_CASE_TYPE_INVALID"),
         (_document_unknown_kind, "GOLDENS_INVALID"),
         (_document_unknown_top_key, "GOLDENS_INVALID"),
         (_document_unknown_case_key, "GOLDENS_INVALID"),
         (_document_unknown_input_key, "GOLDENS_INVALID"),
         (_document_missing_input_key, "GOLDENS_INVALID"),
+        (lambda: _document_with_constants(lambda c: c.__setitem__("uuid_1", "00000000-0000-0000-0000-000000000001")), "GOLDENS_INVALID"),
+        (lambda: _document_with_constants(lambda c: c.pop("router_stub")), "GOLDENS_INVALID"),
+        (lambda: _document_with_constants(lambda c: c["router_stub"].pop("shared")), "GOLDENS_INVALID"),
+        (lambda: _document_with_constants(lambda c: c["router_stub"].__setitem__("shared", "")), "GOLDENS_INVALID"),
+        (lambda: _document_with_constants(lambda c: c["synthetic_projection_fields"].__setitem__("gates", [1])), "GOLDENS_INVALID"),
+        (lambda: _document_with_constants(lambda c: c.__setitem__("synthetic_projection_fields", {})), "GOLDENS_INVALID"),
+        (lambda: _document_with_constants(lambda c: c.__setitem__("config_id", 2)), "GOLDENS_INVALID"),
+    ],
+    ids=[
+        "g001_missing", "g005_missing", "g001_duplicated", "g999_extra", "g002_g003_swapped", "g001_renamed", "no_cases",
+        "g001_case_type", "g004_kind", "g005_case_type", "unknown_kind", "unknown_top_key", "unknown_case_key",
+        "unknown_input_key", "missing_input_key", "constants_unknown_key", "constants_no_router_stub",
+        "router_stub_missing_key", "router_stub_empty_key", "projection_fields_with_gates", "projection_fields_empty",
+        "config_id_not_string",
     ],
 )
 def test_membership_type_and_schema_refusals(bundle_root, tmp_path, build, code) -> None:
@@ -927,14 +1285,18 @@ def test_compare_goldens_admits_the_real_root(tmp_path, capfdbinary) -> None:
 
 # --- HDE-EPIC040-PR06 (O-17 / CR-06): executed roster members are bound to the candidate --
 
-def test_executed_member_module_map_is_derived_from_the_roster(bundle) -> None:
-    from engine.config.registry_loader import ADMITTED_RELEASE_ROSTER
+def test_executed_member_module_map_is_derived_from_the_roster(bundle, monkeypatch) -> None:
+    from engine.config import registry_loader
 
     mapping = artifact_tools.golden_executed_member_modules(bundle)
     # Derived from the admitted candidate's manifest, not from the import-time roster constant.
     assert tuple(mapping) == tuple(row.path for row in bundle.manifest.files if row.path.endswith(".py"))
     assert tuple(mapping) == tuple(path for path in v2_candidate_roster() if path.endswith(".py"))
-    assert "engine/magic10_v2/calculation.py" in mapping and "engine/magic10_v2/calculation.py" not in ADMITTED_RELEASE_ROSTER
+    assert "engine/magic10_v2/calculation.py" in mapping and "engine/magic10_v2/calculation.py" in registry_loader.ADMITTED_RELEASE_ROSTER
+    # HDE-EPIC043 WU-PR-10: the cut roster now lists the v2 modules too, so the constant is
+    # replaced to show the map does not read it.
+    monkeypatch.setattr(registry_loader, "ADMITTED_RELEASE_ROSTER", ())
+    assert artifact_tools.golden_executed_member_modules(bundle) == mapping
     assert mapping["engine/compat/compute.py"] == "engine.compat.compute"
     assert mapping["engine/magic10_v2/calculation.py"] == "engine.magic10_v2.calculation"
     assert mapping["presenter/reader_v1/emitter.py"] == "presenter.reader_v1.emitter"
@@ -983,7 +1345,7 @@ def test_executed_member_without_readable_source_refuses(bundle_root, tmp_path, 
 def test_unloaded_members_are_not_bound(tmp_path, monkeypatch, v2_roster) -> None:
     name = "tools.bodygraph.check_magic10_gate_readiness"
     monkeypatch.delitem(sys.modules, name, raising=False)
-    altered = synthetic_v2_candidate_root(tmp_path / "altered")
+    altered = synthetic_v2_candidate_root(tmp_path / "altered", fixture_maxima=False)
     member = altered / "tools/bodygraph/check_magic10_gate_readiness.py"
     member.write_bytes(member.read_bytes() + b"# altered but never executed by the goldens\n")
     write_release_manifest(altered, v2_roster)
@@ -1066,8 +1428,9 @@ def test_inputs_that_cannot_be_inspected_or_read_refuse(bundle_root, tmp_path, c
 
 # HDE-EPIC043 WU-PR-09 retired, with their subjects, the v1 golden tests of the annotation
 # and transcription pins, the M10-G005/G007/G008 application runners (self-pair seams,
-# compute._route routing, the router stub) and the consistently-altered-case pins: the v2
-# comparator has one category_vector runner and no such pins.
+# compute._route routing, the router stub) and the consistently-altered-case pins.  WU-PR-10
+# restores the three application runners on the v2 path (their negative controls are in the
+# tables above); the annotation and transcription pins stay retired.
 
 
 @pytest.mark.parametrize("tags", [[{"tag": "pf01_9_5"}], [["pf01_9_5"]], [1], [None]])
@@ -1289,7 +1652,7 @@ def test_cli_match_report_file_and_determinism(bundle_root, tmp_path, capfdbinar
     assert code == 0 and report_path.read_bytes() == out
     second, out_two, _ = _run_cli(["--compare-goldens", str(bundle_root)], capfdbinary)
     assert second == 0 and out_two == out
-    other_root = synthetic_v2_candidate_root(tmp_path / "other")
+    other_root = synthetic_v2_candidate_root(tmp_path / "other", fixture_maxima=False)
     third, out_three, _ = _run_cli(["--compare-goldens", str(other_root)], capfdbinary)
     assert third == 0 and out_three == out  # the report names no host path, so the location drops out
 
@@ -1578,13 +1941,6 @@ def test_v2_band_edges_refuse_an_invalid_document(writer_root, case) -> None:
     for entry in document.get("categories", ()):
         assert json.dumps(entry.get("maxima")) not in shown
     assert "[" not in str(caught.value) and "99" not in shown and "5.5" not in shown
-
-
-def test_v1_band_edges_bytes_are_unchanged() -> None:
-    committed = (ROOT / "artifacts/thresholds/band_edges.json").read_bytes()
-    assert len(committed) == 177
-    assert canon.sercanon(artifact_tools.build_band_edges(), sort_keys=True) == committed
-    assert json.loads(committed)["schema"] == "band_edges.v1"
 
 
 def test_v2_band_edges_are_written_by_the_existing_writer(writer_root) -> None:
