@@ -3538,6 +3538,17 @@ EPIC043_PR10_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC043_PR11_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic043.pr11.v2_bundle_evidence",
+        "discovered_physical_path": "audit/qa/hde-epic043/pr-11/v2_bundle_evidence.txt",
+        "epic_id": "HDE-EPIC043",
+        "record_type": "epic043_pr11_evidence",
+        "schema_version": "1.0",
+        "notes": "HDE-EPIC043 WU-PR-11 Magic-10 v2 typed-bundle evidence (HDE-SEPA008.1 to HDE-SEPA008.3)",
+    },
+]
+
 EPIC042_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic042.qa_step_logs_manifest",
@@ -4711,6 +4722,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC042_PR04_PRIMARY_ARTIFACTS,
             *EPIC042_QA_PRIMARY_ARTIFACTS,
             *EPIC043_PR10_PRIMARY_ARTIFACTS,
+            *EPIC043_PR11_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
@@ -5080,7 +5092,13 @@ def _rebind_sanity_log_model(*, produced_default: str, check: bool) -> None:
     if not sanity_bytes:
         raise SystemExit("SANITY_REBIND_LOG_EMPTY")
     if not sanity_bytes.endswith(b"summary:FAIL\n"):
-        raise SystemExit("SANITY_REBIND_LOG_NOT_FAIL")
+        # HDE-EPIC043 WU-PR-11: the one other bindable content is the exact
+        # generic PASS model the release-sanity gate accepts, which the
+        # canonical run binds at its sealing stage after a committed FAIL.
+        from tools.evidence.run_sanity_pipeline_gate import _expected_log as _sanity_pass_model
+
+        if sanity_bytes != _sanity_pass_model():
+            raise SystemExit("SANITY_REBIND_LOG_NOT_FAIL")
 
     sanity_mtime = _proof_mtime(
         sanity_path, default_produced_at=produced_default
@@ -5910,7 +5928,10 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--rebind-sanity-log",
         action="store_true",
-        help="Rebind only the canonical sanity log after a failed pipeline run",
+        help=(
+            "Rebind only the canonical sanity log: after a failed pipeline run, or to the exact "
+            "generic PASS model at the canonical run's sealing stage"
+        ),
     )
     parser.add_argument(
         "--epic-id",

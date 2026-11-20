@@ -332,3 +332,84 @@ def test_unchanged_fast_path_rejects_file_and_parent_aliases(
     assert real_file.read_bytes() == expected
     assert (real_directory / "owned-file.txt").read_bytes() == expected
     assert proof_target.is_file()
+
+
+# --- HDE-EPIC043 WU-PR-11: the PASS-model rebind (HDE-SEPA008.3) ----------------------------
+
+from tools.evidence import run_sanity_pipeline_gate  # noqa: E402
+
+_REBIND_COMPANIONS = {
+    f"{uei.SANITY_LOG_REL}.path_proof.txt",
+    "artifacts/evidence_index.jsonl",
+    "artifacts/evidence_index.jsonl.path_proof.txt",
+    "artifacts/evidence_index.jsonl.sha256",
+    "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+}
+
+
+def _fixture_files(root):
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in root.rglob("*")
+        if path.is_file()
+    }
+
+
+def test_sanity_rebind_binds_the_exact_generic_pass_model(tmp_path, monkeypatch):
+    paths = _configure_sanity_rebind_fixture(tmp_path, monkeypatch)
+    model = run_sanity_pipeline_gate._expected_log()
+    paths["sanity"].write_bytes(model)
+
+    uei._rebind_sanity_log_only()
+
+    proof = uei._load_existing_proof(tmp_path / f"{uei.SANITY_LOG_REL}.path_proof.txt")
+    assert (proof["sha256"], proof["size_bytes"]) == (uei._sha256_bytes(model), str(len(model)))
+    records = [json.loads(line) for line in paths["mirror"].read_text(encoding="utf-8").splitlines()]
+    sanity_record = next(record for record in records if record["artifact_key"] == "sanity.pipeline.log")
+    assert (sanity_record["sha256"], sanity_record["size_bytes"]) == (uei._sha256_bytes(model), len(model))
+
+
+def test_pass_model_rebind_moves_only_its_own_proof_and_the_mirror_companions(tmp_path, monkeypatch):
+    paths = _configure_sanity_rebind_fixture(tmp_path, monkeypatch)
+    paths["sanity"].write_bytes(run_sanity_pipeline_gate._expected_log())
+    before = _fixture_files(tmp_path)
+
+    uei._rebind_sanity_log_only()
+
+    after = _fixture_files(tmp_path)
+    changed = {name for name in set(before) | set(after) if before.get(name) != after.get(name)}
+    assert changed <= _REBIND_COMPANIONS
+    assert f"{uei.SANITY_LOG_REL}.path_proof.txt" in changed
+    for name in ("docs/evidence/INDEX.json", "docs/evidence/INDEX.sha256", uei.SANITY_LOG_REL):
+        assert after[name] == before[name], name
+    assert uei._STAGED_VIEW is None
+    assert uei._ACTIVE_WRITE_TRANSACTION is None
+
+
+def _one_byte_changed_model() -> bytes:
+    model = bytearray(run_sanity_pipeline_gate._expected_log())
+    index = model.index(b":OK\n")
+    model[index + 1] = ord("0")
+    return bytes(model)
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        _one_byte_changed_model(),
+        run_sanity_pipeline_gate._expected_not_admitted_log(),
+        b"stage: test\nsummary:PASS\n",
+    ],
+    ids=["pass_model_one_byte_changed", "not_admitted_model", "other_pass_tail"],
+)
+def test_sanity_rebind_refuses_non_fail_content_that_is_not_the_exact_pass_model(tmp_path, monkeypatch, content):
+    paths = _configure_sanity_rebind_fixture(tmp_path, monkeypatch)
+    paths["sanity"].write_bytes(content)
+    before = _fixture_files(tmp_path)
+
+    with pytest.raises(SystemExit, match="^SANITY_REBIND_LOG_NOT_FAIL$"):
+        uei._rebind_sanity_log_only()
+
+    assert _fixture_files(tmp_path) == before
+    assert uei._STAGED_VIEW is None
+    assert uei._ACTIVE_WRITE_TRANSACTION is None

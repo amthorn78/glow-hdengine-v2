@@ -75,7 +75,7 @@ def _prepare_bundles(base: Path, *, allow_aliases: bool = False,
     frontend = {
         "schema": "config_bundle.fe.v1",
         "magic10": {key: magic10[key] for key in ("order", "caps")},
-        "bands": {key: bands[key] for key in ("bands", "edges", "clamp", "rounding", "version")},
+        "bands": {key: bands[key] for key in ("bands", "categories", "version")},
         "channels": {"ids": sorted(config.channels), "alias_policy": aliases,
                      "domains": list(config.domains), "centers": list(config.centers)},
         "sources": source_block,
