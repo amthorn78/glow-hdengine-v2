@@ -821,6 +821,30 @@ def test_v2_configuration_has_its_contract_loader_evidence_config_and_s16_owners
     assert classifier._lanes_for_path(source) == {"product", "compat", "release"}
 
 
+# HDE-EPIC043 WU-PR-11: the typed-bundle consumer schemas and the v2 bundle-evidence writer.
+@pytest.mark.parametrize("source", [
+    "docs/schemas/config_bundle_be.json",
+    "docs/schemas/config_bundle_fe.json",
+])
+def test_bundle_consumer_schemas_select_their_bundle_config_and_evidence_owners(source: str) -> None:
+    owners = (
+        "tests/config/test_config_artifacts.py",
+        "tests/config/test_typed_bundles.py",
+        "tests/evidence/test_hde_epic043_v2_bundle_evidence.py",
+    )
+    if source in S16_TRIGGER_FILES:
+        owners += (S16_OWNER_TEST,)
+    assert classifier.changed_test_targets(ROOT, (source,)) == tuple(sorted(owners))
+    assert classifier._lanes_for_path(source) == {"evidence", "release"}
+
+
+def test_v2_bundle_evidence_writer_selects_its_owner_test() -> None:
+    source = "tools/evidence/generate_hde_epic043_v2_bundle_evidence.py"
+    assert classifier.changed_test_targets(ROOT, (source,)) == (
+        "tests/evidence/test_hde_epic043_v2_bundle_evidence.py",
+    )
+
+
 def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
     assert classifier.changed_test_targets(ROOT, ("engine/bodygraph/gates.py",)) == (
         "tests/bodygraph/test_gates.py",

@@ -672,3 +672,118 @@ def test_sanity_gate_main_parses_an_empty_argument_list(monkeypatch):
     with pytest.raises(SystemExit) as usage:
         run_sanity_pipeline_gate.main(["--help"])
     assert usage.value.code == 0 and len(runs) == 2
+
+
+# --- HDE-EPIC043 WU-PR-11: PASS after a committed canonical FAIL record (HDE-SEPA008.3) --------
+#
+# Canonical-mode cases point SANITY_LOG at a temporary log (passed as ``log_path``, whose default
+# is bound at import) and replace the two rebind seams and
+# every stage outcome, so no case runs the real updater or writes the repository.
+
+_SEALING_STAGE = run_sanity_pipeline.STAGE_NAMES[10]
+
+
+def _fail_log() -> bytes:
+    failing = run_sanity_pipeline.STAGE_NAMES[1]
+    results = [(run_sanity_pipeline.STAGE_NAMES[0], "OK"), (failing, "FAIL")]
+    results += [(name, f"NOT_EXECUTED_EARLIER_FAILURE:{failing}") for name in run_sanity_pipeline.STAGE_NAMES[2:]]
+    return run_sanity_pipeline._render_log(results, failing, "FAIL")
+
+
+def _bind(log: Path) -> None:
+    """Write the path proof the updater would write for the log's current bytes."""
+    data = log.read_bytes()
+    log.with_name(log.name + ".path_proof.txt").write_text(
+        f"path: {log.name}\nsize_bytes: {len(data)}\nsha256: {hashlib.sha256(data).hexdigest()}\n",
+        encoding="utf-8",
+    )
+
+
+def _canonical_fixture(tmp_path, monkeypatch, content: bytes, *, stage_codes=None):
+    log = tmp_path / "canonical" / "sanity_pipeline.log"
+    log.parent.mkdir()
+    log.write_bytes(content)
+    _bind(log)
+    monkeypatch.setattr(run_sanity_pipeline, "SANITY_LOG", log)
+    codes = dict(stage_codes or {})
+    stages: list[str] = []
+    monkeypatch.setattr(run_sanity_pipeline, "_run_stage", lambda step: stages.append(step.name) or codes.get(step.name, 0))
+    calls: list[str] = []
+
+    def sealed() -> int:
+        calls.append("sealed")
+        _bind(log)  # the updater's PASS-model rebind binds the prospective bytes
+        return 0
+
+    def failure() -> int:
+        calls.append("failure")
+        _bind(log)
+        return 0
+
+    monkeypatch.setattr(run_sanity_pipeline, "_rebind_sealed_pass_log", sealed)
+    monkeypatch.setattr(run_sanity_pipeline, "_rebind_failure_log", failure)
+    monkeypatch.delenv("HDE_ISOLATED_RELEASE_BUILD", raising=False)
+    return log, calls, stages
+
+
+def test_canonical_run_after_a_committed_fail_record_binds_the_pass_model_once(tmp_path, monkeypatch):
+    log, calls, _ = _canonical_fixture(tmp_path, monkeypatch, _fail_log())
+    assert run_sanity_pipeline.run_pipeline(log_path=log) == 0
+    assert log.read_bytes() == run_sanity_pipeline_gate._expected_log() == _final_pass_log()
+    assert calls == ["sealed"]
+    assert run_sanity_pipeline._bound_sanity_sha256() == hashlib.sha256(log.read_bytes()).hexdigest()
+    before = _tree_bytes(log.parent)
+    assert run_sanity_pipeline.run_pipeline(log_path=log) == 0
+    assert calls == ["sealed"]
+    assert _tree_bytes(log.parent) == before
+
+
+def test_steady_state_pass_run_never_rebinds(tmp_path, monkeypatch):
+    log, calls, _ = _canonical_fixture(tmp_path, monkeypatch, _final_pass_log())
+    before = _tree_bytes(log.parent)
+    assert run_sanity_pipeline.run_pipeline(log_path=log) == 0
+    assert calls == []
+    assert _tree_bytes(log.parent) == before
+
+
+def test_isolated_release_build_never_takes_the_sealing_rebind(tmp_path, monkeypatch):
+    # Stage 11's read-only updater check refuses bytes its proof does not bind.
+    log, calls, _ = _canonical_fixture(tmp_path, monkeypatch, _fail_log(), stage_codes={_SEALING_STAGE: 1})
+    monkeypatch.setenv("HDE_ISOLATED_RELEASE_BUILD", "1")
+    assert run_sanity_pipeline.run_pipeline(log_path=log) == 1
+    assert calls == ["failure"]
+    lines = log.read_text(encoding="utf-8").splitlines()
+    assert lines[-2:] == [f"first_failed_stage:{_SEALING_STAGE}", "summary:FAIL"]
+
+
+def test_not_admitted_and_external_log_runs_never_take_the_sealing_rebind(tmp_path, monkeypatch):
+    log, calls, _ = _canonical_fixture(
+        tmp_path, monkeypatch, _fail_log(),
+        stage_codes={
+            gated: run_sanity_pipeline.RELEASE_NOT_ADMITTED_EXIT_CODE
+            for gated in run_sanity_pipeline.RELEASE_ADMISSION_GATED_STAGES
+        },
+    )
+    assert run_sanity_pipeline.run_pipeline(log_path=log) == run_sanity_pipeline.RELEASE_NOT_ADMITTED_EXIT_CODE
+    assert calls == []
+    # The canonical NOT_ADMITTED run writes the NOT_ADMITTED model, as before this unit.
+    assert log.read_bytes() == run_sanity_pipeline_gate._expected_not_admitted_log()
+    canonical = log.read_bytes()
+    external = tmp_path / "external.log"
+    assert run_sanity_pipeline.run_pipeline(log_path=external) == run_sanity_pipeline.RELEASE_NOT_ADMITTED_EXIT_CODE
+    assert calls == []
+    monkeypatch.setattr(run_sanity_pipeline, "_run_stage", lambda step: 0)
+    assert run_sanity_pipeline.run_pipeline(log_path=external) == 0
+    assert external.read_bytes() == _final_pass_log()
+    assert calls == []
+    assert log.read_bytes() == canonical
+
+
+def test_a_refused_sealing_rebind_leaves_stage_11_to_record_fail(tmp_path, monkeypatch, capsys):
+    log, calls, _ = _canonical_fixture(tmp_path, monkeypatch, _fail_log(), stage_codes={_SEALING_STAGE: 1})
+    monkeypatch.setattr(run_sanity_pipeline, "_rebind_sealed_pass_log", lambda: calls.append("refused") or 1)
+    assert run_sanity_pipeline.run_pipeline(log_path=log) == 1
+    assert calls == ["refused", "failure"]
+    assert "canonical PASS rebind refused before evidence sealing" in capsys.readouterr().err
+    lines = log.read_text(encoding="utf-8").splitlines()
+    assert lines[-2:] == [f"first_failed_stage:{_SEALING_STAGE}", "summary:FAIL"]

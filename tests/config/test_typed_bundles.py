@@ -62,8 +62,8 @@ def test_frontend_bundle_schema_and_sources() -> None:
 
     assert fe_bundle["magic10"]["order"] == magic10_config["order"]
     assert fe_bundle["magic10"]["caps"] == magic10_config["caps"]
-    assert fe_bundle["bands"]["edges"] == band_edges["edges"]
-    assert fe_bundle["bands"]["bands"] == band_edges["bands"]
+    # HDE-EPIC043 WU-PR-11 (HDE-SEPA008.2): the frontend block carries the per-category maxima.
+    assert fe_bundle["bands"] == {key: band_edges[key] for key in ("bands", "categories", "version")}
     assert fe_bundle["channels"]["ids"] == registry_report["artifacts"]["registry"]["channel_ids"]
 
     for key, src in fe_bundle["sources"].items():
@@ -132,7 +132,7 @@ def test_selected_root_bundles_preserve_complete_payload_and_schema_bytes(bundle
     config_tools.generate_config_artifacts(bundle_root)
     outputs = bundle_tools.generate_bundles(bundle_root)
     be, fe = (json.loads(outputs[name].read_bytes()) for name in ("be_bundle", "fe_bundle"))
-    assert be["bands"]["edges"] == fe["bands"]["edges"] == [20, 40, 60, 100]
+    assert be["bands"]["categories"][0]["maxima"] == fe["bands"]["categories"][0]["maxima"] == [20, 40, 60, 100]
     assert be["channels"] == json.loads((bundle_root / "catalog/channels_v1.json").read_bytes())["channels"]
     assert fe["channels"]["ids"] == [row["id"] for row in be["channels"]]
     assert set(fe["channels"]) == {"ids", "alias_policy", "domains", "centers"}
@@ -232,7 +232,9 @@ def test_bundle_captured_primary_race_restores_pair(bundle_root, monkeypatch) ->
         if not called:
             called.append(True)
             data = json.loads(source.read_bytes())
-            data["edges"] = [20, 40, 60, 100]
+            # A concurrent change to the v2 band-edges primary (HDE-EPIC043 WU-PR-11).
+            assert data["categories"][0]["maxima"] != [20, 40, 60, 100]
+            data["categories"][0]["maxima"] = [20, 40, 60, 100]
             write_canonical(source, data)
 
     monkeypatch.setattr(updater, "_publish_staged", change_after_replace)
@@ -326,10 +328,11 @@ def test_bundle_check_rechecks_sources_and_outputs_after_comparison(bundle_root,
     def compare_then_concurrent_change(base, expected):
         state = original(base, expected)
         values = json.loads(target.read_bytes())
+        # One maximum changes in the v2 thresholds or the v2 frontend block (HDE-EPIC043 WU-PR-11).
         if changed_kind == "source":
-            values["edges"] = [20, 40, 60, 100]
+            values["categories"][0]["maxima"] = [20, 40, 60, 100]
         else:
-            values["bands"]["edges"] = [20, 40, 60, 100]
+            values["bands"]["categories"][0]["maxima"] = [20, 40, 60, 100]
         write_canonical(target, values)
         changed.append(target.read_bytes())
         return state
@@ -343,3 +346,194 @@ def test_bundle_check_rechecks_sources_and_outputs_after_comparison(bundle_root,
     for name, state in before.items():
         if name != target.relative_to(bundle_root).as_posix():
             assert after[name] == state
+
+
+# --- HDE-EPIC043 WU-PR-11: the v2 band shape (HDE-SEPA008.1 to .3; R-10 to R-12) ---------------
+#
+# Both consumer schemas accept one set of four strictly ascending integers ending at 100 per
+# category, in catalog order, and refuse the v1 global shape and malformed sets.  Draft-07 cannot
+# compare array elements, so ``definitions.maxima`` states "strictly ascending" as one clause per
+# value: if maxima[i] is v, maxima[i+1] is at least v + 1.
+
+import copy
+
+from engine.config.registry_loader import (
+    SchemaValidationError,
+    _LocalCapture,
+    _capture_registry_config,
+    _validate_local_schema,
+)
+from tools.config import artifacts as config_artifacts
+
+V2_CATEGORY_ORDER = (
+    "harmony", "heat", "communication", "alignment", "comfort",
+    "consistency", "expansion", "creativity", "drive", "balance",
+)
+_V1_GLOBAL_BANDS = {
+    "bands": ["Cool", "Open", "Warm", "Glow"], "clamp": [0, 100], "edges": [24, 49, 74, 100],
+    "rounding": "half_up", "schema": "band_edges.v1", "source": "math/thresholds.json", "version": "1",
+}
+
+
+def _consumer_schema(side: str) -> dict:
+    return json.loads((ROOT / f"docs/schemas/config_bundle_{side}.json").read_bytes())
+
+
+def _expected_maxima_definition() -> dict:
+    """The stated rule, rebuilt independently of the schema files."""
+
+    def clause(position: int, value: int) -> dict:
+        lead = [{} for _ in range(position)]
+        return {"if": {"items": [*lead, {"const": value}]},
+                "then": {"items": [*lead, {}, {"minimum": value + 1}]}}
+
+    return {
+        "$comment": ("Four strictly ascending integers ending at 100. Each clause states: if maxima[i] is v, "
+                     "maxima[i+1] is at least v+1. tests/config/test_typed_bundles.py rebuilds this list "
+                     "and compares it."),
+        "type": "array", "minItems": 4, "maxItems": 4, "additionalItems": False,
+        "items": [
+            {"type": "integer", "minimum": 0, "maximum": 97},
+            {"type": "integer", "minimum": 1, "maximum": 98},
+            {"type": "integer", "minimum": 2, "maximum": 99},
+            {"type": "integer", "const": 100},
+        ],
+        "allOf": [clause(0, value) for value in range(1, 98)] + [clause(1, value) for value in range(2, 99)],
+    }
+
+
+def test_both_schemas_state_the_ascending_rule_and_the_catalog_order() -> None:
+    order = tuple(_capture_registry_config(ROOT).config.magic10_order)
+    assert order == V2_CATEGORY_ORDER
+    expected_maxima = _expected_maxima_definition()
+    for side in ("be", "fe"):
+        definitions = _consumer_schema(side)["definitions"]
+        assert definitions["maxima"] == expected_maxima, side
+        categories = definitions["band_categories"]
+        assert (categories["minItems"], categories["maxItems"], categories["additionalItems"]) == (10, 10, False)
+        assert [item["properties"]["category_id"]["const"] for item in categories["items"]] == list(order)
+        for item in categories["items"]:
+            assert item["additionalProperties"] is False
+            assert item["required"] == ["category_id", "maxima"]
+            assert item["properties"]["maxima"] == {"$ref": "#/definitions/maxima"}
+    assert _consumer_schema("be")["definitions"]["band_categories"] == _consumer_schema("fe")["definitions"]["band_categories"]
+
+
+def _set_first_maxima(maxima):
+    return lambda bands: bands["categories"][0].__setitem__("maxima", maxima)
+
+
+# Each adverse case, the jsonschema keyword that refuses it, and the instance path it refuses.
+_ADVERSE_BAND_CASES = {
+    # The Plan's list (WU-PR-11 acceptance item 1; AC-10).
+    "v1_global_shape": (lambda bands: (bands.clear(), bands.update(copy.deepcopy(_V1_GLOBAL_BANDS))),
+                        "additionalProperties", ["bands"]),
+    "three_values": (_set_first_maxima([35, 44, 100]), "minItems", ["bands", "categories", 0, "maxima"]),
+    "non_ascending": (_set_first_maxima([44, 35, 53, 100]), "minimum", ["bands", "categories", 0, "maxima", 1]),
+    "not_ending_at_100": (_set_first_maxima([35, 44, 53, 99]), "const", ["bands", "categories", 0, "maxima", 3]),
+    "missing_category": (lambda bands: bands["categories"].pop(), "minItems", ["bands", "categories"]),
+    # The instruction's further constraints (§4.1, §11.2): strict ascent, catalog order, strict
+    # integers in 0..100, closed objects.
+    "equal_pair": (_set_first_maxima([35, 35, 53, 100]), "minimum", ["bands", "categories", 0, "maxima", 1]),
+    "reordered": (lambda bands: bands["categories"].__setitem__(slice(0, 2), bands["categories"][1::-1]),
+                  "const", ["bands", "categories", 0, "category_id"]),
+    "duplicated": (lambda bands: bands["categories"].__setitem__(9, copy.deepcopy(bands["categories"][0])),
+                   "const", ["bands", "categories", 9, "category_id"]),
+    "bool_value": (_set_first_maxima([True, 44, 53, 100]), "type", ["bands", "categories", 0, "maxima", 0]),
+    "float_value": (_set_first_maxima([35, 44, 53, 100.0]), "type", ["bands", "categories", 0, "maxima", 3]),
+    "five_values": (_set_first_maxima([35, 44, 53, 60, 100]), "maxItems", ["bands", "categories", 0, "maxima"]),
+    "above_100": (_set_first_maxima([35, 44, 101, 100]), "maximum", ["bands", "categories", 0, "maxima", 2]),
+    "below_0": (_set_first_maxima([-1, 44, 53, 100]), "minimum", ["bands", "categories", 0, "maxima", 0]),
+    "extra_bands_key": (lambda bands: bands.__setitem__("edges", [24, 49, 74, 100]),
+                        "additionalProperties", ["bands"]),
+    "extra_category_key": (lambda bands: bands["categories"][0].__setitem__("label", "x"),
+                           "additionalProperties", ["bands", "categories", 0]),
+}
+
+
+@pytest.mark.parametrize("side", ["be", "fe"])
+def test_consumer_schemas_accept_the_committed_v2_bundles(side) -> None:
+    payload = _read_canonical(ROOT / f"artifacts/config_bundles/{side}_bundle.json")
+    _validate_local_schema(_LocalCapture(ROOT), f"docs/schemas/config_bundle_{side}.json", payload)
+
+
+@pytest.mark.parametrize("case", sorted(_ADVERSE_BAND_CASES))
+@pytest.mark.parametrize("side", ["be", "fe"])
+def test_consumer_schemas_refuse_the_v1_shape_and_malformed_sets(side, case) -> None:
+    mutate, keyword, path = _ADVERSE_BAND_CASES[case]
+    payload = _read_canonical(ROOT / f"artifacts/config_bundles/{side}_bundle.json")
+    mutate(payload["bands"])
+    with pytest.raises(SchemaValidationError) as refused:
+        _validate_local_schema(_LocalCapture(ROOT), f"docs/schemas/config_bundle_{side}.json", payload)
+    assert refused.value.code == "SCHEMA_VALIDATION_FAILED"
+    cause = refused.value.__cause__
+    assert (cause.validator, list(cause.absolute_path)) == (keyword, path)
+
+
+def _strict_draft7(schema: dict):
+    """The validator class ``_validate_local_schema`` builds: Draft-07 with strict integers."""
+    from jsonschema import Draft7Validator, validators
+
+    strict = validators.extend(
+        Draft7Validator,
+        type_checker=Draft7Validator.TYPE_CHECKER.redefine("integer", lambda checker, value: type(value) is int),
+    )
+    return strict(schema)
+
+
+def _boundary_complete_maxima() -> list:
+    """Every adjacent pair at every value -1..101 with its next value v-1, v and v+1."""
+    candidates = []
+    for value in range(-1, 102):
+        for following in (value - 1, value, value + 1):
+            for maxima in ([value, following, 99, 100], [0, value, following, 100], [1, 2, value, following]):
+                if maxima not in candidates:
+                    candidates.append(maxima)
+    candidates += [[35, 44, 100], [35, 44, 53, 60, 100], [True, 44, 53, 100], [35, 44, 53, 100.0], [], [100]]
+    return candidates
+
+
+def test_the_maxima_schema_agrees_with_the_band_edges_v2_producer(monkeypatch) -> None:
+    for name, value in closed_rails_env().items():
+        monkeypatch.setenv(name, value)
+    capture = _capture_registry_config(ROOT)
+    thresholds = capture.read("math/thresholds.json").data
+    schema = _strict_draft7(_consumer_schema("be")["definitions"]["maxima"])
+    assert _consumer_schema("fe")["definitions"]["maxima"] == _consumer_schema("be")["definitions"]["maxima"]
+    accepted = refused = 0
+    for maxima in _boundary_complete_maxima():
+        raw = copy.deepcopy(thresholds)
+        raw["categories"][0]["maxima"] = maxima
+        try:
+            config_artifacts._band_edges_v2(capture, raw)
+        except SchemaValidationError:
+            producer_accepts = False
+        else:
+            producer_accepts = True
+        assert schema.is_valid(maxima) is producer_accepts, maxima
+        accepted += producer_accepts
+        refused += not producer_accepts
+    assert accepted > 100 and refused > 100
+
+
+def test_both_bundles_carry_the_per_category_maxima_and_no_v1_keys(bundle_root) -> None:
+    outputs = bundle_tools.generate_bundles(bundle_root)
+    be, fe = (json.loads(outputs[name].read_bytes()) for name in ("be_bundle", "fe_bundle"))
+    band_edges = json.loads((bundle_root / "artifacts/thresholds/band_edges.json").read_bytes())
+    assert band_edges["schema"] == "band_edges.v2"
+    assert be["bands"] == band_edges
+    assert sorted(fe["bands"]) == ["bands", "categories", "version"]
+    assert fe["bands"]["categories"] == band_edges["categories"]
+    for payload in (be, fe):
+        assert not {"edges", "clamp", "rounding"} & set(payload["bands"])
+
+
+def test_committed_bundles_carry_the_thresholds_maxima_and_validate() -> None:
+    thresholds = _read_canonical(ROOT / "math/thresholds.json")
+    expected = [(entry["category_id"], entry["maxima"]) for entry in thresholds["categories"]]
+    assert [category for category, _ in expected] == list(V2_CATEGORY_ORDER)
+    for side in ("be", "fe"):
+        payload = _read_canonical(ROOT / f"artifacts/config_bundles/{side}_bundle.json")
+        carried = [(entry["category_id"], entry["maxima"]) for entry in payload["bands"]["categories"]]
+        assert carried == expected, side
+        _validate_local_schema(_LocalCapture(ROOT), f"docs/schemas/config_bundle_{side}.json", payload)

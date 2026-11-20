@@ -1,0 +1,93 @@
+schema: hde_epic043_v2_bundle_evidence.v1
+epic_id: HDE-EPIC043
+task_id: HDE-SEPA008
+subtask_ids: HDE-SEPA008.1,HDE-SEPA008.2,HDE-SEPA008.3
+work_unit_id: WU-PR-11
+run.time_utc: 2026-11-20T04:57:37Z
+run.actor: HDE-EPIC043 WU-PR-11 dedicated PR session (PR-30), https://claude.ai/code/session_01Q789tzhzsYMn4bUAG2DE62
+run.python: 3.12.3
+input.docs/schemas/config_bundle_be.json.sha256: 310cf90fd65d3760ce2463c6a26bf0d359a978979f3944afe309433339b4c072
+input.docs/schemas/config_bundle_be.json.size_bytes: 24666
+input.docs/schemas/config_bundle_fe.json.sha256: e1208bab966349d89bb9385bff2015edb14f292b1635808a6ae8165ce90ac7e6
+input.docs/schemas/config_bundle_fe.json.size_bytes: 23313
+input.engine/config/bundles.py.sha256: d80e145561d78ee38c17ea5d4abc11552d509ac6120b2ccae6739ed248f59f5e
+input.engine/config/bundles.py.size_bytes: 5237
+input.artifacts/config_bundles/be_bundle.json.sha256: f942e8b3eb11d988734b2d1e64a2fca1c08ec5fbfcd335a0a03adff69620aede
+input.artifacts/config_bundles/be_bundle.json.size_bytes: 9283
+input.artifacts/config_bundles/fe_bundle.json.sha256: 87c39ae7f398b6ba3f88714dcbfa19fc2624d0a9746f5e8491a0a44fb0bf36fe
+input.artifacts/config_bundles/fe_bundle.json.size_bytes: 2662
+input.artifacts/thresholds/band_edges.json.sha256: dfd1df21e694b08fde81aa782c26b1b9a47b973b6c00d52d00ac66d4b11d1429
+input.artifacts/thresholds/band_edges.json.size_bytes: 638
+input.math/thresholds.json.sha256: b4e7639f0f42a3221b06e026a0fb2fe19ce940736d099d5e5e47159970567f5d
+input.math/thresholds.json.size_bytes: 543
+input.catalog/manifest.json.sha256: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+input.catalog/manifest.json.size_bytes: 6803
+tested_inputs.count: 8
+tested_inputs.sha256: ca5c88673a837058d70b5570f63b87fc77bfd522c4ab5458651742c3692ddf24
+release.release_id: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+release.config_id: m10-relevance-centers-type-v2.0.0
+bundle.be.path: artifacts/config_bundles/be_bundle.json
+bundle.be.schema_path: docs/schemas/config_bundle_be.json
+bundle.be.schema_identity: config_bundle.be.v1
+bundle.be.validated: true
+bundle.be.bands_keys: ["bands","categories","schema","source","version"]
+bundle.be.v1_global_keys_absent: true
+bundle.be.sources_band_edges_equal: true
+bundle.fe.path: artifacts/config_bundles/fe_bundle.json
+bundle.fe.schema_path: docs/schemas/config_bundle_fe.json
+bundle.fe.schema_identity: config_bundle.fe.v1
+bundle.fe.validated: true
+bundle.fe.bands_keys: ["bands","categories","version"]
+bundle.fe.v1_global_keys_absent: true
+bundle.fe.sources_band_edges_equal: true
+category.harmony.thresholds_maxima: [35,44,53,100]
+category.harmony.be_maxima: [35,44,53,100]
+category.harmony.fe_maxima: [35,44,53,100]
+category.harmony.equal: true
+category.heat.thresholds_maxima: [35,45,55,100]
+category.heat.be_maxima: [35,45,55,100]
+category.heat.fe_maxima: [35,45,55,100]
+category.heat.equal: true
+category.communication.thresholds_maxima: [36,47,57,100]
+category.communication.be_maxima: [36,47,57,100]
+category.communication.fe_maxima: [36,47,57,100]
+category.communication.equal: true
+category.alignment.thresholds_maxima: [38,48,57,100]
+category.alignment.be_maxima: [38,48,57,100]
+category.alignment.fe_maxima: [38,48,57,100]
+category.alignment.equal: true
+category.comfort.thresholds_maxima: [34,44,53,100]
+category.comfort.be_maxima: [34,44,53,100]
+category.comfort.fe_maxima: [34,44,53,100]
+category.comfort.equal: true
+category.consistency.thresholds_maxima: [41,51,60,100]
+category.consistency.be_maxima: [41,51,60,100]
+category.consistency.fe_maxima: [41,51,60,100]
+category.consistency.equal: true
+category.expansion.thresholds_maxima: [33,44,54,100]
+category.expansion.be_maxima: [33,44,54,100]
+category.expansion.fe_maxima: [33,44,54,100]
+category.expansion.equal: true
+category.creativity.thresholds_maxima: [33,44,53,100]
+category.creativity.be_maxima: [33,44,53,100]
+category.creativity.fe_maxima: [33,44,53,100]
+category.creativity.equal: true
+category.drive.thresholds_maxima: [39,51,60,100]
+category.drive.be_maxima: [39,51,60,100]
+category.drive.fe_maxima: [39,51,60,100]
+category.drive.equal: true
+category.balance.thresholds_maxima: [50,62,70,100]
+category.balance.be_maxima: [50,62,70,100]
+category.balance.fe_maxima: [50,62,70,100]
+category.balance.equal: true
+command.regeneration: python tools/config/generate_config_artifacts.py --publish-family
+command.check_1: python tools/config/generate_bundles.py --check
+command.check_1.exit: 0
+command.check_2: python tools/config/generate_config_artifacts.py --check
+command.check_2.exit: 0
+command.writer: python tools/evidence/generate_hde_epic043_v2_bundle_evidence.py --actor <run.actor>
+limitation.1: no live run: no production, vendor, database or network access
+limitation.2: interpreter: run.python locally; hosted CI's interpreter may differ
+limitation.3: evidence of the tested inputs named above only, not of a later state
+limitation.4: establishes no QA verdict, acceptance, Ops, deployment or closure
+status: PASS

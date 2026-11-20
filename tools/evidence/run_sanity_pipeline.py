@@ -405,6 +405,33 @@ def _rebind_failure_log() -> int:
     return result.returncode or 0
 
 
+# HDE-EPIC043 WU-PR-11 (HDE-SEPA008.3): a canonical run after a committed
+# canonical FAIL record.  At the sealing stage the prospective PASS log differs
+# from the bytes the committed path proof binds, so stage 11's read-only updater
+# check would refuse the run's own PASS.  Only then, the run asks the updater to
+# rebind the sanity log alone; the updater binds no content but a FAIL log or
+# the exact generic PASS model the gate accepts.  Stage 11 then runs unchanged
+# and still checks every other row.  The isolated release build never takes
+# this route, so the attestation's sanity predicate is exactly as before.
+def _bound_sanity_sha256() -> str | None:
+    """The SHA-256 the committed path proof binds for the canonical log, if readable."""
+    proof = SANITY_LOG.with_name(SANITY_LOG.name + ".path_proof.txt")
+    try:
+        text = proof.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return None
+    values = [line[len("sha256: "):] for line in text.splitlines() if line.startswith("sha256: ")]
+    return values[0] if len(values) == 1 else None
+
+
+def _rebind_sealed_pass_log() -> int:
+    """Bind only the exact generic PASS model before stage 11 checks every row."""
+    result = _run_command(
+        _py("tools/evidence/update_evidence_index.py", "--rebind-sanity-log")
+    )
+    return result.returncode or 0
+
+
 def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | None = None, refresh_index: bool = True) -> int:
     log_path = validate_log_path(log_path)
     ensure_determinism_env()
@@ -432,6 +459,14 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
                 "NONE",
                 "PASS",
             )
+            if (
+                os.environ.get("HDE_ISOLATED_RELEASE_BUILD") != "1"
+                and _bound_sanity_sha256() != hashlib.sha256(prospective_pass).hexdigest()
+                and _rebind_sealed_pass_log()
+            ):
+                # Stage 11 below then refuses the unbound bytes and the FAIL
+                # route records and rebinds the FAIL log, as before.
+                print("canonical PASS rebind refused before evidence sealing", file=sys.stderr)
         code = _run_stage(step)
         if code == 0:
             status = "OK"

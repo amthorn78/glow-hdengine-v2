@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic043/pr-11/v2_bundle_evidence.txt
+size_bytes: 4987
+sha256: 8a99a1da3ee677104118a40a5950127c0fc3eefa8d00d48e5004ebc8875e1baa
+mtime_utc: 2026-11-20T04:57:39Z
+produced_at_utc: 2026-11-19T19:19:12Z

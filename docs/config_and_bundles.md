@@ -4,6 +4,7 @@
 - Mechanics configuration: `catalog/magic10_mechanics_v2.json` (`magic10_mechanics_config.v2`, `config_id` `m10-relevance-centers-type-v2.0.0`, `result_schema` `magic10_result.v2`), validated by `engine/config/magic10_v2_loader.py` against `schemas/magic10_mechanics_v2.schema.json`. Its `sources` bind its catalogs and `math/thresholds.json` (version 2, the cut's per-category maxima) by SHA-256. `main` keeps `catalog/magic10_mechanics_v1.json` until the cutover.
 - Result schemas: `schemas/magic10_result_v2.schema.json` (intrinsic core result) and `schemas/magic10_compat_result_v2.schema.json` (application result; `hdctl showcompat` stdout). Catalog schemas: `schemas/channels_v1.schema.json` and `schemas/gates_v1.schema.json`. All are release members.
 - Writers (canonical owners; never hand-edit their outputs): `tools/config/generate_config_artifacts.py` writes `artifacts/registry/registry_report.json`, `artifacts/thresholds/magic10_config.json` and `artifacts/thresholds/band_edges.json` (`--check` validates them without writing; `--publish-family` publishes the scoped config family, catalog logs, bundles and required evidence companions); `tools/config/generate_bundles.py` writes `artifacts/config_bundles/fe_bundle.json` and `artifacts/config_bundles/be_bundle.json`; `tools/generate_registry_report.py` writes the registry report; `tools/evidence/update_evidence_index.py` publishes the Index/Mirror companions.
+- Typed bundles (HDE-EPIC043 WU-PR-11): both bundles carry the cut's per-category maxima from `artifacts/thresholds/band_edges.json` (`band_edges.v2`). The backend `bands` block is the whole band-edges object; the frontend block is its `bands`, `categories` and `version`. Neither carries the v1 `edges`, `clamp` or `rounding` keys.
 - FE/BE promise: the bundle schema identities `config_bundle.fe.v1` and `config_bundle.be.v1` are unchanged by HDE-EPIC040, and the Channel fields `primary_domain`, `domains` and `flags` remain non-scoring Product metadata (`PF12-Canon-HDE-Schemas-and-Artifacts` §2.1).
 - Writer recovery limits: the config-family writers restore on caught failures, refuse source/destination races, keep check paths non-writing and preserve conflicting external changes. They do not promise crash atomicity, multi-file atomic visibility or cross-process locking.
 
@@ -15,8 +16,8 @@
 - Acceptance mapping: `audit/EPIC-018_config_acceptance_map.json` links PF09 tasks to config artifacts, tokens, and tests; treat it as governed evidence with `.path_proof.txt`.
 
 ## Typed bundles (D6)
-- Generated with `python tools/config/generate_bundles.py` under the same rails.
-- Schemas: `docs/schemas/config_bundle_fe.json` (frontend) and `docs/schemas/config_bundle_be.json` (backend). Bundles mirror governed config and registry state.
+- Generated with `python tools/config/generate_bundles.py` under the same rails. The governed regeneration is `python tools/config/generate_config_artifacts.py --publish-family`, which writes the bundles together with the catalog logs; `python tools/config/generate_bundles.py --check` validates them without writing.
+- Schemas: `docs/schemas/config_bundle_fe.json` (frontend) and `docs/schemas/config_bundle_be.json` (backend). Bundles mirror governed config and registry state. Both schemas (Draft-07; identities unchanged) accept, in each `bands` block, one set of four strictly ascending integers ending at 100 per category, in catalog order, and refuse the v1 global shape (HDE-SEPA008.1).
 - Bundle outputs are governed: add `.path_proof.txt` siblings and update evidence indexes via `tools/evidence/update_evidence_index.py`.
 
 ## Registry alignment

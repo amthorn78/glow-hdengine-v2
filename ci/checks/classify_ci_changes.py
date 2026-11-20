@@ -224,6 +224,10 @@ _RELEASE_EVIDENCE_PREFIXES = (
 )
 _RELEASE_IMPLEMENTATION_PATHS = {
     "ci/checks/check_evidence_index_hash.sh",
+    # HDE-EPIC043 WU-PR-11: the typed-bundle consumer schemas, which the
+    # release closure's bundle step and the config-family publication execute.
+    "docs/schemas/config_bundle_be.json",
+    "docs/schemas/config_bundle_fe.json",
     "ci/checks/check_env_pins.sh",
     "ci/checks/check_final_lf.sh",
     "ci/checks/check_mirror_schema.sh",
@@ -893,6 +897,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     "tools/evidence/generate_hde_epic043_cut_record.py": (
         "tests/evidence/test_hde_epic043_cut_record.py",
     ),
+    # HDE-EPIC043 WU-PR-11: the Magic-10 v2 typed-bundle evidence (HDE-SEPA008.3).
+    "tools/evidence/generate_hde_epic043_v2_bundle_evidence.py": (
+        "tests/evidence/test_hde_epic043_v2_bundle_evidence.py",
+    ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
     "tests/evidence/test_evidence_tool_ownership.py"
@@ -1071,6 +1079,17 @@ _CONFIG_WRITER_TEST_OWNERS = {
     "tools/config/generate_bundles.py": (
         "tests/config/test_config_artifacts.py",
         "tests/config/test_typed_bundles.py",
+    ),
+    # HDE-EPIC043 WU-PR-11 (HDE-SEPA008.1): the two consumer schemas.
+    "docs/schemas/config_bundle_be.json": (
+        "tests/config/test_config_artifacts.py",
+        "tests/config/test_typed_bundles.py",
+        "tests/evidence/test_hde_epic043_v2_bundle_evidence.py",
+    ),
+    "docs/schemas/config_bundle_fe.json": (
+        "tests/config/test_config_artifacts.py",
+        "tests/config/test_typed_bundles.py",
+        "tests/evidence/test_hde_epic043_v2_bundle_evidence.py",
     ),
 }
 # HDE-EPIC040-PR05: repository-owned BodyGraph tools (the PF12 "Gate
