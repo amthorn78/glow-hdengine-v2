@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic043/pr-13/v2_proof_family_record.txt
+size_bytes: 38687
+sha256: e829f5c46b002c44cdc961b4785e4f9c43047ba626846e1774630615a0fa764c
+mtime_utc: 2026-11-22T13:16:51Z
+produced_at_utc: 2026-11-20T05:17:35Z

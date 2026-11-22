@@ -4,14 +4,18 @@ One row per item of the HDE-DIST008.1 Magic10 v2 re-target note (F-01 to F-10)
 and per item of the subtask description that the note does not replace (F-11 to
 F-28, with F-21 split into its manifest-row and release-binding parts). Each row
 names its passing cases and its refused mutations by ``path::function``, its
-Stage A basis, and when its v2 evidence falls due: ``now``; ``WU-PR-09`` (the
-switch, for surface-bound items whose v2 run starts there); ``WU-PR-10`` (the
-cut maxima and ``M10-G002`` to ``M10-G008``); ``WU-PR-13`` (the candidate run).
+basis, and when its v2 evidence falls due: ``now``; ``WU-PR-09`` (the switch, for
+surface-bound items whose v2 run starts there); ``WU-PR-10`` (the cut maxima and
+``M10-G002`` to ``M10-G008``); ``WU-PR-13`` (the candidate run, where F-06 and F-08
+were re-targeted to the admitted release).
 
 The pin proves every item has at least one passing case and one refused
 mutation, every node resolves to a top-level test function, and every mutation
 lives in the family directory. It makes the family a runnable gate:
-``python -m pytest -q -p no:cacheprovider tests/m10_v2`` runs all of it.
+``python -m pytest -q -p no:cacheprovider tests/m10_v2`` runs all of it. A second
+pin (HDE-EPIC043 WU-PR-13) refuses a broad exception handler in any module that
+holds a mutation case, so a mutation case can pass only on a failed assertion or
+the product's own typed refusal, never on an unrelated crash.
 """
 from __future__ import annotations
 
@@ -79,12 +83,13 @@ FAMILY_INDEX = (
          (f"{S}::test_f05_mutation_type_scoring_alone_is_refused", f"{S}::test_f05_mutation_rounding_down_is_refused"),
          "fixture bundle", "now"),
     _row("F-06", "Band assignment from each category's own inclusive maxima at every edge",
-         (f"{S}::test_f06_band_at_every_edge_of_every_category",
+         (f"{S}::test_f06_band_at_every_edge_against_the_cut_maxima",
+         f"{S}::test_f06_band_at_every_edge_of_every_category",
           "tests/m10_v2/test_calculation_bands.py::test_band_at_every_edge_of_each_category",
           "tests/m10_v2/test_calculation_bands.py::test_real_pairs_land_in_their_own_categorys_bands",
           "tests/m10_v2/test_calculation_bands.py::test_test_maxima_differ_by_category"),
-         (f"{S}::test_f06_mutation_exclusive_maxima_is_refused",),
-         "test maxima", "WU-PR-13"),
+         (f"{S}::test_f06_mutation_exclusive_maxima_at_the_cut_is_refused", f"{S}::test_f06_mutation_exclusive_maxima_is_refused"),
+         "active release", "WU-PR-13"),
     _row("F-07", "Integer-only arithmetic; no viewer preferences, presets or caller weights",
          (f"{S}::test_f07_integer_only_and_exactly_four_inputs",
           "tests/m10_v2/test_kernel_static_guards.py::test_no_binary_floating_point_in_the_package",
@@ -92,14 +97,17 @@ FAMILY_INDEX = (
          (f"{S}::test_f07_mutation_a_float_operation_is_flagged", f"{S}::test_f07_mutation_a_caller_weight_input_is_refused"),
          "static", "now"),
     _row("F-08", "pair_key under the v2 config_id, the magic10:v2: cache key, the v2 release, result and compat schema closure, q 0..1000",
-         (f"{I}::test_f08_identity_cache_key_and_schema_closure",
+         (f"{I}::test_f08_identity_cache_key_and_schema_closure_on_the_admitted_release",
+          f"{I}::test_f08_identity_cache_key_and_schema_closure",
           "tests/m10_v2/test_calculation_result.py::test_pair_key_is_the_v2_identity",
           "tests/m10_v2/test_calculation_result.py::test_result_validates_and_follows_the_governed_order",
           "tests/m10_v2/test_compat_result.py::test_cache_key_is_the_loader_key_and_differs_from_v1",
           "tests/m10_v2/test_compat_result.py::test_schema_accepts_q_at_both_ends",
           "tests/m10_v2/test_compat_result.py::test_schema_refuses_q_outside_its_integer_domain"),
-         (f"{I}::test_f08_mutation_pair_key_without_config_id_is_refused", f"{I}::test_f08_mutation_cache_key_prefix_is_refused"),
-         "fixture bundle", "WU-PR-13"),
+         (f"{I}::test_f08_mutation_pair_key_without_the_release_is_refused",
+          f"{I}::test_f08_mutation_v1_cache_key_prefix_on_the_admitted_release_is_refused",
+          f"{I}::test_f08_mutation_pair_key_without_config_id_is_refused", f"{I}::test_f08_mutation_cache_key_prefix_is_refused"),
+         "active release", "WU-PR-13"),
     _row("F-09", "Configuration-mutation rejection under the v2 loader rules",
          (f"{C}::test_f09_configuration_mutation_rejection",),
          (f"{C}::test_f09_mutation_owning_schema_not_applied_is_refused",),
@@ -245,3 +253,36 @@ def test_the_index_pin_refuses_a_node_that_does_not_resolve() -> None:
     )
     with pytest.raises(AssertionError):
         _check_index(broken)
+
+
+# --- HDE-EPIC043 WU-PR-13: no mutation case passes on an unrelated crash ------------------------
+
+BROAD_HANDLER_NAMES = {"Exception", "BaseException"}
+
+
+def broad_handlers(source: str) -> list[int]:
+    """The lines of handlers that would turn an arbitrary exception into a refused mutation."""
+    lines = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.ExceptHandler):
+            types = node.type.elts if isinstance(node.type, ast.Tuple) else [node.type]
+            if node.type is None or any(isinstance(item, ast.Name) and item.id in BROAD_HANDLER_NAMES for item in types):
+                lines.append(node.lineno)
+    return lines
+
+
+def mutation_modules(index) -> tuple[str, ...]:
+    return tuple(sorted({node.partition("::")[0] for row in index for node in row["mutations"]}))
+
+
+def test_no_mutation_module_converts_an_arbitrary_exception() -> None:
+    paths = mutation_modules(FAMILY_INDEX)
+    assert paths
+    assert {path: broad_handlers((ROOT / path).read_text(encoding="utf-8")) for path in paths} == {path: [] for path in paths}
+
+
+def test_the_handler_pin_refuses_a_broad_handler() -> None:
+    assert broad_handlers("try:\n    pass\nexcept Exception as exc:\n    pass\n") == [3]
+    assert broad_handlers("try:\n    pass\nexcept (KeyError, BaseException):\n    pass\n") == [3]
+    assert broad_handlers("try:\n    pass\nexcept:\n    pass\n") == [3]
+    assert broad_handlers("try:\n    pass\nexcept KeyError:\n    pass\n") == []

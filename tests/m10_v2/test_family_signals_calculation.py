@@ -12,7 +12,9 @@ broken; the passing case runs it on the landed code and the refused mutation
 patches one rule in-process. Mutations are constructed perturbations of a rule,
 not inputs. Expected values are transcribed from HDE Math Spec §5.2.11 and §5.3.7.
 The bundle is the labelled non-canon fixture bundle; the per-category maxima of
-F-06 are test values ``(5 + i, 20 + i, 40 + i, 100)``, not canon and not the cut.
+F-06's first case are test values ``(5 + i, 20 + i, 40 + i, 100)``, not canon and
+not the cut. F-06's candidate case (HDE-EPIC043 WU-PR-13) runs over the repository
+root admitted as the active release, at the cut maxima of ``math/thresholds.json``.
 
 Stated limit (F-03): no exact half is reachable for the eighteen ordinary
 signals on a real input (PF10 addendum 2.4 R-4), so their half-up reading is
@@ -215,6 +217,48 @@ def test_f06_mutation_exclusive_maxima_is_refused(v2_bundle, mask_of, monkeypatc
     monkeypatch.setattr(calculation, "assign_band", exclusive)
     with pytest.raises(AssertionError):
         _check_f06(v2_bundle, mask_of)
+
+
+def _check_f06_cut_edges(admitted) -> None:
+    """Band assignment at every edge of every category, against the admitted release's own maxima."""
+    bundle = admitted.magic10_v2
+    order = bundle.registry.magic10_order
+    for category in order:
+        first, second, third, last = maxima = bundle.maxima[category]
+        edges = {0: "Cool", first: "Cool", first + 1: "Open", second: "Open", second + 1: "Warm",
+                 third: "Warm", third + 1: "Glow", last: "Glow"}
+        for score, band in edges.items():
+            assert calculation.assign_band(score, maxima) == band, f"F-06 cut edge {category} {score}"
+        for other in order:
+            if other != category:
+                assert any(calculation.assign_band(score, bundle.maxima[other]) != band
+                           for score, band in edges.items()), f"F-06 cut own category {category} {other}"
+
+
+def _check_f06_cut_pairs(admitted, mask_of) -> None:
+    """Real pairs over the admitted release land in their own category's inclusive bands."""
+    bundle = admitted.magic10_v2
+    for gates_a, gates_b in PAIRS:
+        kernel = compute_kernel(mask_of(*gates_a), mask_of(*gates_b), bundle)
+        for item in calculation.compute_category_components(kernel, signals.compute_signals(kernel, bundle), bundle):
+            first, second, third, _ = bundle.maxima[item.category_id]
+            band = "Cool" if item.score <= first else "Open" if item.score <= second else "Warm" if item.score <= third else "Glow"
+            assert item.band == band, f"F-06 cut pair {item.category_id}"
+
+
+def test_f06_band_at_every_edge_against_the_cut_maxima(v2_admitted, mask_of) -> None:
+    _check_f06_cut_edges(v2_admitted)
+    _check_f06_cut_pairs(v2_admitted, mask_of)
+
+
+def test_f06_mutation_exclusive_maxima_at_the_cut_is_refused(v2_admitted, monkeypatch) -> None:
+    def exclusive(score, maxima):
+        first, second, third, _ = maxima
+        return "Cool" if score < first else "Open" if score < second else "Warm" if score < third else "Glow"
+
+    monkeypatch.setattr(calculation, "assign_band", exclusive)
+    with pytest.raises(AssertionError, match=r"^F-06 cut edge "):
+        _check_f06_cut_edges(v2_admitted)
 
 
 # --- F-07 -------------------------------------------------------------------------------------

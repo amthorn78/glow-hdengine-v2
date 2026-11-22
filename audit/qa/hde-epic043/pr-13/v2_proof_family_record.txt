@@ -1,0 +1,429 @@
+schema: hde_epic043_v2_proof_family_record.v1
+epic_id: HDE-EPIC043
+task_id: HDE-DIST008
+subtask_ids: HDE-DIST008.1
+work_unit_id: WU-PR-13
+run.time_utc: 2026-11-22T13:16:14Z
+run.actor: HDE-EPIC043 WU-PR-13 PR-30 session (Claude Code)
+run.python: 3.12.3
+input.catalog/manifest.json.sha256: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+input.catalog/manifest.json.size_bytes: 6803
+input.pytest.ini.sha256: b8ead10232e630746acca0e8b802e4c8f23da840ab90d5b14185c766850bd2e6
+input.pytest.ini.size_bytes: 3973
+input.tests/conftest.py.sha256: 6786a96b69546b38f8978af7c946da28976874c848f0c7abd41e260239ec13b7
+input.tests/conftest.py.size_bytes: 201
+input.tests/m10_v2/conftest.py.sha256: 0baf441c31fb3ebb36e722c491381b1c872cc431d390b8a3f978a7c47c38be15
+input.tests/m10_v2/conftest.py.size_bytes: 3585
+input.tests/m10_v2/test_calculation_bands.py.sha256: 390a1199e8e5f7c62f1933247183e68ccc35e8e6a0384701f5e7ff40ad9818aa
+input.tests/m10_v2/test_calculation_bands.py.size_bytes: 5588
+input.tests/m10_v2/test_calculation_components.py.sha256: 0e98c55f36cbd0ba0c4c9abbea8c2c53c74f4c20bedc38594bee42339c4836e0
+input.tests/m10_v2/test_calculation_components.py.size_bytes: 10954
+input.tests/m10_v2/test_calculation_result.py.sha256: fa2d2977e370da4d1e947fdb23d24118b3d7e65b43e8e495cf1d81fafcdeae26
+input.tests/m10_v2/test_calculation_result.py.size_bytes: 7538
+input.tests/m10_v2/test_compat_reader_projection.py.sha256: 67f960dbc74a686eae6c5b1c1f712efaf74e9ac7cd379817710c364e4cc61ea6
+input.tests/m10_v2/test_compat_reader_projection.py.size_bytes: 5810
+input.tests/m10_v2/test_compat_refusals.py.sha256: a30d969b704ad314ac8e56469a2f800f8b0e4a1b419eadd4b7ad83001deccb6e
+input.tests/m10_v2/test_compat_refusals.py.size_bytes: 3031
+input.tests/m10_v2/test_compat_result.py.sha256: 60fce5ef03826f03fcf61c4b229e6d85b7201eedcce47f396d608c9be3ee9620
+input.tests/m10_v2/test_compat_result.py.size_bytes: 8296
+input.tests/m10_v2/test_compat_static_guards.py.sha256: 8d5c431dbc32071822de68135dfc16aa86d4e4b65c7874d53c1740bd2b2f58fe
+input.tests/m10_v2/test_compat_static_guards.py.size_bytes: 4206
+input.tests/m10_v2/test_family_config_rejection.py.sha256: 1b49f667b7098814bcba67ca970161891279f5ed451d07e56caa19c5b8eea654
+input.tests/m10_v2/test_family_config_rejection.py.size_bytes: 6613
+input.tests/m10_v2/test_family_goldens.py.sha256: fc78545982213f30d3817629461eab608055c8d97f4bf682f6464a323373b6c6
+input.tests/m10_v2/test_family_goldens.py.size_bytes: 10153
+input.tests/m10_v2/test_family_identity_and_reader.py.sha256: ca63fcf13d275813c9348b450c3a272e45bb63cd3ed03c0c44ab78e8b37873f1
+input.tests/m10_v2/test_family_identity_and_reader.py.size_bytes: 10186
+input.tests/m10_v2/test_family_kernel.py.sha256: 5db8e87df0ebd393bf4c2567b58157a98c89a4349c368c356c96690cb2a564eb
+input.tests/m10_v2/test_family_kernel.py.size_bytes: 10939
+input.tests/m10_v2/test_family_signals_calculation.py.sha256: f2671d77a1a835e6adbb62c96b3801384bd239921c4347fca09ffa4121817da4
+input.tests/m10_v2/test_family_signals_calculation.py.size_bytes: 19311
+input.tests/m10_v2/test_family_surface.py.sha256: 44bd444a5c17e8f2335817287e8b946f9269acadf8678c0654f7a3c2dbc95d21
+input.tests/m10_v2/test_family_surface.py.size_bytes: 17931
+input.tests/m10_v2/test_kernel_channel_states.py.sha256: a5c4b8f7e32c5416e9de4829dd3c7fc8e9d43ef7be1166e10d37b4e72b770f42
+input.tests/m10_v2/test_kernel_channel_states.py.size_bytes: 3904
+input.tests/m10_v2/test_kernel_mechanics.py.sha256: 9dbf17ceb13d4f62ff2f85b28a512c37360f5e38ea0b01c527765be958fb22a3
+input.tests/m10_v2/test_kernel_mechanics.py.size_bytes: 9352
+input.tests/m10_v2/test_kernel_refusals.py.sha256: 9fa717aaf8f8cd8a832c1239411680acea23cacbd9c30dffa2f2c5ceedcb0ac9
+input.tests/m10_v2/test_kernel_refusals.py.size_bytes: 4935
+input.tests/m10_v2/test_kernel_static_guards.py.sha256: 42ae3d5db267a76ed4c4b3a9f559409cfdc12cd0aa9d5298e1c556404aceedf9
+input.tests/m10_v2/test_kernel_static_guards.py.size_bytes: 5019
+input.tests/m10_v2/test_no_legacy_scorers.py.sha256: 69fb1ad26eb9d303e392d061ead59dc9945c0e005219f0fb235deed5cf970841
+input.tests/m10_v2/test_no_legacy_scorers.py.size_bytes: 15988
+input.tests/m10_v2/test_proof_family_index.py.sha256: 655db8a0c939533d348c088b33e8543395c2464afc523094701318f588931b75
+input.tests/m10_v2/test_proof_family_index.py.size_bytes: 19200
+input.tests/m10_v2/test_signals.py.sha256: e5745517876b1a40b3fcd683672e37d560185b6392cb5e88eead0023925366e3
+input.tests/m10_v2/test_signals.py.size_bytes: 11667
+input.tests/m10_v2/test_signals_calculation_refusals.py.sha256: b96a00fe01cf6d4890790e45ab86e6396447faffed434b927a8116daad3fad55
+input.tests/m10_v2/test_signals_calculation_refusals.py.size_bytes: 13664
+input.tests/m10_v2/test_signals_calculation_static_guards.py.sha256: 327db3c2da788b21c47e33429662a279c36627dbbd17510e2fd4c6bcf9bbab01
+input.tests/m10_v2/test_signals_calculation_static_guards.py.size_bytes: 4021
+input.tests/m10_v2/test_switch.py.sha256: 0ddf74dbbbb367eaacf8ef4d9dbdfb3fdd59af6db0fadaa4573ea58d54f95645
+input.tests/m10_v2/test_switch.py.size_bytes: 28426
+input.tests/m10_v2/test_v2_unreachable_from_production.py.sha256: dc65be54114a9ae53ac840b17b9a0154edfb7d6ede2495971a81957d5a2acf30
+input.tests/m10_v2/test_v2_unreachable_from_production.py.size_bytes: 3581
+input.tests/config/test_config_artifacts.py.sha256: 5801d62f13e911a1f22247ff7434e3c55fd914a944c2b5ccf21c1447f5a575a1
+input.tests/config/test_config_artifacts.py.size_bytes: 100968
+input.tests/config/helpers.py.sha256: 32a2ad122a09211b8f14eeafb0b3e9e5a6fef30e33f103da7a35d32e0e1c1307
+input.tests/config/helpers.py.size_bytes: 10788
+input.tests/support/pr04_fixtures.py.sha256: c60fb6fc5ddea9b50b093275e31b8a6abbef33c59f1ffc86a6c344e07f65f8e6
+input.tests/support/pr04_fixtures.py.size_bytes: 4972
+input.tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json.sha256: 8aaaa0c37d545fc267eb3816967b33547562b3f19c804fe963dabb2429c44d41
+input.tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json.size_bytes: 10149
+input.tests/fixtures/magic10_v2/thresholds_v2.fixture.json.sha256: 058a0b11032180e40ccfeddda3228290af994d5e6d828a92a4a2ef2a27903576
+input.tests/fixtures/magic10_v2/thresholds_v2.fixture.json.size_bytes: 543
+input.tests/fixtures/magic10/v2/goldens.json.sha256: 1f0a529eca6e678774955518f7d73e6e2765203f18f5b993334c9dda9dfac792
+input.tests/fixtures/magic10/v2/goldens.json.size_bytes: 31071
+input.fixtures/charts/bob.json.sha256: 18b5240c60fd631258c5fb90cd6b0cdcb81342d0e6f3480c280c3dcb424bd4c9
+input.fixtures/charts/bob.json.size_bytes: 486
+input.tools/config/artifacts.py.sha256: ec4448df69930123960b144604bfec2adea481a14a68b9900c7d13160e0bb4ca
+input.tools/config/artifacts.py.size_bytes: 56062
+input.tools/config/generate_config_artifacts.py.sha256: 3faf51979a66ba8e23a2a069e70810ae0d2d3fe18834901c86f3e4731d7f7186
+input.tools/config/generate_config_artifacts.py.size_bytes: 22564
+input.tools/evidence/update_evidence_index.py.sha256: adac08e1820d37663b51333a9840be8c27c5c0b06d3da9df3425baba9e4b616e
+input.tools/evidence/update_evidence_index.py.size_bytes: 282714
+input.tools/evidence/generate_hde_epic043_v2_proof_family_record.py.sha256: 42289a9c8519a8c008817cc8964184a4d2771f57ea45d8a2d307a3f0682d79b7
+input.tools/evidence/generate_hde_epic043_v2_proof_family_record.py.size_bytes: 32195
+tested_inputs.count: 39
+tested_inputs.sha256: 308f03ed8c9c332dbf14b00d1c212cf4e5f3da685083cb3d6ec172af0c831e65
+tested_state: the inputs above; this record carries no git state, and the PR result maps tested_inputs.sha256 to the attested head
+release.release_id: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+release.manifest_sha256_equals_release_id: true
+release.version: 2.0.0
+release.member_count: 52
+release.config_id: m10-relevance-centers-type-v2.0.0
+release.result_schema: magic10_result.v2
+release.compat_result_schema: magic10_compat_result.v2
+release.member.schemas/magic10_compat_result_v2.schema.json.sha256: e27895de7130a32612b521550d731e2f271d198255494cc535d9fde07ea843cf
+release.member.schemas/magic10_result_v2.schema.json.sha256: eb58967875bf39b828bec3843a37192afe633e3d061fb33ebd2cb6c39e908167
+fixture.configuration: tests/fixtures/magic10_v2/magic10_mechanics_v2.fixture.json
+fixture.configuration.config_id: m10-relevance-centers-type-v2.0.0
+fixture.configuration.equal_to: catalog/magic10_mechanics_v2.json except sources.thresholds.sha256
+fixture.thresholds: tests/fixtures/magic10_v2/thresholds_v2.fixture.json
+fixture.thresholds.equal_to: math/thresholds.json except categories[].maxima
+fixture.thresholds.maxima: [[24,49,74,100]]
+family.command: python -m pytest -q -p no:cacheprovider --basetemp <temporary> --junitxml <temporary> tests/m10_v2 tests/config/test_config_artifacts.py::test_compare_goldens_admits_the_real_root
+family.environment: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV PYTHONDONTWRITEBYTECODE=1
+family.index: tests/m10_v2/test_proof_family_index.py
+family.items: 29
+family.indexed_nodes: 126
+family.cases.total: 435
+family.cases.passed: 435
+family.cases.failed: 0
+family.cases.errors: 0
+family.cases.skipped: 0
+basis.active_release.stands_because: the cases admit the repository root, or compare the goldens at it
+basis.active_release_and_fixture_bundle.stands_because: the surface part admits the repository root; the fixture part's rule depends on neither the maxima nor the release identity
+basis.fixture_bundle.stands_because: each item's rule depends on neither the maxima nor the release identity, and the fixture configuration equals the cut configuration except sources.thresholds.sha256 (checked below)
+basis.static.stands_because: static analysis of the committed source
+basis.temporary_root.stands_because: loader rules over constructed roots; no release identity is involved
+item.F-01.text: Per-member channels, centers, components, motor_to_throat, Type from the Gate set only, aura classes; union
+item.F-01.basis: fixture bundle
+item.F-01.due: now
+item.F-01.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-01.passing.1: tests/m10_v2/test_family_kernel.py::test_f01_member_and_union_mechanics cases=1 passed=1
+item.F-01.passing.2: tests/m10_v2/test_kernel_mechanics.py::test_derived_type_and_member_mechanics cases=6 passed=6
+item.F-01.passing.3: tests/m10_v2/test_kernel_mechanics.py::test_type_cases_cover_every_type_aura_class_and_predicate_value cases=1 passed=1
+item.F-01.passing.4: tests/m10_v2/test_kernel_mechanics.py::test_union_mechanics_when_only_the_union_defines_centers cases=1 passed=1
+item.F-01.passing.5: tests/m10_v2/test_kernel_mechanics.py::test_derived_type_ignores_a_contradicting_stored_vendor_type cases=1 passed=1
+item.F-01.mutation.1: tests/m10_v2/test_family_kernel.py::test_f01_mutation_aura_class_is_refused cases=1 refused=1
+item.F-01.mutation.2: tests/m10_v2/test_family_kernel.py::test_f01_mutation_motor_to_throat_route_is_refused cases=1 refused=1
+item.F-01.result: PASS
+item.F-02.text: The four center outcomes for every center, with owner; motor→Throat
+item.F-02.basis: fixture bundle
+item.F-02.due: now
+item.F-02.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-02.passing.1: tests/m10_v2/test_family_kernel.py::test_f02_every_outcome_on_every_center cases=9 passed=9
+item.F-02.passing.2: tests/m10_v2/test_family_kernel.py::test_f02_witnesses_cover_every_center cases=1 passed=1
+item.F-02.passing.3: tests/m10_v2/test_kernel_mechanics.py::test_center_and_motor_throat_outcomes cases=5 passed=5
+item.F-02.passing.4: tests/m10_v2/test_kernel_mechanics.py::test_outcome_cases_cover_each_outcome_and_owner cases=1 passed=1
+item.F-02.mutation.1: tests/m10_v2/test_family_kernel.py::test_f02_mutation_shared_and_mutual_swapped_is_refused cases=1 refused=1
+item.F-02.result: PASS
+item.F-03.text: Twenty signals in per-mille under the three v2 operations; zero results; half-up boundaries
+item.F-03.basis: fixture bundle
+item.F-03.due: now
+item.F-03.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-03.passing.1: tests/m10_v2/test_family_signals_calculation.py::test_f03_signals_in_per_mille cases=1 passed=1
+item.F-03.passing.2: tests/m10_v2/test_signals.py::test_zero_when_every_channel_state_is_none cases=1 passed=1
+item.F-03.passing.3: tests/m10_v2/test_signals.py::test_ordinary_signal_maximum_is_800_or_833_never_1000 cases=18 passed=18
+item.F-03.passing.4: tests/m10_v2/test_signals.py::test_ordinary_signal_midpoint cases=18 passed=18
+item.F-03.passing.5: tests/m10_v2/test_signals.py::test_rhu_rounds_half_up_on_its_own_integer_arguments cases=11 passed=11
+item.F-03.passing.6: tests/m10_v2/test_signals.py::test_no_ordinary_signal_has_an_exact_half_real_input cases=1 passed=1
+item.F-03.passing.7: tests/m10_v2/test_signals.py::test_equilibrium_score cases=5 passed=5
+item.F-03.passing.8: tests/m10_v2/test_signals.py::test_counterweight_ratio cases=5 passed=5
+item.F-03.mutation.1: tests/m10_v2/test_family_signals_calculation.py::test_f03_mutation_half_down_rounding_is_refused cases=1 refused=1
+item.F-03.mutation.2: tests/m10_v2/test_family_signals_calculation.py::test_f03_mutation_companionship_not_mutual_is_refused cases=1 refused=1
+item.F-03.result: PASS
+item.F-04.text: C_k, Z_k and T_k for all ten categories, every pair rule, the clamp of T_k to 0..1000
+item.F-04.basis: fixture bundle
+item.F-04.due: now
+item.F-04.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-04.passing.1: tests/m10_v2/test_family_signals_calculation.py::test_f04_components_and_pair_rules cases=1 passed=1
+item.F-04.passing.2: tests/m10_v2/test_calculation_components.py::test_channel_component_on_real_pairs cases=1 passed=1
+item.F-04.passing.3: tests/m10_v2/test_calculation_components.py::test_center_component_mapped cases=8 passed=8
+item.F-04.passing.4: tests/m10_v2/test_calculation_components.py::test_center_component_balance_counts_the_nine_centers_only cases=5 passed=5
+item.F-04.passing.5: tests/m10_v2/test_calculation_components.py::test_type_component_and_every_pair_rule cases=15 passed=15
+item.F-04.passing.6: tests/m10_v2/test_calculation_components.py::test_every_rule_is_shown_holding_and_not_holding cases=1 passed=1
+item.F-04.passing.7: tests/m10_v2/test_calculation_components.py::test_type_component_clamp_on_its_own_arguments cases=7 passed=7
+item.F-04.passing.8: tests/m10_v2/test_calculation_components.py::test_type_component_clamp_cannot_act_on_an_admitted_bundle cases=1 passed=1
+item.F-04.mutation.1: tests/m10_v2/test_family_signals_calculation.py::test_f04_mutation_unclamped_type_component_is_refused cases=1 refused=1
+item.F-04.mutation.2: tests/m10_v2/test_family_signals_calculation.py::test_f04_mutation_dropped_pair_rule_is_refused cases=1 refused=1
+item.F-04.result: PASS
+item.F-05.text: Score rule: C_k = 0 and Z_k = 0 scores 0; otherwise one ROUND_HALF_UP of 60/25/15, clamped 0..100
+item.F-05.basis: fixture bundle
+item.F-05.due: now
+item.F-05.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-05.passing.1: tests/m10_v2/test_family_signals_calculation.py::test_f05_score_rule cases=1 passed=1
+item.F-05.passing.2: tests/m10_v2/test_calculation_components.py::test_zero_rule_and_score cases=1 passed=1
+item.F-05.passing.3: tests/m10_v2/test_calculation_components.py::test_score_clamp_on_its_own_arguments cases=5 passed=5
+item.F-05.passing.4: tests/m10_v2/test_calculation_components.py::test_score_clamp_cannot_act_on_an_admitted_bundle cases=1 passed=1
+item.F-05.mutation.1: tests/m10_v2/test_family_signals_calculation.py::test_f05_mutation_type_scoring_alone_is_refused cases=1 refused=1
+item.F-05.mutation.2: tests/m10_v2/test_family_signals_calculation.py::test_f05_mutation_rounding_down_is_refused cases=1 refused=1
+item.F-05.result: PASS
+item.F-06.text: Band assignment from each category's own inclusive maxima at every edge
+item.F-06.basis: active release
+item.F-06.due: WU-PR-13
+item.F-06.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-06.passing.1: tests/m10_v2/test_family_signals_calculation.py::test_f06_band_at_every_edge_against_the_cut_maxima cases=1 passed=1
+item.F-06.passing.2: tests/m10_v2/test_family_signals_calculation.py::test_f06_band_at_every_edge_of_every_category cases=1 passed=1
+item.F-06.passing.3: tests/m10_v2/test_calculation_bands.py::test_band_at_every_edge_of_each_category cases=10 passed=10
+item.F-06.passing.4: tests/m10_v2/test_calculation_bands.py::test_real_pairs_land_in_their_own_categorys_bands cases=1 passed=1
+item.F-06.passing.5: tests/m10_v2/test_calculation_bands.py::test_test_maxima_differ_by_category cases=1 passed=1
+item.F-06.mutation.1: tests/m10_v2/test_family_signals_calculation.py::test_f06_mutation_exclusive_maxima_at_the_cut_is_refused cases=1 refused=1
+item.F-06.mutation.2: tests/m10_v2/test_family_signals_calculation.py::test_f06_mutation_exclusive_maxima_is_refused cases=1 refused=1
+item.F-06.result: PASS
+item.F-07.text: Integer-only arithmetic; no viewer preferences, presets or caller weights
+item.F-07.basis: static
+item.F-07.due: now
+item.F-07.ran_against: no release: static source analysis
+item.F-07.passing.1: tests/m10_v2/test_family_signals_calculation.py::test_f07_integer_only_and_exactly_four_inputs cases=1 passed=1
+item.F-07.passing.2: tests/m10_v2/test_kernel_static_guards.py::test_no_binary_floating_point_in_the_package cases=1 passed=1
+item.F-07.passing.3: tests/m10_v2/test_calculation_result.py::test_calculation_reads_no_file_and_takes_exactly_four_inputs cases=1 passed=1
+item.F-07.mutation.1: tests/m10_v2/test_family_signals_calculation.py::test_f07_mutation_a_float_operation_is_flagged cases=1 refused=1
+item.F-07.mutation.2: tests/m10_v2/test_family_signals_calculation.py::test_f07_mutation_a_caller_weight_input_is_refused cases=1 refused=1
+item.F-07.result: PASS
+item.F-08.text: pair_key under the v2 config_id, the magic10:v2: cache key, the v2 release, result and compat schema closure, q 0..1000
+item.F-08.basis: active release
+item.F-08.due: WU-PR-13
+item.F-08.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-08.passing.1: tests/m10_v2/test_family_identity_and_reader.py::test_f08_identity_cache_key_and_schema_closure_on_the_admitted_release cases=1 passed=1
+item.F-08.passing.2: tests/m10_v2/test_family_identity_and_reader.py::test_f08_identity_cache_key_and_schema_closure cases=1 passed=1
+item.F-08.passing.3: tests/m10_v2/test_calculation_result.py::test_pair_key_is_the_v2_identity cases=1 passed=1
+item.F-08.passing.4: tests/m10_v2/test_calculation_result.py::test_result_validates_and_follows_the_governed_order cases=13 passed=13
+item.F-08.passing.5: tests/m10_v2/test_compat_result.py::test_cache_key_is_the_loader_key_and_differs_from_v1 cases=1 passed=1
+item.F-08.passing.6: tests/m10_v2/test_compat_result.py::test_schema_accepts_q_at_both_ends cases=2 passed=2
+item.F-08.passing.7: tests/m10_v2/test_compat_result.py::test_schema_refuses_q_outside_its_integer_domain cases=5 passed=5
+item.F-08.mutation.1: tests/m10_v2/test_family_identity_and_reader.py::test_f08_mutation_pair_key_without_the_release_is_refused cases=1 refused=1
+item.F-08.mutation.2: tests/m10_v2/test_family_identity_and_reader.py::test_f08_mutation_v1_cache_key_prefix_on_the_admitted_release_is_refused cases=1 refused=1
+item.F-08.mutation.3: tests/m10_v2/test_family_identity_and_reader.py::test_f08_mutation_pair_key_without_config_id_is_refused cases=1 refused=1
+item.F-08.mutation.4: tests/m10_v2/test_family_identity_and_reader.py::test_f08_mutation_cache_key_prefix_is_refused cases=1 refused=1
+item.F-08.result: PASS
+item.F-09.text: Configuration-mutation rejection under the v2 loader rules
+item.F-09.basis: temporary root
+item.F-09.due: now
+item.F-09.ran_against: a temporary root over the repository's catalog, math and schemas with the labelled fixtures
+item.F-09.passing.1: tests/m10_v2/test_family_config_rejection.py::test_f09_configuration_mutation_rejection cases=1 passed=1
+item.F-09.mutation.1: tests/m10_v2/test_family_config_rejection.py::test_f09_mutation_owning_schema_not_applied_is_refused cases=1 refused=1
+item.F-09.result: PASS
+item.F-10.text: The v2 goldens M10-G001 to M10-G008 in both pair orders at the cut maxima; M10-G001 is 0 in every category, Cool
+item.F-10.basis: active release
+item.F-10.due: WU-PR-10
+item.F-10.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-10.passing.1: tests/m10_v2/test_family_goldens.py::test_goldens_document_holds_m10_g001_to_m10_g008 cases=1 passed=1
+item.F-10.passing.2: tests/m10_v2/test_family_goldens.py::test_m10_g001_in_both_pair_orders cases=1 passed=1
+item.F-10.passing.3: tests/m10_v2/test_family_goldens.py::test_m10_g002_and_m10_g004_in_both_pair_orders cases=1 passed=1
+item.F-10.passing.4: tests/m10_v2/test_family_goldens.py::test_m10_g003_owner_split_with_the_owners_swapped cases=1 passed=1
+item.F-10.passing.5: tests/m10_v2/test_family_goldens.py::test_m10_g006_band_boundaries_at_each_categorys_cut_maxima cases=1 passed=1
+item.F-10.passing.6: tests/m10_v2/test_family_goldens.py::test_every_golden_matches_the_cut_release_in_both_pair_orders cases=1 passed=1
+item.F-10.passing.7: tests/config/test_config_artifacts.py::test_compare_goldens_admits_the_real_root cases=1 passed=1
+item.F-10.mutation.1: tests/m10_v2/test_family_goldens.py::test_m10_g001_mutation_changed_band_is_refused cases=1 refused=1
+item.F-10.mutation.2: tests/m10_v2/test_family_goldens.py::test_m10_g001_mutation_channel_completing_pair_is_refused cases=1 refused=1
+item.F-10.mutation.3: tests/m10_v2/test_family_goldens.py::test_m10_g004_mutation_changed_score_is_refused cases=1 refused=1
+item.F-10.mutation.4: tests/m10_v2/test_family_goldens.py::test_m10_g006_mutation_fixture_maxima_are_refused cases=1 refused=1
+item.F-10.mutation.5: tests/m10_v2/test_family_goldens.py::test_mutation_order_dependent_core_is_refused_as_pair_order cases=1 refused=1
+item.F-10.result: PASS
+item.F-11.text: The complete five-state truth table over Channel endpoint-ownership patterns
+item.F-11.basis: fixture bundle
+item.F-11.due: now
+item.F-11.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-11.passing.1: tests/m10_v2/test_family_kernel.py::test_f11_f12_five_states_over_all_36_channels cases=1 passed=1
+item.F-11.passing.2: tests/m10_v2/test_kernel_channel_states.py::test_exhaustive_channel_state_table cases=36 passed=36
+item.F-11.mutation.1: tests/m10_v2/test_family_kernel.py::test_f11_f12_mutation_compromise_reported_as_dominance_is_refused cases=1 refused=1
+item.F-11.result: PASS
+item.F-12.text: All 36 Channels in every reachable state
+item.F-12.basis: fixture bundle
+item.F-12.due: now
+item.F-12.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-12.passing.1: tests/m10_v2/test_family_kernel.py::test_f11_f12_five_states_over_all_36_channels cases=1 passed=1
+item.F-12.passing.2: tests/m10_v2/test_kernel_channel_states.py::test_channel_roster_matches_the_bundle cases=1 passed=1
+item.F-12.mutation.1: tests/m10_v2/test_family_kernel.py::test_f11_f12_mutation_compromise_reported_as_dominance_is_refused cases=1 refused=1
+item.F-12.result: PASS
+item.F-13.text: Every default Channel-to-signal row
+item.F-13.basis: fixture bundle
+item.F-13.due: now
+item.F-13.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-13.passing.1: tests/m10_v2/test_family_signals_calculation.py::test_f13_every_default_channel_to_signal_row cases=1 passed=1
+item.F-13.passing.2: tests/m10_v2/test_signals.py::test_register_ids_pairs_maps_and_operations_are_unchanged cases=1 passed=1
+item.F-13.mutation.1: tests/m10_v2/test_family_signals_calculation.py::test_f13_mutation_dropped_row_is_refused cases=1 refused=1
+item.F-13.mutation.2: tests/m10_v2/test_family_signals_calculation.py::test_f13_mutation_moved_channel_is_refused cases=1 refused=1
+item.F-13.result: PASS
+item.F-14.text: Gate normalization: the canonical domain accepted; missing, empty, duplicate, malformed or out-of-range refused
+item.F-14.basis: fixture bundle
+item.F-14.due: now
+item.F-14.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-14.passing.1: tests/m10_v2/test_family_kernel.py::test_f14_gate_normalization_and_mask_domain cases=1 passed=1
+item.F-14.passing.2: tests/m10_v2/test_kernel_refusals.py::test_mask_outside_the_domain_is_refused cases=10 passed=10
+item.F-14.passing.3: tests/m10_v2/test_kernel_mechanics.py::test_domain_boundary_masks_are_accepted cases=1 passed=1
+item.F-14.mutation.1: tests/m10_v2/test_family_kernel.py::test_f14_mutation_zero_mask_accepted_is_refused cases=1 refused=1
+item.F-14.result: PASS
+item.F-15.text: Complete-matrix atomicity
+item.F-15.basis: fixture bundle
+item.F-15.due: now
+item.F-15.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-15.passing.1: tests/m10_v2/test_family_signals_calculation.py::test_f15_complete_matrix_or_refusal cases=1 passed=1
+item.F-15.mutation.1: tests/m10_v2/test_family_signals_calculation.py::test_f15_mutation_partial_matrix_is_refused cases=1 refused=1
+item.F-15.result: PASS
+item.F-16.text: AB/BA identity
+item.F-16.basis: fixture bundle
+item.F-16.due: now
+item.F-16.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-16.passing.1: tests/m10_v2/test_family_signals_calculation.py::test_f16_ab_ba_identity cases=1 passed=1
+item.F-16.passing.2: tests/m10_v2/test_calculation_result.py::test_result_is_symmetric_deterministic_and_immutable cases=13 passed=13
+item.F-16.passing.3: tests/m10_v2/test_compat_result.py::test_bytes_are_canonical_symmetric_and_repeatable cases=1 passed=1
+item.F-16.mutation.1: tests/m10_v2/test_family_signals_calculation.py::test_f16_mutation_order_dependent_kernel_is_refused cases=1 refused=1
+item.F-16.result: PASS
+item.F-17.text: Two-run identity
+item.F-17.basis: fixture bundle
+item.F-17.due: now
+item.F-17.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-17.passing.1: tests/m10_v2/test_family_signals_calculation.py::test_f17_two_run_identity cases=1 passed=1
+item.F-17.passing.2: tests/m10_v2/test_calculation_result.py::test_result_is_symmetric_deterministic_and_immutable cases=13 passed=13
+item.F-17.mutation.1: tests/m10_v2/test_family_signals_calculation.py::test_f17_mutation_run_dependent_kernel_is_refused cases=1 refused=1
+item.F-17.result: PASS
+item.F-18.text: Absence of UID hashing and Type-only fallback
+item.F-18.basis: static
+item.F-18.due: WU-PR-09
+item.F-18.ran_against: no release: static source analysis
+item.F-18.passing.1: tests/m10_v2/test_no_legacy_scorers.py::test_no_uid_hash_scorer_in_production cases=1 passed=1
+item.F-18.passing.2: tests/m10_v2/test_no_legacy_scorers.py::test_no_production_module_imports_a_removed_module cases=1 passed=1
+item.F-18.passing.3: tests/m10_v2/test_no_legacy_scorers.py::test_the_removed_files_are_absent cases=1 passed=1
+item.F-18.mutation.1: tests/m10_v2/test_no_legacy_scorers.py::test_each_guard_fails_on_a_constructed_positive_and_passes_a_clean_root cases=1 refused=1
+item.F-18.result: PASS
+item.F-19.text: Production no-import and no-symbol-use proof for the historical numeric-Gate compromise helper
+item.F-19.basis: static
+item.F-19.due: now
+item.F-19.ran_against: no release: static source analysis
+item.F-19.passing.1: tests/m10_v2/test_no_legacy_scorers.py::test_no_numeric_gate_compromise_helper_in_production cases=1 passed=1
+item.F-19.mutation.1: tests/m10_v2/test_no_legacy_scorers.py::test_each_guard_fails_on_a_constructed_positive_and_passes_a_clean_root cases=1 refused=1
+item.F-19.result: PASS
+item.F-20.text: Corrected reader.v1 schema closure; numeric-free public Reader proof
+item.F-20.basis: fixture bundle
+item.F-20.due: now
+item.F-20.ran_against: the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-20.passing.1: tests/m10_v2/test_family_identity_and_reader.py::test_f20_reader_projection_is_numeric_free cases=1 passed=1
+item.F-20.passing.2: tests/m10_v2/test_compat_reader_projection.py::test_projection_matches_its_schema_and_is_numeric_free cases=6 passed=6
+item.F-20.passing.3: tests/m10_v2/test_compat_reader_projection.py::test_projection_depends_on_bands_alone cases=2 passed=2
+item.F-20.mutation.1: tests/m10_v2/test_family_identity_and_reader.py::test_f20_mutation_a_numeric_field_is_refused cases=1 refused=1
+item.F-20.result: PASS
+item.F-21.text: Manifest and release-binding rejection, manifest-row part (v2 loader)
+item.F-21.basis: temporary root
+item.F-21.due: now
+item.F-21.ran_against: a temporary root over the repository's catalog, math and schemas with the labelled fixtures
+item.F-21.passing.1: tests/m10_v2/test_family_config_rejection.py::test_f21_manifest_row_rejection cases=1 passed=1
+item.F-21.mutation.1: tests/m10_v2/test_family_config_rejection.py::test_f21_mutation_unchecked_manifest_rows_is_refused cases=1 refused=1
+item.F-21.result: PASS
+item.F-21b.text: Manifest and release-binding rejection, release-binding part (admission)
+item.F-21b.basis: active release
+item.F-21b.due: WU-PR-10
+item.F-21b.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-21b.passing.1: tests/m10_v2/test_family_surface.py::test_f21b_release_binding_rejection cases=1 passed=1
+item.F-21b.mutation.1: tests/m10_v2/test_family_surface.py::test_f21b_mutation_unbound_member_admitted_is_refused cases=1 refused=1
+item.F-21b.result: PASS
+item.F-22.text: Valid identical self-pair short-circuit: no core, narrative, cache or pair_key
+item.F-22.basis: active release
+item.F-22.due: WU-PR-09
+item.F-22.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-22.passing.1: tests/m10_v2/test_family_surface.py::test_f22_self_pair_short_circuit cases=1 passed=1
+item.F-22.mutation.1: tests/m10_v2/test_family_surface.py::test_f22_mutation_self_pair_evaluated_is_refused cases=1 refused=1
+item.F-22.result: PASS
+item.F-23.text: Same canonical identity with unequal normalized projections rejected as ERR_READER_INVALID_CHART
+item.F-23.basis: active release
+item.F-23.due: WU-PR-09
+item.F-23.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-23.passing.1: tests/m10_v2/test_family_surface.py::test_f23_same_identity_unequal_projection_is_refused cases=1 passed=1
+item.F-23.mutation.1: tests/m10_v2/test_family_surface.py::test_f23_mutation_inconsistent_self_treated_as_self_is_refused cases=1 refused=1
+item.F-23.result: PASS
+item.F-24.text: Distinct-person equal-mask intrinsic identity: equal fingerprints and one identity-free pair_key
+item.F-24.basis: active release and fixture bundle
+item.F-24.due: WU-PR-09
+item.F-24.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0; and the labelled fixture bundle: config_id m10-relevance-centers-type-v2.0.0, a synthetic release_id, the fixture maxima
+item.F-24.passing.1: tests/m10_v2/test_family_surface.py::test_f24_equal_masks_of_distinct_people_share_one_identity_free_pair_key cases=1 passed=1
+item.F-24.passing.2: tests/m10_v2/test_family_identity_and_reader.py::test_f24_equal_masks_give_one_identity_free_v2_pair_key cases=1 passed=1
+item.F-24.mutation.1: tests/m10_v2/test_family_surface.py::test_f24_mutation_identity_in_the_pair_preimage_is_refused cases=1 refused=1
+item.F-24.mutation.2: tests/m10_v2/test_family_identity_and_reader.py::test_f24_mutation_identity_in_the_v2_preimage_is_refused cases=1 refused=1
+item.F-24.result: PASS
+item.F-25.text: Equal-mask personal-key orientation by ASCII canonical UUID tie-break, with AB/BA byte identity
+item.F-25.basis: active release
+item.F-25.due: WU-PR-09
+item.F-25.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-25.passing.1: tests/m10_v2/test_family_surface.py::test_f25_equal_mask_orientation_by_uuid_tie_break cases=1 passed=1
+item.F-25.mutation.1: tests/m10_v2/test_family_surface.py::test_f25_mutation_request_order_kept_on_a_tie_is_refused cases=1 refused=1
+item.F-25.result: PASS
+item.F-26.text: Independent public Reader idempotence; a self-pair and an equal-mask pair never share bytes or idempotence_hash
+item.F-26.basis: active release
+item.F-26.due: WU-PR-09
+item.F-26.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-26.passing.1: tests/m10_v2/test_family_surface.py::test_f26_self_pair_and_equal_mask_pair_never_share_public_bytes cases=1 passed=1
+item.F-26.mutation.1: tests/m10_v2/test_family_surface.py::test_f26_mutation_eligibility_outside_the_preimage_is_refused cases=1 refused=1
+item.F-26.result: PASS
+item.F-27.text: CLI, internal HTTP, compat and Reader-projection parity
+item.F-27.basis: active release
+item.F-27.due: WU-PR-09
+item.F-27.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-27.passing.1: tests/m10_v2/test_family_surface.py::test_f27_cli_internal_http_compat_and_reader_parity cases=1 passed=1
+item.F-27.mutation.1: tests/m10_v2/test_family_surface.py::test_f27_mutation_one_surface_diverges_is_refused cases=1 refused=1
+item.F-27.result: PASS
+item.F-28.text: Exact PF05 error token and HTTP mapping for every fail-closed condition
+item.F-28.basis: active release
+item.F-28.due: WU-PR-09
+item.F-28.ran_against: the admitted root: release_id be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0, config_id m10-relevance-centers-type-v2.0.0
+item.F-28.passing.1: tests/m10_v2/test_family_surface.py::test_f28_token_and_status_mapping_agree cases=1 passed=1
+item.F-28.passing.2: tests/m10_v2/test_family_surface.py::test_f28_surfaces_emit_the_mapped_token_and_status cases=1 passed=1
+item.F-28.mutation.1: tests/m10_v2/test_family_surface.py::test_f28_mutation_reader_status_out_of_mapping_is_refused cases=1 refused=1
+item.F-28.mutation.2: tests/m10_v2/test_family_surface.py::test_f28_mutation_http_status_out_of_mapping_is_refused cases=1 refused=1
+item.F-28.result: PASS
+goldens.collection: tests/fixtures/magic10/v2/goldens.json
+goldens.collection_sha256: 1f0a529eca6e678774955518f7d73e6e2765203f18f5b993334c9dda9dfac792
+goldens.candidate_release_id: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+goldens.config_id: m10-relevance-centers-type-v2.0.0
+goldens.orders: both pair orders, at the cut maxima, through tools/config/artifacts.py compare_goldens
+goldens.case.M10-G001: match
+goldens.case.M10-G002: match
+goldens.case.M10-G003: match
+goldens.case.M10-G004: match
+goldens.case.M10-G005: match
+goldens.case.M10-G006: match
+goldens.case.M10-G007: match
+goldens.case.M10-G008: match
+goldens.match: 8 of 8
+nonvacuity.rule: a mutation counts as refused only on a failed assertion or the product's own typed refusal; no module that holds a mutation case has a handler for Exception, BaseException or a bare except
+nonvacuity.mutation_modules: 7
+nonvacuity.mutation_modules.paths: tests/m10_v2/test_family_config_rejection.py,tests/m10_v2/test_family_goldens.py,tests/m10_v2/test_family_identity_and_reader.py,tests/m10_v2/test_family_kernel.py,tests/m10_v2/test_family_signals_calculation.py,tests/m10_v2/test_family_surface.py,tests/m10_v2/test_no_legacy_scorers.py
+nonvacuity.broad_handlers: 0
+nonvacuity.F-24.case: tests/m10_v2/test_family_surface.py::test_f24_mutation_identity_in_the_pair_preimage_is_refused
+nonvacuity.F-24.refused: refused by the product's own typed refusal: evaluate_pair's fail-closed pair_key guard raises CompatBoundaryError(result_schema, detail=pair_key), and the case asserts that cause
+nonvacuity.F-21.case: tests/m10_v2/test_family_config_rejection.py::test_f21_mutation_unchecked_manifest_rows_is_refused
+nonvacuity.F-21.refused: refused by a genuine assertion: with the row-form, uniqueness and order rules dropped, the not-a-manifest-entry sub-case gives M10V2_CONFIGURATION_ROW_MISSING where M10V2_INVALID_MANIFEST_ROWS is required
+nonvacuity.pin.1: tests/m10_v2/test_proof_family_index.py::test_no_mutation_module_converts_an_arbitrary_exception cases=1 passed=1
+nonvacuity.pin.2: tests/m10_v2/test_proof_family_index.py::test_the_handler_pin_refuses_a_broad_handler cases=1 passed=1
+command.write: python tools/evidence/generate_hde_epic043_v2_proof_family_record.py --actor <actor>
+command.check: python tools/evidence/generate_hde_epic043_v2_proof_family_record.py --check
+result_record: the validation pair, admission, the cut, bundle and integration records' --check, the unchanged-history proof and the exact-source attestation of the attested head with its predicate table are recorded in the unit's PR_IMPLEMENTATION_RESULT in amthorn78/glow-docs
+limitation.1: no live run: no production, vendor, database or network access
+limitation.2: interpreter: run.python locally; hosted CI's interpreter may differ
+limitation.3: evidence of the tested inputs named above only; a later state must pass --check (RK-11)
+limitation.4: the fixture-bundle items stand on the configuration equality checked here, not on a run over the cut maxima
+limitation.5: the validation and the exact-source attestation of the attested head are recorded in the unit's PR_IMPLEMENTATION_RESULT in amthorn78/glow-docs, not in this record (C-13)
+limitation.6: establishes no QA verdict, acceptance, PF09 movement, Ops, deployment or closure
+items.pass: 29
+status: COMPLETE
