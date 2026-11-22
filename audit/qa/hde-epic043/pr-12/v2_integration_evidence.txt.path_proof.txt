@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic043/pr-12/v2_integration_evidence.txt
+size_bytes: 24192
+sha256: 162b0c62eb6b0d4c06f8e538fb95e1752785048d02d6eec795c08b08923acb83
+mtime_utc: 2026-11-22T08:39:48Z
+produced_at_utc: 2026-11-20T05:17:35Z

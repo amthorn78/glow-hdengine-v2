@@ -1,0 +1,276 @@
+schema: hde_epic043_v2_integration_evidence.v1
+epic_id: HDE-EPIC043
+task_id: HDE-CONJ010
+subtask_ids: HDE-CONJ010.6
+work_unit_id: WU-PR-12
+run.time_utc: 2026-11-22T08:33:30Z
+run.actor: HDE-EPIC043 WU-PR-12 dedicated PR session (PR-30), https://claude.ai/code/session_01Q789u3mtrmhqMKMLc4gRD9
+run.python: 3.12.3
+input.catalog/manifest.json.sha256: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+input.catalog/manifest.json.size_bytes: 6803
+input.tools/score_distribution/reference_corpus_v1.json.sha256: 740d1a3acc2557832431ac4fd14f69223ed6c2cb402329619af97e8e66c8a873
+input.tools/score_distribution/reference_corpus_v1.json.size_bytes: 443169
+input.tools/score_distribution/reference_baseline_v1.json.sha256: 6d5d85fa64d94728766533966894734d3c35f3baaf8ba95114b516e980b706e2
+input.tools/score_distribution/reference_baseline_v1.json.size_bytes: 1195
+input.tests/fixtures/magic10/v2/goldens.json.sha256: 1f0a529eca6e678774955518f7d73e6e2765203f18f5b993334c9dda9dfac792
+input.tests/fixtures/magic10/v2/goldens.json.size_bytes: 31071
+input.goldens/reader/v1/g01_minimal_ineligible.json.sha256: 93ab201691f61ea5ce9d657bf932b413e5f38f7155593899f1d9074e0262141b
+input.goldens/reader/v1/g01_minimal_ineligible.json.size_bytes: 283
+input.goldens/reader/v1/g02_ab_ba_parity_A.jsonl.sha256: eab612160f7e3e69d207c53f9b327c30c64f7f3e3d083c29a99f8fcd418068e3
+input.goldens/reader/v1/g02_ab_ba_parity_A.jsonl.size_bytes: 624
+input.goldens/reader/v1/g02_ab_ba_parity_B.jsonl.sha256: eab612160f7e3e69d207c53f9b327c30c64f7f3e3d083c29a99f8fcd418068e3
+input.goldens/reader/v1/g02_ab_ba_parity_B.jsonl.size_bytes: 624
+input.goldens/reader/v1/g03_harmony_open.json.sha256: 976c46365936b189341fb12bb380c60ef9960210a2259ae1d1726f0642df470c
+input.goldens/reader/v1/g03_harmony_open.json.size_bytes: 312
+input.goldens/reader/v1/g04_harmony_warm.json.sha256: fc6dd4dd9c60658347701f5afbe98aec550b5c7e78a18dc5e9ad455df3c84125
+input.goldens/reader/v1/g04_harmony_warm.json.size_bytes: 312
+input.goldens/reader/v1/g05_harmony_cool.json.sha256: bd68ed151d162a5a54c2dab955b8f754583d95032888cbb6f22df008b0551e77
+input.goldens/reader/v1/g05_harmony_cool.json.size_bytes: 312
+input.goldens/reader/v1/g07_harmony_glow.json.sha256: 1319badc97ac057430041831a962079bbecee95ca740061411aba8f085404186
+input.goldens/reader/v1/g07_harmony_glow.json.size_bytes: 312
+input.goldens/reader/v2/g01_ineligible.json.sha256: fcf2d41793ab62f2eee7fddb26f4ca638a37027189d25719e5de80d39d0f0803
+input.goldens/reader/v2/g01_ineligible.json.size_bytes: 283
+input.tools/score_distribution/score_distribution.py.sha256: 479d516be4cdb885674644c425ee52e0451b93965619eb23e48e463aee473ec0
+input.tools/score_distribution/score_distribution.py.size_bytes: 35222
+input.tools/config/artifacts.py.sha256: ec4448df69930123960b144604bfec2adea481a14a68b9900c7d13160e0bb4ca
+input.tools/config/artifacts.py.size_bytes: 56062
+input.scripts/hdctl.py.sha256: 760a9e4e77e8926deeeca40b03a71b79a99c52d3c84bdcee243fb25129580316
+input.scripts/hdctl.py.size_bytes: 636
+input.tools/presenter/generate_presenter_artifacts.py.sha256: 1a9bd0aed6e211abcaf4312b7e2526f779cf0cb43cc71c8c435a7a938970a8cc
+input.tools/presenter/generate_presenter_artifacts.py.size_bytes: 5435
+input.tools/cli/generate_showcompat_parity_artifacts.py.sha256: 8853c92b67d63e3fec7299059de8683daf196e1ef09080a40606233a36bf9e2b
+input.tools/cli/generate_showcompat_parity_artifacts.py.size_bytes: 3711
+input.tools/evidence/run_showcompat_artifacts.py.sha256: 80ae8ffe7899d4fa7b045f718cc912c72a6bacbdca08fda760931aa387928170
+input.tools/evidence/run_showcompat_artifacts.py.size_bytes: 8095
+input.scripts/cli/canonical_harness.py.sha256: 65cd33f6ae473bc7c798c923b8812f27f499dd7148271948bf161659db31332e
+input.scripts/cli/canonical_harness.py.size_bytes: 4705
+input.scripts/validate/public_bytes_check.py.sha256: d3e790c343ad43ce248effb553c44e701052655f5f17b5d178fd2fb9815bd903
+input.scripts/validate/public_bytes_check.py.size_bytes: 966
+input.scripts/validate/sidecar_check.py.sha256: 2af4f97240d8dc35a7e0e26b1b253437045788c24fafd0d4765dc0a06c463f7f
+input.scripts/validate/sidecar_check.py.size_bytes: 3286
+input.tools/evidence/generate_hde_epic043_v2_integration_evidence.py.sha256: 850818e62cc9d53fd0db43034c4b088e5ca15fdab4ec25675f8ceb45170ac81f
+input.tools/evidence/generate_hde_epic043_v2_integration_evidence.py.size_bytes: 62606
+tested_inputs.count: 22
+tested_inputs.sha256: d0738f4db845303f597bc41b1aa9d208a0033b132a6826bc6c7405f3cf81ab8e
+tested_state: the inputs above; this record carries no git state, and the PR result maps tested_inputs.sha256 to the tested commit
+release.release_id: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+release.manifest_sha256_equals_release_id: true
+release.version: 2.0.0
+release.member_count: 52
+release.config_id: m10-relevance-centers-type-v2.0.0
+release.result_schema: magic10_result.v2
+release.compat_result_schema: magic10_compat_result.v2
+release.admission: _load_active_mechanics_bundle_from_root at the repository root
+set.goldens.path: tests/fixtures/magic10/v2/goldens.json
+set.goldens.cases: M10-G001,M10-G002,M10-G003,M10-G004,M10-G005,M10-G006,M10-G007,M10-G008
+set.corpus.path: tools/score_distribution/reference_corpus_v1.json
+set.corpus.sha256: 740d1a3acc2557832431ac4fd14f69223ed6c2cb402329619af97e8e66c8a873
+set.corpus.people: 2000
+set.corpus.pairs: 20000
+set.surface.rule: for each (category, band), the first corpus pair in corpus order whose AB result has that band in that category; then the golden application parties
+set.surface.corpus_indices: [0,1,2,3,4,5,6,8,13,15,18,27]
+set.surface.golden_parties: M10-G005.pair_1,M10-G005.pair_2,M10-G007,M10-G008
+set.surface.pairs: 16
+set.surface.orders: ab,ba
+set.surface.party_form: complete mapped chart: the golden collection's constants.synthetic_projection_fields with the party's Gates and identity
+set.failure_rows: FT-1,FT-2,FT-3,FT-4,FT-5,FT-6,FT-7,FT-8
+class.full_matrix.owning_source: HDE Math Spec §5.2 and §9.5
+class.full_matrix.entrypoint: engine.compat.compute.evaluate_pair, the once-admitted bundle as bundle_provider
+class.full_matrix.set: corpus
+class.full_matrix.pairs: 20000
+class.full_matrix.results_complete: 20000
+class.full_matrix.result_fields: schema,config_id,release_id,pair_key,signals(20),categories(10: category_id,score,band)
+class.full_matrix.matrix_sha256: 932fba8cc6ae0e4889899761774e4156eb9b59c9b673b9722bd3851b5436d4cc
+class.full_matrix.band_counts.overall: {"Cool":59379,"Open":70026,"Warm":51360,"Glow":19235}
+class.full_matrix.band_counts.harmony: {"Cool":6127,"Open":6722,"Warm":5332,"Glow":1819}
+class.full_matrix.band_counts.heat: {"Cool":6148,"Open":6667,"Warm":5344,"Glow":1841}
+class.full_matrix.band_counts.communication: {"Cool":6242,"Open":6542,"Warm":5261,"Glow":1955}
+class.full_matrix.band_counts.alignment: {"Cool":6135,"Open":6794,"Warm":5290,"Glow":1781}
+class.full_matrix.band_counts.comfort: {"Cool":5755,"Open":6999,"Warm":5342,"Glow":1904}
+class.full_matrix.band_counts.consistency: {"Cool":6147,"Open":6617,"Warm":5267,"Glow":1969}
+class.full_matrix.band_counts.expansion: {"Cool":5621,"Open":7283,"Warm":5043,"Glow":2053}
+class.full_matrix.band_counts.creativity: {"Cool":5623,"Open":7742,"Warm":4533,"Glow":2102}
+class.full_matrix.band_counts.drive: {"Cool":5735,"Open":7391,"Warm":5051,"Glow":1823}
+class.full_matrix.band_counts.balance: {"Cool":5846,"Open":7269,"Warm":4897,"Glow":1988}
+class.full_matrix.baseline.path: tools/score_distribution/reference_baseline_v1.json
+class.full_matrix.baseline.release_id: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+class.full_matrix.baseline.equal: true
+class.full_matrix.result: PASS
+class.ab_ba_two_run.owning_source: HDE Math Spec §9.5 Prove
+class.ab_ba_two_run.ab_ba.corpus.pairs: 20000
+class.ab_ba_two_run.ab_ba.corpus.byte_identical: 20000
+class.ab_ba_two_run.ab_ba.surface.pairs: 16
+class.ab_ba_two_run.ab_ba.surface.byte_identical_at: evaluate_pair,cli,http,reader_v1,reader_v2
+class.ab_ba_two_run.ab_ba.goldens: every case checked in both pair orders (pair_order); M10-G002 and M10-G004 ab_ba_identity true
+class.ab_ba_two_run.two_run.surface.in_process: 16
+class.ab_ba_two_run.two_run.surface.cli: 16
+class.ab_ba_two_run.two_run.surface.http: 16
+class.ab_ba_two_run.two_run.goldens: M10-G002 and M10-G004 two_run_identity true; M10-G008 two_run_bytes_identical true
+class.ab_ba_two_run.two_run.corpus: reproduced by every --check of this record, a second process over the same inputs, through class.full_matrix.matrix_sha256
+class.ab_ba_two_run.result: PASS
+class.pair_cache_identity.owning_source: HDE Math Spec §5.2.2
+class.pair_cache_identity.construction: chart_fingerprint and magic10_pair_preimage.v1 rebuilt by this writer: members by numeric Gate mask, config_id, release_id, result_schema magic10_result.v2
+class.pair_cache_identity.pair_key_equal: 20000
+class.pair_cache_identity.cache_key_form: magic10:v2:<pair_key>
+class.pair_cache_identity.cache_key_equal.corpus: 20000
+class.pair_cache_identity.cache_key_equal.surface: 30
+class.pair_cache_identity.stable_across_order_and_runs: true (class ab_ba_two_run)
+class.pair_cache_identity.distinct_pair_keys: 19992
+class.pair_cache_identity.distinct_mask_pairs: 19992
+class.pair_cache_identity.prior_identity: config m10-channel-state-v1.0.0, release 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129, result_schema magic10_result.v1, cache prefix magic10:v1:
+class.pair_cache_identity.distinct_from_prior: 20000
+class.pair_cache_identity.result: PASS
+class.uid_independence.owning_source: HDE Math Spec §9.5 M10-G005
+class.uid_independence.goldens: M10-G005 match
+class.uid_independence.surface.eligible_pairs: 15
+class.uid_independence.surface.variants_per_pair: 2
+class.uid_independence.surface.identical: 30
+class.uid_independence.scope: intrinsic content and pair_key; not eligibility, narrative orientation or Reader bytes
+class.uid_independence.result: PASS
+class.result_schema.owning_source: schemas/magic10_result_v2.schema.json and schemas/magic10_compat_result_v2.schema.json (release members)
+class.result_schema.path_validated: 20000
+class.result_schema.schemas/magic10_result_v2.schema.json.validated: 20000
+class.result_schema.schemas/magic10_compat_result_v2.schema.json.validated: 20000
+class.result_schema.validator: Draft 2020-12 over the committed schema bytes, strict integers
+class.result_schema.adverse_refused: schemas/magic10_result_v2.schema.json:score_101,schemas/magic10_result_v2.schema.json:band_hot,schemas/magic10_result_v2.schema.json:signal_missing,schemas/magic10_result_v2.schema.json:extra_key,schemas/magic10_result_v2.schema.json:bool_score,schemas/magic10_compat_result_v2.schema.json:score_101,schemas/magic10_compat_result_v2.schema.json:band_hot,schemas/magic10_compat_result_v2.schema.json:signal_missing,schemas/magic10_compat_result_v2.schema.json:extra_key,schemas/magic10_compat_result_v2.schema.json:bool_score
+class.result_schema.result: PASS
+class.reader_projection.owning_source: Reader v1 and v2 contracts; schemas/reader.v1.schema.json; schemas/reader.v2.schema.json; goldens/reader/
+class.reader_projection.entrypoint: engine.magic10_v2.compat.reader_projection_v2 over compute_core; presenter/reader_v1/emitter.py for the goldens
+class.reader_projection.eligible_runs: 30
+class.reader_projection.validated: 30
+class.reader_projection.numeric_free: true
+class.reader_projection.hash_rule: idempotence_hash equals the SHA-256 of the canonical preimage
+class.reader_projection.cli_dump_equal: 32
+class.reader_projection.goldens_equal: goldens/reader/v1/g03_harmony_open.json,goldens/reader/v1/g04_harmony_warm.json,goldens/reader/v1/g05_harmony_cool.json,goldens/reader/v1/g07_harmony_glow.json,goldens/reader/v1/g02_ab_ba_parity_A.jsonl,goldens/reader/v1/g02_ab_ba_parity_B.jsonl,goldens/reader/v1/g01_minimal_ineligible.json,goldens/reader/v2/g01_ineligible.json
+class.reader_projection.m10_g007_v1_hash: 8214324eb0129ff1dc213a5d53bd9d7b3758a351032c5258f7ba28eace7adc15
+class.reader_projection.m10_g008_v1_hash: ae435ccc1f9d2043b4ee825f48c54ea421276d49d159b19271e46b24c04f2f6e
+class.reader_projection.m10_g008_v2_hash: ec996e4554f18f0dd27f9fcac54370c13e7c1f1dfe160cc4e458070c6f0319f9
+class.reader_projection.result: PASS
+class.failure_tokens.owning_source: errors/token_map/token_map.json; HDE CLI, API and Vendor Ref §§3.3, 4.1.4 and 5.2.3
+class.failure_tokens.surfaces: in process (resolve_compat_chart, evaluation_party, evaluate_pair); hdctl showcompat --pair-file; POST /api/compat/v1 (dev app test client)
+class.failure_tokens.rows: 8
+class.failure_tokens.FT-1.input: legacy birth-only party
+class.failure_tokens.FT-1.governed: ERR_M10_LEGACY_INPUT_UNSUPPORTED 422
+class.failure_tokens.FT-1.observed.in_process: ERR_M10_LEGACY_INPUT_UNSUPPORTED
+class.failure_tokens.FT-1.observed.cli: exit 1; stdout empty; stderr ERR_M10_LEGACY_INPUT_UNSUPPORTED
+class.failure_tokens.FT-1.observed.http: 422 ERR_M10_LEGACY_INPUT_UNSUPPORTED; Cache-Control no-store; error_v1 four keys; no number
+class.failure_tokens.FT-1.result: PASS
+class.failure_tokens.FT-2.input: legacy ID-only party
+class.failure_tokens.FT-2.governed: ERR_M10_LEGACY_INPUT_UNSUPPORTED 422
+class.failure_tokens.FT-2.observed.in_process: ERR_M10_LEGACY_INPUT_UNSUPPORTED
+class.failure_tokens.FT-2.observed.cli: exit 1; stdout empty; stderr ERR_M10_LEGACY_INPUT_UNSUPPORTED
+class.failure_tokens.FT-2.observed.http: 422 ERR_M10_LEGACY_INPUT_UNSUPPORTED; Cache-Control no-store; error_v1 four keys; no number
+class.failure_tokens.FT-2.result: PASS
+class.failure_tokens.FT-3.input: complete chart with no gates key
+class.failure_tokens.FT-3.governed: ERR_M10_GATES_MISSING 422
+class.failure_tokens.FT-3.observed.in_process: ERR_READER_MISSING_PARAM
+class.failure_tokens.FT-3.observed.cli: exit 1; stdout empty; stderr ERR_READER_MISSING_PARAM
+class.failure_tokens.FT-3.observed.http: 422 ERR_READER_MISSING_PARAM; Cache-Control no-store; error_v1 four keys; no number
+class.failure_tokens.FT-3.result: BASELINE_FAILURE_DISCLOSED
+class.failure_tokens.FT-3.cause: BOUNDARY_REASONS in engine/compat/error_tokens.py (a release member, since HDE-EPIC040-PR04) maps gates_missing to ERR_READER_MISSING_PARAM and gates_invalid to ERR_READER_INVALID_CHART on the application surfaces; the CLI/API canon names ERR_M10_GATES_MISSING and ERR_M10_GATES_INVALID (422) for an internal or CLI complete-chart input; not fixed here (a release-member change)
+class.failure_tokens.FT-4.input: complete chart with an empty Gate array
+class.failure_tokens.FT-4.governed: ERR_M10_GATES_MISSING 422
+class.failure_tokens.FT-4.observed.in_process: ERR_READER_MISSING_PARAM
+class.failure_tokens.FT-4.observed.cli: exit 1; stdout empty; stderr ERR_READER_MISSING_PARAM
+class.failure_tokens.FT-4.observed.http: 422 ERR_READER_MISSING_PARAM; Cache-Control no-store; error_v1 four keys; no number
+class.failure_tokens.FT-4.result: BASELINE_FAILURE_DISCLOSED
+class.failure_tokens.FT-4.cause: BOUNDARY_REASONS in engine/compat/error_tokens.py (a release member, since HDE-EPIC040-PR04) maps gates_missing to ERR_READER_MISSING_PARAM and gates_invalid to ERR_READER_INVALID_CHART on the application surfaces; the CLI/API canon names ERR_M10_GATES_MISSING and ERR_M10_GATES_INVALID (422) for an internal or CLI complete-chart input; not fixed here (a release-member change)
+class.failure_tokens.FT-5.input: Gate 65
+class.failure_tokens.FT-5.governed: ERR_M10_GATES_INVALID 422
+class.failure_tokens.FT-5.observed.in_process: ERR_READER_INVALID_CHART
+class.failure_tokens.FT-5.observed.cli: exit 1; stdout empty; stderr ERR_READER_INVALID_CHART
+class.failure_tokens.FT-5.observed.http: 422 ERR_READER_INVALID_CHART; Cache-Control no-store; error_v1 four keys; no number
+class.failure_tokens.FT-5.result: BASELINE_FAILURE_DISCLOSED
+class.failure_tokens.FT-5.cause: BOUNDARY_REASONS in engine/compat/error_tokens.py (a release member, since HDE-EPIC040-PR04) maps gates_missing to ERR_READER_MISSING_PARAM and gates_invalid to ERR_READER_INVALID_CHART on the application surfaces; the CLI/API canon names ERR_M10_GATES_MISSING and ERR_M10_GATES_INVALID (422) for an internal or CLI complete-chart input; not fixed here (a release-member change)
+class.failure_tokens.FT-6.input: a duplicate Gate
+class.failure_tokens.FT-6.governed: ERR_M10_GATES_INVALID 422
+class.failure_tokens.FT-6.observed.in_process: ERR_READER_INVALID_CHART
+class.failure_tokens.FT-6.observed.cli: exit 1; stdout empty; stderr ERR_READER_INVALID_CHART
+class.failure_tokens.FT-6.observed.http: 422 ERR_READER_INVALID_CHART; Cache-Control no-store; error_v1 four keys; no number
+class.failure_tokens.FT-6.result: BASELINE_FAILURE_DISCLOSED
+class.failure_tokens.FT-6.cause: BOUNDARY_REASONS in engine/compat/error_tokens.py (a release member, since HDE-EPIC040-PR04) maps gates_missing to ERR_READER_MISSING_PARAM and gates_invalid to ERR_READER_INVALID_CHART on the application surfaces; the CLI/API canon names ERR_M10_GATES_MISSING and ERR_M10_GATES_INVALID (422) for an internal or CLI complete-chart input; not fixed here (a release-member change)
+class.failure_tokens.FT-7.input: a non-integer Gate
+class.failure_tokens.FT-7.governed: ERR_M10_GATES_INVALID 422
+class.failure_tokens.FT-7.observed.in_process: ERR_READER_INVALID_CHART
+class.failure_tokens.FT-7.observed.cli: exit 1; stdout empty; stderr ERR_READER_INVALID_CHART
+class.failure_tokens.FT-7.observed.http: 422 ERR_READER_INVALID_CHART; Cache-Control no-store; error_v1 four keys; no number
+class.failure_tokens.FT-7.result: BASELINE_FAILURE_DISCLOSED
+class.failure_tokens.FT-7.cause: BOUNDARY_REASONS in engine/compat/error_tokens.py (a release member, since HDE-EPIC040-PR04) maps gates_missing to ERR_READER_MISSING_PARAM and gates_invalid to ERR_READER_INVALID_CHART on the application surfaces; the CLI/API canon names ERR_M10_GATES_MISSING and ERR_M10_GATES_INVALID (422) for an internal or CLI complete-chart input; not fixed here (a release-member change)
+class.failure_tokens.FT-8.input: the same UUID with unequal complete projections
+class.failure_tokens.FT-8.governed: ERR_READER_INVALID_CHART 422
+class.failure_tokens.FT-8.observed.in_process: ERR_READER_INVALID_CHART
+class.failure_tokens.FT-8.observed.cli: exit 1; stdout empty; stderr ERR_READER_INVALID_CHART
+class.failure_tokens.FT-8.observed.http: 422 ERR_READER_INVALID_CHART; Cache-Control no-store; error_v1 four keys; no number
+class.failure_tokens.FT-8.result: PASS
+class.failure_tokens.rows_pass: 3
+class.failure_tokens.rows_disclosed: 5
+class.failure_tokens.cause: BOUNDARY_REASONS in engine/compat/error_tokens.py (a release member, since HDE-EPIC040-PR04) maps gates_missing to ERR_READER_MISSING_PARAM and gates_invalid to ERR_READER_INVALID_CHART on the application surfaces; the CLI/API canon names ERR_M10_GATES_MISSING and ERR_M10_GATES_INVALID (422) for an internal or CLI complete-chart input; not fixed here (a release-member change)
+class.failure_tokens.result: BASELINE_FAILURE_DISCLOSED
+class.internal_parity.owning_source: the Plan's four surfaces: CLI, internal HTTP, compat and Reader projection
+class.internal_parity.cli: python scripts/hdctl.py showcompat --pair-file <temporary> --dump-reader <temporary>
+class.internal_parity.http: POST /api/compat/v1 through a test client of adapter.http_reader.create_app
+class.internal_parity.runs: 32
+class.internal_parity.cli_stdout_equal: 32
+class.internal_parity.http_body_equal: 32
+class.internal_parity.reader_dump_equal: 32
+class.internal_parity.result: PASS
+goldens.path: tests/fixtures/magic10/v2/goldens.json
+goldens.sha256: 1f0a529eca6e678774955518f7d73e6e2765203f18f5b993334c9dda9dfac792
+goldens.entrypoint: tools/config/artifacts.py compare_goldens(<repository root>)
+goldens.M10-G001: match
+goldens.M10-G002: match
+goldens.M10-G003: match
+goldens.M10-G004: match
+goldens.M10-G005: match
+goldens.M10-G006: match
+goldens.M10-G007: match
+goldens.M10-G008: match
+goldens.comparison: match
+baseline_failure.1.command: python tools/presenter/generate_presenter_artifacts.py --check
+baseline_failure.1.exit: 1
+baseline_failure.1.refusal: showcompat ab failed: rc=1, stderr=b'PROVIDER_REFUSED\n'
+baseline_failure.1.cause: it drives showcompat with birth arguments, which need a chart provider that closed rails refuse (Audit M-5)
+baseline_failure.1.observed: run by this writer under closed rails; exit and refusal as declared
+baseline_failure.2.command: python tools/cli/generate_showcompat_parity_artifacts.py --check
+baseline_failure.2.exit: 1
+baseline_failure.2.refusal: showcompat ab failed: rc=1, stderr=b'PROVIDER_REFUSED\n'
+baseline_failure.2.cause: it drives showcompat with birth arguments, which need a chart provider that closed rails refuse
+baseline_failure.2.observed: run by this writer under closed rails; exit and refusal as declared
+baseline_failure.3.command: python tools/evidence/run_showcompat_artifacts.py --check
+baseline_failure.3.exit: 1
+baseline_failure.3.refusal: showcompat failed (rc=1): ERR_M10_LEGACY_INPUT_UNSUPPORTED
+baseline_failure.3.cause: it sends birth-only stdin parties, which showcompat refuses as legacy input
+baseline_failure.3.observed: not run by this writer: it writes into the repository (its QA log and path proof, or its artifacts); measured by the WU-PR-12 PR-30 session in a throwaway worktree at the tested inputs
+baseline_failure.4.command: python scripts/cli/canonical_harness.py
+baseline_failure.4.exit: 1
+baseline_failure.4.refusal: showcompat failed during harness
+baseline_failure.4.cause: it sends birth-only stdin parties, which showcompat refuses as legacy input
+baseline_failure.4.observed: not run by this writer: it writes into the repository (its QA log and path proof, or its artifacts); measured by the WU-PR-12 PR-30 session in a throwaway worktree at the tested inputs
+baseline_failure.5.command: python scripts/validate/public_bytes_check.py
+baseline_failure.5.exit: 1
+baseline_failure.5.refusal: CalledProcessError
+baseline_failure.5.cause: it calls showcompat with flags hdctl no longer has (--birthdate --birthtime --place --tz ...), refused with exit 64
+baseline_failure.5.observed: run by this writer under closed rails; exit and refusal as declared
+baseline_failure.6.command: python scripts/validate/sidecar_check.py
+baseline_failure.6.exit: 2
+baseline_failure.6.refusal: unrecognized arguments
+baseline_failure.6.cause: it calls showcompat with flags hdctl no longer has (--birthdate ... --showmath --admin-out --admin)
+baseline_failure.6.observed: run by this writer under closed rails; exit and refusal as declared
+baseline_failure.count: 6
+baseline_failure.also_on_main: each fails identically at main 26158fcb (release 1.3.0)
+baseline_failure.fixed_here: none
+deferred.HDE-COAG003.8: live current-row Gate readiness: DEFERRED; not represented as achieved (C-09)
+deferred.HDE-COAG003.9: live DB Reader success: DEFERRED; not represented as achieved (C-09)
+command.writer: python tools/evidence/generate_hde_epic043_v2_integration_evidence.py --actor <run.actor>
+command.check: python tools/evidence/generate_hde_epic043_v2_integration_evidence.py --check
+limitation.1: no live run: no production, vendor, database or network access; the live parts are DEFERRED
+limitation.2: interpreter: run.python locally; hosted CI's interpreter may differ
+limitation.3: evidence of the tested inputs named above only; a later state must pass --check (RK-11, WU-PR-13)
+limitation.4: cache identity is the key and its preimage; no production surface passes an intrinsic cache to evaluate_pair
+limitation.5: failure tokens: the request-reachable conditions only; the configuration, manifest, result-schema, stale-result and stored-row tokens are pinned by tests/cli/test_errors_parity.py, tests/http/test_compat_endpoint_contract.py and tests/m10_v2/test_*_refusals.py
+limitation.6: Reader v2 g02 and g03 (a band vector no declared v2 result yields) and the Reader-route error goldens stay with tests/reader_v1/test_goldens.py
+limitation.7: internal HTTP is the dev app; the selected factory and WSGI apps are pinned to it by tests/adapter/test_compat_http_parity.py
+limitation.8: establishes no QA verdict, acceptance, PF09 movement, Ops, deployment or closure
+classes.pass: 7
+classes.baseline_failure_disclosed: 1
+status: COMPLETE

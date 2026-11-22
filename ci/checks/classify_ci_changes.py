@@ -901,6 +901,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     "tools/evidence/generate_hde_epic043_v2_bundle_evidence.py": (
         "tests/evidence/test_hde_epic043_v2_bundle_evidence.py",
     ),
+    # HDE-EPIC043 WU-PR-12: the Magic-10 v2 integration goldens and parity evidence (HDE-CONJ010.6).
+    "tools/evidence/generate_hde_epic043_v2_integration_evidence.py": (
+        "tests/evidence/test_hde_epic043_v2_integration_evidence.py",
+    ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
     "tests/evidence/test_evidence_tool_ownership.py"
