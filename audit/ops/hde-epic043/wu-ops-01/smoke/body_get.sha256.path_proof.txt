@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic043/wu-ops-01/smoke/body_get.sha256
+size_bytes: 65
+sha256: 3dc6e5997328b8e4feaf0fc5b145941091c247ab3372b4db7b88239339d19e8c
+mtime_utc: 2026-11-26T06:30:42Z
+produced_at_utc: 2026-11-20T05:17:35Z

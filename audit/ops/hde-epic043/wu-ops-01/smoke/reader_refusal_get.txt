@@ -1,0 +1,10 @@
+GET /reader?v=1
+status=403
+code=ERR_READER_FORBIDDEN
+cache_control=no-store
+etag_absent=true
+content_type=application/json; charset=utf-8
+numeric_free=true
+canonical_body=true
+route_source=docs/ENDPOINTS_CATALOG.json success_endpoints
+result=PASS

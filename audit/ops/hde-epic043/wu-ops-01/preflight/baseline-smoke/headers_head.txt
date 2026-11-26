@@ -1,0 +1,9 @@
+Request: HEAD /internal/version
+Status: 200
+Cache-Control: no-store
+Content-Length: 347
+Content-Type: application/json; charset=utf-8
+ETag: <absent>
+Body-Length: 0 bytes
+Body-SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+Result: PASS

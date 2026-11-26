@@ -1,0 +1,14 @@
+read: 1
+at_utc: 2026-11-26T06:23:54Z
+mode: EXECUTION
+request: GET /internal/version; headers sent: Accept: application/json; no credential header
+status: 200
+transport_error: <none>
+header.Content-Type: application/json; charset=utf-8
+header.Cache-Control: no-store
+header.Content-Length: 347
+header.ETag: <absent>
+body_sha256: 3cd498d11f556a5a98644a347bd8d82633e25d3c7bbfdbf2d3d2b6fee2bc9820
+served_release_id: 2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129
+expected_release_id: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+classification: MISMATCH

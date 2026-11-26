@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic043/wu-ops-01/smoke/headers_get.txt
+size_bytes: 262
+sha256: cba801a51e56aff3d131c4153fa3a42382b41c741e1c2013733bd323aa39a01b
+mtime_utc: 2026-11-26T06:30:42Z
+produced_at_utc: 2026-11-20T05:17:35Z

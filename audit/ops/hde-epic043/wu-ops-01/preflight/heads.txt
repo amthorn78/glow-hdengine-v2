@@ -1,0 +1,15 @@
+2026-11-26T06:13:56Z
+ce27daf34877bb6df4e13d8675ddbae503c3e794
+false
+0
+origin_ok=yes
+26158fcbc3c79eec311e9a802e5740076f7f57d9	refs/heads/main
+ce27daf34877bb6df4e13d8675ddbae503c3e794	refs/heads/release/hde-epic043-m10-v2
+e576a0b49c811555013428afaea2f0f7d6a04b37	refs/pull/873/head
+3953e84af9e19f58763d4351d1c2bb680f5607b7
+3953e84af9e19f58763d4351d1c2bb680f5607b7
+diff_attested_frozen_exit=0
+prior_is_ancestor_exit=0
+be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0  catalog/manifest.json
+2d5a4ec485fde5dd51004e0286fff1cb1211e4ee79fa71bc62b2a5ecd0b6c129  -
+pytest 8.4.2

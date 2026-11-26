@@ -1,0 +1,12 @@
+LC_ALL=C
+LANG=C
+TZ=UTC
+SAFE_MODE=0
+ALLOW_NETWORK=1
+DATABASE_URL=SET
+HTTPS_PROXY=UNSET
+retired_db_transport_keys=none
+target_app_env=prod
+ops_task_ref=HDE-EPIC043-WU-OPS-01-OPS-TASK-v1.0
+python=3.12.15
+server_rails=not_observable_over_http

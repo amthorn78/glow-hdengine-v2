@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic043/wu-ops-01/smoke/reader_refusal_get.txt
+size_bytes: 247
+sha256: a6528b03b05878c9208269edbf6ba9c6f2b70171b667005dda1972fe481ce1b6
+mtime_utc: 2026-11-26T06:30:42Z
+produced_at_utc: 2026-11-20T05:17:35Z
