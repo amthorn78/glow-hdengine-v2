@@ -1826,6 +1826,8 @@ SMOKE_FILES = (
 def smoke_repo(tmp_path: Path) -> Path:
     repo = tmp_path / "repo"
     shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    # Start from the absent state whether or not the real WU-OPS-01 capture is in the tree.
+    _strip_from_copy(repo, "audit/ops/hde-epic043")
     assert not (repo / "audit/ops/hde-epic043").exists()
     return repo
 
