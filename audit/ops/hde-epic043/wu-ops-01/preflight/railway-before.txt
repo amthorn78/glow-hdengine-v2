@@ -1,0 +1,9 @@
+observed_at_utc: 2026-11-26T06:19:33Z
+observer: PO for railway_environment, source_repository_and_branch and automatic_deploys_from_main (dashboard); PO-delegated agent for active_deployment_commit and active_deployment_status (Railway connector, read-only, at the PO's direction)
+railway_project: ample-illumination
+railway_environment: production
+railway_service: glow-hdengine-v2
+source_repository_and_branch: amthorn78/glow-hdengine-v2 main
+automatic_deploys_from_main: ON
+active_deployment_commit: 26158fcbc3c79eec311e9a802e5740076f7f57d9
+active_deployment_status: SUCCESS

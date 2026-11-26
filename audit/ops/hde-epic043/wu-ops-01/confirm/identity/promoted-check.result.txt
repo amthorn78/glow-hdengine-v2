@@ -1,0 +1,10 @@
+label: promoted-check
+mode: EXECUTION
+base_url: https://glow-hdengine-v2-production.up.railway.app
+expected_release_id: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
+reads_allowed: 15
+interval_seconds: 60
+reads_used: 2
+result: MATCH
+script_sha256: 8763b352f8d5efaf2b4172f95a110702cb1c7d7db83c8b78fa34f29e92810f6d
+nonclaims: no QA verdict; no acceptance; no PF09 status movement; not an INTVER evidence family artifact

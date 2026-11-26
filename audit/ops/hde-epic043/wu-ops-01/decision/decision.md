@@ -1,0 +1,11 @@
+# HDE-EPIC043 WU-OPS-01 decision
+- decided_at_utc: 2026-11-26T06:30:11Z
+- decided_by: PO
+- outcome: SUCCESS
+- preflight: all P-0 to P-10 PASS
+- promotion: main = ce27daf3 at 2026-11-26T06:23:53Z
+- identity_after_promotion: MATCH
+- railway_active_commit_equals_frozen: YES
+- post_deploy_smoke: exit 0, SMOKE_RESULT:PASS
+- rollback_executed: NO
+- cutover_outcome_met: YES

@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic043/wu-ops-01/smoke/success_writers_errors.txt
+size_bytes: 436
+sha256: 891bd24abaef3363f6698c7452485b4e2703b221e1afee5ecbcb3efb1c1ed801
+mtime_utc: 2026-11-26T06:30:42Z
+produced_at_utc: 2026-11-20T05:17:35Z

@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic043/wu-ops-01/smoke/db_posture_spot_check.json
+size_bytes: 1987
+sha256: c462a1e1c42863da62975007d91a5f78d2b3ecd72fe100b9aae7c4528098ab81
+mtime_utc: 2026-11-26T06:30:42Z
+produced_at_utc: 2026-11-20T05:17:35Z
