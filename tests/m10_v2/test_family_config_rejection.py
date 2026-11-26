@@ -65,9 +65,7 @@ def _refusal(root: Path, rows) -> str | None:
         v2.load_magic10_v2_bundle_from_root(root, rows)
     except SchemaValidationError as exc:
         return exc.code
-    except Exception as exc:  # a crash is not the named refusal; the check reports it
-        return f"UNEXPECTED:{type(exc).__name__}"
-    return None
+    return None  # any other exception propagates: a crash is never the named refusal
 
 
 # --- F-09 -------------------------------------------------------------------------------------
@@ -132,9 +130,13 @@ def test_f21_manifest_row_rejection(tmp_path) -> None:
 
 
 def test_f21_mutation_unchecked_manifest_rows_is_refused(tmp_path, monkeypatch) -> None:
-    def first_row(manifest_rows):
-        return list(manifest_rows)[0] if manifest_rows else ManifestEntry(CONFIG, "0" * 64, 1)
+    def selects_without_checking_rows(manifest_rows):
+        """The row-form, uniqueness and order rules dropped; the configuration row still selected."""
+        rows = [row for row in manifest_rows if type(row) is ManifestEntry and row.path == CONFIG]
+        if not rows:
+            raise SchemaValidationError("M10V2_CONFIGURATION_ROW_MISSING", "constructed mutation")
+        return rows[0]
 
-    monkeypatch.setattr(v2, "_check_manifest_rows", first_row)
+    monkeypatch.setattr(v2, "_check_manifest_rows", selects_without_checking_rows)
     with pytest.raises(AssertionError):
         _check_f21(tmp_path)

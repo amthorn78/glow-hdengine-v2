@@ -87,15 +87,17 @@ def _stub_router(category, band, perspective):
 
 
 def _check(function):
-    """A check reports any failure, a crash included, as ``AssertionError``."""
+    """A check reports a failed assertion, or the product's own typed refusal, as ``AssertionError``.
+
+    Any other exception propagates, so a mutation case cannot pass on an unrelated crash
+    (HDE-EPIC043 WU-PR-13; PF10 addendum 2.6 R-3).
+    """
     @functools.wraps(function)
     def wrapper(*args, **kwargs):
         try:
             return function(*args, **kwargs)
-        except AssertionError:
-            raise
-        except Exception as exc:
-            raise AssertionError(f"{function.__name__}: {type(exc).__name__}") from exc
+        except CompatBoundaryError as exc:
+            raise AssertionError(f"{function.__name__}: {exc}") from exc
     return wrapper
 
 
@@ -241,8 +243,11 @@ def test_f24_mutation_identity_in_the_pair_preimage_is_refused(monkeypatch) -> N
         return original(lo, hi, config_id=f"{config_id}:{lo.canonical_person_id}", release_id=release_id)
 
     monkeypatch.setattr(compute, "intrinsic_pair_key", with_identity)
-    with pytest.raises(AssertionError):
+    with pytest.raises(AssertionError) as refused:
         _check_f24()
+    # The product refuses the mutated rule: evaluate_pair's fail-closed pair_key guard.
+    cause = refused.value.__cause__
+    assert isinstance(cause, CompatBoundaryError) and (cause.reason, cause.detail) == ("result_schema", "pair_key")
 
 
 # --- F-25 -------------------------------------------------------------------------------------

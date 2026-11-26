@@ -6,7 +6,9 @@ The v2 bundle is admitted from a temporary root assembled exactly as
 fixtures of ``tests/fixtures/magic10_v2/`` at ``math/thresholds.json`` and
 ``catalog/magic10_mechanics_v2.json``. Those fixtures are non-canon: this bundle
 is not the cutover configuration, and no maxima value is asserted. The goldens
-run over ``v2_cut_bundle``, the governed cut bytes (HDE-EPIC043 WU-PR-10).
+run over ``v2_cut_bundle``, the governed cut bytes (HDE-EPIC043 WU-PR-10). The items
+re-targeted to the candidate (HDE-EPIC043 WU-PR-13) run over ``v2_admitted``, the
+repository root admitted as the active release.
 Nothing is written under the repository's own tree.
 
 Masks are built by the repository's own Gate normalizer, so every constructed
@@ -23,7 +25,7 @@ import pytest
 
 from engine.bodygraph.gates import normalize_gates
 from engine.config import magic10_v2_loader as v2
-from engine.config.registry_loader import ManifestEntry
+from engine.config.registry_loader import ManifestEntry, _load_active_mechanics_bundle_from_root
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests" / "fixtures" / "magic10_v2"
@@ -60,6 +62,12 @@ def v2_cut_bundle(tmp_path_factory: pytest.TempPathFactory) -> v2.Magic10V2Bundl
     assert raw == (ROOT / CONFIG).read_bytes() and (root / THRESHOLDS).read_bytes() == (ROOT / THRESHOLDS).read_bytes()
     rows = (ManifestEntry(CONFIG, hashlib.sha256(raw).hexdigest(), len(raw)),)
     return v2.load_magic10_v2_bundle_from_root(root, rows)
+
+
+@pytest.fixture(scope="session")
+def v2_admitted():
+    """HDE-EPIC043 WU-PR-13: the repository root admitted as the active release (the candidate)."""
+    return _load_active_mechanics_bundle_from_root(ROOT)
 
 
 @pytest.fixture(scope="session")

@@ -905,6 +905,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     "tools/evidence/generate_hde_epic043_v2_integration_evidence.py": (
         "tests/evidence/test_hde_epic043_v2_integration_evidence.py",
     ),
+    # HDE-EPIC043 WU-PR-13: the Magic-10 v2 proof family record on the candidate (HDE-DIST008.1).
+    "tools/evidence/generate_hde_epic043_v2_proof_family_record.py": (
+        "tests/evidence/test_hde_epic043_v2_proof_family_record.py",
+    ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
     "tests/evidence/test_evidence_tool_ownership.py"

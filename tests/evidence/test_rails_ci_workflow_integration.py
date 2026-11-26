@@ -853,6 +853,14 @@ def test_v2_integration_evidence_writer_selects_its_owner_test() -> None:
     )
 
 
+# HDE-EPIC043 WU-PR-13: the v2 proof family record writer (HDE-DIST008.1).
+def test_v2_proof_family_record_writer_selects_its_owner_test() -> None:
+    source = "tools/evidence/generate_hde_epic043_v2_proof_family_record.py"
+    assert classifier.changed_test_targets(ROOT, (source,)) == (
+        "tests/evidence/test_hde_epic043_v2_proof_family_record.py",
+    )
+
+
 def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
     assert classifier.changed_test_targets(ROOT, ("engine/bodygraph/gates.py",)) == (
         "tests/bodygraph/test_gates.py",

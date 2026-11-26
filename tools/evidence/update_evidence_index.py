@@ -3560,6 +3560,17 @@ EPIC043_PR12_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC043_PR13_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic043.pr13.v2_proof_family_record",
+        "discovered_physical_path": "audit/qa/hde-epic043/pr-13/v2_proof_family_record.txt",
+        "epic_id": "HDE-EPIC043",
+        "record_type": "epic043_pr13_evidence",
+        "schema_version": "1.0",
+        "notes": "HDE-EPIC043 WU-PR-13 Magic-10 v2 proof family record on the candidate (HDE-DIST008.1)",
+    },
+]
+
 EPIC042_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic042.qa_step_logs_manifest",
@@ -4735,6 +4746,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC043_PR10_PRIMARY_ARTIFACTS,
             *EPIC043_PR11_PRIMARY_ARTIFACTS,
             *EPIC043_PR12_PRIMARY_ARTIFACTS,
+            *EPIC043_PR13_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
