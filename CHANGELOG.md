@@ -1,5 +1,22 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC043: Magic10 v2 cutover, deployment and final repository documentation (WU-DOC-01)
+
+### Added
+- Operator runbooks `docs/runbooks/build_verify_release_rollback.md` and `docs/runbooks/incidents.md` (HDE-COAG003.1; WU-PR-06).
+- The post-deploy smoke harness `scripts/ops/post_deploy_smoke.py` (HDE-COAG003.5; WU-PR-06), Product Owner-authorized and never run as PR validation; its owner tests pass with or without the live capture (WU-PR-15).
+- The cutover guard `scripts/m10_cutover_guard.py` (HDE-COAG003.6; WU-PR-07): a read-only release preflight with four proofs, exiting 0 only when all pass.
+- The governed synthetic observation population `tools/score_distribution/observation_population_v1.json` and the `observation` mode of `tools/score_distribution/score_distribution.py` (HDE-FERM009; WU-PR-08), and its report `audit/qa/hde-epic043/pr-14/ferm009_observation_report.txt` (WU-PR-14).
+- The HDE-EPIC043 PR evidence records under `audit/qa/hde-epic043/pr-10/` to `pr-14/`, each written by its owner generator and indexed by `tools/evidence/update_evidence_index.py` (WU-PR-10 to WU-PR-14), and the Ops evidence under `audit/ops/hde-epic043/wu-ops-01/` (WU-OPS-01).
+
+### Changed
+- The switch (WU-PR-09): the surfaces and release admission moved to the Magic-10 v2 calculation, and v1 was retired.
+- The v2 cut (HDE-DIST008.2; WU-PR-10): release `2.0.0`, 52 members, `release_id` `be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0`, `config_id` `m10-relevance-centers-type-v2.0.0`; the release members `catalog/magic10_mechanics_v2.json` and the version-2 `math/thresholds.json`; the cut also wrote `artifacts/thresholds/band_edges.json` (`band_edges.v2`) and the v2 goldens `tests/fixtures/magic10/v2/goldens.json`, which are not release members.
+- The typed bundles carry the cut's maxima (WU-PR-11). WU-PR-13 recorded the final proof family, the validation pair and the attestation of the frozen candidate.
+- The promotion (HDE-COAG003.7; WU-OPS-01): the frozen candidate reached `main` on 2026-11-26 and was deployed; production served the v2 `release_id` and the post-deploy smoke passed. Release `1.3.0` (`m10-channel-state-v1.0.0`) is no longer admitted.
+- This documentation pass changes `AGENTS.md`, `README.md`, `docs/INDEX.md` and `CHANGELOG.md` (WU-DOC-01): it adds the HDE-EPIC043 posture, moves the HDE-EPIC042 posture to history and corrects the statements that described v2 as admitted only on the release candidate branch.
+- Nonclaims: no Reader shape changed. No QA verdict, acceptance, PF09 movement, canon drainage or closure is claimed.
+
 Unreleased — HDE-EPIC042: Separation v2 contract (WU-PR-02 to WU-PR-04) and final repository documentation (WU-DOC-01)
 
 ### Added
