@@ -861,6 +861,14 @@ def test_v2_proof_family_record_writer_selects_its_owner_test() -> None:
     )
 
 
+# HDE-EPIC043 WU-PR-14: the FERM009 observation report writer (HDE-FERM009).
+def test_ferm009_observation_report_writer_selects_its_owner_test() -> None:
+    source = "tools/evidence/generate_hde_epic043_ferm009_observation_report.py"
+    assert classifier.changed_test_targets(ROOT, (source,)) == (
+        "tests/evidence/test_hde_epic043_ferm009_observation_report.py",
+    )
+
+
 def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
     assert classifier.changed_test_targets(ROOT, ("engine/bodygraph/gates.py",)) == (
         "tests/bodygraph/test_gates.py",

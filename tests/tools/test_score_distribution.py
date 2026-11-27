@@ -387,7 +387,10 @@ def test_the_tool_is_never_a_public_surface() -> None:
     # the cut-record evidence writer reuses the tool's functions in process; it is not a surface.
     # HDE-EPIC043 WU-PR-12: the integration evidence writer reuses the corpus loader and the
     # reference party in process, as the cut record does; it is not a surface either.
+    # HDE-EPIC043 WU-PR-14: the FERM009 observation-report writer runs the observation command as a
+    # subprocess and imports the tool's constants; it is not a surface either.
     assert referencing == ["ci/checks/classify_ci_changes.py", "tools/evidence/generate_hde_epic043_cut_record.py",
+                           "tools/evidence/generate_hde_epic043_ferm009_observation_report.py",
                            "tools/evidence/generate_hde_epic043_v2_integration_evidence.py", GENERATOR_PATH]
     scripts = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["scripts"]
     assert scripts == {"hdctl": "engine.cli.main:cli"}

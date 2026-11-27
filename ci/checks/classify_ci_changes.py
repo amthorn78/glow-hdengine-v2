@@ -909,6 +909,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     "tools/evidence/generate_hde_epic043_v2_proof_family_record.py": (
         "tests/evidence/test_hde_epic043_v2_proof_family_record.py",
     ),
+    # HDE-EPIC043 WU-PR-14: the FERM009 observation report (HDE-FERM009).
+    "tools/evidence/generate_hde_epic043_ferm009_observation_report.py": (
+        "tests/evidence/test_hde_epic043_ferm009_observation_report.py",
+    ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
     "tests/evidence/test_evidence_tool_ownership.py"

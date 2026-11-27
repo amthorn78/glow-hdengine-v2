@@ -3,8 +3,8 @@ epic_id: HDE-EPIC043
 task_id: HDE-DIST008
 subtask_ids: HDE-DIST008.1
 work_unit_id: WU-PR-13
-run.time_utc: 2026-11-22T13:16:14Z
-run.actor: HDE-EPIC043 WU-PR-13 PR-30 session (Claude Code)
+run.time_utc: 2026-11-27T04:01:55Z
+run.actor: HDE-EPIC043 WU-PR-14 PR-30 session (Claude Code)
 run.python: 3.12.3
 input.catalog/manifest.json.sha256: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
 input.catalog/manifest.json.size_bytes: 6803
@@ -80,12 +80,12 @@ input.tools/config/artifacts.py.sha256: ec4448df69930123960b144604bfec2adea481a1
 input.tools/config/artifacts.py.size_bytes: 56062
 input.tools/config/generate_config_artifacts.py.sha256: 3faf51979a66ba8e23a2a069e70810ae0d2d3fe18834901c86f3e4731d7f7186
 input.tools/config/generate_config_artifacts.py.size_bytes: 22564
-input.tools/evidence/update_evidence_index.py.sha256: adac08e1820d37663b51333a9840be8c27c5c0b06d3da9df3425baba9e4b616e
-input.tools/evidence/update_evidence_index.py.size_bytes: 282714
+input.tools/evidence/update_evidence_index.py.sha256: 8c5118c6bf11891f66f597996a03c94d0ddbc71ace9103db7afa1e005d716f7c
+input.tools/evidence/update_evidence_index.py.size_bytes: 283196
 input.tools/evidence/generate_hde_epic043_v2_proof_family_record.py.sha256: 42289a9c8519a8c008817cc8964184a4d2771f57ea45d8a2d307a3f0682d79b7
 input.tools/evidence/generate_hde_epic043_v2_proof_family_record.py.size_bytes: 32195
 tested_inputs.count: 39
-tested_inputs.sha256: 308f03ed8c9c332dbf14b00d1c212cf4e5f3da685083cb3d6ec172af0c831e65
+tested_inputs.sha256: bf496c4e9153a2e5bf1aa42df63f8894d11ea3c60f688067744ae42f1cc7ea5f
 tested_state: the inputs above; this record carries no git state, and the PR result maps tested_inputs.sha256 to the attested head
 release.release_id: be9ec30aa100ba80c5ad9517ed3bfd2a42db9621a684769753403e01476046d0
 release.manifest_sha256_equals_release_id: true

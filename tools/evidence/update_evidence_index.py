@@ -3571,6 +3571,17 @@ EPIC043_PR13_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC043_PR14_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic043.pr14.ferm009_observation_report",
+        "discovered_physical_path": "audit/qa/hde-epic043/pr-14/ferm009_observation_report.txt",
+        "epic_id": "HDE-EPIC043",
+        "record_type": "epic043_pr14_evidence",
+        "schema_version": "1.0",
+        "notes": "HDE-EPIC043 WU-PR-14 FERM009 observation report (HDE-FERM009)",
+    },
+]
+
 EPIC042_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic042.qa_step_logs_manifest",
@@ -4747,6 +4758,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC043_PR11_PRIMARY_ARTIFACTS,
             *EPIC043_PR12_PRIMARY_ARTIFACTS,
             *EPIC043_PR13_PRIMARY_ARTIFACTS,
+            *EPIC043_PR14_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
