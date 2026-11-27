@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic043/pr-14/ferm009_observation_report.txt
+size_bytes: 15807
+sha256: e96b706844ff7b09296a64cbfb9fde8f06bb1ea97a73476d0356b1e7ad56a442
+mtime_utc: 2026-11-27T03:56:45Z
+produced_at_utc: 2026-11-20T05:17:35Z
